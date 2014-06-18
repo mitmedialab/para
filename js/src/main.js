@@ -1,4 +1,4 @@
-/* main.js */
+/* Filename: main.js */
 
 require.config({
 
@@ -6,18 +6,38 @@ require.config({
     baseUrl: "js/src",
     // Boost module timeout slightly for slower machines.
 	paths : {   
-        'jquery' : "../../bower_components/jquery/dist/jquery", //specific libraries -- can be specified later
-        'paper' : "../../bower_components/paper/dist/paper-full",
+        "jquery" : "../../bower_components/jquery/dist/jquery", //specific libraries -- can be specified later
+        "paper" : "../../bower_components/paper/dist/paper-full",
         "backbone" : "../../bower_components/backbone/backbone",
-        "underscore" : "../../bower_components/underscore/underscore"
+        "underscore" : "../../bower_components/underscore/underscore",
+        "mustache"  : "../../bower_components/mustache.js/mustache"
     },
     
     shim: {
-        "paper" : {
+        paper : {
             exports: "paper"
+        },
+        backbone: {
+        deps: ["underscore", "jquery"],
+        exports: "Backbone"
+        },
+
+        underscore: {
+         exports: "_"
         }
     },
 });
+
+require([
+  // Load our app module and pass it to our definition function
+  "app",
+
+], function(App){
+  // The "app" dependency is passed in as "App"
+  // Again, the other dependencies passed in are not "AMD" therefore don't pass a parameter to this function
+  App.initialize();
+});
+
 
 /**
  * **Main** Module
@@ -25,7 +45,7 @@ require.config({
  */
  
 
-define(function (require){
+/*define(function (require){
     "use strict";
     //jQuery, canvas and the app/sub module are all
     //loaded and can be used here now.
@@ -56,17 +76,6 @@ define(function (require){
 
     //var canvas = document.getElementById('canvas');
 	// Create an empty project and a view for the canvas:
-	/*paper.setup(canvas);
-  var path = new paper.Path();
-		// Give the stroke a color
-		path.strokeColor = 'black';
-		var start = new paper.Point(100, 100);
-		// Move to start and draw a line from there
-		path.moveTo(start);
-		// Note that the plus operator on Point objects does not work
-		// in JavaScript. Instead, we need to call the add() function:
-		path.lineTo(start.add([ 200, -50 ]));
-		// Draw the view now:
-		paper.view.draw();	console.log(rect.size); // { width: 200, height: 100 }*/
-});
+
+});*/
 
