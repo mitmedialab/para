@@ -6,14 +6,16 @@ require.config({
     baseUrl: "js/src",
     // Boost module timeout slightly for slower machines.
 	paths : {   
-        'jquery' : "../../bower_components/dist/jquery", //specific libraries -- can be specified later
-        'paper' : "../../bower_components/paper/dist/paper-full"
+        'jquery' : "../../bower_components/jquery/dist/jquery", //specific libraries -- can be specified later
+        'paper' : "../../bower_components/paper/dist/paper-full",
+        "backbone" : "../../bower_components/backbone/backbone",
+        "underscore" : "../../bower_components/underscore/underscore"
     },
     
     shim: {
-        'paper' : {
-            exports: 'paper'
-        },
+        "paper" : {
+            exports: "paper"
+        }
     },
 });
 
@@ -24,10 +26,11 @@ require.config({
  
 
 define(function (require){
+    "use strict";
     //jQuery, canvas and the app/sub module are all
     //loaded and can be used here now.
     var canvas = require("views/canvas");
-    var docCanvas = document.getElementById('canvas');
+    var docCanvas = document.getElementById("canvas");
     console.log(canvas.draw(docCanvas));
 
 
@@ -35,9 +38,9 @@ define(function (require){
     var PathNode = require("models/PathNode");
 
 
-     mySN = new SceneNode(null,"root");
-     mySN2 = new SceneNode(mySN,"child");
-     mySN3 = new PathNode(null,"subchild");
+     var mySN = new SceneNode(null,"root");
+     var mySN2 = new SceneNode(mySN,"child");
+    var  mySN3 = new PathNode(null,"subchild");
 
      console.log("adding child node="+mySN.addChildNode(mySN2));
     console.log("adding child node="+mySN2.addChildNode(mySN3));
