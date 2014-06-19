@@ -19,8 +19,8 @@ define([
     var paper = require('paper');
     var canvas= $('canvas').get(0);
     paper.setup(canvas);
-    
-    app_router.on('route:defaultAction', function (actions) {
+
+   app_router.on('route:defaultAction', function (actions) {
      
        // We have no matching route, lets display the home page 
         var drawingView = new DrawingView();

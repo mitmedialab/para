@@ -10,16 +10,15 @@ define(
 	], 
 
 	function(SceneNode){
-	"use strict";
-	var Backbone = require("backbone");
-	var Underscore = require("underscore");
+	"use strict"
+	
 	//constructor
  		function GeometryNode(node, name) {
  			SceneNode.call(this,node,name);
  			this.type="geom";
  		
     	}
-		//Underscore.extend(GeometryNode, Backbone.Events);
+		_.extend(GeometryNode, Backbone.Events);
 
 		GeometryNode.prototype = Object.create( SceneNode.prototype );
 	

@@ -15,6 +15,7 @@ define(
  		function PathNode(node, name) {
  			GeometryNode.call(this,node,name);
  			this.type="path";
+ 			this
  		
     	}
 	

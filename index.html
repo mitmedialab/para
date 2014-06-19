@@ -2,35 +2,90 @@
 <!--
 /*index.html*/
 -->
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
 
-    <title>Sketch1</title>
+  <title>Sketch 1</title>
 
-    <link rel="stylesheet" href="css/basic.css" type="text/css" media="screen">
+  <!-- Bootstrap core CSS -->
+  <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
-</head>
+  <!-- Custom styles for this template -->
+  <link href="css/basic.css" rel="stylesheet">
 
-<body>
-  
-    <div id="main" role="main">
-       <div id= "toolbar">
-        <div id="tools">
-            <button id="selectTool"><img src="images/select_tool_icon.png" width="28" height="28"/></li>
-            <button id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/></li>
-            <button id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/></li>
-        </div
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <![endif]-->
+    </head>
 
-       </div>
-       <div id = "propertyBar"></div>
-        <div id = "swatches"></div>
-       <div id="drawingBoard">
-             <canvas id="canvas" width="700" height="700"></canvas>
-        </div>
-    </div>
+    <body>
 
+      <div class="container">
+
+        <!-- Static navbar -->
+        <div class="navbar navbar-default" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">Sketch 1</a>
+            </div>
+            <div id = "toolbar" class="navbar-collapse collapse">
+              <button  class="btn btn-default btn-tool" id="selectTool"><span><img src="images/select_tool_icon.png" width="28" height="28"/></li>
+                <button class="btn btn-default btn-tool" id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/></li>
+                  <button class="btn btn-default btn-tool" id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/></li>
+                  </div><!--/.nav-collapse -->
+                </div><!--/.container-fluid -->
+              </div>
+
+            </div>
+
+              <!--draw container, contains canvas and object and property menus -->
+              <div id = "draw-container" class="container"><!--draw container-->
+
+                <div class = "row"> <!--master-row -->
+
+                 <div class="col-md-9"> <!--large column -->
+                   <div class = "row"> <!--row-->
+                     <div class = "col-md-12" id = "group-menu"><!--group-menu-->
+                      group menu
+                    </div><!--/group-menu-->
+                  </div><!--/row-->
+                    <div class = "row"> <!--row-->
+                    <div class = "col-md-12" id = "canvas-container"><!--canvas-container-->
+                     <canvas id="canvas" width="700" height="700"></canvas>
+                    </div><!--/canvas-container-->
+                  </div><!--/row-->
+                 </div> <!--/large column-->
+
+                 <div class="col-md-3">
+                  <div class="row">
+                    <div id = "prop-menu" class ="col-md-12"></div>
+                  </div>
+                  <div class = "row">
+                    <div id = "object-menu" class ="col-md-12"></div>
+                  </div>
+
+                </div>
+              </div><!--/master row -->
+            </div><!--/draw container-->
     
-     <script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>
+    <!-- Bootstrap core JavaScript
+    ================================================== 
+    Placed at the end of the document so the pages load faster -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- main application script -->
+    <script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>
 </body>
 </html>
