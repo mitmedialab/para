@@ -5,12 +5,10 @@ define([
   'backbone',
   'paper',
   'views/drawing/CanvasView',
-  'models/data/SceneNode',
-  'models/data/GeometryNode',
-  'models/data/PathNode',
+  'views/drawing/ToolView',
   'models/StateManagerModel'
 
-], function($, _, Backbone, paper, CanvasView, SceneNode, GeometryNode, PathNode, StateManagerModel) {
+], function($, _, Backbone, paper, CanvasView, ToolView, StateManagerModel) {
   
   var AppRouter = Backbone.Router.extend({
     routes: {// Default
@@ -31,6 +29,7 @@ define([
         var stateManager = new StateManagerModel();
         //setup the canvas view
         var canvasView = new CanvasView({el:'#canvas',model:stateManager});
+        var toolView = new ToolView({el:'#toolbar',model:stateManager});
         //bind update event to canvas view
         stateManager.on('change:update',canvasView.render);
 

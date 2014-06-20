@@ -28,15 +28,15 @@ define([
 
    render: function(){
       
-     var paper = PaperManager.getPaperInstance("canvas");
+    var paper = PaperManager.getPaperInstance("canvas");
     paper.view.draw();  
     
  
     },
 
     canvasMouseDown: function(event){
-      console.log(event);
-      this.model.canvasMouseDown(event.offsetX, event.offsetY)
+     // console.log(event);
+      this.model.canvasMouseDown(event);
     }
 
   });

@@ -18,7 +18,8 @@ define([
 
     initialize: function(){
       //call the super constructor
-      GeometryNode.prototype.initialize.call(this);
+      //GeometryNode.prototype.initialize.call(this);
+      console.log('initializing path node');
       this.paper = PaperManager.getPaperInstance('path');
       this.path = new this.paper.Path();
       console.log('path stroke color='+this.get('strokeColor'));
@@ -26,7 +27,8 @@ define([
     },
 
     addPoint: function(x,y){
-      this.path.add(new paper.Point(x, y));
+      
+      this.path.add(new this.paper.Point(x, y));
     },
 
     draw: function(){

@@ -13,11 +13,11 @@ define ([
  	var SceneNode = Backbone.Model.extend({	
         defaults: {
             type: 'default',
-            name:'foo',
+            name:'',
             
         },
  		
-    initialize: function(){
+    constructor: function(){
        this.parent = null;
        this.children= [];
  		//console.log("name="+name);
@@ -25,7 +25,12 @@ define ([
  		//console.log("parent="+node.name);
  		
  		SceneNode.numNodeInstances++;
+        Backbone.Model.apply(this, arguments);
  		//console.log("number of nodes="+SceneNode.numNodeInstances);
+    },
+
+    initialize: function(){
+
     },
 /*================ SceneNode method defintions ================*/
 
@@ -79,7 +84,7 @@ define ([
 //setsparent node. 
 //If node already has a parent, it removes itself from the parent's this.children
         setParentNode: function(node){
-            console.log("parent="+this.parent);
+            console.log('parent='+this.parent);
             if(node!==null){
                 if(this.parent!== null){
                     this.parent.removeChildNode(this);

@@ -5,29 +5,58 @@ define([
   'jquery',
   'underscore',
   'backbone',
-   'models/data/PathNode'
+  'models/data/SceneNode',
+  'models/tools/ToolCollection',
+  'models/tools/PenToolModel',
+  'models/tools/PolyToolModel',
+  'models/tools/SelectToolModel'
 
-], function($, _, Backbone,PathNode) {
-  var currentPath;
+], function($, _, Backbone,SceneNode, ToolCollection, PenToolModel,PolyToolModel,SelectToolModel) {
+  var rootNode,
+  	toolCollection,
+  	penTool,
+  	polyTool,
+  	selectTool;
+
+
   var StateManagerModel = Backbone.Model.extend({
 
   	 defaults: {
-    'state':  'shapeDraw',
+    'state':  'selectTool',
   	},
 
   	initialize: function(){
-  //setup the root node
-        /*var rootNode = new SceneNode({name:'root'});
-         rootNode.addChildNode(pathNode1);
-        rootNode.update();*/
+        penTool = new PenToolModel({id:'penTool'});
+        selectTool = new SelectToolModel({id:'selectTool'});
+        polyTool = new PolyToolModel({id:'polyTool'});
+
+        toolCollection = new ToolCollection([penTool,selectTool,polyTool]);
+        toolCollection.on('change:shapeAdded',this.shapeAdded);
+        rootNode = new SceneNode({name:'root'});
+
+  	},
+
+  	setState: function(state){
+  		this.set('state',state);
+  		toolCollection.get(this.get('state')).reset();
+  		console.log(this.get('state'));
+
+  	},
+
+
+  	shapeAdded: function(shape){
+  		console.log('event triggered');
+  		rootNode.addChildNode(shape);
+  		console.log('path added to root:'+shape);
+  		console.log('num children for root node ='+rootNode.getNumChildren());
+  		console.log('num children for shape node ='+shape.getNumChildren());
+
   	},
 
 //triggered by canvas view on a mouse down event
-  	canvasMouseDown : function(x,y) {
-  		  if (!currentPath) {
-        		currentPath = new PathNode({name:'path1'});
-			}
-       	currentPath.addPoint(x,y);
+  	canvasMouseDown : function(event) {
+       	var selectedTool = toolCollection.get(this.get('state'));
+       	selectedTool.mouseDown(event);
        	this.trigger('change:update');
       
        }

@@ -10,7 +10,7 @@ define([
 ], function( _, SceneNode) {
   
   var GeometryNode = SceneNode.extend({
-  	 defaults:_.extend({}, (new SceneNode).attributes,  {
+  	 defaults:_.extend({},SceneNode.prototype.defaults,  {
            x: 0,
            y: 0,
            type: 'geom',
@@ -21,7 +21,7 @@ define([
           }),
   	initialize: function(){
   		//call the super constructor
-  		SceneNode.prototype.initialize.call(this);
+  		//SceneNode.prototype.initialize.call(this);
 
   	},
 
