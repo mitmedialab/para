@@ -4,31 +4,39 @@
 define([
   'jquery',
   'underscore',
-  'backbone'
+  'backbone',
+  'models/PaperManager',
 
-], function($, _, Backbone){
+], function($, _, Backbone, PaperManager){
 
 
   var CanvasView = Backbone.View.extend({
     //
-    el:"#canvas",
+   
+    defaults:{
+
+    },
 
     initialize: function(){
-      //this.listenTo(this.model, 'change', this.render);
 
   },
 
    events: {
-        'mousedown': 'toolDown'
+        'mousedown': 'canvasMouseDown'
     },
 
 
-    render: function(){
+   render: function(){
+      
+     var paper = PaperManager.getPaperInstance("canvas");
+    paper.view.draw();  
+    
  
     },
 
-    toolDown: function(){
-      console.log('mousedown');
+    canvasMouseDown: function(event){
+      console.log(event);
+      this.model.canvasMouseDown(event.offsetX, event.offsetY)
     }
 
   });

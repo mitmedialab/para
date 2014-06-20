@@ -1,31 +1,38 @@
-/*Geometry.js
+/*GeometryNode.js
 * base class for geometry object
 * extends SceneNode
 */
 
-define(
-	[
-		"models/SceneNode",
+define([ 
+  'underscore',
+  'models/data/SceneNode',
 
-	], 
+], function( _, SceneNode) {
+  
+  var GeometryNode = SceneNode.extend({
+  	 defaults:_.extend({}, (new SceneNode).attributes,  {
+           x: 0,
+           y: 0,
+           type: 'geom',
+           width: 0,
+           height:0,
+           strokeColor:'black',
+           fillColor: 'white'
+          }),
+  	initialize: function(){
+  		//call the super constructor
+  		SceneNode.prototype.initialize.call(this);
 
-	function(SceneNode){
-	"use strict"
-	
-	//constructor
- 		function GeometryNode(node, name) {
- 			SceneNode.call(this,node,name);
- 			this.type="geom";
- 		
-    	}
-		_.extend(GeometryNode, Backbone.Events);
+  	},
 
-		GeometryNode.prototype = Object.create( SceneNode.prototype );
-	
-	/*================ GeometryNode method defintions ================*/
+  	draw: function(){
+
+  	}
 
 
-		return(GeometryNode);
 
-	}
-);
+  });
+
+  return GeometryNode;
+
+});

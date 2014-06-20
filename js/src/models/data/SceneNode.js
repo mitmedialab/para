@@ -3,37 +3,44 @@
 *
 */
 
-define (function (require){
+define ([
+  'underscore',
+  'backbone'
 
-	//constructor
- 	function SceneNode(node, name) {
+], function(_, Backbone) {
+       
+
+ 	var SceneNode = Backbone.Model.extend({	
+        defaults: {
+            type: 'default',
+            name:'foo',
+            
+        },
  		
- 		this.name = name;
-        this.children = [];
-        this.type="default";
+    initialize: function(){
+       this.parent = null;
+       this.children= [];
  		//console.log("name="+name);
  		
-        this.setParentNode(node);
  		//console.log("parent="+node.name);
  		
  		SceneNode.numNodeInstances++;
  		//console.log("number of nodes="+SceneNode.numNodeInstances);
-    }
+    },
 /*================ SceneNode method defintions ================*/
 
-    SceneNode.prototype = {
-
-//destructor: clears all children and sets parent to null
+//destructor: clears all this.children and sets parent to null
 		clear: function(){
-    		console.log("clear called");
+         
+    		console.log('clear called');
     		this.parent=null;
-    		for(var i =0; i<children.length;i++){
-    			console.log("clearning child of "+this.name+" at:"+i);
+    		for(var i =0; i<this.children.length;i++){
+    			console.log('clearning child of '+this.name+'at:'+i);
     			this.children[i].clear();
-    			this.children[i] = null;
+    		  this.children[i] = null;
     		}
 
-    		//children.clear();
+    		//this.children.clear();
     		return true;
 
 
@@ -41,7 +48,8 @@ define (function (require){
 
 //returns parent node
    		getParentNode: function(){
-            if(this.parent!=null){
+            
+            if(this.parent!==null){
                 return this.parent;
             }
             else{
@@ -49,37 +57,31 @@ define (function (require){
             }
     	},
 
-//returns children array
+//returns this.children array
         getChildren: function(){
             return this.children;
         },
 
 //returns child at specified index 
         getChildAt: function(index){
+           
             if(this.children.length>index){
                 return this.children[index];
             }
             return null;
         },
-//returns name
-        getName: function(){
-            return this.name; 
-        },
-//returns type
-         getType: function(){
-            return this.type
-        },
-//returns number of children        
+
+//returns number of this.children        
         getNumChildren: function(){
-            return this.children.length;
+           return this.children.length;
         },
 
-//sets parent node. 
-//If node already has a parent, it removes itself from the parent's children
-         setParentNode: function(node){
-            
-            if(node!=null){
-                if(this.parent!= null){
+//setsparent node. 
+//If node already has a parent, it removes itself from the parent's this.children
+        setParentNode: function(node){
+            console.log("parent="+this.parent);
+            if(node!==null){
+                if(this.parent!== null){
                     this.parent.removeChildNode(this);
                 }
                 this.parent = node;
@@ -89,7 +91,8 @@ define (function (require){
         },
 //adds new child and sets child parent to this
         addChildNode: function(node){
-            if(node != null){
+            
+            if(node !==null){
                 node.setParentNode(this);
                 this.children.push(node);
                 return true;
@@ -98,14 +101,14 @@ define (function (require){
             return false;
 
         },
-//removes child node from list of children- does not delete the removed child!
+//removes child node from list of this.children- does not delete the removed child!
         removeChildNode: function(node){
-           // console.log("number of children="+this.children.length);
-            if(node!=null && this.children.length>0){
+           // console.log("number of this.children="+this.children.length);
+            if(node!==null && this.children.length>0){
                // console.log("attempting to remove");
-                for(var i = 0; i < children.length; i++){
+                for(var i = 0; i < this.children.length; i++){
                   
-                    if(children[i] == node){
+                    if(this.children[i] == node){
                         this.children.splice(i,1);
                         return true;
 
@@ -115,23 +118,21 @@ define (function (require){
             return false;
         },
 
-//recursively searches all sub children for child to remove- depth first. Not very efficient. double check to see if this is actually working correctly...
+//recursively searches all sub this.children for child to remove- depth first. Not very efficient. double check to see if this is actually working correctly...
         recursiveRemoveChildNode: function(node){
            //console.log("starting recurse at node:"+this.name);
-            if(node!= null && this.children.length>0){
+            if(node!== null && this.children.length>0){
                 for(var i = 0; i < this.children.length; i++){
                    // console.log("-----checking child at:"+i);
                     if(this.children[i] == node){
                         this.children.splice(i,1);
-                        console.log("found node to remove at parent:"+this.name+" , index:"+i);
+                        console.log('found node to remove at parent:'+this.name+' , index:'+i);
                         return true;
-                        break;
                     }
                     else{
                       
                         if(this.children[i].recursiveRemoveChildNode(node)){
                             return true;
-                            break;  
                         }
                     }
                 }
@@ -141,28 +142,27 @@ define (function (require){
 
        //TODO: copies itself and returns the copy
 
-        copy: function(){
-
-
-        },
+        copy: function(){},
 
         //recursively updates all child nodes. placeholder for geometric update functions in subclasses
         update: function(){
-            console.log("updating:"+this.name);
+            console.log('updating:'+this.get('name'));
             if(this.children.length>0){
                 for(var i=0; i<this.children.length;i++){
-                    if(this.children[i]!=null){
+                    if(this.children[i]!==null){
                         this.children[i].update();
                     }
                 }
             }
 
+            this.trigger('change:update');
+
         },
 
 
 
 
-	};
+	});
 
 
 

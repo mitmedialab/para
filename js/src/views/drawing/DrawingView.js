@@ -8,16 +8,20 @@ define([
   'views/drawing/ToolView',
   'views/drawing/PropertyView',
   'views/drawing/CanvasView',
-  'views/drawing/ObjectsView'
-], function($, _, Backbone, ToolView, PropertyView, CanvasView, ObjectsView){
+  'views/drawing/ObjectsView',
+  'models/tools/ShapeToolModel'
+
+], function($, _, Backbone, ToolView, PropertyView, CanvasView, ObjectsView, ShapeToolModel){
 
   var DrawingView = Backbone.View.extend({
     //
     initialize: function(){
+       shapeToolModel = new ShapeToolModel({type:"Shape"})
+      console.log(shapeToolModel.type);
        this.children = {
         toolView: new ToolView({collection: this.collection}),
         propertyView: new PropertyView({collection:this.collection}),
-        canvasView: new CanvasView({collection:this.collection})
+        canvasView: new CanvasView({collection:this.collection,  el:"#canvas"})
       };
   },
 

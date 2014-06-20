@@ -1,16 +1,21 @@
 /*ShapeToolModel.js
 *base model class for all direct manipulation tool models*/
 
+define([
   'underscore',
   'backbone',
-  'models/BaseToolModel'
-], function(_, Backbone, BaseTool) {
+  'models/tools/BaseToolModel'
+
+], function(_, Backbone, BaseToolModel) {
   
   var ShapeToolModel = BaseToolModel.extend({
+  	type: "default",
 
-  	initialize: function(){
+  	initialize: function(obj){
+  		this.type = obj.type;
+  		console.log(this.type);
+  	},
 
-  	}
 
 
   });

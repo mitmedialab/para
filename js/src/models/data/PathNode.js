@@ -1,32 +1,43 @@
 /*PathNode.js
-* base class for path object
+* path object
 * extends GeometryNode
 */
 
-define(
-	[
-		"models/GeometryNode"
 
-	], 
+define([
+  'underscore',
+  'models/data/GeometryNode',
+  'models/PaperManager',
 
-	function(GeometryNode){
-	
-	//constructor
- 		function PathNode(node, name) {
- 			GeometryNode.call(this,node,name);
- 			this.type="path";
- 			this
- 		
-    	}
-	
+], function(_, GeometryNode, PaperManager) {
+  
+  var PathNode = GeometryNode.extend({
+     defaults: _.extend({},GeometryNode.prototype.defaults, {
+           type: 'path',
+        }),
 
-		PathNode.prototype = Object.create(GeometryNode.prototype );
-	
-	/*================ SceneNode method defintions ================*/
+    initialize: function(){
+      //call the super constructor
+      GeometryNode.prototype.initialize.call(this);
+      this.paper = PaperManager.getPaperInstance('path');
+      this.path = new this.paper.Path();
+      console.log('path stroke color='+this.get('strokeColor'));
+      this.path.strokeColor = this.get('strokeColor');
+    },
 
-		
+    addPoint: function(x,y){
+      this.path.add(new paper.Point(x, y));
+    },
 
-		return(PathNode);
+    draw: function(){
+      
 
-	}
-);
+    }
+
+
+
+  });
+
+  return PathNode;
+
+});
