@@ -11,6 +11,11 @@ define([
   var lastSelected;
   var ToolView = Backbone.View.extend({
     //
+
+    initialize: function(){
+      this.penToolClick();
+    },
+
     render: function(){
  
     },

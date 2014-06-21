@@ -18,7 +18,11 @@ define([
   	},
 
   	reset: function(){
-  		this.currentPath = null;
+  		if(this.currentPath){
+  			this.currentPath.path.selected = false;
+  			 this.currentPath = null;
+
+  		}
   	},
 
   	//mousedown event

@@ -11,7 +11,7 @@ body{
 }
 
 .container{
-	
+	width:1000px;
 }
 .clearfix{
 
@@ -24,20 +24,26 @@ body{
 .row .row {
   margin-bottom: 0;
 }*/
-
+.row{
+	margin-left: 0;
+	margin-right: 0;
+}
 [class*="col-"] {
   padding-top: 0px;
   background-color: #eee;
   background-color: #FFF;
   border: 1px solid #ddd;
   border: 1px solid rgba(86,61,124,.2);
+  padding-left: 0;
+  padding-right: 0;
  
 }
 
+
 .navbar{
 	margin:0;
-	margin-left:-15px;
-	margin-right:-15px;
+	margin-left:0px;
+	margin-right:0px;
 	height:48px;
 	background-color: #FFF;
 	border-radius: 0;
@@ -79,4 +85,9 @@ min-height: 200px;
 #canvas-container{
  min-height: 700px;
 
+}
+
+#canvas{
+	min-height:700px;
+	width: 726px; /* this is bad, fix it */
 }

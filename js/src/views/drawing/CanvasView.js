@@ -8,8 +8,10 @@ define([
   'models/PaperManager',
 
 ], function($, _, Backbone, PaperManager){
-
-
+  
+ var paper = PaperManager.getPaperInstance('canvas');
+ var tool = new  paper.Tool();
+ var mouseDown = false;
   var CanvasView = Backbone.View.extend({
     //
    
@@ -18,25 +20,76 @@ define([
     },
 
     initialize: function(){
-
+      //this.$el.width(this.$el.parent().width());
+   
+      //bind paper tool events
+      tool.activate();
+      tool.parent = this;
+      tool.attach('mousedown',this.toolMouseDown);
+      tool.attach('mousedrag',this.toolMouseDrag);
+      tool.attach('mouseup',this.toolMouseUp);
+   
   },
 
+//canvas events
    events: {
-        'mousedown': 'canvasMouseDown'
+        'mousedown': 'canvasMouseDown',
+        'mouseup' : 'canvasMouseUp',
+        'mousemove': 'canvasMouseMove'
     },
 
 
    render: function(){
-      
-    var paper = PaperManager.getPaperInstance("canvas");
+      console.log("paper is being drawn");
+   
     paper.view.draw();  
     
  
     },
 
+
+    /* tool mouse event functions */
+
+    toolMouseDown: function(event){
+      //this.target. model.toolMouseDown(event);
+      this.parent.model.toolMouseDown(event);
+    },
+
+    toolMouseUp: function(event){
+      this.parent.model.toolMouseUp(event);
+      //console.log("tool mouse up:"+ event);
+    },
+
+    toolMouseDrag: function(event){
+      this.parent.model.toolMouseDrag(event);
+      //console.log("tool mouse drag:"+ event);
+    },
+  
+  /* canvas mouse event functions */
+
     canvasMouseDown: function(event){
      // console.log(event);
-      this.model.canvasMouseDown(event);
+     mouseDown = true;
+      //this.model.canvasMouseDown(event);
+    },
+
+    canvasMouseDrag: function(event){
+     // console.log(event);
+     mouseDown = false;
+      this.model.canvasMouseDrag(event);
+    },
+
+    canvasMouseMove: function(event){
+      if(mouseDown){
+        //console.log("mouse drag event: "+event);
+        //this.model.canvasMouseDrag(event);
+      }
+      else{
+        //console.log("mouse move event: "+event);
+       // this.model.canvasMouseMove(event);
+      }
+
+
     }
 
   });

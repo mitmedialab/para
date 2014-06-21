@@ -40,6 +40,7 @@ define([
   		this.set('state',state);
   		toolCollection.get(this.get('state')).reset();
   		console.log(this.get('state'));
+  		this.trigger('change:update');
 
   	},
 
@@ -53,13 +54,30 @@ define([
 
   	},
 
-//triggered by canvas view on a mouse down event
-  	canvasMouseDown : function(event) {
+//triggered by paper tool on a mouse down event
+  	toolMouseDown : function(event) {
        	var selectedTool = toolCollection.get(this.get('state'));
        	selectedTool.mouseDown(event);
-       	this.trigger('change:update');
+       	//this.trigger('change:update');
       
-       }
+       },
+
+   toolMouseUp : function(event) {
+       	var selectedTool = toolCollection.get(this.get('state'));
+       	selectedTool.mouseUp(event);
+       	//this.trigger('change:update');
+      
+       },
+
+
+ 	toolMouseDrag : function(event) {
+       	var selectedTool = toolCollection.get(this.get('state'));
+       	selectedTool.mouseDrag(event);
+       //	this.trigger('change:update');
+     }
+
+
+
 
 
 
