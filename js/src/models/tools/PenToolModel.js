@@ -12,7 +12,11 @@ define([
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
+
+  //segment being drawn, mode of current drawing, type
   var currentSegment, mode, type;
+
+  
   var PenToolModel = BaseToolModel.extend({
   	  defaults:_.extend({},BaseToolModel.prototype.defaults,  {
           }),
@@ -21,27 +25,28 @@ define([
 
   	},
 
+//method to determine location of handle for current segment
     findHandle: function(point) {
       console.log('searching for handle');
       for (var i = 0, l = this.currentPath.path.segments.length; i < l; i++) {
         for (var j = 0; j < 3; j++) {
-          var type = types[j];
+          var _type = types[j];
           var segment = this.currentPath.path.segments[i];
           var segmentPoint;
          if(type == 'point'){
              segmentPoint = segment.point;
             }
           else{
-              segmentPoint = segment.point + segment[type];
+              segmentPoint = segment.point.add(segment[type]);
 
             }
           console.log('segment.point='+segment.point);
 
-          var distance = (point - segmentPoint).length;
+          var distance = (point.subtract(segmentPoint)).length;
            console.log('distance='+segment.point);
           if (distance < 3) {
             return {
-              type: type,
+              type: _type,
               segment: segment
             };
           }
@@ -53,6 +58,7 @@ define([
       /*mousedown event- checks to see if current path has been initialized-
       *if it has not, create a new one and trigger a shapeAdded event
       */
+
       mouseDown : function(event) {
 
         //console.log('pen tool mouse down');
@@ -60,16 +66,12 @@ define([
             currentSegment.selected = false;
           }
           mode = type = currentSegment = null;
+          
+
           if (!this.currentPath) {
             this.currentPath = new PathNode({name:'path1'});
             this.currentPath.path.selected = true;
-            this.currentPath.path.fillColor = {
-                hue: 360 * Math.random(),
-                saturation: 1,
-                brightness: 1,
-                alpha: 0.5
-              }
-            //this.trigger('change:shapeAdded',this.currentPath);
+            this.trigger('change:shapeAdded',this.currentPath);
 
           }
 
@@ -82,9 +84,11 @@ define([
             type = result.type;
             if (this.currentPath.path.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
               mode = 'close';
+              console.log('path is closed');
               this.currentPath.path.closed = true;
               this.currentPath.path.selected = false;
               this.currentPath.path = null;
+              this.currentPath = null;
             }
           }
           //console.log('after result='+result);
@@ -105,18 +109,18 @@ define([
 
      //mouse drag event - brokem
      mouseDrag: function(event){
-      /*console.log("mouseDrag delta="+event.delta);
+
       if (mode == 'move' && type == 'point') {
         currentSegment.point = event.point;
       } else if (mode != 'close') {
         var delta = event.delta.clone();
         if (type == 'handleOut' || mode == 'add'){
-          delta = -delta;
+          delta = delta.negate();
         }
-        currentSegment.handleIn += delta;
-        currentSegment.handleOut -= delta;
+         currentSegment.handleIn = currentSegment.handleIn.add(delta);
+        currentSegment.handleOut = currentSegment.handleOut.subtract(delta);
         console.log("trying to add handle to current segment");
-      }*/
+      }
 
      },
 
