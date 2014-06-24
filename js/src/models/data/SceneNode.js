@@ -21,6 +21,7 @@ define ([
     constructor: function(){
        this.parent = null;
        this.children= [];
+
  		//console.log("name="+name);
  		
  		//console.log("parent="+node.name);
@@ -169,7 +170,7 @@ define ([
         copy: function(){},
 
         //recursively updates all child nodes. placeholder for geometric update functions in subclasses
-        update: function(){
+        update: function(event){
             console.log('updating:'+this.get('name'));
             if(this.children.length>0){
                 for(var i=0; i<this.children.length;i++){

@@ -64,7 +64,6 @@ define([
 
     toolMouseDrag: function(event){
       this.parent.model.toolMouseDrag(event);
-      paper.view.draw();
       //console.log("tool mouse drag:"+ event);
     },
 

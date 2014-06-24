@@ -18,18 +18,29 @@ define([
            height:0,
            strokeColor:'black',
            fillColor: 'white',
-           weight:1
+           weight:1,
           }),
   	 
-  	initialize: function(){
+  	
+
+    initialize: function(){
   		//call the super constructor
+      
   		//SceneNode.prototype.initialize.call(this);
+      this.visible= true;
+      console.log("geom visible"+this.visible);
 
   	},
 
   	draw: function(){
 
-  	}
+  	},
+
+    remove: function(){
+       this.path.remove();
+      this.visible = false;
+
+    }
 
 
 

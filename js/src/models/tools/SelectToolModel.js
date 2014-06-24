@@ -59,19 +59,31 @@ define([
        
      //mouse up event
      mouseUp : function(event) {
-      
+      console.log("tool mouse up");
+      if(this.path){
+             // console.log("path exists");
+
+          
+
+            this.path.fire('mouseup',event);
+            
+            if(this.path.nodeParent instanceof PathNode){
+              this.path.nodeParent.checkIntersections();
+            }
+
+          }
        },
 
      //mouse drag event
      mouseDrag: function(event){
      // console.log("tool mouse drag");
       if (segment) {
-        //console.log("dragging segment");
+        console.log("dragging segment");
         segment.point = segment.point.add(event.delta);
 
         //path.smooth();
       } else if (this.path) {
-         //console.log("dragging path");
+         console.log("dragging path");
         this.path.position = this.path.position.add(event.delta); 
       }
      },
@@ -83,10 +95,7 @@ define([
           paper.project.activeLayer.selected = false;
           if (hitResult && hitResult.item){
            hitResult.item.selected = true;
-            
-          if(this.path){
-            this.path.nodeParent.checkIntersections();
-          }
+         
        }
 
      }

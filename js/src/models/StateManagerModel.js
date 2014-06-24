@@ -88,7 +88,7 @@ define([
   		//console.log(shape.toJSON());
   		currentNode = shape;
 
-  		this.trigger('updateView');
+  		//this.trigger('updateView');
   		//console.log('path added to root:'+shape);
   		//console.log('num children for root node ='+rootNode.getNumChildren());
   		//console.log('num children for shape node ='+shape.getNumChildren());
@@ -98,7 +98,7 @@ define([
   	shapeSelected: function(shape){
   		currentNode = shape.nodeParent;
 
-  		this.trigger('updateView');
+  		//this.trigger('updateView');
   		//console.log('path added to root:'+shape);
   		//console.log('num children for root node ='+rootNode.getNumChildren());
   		//console.log('num children for shape node ='+shape.getNumChildren());

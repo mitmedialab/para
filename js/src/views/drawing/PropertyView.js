@@ -23,8 +23,8 @@ define([
     },
 
     render: function(){
-       console.log('property view rendering');
-        console.log('source='+$('#property-list-template').html());
+      // console.log('property view rendering');
+       // console.log('source='+$('#property-list-template').html());
         var source = $('#property-list-template').html();
         var template = Handlebars.compile(source);
         var properties = this.model.getSelected();
