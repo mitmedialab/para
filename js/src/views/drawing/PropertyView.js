@@ -23,7 +23,7 @@ define([
     },
 
     render: function(){
-       /* console.log('property view rendering');
+       console.log('property view rendering');
         console.log('source='+$('#property-list-template').html());
         var source = $('#property-list-template').html();
         var template = Handlebars.compile(source);
@@ -31,13 +31,13 @@ define([
        // console.log(properties);
         var html = template(properties);
         this.$el.html(html);
-        */
+        
     },
 
 
     nameChange: function(){
       //console.log("updating name to:"+ $('#obj-name').val());
-      //this.model.updateSelected({name:$('#obj-name').val()});
+      this.model.updateSelected({name:$('#obj-name').val()});
     }
 
   });

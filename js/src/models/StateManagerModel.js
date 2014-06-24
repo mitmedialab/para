@@ -33,6 +33,7 @@ define([
 
         toolCollection = new ToolCollection([penTool,selectTool,polyTool]);
         this.listenTo(toolCollection,'shapeAdded',this.shapeAdded);
+        this.listenTo(toolCollection,'shapeSelected',this.shapeSelected);
         rootNode = new SceneNode({name:'root'});
         currentNode = rootNode;
 
@@ -57,7 +58,7 @@ define([
 
 //broken
   	updateSelected: function(data){
-  		console.log("updating selected");
+  		//console.log("updating selected");
 
   		if(currentNode){
   			//console.log(currentNode.get('fill'));
@@ -79,13 +80,23 @@ define([
   	},
 
   	shapeAdded: function(shape){
-  		console.log("adding shape")
-  		console.log(shape.toJSON());
+  		//console.log("adding shape");
+  		//console.log(shape.toJSON());
 
   		rootNode.addChildNode(shape);
-  		console.log("adding shape to root")
-  		console.log(shape.toJSON());
+  		//console.log("adding shape to root")
+  		//console.log(shape.toJSON());
   		currentNode = shape;
+
+  		this.trigger('updateView');
+  		//console.log('path added to root:'+shape);
+  		//console.log('num children for root node ='+rootNode.getNumChildren());
+  		//console.log('num children for shape node ='+shape.getNumChildren());
+
+  	},
+
+  	shapeSelected: function(shape){
+  		currentNode = shape.nodeParent;
 
   		this.trigger('updateView');
   		//console.log('path added to root:'+shape);

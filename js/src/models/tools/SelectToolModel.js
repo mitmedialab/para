@@ -9,7 +9,7 @@ define([
   'models/PaperManager'
 
 ], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
-  var segment, path, paper;
+  var segment, paper;
 
     var hitOptions = {
       segments: true,
@@ -24,14 +24,15 @@ define([
 
   	initialize: function(){
         paper = PaperManager.getPaperInstance();
+        this.path = null;
   	},
 
       /*mousedown event- checks to see if current path has been initialized-
       *if it has not, create a new one and trigger a shapeAdded event
       */
-      mouseDown : function(event) {
+      mouseDown : function(event) { 
         var paper = PaperManager.getPaperInstance();
-       segment = path = null;
+       segment = this.path = null;
         var hitResult = paper.project.hitTest(event.point, hitOptions);
 
       if (event.modifiers.shift) {
@@ -42,7 +43,8 @@ define([
       }
 
       if (hitResult) {
-        path = hitResult.item;
+       this.path = hitResult.item;
+        this.trigger('shapeSelected',this.path);
         if (hitResult.type == 'segment') {
           segment = hitResult.segment;
         } else if (hitResult.type == 'stroke') {
@@ -62,28 +64,28 @@ define([
 
      //mouse drag event
      mouseDrag: function(event){
-      console.log("tool mouse drag");
+     // console.log("tool mouse drag");
       if (segment) {
-        console.log("dragging segment");
+        //console.log("dragging segment");
         segment.point = segment.point.add(event.delta);
 
         //path.smooth();
-      } else if (path) {
-         console.log("dragging path");
-        path.position = path.position.add(event.delta);
+      } else if (this.path) {
+         //console.log("dragging path");
+        this.path.position = this.path.position.add(event.delta); 
       }
      },
 
      //mouse move event
      mouseMove: function(event){
-        console.log("tool mouse move");
+       // console.log("tool mouse move");
           var hitResult = paper.project.hitTest(event.point, hitOptions);
           paper.project.activeLayer.selected = false;
           if (hitResult && hitResult.item){
            hitResult.item.selected = true;
             
-          if(path){
-            path.nodeParent.checkIntersections();
+          if(this.path){
+            this.path.nodeParent.checkIntersections();
           }
        }
 
