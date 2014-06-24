@@ -71,6 +71,12 @@ define([
 
     },
 
+     remove: function(){
+       this.path.remove();
+      this.visible = false;
+
+    },
+
     //checks for intersections between this path and any of its siblings in the scene graph
     checkIntersections: function(){
       var siblings = this.getSiblings();
@@ -141,6 +147,7 @@ define([
 
 //projects a set of instances along a parent path
     followPath: function(parent, instances){
+      this.path.strokeColor='red';
       var path = parent.path;
       var num =instances.length;
       var maxDist = path.length/(num-1);
@@ -156,18 +163,22 @@ define([
           
           var delta = location_n.subtract(location);
           delta.angle+=90;
-          instance.data.position = location_n;
+
           instance.data.rotate(delta.angle,instance.data.position); 
           instance.rotation=delta.angle;
-          
         }
+       
+        instance.data.position = location_n;
+       
+          
+        
         location = location_n;  
 
 
       }
-      if(this.visible){
-        this.remove();
-      }
+     if(this.visible){
+       this.remove();
+     }
       if(this.getParentNode!=parent){
         parent.addChildNode(this);
       }
@@ -179,6 +190,8 @@ define([
 
 
   });
+
+   
 
   return PathNode;
 
