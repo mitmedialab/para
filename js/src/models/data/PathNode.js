@@ -7,10 +7,11 @@
 define([
   'underscore',
   'models/data/GeometryNode',
+  'models/data/SceneNode',
   'models/PaperManager',
   'models/data/Instance',
 
-], function(_, GeometryNode, PaperManager, Instance) {
+], function(_, GeometryNode, SceneNode, PaperManager, Instance) {
   
   var PathNode = GeometryNode.extend({
      defaults: _.extend({},GeometryNode.prototype.defaults, {
@@ -30,6 +31,7 @@ define([
       //bind an update event to the path
       this.path.on('mouseup',function(){
         this.nodeParent.updateInstances(this);
+        this.nodeParent.update();
         });
       //intialize array to store instances
       this.instances = [];
@@ -50,9 +52,22 @@ define([
         },
 
 
-    update: function(path){
+    update: function(){
+      console.log("number of children="+this.getNumChildren());
+      if(this.getParentNode() instanceof PathNode){
+        console.log("updating follow path");
+        this.followPath(this.parent, this.instances);
+      }
 
+      if(this.children.length>0){
+                for(var i=0; i<this.children.length;i++){
+                    if(this.children[i]!==null){
+                        this.children[i].update();
+                    }
+                }
+            }
 
+            this.trigger('change:update');
 
     },
 
@@ -150,8 +165,12 @@ define([
 
 
       }
-      this.remove();
-      parent.addChildNode(this);
+      if(this.visible){
+        this.remove();
+      }
+      if(this.getParentNode!=parent){
+        parent.addChildNode(this);
+      }
       position.remove();
 
 
