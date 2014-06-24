@@ -14,6 +14,7 @@ define ([
         defaults: {
             type: 'default',
             name:'',
+            parent: {exists:false,name:''}
             
         },
  		
@@ -66,6 +67,10 @@ define ([
         getChildren: function(){
             return this.children;
         },
+//returns other nodes with the same parent
+        getSiblings: function(){
+            return this.parent.getChildren();
+        },
 
 //returns child at specified index 
         getChildAt: function(index){
@@ -81,7 +86,7 @@ define ([
            return this.children.length;
         },
 
-//setsparent node. 
+//sets parent node. 
 //If node already has a parent, it removes itself from the parent's this.children
         setParentNode: function(node){
             console.log('parent='+this.parent);
@@ -90,7 +95,20 @@ define ([
                     this.parent.removeChildNode(this);
                 }
                 this.parent = node;
+                this.set('parent',{exists:true,name:this.parent.get('name')});
                 return true;
+            }
+            return false;
+        },
+
+        removeParentNode: function(){
+            
+            
+                if(this.parent!== null){
+                    this.parent =null;
+                this.set('parent',{exists:false,name:''});
+                return true;
+
             }
             return false;
         },
@@ -114,6 +132,7 @@ define ([
                 for(var i = 0; i < this.children.length; i++){
                   
                     if(this.children[i] == node){
+                        this.children[i].removeParentNode();
                         this.children.splice(i,1);
                         return true;
 

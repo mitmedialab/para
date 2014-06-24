@@ -21,13 +21,16 @@ define([
 
     initialize: function(){
       //this.$el.width(this.$el.parent().width());
-   
+
+      //listen to update view statements from model to re-render view
+      this.listenTo(this.model,'updateView',this.render);
       //bind paper tool events
       tool.activate();
       tool.parent = this;
       tool.attach('mousedown',this.toolMouseDown);
       tool.attach('mousedrag',this.toolMouseDrag);
       tool.attach('mouseup',this.toolMouseUp);
+      tool.attach('mousemove',this.toolMouseMove);
    
   },
 
@@ -40,9 +43,8 @@ define([
 
 
    render: function(){
-      console.log("paper is being drawn");
-   
-    paper.view.draw();  
+      //console.log("paper is being drawn");
+      paper.view.draw();  
     
  
     },
@@ -62,8 +64,15 @@ define([
 
     toolMouseDrag: function(event){
       this.parent.model.toolMouseDrag(event);
+      paper.view.draw();
       //console.log("tool mouse drag:"+ event);
     },
+
+    toolMouseMove: function(event){
+      this.parent.model.toolMouseMove(event);
+      //console.log("tool mouse drag:"+ event);
+    },
+  
   
   /* canvas mouse event functions */
 

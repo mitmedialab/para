@@ -13,6 +13,7 @@ define([
 
 ], function($, _, Backbone,SceneNode, ToolCollection, PenToolModel,PolyToolModel,SelectToolModel) {
   var rootNode,
+  	currentNode,
   	toolCollection,
   	penTool,
   	polyTool,
@@ -31,26 +32,65 @@ define([
         polyTool = new PolyToolModel({id:'polyTool'});
 
         toolCollection = new ToolCollection([penTool,selectTool,polyTool]);
-        toolCollection.on('change:shapeAdded',this.shapeAdded);
+        this.listenTo(toolCollection,'shapeAdded',this.shapeAdded);
         rootNode = new SceneNode({name:'root'});
+        currentNode = rootNode;
+
 
   	},
 
   	setState: function(state){
   		this.set('state',state);
   		toolCollection.get(this.get('state')).reset();
-  		console.log(this.get('state'));
-  		this.trigger('change:update');
+  		//console.log(this.get('state'));
+  		//this.trigger('change:update');
+  	},
 
+  	//returns currently selected object as JSON object. If nothing is selected, returns the root object
+  	getSelected: function(){
+  		//console.log('attempting to get selected'+rootNode.getChildAt(0));
+  		//currentNode = rootNode.getChildAt(0);
+  		return currentNode.toJSON();
+  		
   	},
 
 
+//broken
+  	updateSelected: function(data){
+  		console.log("updating selected");
+
+  		if(currentNode){
+  			//console.log(currentNode.get('fill'));
+  			//check if multiple objects are selected
+  			if(currentNode instanceof SceneNode){
+  				 //console.log("not an array");
+
+  				//update currently selected to correspond with user changes
+  				for(var k in data){
+  					console.log(k);
+  					if(currentNode.hasOwnProperty(k)){
+  						currentNode.set(k,data[k]);
+  					}
+  				}
+  				  //console.log(currentNode.get('fill'));
+  			}
+  		}
+
+  	},
+
   	shapeAdded: function(shape){
-  		console.log('event triggered');
+  		console.log("adding shape")
+  		console.log(shape.toJSON());
+
   		rootNode.addChildNode(shape);
-  		console.log('path added to root:'+shape);
-  		console.log('num children for root node ='+rootNode.getNumChildren());
-  		console.log('num children for shape node ='+shape.getNumChildren());
+  		console.log("adding shape to root")
+  		console.log(shape.toJSON());
+  		currentNode = shape;
+
+  		this.trigger('updateView');
+  		//console.log('path added to root:'+shape);
+  		//console.log('num children for root node ='+rootNode.getNumChildren());
+  		//console.log('num children for shape node ='+shape.getNumChildren());
 
   	},
 
@@ -59,6 +99,7 @@ define([
        	var selectedTool = toolCollection.get(this.get('state'));
        	selectedTool.mouseDown(event);
        	//this.trigger('change:update');
+
       
        },
 
@@ -73,6 +114,13 @@ define([
  	toolMouseDrag : function(event) {
        	var selectedTool = toolCollection.get(this.get('state'));
        	selectedTool.mouseDrag(event);
+       //	this.trigger('change:update');
+     },
+
+
+ 	toolMouseMove : function(event) {
+       	var selectedTool = toolCollection.get(this.get('state'));
+       	selectedTool.mouseMove(event);
        //	this.trigger('change:update');
      }
 

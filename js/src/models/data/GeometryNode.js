@@ -17,8 +17,10 @@ define([
            width: 0,
            height:0,
            strokeColor:'black',
-           fillColor: 'white'
+           fillColor: 'white',
+           weight:1
           }),
+  	 
   	initialize: function(){
   		//call the super constructor
   		//SceneNode.prototype.initialize.call(this);

@@ -68,8 +68,36 @@
 
                  <div class="col-md-3">
                   <div class="row">
-                    <div id = "prop-menu" class ="col-md-12"></div>
+                   
+                    <div id = "prop-menu" class ="col-md-12">
+                        <script id="property-list-template" type="text/x-handlebars-template">
+                        <form>
+                        <div class="row">
+                            <div class = "span12">{{#parent.exists}}parent:<a>{{parent.name}}{{/parent.exists}}</a></div>
+                        </div>
+                         <div class="row">
+                            <div class = "span12">name: <input type="text" id="obj-name" value={{name}}></div>
+                        </div>
+
+                         <div class="row">
+                            <div class = "col-md-6">x: {{x}}</div>
+                            <div class = "col-md-6">y: {{y}}</div>
+                        </div>
+                         <div class="row">
+                            <div class = "col-md-6">width: {{width}}</div>
+                            <div class = "col-md-6">height: {{height}}</div>
+                        </div>
+                         <div class="row">
+                            <div class = "col-md-4">stroke: {{strokeColor}}</div>
+                            <div class = "col-md-4">fill: {{fillColor}}</div>
+                            <div class = "col-md-4">weight: {{weight}}</div>
+                        </div>
+                        </form>
+                    </script>
+                    </div>
                   </div>
+                  
+
                   <div class = "row">
                     <div id = "object-menu" class ="col-md-12"></div>
                   </div>
@@ -83,6 +111,7 @@
     Placed at the end of the document so the pages load faster -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/handlebars/handlebars.js" type="text/javascript"></script> 
 
     <!-- main application script -->
     <script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>

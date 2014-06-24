@@ -1,0 +1,18 @@
+define([
+  'underscore',
+  'backbone'
+
+], function(_, Backbone {
+  
+ var FollowPath= function({
+
+
+
+
+ 	});
+
+ return FollowPath;
+
+
+
+  });

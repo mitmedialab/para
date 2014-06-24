@@ -16,6 +16,9 @@ define([
   var DrawingView = Backbone.View.extend({
     //
     initialize: function(){
+       //listen to update view statements from model to re-render view
+      this.listenTo(this.model,'updateView',this.render);
+      
        shapeToolModel = new ShapeToolModel({type:"Shape"})
       console.log(shapeToolModel.type);
        this.children = {

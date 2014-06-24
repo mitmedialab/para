@@ -10,7 +10,8 @@ require.config({
         "paper" : "../../bower_components/paper/dist/paper-full",
         "backbone" : "../../bower_components/backbone/backbone",
         "underscore" : "../../bower_components/underscore/underscore",
-        "mustache"  : "../../bower_components/mustache.js/mustache"
+        "mustache"  : "../../bower_components/mustache.js/mustache",
+        "handlebars"  : "../../bower_components/handlebars/handlebars"
     },
     
     shim: {
@@ -24,6 +25,10 @@ require.config({
 
         underscore: {
          exports: "_"
+        },
+
+        handlebars: {
+         exports: "Handlebars"
         }
     },
 });

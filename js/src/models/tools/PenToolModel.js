@@ -5,10 +5,9 @@ define([
   'underscore',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PathNode',
-  'models/PaperManager'
+  'models/data/PathNode'
 
-], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
+], function(_, Backbone, BaseToolModel, PathNode) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -16,7 +15,7 @@ define([
   //segment being drawn, mode of current drawing, type
   var currentSegment, mode, type;
 
-  
+
   var PenToolModel = BaseToolModel.extend({
   	  defaults:_.extend({},BaseToolModel.prototype.defaults,  {
           }),
@@ -27,7 +26,7 @@ define([
 
 //method to determine location of handle for current segment
     findHandle: function(point) {
-      console.log('searching for handle');
+     // console.log('searching for handle');
       for (var i = 0, l = this.currentPath.path.segments.length; i < l; i++) {
         for (var j = 0; j < 3; j++) {
           var _type = types[j];
@@ -40,10 +39,10 @@ define([
               segmentPoint = segment.point.add(segment[type]);
 
             }
-          console.log('segment.point='+segment.point);
+          //console.log('segment.point='+segment.point);
 
           var distance = (point.subtract(segmentPoint)).length;
-           console.log('distance='+segment.point);
+          // console.log('distance='+segment.point);
           if (distance < 3) {
             return {
               type: _type,
@@ -71,12 +70,12 @@ define([
           if (!this.currentPath) {
             this.currentPath = new PathNode({name:'path1'});
             this.currentPath.path.selected = true;
-            this.trigger('change:shapeAdded',this.currentPath);
+            this.trigger('shapeAdded',this.currentPath);
 
           }
 
           var result = this.findHandle(event.point);
-          console.log('handle result='+result);
+          //console.log('handle result='+result);
           if (result) {
             //console.log('found result='+result);
 
@@ -84,10 +83,10 @@ define([
             type = result.type;
             if (this.currentPath.path.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
               mode = 'close';
-              console.log('path is closed');
+              //console.log('path is closed');
               this.currentPath.path.closed = true;
               this.currentPath.path.selected = false;
-              this.currentPath.path = null;
+              //this.currentPath.path = null;
               this.currentPath = null;
             }
           }
@@ -119,7 +118,7 @@ define([
         }
          currentSegment.handleIn = currentSegment.handleIn.add(delta);
         currentSegment.handleOut = currentSegment.handleOut.subtract(delta);
-        console.log("trying to add handle to current segment");
+        //console.log("trying to add handle to current segment");
       }
 
      },
