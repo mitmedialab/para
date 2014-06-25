@@ -7,11 +7,10 @@
 define([
   'underscore',
   'models/data/GeometryNode',
-  'models/data/SceneNode',
   'models/PaperManager',
-  'models/data/Instance',
+  'models/data/Instance'
 
-], function(_, GeometryNode, SceneNode, PaperManager, Instance) {
+], function(_, GeometryNode, PaperManager, Instance) {
   
   var PathNode = GeometryNode.extend({
      defaults: _.extend({},GeometryNode.prototype.defaults, {
@@ -85,8 +84,15 @@ define([
       //recursive function to handle checking for intersections in groups...
       for(var i=0;i<siblings.length;i++){
         
-        if(siblings[i]!=this && siblings[i].visible){  
-          var intersections = this.path.getIntersections(siblings[i].path);
+        if(siblings[i]!=this){  
+          var intersections;
+          /*if(siblings[i].instances.length>0){
+            intersections = this.path.getIntersections(siblings[i].path);
+
+          }
+          else{*/
+            intersections = this.path.getIntersections(siblings[i].path);
+          //}
           if(intersections.length>0){
             this.trigger('intersect-found');
             this.createInstances(10);
@@ -141,7 +147,7 @@ define([
     },
 
     //renders a given instance static and adds it to the scene graph as its own object
-    bakeInstance: function(instance){
+    bakeInstance: function(instance){ 
 
     },
 
@@ -159,6 +165,7 @@ define([
          //console.log(location);
          var location_n = position.segments[i].point;
         var instance = instances[i];
+        instance.resetRotation();
          if(location){  
           
           var delta = location_n.subtract(location);

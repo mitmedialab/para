@@ -5,7 +5,7 @@
 
 define([ 
   'underscore',
-  'models/data/SceneNode',
+  'models/data/SceneNode'
 
 ], function( _, SceneNode) {
   
@@ -21,7 +21,12 @@ define([
            weight:1,
           }),
   	 
-  	
+  	  constructor: function(){
+    
+       SceneNode.apply(this, arguments);
+    //console.log("number of nodes="+SceneNode.numNodeInstances);
+    },
+
 
     initialize: function(){
   		//call the super constructor
@@ -36,11 +41,7 @@ define([
 
   	},
 
-    remove: function(){
-       this.path.remove();
-      this.visible = false;
-
-    }
+    
 
 
 

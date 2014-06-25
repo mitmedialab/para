@@ -5,10 +5,10 @@
 
 define([
 'underscore',
-'backbone'
-], function(_, Backbone){
+'models/data/SceneNode'
+], function(_, SceneNode){
 	
-	var Instance = Backbone.Model.extend({
+	var Instance = SceneNode.extend({
 		data:null,
 		next:null,
 		rotation:0,
@@ -19,9 +19,15 @@ define([
 			this.data.nodeParent= this;
 			this.next = null;
 
+
 			this.data.on('mouseup',function(){
         		this.nodeParent.updateInstances(this);
         	});
+		},
+
+		resetRotation: function(){
+			this.data.rotate(0-this.rotation);
+			this.rotation=0;
 		},
 
 		updateInstances: function(path){

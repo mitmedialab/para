@@ -7,9 +7,10 @@ define([
   'views/drawing/CanvasView',
   'views/drawing/ToolView',
   'views/drawing/PropertyView',
-  'models/StateManagerModel'
+  'models/StateManagerModel',
+  'models/data/TestNode'
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, StateManagerModel) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, StateManagerModel, TestNode) {
   
   var AppRouter = Backbone.Router.extend({
     routes: {// Default
@@ -32,13 +33,15 @@ define([
         var canvasView = new CanvasView({el:'#canvas',model:stateManager});
         var toolView = new ToolView({el:'#toolbar',model:stateManager});
         var propertyView = new PropertyView({el:'#prop-menu',model:stateManager});
+      
         //bind update event to canvas view
-        stateManager.on('change:update',canvasView.render);
-        stateManager.on('shapeAdded',propertyView.render);
+        //stateManager.listenTo('change:update',canvasView.render);
+
+        //penTool.on('change:shapeAdded',propertyView.render);
 
 
        // stateManager.shapeAdded();
-
+       //var testNode = new TestNode("foo");
 
        
 

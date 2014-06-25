@@ -21,7 +21,8 @@ define([
           }),
 
   	initialize: function(){
-
+    console.log("pathnode test");
+      console.log(PathNode);
   	},
 
 //method to determine location of handle for current segment
