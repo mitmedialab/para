@@ -5,11 +5,16 @@
 
 define([
   'underscore',
-  'models/data/SceneNode'
-  
-], function(_, SceneNode) {
+  'models/data/SceneNode',
+  'models/Utils'
+
+], function(_, SceneNode, Utils) {
 
   var GeometryNode = SceneNode.extend({
+
+    
+    visible: true,
+
     defaults: _.extend({}, SceneNode.prototype.defaults, {
       x: 0,
       y: 0,
@@ -23,8 +28,6 @@ define([
 
     constructor: function() {
 
-      this.visible = true;
-
       SceneNode.apply(this, arguments);
       //console.log("number of nodes="+SceneNode.numNodeInstances);
     },
@@ -36,6 +39,7 @@ define([
 
     //overrides SceneNode update function
     update: function() {
+      console.log("updating Geom method called");
       SceneNode.prototype.update.apply(this, arguments);
     },
 

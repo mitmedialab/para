@@ -1,5 +1,5 @@
-/* PaperManager.js
-* provides other classes with access to a static paper.js object*/
+/* RootManager.js
+* provides a static manager for the root node*/
 
 define([
      'jquery',

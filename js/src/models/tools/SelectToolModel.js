@@ -61,6 +61,7 @@ define([
      mouseUp : function(event) {
       console.log("tool mouse up");
       if(this.path){
+            
             this.path.fire('mouseup',event);
 
           }

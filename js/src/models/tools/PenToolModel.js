@@ -5,9 +5,11 @@ define([
   'underscore',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PathNode'
+  'models/data/PathNode',
+  'models/behaviors/ParentBehavior',
+  'models/behaviors/FollowPathBehavior'
 
-], function(_, Backbone, BaseToolModel, PathNode) {
+], function(_, Backbone, BaseToolModel, PathNode,ParentBehavior, FollowPathBehavior) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -69,6 +71,8 @@ define([
 
           if (!this.currentPath) {
             this.currentPath = new PathNode({name:'path1'});
+            //this.currentPath.mixin(FollowPathBehavior,'intersectionFound');
+            //this.currentPath.mixin(ParentBehavior,'intersectionFound');
             this.trigger('shapeAdded',this.currentPath);
 
           }

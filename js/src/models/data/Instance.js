@@ -67,11 +67,11 @@ define([
 			this.rotation = null;
 		},
 
-		checkIntersections: function(instances){
-			
-			for(var i=0;i<instances.length;i++){
+		checkIntersections: function(instances) {
+
+			for (var i = 0; i < instances.length; i++) {
 				var intersections = this.data.getIntersections(instances[i].data);
-				if(intersections.length>0){
+				if (intersections.length > 0) {
 					return intersections;
 				}
 			}

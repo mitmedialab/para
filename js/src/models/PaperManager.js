@@ -25,7 +25,7 @@ define([
              var canvas= $('canvas').get(0);
              paperInstance = paper;
              paper.install($('canvas', window.parent.document));
-             paperInstance.setup(canvas);
+             paperInstance.setup(canvas); 
              console.log('setting up paperInstance for'+callerId);
         }
         return paperInstance;

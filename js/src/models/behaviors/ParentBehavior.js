@@ -1,14 +1,20 @@
 /*ParentBehavior.js
- * base class for geometry object
- * extends SceneNode
  */
-define(function() {
-  var ParentBehavior = function() {
+define([
+  'underscore',
+  'backbone'],
 
-    this.intersectionFound = function(data) {
-      console.log('parent behavior called');
-      data.node.addChildNode(this);
-    };
+  function() {
+
+  var ParentBehavior = {
+
+    update:function() {
+      console.log('parent behavior update called');
+    },
+
+    intersectionFound: function(data) {
+      console.log('parent path behavior interesection found called');
+    }
   };
 
   return ParentBehavior;

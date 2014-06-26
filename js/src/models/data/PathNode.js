@@ -9,14 +9,24 @@ define([
   'models/data/GeometryNode',
   'models/PaperManager',
   'models/data/Instance',
-  'models/behaviors/ParentBehavior'
+  'models/behaviors/ParentBehavior',
+  'models/behaviors/FollowPathBehavior'//,
+  //'models/Utils'
 
-], function(_, GeometryNode, PaperManager, Instance, ParentBehavior) {
+], function(_, GeometryNode, PaperManager, Instance, ParentBehavior, FollowPathBehavior) {
 
   var PathNode = GeometryNode.extend({
     defaults: _.extend({}, GeometryNode.prototype.defaults, {
       type: 'path',
     }),
+
+    constructor: function() {
+
+     GeometryNode.apply(this, arguments);
+      //console.log('number of nodes='+SceneNode.numNodeInstances);
+    },
+
+    //mixin: Utils.nodeMixin,
 
     initialize: function() {
       //call the super constructor
@@ -26,11 +36,44 @@ define([
       this.instances = [];
       this.createInstance();
      
-      console.log(ParentBehavior);
-      ParentBehavior.call(this);
-      //this.intersectionFound(null);
+      //this.mixin(this['constructor'],FollowPathBehavior,'intersectionFound');
+      //this.prototype.mixin(FollowPathBehavior,'intersectionFound');
+      //this.prototype.mixin(ParentBehavior,'intersectionFound');
+      //ParentBehavior.call(this);
+     // FollowPathBehavior.call(this);
+     this.extendMethod(FollowPathBehavior,'intersectionFound');
+    this.extendMethod(ParentBehavior,'intersectionFound');
+      this.intersectionFound(null);
 
     },
+
+     // Helper method to extend an already existing method
+      extendMethod: function(from, methodName) {
+         console.log('trying to extend methods');
+        // if the method is defined on from ...
+        if (!_.isUndefined(from[methodName])) {
+          console.log('setting methods');
+          var old = this[methodName];
+
+          // ... we create a new function on to
+          this[methodName] = function() {
+
+           
+
+            // and then call the method on `from`
+            from[methodName].apply(this, arguments);
+
+             // wherein we first call the method which exists on `to`
+            var oldReturn = old.apply(this, arguments);
+
+            // and then return the expected result,
+            // i.e. what the method on `to` returns
+            return oldReturn;
+
+          };
+        }
+
+      },
 
     //registers overriding function for update methods- determined by parent node
     //for now assume one logic setting per node. Will change this in the future
@@ -89,14 +132,14 @@ define([
 
 
     //event callbacks
-   /* intersectionFound: function(data){
-      console.log("prototype intersection behavior called");
+   intersectionFound: function(data){
+      console.log('prototype intersection behavior called');
 
-    },*/
+    },
 
     //updates  overrides GeometryNode update function
     update: function() {
-
+      console.log('updating path method called');
       if (this.getParentNode() instanceof PathNode) {
         console.log('updating follow path');
         this.followPath(this.parent, this.instances);
@@ -140,10 +183,10 @@ define([
 
     //recursively searches for intersections between this nodes' instances and the scenegraph
     recursiveCheckIntersections: function(found_intersections, node) {
-      //console.log("starting recurse at node:"+this.name);
+      //console.log('starting recurse at node:'+this.name);
       if (node !== null && this.instances.length > 0) {
         for (var i = 0; i < this.instances.length; i++) {
-          // console.log("-----checking child at:"+i);
+          // console.log('-----checking child at:'+i);
           var intersections = this.instances[i].checkIntersections(node.instances);
           if (intersections) {
             found_intersections = intersections;
@@ -161,7 +204,7 @@ define([
 
     //checks for intersections between this path and any of its siblings in the scene graph
     checkIntersections: function() {
-      console.log("checking for intersection");
+      console.log('checking for intersection');
       var siblings = this.getSiblings();
 
       //currently assumes that siblings have no children- will need to update to a 
@@ -170,7 +213,7 @@ define([
 
         if (siblings[i] != this) {
           for (var j = 0; j < this.instances.length; j++) {
-            // console.log("-----checking child at:"+i);
+            // console.log('-----checking child at:'+i);
             var intersections = this.instances[j].checkIntersections(siblings[i].instances);
             if (intersections) {
               return {node:siblings[i],intersections:intersections};
@@ -227,10 +270,10 @@ define([
 
 
 
-  });
-
-
-
+  }//,{mixin: Utils.nodeMixin}
+  );
+  //PathNode.mixin(FollowPathBehavior,'intersectionFound');
+  //PathNode.mixin(ParentBehavior,'intersectionFound');
   return PathNode;
 
 });
