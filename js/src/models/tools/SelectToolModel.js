@@ -61,15 +61,7 @@ define([
      mouseUp : function(event) {
       console.log("tool mouse up");
       if(this.path){
-             // console.log("path exists");
-
-          
-
             this.path.fire('mouseup',event);
-            
-            if(this.path.nodeParent instanceof PathNode){
-              this.path.nodeParent.checkIntersections();
-            }
 
           }
        },

@@ -21,17 +21,16 @@ define([
           }),
 
   	initialize: function(){
-    console.log("pathnode test");
-      console.log(PathNode);
+
   	},
 
 //method to determine location of handle for current segment
     findHandle: function(point) {
      // console.log('searching for handle');
-      for (var i = 0, l = this.currentPath.path.segments.length; i < l; i++) {
+      for (var i = 0, l = this.currentPath.getPath().segments.length; i < l; i++) {
         for (var j = 0; j < 3; j++) {
           var _type = types[j];
-          var segment = this.currentPath.path.segments[i];
+          var segment = this.currentPath.getPath().segments[i];
           var segmentPoint;
          if(type == 'point'){
              segmentPoint = segment.point;
@@ -70,7 +69,6 @@ define([
 
           if (!this.currentPath) {
             this.currentPath = new PathNode({name:'path1'});
-            this.currentPath.path.selected = true;
             this.trigger('shapeAdded',this.currentPath);
 
           }
@@ -82,12 +80,11 @@ define([
 
             currentSegment = result.segment;
             type = result.type;
-            if (this.currentPath.path.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
+            if (this.currentPath.getPath().segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
               mode = 'close';
               //console.log('path is closed');
-              this.currentPath.path.closed = true;
-              this.currentPath.path.selected = false;
-              //this.currentPath.path = null;
+              this.currentPath.getPath().closed = true;
+              this.currentPath.getPath().selected = false;
               this.currentPath = null;
             }
           }
@@ -96,7 +93,7 @@ define([
         if (mode != 'close') {
           mode = currentSegment ? 'move' : 'add';
           if (!currentSegment){
-            currentSegment = this.currentPath.path.add(event.point);
+            currentSegment = this.currentPath.getPath().add(event.point);
           }
           currentSegment.selected = true;
         }
