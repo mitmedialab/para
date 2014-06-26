@@ -10,8 +10,7 @@ define([
   'models/PaperManager',
   'models/data/Instance',
   'models/behaviors/ParentBehavior',
-  'models/behaviors/FollowPathBehavior'//,
-  //'models/Utils'
+  'models/behaviors/FollowPathBehavior'
 
 ], function(_, GeometryNode, PaperManager, Instance, ParentBehavior, FollowPathBehavior) {
 
@@ -35,20 +34,12 @@ define([
       //intialize array to store instances
       this.instances = [];
       this.createInstance();
-     
-      //this.mixin(this['constructor'],FollowPathBehavior,'intersectionFound');
-      //this.prototype.mixin(FollowPathBehavior,'intersectionFound');
-      //this.prototype.mixin(ParentBehavior,'intersectionFound');
-      //ParentBehavior.call(this);
-     // FollowPathBehavior.call(this);
-     this.extendMethod(FollowPathBehavior,'intersectionFound');
-    this.extendMethod(ParentBehavior,'intersectionFound');
-      this.intersectionFound(null);
+  
 
     },
 
-     // Helper method to extend an already existing method
-      extendMethod: function(from, methodName) {
+      //registers overriding function for update methods- determined by parent node
+      extendBehavior: function(from, methodName) {
          console.log('trying to extend methods');
         // if the method is defined on from ...
         if (!_.isUndefined(from[methodName])) {
@@ -56,9 +47,7 @@ define([
           var old = this[methodName];
 
           // ... we create a new function on to
-          this[methodName] = function() {
-
-           
+          this[methodName] = function() { 
 
             // and then call the method on `from`
             from[methodName].apply(this, arguments);
@@ -75,12 +64,6 @@ define([
 
       },
 
-    //registers overriding function for update methods- determined by parent node
-    //for now assume one logic setting per node. Will change this in the future
-    setLogic: function(logic) {
-      logic.call(this);
-    },
-
     //creates and stores an instance which is identical to this path 
     createInstance: function() {
       /*for now it is neccesary to make a copy of the shape data
@@ -93,7 +76,8 @@ define([
       if (this.instances.length === 0) {
         instance = new Instance();
       } else {
-        instance = new Instance(this.instances[0].data.clone);
+      
+        instance = new Instance(this.instances[0].data.clone());
       }
 
       this.listenTo(instance, 'change:updateInstances', this.updateInstances);
@@ -109,6 +93,7 @@ define([
         this.deleteInstances();
       }
       for (var i = 0; i < num; i++) {
+        console.log("creating instance number:"+ i);
         this.createInstance();
       }
       return this.instances;
@@ -140,10 +125,7 @@ define([
     //updates  overrides GeometryNode update function
     update: function() {
       console.log('updating path method called');
-      if (this.getParentNode() instanceof PathNode) {
-        console.log('updating follow path');
-        this.followPath(this.parent, this.instances);
-      }
+      
 
       GeometryNode.prototype.update.apply(this, arguments);
 
@@ -156,7 +138,7 @@ define([
       if(intersections){
         this.intersectionFound(intersections);
       }
-      if (this.instances.length > 1) {
+     /* if (this.instances.length > 1) {
         for (var i = 0; i < this.instances.length; i++) {
           if (this.instances[i].data != path) {
             var clone = path.clone();
@@ -164,7 +146,7 @@ define([
             this.instances[i].update(clone);
           }
         }
-      }
+      }*/
 
     },
 
@@ -226,19 +208,22 @@ define([
 
 
     //projects a set of instances along a parent path- needs to be moved to mixin
-    followPath: function(parent, instances) {
-      this.path.strokeColor = 'red';
-      var path = parent.path;
-      var num = instances.length;
-      var maxDist = path.length / (num - 1);
+    followPath: function(path) {
+     
+      //this.path.strokeColor = 'red';
+     var num = this.instances.length;
+     var maxDist = path.length / (num);
+     
       var position = path.clone();
+    
       position.flatten(maxDist);
-      //console.log(position);
+
+      console.log(position);
       var location;
-      for (var i = 0; i < instances.length; i++) {
-        //console.log(location);
+      for (var i = 0; i < this.instances.length; i++) {
+       console.log(location);
         var location_n = position.segments[i].point;
-        var instance = instances[i];
+        var instance = this.instances[i];
         instance.resetRotation();
         if (location) {
 
@@ -254,15 +239,10 @@ define([
 
 
         location = location_n;
-
-
       }
-      if (this.visible) {
-        this.remove();
-      }
-      if (this.getParentNode != parent) {
+      /*if (this.getParentNode != parent) {
         parent.addChildNode(this);
-      }
+      }*/
       position.remove();
 
 

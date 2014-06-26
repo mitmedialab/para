@@ -71,8 +71,11 @@ define([
 
           if (!this.currentPath) {
             this.currentPath = new PathNode({name:'path1'});
-            //this.currentPath.mixin(FollowPathBehavior,'intersectionFound');
-            //this.currentPath.mixin(ParentBehavior,'intersectionFound');
+            
+            this.currentPath.extendBehavior(FollowPathBehavior,'intersectionFound');
+            this.currentPath.extendBehavior(ParentBehavior,'intersectionFound');
+            
+
             this.trigger('shapeAdded',this.currentPath);
 
           }
