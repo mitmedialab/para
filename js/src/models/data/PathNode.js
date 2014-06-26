@@ -9,9 +9,9 @@ define([
   'models/data/GeometryNode',
   'models/PaperManager',
   'models/data/Instance',
-  'models/data/TestNode'
+  'models/behaviors/ParentBehavior'
 
-], function(_, GeometryNode, PaperManager, Instance) {
+], function(_, GeometryNode, PaperManager, Instance, ParentBehavior) {
 
   var PathNode = GeometryNode.extend({
     defaults: _.extend({}, GeometryNode.prototype.defaults, {
@@ -25,7 +25,10 @@ define([
       //intialize array to store instances
       this.instances = [];
       this.createInstance();
-      console.log(this.children);
+     
+      console.log(ParentBehavior);
+      ParentBehavior.call(this);
+      //this.intersectionFound(null);
 
     },
 
@@ -83,6 +86,14 @@ define([
 
     },
 
+
+
+    //event callbacks
+   /* intersectionFound: function(data){
+      console.log("prototype intersection behavior called");
+
+    },*/
+
     //updates  overrides GeometryNode update function
     update: function() {
 
@@ -99,8 +110,9 @@ define([
     //update all instance members if there is more than one
     updateInstances: function(path) {
       var intersections = this.checkIntersections();
-      console.log("intersections=" + intersections);
-      console.log("path trying to update instance");
+      if(intersections){
+        this.intersectionFound(intersections);
+      }
       if (this.instances.length > 1) {
         for (var i = 0; i < this.instances.length; i++) {
           if (this.instances[i].data != path) {
@@ -146,6 +158,7 @@ define([
       }
       return false;
     },
+
     //checks for intersections between this path and any of its siblings in the scene graph
     checkIntersections: function() {
       console.log("checking for intersection");
@@ -153,12 +166,15 @@ define([
 
       //currently assumes that siblings have no children- will need to update to a 
       //recursive function to handle checking for intersections in groups...
-      var found_intersections = null;
       for (var i = 0; i < siblings.length; i++) {
 
         if (siblings[i] != this) {
-          if (this.recursiveCheckIntersections(found_intersections, siblings[i])) {
-            return found_intersections;
+          for (var j = 0; j < this.instances.length; j++) {
+            // console.log("-----checking child at:"+i);
+            var intersections = this.instances[j].checkIntersections(siblings[i].instances);
+            if (intersections) {
+              return {node:siblings[i],intersections:intersections};
+            }
           }
         }
       }

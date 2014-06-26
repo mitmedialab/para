@@ -90,7 +90,7 @@ define ([
 //sets parent node. 
 //If node already has a parent, it removes itself from the parent's this.children
         setParentNode: function(node){
-            console.log('parent='+this.parent);
+            //console.log('parent='+this.parent);
             if(node!==null){
                 if(this.parent!== null){
                     this.parent.removeChildNode(this);
@@ -170,8 +170,8 @@ define ([
         copy: function(){},
 
         //recursively updates all child nodes. placeholder for geometric update functions in subclasses
-        update: function(event){
-            console.log('updating:'+this.get('name'));
+        update: function(){
+           console.log('updating:'+this.get('name'));
             if(this.children.length>0){
                 for(var i=0; i<this.children.length;i++){
                     if(this.children[i]!==null){
