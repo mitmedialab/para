@@ -1,26 +1,28 @@
 /*ParentBehavior.js
  */
 define([
-  'models/behaviors/BaseBehavior'
-],
+    'models/behaviors/BaseBehavior'
+  ],
 
   function(BaseBehavior) {
 
-  var ParentBehavior = BaseBehavior.extend({
+    var ParentBehavior = BaseBehavior.extend({
 
-    update:function() {
-      console.log('parent behavior update called');
-    },
+      setup: function(data) {
+        console.log('parent behavior setup called');
+        console.log('num of children for node=' + data.getNumChildren());
 
-    intersectionFound: function(data) {
-      console.log('parent path behavior interesection found called');
-      console.log("num of children for node="+data.node.getNumChildren());
+        data.addChildNode(this);
+        console.log('num of children for node=' + data.getNumChildren());
+        //data.node.update();
+      },
 
-      data.node.addChildNode(this);
-      console.log("num of children for node="+data.node.getNumChildren());
-      //data.node.update();
-    }
+      update: function() {
+        console.log('parent behavior update called');
+      },
+
+
+    });
+
+    return ParentBehavior;
   });
-
-  return ParentBehavior;
-});

@@ -1,49 +1,53 @@
-/*Behavior.js
-root class for all behaviors */
+/*BaseBehavior.js
+base class for all behaviors */
 
 define([
-	'toolbox'
-	
-  ],
+		'toolbox'
+
+	],
 
 	function(Toolbox) {
 
-  var BaseBehavior = Toolbox.Base.extend({
-  	conditions: [],
+		var BaseBehavior = Toolbox.Base.extend({
+			conditions: [],
 
-/*adds a condition string. Strings should be formatted as code:
-* instance.position.x < 100 & instance.position.y <100;
-*
-*/
-	initialize: function(condition){
-		if(condition){
-			this.conditions.push(condition);
-		}
-	},
 
-   	setCondition: function(condition_string){
-   		this.conditions.push(condition_string);
-   	},
+			events: {
 
-   	checkConditions: function(instance){
-   		console.log("total num of conditions="+this.conditions.length);
-   		for(var i=0;i<this.conditions.length;i++){
-   			if(!this.checkCondition(this.conditions[i],instance)){
-   				return false;
-   			}
-   		}
-   		return true;
-   	},
+			},
 
-   	checkCondition: function(condition, instance){
-   		console.log("condition="+condition);
-   		console.log("evaluating=");
-   		console.log(eval(condition));
-   		var result = eval(condition);
-   		return result;
-   	}
+			initialize: function() {
+				
+			},
 
-  });
+			/*adds a condition string. Strings should be formatted as code:
+			 * instance.position.x < 100 & instance.position.y <100;
+			 *
+			 */
+			addCondition: function(condition_string) {
+				this.conditions.push(condition_string);
+			},
 
-  return BaseBehavior;
-});
+			checkConditions: function(instance) {
+				console.log('total num of conditions=' + this.conditions.length);
+				for (var i = 0; i < this.conditions.length; i++) {
+					if (!this.checkCondition(this.conditions[i], instance)) {
+						return false;
+					}
+				}
+				return true;
+			},
+
+			checkCondition: function(condition, instance) {
+				console.log('condition=' + condition);
+				console.log('evaluating=');
+				//console.log(eval(condition));
+				var result = eval(condition);
+				console.log('evaluating='+result);
+				return result;
+			}
+
+		});
+
+		return BaseBehavior;
+	});

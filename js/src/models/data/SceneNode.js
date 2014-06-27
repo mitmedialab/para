@@ -15,16 +15,11 @@ define([
             defaults: {
                 type: 'default',
                 name: '',
-                parent: {
-                    exists: false,
-                    name: ''
-                }
-
             },
 
 
             constructor: function() {
-                this.parent = null;
+                this.nodeParent = null;
                 this.children = [];
 
                 //console.log("name="+name);
@@ -45,7 +40,7 @@ define([
             clear: function() {
 
                 console.log('clear called');
-                this.parent = null;
+                this.nodeParent = null;
                 for (var i = 0; i < this.children.length; i++) {
                     console.log('clearning child of ' + this.name + 'at:' + i);
                     this.children[i].clear();
@@ -61,8 +56,8 @@ define([
             //returns parent node
             getParentNode: function() {
 
-                if (this.parent !== null) {
-                    return this.parent;
+                if (this.nodeParent !== null) {
+                    return this.nodeParent;
                 } else {
                     return null;
                 }
@@ -74,7 +69,7 @@ define([
             },
             //returns other nodes with the same parent
             getSiblings: function() {
-                return this.parent.getChildren();
+                return this.nodeParent.getChildren();
             },
 
             //returns child at specified index 
@@ -94,16 +89,12 @@ define([
             //sets parent node. 
             //If node already has a parent, it removes itself from the parent's this.children
             setParentNode: function(node) {
-                //console.log('parent='+this.parent);
+                //console.log('parent='+this.nodeParent);
                 if (node !== null) {
-                    if (this.parent !== null) {
-                        this.parent.removeChildNode(this);
+                    if (this.nodeParent !== null) {
+                        this.nodeParent.removeChildNode(this);
                     }
-                    this.parent = node;
-                    this.set('parent', {
-                        exists: true,
-                        name: this.parent.get('name')
-                    });
+                    this.nodeParent = node;
                     return true;
                 }
                 return false;
@@ -112,12 +103,8 @@ define([
             removeParentNode: function() {
 
 
-                if (this.parent !== null) {
-                    this.parent = null;
-                    this.set('parent', {
-                        exists: false,
-                        name: ''
-                    });
+                if (this.nodeParent !== null) {
+                    this.nodeParent = null;
                     return true;
 
                 }
@@ -129,6 +116,7 @@ define([
                 if (node !== null) {
                     node.setParentNode(this);
                     this.children.push(node);
+
                     return true;
                 }
 
@@ -178,6 +166,10 @@ define([
 
             copy: function() {},
 
+
+            setup: function(data){
+
+            },
             //recursively updates all child nodes. placeholder for geometric update functions in subclasses
             update: function() {
                 console.log("updating Scene method called");
@@ -185,12 +177,12 @@ define([
                 if (this.children.length > 0) {
                     for (var i = 0; i < this.children.length; i++) {
                         if (this.children[i] !== null) {
-                            this.children[i].update();
+                            this.children[i].update(this,event);
                         }
                     }
                 }
 
-                this.trigger('change:update');
+                //this.trigger('change:update');
 
             },
 

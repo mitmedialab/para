@@ -5,16 +5,17 @@
 
 define([
   'underscore',
-  'models/data/SceneNode',
-  'models/Utils'
+  'models/data/SceneNode'
 
-], function(_, SceneNode, Utils) {
+], function(_, SceneNode) {
 
   var GeometryNode = SceneNode.extend({
 
     
     visible: true,
-
+    scaleAmt: 1,
+    position: 0,
+    rotation: 0,
     defaults: _.extend({}, SceneNode.prototype.defaults, {
       x: 0,
       y: 0,
@@ -23,10 +24,7 @@ define([
       height: 0,
       strokeColor: 'black',
       fillColor: 'white',
-      weight: 1,
-      rotation: 0,
-      scale: 1,
-      position: 0,
+      weight: 1,   
     }),
 
     constructor: function() {
@@ -40,6 +38,10 @@ define([
     
     },
 
+
+    setup: function(data){
+
+    },
     //overrides SceneNode update function
     update: function() {
       console.log('updating Geom method called');
@@ -71,15 +73,21 @@ define([
     },
 
     //scale 
-    scale: function(scaleAmt){
-      this.scale = this.scale*scaleAmt;
-      this.data.scale(scaleAmt);
+    scale: function(s){
+      this.scaleAmt=s;
+      this.data.scale(s);
     },
 
     //resets scale to 1
     resetScale: function(){
-      this.data.scale(1/this.scale);
-      this.scale=1;
+      var rscale = 1/this.scaleAmt;
+      this.data.scale(rscale);
+      console.log("scale="+rscale);
+      this.scaleAmt = 1;
+    },
+
+    resetStrokeColor: function(){
+      this.data.strokeColor = 'black';
     }
 
 
