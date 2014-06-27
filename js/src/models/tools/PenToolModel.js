@@ -7,9 +7,10 @@ define([
   'models/tools/BaseToolModel',
   'models/data/PathNode',
   'models/behaviors/ParentBehavior',
-  'models/behaviors/FollowPathBehavior'
+  'models/behaviors/FollowPathBehavior',
+  'models/behaviors/ScaleBehavior'
 
-], function(_, Backbone, BaseToolModel, PathNode,ParentBehavior, FollowPathBehavior) {
+], function(_, Backbone, BaseToolModel, PathNode,ParentBehavior, FollowPathBehavior,ScaleBehavior) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -71,11 +72,13 @@ define([
 
           if (!this.currentPath) {
             this.currentPath = new PathNode({name:'path1'});
-            
-            this.currentPath.extendBehavior(FollowPathBehavior,'intersectionFound');
-            this.currentPath.extendBehavior(ParentBehavior,'intersectionFound');
-            
 
+            var scaleBehavior  = new ScaleBehavior();
+            scaleBehavior.setCondition('instance.position.x >250');
+            this.currentPath.extendBehavior(scaleBehavior,'intersectionFound');
+            this.currentPath.extendBehavior(new FollowPathBehavior(),'intersectionFound');
+            this.currentPath.extendBehavior(new ParentBehavior(),'intersectionFound');
+            
             this.trigger('shapeAdded',this.currentPath);
 
           }

@@ -42,6 +42,13 @@ define([
       extendBehavior: function(from, methodName) {
          console.log('trying to extend methods');
         // if the method is defined on from ...
+         // we add those methods which exists on `from` but not on `to` to the latter
+              _.defaults(this, from);
+        // … and we do the same for events
+           _.defaults(this.events, from.events);
+         // console.log(this);
+          // console.log(from);
+
         if (!_.isUndefined(from[methodName])) {
           console.log('setting methods');
           var old = this[methodName];
@@ -93,7 +100,7 @@ define([
         this.deleteInstances();
       }
       for (var i = 0; i < num; i++) {
-        console.log("creating instance number:"+ i);
+       // console.log('creating instance number:'+ i);
         this.createInstance();
       }
       return this.instances;
@@ -207,46 +214,6 @@ define([
     },
 
 
-    //projects a set of instances along a parent path- needs to be moved to mixin
-    followPath: function(path) {
-     
-      //this.path.strokeColor = 'red';
-     var num = this.instances.length;
-     var maxDist = path.length / (num);
-     
-      var position = path.clone();
-    
-      position.flatten(maxDist);
-
-      console.log(position);
-      var location;
-      for (var i = 0; i < this.instances.length; i++) {
-       console.log(location);
-        var location_n = position.segments[i].point;
-        var instance = this.instances[i];
-        instance.resetRotation();
-        if (location) {
-
-          var delta = location_n.subtract(location);
-          delta.angle += 90;
-
-          instance.data.rotate(delta.angle, instance.data.position);
-          instance.rotation = delta.angle;
-        }
-
-        instance.data.position = location_n;
-
-
-
-        location = location_n;
-      }
-      /*if (this.getParentNode != parent) {
-        parent.addChildNode(this);
-      }*/
-      position.remove();
-
-
-    }
 
 
 

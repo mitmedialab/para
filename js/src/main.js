@@ -11,7 +11,8 @@ require.config({
         "backbone" : "../../bower_components/backbone/backbone",
         "underscore" : "../../bower_components/underscore/underscore",
         "mustache"  : "../../bower_components/mustache.js/mustache",
-        "handlebars"  : "../../bower_components/handlebars/handlebars"
+        "handlebars"  : "../../bower_components/handlebars/handlebars",
+        "toolbox": "../../bower_components/js-toolbox/toolbox"
     },
     
     shim: {
@@ -29,6 +30,9 @@ require.config({
 
         handlebars: {
          exports: "Handlebars"
+        },
+        toolbox:{
+          exports: "Toolbox"
         }
     },
 });

@@ -1,12 +1,12 @@
 /*ParentBehavior.js
  */
 define([
-  'underscore',
-  'backbone'],
+  'models/behaviors/BaseBehavior'
+],
 
-  function() {
+  function(BaseBehavior) {
 
-  var ParentBehavior = {
+  var ParentBehavior = BaseBehavior.extend({
 
     update:function() {
       console.log('parent behavior update called');
@@ -20,7 +20,7 @@ define([
       console.log("num of children for node="+data.node.getNumChildren());
       //data.node.update();
     }
-  };
+  });
 
   return ParentBehavior;
 });
