@@ -1,4 +1,4 @@
-/*FollowPathBehavior.js
+/*RandomDistributionBehavior.js
  */
 define([
     'models/behaviors/BaseBehavior'
@@ -17,41 +17,23 @@ define([
       },
 
       update: function() {
-        console.log('follow path behavior update called');
-        console.log(this.nodeParent.nodeParent);
-        if(this.nodeParent.nodeParent){
-          this.followPath(this.nodeParent.instances[0].data);
-        }
+        this.distribute();
+       
 
       },
 
 
       //projects a set of instances along a parent path- needs to be moved to mixin
-      followPath: function(path) {
+      distribute: function() {
 
         //this.path.strokeColor = 'red';
         var num = this.instances.length;
-        var maxDist = path.length / num;
-
-        var position = path.clone();
-
-        position.flatten(maxDist);
-
-        //console.log(position);
-        var location;
+       
         for (var i = 0; i < num; i++) {
           //console.log(location);
-          var location_n = position.segments[i].point;
-          var instance = this.instances[i];
-          instance.resetRotation();
-          if (location) {
-
-            var delta = location_n.subtract(location);
-            delta.angle += 90;
-
-            instance.rotate(delta.angle);
-
-          }
+          var x = random(0,500);
+          var y = random(0,500);
+          var point = new Paper.point
           instance.setPosition(location_n);
 
 

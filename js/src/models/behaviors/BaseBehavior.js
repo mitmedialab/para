@@ -16,8 +16,19 @@ define([
 
 			},
 
-			initialize: function() {
-				
+			//sets parameters for behavior
+			setParams: function(data){
+
+			},
+
+			//called when node is assigned the behavior
+			setup: function(data){
+
+			},
+
+			//called when node is updated
+			update: function(){
+
 			},
 
 			/*adds a condition string. Strings should be formatted as code:

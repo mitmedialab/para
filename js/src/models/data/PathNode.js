@@ -37,7 +37,7 @@ define([
       },
 
       //registers overriding function for update methods- determined by parent node
-      extendBehavior: function(from, methodName) {
+      extendBehavior: function(from, methodName, data) {
         console.log('trying to extend methods');
         // if the method is defined on from ...
         // we add those methods which exists on `from` but not on `to` to the latter
@@ -131,7 +131,16 @@ define([
       update: function() {
         console.log('updating path method called');
        
+        /*for(var i =0;i<instances.length;i++){
+          this.updateInstanceAt(i);
+        }*/
+
         GeometryNode.prototype.update.apply(this, arguments);
+
+
+      },
+
+      updateInstanceAt: function(){
 
 
       },
