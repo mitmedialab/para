@@ -9,7 +9,7 @@ define([
     // Pass in our Router module and call it's initialize function
     Router.initialize();
   };
-
+//checked out on my local machine
   return { 
     initialize: initialize
   };
