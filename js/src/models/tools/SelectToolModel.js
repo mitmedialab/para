@@ -37,11 +37,11 @@ define([
       var hitResult = paper.project.hitTest(event.point, hitOptions);
       var children = paper.project.activeLayer.children;
       for(var i=0;i<children.length;i++){
-        if(children[i].data.instanceParent){
-          if(!children[i].data.instanceParent.anchor){
+        //if(children[i].data.instanceParent){
+          //if(!children[i].data.instanceParent.anchor){
             children[i].selected = false;
-          }
-        }
+         // }
+        //}
       }
       /*if (event.modifiers.shift) {
         if (hitResult.type == 'segment') {
@@ -98,14 +98,12 @@ define([
     mouseDrag: function(event) {
       // console.log("tool mouse drag");
       if (segment) {
-        console.log("dragging segment");
+        console.log('dragging segment');
         segment.point = segment.point.add(event.delta);
 
         //path.smooth();
       } else if (this.path) {
-        console.log("dragging path");
-        
-          this.path.position = this.path.position.add(event.delta);
+          this.path.data.nodeParent.update({delta:event.delta});
 
       }
     },

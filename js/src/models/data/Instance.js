@@ -5,34 +5,35 @@
 
 define([
 	'underscore',
-	'models/data/GeometryNode',
+    'backbone',
 	'models/PaperManager'
-], function(_, GeometryNode, PaperManager) {
+], function(_, Backbone, PaperManager) {
 	var dataCopies = [];
 
-	var Instance = GeometryNode.extend({
-		visible: true,
-		scaleVal: 1,
-		position: 0,
-		rotation: 0,
+	var Instance = Backbone.Model.extend({
+		 visible: true,
+    	scaleVal: 1,
+    	position: 0,
+    	rotation: 0,
 		anchor: false,
 		nodeParent: null,
-		myData: null,
 		//initialize function- if no path object is passed, a new one is created
-		initialize: function(nodeParent) {
+		constructor: function(nodeParent) {
 			this.nodeParent =nodeParent;
 			
 			//add mouse event listener for changes on path object
 		
-			GeometryNode.prototype.initialize.call(this);
 		},
 
 		//updates the path data to correspond to the prototype
-		update: function(data) {
-			this.position = this.position.add(data.position);
-			this.scaleVal*data.scaleVal;
-			this.rotation+=data.rotation;
-			this.visible = data.visible;
+		update: function(delta_data) {
+			this.resetScale();
+			this.resetRotation();
+			//resetPosition();
+			this.position = this.position.add(delta_data.position);
+			//this.scaleVal*data.scaleVal;
+			//this.rotation+=data.rotation;
+			//this.visible = data.visible;
 			/*this.position = this.data.position;
 			console.log('rotation before =' + this.rotation);
 			this.data.detach('mouseup');
@@ -59,8 +60,8 @@ define([
 			this.rotation = instance.rotation;
 		},
 
-		draw: function(data){
-			var myData = data.clone();
+		draw: function(path_data){
+			var myData = path_data.clone();
 			dataCopies.push(myData);
 			myData.setPosition(this.position);
 			myData.rotate(this.rotation);

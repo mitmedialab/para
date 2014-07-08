@@ -1,6 +1,7 @@
 /*PathNode.js
  * path object
  * extends GeometryNode
+ * node with actual path in it
  */
 
 
@@ -12,12 +13,13 @@ define([
 
 ], function(_, GeometryNode, PaperManager, Instance) {
   //drawable paper.js path object that is stored in the pathnode
-  var path_literal = null;
 
   var PathNode = GeometryNode.extend({
     defaults: _.extend({}, GeometryNode.prototype.defaults, {
       type: 'path',
     }),
+
+    path_literal: null,
 
     
 
@@ -31,20 +33,17 @@ define([
     //mixin: Utils.nodeMixin,
 
     initialize: function() {
-      //call the super constructor
-      GeometryNode.prototype.initialize.call(this);
+     console.log("path is intialized");
+     GeometryNode.prototype.initialize.call(this);
 
       //intialize array to store instances
-      this.instances = [];
-      var instance= this.createInstance();
-       this.instances.push(instance);
 
-      var paper = PaperManager.getPaperInstance('path');
-       path_literal = new paper.Path();
-        path_literal.selected = true;
-         path_literal.strokeColor = 'black';
-         path_literal.data.nodeParent = this;
-         myData.data.instanceParent = null;
+        var paper = PaperManager.getPaperInstance('path');
+        this.path_literal = new paper.Path();
+       this.path_literal.selected = true;
+         this.path_literal.strokeColor = 'black';
+         this.path_literal.data.nodeParent = this;
+         this.path_literal.data.instanceParent = null;
     },
 
     //registers overriding function for update methods- determined by parent node
@@ -79,70 +78,7 @@ define([
       }
 
     },
-
-    //creates and stores an instance which is identical to this path 
-    createInstance: function(anchor,copy) {
-      /*for now it is neccesary to make a copy of the shape data
-       * rather than reference it due to the drawing structure of
-       * paperjs. update this for efficency in the future
-       */
-      var instance = new Instance(this);
-      //if there are no instances, create a new one with a new path
-      //else create an instance with a clone of the first instances' path
-      
-        if(copy){
-          instance.copyParameter(copy);
-        }
-        
-      
-
-      this.listenTo(instance, 'change:mouseUpInstance', this.mouseUpInstance);
-      this.listenTo(instance, 'change:anchorInit', this.anchorUpdated);
-      if(anchor){
-        instance.isAnchor(true);
-      }
-     
-
-      return instance;
-
-    },
-
-    //creates a specified number of instances, with option to clear existing instances
-    createInstances: function(num, clear) {
-      if (clear) {
-        this.deleteInstances();
-      }
-      for (var i = 0; i < num; i++) {
-        // console.log('creating instance number:'+ i);
-       var instance = this.createInstance();
-       this.instances.splice(this.instances.length-2,0,instance);
-      }
-      return this.instances;
-
-    },
-
-    //deletes specified number of instances avoiding start and end if possible
-    deleteInstances: function(num, clear) {
-      var toRemove = this.instances.length - num;
-      if (toRemove >= 1) {
-        for (var i = this.instances.length - 1; i >= toRemove; i--) {
-          var clearedInstance = this.instances.splice(i,1);
-          clearedInstance.clear();
-          this.stopListening(clearedInstance);
-          clearedInstance = null;
-          
-        }
-      }
-      if (clear) {
-        this.instances = [];
-      }
-    },
-
-    //converts an instance into a prototype and adds it to the scene graph as its own object
-    bakeInstance: function(instance) {
-
-    },
-
+  
 
     //event callbacks
 
@@ -152,30 +88,8 @@ define([
         if(data){
             var delta = data.delta;
             var d_instances = data.instances;
-
-            this.path_literal.position.add(delta);
-
-           for(var k=0;k>this.instances.length;k++){
-            this.instances[k].clear();
-            }
-
-          for(var i=0;i<d_instances.length;i++){
-            for(var j=0;j>this.instances.length;j++){
-              this.instances[j].update(data[i]);
-              this.instances[j].draw(path_literal);
-            }
-            this.instances.update();
+           this.path_literal.position=this.path_literal.position.add(delta);
           }
-        }
-
-       if (this.children.length > 0) {
-          for (var z = 0; z < this.children.length; z++) {
-            if (this.children[z] !== null) {
-                  this.children[z].update(this.instances);
-                  }
-              }
-          }
-
 
     },
 
@@ -196,7 +110,7 @@ define([
 
 
       this.update();
-
+      this.trigger('change:mouseUpInstance', this);
       /*for(var i=0;i<this.instances.length;i++){
           if(this.instances[i]!=instance){
             this.instances[i].correspond(instance.data);
@@ -217,7 +131,7 @@ define([
 
     getPath: function(index) {
       if (!index) {
-        return path_literal;
+        return this.path_literal;
       } else {
         if (index < this.instances.length) {
           return this.instances[index];
