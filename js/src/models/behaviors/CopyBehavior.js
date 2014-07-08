@@ -7,22 +7,31 @@ define([
 
   function(BaseBehavior) {
 
-    var ScaleBehavior = BaseBehavior.extend({
-    
-      setup: function(data) {
-        var num = data;
-        console.log('copy behavior setup called');
-        this.createInstances(num - 1, false);
+    var CopyBehavior = BaseBehavior.extend({
+      copyNum:2,
+
+      update: function() {
+        // console.log('copy behavior update called');
+        console.log("copying");
+        var numToCreate = this.copyNum - this.instances.length;
+        if (numToCreate !== 0) {
+          if (numToCreate > 0) {
+            this.createInstances(numToCreate, false);
+          } else {
+            this.deleteInstances(numToCreate, false);
+          }
+        }
 
       },
 
-      update: function() {
-        console.log('copy behavior update called');
-       
+      setCopyNum: function(data) {
+        this.copyNum = data;
+        console.log("number of copies = " + this.copyNum);
+
       }
 
-      
+
     });
 
-    return ScaleBehavior;
+    return CopyBehavior;
   });

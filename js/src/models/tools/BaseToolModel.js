@@ -11,7 +11,7 @@ define([
   var BaseToolModel = Backbone.Model.extend({
  	defaults: {
   	},
-
+  path: null,
   	constructor: function(){
   		this.currentPath = null;
   		Backbone.Model.apply(this, arguments);

@@ -9,16 +9,19 @@ define([
   'models/tools/ToolCollection',
   'models/tools/PenToolModel',
   'models/tools/PolyToolModel',
-  'models/tools/SelectToolModel'
+  'models/tools/SelectToolModel',
+  'models/behaviors/CopyBehavior',
+  'models/behaviors/DistributeBehavior'
 
-], function($, _, Backbone,SceneNode, ToolCollection, PenToolModel,PolyToolModel,SelectToolModel) {
+], function($, _, Backbone,SceneNode, ToolCollection, PenToolModel,PolyToolModel,SelectToolModel, CopyBehavior,DistributeBehavior) {
   var rootNode,
   	currentNode,
   	toolCollection,
   	penTool,
   	polyTool,
   	selectTool;
-
+    
+    
 
   var StateManagerModel = Backbone.Model.extend({
 
@@ -95,9 +98,9 @@ define([
 
   	},
 
-  	shapeSelected: function(shape){
-  		currentNode = shape.nodeParent;
-
+  	shapeSelected: function(obj){
+  		currentNode = obj.shape.instanceParent;
+      //console.log("selected anchor="+obj.anchor);
   		//this.trigger('updateView');
   		//console.log('path added to root:'+shape);
   		//console.log('num children for root node ='+rootNode.getNumChildren());
@@ -133,7 +136,44 @@ define([
        	var selectedTool = toolCollection.get(this.get('state'));
        	selectedTool.mouseMove(event);
        //	this.trigger('change:update');
-     }
+     },
+
+    canvasMouseWheel: function(event){
+
+      var selectedTool = toolCollection.get(this.get('state'));
+      var currentlySelected = selectedTool.path.instanceParent.nodeParent;
+      if(!_.has(currentlySelected,'copyNum')){
+        console.log('no behavior, assigning copy and distribute');
+      var copyBehavior = new CopyBehavior();
+      var distributeBehavior = new DistributeBehavior();
+      distributeBehavior.initialize();
+      copyBehavior.setCopyNum(2);
+      currentlySelected.extendBehavior(distributeBehavior,'update');
+      currentlySelected.extendBehavior(copyBehavior,'update');
+    }
+    else{
+       console.log('behavior exists. updating num');
+      currentlySelected.setCopyNum(currentlySelected.copyNum+1);
+    }
+
+    currentlySelected.update();
+
+
+
+    },
+
+    canvasDblclick: function(event){
+      var selectedTool = toolCollection.get(this.get('state'));
+      selectedTool.dblClick(event);
+
+    },
+    //called when escape key is pressed in canvas
+    escapeEvent: function(){
+      currentNode.removeAnchors();
+    },
+
+   
+
 
 
 

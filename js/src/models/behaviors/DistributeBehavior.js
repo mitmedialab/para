@@ -1,19 +1,17 @@
-/*RandomDistributionBehavior.js
+/*DistributeBehavior.js
  */
 define([
-    'models/behaviors/BaseBehavior'
+    'models/behaviors/BaseBehavior',
+    'models/PaperManager'
   ],
 
-  function(BaseBehavior) {
+  function(BaseBehavior, PaperManager) {
 
-    var FollowPathBehavior = BaseBehavior.extend({
+    var DistributeBehavior = BaseBehavior.extend({
+      paper:null,
 
-
-      setup: function(data) {
-        var num = 10;
-        console.log('follow path behavior setup called');
-        this.createInstances(num - 1, false);
-
+      initialize: function(){
+          this.paper = PaperManager.getPaperInstance();
       },
 
       update: function() {
@@ -25,30 +23,29 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       distribute: function() {
-
         //this.path.strokeColor = 'red';
         var num = this.instances.length;
-       
+        var pointA = this.anchors[0].location;
+        var pointB = this.anchors[this.anchors.length].location;
+        var xDiff = pointB.x-pointA.x/num;
+        var yDiff = pointB.y-pointA.y/num;
+
+
         for (var i = 0; i < num; i++) {
           //console.log(location);
-          var x = random(0,500);
-          var y = random(0,500);
-          var point = new Paper.point
-          instance.setPosition(location_n);
-
-
-
-          location = location_n;
+          var x = pointA.x+xDiff*i;
+          var y = pointA.y+yDiff*i;
+          var point = new this.paper.Point(x,y);
+          this.instances[i].setPosition(point);
         }
         /*if (this.getParentNode != parent) {
         parent.addChildNode(this);
       }*/
-        position.remove();
 
 
       }
 
     });
 
-    return FollowPathBehavior;
+    return DistributeBehavior;
   });

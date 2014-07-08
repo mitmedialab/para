@@ -4,10 +4,11 @@
  */
 
 define([
+  'jquery',
   'underscore',
   'models/data/SceneNode'
 
-], function(_, SceneNode) {
+], function($,_, SceneNode) {
 
   var GeometryNode = SceneNode.extend({
 
@@ -16,6 +17,7 @@ define([
     scaleAmt: 1,
     position: 0,
     rotation: 0,
+    anchors: [],
     defaults: _.extend({}, SceneNode.prototype.defaults, {
       x: 0,
       y: 0,
@@ -26,6 +28,7 @@ define([
       fillColor: 'white',
       weight: 1,   
     }),
+
 
     constructor: function() {
 
@@ -44,7 +47,7 @@ define([
     },
     //overrides SceneNode update function
     update: function() {
-      console.log('updating Geom method called');
+      //console.log('updating Geom method called');
       SceneNode.prototype.update.apply(this, arguments);
     },
 
@@ -57,7 +60,7 @@ define([
     setPosition: function(position){
       this.position = position;
       this.data.position = position;
-      console.log(position);
+      //console.log(position);
     },
 
     //rotate
@@ -82,13 +85,33 @@ define([
     resetScale: function(){
       var rscale = 1/this.scaleAmt;
       this.data.scale(rscale);
-      console.log("scale="+rscale);
+      console.log('scale='+rscale);
       this.scaleAmt = 1;
     },
 
     resetStrokeColor: function(){
       this.data.strokeColor = 'black';
+    },
+
+    
+ //clears all anchors from array
+    removeAnchors: function(){
+      for(var i =0;i<this.anchors.length;i++){
+        this.anchors[i].isAnchor(false);
+      }
+      this.anchors = [];
+    },
+
+    anchorUpdated: function(instance){
+      if(instance.anchor){
+        this.anchors.push(instance);
+      }
+      else{
+        this.anchors.splice($.inArray(instance,this.anchors),1);
+      }
+      console.log("num of anchors="+this.anchors.length);
     }
+
 
 
 

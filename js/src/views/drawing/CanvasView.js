@@ -38,7 +38,12 @@ define([
    events: {
         'mousedown': 'canvasMouseDown',
         'mouseup' : 'canvasMouseUp',
-        'mousemove': 'canvasMouseMove'
+        'mousemove': 'canvasMouseMove',
+        'keydown': 'canvasKeypress',
+         'mouseenter': 'enter',
+        'mouseleave': 'leave',
+        'mousewheel': 'canvasMousewheel',
+        'dblclick': 'canvasDblclick'
     },
 
 
@@ -54,6 +59,7 @@ define([
 
     toolMouseDown: function(event){
       //this.target. model.toolMouseDown(event);
+      //console.log(event);
       this.parent.model.toolMouseDown(event);
     },
 
@@ -73,10 +79,33 @@ define([
     },
   
   
-  /* canvas mouse event functions */
+  /* canvas event functions */
+
+    canvasKeypress: function(event){
+     // console.log('keypress called');
+      //console.log(event.keyCode);
+      if(event.keyCode = 27){
+        this.model.escapeEvent();
+      }
+    },
+
+    //enter and leave functions manage keyboard events by focusing the canvas elemennt
+    enter: function() {
+        this.$el.addClass('hover');
+        var span = this.$el.find('span');
+        span.attr('tabindex', '1').attr('contenteditable', 'true');
+        span.focus();
+    },
+
+    leave: function() {
+        this.$el.removeClass('hover');
+        var span = this.$el.find('span');
+        span.removeAttr('contenteditable').removeAttr('tabindex');
+        span.blur();
+    },
 
     canvasMouseDown: function(event){
-     // console.log(event);
+    //console.log(event);
      mouseDown = true;
       //this.model.canvasMouseDown(event);
     },
@@ -98,6 +127,16 @@ define([
       }
 
 
+    },
+
+    canvasMousewheel: function(event){
+      //console.log(event.originalEvent.deltaY);
+      this.model.canvasMouseWheel(event);
+
+    },
+
+    canvasDblclick: function(event){
+      this.model.canvasDblclick(event);
     }
 
   });

@@ -54,6 +54,16 @@ body{
 
 }
 
+span:hover{
+	cursor: default;
+	outline:none;
+    border:none;
+    box-shadow:none;
+}
+span:focus{
+	border:none;
+}
+
 
 #toolbar{
 	float:right;
@@ -85,6 +95,11 @@ min-height: 200px;
 #canvas-container{
  min-height: 700px;
 
+}
+#canvas-container:focus{
+	outline:none;
+    border:none;
+    box-shadow:none;
 }
 
 #canvas{

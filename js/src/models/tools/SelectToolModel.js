@@ -10,6 +10,7 @@ define([
 
 ], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
   var segment, paper;
+ 
 
   var hitOptions = {
     segments: true,
@@ -20,30 +21,42 @@ define([
 
   var SelectToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {}),
-
+    
     initialize: function() {
       paper = PaperManager.getPaperInstance();
-      this.path = null;
     },
-
+    
     /*mousedown event- checks to see if current path has been initialized-
      *if it has not, create a new one and trigger a shapeAdded event
      */
     mouseDown: function(event) {
+      console.log("tool mouse down");
       var paper = PaperManager.getPaperInstance();
-      segment = this.path = null;
+      segment = null;
+      this.path=null;
       var hitResult = paper.project.hitTest(event.point, hitOptions);
 
-      if (event.modifiers.shift) {
+      /*if (event.modifiers.shift) {
         if (hitResult.type == 'segment') {
           hitResult.segment.remove();
         }
         return;
-      }
+      }*/
 
       if (hitResult) {
         this.path = hitResult.item;
-        this.trigger('shapeSelected', this.path);
+        if(event.modifiers.shift){
+          var copy = this.path.instanceParent.nodeParent.createInstance(false,this.path).data;
+           this.path=copy;
+        }
+        this.trigger('shapeSelected', {shape:this.path});
+        /*if(event.modifiers.shift){
+          this.trigger('shapeSelected',{shape:this.path, anchor:true});
+        }
+        else{
+          this.trigger('shapeSelected', {shape:this.path, anchor:false});
+
+        }*/
         if (hitResult.type == 'segment') {
           segment = hitResult.segment;
         } else if (hitResult.type == 'stroke') {
@@ -56,9 +69,16 @@ define([
 
     },
 
+    dblClick: function(event){
+      if(this.path){
+        this.path.instanceParent.isAnchor(!this.path.instanceParent.anchor);
+      }
+    },
+
+
     //mouse up event
     mouseUp: function(event) {
-      console.log("tool mouse up");
+     // console.log("tool mouse up");
       if (this.path) {
 
         this.path.fire('mouseup', event);
@@ -76,7 +96,9 @@ define([
         //path.smooth();
       } else if (this.path) {
         console.log("dragging path");
-        this.path.position = this.path.position.add(event.delta);
+        
+          this.path.position = this.path.position.add(event.delta);
+
       }
     },
 

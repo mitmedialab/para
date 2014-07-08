@@ -30,7 +30,7 @@ define([
       
         var stateManager = new StateManagerModel();
         //setup the canvas view
-        var canvasView = new CanvasView({el:'#canvas',model:stateManager});
+        var canvasView = new CanvasView({el:'#canvas-container',model:stateManager});
         var toolView = new ToolView({el:'#toolbar',model:stateManager});
         var propertyView = new PropertyView({el:'#prop-menu',model:stateManager});
       

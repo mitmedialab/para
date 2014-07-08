@@ -19,12 +19,12 @@ define([
 
        //called when node is assigned the behavior
       setup: function(data) {
-        console.log('scale behavior interesection found called');
+        //console.log('scale behavior interesection found called');
 
       },
 
       update: function() {
-        console.log('scale behavior update called');
+       // console.log('scale behavior update called');
         if(this.nodeParent.nodeParent){
           this.iterativeScale(this.getParentNode().instances[0].data);
         }
@@ -33,7 +33,7 @@ define([
 
       //called when node is updated
       updateInstanceAt: function(i) {
-        console.log('scale behavior update called');
+       // console.log('scale behavior update called');
         if(this.nodeParent.nodeParent){
           this.scale(i);
         }

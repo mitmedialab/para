@@ -11,17 +11,18 @@ define([
 
 	var Instance = GeometryNode.extend({
 		data: null,
-
+		anchor: false,
+		nodeParent: null,
 		//initialize function- if no path object is passed, a new one is created
-		initialize: function(path_data) {
-
-			if (!path_data) {
+		initialize: function(obj) {
+			this.nodeParent = obj.nodeParent;
+			if (!obj.data) {
 				var paper = PaperManager.getPaperInstance('path');
 				this.data = new paper.Path();
 				this.data.selected = true;
 				this.data.strokeColor = this.get('strokeColor');
 			} else {
-				this.data = path_data;
+				this.data = obj.data;
 			}
 
 			//reflexive definition
@@ -37,7 +38,7 @@ define([
 
 		//updates the path data to correspond to the prototype
 		correspond: function(_data) {
-			//this.position = this.data.position;
+			this.position = this.data.position;
 			console.log('rotation before =' + this.rotation);
 			this.data.detach('mouseup');
 			this.data.remove();
@@ -75,6 +76,22 @@ define([
 			}
 			return null;
 
+		},
+
+		isAnchor: function(toggle) {
+			if (toggle) {
+				this.anchor = true;
+				this.data.strokeColor = 'red';
+				this.data.strokeWidth = 2;
+
+			} else {
+				this.anchor = false;
+				this.data.strokeColor = 'black';
+				this.data.strokeWidth = 1;
+
+			}
+
+			this.trigger('change:anchorInitialized', this);
 		}
 
 
