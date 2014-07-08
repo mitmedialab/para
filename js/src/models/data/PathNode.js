@@ -11,11 +11,15 @@ define([
   'models/data/Instance'
 
 ], function(_, GeometryNode, PaperManager, Instance) {
+  //drawable paper.js path object that is stored in the pathnode
+  var path_literal = null;
 
   var PathNode = GeometryNode.extend({
     defaults: _.extend({}, GeometryNode.prototype.defaults, {
       type: 'path',
     }),
+
+    
 
 
     constructor: function() {
@@ -32,10 +36,15 @@ define([
 
       //intialize array to store instances
       this.instances = [];
-     var instance= this.createInstance();
+      var instance= this.createInstance();
        this.instances.push(instance);
 
-
+      var paper = PaperManager.getPaperInstance('path');
+       path_literal = new paper.Path();
+        path_literal.selected = true;
+         path_literal.strokeColor = 'black';
+         path_literal.data.nodeParent = this;
+         myData.data.instanceParent = null;
     },
 
     //registers overriding function for update methods- determined by parent node
@@ -77,19 +86,15 @@ define([
        * rather than reference it due to the drawing structure of
        * paperjs. update this for efficency in the future
        */
-      var instance;
+      var instance = new Instance(this);
       //if there are no instances, create a new one with a new path
       //else create an instance with a clone of the first instances' path
-      if (this.instances.length === 0) {
-        instance = new Instance({nodeParent:this});
-      } else {
+      
         if(copy){
-          instance = new Instance({nodeParent:this,data:copy.clone()});
+          instance.copyParameter(copy);
         }
-        else{
-          instance = new Instance({nodeParent:this,data:this.instances[0].data.clone()});
-        }
-      }
+        
+      
 
       this.listenTo(instance, 'change:mouseUpInstance', this.mouseUpInstance);
       this.listenTo(instance, 'change:anchorInit', this.anchorUpdated);
@@ -139,18 +144,37 @@ define([
     },
 
 
-
     //event callbacks
 
     //updates  overrides GeometryNode update function
-    update: function() {
-      // console.log('updating path method called');
+    update: function(data) {
 
-      /*for(var i =0;i<instances.length;i++){
-          this.updateInstanceAt(i);
-        }*/
+        if(data){
+            var delta = data.delta;
+            var d_instances = data.instances;
 
-      GeometryNode.prototype.update.apply(this, arguments);
+            this.path_literal.position.add(delta);
+
+           for(var k=0;k>this.instances.length;k++){
+            this.instances[k].clear();
+            }
+
+          for(var i=0;i<d_instances.length;i++){
+            for(var j=0;j>this.instances.length;j++){
+              this.instances[j].update(data[i]);
+              this.instances[j].draw(path_literal);
+            }
+            this.instances.update();
+          }
+        }
+
+       if (this.children.length > 0) {
+          for (var z = 0; z < this.children.length; z++) {
+            if (this.children[z] !== null) {
+                  this.children[z].update(this.instances);
+                  }
+              }
+          }
 
 
     },
@@ -193,7 +217,7 @@ define([
 
     getPath: function(index) {
       if (!index) {
-        return this.instances[0].data;
+        return path_literal;
       } else {
         if (index < this.instances.length) {
           return this.instances[index];

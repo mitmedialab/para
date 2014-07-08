@@ -168,13 +168,13 @@ define([
 
 
             //recursively updates all child nodes. placeholder for geometric update functions in subclasses
-            update: function() {
+            update: function(data) {
                 //console.log("updating Scene method called");
                 //console.log('updating:' + this.get('name'));
                 if (this.children.length > 0) {
                     for (var i = 0; i < this.children.length; i++) {
                         if (this.children[i] !== null) {
-                            this.children[i].update(this,event);
+                            this.children[i].update(data);
                         }
                     }
                 }

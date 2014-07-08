@@ -30,15 +30,17 @@ define([
      *if it has not, create a new one and trigger a shapeAdded event
      */
     mouseDown: function(event) {
-      console.log("tool mouse down");
+      
       var paper = PaperManager.getPaperInstance();
       segment = null;
       this.path=null;
       var hitResult = paper.project.hitTest(event.point, hitOptions);
       var children = paper.project.activeLayer.children;
       for(var i=0;i<children.length;i++){
-        if(!children[i].instanceParent.anchor){
-          children[i].selected = false;
+        if(children[i].data.instanceParent){
+          if(!children[i].data.instanceParent.anchor){
+            children[i].selected = false;
+          }
         }
       }
       /*if (event.modifiers.shift) {
@@ -52,7 +54,7 @@ define([
         hitResult.item.selected = true;
         this.path = hitResult.item;
         if(event.modifiers.shift){
-          var copy = this.path.instanceParent.nodeParent.createInstance(false,this.path).data;
+          var copy = this.path.data.nodeParent.createInstance(false,this.path).data;
            this.path=copy;
         }
         this.trigger('shapeSelected', {shape:this.path});
