@@ -6,9 +6,11 @@
 define([
   'jquery',
   'underscore',
-  'models/data/SceneNode'
+  'models/data/SceneNode',
+    'models/behaviors/CopyBehavior',
+  'models/behaviors/DistributeBehavior',
 
-], function($,_, SceneNode) {
+], function($,_, SceneNode,CopyBehavior,DistributeBehavior) {
 
   var GeometryNode = SceneNode.extend({
 
@@ -103,6 +105,7 @@ define([
     },
 
     anchorUpdated: function(instance){
+      
       if(instance.anchor){
         this.anchors.push(instance);
       }
@@ -110,6 +113,19 @@ define([
         this.anchors.splice($.inArray(instance,this.anchors),1);
       }
       console.log("num of anchors="+this.anchors.length);
+     if(this.anchors.length==2){
+      if(!_.has(this,'copyNum')){
+        console.log('no behavior, assigning copy and distribute');
+      var copyBehavior = new CopyBehavior();
+      var distributeBehavior = new DistributeBehavior();
+      distributeBehavior.initialize();
+      copyBehavior.setCopyNum(10);
+      this.extendBehavior(distributeBehavior,'update');
+      this.extendBehavior(copyBehavior,'update');
+      this.update();
+      }
+     }
+
     }
 
 

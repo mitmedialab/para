@@ -25,10 +25,14 @@ define([
       distribute: function() {
         //this.path.strokeColor = 'red';
         var num = this.instances.length;
-        var pointA = this.anchors[0].location;
-        var pointB = this.anchors[this.anchors.length].location;
-        var xDiff = pointB.x-pointA.x/num;
-        var yDiff = pointB.y-pointA.y/num;
+        console.log(this.anchors);
+        var pointA = this.anchors[0].data.position;
+        var pointB = this.anchors[this.anchors.length-1].data.position;
+        console.log("point a and b");
+        console.log(pointA);
+        console.log(pointB);
+        var xDiff = (pointB.x-pointA.x)/num;
+        var yDiff = (pointB.y-pointA.y)/num;
 
 
         for (var i = 0; i < num; i++) {

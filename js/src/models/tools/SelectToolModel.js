@@ -35,7 +35,12 @@ define([
       segment = null;
       this.path=null;
       var hitResult = paper.project.hitTest(event.point, hitOptions);
-
+      var children = paper.project.activeLayer.children;
+      for(var i=0;i<children.length;i++){
+        if(!children[i].instanceParent.anchor){
+          children[i].selected = false;
+        }
+      }
       /*if (event.modifiers.shift) {
         if (hitResult.type == 'segment') {
           hitResult.segment.remove();
@@ -44,6 +49,7 @@ define([
       }*/
 
       if (hitResult) {
+        hitResult.item.selected = true;
         this.path = hitResult.item;
         if(event.modifiers.shift){
           var copy = this.path.instanceParent.nodeParent.createInstance(false,this.path).data;
@@ -105,12 +111,12 @@ define([
     //mouse move event
     mouseMove: function(event) {
       // console.log("tool mouse move");
-      var hitResult = paper.project.hitTest(event.point, hitOptions);
-      paper.project.activeLayer.selected = false;
-      if (hitResult && hitResult.item) {
+      //var hitResult = paper.project.hitTest(event.point, hitOptions);
+      //paper.project.activeLayer.selected = false;
+      /*if (hitResult && hitResult.item) {
         hitResult.item.selected = true;
 
-      }
+      }*/
 
     }
 

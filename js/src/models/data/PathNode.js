@@ -92,7 +92,7 @@ define([
       }
 
       this.listenTo(instance, 'change:mouseUpInstance', this.mouseUpInstance);
-      this.listenTo(instance, 'change:anchorInitialized', this.anchorUpdated);
+      this.listenTo(instance, 'change:anchorInit', this.anchorUpdated);
       if(anchor){
         instance.isAnchor(true);
       }

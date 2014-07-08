@@ -24,6 +24,7 @@ define([
 			} else {
 				this.data = obj.data;
 			}
+			this.data.selectedColor = 'blue';
 
 			//reflexive definition
 			this.data.instanceParent = this;
@@ -81,17 +82,21 @@ define([
 		isAnchor: function(toggle) {
 			if (toggle) {
 				this.anchor = true;
-				this.data.strokeColor = 'red';
-				this.data.strokeWidth = 2;
+				this.data.selected = true;
+				this.data.selectedColor = "red";
+				//this.data.strokeColor = 'red';
+				//this.data.strokeWidth = 2;
 
 			} else {
 				this.anchor = false;
-				this.data.strokeColor = 'black';
-				this.data.strokeWidth = 1;
+				this.data.selected = false;
+				this.data.selectedColor = "blue";
+				//this.data.strokeColor = 'black';
+				//this.data.strokeWidth = 1;
 
 			}
 
-			this.trigger('change:anchorInitialized', this);
+			this.trigger('change:anchorInit', this);
 		}
 
 
