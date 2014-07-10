@@ -5,15 +5,13 @@ define([
   'underscore',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PathNode',
-  'models/behaviors/FollowPathBehavior',
-  'models/behaviors/ScaleBehavior'
+  'models/data/PathNode'
 
-], function(_, Backbone, BaseToolModel, PathNode, FollowPathBehavior,ScaleBehavior) {
+], function(_, Backbone, BaseToolModel, PathNode) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
-
+  var nameVal = 0;
   //segment being drawn, mode of current drawing, type
   var currentSegment, mode, type;
 
@@ -22,23 +20,27 @@ define([
   	  defaults:_.extend({},BaseToolModel.prototype.defaults,  {
           }),
 
+   
   	initialize: function(){
 
   	},
 
     reset: function(){
       console.log('pen tool is reset');
-      currenSegment = null;
-      this.currentPath = null;
+      currentSegment = null;
+      if(this.currentPath){
+        this.currentNode.pathComplete();
+        this.currentPath = null;
+        this.currentNode = null;
+      }
     },
 
 //method to determine location of handle for current segment
     findHandle: function(point) {
-     // console.log('searching for handle');
-      for (var i = 0, l = this.currentPath.getPath().segments.length; i < l; i++) {
+      for (var i = 0, l = this.currentPath.segments.length; i < l; i++) {
         for (var j = 0; j < 3; j++) {
           var _type = types[j];
-          var segment = this.currentPath.getPath().segments[i];
+          var segment = this.currentPath.segments[i];
           var segmentPoint;
          if(type == 'point'){
              segmentPoint = segment.point;
@@ -47,10 +49,8 @@ define([
               segmentPoint = segment.point.add(segment[type]);
 
             }
-          //console.log('segment.point='+segment.point);
 
           var distance = (point.subtract(segmentPoint)).length;
-          // console.log('distance='+segment.point);
           if (distance < 3) {
             return {
               type: _type,
@@ -67,8 +67,6 @@ define([
       */
 
       mouseDown : function(event) {
-
-        //console.log('pen tool mouse down');
          if (currentSegment){
             currentSegment.selected = false;
           }
@@ -76,47 +74,34 @@ define([
           
 
           if (!this.currentPath) {
-            this.currentPath = new PathNode({name:'path1'});
-
-            var scaleBehavior  = new ScaleBehavior();
-            var followPathBehavior = new FollowPathBehavior();
-           
-            scaleBehavior.addCondition('instance.position.y >250');
-            //scaleBehavior.addCondition('instance.position.x >250');
-
-
-           //this.currentPath.extendBehavior(scaleBehavior,'update');
-
-           // this.currentPath.extendBehavior(followPathBehavior,'setup');
-            //this.currentPath.extendBehavior(followPathBehavior,'update');
-            //this.currentPath.extendBehavior(parentBehavior,'setup');
-
-            
-            this.trigger('shapeAdded',this.currentPath);
+            this.currentNode  = new PathNode();
+            this.currentNode.name = nameVal;
+            nameVal++;
+            this.currentPath = this.currentNode.path_literal;
+            this.trigger('nodeAdded',this.currentNode);
 
           }
 
           var result = this.findHandle(event.point);
-          //console.log('handle result='+result);
+          
           if (result) {
-            //console.log('found result='+result);
-
             currentSegment = result.segment;
             type = result.type;
-            if (this.currentPath.getPath().segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
+            if (this.currentPath.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
               mode = 'close';
-              //console.log('path is closed');
-              this.currentPath.getPath().closed = true;
-              this.currentPath.getPath().selected = false;
+
+              this.currentPath.closed = true;
+              this.currentPath.selected = false;
+              this.currentNode.pathComplete();
               this.currentPath = null;
+              this.currentNode = null;
             }
           }
-          //console.log('after result='+result);
 
         if (mode != 'close') {
           mode = currentSegment ? 'move' : 'add';
           if (!currentSegment){
-            currentSegment = this.currentPath.getPath().add(event.point);
+            currentSegment = this.currentPath.add(event.point);
           }
           currentSegment.selected = true;
         }
@@ -139,7 +124,6 @@ define([
         }
          currentSegment.handleIn = currentSegment.handleIn.add(delta);
         currentSegment.handleOut = currentSegment.handleOut.subtract(delta);
-        //console.log("trying to add handle to current segment");
       }
 
      },

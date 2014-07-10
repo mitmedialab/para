@@ -11,18 +11,15 @@ define([
   var BaseToolModel = Backbone.Model.extend({
  	defaults: {
   	},
-  path: null,
+  currentPath: null,
+  currentNode: null,
+
   	constructor: function(){
-  		this.currentPath = null;
   		Backbone.Model.apply(this, arguments);
   	},
 
   	reset: function(){
-  		if(this.currentPath){
-  			this.currentPath.path.selected = false;
-  			 this.currentPath = null;
-
-  		}
+  
   	},
 
   	//mousedown event

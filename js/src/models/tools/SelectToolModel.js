@@ -6,9 +6,11 @@ define([
   'backbone',
   'models/tools/BaseToolModel',
   'models/data/PathNode',
-  'models/PaperManager'
+  'models/PaperManager',
+  'models/behaviors/CopyBehavior',
+  'models/data/BehaviorNode'
 
-], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
+], function(_, Backbone, BaseToolModel, PathNode, PaperManager, CopyBehavior, BehaviorNode) {
   var segment, paper;
  
 
@@ -26,8 +28,7 @@ define([
       paper = PaperManager.getPaperInstance();
     },
     
-    /*mousedown event- checks to see if current path has been initialized-
-     *if it has not, create a new one and trigger a shapeAdded event
+    /*mousedown event
      */
     mouseDown: function(event) {
       
@@ -43,36 +44,35 @@ define([
          // }
         //}
       }
-      /*if (event.modifiers.shift) {
-        if (hitResult.type == 'segment') {
-          hitResult.segment.remove();
-        }
-        return;
-      }*/
 
       if (hitResult) {
-        hitResult.item.selected = true;
-        this.path = hitResult.item;
-        if(event.modifiers.shift){
-          var copy = this.path.data.nodeParent.createInstance(false,this.path).data;
-           this.path=copy;
-        }
-        this.trigger('shapeSelected', {shape:this.path});
-        /*if(event.modifiers.shift){
-          this.trigger('shapeSelected',{shape:this.path, anchor:true});
-        }
-        else{
-          this.trigger('shapeSelected', {shape:this.path, anchor:false});
+        this.currentPath = hitResult.item; 
+        this.trigger('shapeSelected', this.currentPath.data.nodeParent);
+       
+        console.log("selected node type="+this.currentNode.type);
+        
 
-        }*/
+
+
+        if(event.modifiers.shift){
+          var behaviorNode = new BehaviorNode();
+          behaviorNode.addChildNode(this.currentNode);
+          this.trigger('nodeAdded',behaviorNode);
+          var copyBehavior = new CopyBehavior();
+          copyBehavior.setCopyNum(2);
+          behaviorNode.extendBehavior(copyBehavior, 'render');
+          behaviorNode.render([{position:{x:0,y:0},scale:1,rotation:0}]);
+          this.currentNode = behaviorNode;
+
+          //triggers parent to select current node level in graph
+        //this.trigger('setCurrentNode', this.currentNode);
+        }
+        
+       
         if (hitResult.type == 'segment') {
           segment = hitResult.segment;
-        } else if (hitResult.type == 'stroke') {
-          var location = hitResult.location;
-          //segment = path.insert(location.index + 1, event.point);
-          //path.smooth();
-        }
-        //hitResult.item.bringToFront();
+        } 
+     
       }
 
     },
@@ -86,7 +86,6 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-     // console.log("tool mouse up");
       if (this.path) {
 
         this.path.fire('mouseup', event);
@@ -96,7 +95,6 @@ define([
 
     //mouse drag event
     mouseDrag: function(event) {
-      // console.log("tool mouse drag");
       if (segment) {
         console.log('dragging segment');
         segment.point = segment.point.add(event.delta);
@@ -110,14 +108,7 @@ define([
 
     //mouse move event
     mouseMove: function(event) {
-      // console.log("tool mouse move");
-      //var hitResult = paper.project.hitTest(event.point, hitOptions);
-      //paper.project.activeLayer.selected = false;
-      /*if (hitResult && hitResult.item) {
-        hitResult.item.selected = true;
-
-      }*/
-
+     
     }
 
 

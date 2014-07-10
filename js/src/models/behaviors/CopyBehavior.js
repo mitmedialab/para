@@ -2,7 +2,9 @@
 iteratively changes scale from start to end
  */
 define([
-    'models/behaviors/BaseBehavior'
+    'models/behaviors/BaseBehavior',
+
+
   ],
 
   function(BaseBehavior) {
@@ -10,23 +12,24 @@ define([
     var CopyBehavior = BaseBehavior.extend({
       copyNum:2,
 
-      update: function() {
-        // console.log('copy behavior update called');
-        console.log("copying");
-        var numToCreate = this.copyNum - this.instances.length;
-        if (numToCreate !== 0) {
-          if (numToCreate > 0) {
-            this.createInstances(numToCreate, false);
-          } else {
-            this.deleteInstances(numToCreate, false);
-          }
-        }
+      render: function(data) {
+        // console.log('copy behavior update called'  );
+        console.log('copy render');
+        this.instances = [];
+        for(var j=0;j<data.length;j++){
+         for(var i=0;i<this.copyNum; i++){
+            var x = i*20+data[j].position.x;
+            var y = x+data[j].position.y;
+          this.instances.push({position:{x:x,y:y},rotation:0,scale:1});
+         }
+       }
 
       },
 
       setCopyNum: function(data) {
         this.copyNum = data;
-        console.log("number of copies = " + this.copyNum);
+        
+        console.log('number of copies = ' + this.copyNum);
 
       }
 
