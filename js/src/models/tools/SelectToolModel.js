@@ -65,7 +65,9 @@ define([
           behaviorNode.update([{}]);
           behaviorNode.render();
           this.currentNode = behaviorNode;
+          children = paper.project.activeLayer.children;
 
+          console.log("total number of literal_paths="+children);
           //triggers parent to select current node level in graph
           //this.trigger('setCurrentNode', this.currentNode);
         }
@@ -121,13 +123,13 @@ define([
       } else if (this.currentPath) {
         console.log("delta is");
         console.log(event.delta);
-        this.currentNode.update([{
+       /* this.currentNode.update([{
           position: {
             x: event.delta.x,
             y: event.delta.y
           }
         }]);
-        this.currentNode.getParentNode().render();
+        this.currentNode.getParentNode().render();*/
 
       }
     },

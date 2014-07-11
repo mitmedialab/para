@@ -31,14 +31,14 @@ define([
                 for (var i = 0; i < newCopy; i++) {
                   console.log(i);
                   var instance = child.createInstance(child.instances[0]);
-                  var x = (i+1) * 20;
+                  /*var x = (i+1) * 20;
                   var y = x;
                   instance.update({
                     position: {
                       x: x,
                       y: y
                     }
-                  });
+                  });*/
                   
                 }
               } else if (numInstances > this.copyNum) {

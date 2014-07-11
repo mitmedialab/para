@@ -11,7 +11,7 @@ define([
   'models/data/Instance',
   'models/PaperManager'
 
-], function(_, GeometryNode,Instance, PaperManager) {
+], function(_, GeometryNode, Instance, PaperManager) {
   //drawable paper.js path object that is stored in the pathnode
 
   var PathNode = GeometryNode.extend({
@@ -20,8 +20,8 @@ define([
 
 
     constructor: function() {
-       //array to store actual paper.js objects
-       this.instance_literals = [];
+      //array to store actual paper.js objects
+      this.instance_literals = [];
       GeometryNode.apply(this, arguments);
       //console.log('number of nodes='+SceneNode.numNodeInstances);
     },
@@ -37,18 +37,18 @@ define([
       this.path_literal.selected = true;
       this.path_literal.strokeColor = 'black';
       this.path_literal.data.nodeParent = this;
-      
-    
+
+
     },
 
-   /*called when drawing of the path is complete. 
-    * Removes the path and creates one instance
-    * in original path location
-    */
-    createInstance: function(data){
+    /*called when drawing of the path is complete. 
+     * Removes the path and creates one instance
+     * in original path location
+     */
+    createInstance: function(data) {
       var instance = new Instance();
       instance.position.x = data.position.x;
-      instance.position.y = data.position.y; 
+      instance.position.y = data.position.y;
       console.log("createPathInstance");
       console.log(instance.position);
       this.instances.push(instance);
@@ -57,49 +57,49 @@ define([
     },
 
     /* renders instances of the original path
-    * render data contains an array of objects containing
-    * poition, scale and rotation data for each instance
-    */
-    render: function(){
+     * render data contains an array of objects containing
+     * poition, scale and rotation data for each instance
+     */
+    render: function(data) {
       console.log("path render");
-     
-      if(this.instance_literals.length>0){
-        this.path_literal= this.instance_literals[0];
+
+      if (this.instance_literals.length > 0) {
+        this.path_literal = this.instance_literals[0];
       }
-    for(var j=1;j<this.instance_literals.length;j++){
+      for (var j = 1; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
-    }
-    this.instance_literals = [];
-     
-        for(var k=0;k<this.instances.length;k++){
-                console.log(this.instances[k].position);
-
+      }
+      this.instance_literals = [];
+      for (var d = 0; d < data.length; d++) {
+        for (var k = 0; k < this.instances.length; k++) {
+          console.log(this.instances[k].position);
+          console.log("creating instance literal");
           var instance_literal = this.path_literal.clone();
-          instance_literal.nodeParent= this;
-          instance_literal.position.x= this.instances[k].position.x;
-          instance_literal.position.y= this.instances[k].position.y;
+          instance_literal.nodeParent = this;
+          instance_literal.position.x = this.instances[k].position.x;
+          instance_literal.position.y = this.instances[k].position.y;
 
-       
-        
-        this.instance_literals.push(instance_literal);
 
-       
-     }
-        this.path_literal.remove();
-         var paper = PaperManager.getPaperInstance();
-       //console.log('num of drawn children='+paper.project.activeLayer.children.length);
-       console.log('\n==========================\n');
+
+          this.instance_literals.push(instance_literal);
+
+
+        }
+      }
+      this.path_literal.remove();
+      var paper = PaperManager.getPaperInstance();
+      //console.log('num of drawn children='+paper.project.activeLayer.children.length);
+      console.log('\n==========================\n');
     },
 
     //selects or deselects all path instances
-    selectAll: function(isSelect){
-      console.log('calling path select all'+ isSelect);
+    selectAll: function(isSelect) {
+      console.log('calling path select all' + isSelect);
       this.selected = true;
-      for(var i =0;i<this.instances.length;i++){
-        if(isSelect){
-          this.instances[i].selected= true;
-        }
-        else{
+      for (var i = 0; i < this.instances.length; i++) {
+        if (isSelect) {
+          this.instances[i].selected = true;
+        } else {
           this.instances[i].selected = false;
         }
       }

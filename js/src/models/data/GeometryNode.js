@@ -15,7 +15,7 @@ define([
   var GeometryNode = SceneNode.extend({
 
 
-   
+
     type: 'geometry',
     constructor: function() {
       /* instances contain objects that provide geometric info
@@ -27,7 +27,7 @@ define([
         selected: boolean indicating selection state          
     }
     */
-      
+
       this.instances = [];
       this.anchors = [];
 
@@ -38,42 +38,46 @@ define([
     initialize: function() {
       var instance1 = new Instance();
       var instance2 = new Instance();
-      instance1.position={x:100,y:100};
+      instance1.position = {
+        x: 100,
+        y: 100
+      };
       console.log(instance1.position);
       console.log(instance2.position);
+      this.createInstance();
     },
 
 
- /*called when drawing of the path is complete. 
-    * Removes the path and creates one instance
-    * in original path location
-    */
-    createInstance: function(data){
+    /*called when drawing of the path is complete. 
+     * Removes the path and creates one instance
+     * in original path location
+     */
+    createInstance: function(data) {
       //should it create a copy node here with a value of 1? no, that produces an infinite chain...
       var instance = new Instance();
       for (var k in data) {
-          if (instance[k]) {
-            instance[k] = data[k];
-          }
-        } //
+        if (instance[k]) {
+          instance[k] = data[k];
+        }
+      } //
       this.instances.push(new Instance());
       return instance;
 
     },
 
-  
+
     //updates instances according to data and the passes the updated instances to child function
 
     update: function(data) {
       // console.log("path update");
-      for(var i=0;i<data.length;i++){
-        for(var j =0;j<this.instances.length;j++){
-          var instance =this.instances[j];
+      for (var i = 0; i < data.length; i++) {
+        for (var j = 0; j < this.instances.length; j++) {
+          var instance = this.instances[j];
           instance.update(data[i]);
-        // console.log("update position:");
+          // console.log("update position:");
         }
       }
-    
+
 
       if (this.children.length > 0) {
         for (var z = 0; z < this.children.length; z++) {
@@ -85,17 +89,27 @@ define([
     },
 
     reset: function() {
-       for(var j =0;j<this.instances.length;j++){
-          this.instances[j].reset();
-        }
+      for (var j = 0; j < this.instances.length; j++) {
+        this.instances[j].reset();
+      }
     },
 
     //renders geometry
-    render: function() {
+    render: function(data) {
       console.log('base render');
-      for (var i = 0; i < this.children.length; i++) {
-       
-        this.children[i].render();
+      if (data && data.length > 0) {
+        for (var d = 0; d < data.length; d++) {
+          for (var i = 0; i < this.children.length; i++) {
+
+            this.children[i].render(this.instances);
+          }
+        }
+      } else {
+
+        for (var i = 0; i < this.children.length; i++) {
+
+          this.children[i].render(this.instances);
+        }
       }
     },
 

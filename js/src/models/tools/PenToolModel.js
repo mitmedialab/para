@@ -32,7 +32,7 @@ define([
          this.currentPath.selected = false;
         this.currentNode.createInstance(this.currentPath);
       
-          this.currentNode.nodeParent.render();
+          this.currentNode.nodeParent.render([{}]);
           this.currentPath = null;
         this.currentNode = null;
       }

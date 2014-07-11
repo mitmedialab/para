@@ -61,15 +61,7 @@ define([
 
 			
 
-			render: function(data){
-
-				 for(var i=0;i<this.children.length;i++){
-				 	console.log('behavior render');
-
-          			this.children[i].render(this.instances);
-        		}
-			},
-
+		
 
 		
 
