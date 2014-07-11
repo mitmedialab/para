@@ -15,12 +15,11 @@ define([
 
   var PathNode = GeometryNode.extend({
 
-    path_literal: null,
     type: 'path',
-     instances: [],
+
 
     constructor: function() {
-
+      this.path_literal = null;
       GeometryNode.apply(this, arguments);
       //console.log('number of nodes='+SceneNode.numNodeInstances);
     },

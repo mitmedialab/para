@@ -20,7 +20,11 @@ define([
     rotation: 0,
     type: 'geometry',
 
-    /* instances contain objects that provide geometric info
+   
+
+
+    constructor: function() {
+       /* instances contain objects that provide geometric info
     * this is propogated down to the leaves of the tree to 
     * draw the actual shapes 
     {  position: x,y coordinates of instance
@@ -29,15 +33,9 @@ define([
         selected: boolean indicating selection state          
     }
     */
-
-    instances: [],
-    anchors: [],
-    selected: false,
-
-
-
-    constructor: function() {
-
+      this.instances = [];
+      this.anchors = [];
+      this.selected = false;
       SceneNode.apply(this, arguments);
     },
 
