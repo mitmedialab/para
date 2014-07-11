@@ -50,8 +50,13 @@ define([
 
     },
   
-    //updates  overrides GeometryNode update function
-    update: function(data) {
+   update: function(data){
+          console.log("path update");
+          this.position.x =data.position.x;
+          this.position.y =data.position.y;
+          this.scale = data.scale;
+          this.rotation = data.rotation;
+          console.log(this.position);
 
     },
 
@@ -60,26 +65,33 @@ define([
     * poition, scale and rotation data for each instance
     */
     render: function(render_data){
-      //console.log(render_data);
+      
       if(this.instances.length>0){
         this.path_literal= this.instances[0];
+    }
+    for(var j=1;j<this.instances.length;j++){
+      this.instances[j].remove();
     }
      this.instances = [];
       for(var i=0;i<render_data.length;i++){
           var instance = this.path_literal.clone();
           instance.data.nodeParent= this;
-          instance.position.x = render_data[i].position.x+instance.position.x;
-          instance.position.y = render_data[i].position.y+instance.position.y;
+          instance.position.x+= render_data[i].position.x;
+          instance.position.y+= render_data[i].position.y;
+       
 
+          instance.position.x+=this.position.x;
+          instance.position.y+=this.position.y;
+          
          instance.scale(render_data[i].scale);
          instance.rotate(render_data[i].rotation);
         this.instances.push(instance);
-        console.log('path render');
+       // console.log('path render');
 
        }
        this.path_literal.remove();
         var paper = PaperManager.getPaperInstance();
-       console.log('num of drawn children='+paper.project.activeLayer.children.length);
+      // console.log('num of drawn children='+paper.project.activeLayer.children.length);
     },
 
     //selects or deselects all path instances

@@ -19,7 +19,7 @@ define([
         for(var j=0;j<data.length;j++){
          for(var i=0;i<this.copyNum; i++){
             var x = i*20+data[j].position.x;
-            var y = x+data[j].position.y;
+            var y = i*20+data[j].position.y;
           this.instances.push({position:{x:x,y:y},rotation:0,scale:1});
          }
        }

@@ -106,7 +106,7 @@ define([
       if (selected == rootNode) {
         return;
       } else {
-        this.determineSelectionPoint(selected.getParentNode());
+        this.determineSelectionPoint(selected.getParentNode(),toggle);
       }
     },
 

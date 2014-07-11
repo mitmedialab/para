@@ -59,9 +59,7 @@ define([
 
 			},
 
-			update: function(data){
-
-			},
+			
 
 			render: function(data){
 

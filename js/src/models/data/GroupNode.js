@@ -21,28 +21,7 @@ define([
   
     initialize: function() {
      
-    },
-
-    //overrides SceneNode update function
-  
-    update: function(data) {
-      
-    },
-
-    render: function(data){
-
-    },
-
-     //selects or deselects all path instances
-    selectAll: function(isSelect){
-      for(var i =0;i<this.children.length;i++){
-          this.children[i].selectAll(isSelect);
-      }
-
-    },
-
-
-   
+    }
 
   });
 

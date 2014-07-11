@@ -49,7 +49,7 @@ define([
         this.currentPath = hitResult.item; 
         this.trigger('shapeSelected', this.currentPath.data.nodeParent);
        
-        console.log("selected node type="+this.currentNode.type);
+        console.log('selected node type='+this.currentNode.type);
         
 
 
@@ -100,8 +100,11 @@ define([
         segment.point = segment.point.add(event.delta);
 
         //path.smooth();
-      } else if (this.path) {
-          this.path.data.nodeParent.update({delta:event.delta});
+      } else if (this.currentPath) {
+        console.log("delta is");
+        console.log(event.delta);
+        this.currentNode.update({position:{x:event.delta.x,y:event.delta.y}, scale:1, rotation:0});
+        this.currentNode.render([{position:{x:0,y:0},scale:1,rotation:0}]);
 
       }
     },
