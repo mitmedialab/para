@@ -12,7 +12,7 @@ define([
 
 ], function(_, Backbone, BaseToolModel, PathNode, PaperManager, CopyBehavior, BehaviorNode) {
   var segment, paper;
- 
+
 
   var hitOptions = {
     segments: true,
@@ -23,72 +23,97 @@ define([
 
   var SelectToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {}),
-    
+
     initialize: function() {
       paper = PaperManager.getPaperInstance();
     },
-    
+
     /*mousedown event
      */
     mouseDown: function(event) {
-      
+
       var paper = PaperManager.getPaperInstance();
       segment = null;
-      this.path=null;
+      this.currentPath = null;
+      this.currentNode = null;
       var hitResult = paper.project.hitTest(event.point, hitOptions);
+      //deselect everything
       var children = paper.project.activeLayer.children;
-      for(var i=0;i<children.length;i++){
+      for (var i = 0; i < children.length; i++) {
         //if(children[i].data.instanceParent){
-          //if(!children[i].data.instanceParent.anchor){
-            children[i].selected = false;
-         // }
-        //}
+        //if(!children[i].data.instanceParent.anchor){
+        children[i].selected = false;
+        // } //}
       }
 
       if (hitResult) {
-        this.currentPath = hitResult.item; 
-        this.trigger('shapeSelected', this.currentPath.data.nodeParent);
-       
-        console.log('selected node type='+this.currentNode.type);
-        
+        this.currentPath = hitResult.item;
+        //this sets currentNode depending on current selection level in tree
+        this.trigger('nodeSelected', this.currentPath);
+        console.log('current node is set in select tool to=' + this.currentNode.type);
+        //if(this.currentNode.type='path');
 
 
 
-        if(event.modifiers.shift){
+        if (event.modifiers.shift) {
           var behaviorNode = new BehaviorNode();
           behaviorNode.addChildNode(this.currentNode);
-          this.trigger('nodeAdded',behaviorNode);
+          this.trigger('nodeAdded', behaviorNode);
           var copyBehavior = new CopyBehavior();
           copyBehavior.setCopyNum(2);
-          behaviorNode.extendBehavior(copyBehavior, 'render');
-          behaviorNode.render([{position:{x:0,y:0},scale:1,rotation:0}]);
+          behaviorNode.extendBehavior(copyBehavior, 'update');
+          behaviorNode.update([{
+            position: {
+              x: 0,
+              y: 0
+            },
+            scale: 1,
+            rotation: 0
+          }]);
+          behaviorNode.render();
           this.currentNode = behaviorNode;
 
           //triggers parent to select current node level in graph
-        //this.trigger('setCurrentNode', this.currentNode);
+          //this.trigger('setCurrentNode', this.currentNode);
         }
-        
-       
+
+
         if (hitResult.type == 'segment') {
           segment = hitResult.segment;
-        } 
-     
+        }
+
       }
 
     },
 
-    dblClick: function(event){
-      if(this.path){
-        this.path.instanceParent.isAnchor(!this.path.instanceParent.anchor);
+    dblClick: function(event) {
+      console.log("double click");
+      if (this.currentPath) {
+        if (this.currentNode.getNumChildren() !== 0) {
+          console.log("has child, moving down a layer");
+          this.currentNode.selectAll(false);
+          this.trigger("setCurrentNode", this.currentNode.getChildAt(0));
+          this.trigger('nodeSelected', this.currentPath.nodeParent);
+          // this.trigger('nodeSelected', this.currentNode.getChildAt(0));
+          console.log('current node is set in select tool to=' + this.currentNode.type);
+
+          //this.currentNode.selectAll(false);
+
+        }
+
+        //  this.path.instanceParent.isAnchor(!this.path.instanceParent.anchor);
+      } else {
+        this.trigger('moveUpNode');
+        //console.log('current node is set in select tool to='+this.currentNode.type);
+
       }
     },
 
 
     //mouse up event
     mouseUp: function(event) {
-      if (this.path) {
+      if (this.currentPath) {
 
-        this.path.fire('mouseup', event);
 
       }
     },
@@ -103,15 +128,29 @@ define([
       } else if (this.currentPath) {
         console.log("delta is");
         console.log(event.delta);
-        this.currentNode.update({position:{x:event.delta.x,y:event.delta.y}, scale:1, rotation:0});
-        this.currentNode.getParentNode().render([{position:{x:0,y:0},scale:1,rotation:0}]);
+        this.currentNode.update({
+          position: {
+            x: event.delta.x,
+            y: event.delta.y
+          },
+          scale: 1,
+          rotation: 0
+        });
+        this.currentNode.getParentNode().render([{
+          position: {
+            x: 0,
+            y: 0
+          },
+          scale: 1,
+          rotation: 0
+        }]);
 
       }
     },
 
     //mouse move event
     mouseMove: function(event) {
-     
+
     }
 
 

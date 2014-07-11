@@ -29,8 +29,11 @@ define([
       console.log('pen tool is reset');
       currentSegment = null;
       if(this.currentPath){
-        this.currentNode.pathComplete();
-        this.currentPath = null;
+         this.currentPath.selected = false;
+        this.currentNode.createInstance(this.currentPath);
+      
+          this.currentNode.nodeParent.render();
+          this.currentPath = null;
         this.currentNode = null;
       }
     },
@@ -74,11 +77,13 @@ define([
           
 
           if (!this.currentPath) {
-            this.currentNode  = new PathNode();
-            this.currentNode.name = nameVal;
+          var pathNode  = new PathNode();
+            pathNode.name = nameVal;
             nameVal++;
-            this.currentPath = this.currentNode.path_literal;
-            this.trigger('nodeAdded',this.currentNode);
+            this.currentPath = pathNode.path_literal;
+            this.trigger('nodeAdded',pathNode);
+            console.log("currentNode for pen tool=");
+            console.log(this.currentNode.type);
 
           }
 
@@ -91,10 +96,7 @@ define([
               mode = 'close';
 
               this.currentPath.closed = true;
-              this.currentPath.selected = false;
-              this.currentNode.pathComplete();
-              this.currentPath = null;
-              this.currentNode = null;
+              this.reset();
             }
           }
 

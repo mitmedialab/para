@@ -42,8 +42,10 @@ define([
 
       toolCollection = new ToolCollection([penTool, selectTool, polyTool]);
       this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
-      this.listenTo(toolCollection, 'shapeSelected', this.shapeSelected);
+      this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
       this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
+      this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
+
 
       rootNode = new GeometryNode();
       currentNode = rootNode;
@@ -69,25 +71,39 @@ define([
     //callback triggered when tool adds new node
     nodeAdded: function(node) {
       console.log('node added: '+ node.type);
-     //console.log(node);
-      rootNode.addChildNode(node);
-      currentNode = rootNode;
+ 
+      currentNode.addChildNode(node);
+           console.log("number of children on root="+currentNode.getNumChildren());
+      toolCollection.get(this.get('state')).currentNode = node;
 
+    },
 
-
+    moveUpNode: function(){
+      console.log("moveUpNode");
+      this.setCurrentNode(currentNode);
     },
 
     //callback triggered when tool navigates to specific node in tree;
     setCurrentNode: function(node){
-      console.log('current node is set in state to:' +node.type);
-      currentNode = node;
+     
+      if(node.getParentNode()!==null){
+         console.log('current node is set in state to:' +node.getParentNode().type);
+        currentNode = node.getParentNode();
+      }
+      else{
+        console.log('current node is set in state to:' +currentNode.type);
+
+         
+         
+      }
     },
 
     //callback triggered when select tool selects shape
-    shapeSelected: function(selected) {
-      //console.log('node selected');
-      //console.log(selected);
+    nodeSelected: function(selected) {
+      console.log("node selected");
+      console.log(selected);
 
+      selected.selected = true;
       this.determineSelectionPoint(selected, true);
 
     },
@@ -97,16 +113,18 @@ define([
     * node in the selected tool. 
     * TODO: make this assignment less janky.
     */
-    determineSelectionPoint: function(selected, toggle) {
-      if (selected.getParentNode() == currentNode) {
-        selected.selectAll(toggle);
+    determineSelectionPoint: function(selected,toggle) {
+      console.log("determining selection point");
+      if (selected.nodeParent == currentNode) {
+        
        toolCollection.get(this.get('state')).currentNode = selected;
         return;
       }
       if (selected == rootNode) {
         return;
       } else {
-        this.determineSelectionPoint(selected.getParentNode(),toggle);
+        selected.selected = true;
+        this.determineSelectionPoint(selected.nodeParent,toggle);
       }
     },
 

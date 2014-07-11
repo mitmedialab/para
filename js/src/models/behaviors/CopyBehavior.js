@@ -3,38 +3,54 @@ iteratively changes scale from start to end
  */
 define([
     'models/behaviors/BaseBehavior',
+    'models/data/Instance'
 
 
   ],
 
-  function(BaseBehavior) {
+  function(BaseBehavior, Instance) {
 
     var CopyBehavior = BaseBehavior.extend({
-      copyNum:2,
+        copyNum: 2,
 
-      render: function(data) {
-        // console.log('copy behavior update called'  );
-        console.log('copy render');
-        this.instances = [];
-        for(var j=0;j<data.length;j++){
-         for(var i=0;i<this.copyNum; i++){
-            var x = i*20+data[j].position.x;
-            var y = x+data[j].position.y;
-          this.instances.push({position:{x:x,y:y},rotation:0,scale:1});
-         }
-       }
+        update: function(data) {
+          // console.log('copy behavior update called'  );
+          //checks to see if we have the correct number of copies
 
-      },
+          console.log('copy update');
+           var numInstances = this.instances.length;
+          for (var j = 0; j < data.length; j++) {
+          if (numInstances < this.copyNum) {
+            for (var i = 0; i < this.copyNum - numInstances; i++) {
 
-      setCopyNum: function(data) {
-        this.copyNum = data;
-        
-        console.log('number of copies = ' + this.copyNum);
+              this.instances.push(new Instance());
+               var x = i * 20 + data[j].position.x;
+              var y = x + data[j].position.y;
+              this.instances[i].position = {
+                x: x,
+                y: y
+              };
+            }
+          } else if (numInstances > this.copyNum) {
+              for (var k = 0; k < numInstances - this.copyNum; k++) {
+                this.instances.pop();
+              }
+            }
+          }
+         
+        },
 
-      }
+        setCopyNum: function(data) {
+          this.copyNum = data;
+         
+
+            console.log('number of copies = ' + this.instances.length);
 
 
+          }
+
+
+        });
+
+      return CopyBehavior;
     });
-
-    return CopyBehavior;
-  });
