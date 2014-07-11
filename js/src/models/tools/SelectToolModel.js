@@ -62,14 +62,7 @@ define([
           var copyBehavior = new CopyBehavior();
           copyBehavior.setCopyNum(2);
           behaviorNode.extendBehavior(copyBehavior, 'update');
-          behaviorNode.update([{
-            position: {
-              x: 0,
-              y: 0
-            },
-            scale: 1,
-            rotation: 0
-          }]);
+          behaviorNode.update([{}]);
           behaviorNode.render();
           this.currentNode = behaviorNode;
 
@@ -128,22 +121,13 @@ define([
       } else if (this.currentPath) {
         console.log("delta is");
         console.log(event.delta);
-        this.currentNode.update({
+        this.currentNode.update([{
           position: {
             x: event.delta.x,
             y: event.delta.y
-          },
-          scale: 1,
-          rotation: 0
-        });
-        this.currentNode.getParentNode().render([{
-          position: {
-            x: 0,
-            y: 0
-          },
-          scale: 1,
-          rotation: 0
+          }
         }]);
+        this.currentNode.getParentNode().render();
 
       }
     },

@@ -29,9 +29,21 @@ define([
 			this.anchor= false;
 			this.selected= false;
 		},
+
 		update: function(data) {
-			//this.position.x = (data.positon ? data.position.x : this.position.x);
-			//this.position.y = (data.positon ? data.position.y : this.position.y);
+			if(data.position){
+				this.position.x+=data.position.x;
+				this.position.y+=data.position.y;
+				console.log("instance position");
+				console.log(this.position);
+			}
+			if(data.scale){
+				this.scale*=data.scale;
+			
+			}
+			if(data.rotation){
+				this.rotation+=data.rotation;
+			}
 
 
 		}

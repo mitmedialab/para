@@ -52,6 +52,7 @@ define([
       console.log("createPathInstance");
       console.log(instance.position);
       this.instances.push(instance);
+      return instance;
 
     },
 

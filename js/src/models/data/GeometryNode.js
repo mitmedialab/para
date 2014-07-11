@@ -57,6 +57,7 @@ define([
           }
         } //
       this.instances.push(new Instance());
+      return instance;
 
     },
 
@@ -68,7 +69,7 @@ define([
       for(var i=0;i<data.length;i++){
         for(var j =0;j<this.instances.length;j++){
           var instance =this.instances[j];
-          instance.update(data);
+          instance.update(data[i]);
         // console.log("update position:");
         }
       }
