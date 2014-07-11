@@ -5,7 +5,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'models/data/SceneNode',
+  'models/data/GeometryNode',
   'models/tools/ToolCollection',
   'models/tools/PenToolModel',
   'models/tools/PolyToolModel',
@@ -13,7 +13,7 @@ define([
   'models/behaviors/CopyBehavior',
   'models/behaviors/DistributeBehavior'
 
-], function($, _, Backbone, SceneNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, CopyBehavior, DistributeBehavior) {
+], function($, _, Backbone, GeometryNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, CopyBehavior, DistributeBehavior) {
   var rootNode,
     currentNode,
     toolCollection,
@@ -45,7 +45,7 @@ define([
       this.listenTo(toolCollection, 'shapeSelected', this.shapeSelected);
       this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
 
-      rootNode = new SceneNode();
+      rootNode = new GeometryNode();
       currentNode = rootNode;
 
 

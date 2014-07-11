@@ -1,7 +1,7 @@
 /*FollowPathBehavior.js
  */
 define([
-    'models/behaviors/BaseBehavior'
+    'models/behaviors/BaseBehavior',
   ],
 
   function(BaseBehavior) {

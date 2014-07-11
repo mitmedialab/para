@@ -17,6 +17,7 @@ define([
 
     path_literal: null,
     type: 'path',
+     instances: [],
 
     constructor: function() {
 
@@ -27,7 +28,6 @@ define([
     //mixin: Utils.nodeMixin,
 
     initialize: function() {
-      GeometryNode.prototype.initialize.call(this);
 
       //intialize array to store instances
 
@@ -86,12 +86,12 @@ define([
          instance.scale(render_data[i].scale);
          instance.rotate(render_data[i].rotation);
         this.instances.push(instance);
-       // console.log('path render');
+        console.log('path render');
 
        }
        this.path_literal.remove();
         var paper = PaperManager.getPaperInstance();
-      // console.log('num of drawn children='+paper.project.activeLayer.children.length);
+       console.log('num of drawn children='+paper.project.activeLayer.children.length);
     },
 
     //selects or deselects all path instances

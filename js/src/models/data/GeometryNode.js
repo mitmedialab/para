@@ -43,17 +43,34 @@ define([
 
   
     initialize: function() {
-     
+     this.instances.push({position:{x:0,y:0},rotation:0,scale:1});
     },
 
-    //overrides SceneNode update function
-  
-    update: function(data){
-      console.log("geom update");
-      for(var i =0;i<this.children.length;i++){
-          this.children[i].update(data);
-      }
-    },
+
+            update: function(data) {
+                //console.log("updating Scene method called");
+                //console.log('updating:' + this.get('name'));
+                if (this.children.length > 0) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        if (this.children[i] !== null) {
+                            this.children[i].update(data);
+                        }
+                    }
+                }
+
+              
+
+            },
+
+    //overrides SceneNode render function
+    render: function(data){
+
+         for(var i=0;i<this.children.length;i++){
+          console.log('behavior render');
+
+                this.children[i].render(this.instances);
+            }
+      },
 
    
      //selects or deselects all path instances

@@ -12,11 +12,6 @@ define([
 
 
     var SceneNode = Backbone.Model.extend({
-            defaults: {
-                type: 'default',
-                name: '',
-            },
-
 
             constructor: function() {
                 this.nodeParent = null;
@@ -162,26 +157,9 @@ define([
                 return false;
             },
 
-            //TODO: copies itself and returns the copy
-
-            copy: function() {},
+            
 
 
-            //recursively updates all child nodes. placeholder for geometric update functions in subclasses
-            update: function(data) {
-                //console.log("updating Scene method called");
-                //console.log('updating:' + this.get('name'));
-                if (this.children.length > 0) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        if (this.children[i] !== null) {
-                            this.children[i].update(data);
-                        }
-                    }
-                }
-
-                //this.trigger('change:update');
-
-            },
 
 
 
