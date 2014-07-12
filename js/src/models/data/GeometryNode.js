@@ -36,14 +36,7 @@ define([
 
 
     initialize: function() {
-      var instance1 = new Instance();
-      var instance2 = new Instance();
-      instance1.position = {
-        x: 100,
-        y: 100
-      };
-      console.log(instance1.position);
-      console.log(instance2.position);
+     
       this.createInstance();
     },
 
@@ -95,20 +88,21 @@ define([
     },
 
     //renders geometry
-    render: function(data) {
-      console.log('base render');
+    render: function(data,length) {
+       console.log('num of instances:'+this.type+': '+this.instances.length);
       if (data && data.length > 0) {
         for (var d = 0; d < data.length; d++) {
+           console.log('base render:'+this.type+':'+d);
           for (var i = 0; i < this.children.length; i++) {
 
             this.children[i].render(this.instances);
           }
         }
       } else {
-
-        for (var i = 0; i < this.children.length; i++) {
-
-          this.children[i].render(this.instances);
+        console.log('base render:'+this.type+': no data');
+        for (var j = 0; j < this.children.length; j++) {
+         
+          this.children[j].render(this.instances);
         }
       }
     },

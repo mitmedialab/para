@@ -17,19 +17,19 @@ define([
         // console.log('copy behavior update called'  );
         //checks to see if we have the correct number of copies
 
-        console.log('copy update');
+       // console.log('copy update');
 
         if (this.children.length > 0) {
           for (var z = 0; z < this.children.length; z++) {
             if (this.children[z] !== null) {
               var child = this.children[z];
-              console.log('number of copies = ' + child.instances.length);
+
               var numInstances = child.instances.length;
               if (numInstances < this.copyNum) {
                 var newCopy = this.copyNum-numInstances;
-                console.log("copies to make:"+newCopy);
+                console.log('creating copy of type, number:'+child.type+','+newCopy);
+
                 for (var i = 0; i < newCopy; i++) {
-                  console.log(i);
                   var instance = child.createInstance(child.instances[0]);
                   /*var x = (i+1) * 20;
                   var y = x;
@@ -46,7 +46,6 @@ define([
                   child.instances.pop();
                 }
               }
-             console.log('number of copies = ' + child.instances.length);
             }
           }
         }

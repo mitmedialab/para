@@ -26,13 +26,13 @@ define([
   	},
 
     reset: function(){
-      console.log('pen tool is reset');
+      //console.log('pen tool is reset');
       currentSegment = null;
       if(this.currentPath){
          this.currentPath.selected = false;
         this.currentNode.createInstance(this.currentPath);
       
-          this.currentNode.nodeParent.render([{}]);
+          this.currentNode.nodeParent.render();
           this.currentPath = null;
         this.currentNode = null;
       }
@@ -82,8 +82,8 @@ define([
             nameVal++;
             this.currentPath = pathNode.path_literal;
             this.trigger('nodeAdded',pathNode);
-            console.log("currentNode for pen tool=");
-            console.log(this.currentNode.type);
+            //console.log("currentNode for pen tool=");
+           // console.log(this.currentNode.type);
 
           }
 

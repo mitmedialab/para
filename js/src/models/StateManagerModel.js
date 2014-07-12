@@ -45,6 +45,7 @@ define([
       this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
       this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
       this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
+      this.listenTo(toolCollection, 'rootRender', this.rootRender);
 
 
       rootNode = new GeometryNode();
@@ -62,7 +63,7 @@ define([
 
     //returns currently selected object as JSON object. If nothing is selected, returns the root object
     getSelected: function() {
-      //console.log('attempting to get selected'+rootNode.getChildAt(0));
+      ////console.log('attempting to get selected'+rootNode.getChildAt(0));
       //currentNode = rootNode.getChildAt(0);
       return currentNode.toJSON();
 
@@ -70,28 +71,31 @@ define([
 
     //callback triggered when tool adds new node
     nodeAdded: function(node) {
-      console.log('node added: '+ node.type);
+      //console.log('node added: '+ node.type);
  
       currentNode.addChildNode(node);
-           console.log("number of children on root="+currentNode.getNumChildren());
+           //console.log("number of children on root="+currentNode.getNumChildren());
       toolCollection.get(this.get('state')).currentNode = node;
 
     },
 
     moveUpNode: function(){
-      console.log("moveUpNode");
+      //console.log("moveUpNode");
       this.setCurrentNode(currentNode);
     },
 
+    rootRender: function(){
+      rootNode.render();
+    },
     //callback triggered when tool navigates to specific node in tree;
     setCurrentNode: function(node){
      
       if(node.getParentNode()!==null){
-         console.log('current node is set in state to:' +node.getParentNode().type);
+         //console.log('current node is set in state to:' +node.getParentNode().type);
         currentNode = node.getParentNode();
       }
       else{
-        console.log('current node is set in state to:' +currentNode.type);
+        //console.log('current node is set in state to:' +currentNode.type);
 
          
          
@@ -100,8 +104,8 @@ define([
 
     //callback triggered when select tool selects shape
     nodeSelected: function(selected) {
-      console.log("node selected");
-      console.log(selected);
+      //console.log("node selected");
+      //console.log(selected);
 
       selected.selected = true;
       this.determineSelectionPoint(selected, true);
@@ -114,7 +118,7 @@ define([
     * TODO: make this assignment less janky.
     */
     determineSelectionPoint: function(selected,toggle) {
-      console.log("determining selection point");
+      //console.log("determining selection point");
       if (selected.nodeParent == currentNode) {
         
        toolCollection.get(this.get('state')).currentNode = selected;
@@ -159,7 +163,7 @@ define([
       var selectedTool = toolCollection.get(this.get('state'));
       var currentlySelected = selectedTool.path.instanceParent.nodeParent;
       if (!_.has(currentlySelected, 'copyNum')) {
-        console.log('no behavior, assigning copy and distribute');
+        //console.log('no behavior, assigning copy and distribute');
         var copyBehavior = new CopyBehavior();
         var distributeBehavior = new DistributeBehavior();
         distributeBehavior.initialize();
@@ -167,7 +171,7 @@ define([
         currentlySelected.extendBehavior(distributeBehavior, 'update');
         currentlySelected.extendBehavior(copyBehavior, 'update');
       } else {
-        console.log('behavior exists. updating num');
+        //console.log('behavior exists. updating num');
         currentlySelected.setCopyNum(currentlySelected.copyNum + 1);
       }
 

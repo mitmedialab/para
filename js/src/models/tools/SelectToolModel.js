@@ -50,7 +50,7 @@ define([
         this.currentPath = hitResult.item;
         //this sets currentNode depending on current selection level in tree
         this.trigger('nodeSelected', this.currentPath);
-        console.log('current node is set in select tool to=' + this.currentNode.type);
+        //console.log('current node is set in select tool to=' + this.currentNode.type);
         //if(this.currentNode.type='path');
 
 
@@ -63,11 +63,12 @@ define([
           copyBehavior.setCopyNum(2);
           behaviorNode.extendBehavior(copyBehavior, 'update');
           behaviorNode.update([{}]);
-          behaviorNode.render();
+          
           this.currentNode = behaviorNode;
+          this.trigger('rootRender');
           children = paper.project.activeLayer.children;
 
-          console.log("total number of literal_paths="+children);
+          console.log("total number of literal_paths="+children.length);
           //triggers parent to select current node level in graph
           //this.trigger('setCurrentNode', this.currentNode);
         }
@@ -82,15 +83,15 @@ define([
     },
 
     dblClick: function(event) {
-      console.log("double click");
+      //console.log("double click");
       if (this.currentPath) {
         if (this.currentNode.getNumChildren() !== 0) {
-          console.log("has child, moving down a layer");
+          //console.log("has child, moving down a layer");
           this.currentNode.selectAll(false);
           this.trigger("setCurrentNode", this.currentNode.getChildAt(0));
           this.trigger('nodeSelected', this.currentPath.nodeParent);
           // this.trigger('nodeSelected', this.currentNode.getChildAt(0));
-          console.log('current node is set in select tool to=' + this.currentNode.type);
+          //console.log('current node is set in select tool to=' + this.currentNode.type);
 
           //this.currentNode.selectAll(false);
 
@@ -116,12 +117,12 @@ define([
     //mouse drag event
     mouseDrag: function(event) {
       if (segment) {
-        console.log('dragging segment');
+       // console.log('dragging segment');
         segment.point = segment.point.add(event.delta);
 
         //path.smooth();
       } else if (this.currentPath) {
-        console.log("delta is");
+       // console.log("delta is");
         console.log(event.delta);
        /* this.currentNode.update([{
           position: {
