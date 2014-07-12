@@ -22,8 +22,6 @@ define([
     constructor: function() {
       //array to store actual paper.js objects
       this.instance_literals = [];
-       var paper = PaperManager.getPaperInstance();
-       this.path_literal =  new paper.Path();
       GeometryNode.apply(this, arguments);
       //console.log('number of nodes='+SceneNode.numNodeInstances);
     },
@@ -33,12 +31,22 @@ define([
     initialize: function() {
 
       //intialize array to store instances
+            
+
+         var paper = PaperManager.getPaperInstance();
+       var path_literal =  new paper.Path();
     
-      this.path_literal.selected = true;
-      this.path_literal.strokeColor = 'black';
-      this.path_literal.data.nodeParent = this;
+      path_literal.selected = true;
+      path_literal.strokeColor = 'black';
+      path_literal.data.nodeParent = this;
+      this.instance_literals.push(path_literal);
 
 
+    },
+
+    getLiteral: function(){
+      return this.instance_literals[0];
+      
     },
 
     /*called when drawing of the path is complete. 
@@ -50,9 +58,10 @@ define([
       var instance = new Instance();
       instance.position.x = data.position.x;
       instance.position.y = data.position.y;
-    //  console.log("createPathInstance");
+    //  console.log('createPathInstance');
       //console.log(instance.position);
       this.instances.push(instance);
+
       return instance;
     },
 
@@ -61,26 +70,36 @@ define([
      * poition, scale and rotation data for each instance
      */
 
+
+     clear: function(){
+      console.log('clear called');
+      
+       for (var j = 1; j < this.instance_literals.length; j++) {
+       // console.log(this.instance_literals[j]);
+        this.instance_literals[j].remove();
+
+      }
+      this.instance_literals.splice(1,this.instance_literals.length);
+      console.log("num of literals:"+this.instance_literals.length); 
+        var paper = PaperManager.getPaperInstance();
+        console.log('num of drawn children='+paper.project.activeLayer.children.length);
+
+     },
     
 
-    render: function(data,length) {
-      
-      for (var j = 0; j < this.instance_literals.length; j++) {
-        console.log("instance literal at "+j+":");
-        console.log(this.instance_literals[j]);
-        //this.instance_literals[j].remove();
-      }
-     
-      for (var d = 0; d < data.length; d++) {
+    render: function(data) {
+      var path_literal=this.getLiteral();
+        for (var d = 0; d < data.length; d++) {
           console.log('pathrender:' +d); 
           for (var k = 0; k < this.instances.length; k++) {
           console.log('pathrender_ literal:' + k);
           //console.log(this.instances[k].position);
-        // console.log("creating instance literal");
-          var instance_literal = this.path_literal.clone();
+        // console.log('creating instance literal');
+          var instance_literal = path_literal.clone();
           instance_literal.nodeParent = this;
           instance_literal.position.x = this.instances[k].position.x;
           instance_literal.position.y = this.instances[k].position.y;
+          instance_literal.visible= true;
 
 
 
@@ -89,8 +108,9 @@ define([
 
         }
       }
+      path_literal.visible=false;
+
       //this.path_literal.remove();
-      var paper = PaperManager.getPaperInstance();
       //console.log('num of drawn children='+paper.project.activeLayer.children.length);
       console.log('\n==========================\n');
     },

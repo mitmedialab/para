@@ -85,6 +85,7 @@ define([
     },
 
     rootRender: function(){
+      rootNode.clear();
       rootNode.render();
     },
     //callback triggered when tool navigates to specific node in tree;

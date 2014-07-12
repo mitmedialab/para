@@ -62,7 +62,7 @@ define([
     //updates instances according to data and the passes the updated instances to child function
 
     update: function(data) {
-      // console.log("path update");
+      console.log("update for:"+this.type);
       for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < this.instances.length; j++) {
           var instance = this.instances[j];
@@ -87,8 +87,15 @@ define([
       }
     },
 
+    clear: function(){
+       for (var i = 0; i < this.children.length; i++) {
+        this.children[i].clear();
+      }
+
+    },
+
     //renders geometry
-    render: function(data,length) {
+    render: function(data) {
        console.log('num of instances:'+this.type+': '+this.instances.length);
       if (data && data.length > 0) {
         for (var d = 0; d < data.length; d++) {
