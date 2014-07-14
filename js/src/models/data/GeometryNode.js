@@ -192,19 +192,15 @@ define([
       } 
     },
 
-   /* //checks to see if path literal is contained by any children
+   //checks to see if path literal is contained by any children
     containsPath: function(path){
       for (var i = 0; i < this.children.length; i++) {
-        var pathIndex = this.children[i].containsPath(path);
-        console.log("contains path_geom="+pathIndex);
-        if(pathIndex!=-1){
-          var parentIndex = this.children[i].instances[pathIndex].instanceParent;
-           console.log("parent index="+parentIndex);
-          return parentIndex;
+        if(this.children[i].containsPath(path)){
+          return true;
         }
       }
-      return -1;
-    },*/
+      return false;
+    },
 
     //clears all anchors from array
     removeAnchors: function() {

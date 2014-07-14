@@ -37,7 +37,7 @@ define([
             nameVal++;
         pathNode.createInstanceFromPath(this.currentPath.clone());
         this.trigger('nodeAdded',pathNode);
-        pathNode.nodeParent.render();
+        this.trigger('rootRender');
 
        
       

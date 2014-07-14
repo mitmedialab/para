@@ -139,33 +139,27 @@ define([
 
 
     //checks to see if path exists in path_literals array
-   /* containsPath: function(path){
-      console.log("total number of literals:"+this.instance_literals.length);
-      console.log("total number of instances:"+this.instances.length);
+    containsPath: function(path){
       for (var i = 0; i < this.instance_literals.length; i++) {
-       // console.log(path);
-     //   console.log(this.instance_literals[i]);
-       // console.log(this.instance_literals[i]==path);
        if(this.instance_literals[i].equals(path)){
-         console.log("found path literal at="+i);
-         return this.instance_literals.instanceParent(i);
+        return true;
        }
       }
-      return (-1);
-    },*/
+      return false;
+    },
 
     //selects or deselects all path instances
     selectAll: function() {
       for(var i=0;i<this.instance_literals.length;i++){
         this.instance_literals[i].selected = true;
       }
-      /*for (var i = 0; i < this.instances.length; i++) {
-        if (isSelect) {
-          this.instances[i].selected = true;
-        } else {
-          this.instances[i].selected = false;
-        }
-      }*/
+
+    },
+
+    deselectAll: function() {
+      for(var i=0;i<this.instance_literals.length;i++){
+        this.instance_literals[i].selected = false;
+      }
 
     },
 

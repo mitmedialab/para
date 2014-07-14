@@ -43,8 +43,12 @@ define([
       toolCollection = new ToolCollection([penTool, selectTool, polyTool]);
       this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
       this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
+            this.listenTo(toolCollection, 'setSelection', this.setSelection);
+
       this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
       this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
+      this.listenTo(toolCollection, 'moveDownNode', this.moveDownNode);
+
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
 
 
@@ -82,10 +86,20 @@ define([
     moveUpNode: function(){
       //console.log("moveUpNode");
       this.setCurrentNode(currentNode);
+       console.log("current node type="+currentNode.type);
     },
 
-    moveDownNode: function(){
-      //this.setCurrentNode()
+    moveDownNode: function(path){
+      console.log("move down node");
+      var children = currentNode.children;
+      for(var i=0;i<children.length;i++){
+        if(children[i].containsPath(path)){
+          console.log("found path at child"+i);
+            currentNode = children[i];
+           toolCollection.get(this.get('state')).currentNode = children[i];
+        }
+      }
+      console.log("current node type="+currentNode.type);
     },
 
     /* sets correct selection based on currentNode*/
@@ -96,6 +110,7 @@ define([
     },
 
     rootRender: function(){
+      console.log("called root render");
       rootNode.clear();
       rootNode.render();
     },
@@ -119,11 +134,12 @@ define([
       //console.log("node selected");
       //console.log(selected);
       this.determineSelectionPoint(selected);
-      this.setSelection(selected);
+      //toolCollection.get(this.get('state')).currentNode = currentNode;
+
 
     },
 
-    /*recursively follows parent hierarchy upwards to find correct selection point 
+   /*recursively follows parent hierarchy upwards to find correct selection point 
     * when selected node is found, it is assigned as the currently selected
     * node in the selected tool. 
     * TODO: make this assignment less janky.
@@ -132,7 +148,6 @@ define([
       //console.log("determining selection point");
       currentNode.deselectAll();
       if (selected.nodeParent == currentNode) {
-        
        toolCollection.get(this.get('state')).currentNode = selected;
         return;
       }

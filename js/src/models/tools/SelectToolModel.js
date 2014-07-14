@@ -47,35 +47,41 @@ define([
       }
 
       if (hitResult) {
-        this.currentPath = hitResult.item;
+
+        var path = hitResult.item;
         //this sets currentNode depending on current selection level in tree
-        this.trigger('nodeSelected', this.currentPath);
-        //console.log('current node is set in select tool to=' + this.currentNode.type);
-        //if(this.currentNode.type='path');
+        this.trigger('nodeSelected', path);
+
+        //checks to make sure path is within current node
+        if (this.currentNode) {
+          if (this.currentNode.nodeParent.containsPath(path)) {
+            console.log("contains path");
+            this.currentPath = path;
+            this.trigger('setSelection', path);
 
 
+            if (event.modifiers.shift) {
+              var behaviorNode = new BehaviorNode();
+              behaviorNode.addChildNode(this.currentNode);
+              this.trigger('nodeAdded', behaviorNode);
+              var copyBehavior = new CopyBehavior();
+              copyBehavior.setCopyNum(2);
+              behaviorNode.extendBehavior(copyBehavior, 'update');
+              behaviorNode.update([{}]);
+              //this.currentNode= behaviorNode;
+              this.trigger('rootRender');
+              children = paper.project.activeLayer.children;
 
-        if (event.modifiers.shift) {
-          var behaviorNode = new BehaviorNode();
-          behaviorNode.addChildNode(this.currentNode);
-          this.trigger('nodeAdded', behaviorNode);
-          var copyBehavior = new CopyBehavior();
-          copyBehavior.setCopyNum(2);
-          behaviorNode.extendBehavior(copyBehavior, 'update');
-          behaviorNode.update([{}]);
-          this.currentNode = behaviorNode;
-
-          this.trigger('rootRender');
-          children = paper.project.activeLayer.children;
-
-          console.log('total number of literal_paths='+children.length);
-          //triggers parent to select current node level in graph
-          //this.trigger('setCurrentNode', this.currentNode);
-        }
+              console.log('total number of literal_paths=' + children.length);
+              //triggers parent to select current node level in graph
+              //this.trigger('setCurrentNode', this.currentNode);
+            }
 
 
-        if (hitResult.type == 'segment') {
-          segment = hitResult.segment;
+            if (hitResult.type == 'segment') {
+              segment = hitResult.segment;
+            }
+          }
         }
 
       }
@@ -83,12 +89,12 @@ define([
     },
 
     dblClick: function(event) {
-      //console.log('double click');
+      console.log('double click');
       if (this.currentPath) {
-        if (this.currentNode.getNumChildren() !== 0) {
-          this.trigger('moveDownNode');
 
-        }
+        this.trigger('moveDownNode', this.currentPath);
+
+
 
         //  this.path.instanceParent.isAnchor(!this.path.instanceParent.anchor);
       } else {
@@ -110,14 +116,14 @@ define([
     //mouse drag event
     mouseDrag: function(event) {
       if (segment) {
-       // console.log('dragging segment');
+        // console.log('dragging segment');
         segment.point = segment.point.add(event.delta);
 
         //path.smooth();
       } else if (this.currentPath) {
-       // console.log('delta is');
+        // console.log('delta is');
         console.log(event.delta);
-       /* this.currentNode.update([{
+        /* this.currentNode.update([{
           position: {
             x: event.delta.x,
             y: event.delta.y
