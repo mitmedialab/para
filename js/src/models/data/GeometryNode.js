@@ -31,6 +31,7 @@ define([
       this.instances = [];
       this.anchors = [];
 
+
       SceneNode.apply(this, arguments);
     },
 
@@ -148,18 +149,34 @@ define([
       
     },
 
+    setSelection: function(currentNode){
+      if(this==currentNode){
+        return;
+      }
+      else{
+        this.selectAll();
+        if(this.nodeParent!==null){
+          this.nodeParent.setSelection(currentNode);
+        }
+      }
+    },
+
     //selects a specifc index
-    selectAt: function(index, val) {
+    /*selectAt: function(index, val) {
       if (index < this.instances.length) {
         this.instances[index].selected = val;
       }
-    },
+    },*/
+
     //selects or deselects all path instances
     selectAll: function() {
       //console.log('calling geometry select all'+ isSelect);
-       for(var i=0;i<this.instances.length;i++){
+       /*for(var i=0;i<this.instances.length;i++){
         this.instances[i].selected = true;
-      }
+      }*/
+      for(var j=0; j<this.children.length;j++){
+        this.children[j].selectAll();
+      } 
       
 
     },
@@ -175,7 +192,7 @@ define([
       } 
     },
 
-    //checks to see if path literal is contained by any children
+   /* //checks to see if path literal is contained by any children
     containsPath: function(path){
       for (var i = 0; i < this.children.length; i++) {
         var pathIndex = this.children[i].containsPath(path);
@@ -187,7 +204,7 @@ define([
         }
       }
       return -1;
-    },
+    },*/
 
     //clears all anchors from array
     removeAnchors: function() {

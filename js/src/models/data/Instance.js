@@ -35,7 +35,6 @@ define([
 			this.rotation= 0;
 			this.anchor= false;
 			this.selected= false;
-			this.instanceParent = -1;
 		},
 
 
@@ -63,13 +62,7 @@ define([
 
 		},
 
-		/* sets the instance parent to the index of
-		the instance in the parent node that renders this instance. Used
-		for mouse hit events*/
-		setInstanceParent: function(index){
-			this.instanceParent=index;
-		},
-
+	
 
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/

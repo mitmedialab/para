@@ -107,17 +107,16 @@ define([
           //console.log(this.instances[k].position);
         // console.log('creating instance literal');
           var instance_literal = path_literal.clone();
-          instance_literal.instanceParent = d;
           instance_literal.nodeParent = this;
           instance_literal.position.x = this.instances[k].position.x+data[d].position.x;
           instance_literal.position.y = this.instances[k].position.y+data[d].position.y;
           
-          if(data[d].selected){
+         /* if(data[d].selected){
             instance_literal.selected = data[d].selected;
           }
           else if(this.instances[k].selected){
             instance_literal.selected = this.instances[k].selected;
-          }
+          }*/
 
           //console.log("rendering instance literal at:"+(this.instances[k].position.x+data[d].position.x)+","+(this.instances[k].position.y+data[d].position.y));
           instance_literal.visible= true;
@@ -136,9 +135,11 @@ define([
       console.log('\n==========================\n');
     },
 
+   
+
 
     //checks to see if path exists in path_literals array
-    containsPath: function(path){
+   /* containsPath: function(path){
       console.log("total number of literals:"+this.instance_literals.length);
       console.log("total number of instances:"+this.instances.length);
       for (var i = 0; i < this.instance_literals.length; i++) {
@@ -151,19 +152,20 @@ define([
        }
       }
       return (-1);
-    },
+    },*/
 
     //selects or deselects all path instances
-    selectAll: function(isSelect) {
-      console.log('calling path select all' + isSelect);
-      this.selected = true;
-      for (var i = 0; i < this.instances.length; i++) {
+    selectAll: function() {
+      for(var i=0;i<this.instance_literals.length;i++){
+        this.instance_literals[i].selected = true;
+      }
+      /*for (var i = 0; i < this.instances.length; i++) {
         if (isSelect) {
           this.instances[i].selected = true;
         } else {
           this.instances[i].selected = false;
         }
-      }
+      }*/
 
     },
 

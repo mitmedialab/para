@@ -85,24 +85,14 @@ define([
     },
 
     moveDownNode: function(){
-
+      //this.setCurrentNode()
     },
 
     /* sets correct selection based on currentNode*/
    setSelection: function(path){
       console.log("set selection");
-
-      for(var i=0;i<currentNode.children.length;i++){
-        
-        var pathIndex = currentNode.children[i].containsPath(path);
-        console.log("path index on root="+pathIndex+ " at child:"+i);
-        if(pathIndex!=-1){
-                         
-          currentNode.children[i].instances[pathIndex].selected=true;
-          rootNode.render();
-          //return;
-        }  
-      }
+      path.selected = true;
+      path.nodeParent.setSelection(currentNode);
     },
 
     rootRender: function(){
