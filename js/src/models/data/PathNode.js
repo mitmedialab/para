@@ -31,15 +31,7 @@ define([
     initialize: function() {
 
       //intialize array to store instances
-            
-
-         var paper = PaperManager.getPaperInstance();
-       var path_literal =  new paper.Path();
-    
-      path_literal.selected = true;
-      path_literal.strokeColor = 'black';
-      path_literal.data.nodeParent = this;
-      this.instance_literals.push(path_literal);
+ 
 
 
     },
@@ -54,14 +46,16 @@ define([
      * in original path location*/
  
 
-    createInstance: function(data){
-      var instance = new Instance();
-      instance.position.x = data.position.x;
-      instance.position.y = data.position.y;
+    createInstanceFromPath: function(path){
+      var instance = this.createInstance();
+      path.position.x = 0;
+      path.position.y=0;
+      instance.position.x = path.position.x;
+      instance.position.y = path.position.y;
+       this.instance_literals.push(path);
     //  console.log('createPathInstance');
       //console.log(instance.position);
-      this.instances.push(instance);
-
+      path.nodeParent = this;
       return instance;
     },
 
@@ -80,25 +74,29 @@ define([
 
       }
       this.instance_literals.splice(1,this.instance_literals.length);
-      console.log("num of literals:"+this.instance_literals.length); 
+      //console.log("num of literals:"+this.instance_literals.length); 
         var paper = PaperManager.getPaperInstance();
-        console.log('num of drawn children='+paper.project.activeLayer.children.length);
+       // console.log('num of drawn children='+paper.project.activeLayer.children.length);
 
      },
     
 
     render: function(data) {
       var path_literal=this.getLiteral();
+       for (var f= 0; f< this.instances.length; f++) {
+       console.log("instance position:"+this.instances[f].position.x+","+this.instances[f].position.y);
+       }
         for (var d = 0; d < data.length; d++) {
           console.log('pathrender:' +d); 
           for (var k = 0; k < this.instances.length; k++) {
-          console.log('pathrender_ literal:' + k);
+          //console.log('pathrender_ literal:' + k);
           //console.log(this.instances[k].position);
         // console.log('creating instance literal');
           var instance_literal = path_literal.clone();
           instance_literal.nodeParent = this;
           instance_literal.position.x = this.instances[k].position.x;
           instance_literal.position.y = this.instances[k].position.y;
+          console.log("rendering instance literal at:"+this.instances[k].position.x+","+this.instances[k].position.y);
           instance_literal.visible= true;
 
 

@@ -5,9 +5,10 @@ define([
   'underscore',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PathNode'
+  'models/data/PathNode',
+   'models/PaperManager'
 
-], function(_, Backbone, BaseToolModel, PathNode) {
+], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -29,12 +30,19 @@ define([
       //console.log('pen tool is reset');
       currentSegment = null;
       if(this.currentPath){
-        this.currentPath.selected = false;
-        this.currentNode.createInstance(this.currentPath);
-        this.currentPath.visible = false;
-        this.currentNode.nodeParent.render();
+      this.currentPath.selected = false;
+        
+        var pathNode  = new PathNode();
+          pathNode.name = nameVal;
+            nameVal++;
+        pathNode.createInstanceFromPath(this.currentPath.clone());
+        this.trigger('nodeAdded',pathNode);
+        pathNode.nodeParent.render();
+
+       
+      
+        this.currentPath.remove();
         this.currentPath = null;
-        this.currentNode = null;
       }
     },
 
@@ -77,14 +85,18 @@ define([
           
 
           if (!this.currentPath) {
-          var pathNode  = new PathNode();
-            pathNode.name = nameVal;
-            nameVal++;
-            this.currentPath = pathNode.getLiteral();
-            console.log("currentPath"+this.currentPath);
-            this.trigger('nodeAdded',pathNode);
-            //console.log("currentNode for pen tool=");
-           // console.log(this.currentNode.type);
+         
+          
+                       
+
+         var paper = PaperManager.getPaperInstance();
+          this.currentPath =  new paper.Path();
+    
+         this.currentPath .selected = true;
+         this.currentPath .strokeColor = 'black';
+         
+         
+
 
           }
 

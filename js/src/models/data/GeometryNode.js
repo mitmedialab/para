@@ -47,13 +47,14 @@ define([
      */
     createInstance: function(data) {
       //should it create a copy node here with a value of 1? no, that produces an infinite chain...
-      var instance = new Instance();
-      for (var k in data) {
-        if (instance[k]) {
-          instance[k] = data[k];
-        }
-      } //
-      this.instances.push(new Instance());
+      var instance;
+      if(data){
+        instance = data.clone();
+      }
+      else{
+        instance = new Instance();
+      }
+      this.instances.push(instance);
       return instance;
 
     },
@@ -62,12 +63,21 @@ define([
     //updates instances according to data and the passes the updated instances to child function
 
     update: function(data) {
-      console.log("update for:"+this.type);
-      for (var i = 0; i < data.length; i++) {
+     // console.log("update for:"+this.type);
+      var parentType = "";
+     if(this.nodeParent){
+      parentType = this.nodeParent.type;
+     // console.log("parent type="+this.nodeParent.type);
+    }
+
+     for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < this.instances.length; j++) {
           var instance = this.instances[j];
-          instance.update(data[i]);
-          // console.log("update position:");
+             console.log("instance " +this.type+"_"+parentType+"_"+instance.copy+" position on reg update:");
+              console.log(instance.position);
+           instance.update(data[i]);
+              console.log("after update");
+              console.log(instance.position);
         }
       }
 
@@ -96,17 +106,17 @@ define([
 
     //renders geometry
     render: function(data) {
-       console.log('num of instances:'+this.type+': '+this.instances.length);
+      // console.log('num of instances:'+this.type+': '+this.instances.length);
       if (data && data.length > 0) {
         for (var d = 0; d < data.length; d++) {
-           console.log('base render:'+this.type+':'+d);
+           //console.log('base render:'+this.type+':'+d);
           for (var i = 0; i < this.children.length; i++) {
 
             this.children[i].render(this.instances);
           }
         }
       } else {
-        console.log('base render:'+this.type+': no data');
+        //console.log('base render:'+this.type+': no data');
         for (var j = 0; j < this.children.length; j++) {
          
           this.children[j].render(this.instances);
