@@ -78,41 +78,49 @@ define([
       //console.log('node added: '+ node.type);
  
       currentNode.addChildNode(node);
-           //console.log("number of children on root="+currentNode.getNumChildren());
+           //console.log('number of children on root='+currentNode.getNumChildren());
       toolCollection.get(this.get('state')).currentNode = node;
 
     },
 
     moveUpNode: function(){
-      //console.log("moveUpNode");
+      //console.log('moveUpNode');
       this.setCurrentNode(currentNode);
-       console.log("current node type="+currentNode.type);
+       console.log('current node type='+currentNode.type);
+       this.currentRender();
     },
 
     moveDownNode: function(path){
-      console.log("move down node");
+      console.log('move down node');
       var children = currentNode.children;
       for(var i=0;i<children.length;i++){
         if(children[i].containsPath(path)){
-          console.log("found path at child"+i);
+          console.log('found path at child'+i);
             currentNode = children[i];
            toolCollection.get(this.get('state')).currentNode = children[i];
         }
       }
-      console.log("current node type="+currentNode.type);
+      console.log('current node type='+currentNode.type);
+       this.currentRender();
     },
 
     /* sets correct selection based on currentNode*/
    setSelection: function(path){
-      console.log("set selection");
+      console.log('set selection');
       path.selected = true;
       path.nodeParent.setSelection(currentNode);
     },
 
     rootRender: function(){
-      console.log("called root render");
+      console.log('called root render');
       rootNode.clear();
       rootNode.render();
+    },
+
+    currentRender: function(){
+      console.log('called current render');
+      currentNode.clear();
+      currentNode.render();
     },
     //callback triggered when tool navigates to specific node in tree;
     setCurrentNode: function(node){
@@ -131,7 +139,7 @@ define([
 
     //callback triggered when select tool selects shape
     nodeSelected: function(selected) {
-      //console.log("node selected");
+      //console.log('node selected');
       //console.log(selected);
       this.determineSelectionPoint(selected);
       //toolCollection.get(this.get('state')).currentNode = currentNode;
@@ -145,7 +153,7 @@ define([
     * TODO: make this assignment less janky.
     */
     determineSelectionPoint: function(selected) {
-      //console.log("determining selection point");
+      //console.log('determining selection point');
       currentNode.deselectAll();
       if (selected.nodeParent == currentNode) {
        toolCollection.get(this.get('state')).currentNode = selected;
