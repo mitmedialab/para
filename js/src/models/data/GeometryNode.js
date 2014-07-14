@@ -63,32 +63,25 @@ define([
     //updates instances according to data and the passes the updated instances to child function
 
     update: function(data) {
-     // console.log("update for:"+this.type);
-      var parentType = "";
+     // console.log('update for:'+this.type);
+      var parentType = '';
      if(this.nodeParent){
       parentType = this.nodeParent.type;
-     // console.log("parent type="+this.nodeParent.type);
+     // console.log('parent type='+this.nodeParent.type);
     }
 
      for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < this.instances.length; j++) {
           var instance = this.instances[j];
-             console.log("instance " +this.type+"_"+parentType+"_"+instance.copy+" position on reg update:");
+             console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
               console.log(instance.position);
-           instance.update(data[i]);
-              console.log("after update");
+              instance.update(data[i]);
+              console.log('after update');
               console.log(instance.position);
         }
       }
 
 
-      if (this.children.length > 0) {
-        for (var z = 0; z < this.children.length; z++) {
-          if (this.children[z] !== null) {
-            this.children[z].update(this.instances);
-          }
-        }
-      }
     },
 
     reset: function() {
@@ -107,21 +100,31 @@ define([
     //renders geometry
     render: function(data) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
-      if (data && data.length > 0) {
-        for (var d = 0; d < data.length; d++) {
-           //console.log('base render:'+this.type+':'+d);
-          for (var i = 0; i < this.children.length; i++) {
-
-            this.children[i].render(this.instances);
-          }
-        }
-      } else {
-        //console.log('base render:'+this.type+': no data');
-        for (var j = 0; j < this.children.length; j++) {
-         
-          this.children[j].render(this.instances);
+      //first create array of new instances that contain propogated updated data
+      var updatedInstances = [];
+      if(data){
+       for (var i = 0; i < data.length; i++) {
+        for (var j = 0; j < this.instances.length; j++) {
+          var u_instance = this.instances[j].clone();
+          u_instance.render(data[i]);
+          updatedInstances.push(u_instance);
+        
         }
       }
+
+    
+          for (var k = 0; k < this.children.length; k++) {
+
+            this.children[k].render(updatedInstances);
+          }
+         }
+         else{
+           for (var j = 0; j < this.children.length; j++) {
+
+            this.children[j].render(this.instances);
+          }
+         }
+      
     },
 
     //selects a specifc index

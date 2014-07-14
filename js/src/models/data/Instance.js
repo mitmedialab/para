@@ -36,9 +36,37 @@ define([
 			this.selected= false;
 		},
 
-		update: function(data) {
+
+		//only called on a update function- 
+		//sets instances' properties to that of the data
+		update: function(data){
+			if(data.position){
+				//console.log('prior position =');
+				//console.log(this.position);
+
+				this.position.x=data.position.x;
+				this.position.y=data.position.y;
+				//console.log('updated position=');
+				//console.log(this.position);
+			}
+			if(data.scale){
+				this.scale=data.scale;
+			
+			}
+			if(data.rotation){
+				this.rotation=data.rotation;
+			}
+
+
+
+		},
+
+
+		//only called on a render function-
+		// propagates the instances' properties with that of the data
+		render: function(data) {
 			//console.log("update called with data:");
-			//console.log(data);
+			//cloconsole.log(data);
 			if(data.position){
 				//console.log('prior position =');
 				//console.log(this.position);

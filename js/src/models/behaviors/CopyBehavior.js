@@ -36,8 +36,8 @@ define([
                   instance.copy=true;
                   instance.update({
                     position: {
-                      x: x,
-                      y: y
+                      x: instance.position.x+x,
+                      y: instance.position.y+y
                     }
                   });
                   

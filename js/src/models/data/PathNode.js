@@ -48,8 +48,7 @@ define([
 
     createInstanceFromPath: function(path){
       var instance = this.createInstance();
-      path.position.x = 0;
-      path.position.y=0;
+    
       instance.position.x = path.position.x;
       instance.position.y = path.position.y;
        this.instance_literals.push(path);
@@ -84,7 +83,7 @@ define([
     render: function(data) {
       var path_literal=this.getLiteral();
        for (var f= 0; f< this.instances.length; f++) {
-       console.log("instance position:"+this.instances[f].position.x+","+this.instances[f].position.y);
+      // console.log("instance position:"+this.instances[f].position.x+","+this.instances[f].position.y);
        }
         for (var d = 0; d < data.length; d++) {
           console.log('pathrender:' +d); 
@@ -94,9 +93,9 @@ define([
         // console.log('creating instance literal');
           var instance_literal = path_literal.clone();
           instance_literal.nodeParent = this;
-          instance_literal.position.x = this.instances[k].position.x;
-          instance_literal.position.y = this.instances[k].position.y;
-          console.log("rendering instance literal at:"+this.instances[k].position.x+","+this.instances[k].position.y);
+          instance_literal.position.x = this.instances[k].position.x+data[d].position.x;
+          instance_literal.position.y = this.instances[k].position.y+data[d].position.y;
+          //console.log("rendering instance literal at:"+(this.instances[k].position.x+data[d].position.x)+","+(this.instances[k].position.y+data[d].position.y));
           instance_literal.visible= true;
 
 
