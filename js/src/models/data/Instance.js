@@ -21,6 +21,7 @@ define([
 			this.anchor= false;
 			this.selected= false;
 			this.copy= false;
+			this.instanceParent = -1;
 			Backbone.Model.apply(this, arguments);
 		 },
 		reset: function() {
@@ -34,6 +35,7 @@ define([
 			this.rotation= 0;
 			this.anchor= false;
 			this.selected= false;
+			this.instanceParent = -1;
 		},
 
 
@@ -61,9 +63,16 @@ define([
 
 		},
 
+		/* sets the instance parent to the index of
+		the instance in the parent node that renders this instance. Used
+		for mouse hit events*/
+		setInstanceParent: function(index){
+			this.instanceParent=index;
+		},
 
-		//only called on a render function-
-		// propagates the instances' properties with that of the data
+
+		/*only called on a render function-
+		propagates the instances' properties with that of the data*/
 		render: function(data) {
 			//console.log("update called with data:");
 			//cloconsole.log(data);
@@ -82,6 +91,9 @@ define([
 			}
 			if(data.rotation){
 				this.rotation+=data.rotation;
+			}
+			if(data.selected){
+				this.selected = data.selected;
 			}
 
 

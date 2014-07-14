@@ -90,6 +90,26 @@ define([
       }
     },
 
+      /*sets focus to this instance and unfocuses all siblings*/
+    focus: function(){
+      
+      var siblings = this.getSiblings();
+      for(var i=0;i<siblings.length;i++){
+        siblings[0].unfocus();
+      }
+      for(var j=0;j<this.children.length; j++){
+          this.children[j].focus();
+      }
+    },
+
+    /* unfocuses this by setting  stroke color to grey */
+    unfocus: function(){
+         this.instance_literals[0].strokeColor = 'red';
+          for(var j=0;j<this.children.length; j++){
+          this.children[j].unfocus();
+      }
+    },
+
     clear: function(){
        for (var i = 0; i < this.children.length; i++) {
         this.children[i].clear();
@@ -105,6 +125,7 @@ define([
       if(data){
        for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < this.instances.length; j++) {
+             this.instances[i].instanceParent = i;
           var u_instance = this.instances[j].clone();
           u_instance.render(data[i]);
           updatedInstances.push(u_instance);
@@ -119,9 +140,9 @@ define([
           }
          }
          else{
-           for (var j = 0; j < this.children.length; j++) {
+           for (var f = 0; f < this.children.length; f++) {
 
-            this.children[j].render(this.instances);
+            this.children[f].render(this.instances);
           }
          }
       
@@ -134,13 +155,38 @@ define([
       }
     },
     //selects or deselects all path instances
-    selectAll: function(isSelect) {
+    selectAll: function() {
       //console.log('calling geometry select all'+ isSelect);
-      this.selected = true;
-      for (var i = 0; i < this.children.length; i++) {
-        this.children[i].selectAll(isSelect);
+       for(var i=0;i<this.instances.length;i++){
+        this.instances[i].selected = true;
       }
+      
 
+    },
+
+//selects or deselects all path instances
+    deselectAll: function() {
+      //console.log('calling geometry select all'+ isSelect);
+       for(var i=0;i<this.instances.length;i++){
+        this.instances[i].selected = false;
+      }
+      for(var j=0; j<this.children.length;j++){
+        this.children[j].deselectAll();
+      } 
+    },
+
+    //checks to see if path literal is contained by any children
+    containsPath: function(path){
+      for (var i = 0; i < this.children.length; i++) {
+        var pathIndex = this.children[i].containsPath(path);
+        console.log("contains path_geom="+pathIndex);
+        if(pathIndex!=-1){
+          var parentIndex = this.children[i].instances[pathIndex].instanceParent;
+           console.log("parent index="+parentIndex);
+          return parentIndex;
+        }
+      }
+      return -1;
     },
 
     //clears all anchors from array

@@ -64,7 +64,26 @@ define([
             },
             //returns other nodes with the same parent
             getSiblings: function() {
-                return this.nodeParent.getChildren();
+                var index = this.getIndex();
+                var siblings = this.nodeParent.getChildren();
+                var cut = siblings.splice(index,1);
+                console.log(cut);
+                console.log(siblings);
+                if(cut == this){
+                    console.log('splice on siblings successfull');
+                    return siblings;
+                }
+                
+            },
+
+            getIndex: function(){
+                var siblings = this.nodeParent.getChildren();
+                for(var i=0;i<siblings.length;i++){
+                    if(siblings[i]==this){
+                        return i;
+                    }
+                }
+                return null;
             },
 
             //returns child at specified index 

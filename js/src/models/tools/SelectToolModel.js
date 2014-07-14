@@ -63,12 +63,12 @@ define([
           copyBehavior.setCopyNum(2);
           behaviorNode.extendBehavior(copyBehavior, 'update');
           behaviorNode.update([{}]);
-          
           this.currentNode = behaviorNode;
+
           this.trigger('rootRender');
           children = paper.project.activeLayer.children;
 
-          console.log("total number of literal_paths="+children.length);
+          console.log('total number of literal_paths='+children.length);
           //triggers parent to select current node level in graph
           //this.trigger('setCurrentNode', this.currentNode);
         }
@@ -83,17 +83,10 @@ define([
     },
 
     dblClick: function(event) {
-      //console.log("double click");
+      //console.log('double click');
       if (this.currentPath) {
         if (this.currentNode.getNumChildren() !== 0) {
-          //console.log("has child, moving down a layer");
-          this.currentNode.selectAll(false);
-          this.trigger("setCurrentNode", this.currentNode.getChildAt(0));
-          this.trigger('nodeSelected', this.currentPath.nodeParent);
-          // this.trigger('nodeSelected', this.currentNode.getChildAt(0));
-          //console.log('current node is set in select tool to=' + this.currentNode.type);
-
-          //this.currentNode.selectAll(false);
+          this.trigger('moveDownNode');
 
         }
 
@@ -122,7 +115,7 @@ define([
 
         //path.smooth();
       } else if (this.currentPath) {
-       // console.log("delta is");
+       // console.log('delta is');
         console.log(event.delta);
        /* this.currentNode.update([{
           position: {

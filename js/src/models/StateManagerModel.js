@@ -84,6 +84,27 @@ define([
       this.setCurrentNode(currentNode);
     },
 
+    moveDownNode: function(){
+
+    },
+
+    /* sets correct selection based on currentNode*/
+   setSelection: function(path){
+      console.log("set selection");
+
+      for(var i=0;i<currentNode.children.length;i++){
+        
+        var pathIndex = currentNode.children[i].containsPath(path);
+        console.log("path index on root="+pathIndex+ " at child:"+i);
+        if(pathIndex!=-1){
+                         
+          currentNode.children[i].instances[pathIndex].selected=true;
+          rootNode.render();
+          //return;
+        }  
+      }
+    },
+
     rootRender: function(){
       rootNode.clear();
       rootNode.render();
@@ -107,9 +128,8 @@ define([
     nodeSelected: function(selected) {
       //console.log("node selected");
       //console.log(selected);
-
-      selected.selected = true;
-      this.determineSelectionPoint(selected, true);
+      this.determineSelectionPoint(selected);
+      this.setSelection(selected);
 
     },
 
@@ -118,8 +138,9 @@ define([
     * node in the selected tool. 
     * TODO: make this assignment less janky.
     */
-    determineSelectionPoint: function(selected,toggle) {
+    determineSelectionPoint: function(selected) {
       //console.log("determining selection point");
+      currentNode.deselectAll();
       if (selected.nodeParent == currentNode) {
         
        toolCollection.get(this.get('state')).currentNode = selected;
@@ -128,8 +149,7 @@ define([
       if (selected == rootNode) {
         return;
       } else {
-        selected.selected = true;
-        this.determineSelectionPoint(selected.nodeParent,toggle);
+        this.determineSelectionPoint(selected.nodeParent);
       }
     },
 
