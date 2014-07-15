@@ -147,7 +147,13 @@ define([
       return false;
     },
 
-    //selects according render signature
+    /*selects according render signature
+      * the render signature is a list of values that is generated upon rendering and 
+      * provides a means to track the inerhtiance structure of an instance
+      * index= index at which to slice instance's render signature
+      *  value= string which represents render signature that we are trying to match
+      * path= original path literal that was selected- used to ensure we are selecting the right object
+    */
     selectByValue: function(index, value, path, currentNode) {
       console.log("select by path value");
       if (this.containsPath(path)) {
@@ -156,20 +162,18 @@ define([
           //console.log(this.instance_literals[i].data.renderSignature);
           var compareSig = this.instance_literals[i].data.renderSignature.slice(0,index+1);
           compareSig = compareSig.join();
-          console.log('compareSig='+compareSig);
-          console.log('valueSig='+value);
+          //console.log('compareSig='+compareSig);
+          //console.log('valueSig='+value);
           if (compareSig === value) {
             this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length-1;
             this.instances[this.instance_literals[i].data.renderSignature[last]].selected = true;
-            console.log('selected path value='+this.instance_literals[i].data.renderSignature);
+            //console.log('selected path value='+this.instance_literals[i].data.renderSignature);
           }
           else{
             console.log('unselected path value='+this.instance_literals[i].data.renderSignature);
 
           }
-          
-
 
         }
       }

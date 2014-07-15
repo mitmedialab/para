@@ -138,7 +138,12 @@ define([
 
     },
 
-    //renders geometry
+    /*renders geometry
+     * if data is provided, creates a temporary instance array with updated values according to data
+     *  otherwise just renders its children with its permanent instances
+     * copies the render signature from the data and concats it with the 
+      *index of the instance used to render the path
+  */
     render: function(data) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data

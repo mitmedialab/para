@@ -104,12 +104,16 @@ define([
        this.rootRender();
     },
 
-    /* sets correct selection based on currentNode*/
+    /* sets correct selection based on currentNode
+    * determines value by finding the hierarchical level of the current node
+    * and using that level as an index to slice the render signature of the currently selected path
+    * sends this as the starting value for selecting other relevant paths based on the current node
+    */
    setSelection: function(path){
       console.log('set selection');
-     // path.selected = true;
+   
       var level  = currentNode.getLevelInTree(rootNode,0);
-      console.log("selection level="+level);
+      //console.log("selection level="+level);
       //console.log("render signature of path="+path.data.renderSignature);
       var value = null;
       value= path.data.renderSignature[level];
@@ -120,13 +124,12 @@ define([
         value = path.data.renderSignature.slice(0,level+1);
         value = value.join();
 
-        console.log("selection value="+value);
+        //console.log("selection value="+value);
         currentNode.selectByValue(level,value, path, currentNode);
       }
       else{
         path.selected=true;
       }
-    // path.nodeParent.setSelection(currentNode,path.instanceParent);
     },
 
     rootRender: function(){
@@ -157,12 +160,7 @@ define([
 
     //callback triggered when select tool selects shape
     nodeSelected: function(selected) {
-      //console.log('node selected');
-      //console.log(selected);
       this.determineSelectionPoint(selected);
-      //toolCollection.get(this.get('state')).currentNode = currentNode;
-
-
     },
 
    /*recursively follows parent hierarchy upwards to find correct selection point 
