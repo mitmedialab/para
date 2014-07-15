@@ -87,6 +87,23 @@ define([
 
     },
 
+    updateSelected: function(data){
+       for (var j = 0; j < this.instances.length; j++) {
+        if(this.instances[i].selected){
+           for (var i = 0; i < data.length; i++) {
+          var instance = this.instances[j];
+             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
+              //console.log(instance.position);
+              instance.render(data[i]);
+              //console.log('after update');
+              //console.log(instance.position);
+        }
+      }
+    }
+
+
+    },
+
     reset: function() {
       for (var j = 0; j < this.instances.length; j++) {
         this.instances[j].reset();
@@ -128,11 +145,11 @@ define([
       
       if(data){
           for (var j = 0; j < this.instances.length; j++) {
-       for (var i = 0; i < data.length; i++) {
+            for (var i = 0; i < data.length; i++) {
            
           var u_instance = this.instances[j].clone();
            u_instance.renderSignature = data[i].renderSignature.slice(0);
-           u_instance.renderSignature.push(i);
+           u_instance.renderSignature.push(j);
           u_instance.render(data[i]);
 
           this.instance_literals.push(u_instance);
@@ -177,11 +194,11 @@ define([
 
 
   //selects according render signature
-    selectByValue: function(index,value,path) {
+    selectByValue: function(index,value, parentValue, path, currentNode) {
      //if(this.containsPath(path)){
      for(var i=0;i<this.children.length;i++){
       if(this.children[i].containsPath(path)){
-        this.children[i].selectByValue(index,value,path);
+        this.children[i].selectByValue(index,value,parentValue,path,currentNode);
 
       }
      }

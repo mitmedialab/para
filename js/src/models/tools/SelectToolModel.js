@@ -122,6 +122,10 @@ define([
         //path.smooth();
       } else if (this.currentPath) {
         // console.log('delta is');
+        if(this.currentNode){
+
+          console.log("dragging on currentNode");
+        }
         console.log(event.delta);
         /* this.currentNode.update([{
           position: {

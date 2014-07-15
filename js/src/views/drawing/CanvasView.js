@@ -19,7 +19,7 @@ define([
 
     },
 
-    initialize: function(){
+    initialize: function(obj,event_bus){
       //this.$el.width(this.$el.parent().width());
 
       //listen to update view statements from model to re-render view
@@ -31,6 +31,7 @@ define([
       tool.attach('mousedrag',this.toolMouseDrag);
       tool.attach('mouseup',this.toolMouseUp);
       tool.attach('mousemove',this.toolMouseMove);
+      this.event_bus = event_bus;
    
   },
 
@@ -84,7 +85,7 @@ define([
     canvasKeypress: function(event){
      // console.log('keypress called');
       //console.log(event.keyCode);
-      if(event.keyCode = 27){
+      if(event.keyCode == 27){
         this.model.escapeEvent();
       }
     },
@@ -107,6 +108,7 @@ define([
     canvasMouseDown: function(event){
     //console.log(event);
      mouseDown = true;
+    // this.event_bus.trigger('shiftClick',event);
       //this.model.canvasMouseDown(event);
     },
 
@@ -117,6 +119,7 @@ define([
     },
 
     canvasMouseMove: function(event){
+     this.event_bus.trigger('canvasMouseMove',event);
       if(mouseDown){
         //console.log("mouse drag event: "+event);
         //this.model.canvasMouseDrag(event);

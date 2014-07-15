@@ -102,6 +102,14 @@ min-height: 200px;
     box-shadow:none;
 }
 
+#context-menu {
+    position: absolute;
+    visibility: hidden;
+    z-index: 2;
+    background-color: #5CA2B5;
+   	height:30px;
+}
+
 #canvas{
 	min-height:700px;
 	width: 726px; /* this is bad, fix it */

@@ -111,8 +111,8 @@ define([
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
             instance_literal.visible = true;
             this.instance_literals.push(instance_literal);
-            console.log("path render signature =" + instance_literal.data.renderSignature);
-            console.log("length of signature =" + instance_literal.data.renderSignature.length);
+             console.log('path render signature =' + instance_literal.data.renderSignature);
+            console.log('length of signature =' + instance_literal.data.renderSignature.length);
 
 
 
@@ -148,15 +148,21 @@ define([
     },
 
     //selects according render signature
-    selectByValue: function(index, value, path) {
+    selectByValue: function(index, value, parentValue, path, currentNode) {
       if (this.containsPath(path)) {
         
         for (var i = 1; i < this.instance_literals.length; i++) {
           //console.log(this.instance_literals[i].data.renderSignature);
-         
+
           if (this.instance_literals[i].data.renderSignature[index] == value) {
             this.instance_literals[i].selected = true;
-            console.log("selected path value="+this.instance_literals[i].data.renderSignature);
+            var last = this.instance_literals[i].data.renderSignature.length-1;
+            this.instances[this.instance_literals[i].data.renderSignature[last]].selected = true;
+            console.log('selected path value='+this.instance_literals[i].data.renderSignature);
+          }
+          else{
+            console.log('unselected path value='+this.instance_literals[i].data.renderSignature);
+
           }
           
 
