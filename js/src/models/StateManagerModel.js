@@ -87,7 +87,7 @@ define([
       //console.log('moveUpNode');
       this.setCurrentNode(currentNode);
        console.log('current node type='+currentNode.type);
-       this.currentRender();
+       this.rootRender();
     },
 
     moveDownNode: function(path){
@@ -101,14 +101,21 @@ define([
         }
       }
       console.log('current node type='+currentNode.type);
-       this.currentRender();
+       this.rootRender();
     },
 
     /* sets correct selection based on currentNode*/
    setSelection: function(path){
       console.log('set selection');
       path.selected = true;
-      path.nodeParent.setSelection(currentNode);
+      var level  = currentNode.getLevelInTree(rootNode,0);
+      console.log("selection level="+level);
+      console.log("render signature of path="+path.data.renderSignature);
+      var value = path.data.renderSignature[level];
+      console.log("selection value="+value);
+
+     currentNode.selectByValue(level,value);
+    // path.nodeParent.setSelection(currentNode,path.instanceParent);
     },
 
     rootRender: function(){

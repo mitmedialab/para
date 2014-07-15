@@ -21,7 +21,8 @@ define([
 			this.anchor= false;
 			this.selected= false;
 			this.copy= false;
-			this.instanceParent = -1;
+			//array that contains the path of inheritance from a render;
+			this.renderSignature = [];
 			Backbone.Model.apply(this, arguments);
 		 },
 		reset: function() {

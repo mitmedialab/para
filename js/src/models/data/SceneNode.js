@@ -86,6 +86,19 @@ define([
                 return null;
             },
 
+            /*returns heierarchal level in tree*/
+            getLevelInTree: function(root,level){
+                if(this==root){
+                    return level;
+                }
+                else{
+                    level++;
+
+                   return this.nodeParent.getLevelInTree(root,level);
+                }
+
+            },
+
             //returns child at specified index 
             getChildAt: function(index) {
 

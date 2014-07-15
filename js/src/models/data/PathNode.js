@@ -21,7 +21,7 @@ define([
 
     constructor: function() {
       //array to store actual paper.js objects
-      this.instance_literals = [];
+
       GeometryNode.apply(this, arguments);
       //console.log('number of nodes='+SceneNode.numNodeInstances);
     },
@@ -101,28 +101,35 @@ define([
       if (data) {
         for (var d = 0; d < data.length; d++) {
           for (var k = 0; k < this.instances.length; k++) {
-
+           
             var instance_literal = path_literal.clone();
             instance_literal.nodeParent = this;
+           instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
+            instance_literal.data.renderSignature.push(k);
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
             instance_literal.visible = true;
             this.instance_literals.push(instance_literal);
+            console.log("path render signature ="+instance_literal.data.renderSignature);
+            console.log("length of signature ="+instance_literal.data.renderSignature.length);
+
+
 
 
           }
         }
-      }
-      else{
-         for (var z = 0; z < this.instances.length; z++) {
+      } else {
+        for (var z = 0; z < this.instances.length; z++) {
 
-            var instance_literal = path_literal.clone();
-            instance_literal.nodeParent = this;
-            instance_literal.position.x = this.instances[z].position.x;
-            instance_literal.position.y = this.instances[z].position.y;
-            instance_literal.visible = true;
-            this.instance_literals.push(instance_literal);
-          }
+          var instance_literal = path_literal.clone();
+          instance_literal.nodeParent = this;
+          instance_literal.position.x = this.instances[z].position.x;
+          instance_literal.position.y = this.instances[z].position.y;
+          instance_literal.visible = true;
+          instance_literal.data.renderSignature.push(0);
+
+          this.instance_literals.push(instance_literal);
+        }
       }
       path_literal.visible = false;
 
@@ -138,6 +145,17 @@ define([
         }
       }
       return false;
+    },
+
+    //selects according render signature
+    selectByValue: function(index,value) {
+     for (var i = 1; i < this.instance_literals.length; i++) {
+      console.log(this.instance_literals[i].data.renderSignature);
+      if(this.instance_literals[i].data.renderSignature[index]==value){
+          this.instance_literals[i].selected = true;
+        }
+      
+    }
     },
 
     //selects or deselects all path instances

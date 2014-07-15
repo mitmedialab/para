@@ -29,6 +29,7 @@ define([
     */
 
       this.instances = [];
+      this.instance_literals = [];
       this.anchors = [];
 
 
@@ -112,6 +113,7 @@ define([
     },
 
     clear: function(){
+      this.instance_literals = [];
        for (var i = 0; i < this.children.length; i++) {
         this.children[i].clear();
       }
@@ -122,14 +124,17 @@ define([
     render: function(data) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data
-      var updatedInstances = [];
+      
       if(data){
        for (var i = 0; i < data.length; i++) {
         for (var j = 0; j < this.instances.length; j++) {
-             this.instances[i].instanceParent = i;
+           
           var u_instance = this.instances[j].clone();
+           u_instance.renderSignature = data[i].renderSignature.slice(0);
+           u_instance.renderSignature.push(j);
           u_instance.render(data[i]);
-          updatedInstances.push(u_instance);
+
+          this.instance_literals.push(u_instance);
         
         }
       }
@@ -137,7 +142,7 @@ define([
     
           for (var k = 0; k < this.children.length; k++) {
 
-            this.children[k].render(updatedInstances);
+            this.children[k].render(this.instance_literals);
           }
          }
          else{
@@ -149,12 +154,12 @@ define([
       
     },
 
-    setSelection: function(currentNode){
+    setSelection: function(currentNode,instanceParent){
       if(this==currentNode){
         return;
       }
       else{
-        this.selectAll();
+        this.selectByInstanceParent(instanceParent);
         if(this.nodeParent!==null){
           this.nodeParent.setSelection(currentNode);
         }
@@ -162,12 +167,20 @@ define([
     },
 
     //selects a specifc index
-    /*selectAt: function(index, val) {
+   /*selectAt: function(index, val) {
       if (index < this.instances.length) {
-        this.instances[index].selected = val;
+        this.instances[index].
       }
-    },*/
+    },
+  */
 
+
+  //selects according render signature
+    selectByValue: function(index,value) {
+     for(var i=0;i<this.children.length;i++){
+        this.children[i].selectByValue(index,value);
+     }
+    },
     //selects or deselects all path instances
     selectAll: function() {
       //console.log('calling geometry select all'+ isSelect);
