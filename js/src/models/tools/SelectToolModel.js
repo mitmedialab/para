@@ -36,6 +36,7 @@ define([
       segment = null;
       this.currentPath = null;
       this.currentNode = null;
+      this.selectedNode = null;
       var hitResult = paper.project.hitTest(event.point, hitOptions);
       //deselect everything
       var children = paper.project.activeLayer.children;
@@ -53,8 +54,8 @@ define([
         this.trigger('nodeSelected', path);
 
         //checks to make sure path is within current node
-        if (this.currentNode) {
-          if (this.currentNode.nodeParent.containsPath(path)) {
+        if (this.selectedNode) {
+          if (this.currentNode.containsPath(path)) {
             console.log("contains path");
             this.currentPath = path;
             this.trigger('setSelection', path);
@@ -62,7 +63,7 @@ define([
 
             if (event.modifiers.shift) {
               var behaviorNode = new BehaviorNode();
-              behaviorNode.addChildNode(this.currentNode);
+              behaviorNode.addChildNode(this.selectedNode);
               this.trigger('nodeAdded', behaviorNode);
               var copyBehavior = new CopyBehavior();
               copyBehavior.setCopyNum(2);
@@ -73,6 +74,9 @@ define([
               children = paper.project.activeLayer.children;
 
               console.log('total number of literal_paths=' + children.length);
+               this.trigger('moveDownNode', this.selectedNode.instance_literals[1]);
+
+               console.log("currentNode=behaviorNode"+this.currentNode == behaviorNode);
               //triggers parent to select current node level in graph
               //this.trigger('setCurrentNode', this.currentNode);
             }
@@ -123,10 +127,18 @@ define([
       } else if (this.currentPath) {
         // console.log('delta is');
         if(this.currentNode){
-
-          console.log("dragging on currentNode");
+          this.selectedNode.updateSelected([{
+          position: {
+            x: event.delta.x,
+            y: event.delta.y
+          }
+        }])
+         this.currentNode.clear();
+         this.currentNode.render();
+           //this.trigger('setSelection', this.currentPath);
+          console.log("re-render");
         }
-        console.log(event.delta);
+        //console.log(event.delta);
         /* this.currentNode.update([{
           position: {
             x: event.delta.x,

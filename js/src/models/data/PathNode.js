@@ -78,7 +78,7 @@ define([
 
     /*clears out all but first of literal paths*/
     clear: function() {
-      console.log('clear called');
+      //console.log('clear called');
 
       for (var j = 1; j < this.instance_literals.length; j++) {
         // console.log(this.instance_literals[j]);
@@ -92,9 +92,30 @@ define([
 
     },
 
+      updateSelected: function(data){
+        console.log("update selected path:"+this.instances.length);
+       for (var j = 0; j < this.instances.length; j++) {
+        if(this.instances[j].selected){
+          console.log("found selected instance at:"+j);
+           for (var i = 0; i < data.length; i++) {
+              var instance = this.instances[j];
+             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
+              //console.log(instance.position);
+              instance.render(data[i]);
+              //console.log('after update');
+              //console.log(instance.position);
+        }
+      }
+    }
+
+
+    },
+
     /* renders instances of the original path
      * render data contains an array of objects containing
-     * poition, scale and rotation data for each instance
+     * position, scale and rotation data for each instance
+      * copies the render signature from the data and concats it with the 
+      *index of the instance used to render the path
      */
     render: function(data) {
       var path_literal = this.getLiteral();
@@ -111,8 +132,9 @@ define([
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
             instance_literal.visible = true;
             this.instance_literals.push(instance_literal);
-             console.log('path render signature =' + instance_literal.data.renderSignature);
-            console.log('length of signature =' + instance_literal.data.renderSignature.length);
+           // this.instance_literals.selected = data[d].selected;
+            // console.log('path render signature =' + instance_literal.data.renderSignature);
+            //console.log('length of signature =' + instance_literal.data.renderSignature.length);
 
 
 
@@ -126,8 +148,9 @@ define([
           instance_literal.position.x = this.instances[z].position.x;
           instance_literal.position.y = this.instances[z].position.y;
           instance_literal.visible = true;
+          instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);
-
+          //this.instance_literals.selected = this.instances[z].selected;
           this.instance_literals.push(instance_literal);
         }
       }
@@ -156,6 +179,8 @@ define([
     */
     selectByValue: function(index, value, path, currentNode) {
       console.log("select by path value");
+      var sIndexes = [];
+      var rIndexes = [];
       if (this.containsPath(path)) {
         
         for (var i = 1; i < this.instance_literals.length; i++) {
@@ -167,16 +192,18 @@ define([
           if (compareSig === value) {
             this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length-1;
+            console.log("setting selected instance at:"+ this.instance_literals[i].data.renderSignature[last]);
             this.instances[this.instance_literals[i].data.renderSignature[last]].selected = true;
             //console.log('selected path value='+this.instance_literals[i].data.renderSignature);
           }
-          else{
-            console.log('unselected path value='+this.instance_literals[i].data.renderSignature);
+          //else{
+           // console.log('unselected path value='+this.instance_literals[i].data.renderSignature);
 
-          }
+          //}
 
         }
       }
+      return sIndexes;
     },
 
     //selects or deselects all path instances
@@ -190,6 +217,9 @@ define([
     deselectAll: function() {
       for (var i = 0; i < this.instance_literals.length; i++) {
         this.instance_literals[i].selected = false;
+      }
+        for (var j = 0; j < this.instances.length; j++) {
+        this.instances[j].selected = false;
       }
 
     },

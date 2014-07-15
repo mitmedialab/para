@@ -89,9 +89,10 @@ define([
 
     updateSelected: function(data){
        for (var j = 0; j < this.instances.length; j++) {
-        if(this.instances[i].selected){
+        if(this.instances[j].selected){
+          console.log("found selected instance at:"+i);
            for (var i = 0; i < data.length; i++) {
-          var instance = this.instances[j];
+              var instance = this.instances[j];
              //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
               //console.log(instance.position);
               instance.render(data[i]);
@@ -156,7 +157,7 @@ define([
            u_instance.renderSignature = data[i].renderSignature.slice(0);
            u_instance.renderSignature.push(j);
           u_instance.render(data[i]);
-
+          //u_instance.selected = data[i].selected;
           this.instance_literals.push(u_instance);
         
         }
@@ -201,12 +202,15 @@ define([
   //selects according render signature
     selectByValue: function(index,value, path, currentNode) {
     console.log("select by geom value");
+    var sIndexes = [];
+    var rIndexes = [];
      for(var i=0;i<this.children.length;i++){
       if(this.children[i].containsPath(path)){
-        this.children[i].selectByValue(index,value,path,currentNode);
+        rIndexes.push.apply(this.children[i].selectByValue(index,value,path,currentNode));
 
       }
      }
+     return sIndexes;
     },
     //selects or deselects all path instances
     selectAll: function() {

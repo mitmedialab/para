@@ -53,6 +53,7 @@ define([
 
 
       rootNode = new GeometryNode();
+      rootNode.type = 'root';
       currentNode = rootNode;
 
 
@@ -90,6 +91,7 @@ define([
        this.rootRender();
     },
 
+    //moves down based on path
     moveDownNode: function(path){
       console.log('move down node');
       var children = currentNode.children;
@@ -101,6 +103,7 @@ define([
         }
       }
       console.log('current node type='+currentNode.type);
+         console.log('current node is root='+('root'===currentNode.type));
        this.rootRender();
     },
 
@@ -110,6 +113,7 @@ define([
     * sends this as the starting value for selecting other relevant paths based on the current node
     */
    setSelection: function(path){
+      rootNode.deselectAll();
       console.log('set selection');
    
       var level  = currentNode.getLevelInTree(rootNode,0);
@@ -172,7 +176,8 @@ define([
       //console.log('determining selection point');
       currentNode.deselectAll();
       if (selected.nodeParent == currentNode) {
-       toolCollection.get(this.get('state')).currentNode = selected;
+       toolCollection.get(this.get('state')).currentNode = currentNode;
+       toolCollection.get(this.get('state')).selectedNode = selected;
         return;
       }
       if (selected == rootNode) {
