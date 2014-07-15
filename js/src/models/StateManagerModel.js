@@ -112,14 +112,16 @@ define([
       console.log("selection level="+level);
       //console.log("render signature of path="+path.data.renderSignature);
       var value = null;
-      var parentValue = null;
       value= path.data.renderSignature[level];
-      parentValue = path.data.renderSignature[level-1];
-      console.log("selection value="+value);
-      console.log("parent value="+parentValue);
+
+     
 
       if(value!==null){
-        currentNode.selectByValue(level,value, parentValue,path, currentNode);
+        value = path.data.renderSignature.slice(0,level+1);
+        value = value.join();
+
+        console.log("selection value="+value);
+        currentNode.selectByValue(level,value, path, currentNode);
       }
       else{
         path.selected=true;

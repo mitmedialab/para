@@ -194,15 +194,14 @@ define([
 
 
   //selects according render signature
-    selectByValue: function(index,value, parentValue, path, currentNode) {
-     //if(this.containsPath(path)){
+    selectByValue: function(index,value, path, currentNode) {
+    console.log("select by geom value");
      for(var i=0;i<this.children.length;i++){
       if(this.children[i].containsPath(path)){
-        this.children[i].selectByValue(index,value,parentValue,path,currentNode);
+        this.children[i].selectByValue(index,value,path,currentNode);
 
       }
      }
-   //}
     },
     //selects or deselects all path instances
     selectAll: function() {

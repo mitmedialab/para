@@ -148,13 +148,17 @@ define([
     },
 
     //selects according render signature
-    selectByValue: function(index, value, parentValue, path, currentNode) {
+    selectByValue: function(index, value, path, currentNode) {
+      console.log("select by path value");
       if (this.containsPath(path)) {
         
         for (var i = 1; i < this.instance_literals.length; i++) {
           //console.log(this.instance_literals[i].data.renderSignature);
-
-          if (this.instance_literals[i].data.renderSignature[index] == value) {
+          var compareSig = this.instance_literals[i].data.renderSignature.slice(0,index+1);
+          compareSig = compareSig.join();
+          console.log('compareSig='+compareSig);
+          console.log('valueSig='+value);
+          if (compareSig === value) {
             this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length-1;
             this.instances[this.instance_literals[i].data.renderSignature[last]].selected = true;
