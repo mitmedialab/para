@@ -72,8 +72,9 @@ define([
      // console.log('parent type='+this.nodeParent.type);
     }
 
-     for (var i = 0; i < data.length; i++) {
+    
         for (var j = 0; j < this.instances.length; j++) {
+           for (var i = 0; i < data.length; i++) {
           var instance = this.instances[j];
              console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
               console.log(instance.position);
@@ -126,12 +127,12 @@ define([
       //first create array of new instances that contain propogated updated data
       
       if(data){
+          for (var j = 0; j < this.instances.length; j++) {
        for (var i = 0; i < data.length; i++) {
-        for (var j = 0; j < this.instances.length; j++) {
            
           var u_instance = this.instances[j].clone();
            u_instance.renderSignature = data[i].renderSignature.slice(0);
-           u_instance.renderSignature.push(j);
+           u_instance.renderSignature.push(i);
           u_instance.render(data[i]);
 
           this.instance_literals.push(u_instance);
@@ -176,10 +177,15 @@ define([
 
 
   //selects according render signature
-    selectByValue: function(index,value) {
+    selectByValue: function(index,value,path) {
+     //if(this.containsPath(path)){
      for(var i=0;i<this.children.length;i++){
-        this.children[i].selectByValue(index,value);
+      if(this.children[i].containsPath(path)){
+        this.children[i].selectByValue(index,value,path);
+
+      }
      }
+   //}
     },
     //selects or deselects all path instances
     selectAll: function() {

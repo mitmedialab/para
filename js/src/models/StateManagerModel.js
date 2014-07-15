@@ -107,14 +107,19 @@ define([
     /* sets correct selection based on currentNode*/
    setSelection: function(path){
       console.log('set selection');
-      path.selected = true;
+     // path.selected = true;
       var level  = currentNode.getLevelInTree(rootNode,0);
       console.log("selection level="+level);
-      console.log("render signature of path="+path.data.renderSignature);
-      var value = path.data.renderSignature[level];
+      //console.log("render signature of path="+path.data.renderSignature);
+      var value = null;
+      value= path.data.renderSignature[level];
       console.log("selection value="+value);
-
-     currentNode.selectByValue(level,value);
+      if(value!=null){
+        currentNode.selectByValue(level,value,path);
+      }
+      else{
+        path.selected=true;
+      }
     // path.nodeParent.setSelection(currentNode,path.instanceParent);
     },
 
