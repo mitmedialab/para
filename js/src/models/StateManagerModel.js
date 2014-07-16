@@ -10,10 +10,10 @@ define([
   'models/tools/PenToolModel',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
-  'models/behaviors/CopyBehavior',
-  'models/behaviors/DistributeBehavior'
+ 
 
-], function($, _, Backbone, GeometryNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, CopyBehavior, DistributeBehavior) {
+
+], function($, _, Backbone, GeometryNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel) {
   var rootNode,
     currentNode,
     toolCollection,
@@ -29,7 +29,7 @@ define([
       'state': 'selectTool',
     },
 
-    initialize: function() {
+    initialize: function(event_bus) {
       penTool = new PenToolModel({
         id: 'penTool'
       });
@@ -40,18 +40,29 @@ define([
         id: 'polyTool'
       });
 
+this.event_bus = event_bus;
+
       toolCollection = new ToolCollection([penTool, selectTool, polyTool]);
       this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
       this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
-            this.listenTo(toolCollection, 'setSelection', this.setSelection);
-
+      this.listenTo(toolCollection, 'setSelection', this.setSelection);
       this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
       this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
       this.listenTo(toolCollection, 'moveDownNode', this.moveDownNode);
 
+      this.listenTo(toolCollection, 'shiftClick', this.openMenu);
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
+      
+
+      this.listenTo(event_bus, 'nodeAdded', this.nodeAdded);
+
+      this.listenTo(event_bus, 'rootRender', this.rootRender);
+      this.listenTo(event_bus, 'currentRender', this.currentRender);
 
 
+      this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
+
+      
       rootNode = new GeometryNode();
       rootNode.type = 'root';
       currentNode = rootNode;
@@ -76,7 +87,7 @@ define([
 
     //callback triggered when tool adds new node
     nodeAdded: function(node) {
-      //console.log('node added: '+ node.type);
+      console.log('node added: '+ node.type);
  
       currentNode.addChildNode(node);
            //console.log('number of children on root='+currentNode.getNumChildren());
@@ -187,6 +198,14 @@ define([
       }
     },
 
+
+    /* Called by select tool on Shift-click
+    * pulls up the properties menu for the selected node
+    */
+    openMenu: function(node){
+      this.event_bus.trigger('openMenu',node);
+    },
+
     //triggered by paper tool on a mouse down event
     toolMouseDown: function(event) {
       var selectedTool = toolCollection.get(this.get('state'));
@@ -219,12 +238,12 @@ define([
       var currentlySelected = selectedTool.path.instanceParent.nodeParent;
       if (!_.has(currentlySelected, 'copyNum')) {
         //console.log('no behavior, assigning copy and distribute');
-        var copyBehavior = new CopyBehavior();
-        var distributeBehavior = new DistributeBehavior();
-        distributeBehavior.initialize();
-        copyBehavior.setCopyNum(2);
-        currentlySelected.extendBehavior(distributeBehavior, 'update');
-        currentlySelected.extendBehavior(copyBehavior, 'update');
+      //  var copyBehavior = new CopyBehavior();
+        //var distributeBehavior = new DistributeBehavior();
+        //distributeBehavior.initialize();
+      //  copyBehavior.setCopyNum(2);
+        //currentlySelected.extendBehavior(distributeBehavior, 'update');
+        //currentlySelected.extendBehavior(copyBehavior, 'update');
       } else {
         //console.log('behavior exists. updating num');
         currentlySelected.setCopyNum(currentlySelected.copyNum + 1);

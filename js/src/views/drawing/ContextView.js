@@ -10,7 +10,7 @@ define([
 
 ], function($, _, Backbone, Handlebars) {
 
-
+var template,source, menuX, menuY, currentNode;
   var ContextView = Backbone.View.extend({
     //
     initialize: function(obj, event_bus) {
@@ -18,41 +18,58 @@ define([
       //this.listenTo(this.model,'updateView',this.render);
 
       this.listenTo(event_bus, 'canvasMouseMove', this.setMenuPosition);
-      this.listenTo(event_bus, 'shiftClick', this.showMenu);
+      this.listenTo(event_bus, 'openMenu', this.showMenu);
       this.visible = false;
+        source = $('#menu-template').html();
+      template = Handlebars.compile(source);
+      
     },
 
     events: {
       'mousemove': 'mouseMove',
-      'mousedown': 'mouseDown'
+      'mousedown': 'mouseDown',
+      'click #close-btn':'hideMenu',
+      'click #new-behavior-btn':'newBehavior'
     },
 
-    render: function() {
-      // console.log('property view rendering');
-      // console.log('source='+$('#property-list-template').html());
-      var source = $('#property-list-template').html();
-      var template = Handlebars.compile(source);
-      var properties = this.model.getSelected();
-      // console.log(properties);
-      var html = template(properties);
-      this.$el.html(html);
-
-    },
     setMenuPosition: function(event) {
-      if(!this.visible){
-      this.$el.css({
-        left: event.pageX,
-        top: event.pageY
-      });
-    }
+      menuX = event.pageX;
+      menuY = event.pageY;
+   
+    
+    
 
     },
 
-    showMenu: function() {
-      this.$el.css({
-        visibility: 'visible'
+    showMenu: function(node) {
+      currentNode = node;
+      var name = node.name;
+      var behaviorData = this.generateBehaviors();
+  
+     
+        var html = template({name:name});
+        this.$el.html(html);
+        this.$el.css({
+        visibility: 'visible',
+        left: menuX,
+        top: menuY,
       });
       this.visible= true;
+
+    },
+
+    newBehavior: function(){
+     
+      this.model.newBehavior(currentNode);
+    },
+
+    generateBehaviors: function(){
+      var behaviors = [];
+      if(currentNode.behaviors){
+        for(var i=0;i<currentNode.behaviors.size();i++){
+        }
+      }
+      return behaviors;
 
     },
 
@@ -65,7 +82,7 @@ define([
     },
 
     mouseDown: function(event){
-      this.hideMenu();
+     
     },
 
     nameChange: function() {

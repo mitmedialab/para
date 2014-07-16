@@ -33,7 +33,7 @@ define([
       this.currentPath.selected = false;
         
         var pathNode  = new PathNode();
-          pathNode.name = nameVal;
+          pathNode.name = "Path_"+nameVal;
             nameVal++;
         pathNode.createInstanceFromPath(this.currentPath.clone());
         this.trigger('nodeAdded',pathNode);

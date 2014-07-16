@@ -62,23 +62,7 @@ define([
 
 
             if (event.modifiers.shift) {
-              var behaviorNode = new BehaviorNode();
-              behaviorNode.addChildNode(this.selectedNode);
-              this.trigger('nodeAdded', behaviorNode);
-              var copyBehavior = new CopyBehavior();
-              copyBehavior.setCopyNum(2);
-              behaviorNode.extendBehavior(copyBehavior, 'update');
-              behaviorNode.update([{}]);
-              //this.currentNode= behaviorNode;
-              this.trigger('rootRender');
-              children = paper.project.activeLayer.children;
-
-              console.log('total number of literal_paths=' + children.length);
-               this.trigger('moveDownNode', this.selectedNode.instance_literals[1]);
-
-               console.log("currentNode=behaviorNode"+this.currentNode == behaviorNode);
-              //triggers parent to select current node level in graph
-              //this.trigger('setCurrentNode', this.currentNode);
+              this.trigger('shiftClick',this.selectedNode);
             }
 
 

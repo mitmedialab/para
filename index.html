@@ -30,7 +30,26 @@
     </head>
 
     <body>
-      <div id="context-menu",class="floating-menu">Menu</div>
+      <div id="context-menu",class="floating-menu">
+        <div id = "main-menu">
+          <script id="menu-template" type="text/x-handlebars-template">
+            <div class="row" id="title-bar">
+              <div id="name">{{name}}</div>
+              <div id="close"><button id="close-btn">x</button></div>
+            </div>
+            <div class="row">
+              <div id="behavior-menu">behaviors</div>
+              {{behavior-menu}}
+              <div><a id="new-behavior-btn">new behavior +</a></div>
+            </div>
+          </script>
+        </div>
+        <div id="behavior-types-menu">
+          <div class="row">copy</div>  
+          <div class="row">linear distribution</div> 
+          <div class="row">radial distribution</div> 
+        </div>
+      </div>
 
       <div class="container">
 

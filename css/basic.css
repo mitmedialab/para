@@ -102,12 +102,42 @@ min-height: 200px;
     box-shadow:none;
 }
 
-#context-menu {
+#context-menu,  #behavior-types-menu{
     position: absolute;
     visibility: hidden;
     z-index: 2;
-    background-color: #5CA2B5;
-   	height:30px;
+    background-color: #D1D9E0;
+   	min-width:140px;
+   	min-height:60px;
+}
+
+#context-menu a{
+	cursor: pointer;
+}
+
+#context-menu div.row {
+	padding:6px;
+	min-height: 20px;
+	background-color: #EAF3FA;
+
+}
+
+#context-menu div.row#title-bar {
+	min-height: 30px;
+	background-color: #5CA2B5;
+
+}
+#context-menu #name{
+	
+	color: #FFF;
+	width:100px;
+	float:left;
+}
+
+#context-menu div#close{
+	float:right;
+	font-weight: bolder;
+	width: 30px;
 }
 
 #canvas{
