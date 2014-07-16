@@ -7,9 +7,10 @@ define([
   'backbone',
   'models/data/BehaviorNode',
   'models/behaviors/CopyBehavior',
-  'models/behaviors/DistributeBehavior'
+  'models/behaviors/DistributeBehavior',
+  'models/behaviors/RadialDistributeBehavior'
 
-], function($, _, Backbone, BehaviorNode, CopyBehavior, DistributeBehavior) {
+], function($, _, Backbone, BehaviorNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior) {
 var nameVal = 0;
   var BehaviorManagerModel = Backbone.Model.extend({
 
@@ -44,6 +45,14 @@ var nameVal = 0;
         behaviorNode.update([{}]);
       }
       else if(type=='radial'){
+           console.log("creating  radial behavior");
+        var copyBehavior = new CopyBehavior();
+        copyBehavior.setCopyNum(10);
+        behaviorNode.extendBehavior(copyBehavior, 'update');
+        behaviorNode.update([{}]);
+        var radialBehavior = new RadialDistributeBehavior();
+        behaviorNode.extendBehavior(radialBehavior, 'update');
+        behaviorNode.update([{}]);
       }
       behaviorNode.update([{}]);
       this.event_bus.trigger('rootRender');

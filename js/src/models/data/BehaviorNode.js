@@ -59,6 +59,15 @@ define([
 
 			},
 
+			clearScaffolds: function(){
+      			for (var j = 0; j < this.scaffold.length; j++) {
+       				 this.scaffold[j].remove();
+
+      		}
+      			this.scaffold = [];
+
+			}
+
 			
 
 		

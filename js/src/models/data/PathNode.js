@@ -13,7 +13,7 @@ define([
 
 ], function(_, GeometryNode, Instance, PaperManager) {
   //drawable paper.js path object that is stored in the pathnode
-
+ // var paper = PaperManager.getPaperInstance();
   var PathNode = GeometryNode.extend({
 
     type: 'path',
@@ -87,7 +87,7 @@ define([
       }
       this.instance_literals.splice(1, this.instance_literals.length);
       //console.log("num of literals:"+this.instance_literals.length); 
-      var paper = PaperManager.getPaperInstance();
+      
       // console.log('num of drawn children='+paper.project.activeLayer.children.length);
 
     },
@@ -119,6 +119,7 @@ define([
      */
     render: function(data) {
       var path_literal = this.getLiteral();
+     
       if (data) {
          for (var k = 0; k < this.instances.length; k++) {
             for (var d = 0; d < data.length; d++) {
@@ -130,6 +131,11 @@ define([
             instance_literal.data.renderSignature.push(k);
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
+            if(this.instances[k].anchor || data[d].anchor){
+              instance_literal.strokeColor= '#83E779';
+            }
+
+
             instance_literal.visible = true;
             this.instance_literals.push(instance_literal);
            // this.instance_literals.selected = data[d].selected;
