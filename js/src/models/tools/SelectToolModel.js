@@ -118,6 +118,7 @@ define([
           }
         }])
          this.currentNode.clear();
+         this.currentNode.update([{}]);
          this.currentNode.render();
            //this.trigger('setSelection', this.currentPath);
           console.log("re-render");

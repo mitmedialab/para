@@ -10,7 +10,7 @@ define([
   'models/behaviors/DistributeBehavior'
 
 ], function($, _, Backbone, BehaviorNode, CopyBehavior, DistributeBehavior) {
-
+var nameVal = 0;
   var BehaviorManagerModel = Backbone.Model.extend({
 
 
@@ -19,14 +19,32 @@ define([
       this.listenTo(this.event_bus, 'openMenu', this.openMenu);
     },
 
-    newBehavior: function(node) {
-
+    newBehavior: function(node,type) {
+      console.log("type="+type);
      var behaviorNode = new BehaviorNode();
+       behaviorNode.name = "Behavior_"+nameVal;
+            nameVal++;
       behaviorNode.addChildNode(node);
       this.event_bus.trigger('nodeAdded', behaviorNode);
-      var copyBehavior = new CopyBehavior();
-      copyBehavior.setCopyNum(2);
-      behaviorNode.extendBehavior(copyBehavior, 'update');
+      if(type ==='copy'){
+        console.log("creating copy behavior");
+        var copyBehavior = new CopyBehavior();
+        copyBehavior.setCopyNum(2);
+        behaviorNode.extendBehavior(copyBehavior, 'update');
+        behaviorNode.update([{}]);
+      }
+      else if(type==='linear'){
+         console.log("creating linear behavior");
+        var copyBehavior = new CopyBehavior();
+        copyBehavior.setCopyNum(5);
+        behaviorNode.extendBehavior(copyBehavior, 'update');
+        behaviorNode.update([{}]);
+        var linearBehavior = new DistributeBehavior();
+        behaviorNode.extendBehavior(linearBehavior, 'update');
+        behaviorNode.update([{}]);
+      }
+      else if(type=='radial'){
+      }
       behaviorNode.update([{}]);
       this.event_bus.trigger('rootRender');
 

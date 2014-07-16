@@ -29,44 +29,51 @@ var template,source, menuX, menuY, currentNode;
       'mousemove': 'mouseMove',
       'mousedown': 'mouseDown',
       'click #close-btn':'hideMenu',
-      'click #new-behavior-btn':'newBehavior'
+      'click #new-behavior-btn':'newBehavior',
+      'click #behavior-types-menu': 'addBehavior'
     },
 
     setMenuPosition: function(event) {
       menuX = event.pageX;
       menuY = event.pageY;
-   
-    
-    
-
     },
 
     showMenu: function(node) {
       currentNode = node;
       var name = node.name;
       var behaviorData = this.generateBehaviors();
-  
      
         var html = template({name:name});
-        this.$el.html(html);
+        this.$('#main-menu').html(html);
         this.$el.css({
         visibility: 'visible',
         left: menuX,
         top: menuY,
       });
       this.visible= true;
-
     },
 
     newBehavior: function(){
-     
-      this.model.newBehavior(currentNode);
+        console.log( this.$('#behavior-types-menu').html());
+        this.$('#behavior-types-menu').css({
+        visibility: 'visible',
+        left: 100,
+
+      });
+      //this.model.newBehavior(currentNode);
+    },
+
+    addBehavior: function(event){
+      var id = $(event.toElement).attr('id');
+      if(id){
+        this.model.newBehavior(currentNode,id);
+      }
     },
 
     generateBehaviors: function(){
       var behaviors = [];
       if(currentNode.behaviors){
-        for(var i=0;i<currentNode.behaviors.size();i++){
+        for(var i=0;i<currentNode.behaviors.length;i++){
         }
       }
       return behaviors;
@@ -76,6 +83,10 @@ var template,source, menuX, menuY, currentNode;
     hideMenu: function() {
       this.$el.css({
         visibility: 'hidden'
+      });
+       this.$('#behavior-types-menu').css({
+        visibility: 'hidden',
+
       });
       this.visible=false;
 

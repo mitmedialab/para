@@ -45,8 +45,11 @@ define([
               } else if (numInstances > this.copyNum) {
                 for (var k = 0; k < numInstances - this.copyNum; k++) {
                   child.instances.pop();
+
                 }
               }
+              child.instances[0].anchor=true;
+              child.instances[child.instances.length-1].anchor=true;
             }
           }
         }

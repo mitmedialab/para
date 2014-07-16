@@ -110,6 +110,9 @@ min-height: 200px;
    	min-width:140px;
    	min-height:60px;
 }
+ #behavior-types-menu{
+ 	z-index:3;
+ }
 
 #context-menu a{
 	cursor: pointer;
