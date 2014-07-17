@@ -33,7 +33,7 @@ define([
 
                 for (var i = 0; i < newCopy; i++) {
                   var instance = child.createInstance(child.instances[0]);
-                  var x = (i+1) * 20+ Math.random()*60;
+                  var x  = (i+1) * 20+ Math.random()*60;
                   var y = x;
                   instance.copy=true;
                   instance.update({

@@ -6,11 +6,9 @@ define([
   'backbone',
   'models/tools/BaseToolModel',
   'models/data/PathNode',
-  'models/PaperManager',
-  'models/behaviors/CopyBehavior',
-  'models/data/BehaviorNode'
+  'models/PaperManager'
 
-], function(_, Backbone, BaseToolModel, PathNode, PaperManager, CopyBehavior, BehaviorNode) {
+], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
   var segment, paper;
 
 
@@ -26,19 +24,26 @@ define([
 
     initialize: function() {
       paper = PaperManager.getPaperInstance();
+      this.selectedNodes = [];
+      this.currentPaths = [];
     },
 
     /*mousedown event
      */
     mouseDown: function(event) {
-      if(this.currentNode){
-        this.currentNode.deselectAll();
+      console.log(event.modifiers);
+      if (!event.modifiers.shift) {
+        if (this.currentNode) {
+         this.currentNode.deselectAll();
+
+        }
+        this.currentPath = [];
+        this.currentNode = null;
+        this.selectedNodes = [];
       }
       var paper = PaperManager.getPaperInstance();
       segment = null;
-      this.currentPath = null;
-      this.currentNode = null;
-      this.selectedNode = null;
+
       var hitResult = paper.project.hitTest(event.point, hitOptions);
       //deselect everything
       var children = paper.project.activeLayer.children;
@@ -56,14 +61,16 @@ define([
         this.trigger('nodeSelected', path);
 
         //checks to make sure path is within current node
-        if (this.selectedNode) {
+        if (this.selectedNodes.length > 0) {
           if (this.currentNode.containsPath(path)) {
-                       this.currentPath = path;
+            if(this.currentPaths.indexOf(path)==-1){
+               this.currentPaths.push(path);
+             }
             this.trigger('setSelection', path);
-            this.trigger('currentRender');
 
-            if (event.modifiers.shift) {
-              this.trigger('shiftClick',this.selectedNode);
+
+            if (event.modifiers.option) {
+              this.trigger('optionClick', this.selectedNodes[this.selectedNodes.length - 1]);
             }
 
 
@@ -74,14 +81,15 @@ define([
         }
 
       }
+      this.trigger('rootRender');
 
     },
 
     dblClick: function(event) {
-     // console.log('double click');
-      if (this.currentPath) {
+      // console.log('double click');
+      if (this.currentPaths.length > 0) {
 
-        this.trigger('moveDownNode', this.currentPath);
+        this.trigger('moveDownNode', this.currentPaths[this.currentPaths.length - 1]);
 
 
 
@@ -105,35 +113,26 @@ define([
     //mouse drag event
     mouseDrag: function(event) {
       if (segment) {
-        // console.log('dragging segment');
         segment.point = segment.point.add(event.delta);
 
-        //path.smooth();
-      } else if (this.currentPath) {
-        // console.log('delta is');
-        if(this.currentNode){
-         // console.log("selected Node =");
-          //console.log(this.selectedNode);
-          this.selectedNode.updateSelected([{
-          position: {
-            x: event.delta.x,
-            y: event.delta.y
+      
+      } 
+      else if (this.currentPaths.length > 0) {
+      
+        if (this.currentNode) {
+      
+          for (var i = 0; i < this.selectedNodes.length; i++) {
+            this.selectedNodes[i].updateSelected([{
+              position: {
+                x: event.delta.x,
+                y: event.delta.y
+              }
+            }]);
           }
-        }]);
-        this.currentNode.update([{}]);
-        this.trigger('currentRender');
-       
-           //this.trigger('setSelection', this.currentPath);
-         // console.log("re-render");
+          this.currentNode.update([{}]);
+          this.trigger('rootRender');
         }
-        //console.log(event.delta);
-        /* this.currentNode.update([{
-          position: {
-            x: event.delta.x,
-            y: event.delta.y
-          }
-        }]);
-        this.currentNode.getParentNode().render();*/
+       
 
       }
     },

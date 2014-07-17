@@ -50,15 +50,15 @@ this.event_bus = event_bus;
       this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
       this.listenTo(toolCollection, 'moveDownNode', this.moveDownNode);
 
-      this.listenTo(toolCollection, 'shiftClick', this.openMenu);
+      this.listenTo(toolCollection, 'optionClick', this.openMenu);
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
-            this.listenTo(toolCollection, 'currentRender', this.rootRender);
+      this.listenTo(toolCollection, 'currentRender', this.currentRender);
 
 
       this.listenTo(event_bus, 'nodeAdded', this.nodeAdded);
 
       this.listenTo(event_bus, 'rootRender', this.rootRender);
-      this.listenTo(event_bus, 'currentRender', this.currentRender);
+      //this.listenTo(event_bus, 'currentRender', this.currentRender);
 
 
       this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
@@ -125,7 +125,6 @@ this.event_bus = event_bus;
     * sends this as the starting value for selecting other relevant paths based on the current node
     */
    setSelection: function(path){
-      rootNode.deselectAll();
      // console.log('set selection');
    
       var index  = currentNode.getLevelInTree(rootNode,0);
@@ -138,9 +137,7 @@ this.event_bus = event_bus;
         //console.log("selection value="+value);
         currentNode.selectByValue(index,value, path, currentNode);
       }
-      else{
-        path.selected=true;
-      }
+     
     },
 
     rootRender: function(){
@@ -181,10 +178,11 @@ this.event_bus = event_bus;
     */
     determineSelectionPoint: function(selected) {
       //console.log('determining selection point');
-      currentNode.deselectAll();
       if (selected.nodeParent == currentNode) {
        toolCollection.get(this.get('state')).currentNode = currentNode;
-       toolCollection.get(this.get('state')).selectedNode = selected;
+         if(toolCollection.get(this.get('state')).selectedNodes.indexOf(selected)==-1){
+            toolCollection.get(this.get('state')).selectedNodes.push(selected);
+          }
         return;
       }
       if (selected == rootNode) {

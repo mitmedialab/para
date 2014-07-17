@@ -132,7 +132,7 @@ define([
             instance_literal.data.renderSignature.push(k);
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
-
+            instance_literal.scale(this.instances[k].scale* data[d].scale);
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
               if (this.instances[k].anchor) {
@@ -159,6 +159,7 @@ define([
           instance_literal.nodeParent = this;
           instance_literal.position.x = this.instances[z].position.x;
           instance_literal.position.y = this.instances[z].position.y;
+          instance_literal.scale(this.instances[z].scale);
           instance_literal.visible = true;
           instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);

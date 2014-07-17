@@ -59,7 +59,12 @@ define([
               var xDiff = (pointB.x - pointA.x) / (num-1);
               var yDiff = (pointB.y - pointA.y) / (num-1);
 
+            for(var j=0;j<num;j++){
+                 child.instances[j].update({
+                  scale:0.5
 
+              });
+            }
               for (var i = 1; i < num-1; i++) {
                 //console.log(location);
                 var x = pointA.x + xDiff * i;
@@ -72,6 +77,8 @@ define([
                   }
                 });
               }
+
+
               /*if (this.getParentNode != parent) {
         parent.addChildNode(this);
       }*/
