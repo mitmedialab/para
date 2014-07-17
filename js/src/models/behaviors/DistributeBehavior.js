@@ -11,14 +11,15 @@ define([
       paper: null,
       name: 'linear',
       type: 'distribution',
-      
+
       initialize: function() {
         this.paper = PaperManager.getPaperInstance();
       },
 
       update: function() {
+       // console.log("distribution update");
         this.clearScaffolds();
-        this.distribute();
+      this.distribute();
 
 
       },
@@ -36,7 +37,7 @@ define([
               var pointA = child.instances[0].position;
               var pointB = child.instances[child.instances.length - 1].position;
 
-                var scaffoldLine =  new paper.Path();
+               /* var scaffoldLine =  new paper.Path();
     
               
                  scaffoldLine.strokeColor = '#83E779';
@@ -46,9 +47,9 @@ define([
                 var pointAC = new paper.Path.Circle(new paper.Point(pointA.x,pointA.y),5);
                  var pointBC = new paper.Path.Circle(new paper.Point(pointB.x,pointB.y),5);
                 pointAC.fillColor =  '#83E779';
-                pointBC.fillColor =  '#83E779';
+                pointBC.fillColor =  '#FF0000';
                 this.scaffold.push(pointAC);
-                this.scaffold.push(pointBC);
+                this.scaffold.push(pointBC);*/
 
          
 

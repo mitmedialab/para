@@ -91,7 +91,7 @@ define([
     updateSelected: function(data){
        for (var j = 0; j < this.instances.length; j++) {
         if(this.instances[j].selected){
-        //  console.log('found selected instance at:'+i);
+        console.log('found selected instance at:'+j);
            for (var i = 0; i < data.length; i++) {
               var instance = this.instances[j];
              //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
@@ -102,6 +102,7 @@ define([
         }
       }
     }
+
 
 
     },
@@ -135,6 +136,7 @@ define([
     clear: function(){
       this.instance_literals = [];
       this.drawAnchor= false;
+
        for (var i = 0; i < this.children.length; i++) {
         this.children[i].clear();
       }
@@ -206,15 +208,41 @@ define([
     selectByValue: function(index,value, path, currentNode) {
     //console.log('select by geom value');
     var sIndexes = [];
-    var rIndexes = [];
      for(var i=0;i<this.children.length;i++){
       if(this.children[i].containsPath(path)){
-        rIndexes.push.apply(this.children[i].selectByValue(index,value,path,currentNode));
+        var results = this.children[i].selectByValue(index,value,path,currentNode);
+        console.log('select by value results='+results);
+        console.log(results);
+        if(this !=currentNode){
+          for(var j=0;j<results.length;j++){
+            if(results[j].length>0){
+            var last = results[j].length-1;
+            console.log("selecting instance at"+last);
+            this.instances[results[j][last]].selected = true;
+            
+            results[j].pop(); 
+            if(results[j].length>0){
+              sIndexes.push(results[j]);
+            }
+          }
+        }
+      }
 
       }
      }
      return sIndexes;
     },
+
+    /*selectBackUp: function(value, currentNode){
+      if(this.nodeParent == currentNode){
+          for(var i=0;i<this.instances.length;i++){
+            instanceSig = this.instances[i].
+          }
+      }
+      else{
+        this.nodeParent.selectBackUp(value, currentNode);
+      }
+    },*/
     //selects or deselects all path instances
     selectAll: function() {
       //console.log('calling geometry select all'+ isSelect);
@@ -262,12 +290,13 @@ define([
 
     },
 
+
     containsBehaviorType: function(type){
       var indexes = [];
         for(var i=0;i<this.behaviors.length;i++){
-          console.log("behavior_type="+this.behaviors[i].type);
+          //console.log('behavior_type='+this.behaviors[i].type);
           if(this.behaviors[i].type===type){
-            console.log("match found");
+           
             indexes.push(i);
           }
         }

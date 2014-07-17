@@ -134,7 +134,7 @@ define([
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
             
             if(this.drawAnchor){
-              if(instance[k].anchor){
+              if(this.instances[k].anchor){
                  instance_literal.strokeColor= '#83E779';
               }
             }
@@ -194,7 +194,7 @@ define([
     selectByValue: function(index, value, path, currentNode) {
       //console.log('select by path value');
       var sIndexes = [];
-      var rIndexes = [];
+    
       if (this.containsPath(path)) {
         
         for (var i = 1; i < this.instance_literals.length; i++) {
@@ -206,9 +206,17 @@ define([
           if (compareSig === value) {
             this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length-1;
-            //console.log('setting selected instance at:'+ this.instance_literals[i].data.renderSignature[last]);
-            this.instances[this.instance_literals[i].data.renderSignature[last]].selected = true;
-            
+            console.log('selected render sig:'+ this.instance_literals[i].data.renderSignature);
+            var iIndex = this.instance_literals[i].data.renderSignature[last];
+            this.instances[iIndex].selected = true;
+            var copySig = this.instance_literals[i].data.renderSignature.slice(0);
+
+            copySig.pop();
+            console.log('copy sig:'+ copySig);
+            if(copySig.length>0){
+              sIndexes.push(copySig);
+            }
+
             //console.log('selected path value='+this.instance_literals[i].data.renderSignature);
           }
           //else{
@@ -220,6 +228,8 @@ define([
       }
       return sIndexes;
     },
+
+
 
     //selects or deselects all path instances
     selectAll: function() {

@@ -31,7 +31,9 @@ define([
     /*mousedown event
      */
     mouseDown: function(event) {
-
+      if(this.currentNode){
+        this.currentNode.deselectAll();
+      }
       var paper = PaperManager.getPaperInstance();
       segment = null;
       this.currentPath = null;

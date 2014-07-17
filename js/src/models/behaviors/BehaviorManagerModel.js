@@ -49,7 +49,7 @@ define([
         console.log("contains copy="+containsCopy); 
         if (containsCopy===false) {
           var copyBehavior = new CopyBehavior();
-          copyBehavior.setCopyNum(5);
+          copyBehavior.setCopyNum(3);
           behaviorNode.extendBehavior(copyBehavior, 'update');
           behaviorNode.update([{}]);
           console.log("copytype=" +copyBehavior.type);

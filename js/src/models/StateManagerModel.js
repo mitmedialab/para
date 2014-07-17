@@ -52,7 +52,7 @@ this.event_bus = event_bus;
 
       this.listenTo(toolCollection, 'shiftClick', this.openMenu);
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
-            this.listenTo(toolCollection, 'currentRender', this.currentRender);
+            this.listenTo(toolCollection, 'currentRender', this.rootRender);
 
 
       this.listenTo(event_bus, 'nodeAdded', this.nodeAdded);
@@ -128,20 +128,15 @@ this.event_bus = event_bus;
       rootNode.deselectAll();
      // console.log('set selection');
    
-      var level  = currentNode.getLevelInTree(rootNode,0);
+      var index  = currentNode.getLevelInTree(rootNode,0);
       //console.log("selection level="+level);
       //console.log("render signature of path="+path.data.renderSignature);
-      var value = null;
-      value= path.data.renderSignature[level];
-
-     
-
-      if(value!==null){
-        value = path.data.renderSignature.slice(0,level+1);
+      if(path.data.renderSignature[index]!==null){
+        var value = path.data.renderSignature.slice(0,index+1);
         value = value.join();
 
         //console.log("selection value="+value);
-        currentNode.selectByValue(level,value, path, currentNode);
+        currentNode.selectByValue(index,value, path, currentNode);
       }
       else{
         path.selected=true;
