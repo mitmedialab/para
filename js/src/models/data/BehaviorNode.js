@@ -23,7 +23,6 @@ define([
 
 		var BehaviorNode = GeometryNode.extend({
 			scaffold: [],
-			behaviors: [],
 			type: 'behavior',
 
 			//registers overriding function for update methods- determined by parent node
@@ -66,8 +65,9 @@ define([
       		}
       			this.scaffold = [];
 
-			}
+			},
 
+			
 			
 
 		

@@ -13,8 +13,8 @@ define([
   //paperjs group object
 
   var GeometryNode = SceneNode.extend({
-
-
+    drawAnchors: false,
+    
 
     type: 'geometry',
     constructor: function() {
@@ -31,6 +31,7 @@ define([
       this.instances = [];
       this.instance_literals = [];
       this.anchors = [];
+      this.behaviors=[];
 
 
       SceneNode.apply(this, arguments);
@@ -76,11 +77,11 @@ define([
         for (var j = 0; j < this.instances.length; j++) {
            for (var i = 0; i < data.length; i++) {
           var instance = this.instances[j];
-             console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-              console.log(instance.position);
+             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
+             // console.log(instance.position);
               instance.update(data[i]);
-              console.log('after update');
-              console.log(instance.position);
+              //console.log('after update');
+            //  console.log(instance.position);
         }
       }
 
@@ -90,7 +91,7 @@ define([
     updateSelected: function(data){
        for (var j = 0; j < this.instances.length; j++) {
         if(this.instances[j].selected){
-          console.log("found selected instance at:"+i);
+        //  console.log('found selected instance at:'+i);
            for (var i = 0; i < data.length; i++) {
               var instance = this.instances[j];
              //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
@@ -133,6 +134,7 @@ define([
 
     clear: function(){
       this.instance_literals = [];
+      this.drawAnchor= false;
        for (var i = 0; i < this.children.length; i++) {
         this.children[i].clear();
       }
@@ -145,7 +147,7 @@ define([
      * copies the render signature from the data and concats it with the 
       *index of the instance used to render the path
   */
-    render: function(data) {
+    render: function(data, currentNode) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data
       
@@ -157,22 +159,23 @@ define([
            u_instance.renderSignature = data[i].renderSignature.slice(0);
            u_instance.renderSignature.push(j);
           u_instance.render(data[i]);
+          u_instance.drawAnchors = this.drawAnchors;
           //u_instance.selected = data[i].selected;
           this.instance_literals.push(u_instance);
         
         }
       }
 
-    
+      
           for (var k = 0; k < this.children.length; k++) {
 
-            this.children[k].render(this.instance_literals);
+            this.children[k].render(this.instance_literals,currentNode);
           }
          }
          else{
            for (var f = 0; f < this.children.length; f++) {
 
-            this.children[f].render(this.instances);
+            this.children[f].render(this.instances,currentNode);
           }
          }
       
@@ -201,7 +204,7 @@ define([
 
   //selects according render signature
     selectByValue: function(index,value, path, currentNode) {
-    console.log("select by geom value");
+    //console.log('select by geom value');
     var sIndexes = [];
     var rIndexes = [];
      for(var i=0;i<this.children.length;i++){
@@ -215,9 +218,9 @@ define([
     //selects or deselects all path instances
     selectAll: function() {
       //console.log('calling geometry select all'+ isSelect);
-       /*for(var i=0;i<this.instances.length;i++){
+      for(var i=0;i<this.instances.length;i++){
         this.instances[i].selected = true;
-      }*/
+      }
       for(var j=0; j<this.children.length;j++){
         this.children[j].selectAll();
       } 
@@ -257,8 +260,40 @@ define([
 
     anchorUpdated: function(instanceNum) {
 
-
     },
+
+    containsBehaviorType: function(type){
+      var indexes = [];
+        for(var i=0;i<this.behaviors.length;i++){
+          console.log("behavior_type="+this.behaviors[i].type);
+          if(this.behaviors[i].type===type){
+            console.log("match found");
+            indexes.push(i);
+          }
+        }
+        if(indexes.length>0){
+          return indexes;
+        }
+        console.log('returning false for behavior');
+        return false;
+
+      },
+
+      containsBehaviorName: function(name){
+        var indexes =[];
+        for(var i=0;i<this.behaviors.length;i++){
+          if(this.behaviors[i].name===name){
+            indexes.push(i);
+          }
+        }
+        if(indexes.length>0){
+          return indexes;
+        }
+        return false;
+
+
+      }
+
 
 
 

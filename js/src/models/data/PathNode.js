@@ -86,17 +86,18 @@ define([
 
       }
       this.instance_literals.splice(1, this.instance_literals.length);
-      //console.log("num of literals:"+this.instance_literals.length); 
+      this.drawAnchor=false;
+      //console.log('num of literals:'+this.instance_literals.length); 
       
       // console.log('num of drawn children='+paper.project.activeLayer.children.length);
 
     },
 
       updateSelected: function(data){
-        console.log("update selected path:"+this.instances.length);
+       // console.log('update selected path:'+this.instances.length);
        for (var j = 0; j < this.instances.length; j++) {
         if(this.instances[j].selected){
-          console.log("found selected instance at:"+j);
+          //console.log('found selected instance at:'+j);
            for (var i = 0; i < data.length; i++) {
               var instance = this.instances[j];
              //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
@@ -117,7 +118,7 @@ define([
       * copies the render signature from the data and concats it with the 
       *index of the instance used to render the path
      */
-    render: function(data) {
+    render: function(data, currentNode) {
       var path_literal = this.getLiteral();
      
       if (data) {
@@ -131,10 +132,17 @@ define([
             instance_literal.data.renderSignature.push(k);
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
-            if(this.instances[k].anchor || data[d].anchor){
-              instance_literal.strokeColor= '#83E779';
+            
+            if(this.drawAnchor){
+              if(instance[k].anchor){
+                 instance_literal.strokeColor= '#83E779';
+              }
+            }
+            else if(data[d].drawAnchor && data[d].anchor){
+                instance_literal.strokeColor= '#83E779';
             }
 
+            
 
             instance_literal.visible = true;
             this.instance_literals.push(instance_literal);
@@ -184,7 +192,7 @@ define([
       * path= original path literal that was selected- used to ensure we are selecting the right object
     */
     selectByValue: function(index, value, path, currentNode) {
-      console.log("select by path value");
+      //console.log('select by path value');
       var sIndexes = [];
       var rIndexes = [];
       if (this.containsPath(path)) {
@@ -198,8 +206,9 @@ define([
           if (compareSig === value) {
             this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length-1;
-            console.log("setting selected instance at:"+ this.instance_literals[i].data.renderSignature[last]);
+            //console.log('setting selected instance at:'+ this.instance_literals[i].data.renderSignature[last]);
             this.instances[this.instance_literals[i].data.renderSignature[last]].selected = true;
+            
             //console.log('selected path value='+this.instance_literals[i].data.renderSignature);
           }
           //else{

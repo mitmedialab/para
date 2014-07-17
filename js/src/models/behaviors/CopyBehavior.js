@@ -12,6 +12,8 @@ define([
 
     var CopyBehavior = BaseBehavior.extend({
       copyNum: 2,
+      name: 'copy',
+      type: 'copy',
 
       update: function(data) {
         // console.log('copy behavior update called'  );

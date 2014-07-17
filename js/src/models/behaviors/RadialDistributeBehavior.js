@@ -9,10 +9,11 @@ define([
   function(BaseBehavior, PaperManager) {
     var paper = PaperManager.getPaperInstance();
     var RadialDistributeBehavior = BaseBehavior.extend({
-      paper: null,
+      name: 'radial',
+      type: 'distribution',
 
       initialize: function() {
-        this.paper = PaperManager.getPaperInstance();
+       
       },
 
       update: function() {
@@ -25,7 +26,7 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       distribute: function() {
-        console.log("distributing instances");
+        //console.log('distributing instances');
         if (this.children.length > 0) {
           for (var z = 0; z < this.children.length; z++) {
             if (this.children[z] !== null) {
@@ -55,7 +56,7 @@ define([
                 var theta = Math.PI*2/num;
                 var first = Math.round(num/2);
               for (var i = 1; i < first; i++) {
-                  console.log("first="+i);
+                  //console.log("first="+i);
                 var x = Math.cos(theta*(i+0.5))*rad+origin.x;
                 var y = Math.sin(theta*(i+0.5))*rad+origin.y;
 
@@ -68,7 +69,7 @@ define([
               }
 
             for (var i = first; i < num-1; i++) {
-                   console.log("second="+(i+1));
+                  // console.log("second="+(i+1));
                 var x = Math.cos(theta*(i+1.5))*rad+origin.x;
                 var y = Math.sin(theta*(i+1.5))*rad+origin.y;
 

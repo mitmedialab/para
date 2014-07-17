@@ -9,7 +9,9 @@ define([
     var paper = PaperManager.getPaperInstance();
     var DistributeBehavior = BaseBehavior.extend({
       paper: null,
-
+      name: 'linear',
+      type: 'distribution',
+      
       initialize: function() {
         this.paper = PaperManager.getPaperInstance();
       },
@@ -24,7 +26,7 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       distribute: function() {
-        console.log("distributing instances");
+       // console.log("distributing instances");
         if (this.children.length > 0) {
           for (var z = 0; z < this.children.length; z++) {
             if (this.children[z] !== null) {
@@ -50,9 +52,9 @@ define([
 
          
 
-              console.log("point a and b");
-              console.log(pointA);
-              console.log(pointB);
+             // console.log("point a and b");
+             // console.log(pointA);
+             // console.log(pointB);
               var xDiff = (pointB.x - pointA.x) / (num-1);
               var yDiff = (pointB.y - pointA.y) / (num-1);
 

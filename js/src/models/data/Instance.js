@@ -19,6 +19,7 @@ define([
 			};
 			this.rotation= 0;
 			this.anchor= false;
+			this.drawAnchor=false;
 			this.selected= false;
 			this.copy= false;
 			//array that contains the path of inheritance from a render;

@@ -10,6 +10,8 @@ define([
 
 		var BaseBehavior = Toolbox.Base.extend({
 			conditions: [],
+			name: 'base',
+			type: 'none',
 
 
 			events: {

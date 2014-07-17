@@ -52,7 +52,8 @@ this.event_bus = event_bus;
 
       this.listenTo(toolCollection, 'shiftClick', this.openMenu);
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
-      
+            this.listenTo(toolCollection, 'currentRender', this.currentRender);
+
 
       this.listenTo(event_bus, 'nodeAdded', this.nodeAdded);
 
@@ -87,7 +88,7 @@ this.event_bus = event_bus;
 
     //callback triggered when tool adds new node
     nodeAdded: function(node) {
-      console.log('node added: '+ node.type);
+      //console.log('node added: '+ node.type);
  
       currentNode.addChildNode(node);
            //console.log('number of children on root='+currentNode.getNumChildren());
@@ -104,17 +105,17 @@ this.event_bus = event_bus;
 
     //moves down based on path
     moveDownNode: function(path){
-      console.log('move down node');
+      //console.log('move down node');
       var children = currentNode.children;
       for(var i=0;i<children.length;i++){
         if(children[i].containsPath(path)){
-          console.log('found path at child'+i);
+         // console.log('found path at child'+i);
             currentNode = children[i];
            toolCollection.get(this.get('state')).currentNode = children[i];
         }
       }
       console.log('current node type='+currentNode.type);
-         console.log('current node is root='+('root'===currentNode.type));
+        // console.log('current node is root='+('root'===currentNode.type));
        this.rootRender();
     },
 
@@ -125,7 +126,7 @@ this.event_bus = event_bus;
     */
    setSelection: function(path){
       rootNode.deselectAll();
-      console.log('set selection');
+     // console.log('set selection');
    
       var level  = currentNode.getLevelInTree(rootNode,0);
       //console.log("selection level="+level);
@@ -148,15 +149,15 @@ this.event_bus = event_bus;
     },
 
     rootRender: function(){
-      console.log('called root render');
+      //console.log('called root render');
       rootNode.clear();
-      rootNode.render();
+      rootNode.render(null,currentNode);
     },
 
     currentRender: function(){
-      console.log('called current render');
+      //console.log('called current render');
       currentNode.clear();
-      currentNode.render();
+      currentNode.render(null,currentNode);
     },
     //callback triggered when tool navigates to specific node in tree;
     setCurrentNode: function(node){

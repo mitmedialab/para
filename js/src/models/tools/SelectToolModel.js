@@ -56,8 +56,7 @@ define([
         //checks to make sure path is within current node
         if (this.selectedNode) {
           if (this.currentNode.containsPath(path)) {
-            console.log("contains path");
-            this.currentPath = path;
+                       this.currentPath = path;
             this.trigger('setSelection', path);
 
 
@@ -77,7 +76,7 @@ define([
     },
 
     dblClick: function(event) {
-      console.log('double click');
+     // console.log('double click');
       if (this.currentPath) {
 
         this.trigger('moveDownNode', this.currentPath);
@@ -111,17 +110,19 @@ define([
       } else if (this.currentPath) {
         // console.log('delta is');
         if(this.currentNode){
+         // console.log("selected Node =");
+          //console.log(this.selectedNode);
           this.selectedNode.updateSelected([{
           position: {
             x: event.delta.x,
             y: event.delta.y
           }
-        }])
-         this.currentNode.clear();
-         this.currentNode.update([{}]);
-         this.currentNode.render();
+        }]);
+        this.currentNode.update([{}]);
+        this.trigger('currentRender');
+       
            //this.trigger('setSelection', this.currentPath);
-          console.log("re-render");
+         // console.log("re-render");
         }
         //console.log(event.delta);
         /* this.currentNode.update([{
