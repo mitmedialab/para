@@ -13,8 +13,7 @@ define([
   //paperjs group object
 
   var GeometryNode = SceneNode.extend({
-    drawAnchors: false,
-    
+
 
     type: 'geometry',
     constructor: function() {
@@ -29,9 +28,10 @@ define([
     */
 
       this.instances = [];
+      this.scaffold = [];
       this.instance_literals = [];
       this.anchors = [];
-      this.behaviors=[];
+      this.behaviors = [];
 
 
       SceneNode.apply(this, arguments);
@@ -39,7 +39,7 @@ define([
 
 
     initialize: function() {
-     
+
       this.createInstance();
     },
 
@@ -51,10 +51,9 @@ define([
     createInstance: function(data) {
       //should it create a copy node here with a value of 1? no, that produces an infinite chain...
       var instance;
-      if(data){
+      if (data) {
         instance = data.clone();
-      }
-      else{
+      } else {
         instance = new Instance();
       }
       this.instances.push(instance);
@@ -66,42 +65,42 @@ define([
     //updates instances according to data and the passes the updated instances to child function
 
     update: function(data) {
-     // console.log('update for:'+this.type);
+      // console.log('update for:'+this.type);
       var parentType = '';
-     if(this.nodeParent){
-      parentType = this.nodeParent.type;
-     // console.log('parent type='+this.nodeParent.type);
-    }
+      if (this.nodeParent) {
+        parentType = this.nodeParent.type;
+        // console.log('parent type='+this.nodeParent.type);
+      }
 
-    
-        for (var j = 0; j < this.instances.length; j++) {
-           for (var i = 0; i < data.length; i++) {
+
+      for (var j = 0; j < this.instances.length; j++) {
+        for (var i = 0; i < data.length; i++) {
           var instance = this.instances[j];
-             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-             // console.log(instance.position);
-              instance.update(data[i]);
-              //console.log('after update');
-            //  console.log(instance.position);
+          //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
+          // console.log(instance.position);
+          instance.update(data[i]);
+          //console.log('after update');
+          //  console.log(instance.position);
         }
       }
 
 
     },
 
-    updateSelected: function(data){
-       for (var j = 0; j < this.instances.length; j++) {
-        if(this.instances[j].selected){
-        console.log('found selected instance at:'+j);
-           for (var i = 0; i < data.length; i++) {
-              var instance = this.instances[j];
-             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-              //console.log(instance.position);
-              instance.render(data[i]);
-              //console.log('after update');
-              //console.log(instance.position);
+    updateSelected: function(data) {
+      for (var j = 0; j < this.instances.length; j++) {
+        if (this.instances[j].selected) {
+          console.log('found selected instance at:' + j);
+          for (var i = 0; i < data.length; i++) {
+            var instance = this.instances[j];
+            //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
+            //console.log(instance.position);
+            instance.render(data[i]);
+            //console.log('after update');
+            //console.log(instance.position);
+          }
         }
       }
-    }
 
 
 
@@ -113,31 +112,31 @@ define([
       }
     },
 
-      /*sets focus to this instance and unfocuses all siblings*/
-    focus: function(){
-      
+    /*sets focus to this instance and unfocuses all siblings*/
+    focus: function() {
+
       var siblings = this.getSiblings();
-      for(var i=0;i<siblings.length;i++){
+      for (var i = 0; i < siblings.length; i++) {
         siblings[0].unfocus();
       }
-      for(var j=0;j<this.children.length; j++){
-          this.children[j].focus();
+      for (var j = 0; j < this.children.length; j++) {
+        this.children[j].focus();
       }
     },
 
     /* unfocuses this by setting  stroke color to grey */
-    unfocus: function(){
-         this.instance_literals[0].strokeColor = 'red';
-          for(var j=0;j<this.children.length; j++){
-          this.children[j].unfocus();
+    unfocus: function() {
+      this.instance_literals[0].strokeColor = 'red';
+      for (var j = 0; j < this.children.length; j++) {
+        this.children[j].unfocus();
       }
     },
 
-    clear: function(){
+    clear: function() {
       this.instance_literals = [];
-      this.drawAnchor= false;
+      this.drawAnchor = false;
 
-       for (var i = 0; i < this.children.length; i++) {
+      for (var i = 0; i < this.children.length; i++) {
         this.children[i].clear();
       }
 
@@ -146,131 +145,118 @@ define([
     /*renders geometry
      * if data is provided, creates a temporary instance array with updated values according to data
      *  otherwise just renders its children with its permanent instances
-     * copies the render signature from the data and concats it with the 
-      *index of the instance used to render the path
-  */
+     * copies the render signature from the data and concats it with the
+     *index of the instance used to render the path
+     */
     render: function(data, currentNode) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data
-      
-      if(data){
-          for (var j = 0; j < this.instances.length; j++) {
-            for (var i = 0; i < data.length; i++) {
-           
-          var u_instance = this.instances[j].clone();
-           u_instance.renderSignature = data[i].renderSignature.slice(0);
-           u_instance.renderSignature.push(j);
-          u_instance.render(data[i]);
-          u_instance.drawAnchors = this.drawAnchors;
-          //u_instance.selected = data[i].selected;
-          this.instance_literals.push(u_instance);
-        
+
+      if (data) {
+        for (var j = 0; j < this.instances.length; j++) {
+          for (var i = 0; i < data.length; i++) {
+            var u_instance = this.instances[j].clone();
+            u_instance.renderSignature = data[i].renderSignature.slice(0);
+            u_instance.renderSignature.push(j);
+            u_instance.render(data[i]);
+            u_instance.drawAnchors = this.drawAnchors;
+            if (this.nodeParent == currentNode) {
+              u_instance.selected = this.instances[j].selected;
+              u_instance.anchor = this.instances[j].anchor;
+            } else {
+              u_instance.selected = data[i].selected;
+               u_instance.anchor = data[i].anchor;
+            }
+            this.instance_literals.push(u_instance);
+
+          }
+        }
+
+
+        for (var k = 0; k < this.children.length; k++) {
+
+          this.children[k].render(this.instance_literals, currentNode);
+        }
+      } else {
+        for (var f = 0; f < this.children.length; f++) {
+
+          this.children[f].render(this.instances, currentNode);
         }
       }
 
-      
-          for (var k = 0; k < this.children.length; k++) {
-
-            this.children[k].render(this.instance_literals,currentNode);
-          }
-         }
-         else{
-           for (var f = 0; f < this.children.length; f++) {
-
-            this.children[f].render(this.instances,currentNode);
-          }
-         }
-      
     },
 
-    setSelection: function(currentNode,instanceParent){
-      if(this==currentNode){
+    setSelection: function(currentNode, instanceParent) {
+      if (this == currentNode) {
         return;
-      }
-      else{
+      } else {
         this.selectByInstanceParent(instanceParent);
-        if(this.nodeParent!==null){
+        if (this.nodeParent !== null) {
           this.nodeParent.setSelection(currentNode);
         }
       }
     },
 
-    //selects a specifc index
-   /*selectAt: function(index, val) {
-      if (index < this.instances.length) {
-        this.instances[index].
-      }
-    },
-  */
+    
 
 
-  //selects according render signature
-    selectByValue: function(index,value, path, currentNode) {
-    //console.log('select by geom value');
-    var sIndexes = [];
-     for(var i=0;i<this.children.length;i++){
-      if(this.children[i].containsPath(path)){
-        var results = this.children[i].selectByValue(index,value,path,currentNode);
-        console.log('select by value results='+results);
-        console.log(results);
-        if(this !=currentNode){
-          for(var j=0;j<results.length;j++){
-            if(results[j].length>0){
-            var last = results[j].length-1;
-            console.log("selecting instance at"+last);
-            this.instances[results[j][last]].selected = true;
-            
-            results[j].pop(); 
-            if(results[j].length>0){
-              sIndexes.push(results[j]);
+    //selects according render signature
+    selectByValue: function(index, value, path, currentNode) {
+      //console.log('select by geom value');
+      var sIndexes = [];
+      for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].containsPath(path)) {
+          var results = this.children[i].selectByValue(index, value, path, currentNode);
+         // console.log('select by value results=' + results);
+          console.log(results);
+          if (this != currentNode) {
+            for (var j = 0; j < results.length; j++) {
+              if (results[j].length > 0) {
+                var last = results[j].length - 1;
+               // console.log("selecting instance at" + last);
+                this.instances[results[j][last]].selected = true;
+
+                results[j].pop();
+                if (results[j].length > 0) {
+                  sIndexes.push(results[j]);
+                }
+              }
             }
           }
+
         }
       }
-
-      }
-     }
-     return sIndexes;
+      return sIndexes;
     },
 
-    /*selectBackUp: function(value, currentNode){
-      if(this.nodeParent == currentNode){
-          for(var i=0;i<this.instances.length;i++){
-            instanceSig = this.instances[i].
-          }
-      }
-      else{
-        this.nodeParent.selectBackUp(value, currentNode);
-      }
-    },*/
     //selects or deselects all path instances
     selectAll: function() {
       //console.log('calling geometry select all'+ isSelect);
-      for(var i=0;i<this.instances.length;i++){
+      for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].selected = true;
       }
-      for(var j=0; j<this.children.length;j++){
+      for (var j = 0; j < this.children.length; j++) {
         this.children[j].selectAll();
-      } 
-      
+      }
+
 
     },
 
-//selects or deselects all path instances
+    //selects or deselects all path instances
     deselectAll: function() {
       //console.log('calling geometry select all'+ isSelect);
-       for(var i=0;i<this.instances.length;i++){
+      for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].selected = false;
       }
-      for(var j=0; j<this.children.length;j++){
+      for (var j = 0; j < this.children.length; j++) {
         this.children[j].deselectAll();
-      } 
+      }
     },
 
-   //checks to see if path literal is contained by any children
-    containsPath: function(path){
+    //checks to see if path literal is contained by any children
+    containsPath: function(path) {
       for (var i = 0; i < this.children.length; i++) {
-        if(this.children[i].containsPath(path)){
+        if (this.children[i].containsPath(path)) {
           return true;
         }
       }
@@ -291,38 +277,37 @@ define([
     },
 
 
-    containsBehaviorType: function(type){
+    containsBehaviorType: function(type) {
       var indexes = [];
-        for(var i=0;i<this.behaviors.length;i++){
-          //console.log('behavior_type='+this.behaviors[i].type);
-          if(this.behaviors[i].type===type){
-           
-            indexes.push(i);
-          }
-        }
-        if(indexes.length>0){
-          return indexes;
-        }
-        console.log('returning false for behavior');
-        return false;
+      for (var i = 0; i < this.behaviors.length; i++) {
+        //console.log('behavior_type='+this.behaviors[i].type);
+        if (this.behaviors[i].type === type) {
 
-      },
-
-      containsBehaviorName: function(name){
-        var indexes =[];
-        for(var i=0;i<this.behaviors.length;i++){
-          if(this.behaviors[i].name===name){
-            indexes.push(i);
-          }
+          indexes.push(i);
         }
-        if(indexes.length>0){
-          return indexes;
-        }
-        return false;
-
-
       }
+      if (indexes.length > 0) {
+        return indexes;
+      }
+      console.log('returning false for behavior');
+      return false;
 
+    },
+
+    containsBehaviorName: function(name) {
+      var indexes = [];
+      for (var i = 0; i < this.behaviors.length; i++) {
+        if (this.behaviors[i].name === name) {
+          indexes.push(i);
+        }
+      }
+      if (indexes.length > 0) {
+        return indexes;
+      }
+      return false;
+
+
+    }
 
 
 

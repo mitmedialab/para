@@ -13,7 +13,7 @@ define([
 
 ], function(_, GeometryNode, Instance, PaperManager) {
   //drawable paper.js path object that is stored in the pathnode
- // var paper = PaperManager.getPaperInstance();
+  // var paper = PaperManager.getPaperInstance();
   var PathNode = GeometryNode.extend({
 
     type: 'path',
@@ -86,28 +86,28 @@ define([
 
       }
       this.instance_literals.splice(1, this.instance_literals.length);
-      this.drawAnchor=false;
+      this.drawAnchor = false;
       //console.log('num of literals:'+this.instance_literals.length); 
-      
+
       // console.log('num of drawn children='+paper.project.activeLayer.children.length);
 
     },
 
-      updateSelected: function(data){
-       // console.log('update selected path:'+this.instances.length);
-       for (var j = 0; j < this.instances.length; j++) {
-        if(this.instances[j].selected){
+    updateSelected: function(data) {
+      // console.log('update selected path:'+this.instances.length);
+      for (var j = 0; j < this.instances.length; j++) {
+        if (this.instances[j].selected) {
           //console.log('found selected instance at:'+j);
-           for (var i = 0; i < data.length; i++) {
-              var instance = this.instances[j];
-             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-              //console.log(instance.position);
-              instance.render(data[i]);
-              //console.log('after update');
-              //console.log(instance.position);
+          for (var i = 0; i < data.length; i++) {
+            var instance = this.instances[j];
+            //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
+            //console.log(instance.position);
+            instance.render(data[i]);
+            //console.log('after update');
+            //console.log(instance.position);
+          }
         }
       }
-    }
 
 
     },
@@ -115,16 +115,16 @@ define([
     /* renders instances of the original path
      * render data contains an array of objects containing
      * position, scale and rotation data for each instance
-      * copies the render signature from the data and concats it with the 
-      *index of the instance used to render the path
+     * copies the render signature from the data and concats it with the
+     *index of the instance used to render the path
      */
     render: function(data, currentNode) {
       var path_literal = this.getLiteral();
-     
+
       if (data) {
-         for (var k = 0; k < this.instances.length; k++) {
-            for (var d = 0; d < data.length; d++) {
-         
+        for (var k = 0; k < this.instances.length; k++) {
+
+          for (var d = 0; d < data.length; d++) {
 
             var instance_literal = path_literal.clone();
             instance_literal.nodeParent = this;
@@ -132,25 +132,23 @@ define([
             instance_literal.data.renderSignature.push(k);
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
-            
-            if(this.drawAnchor){
-              if(this.instances[k].anchor){
-                 instance_literal.strokeColor= '#83E779';
+
+            if (this.nodeParent == currentNode) {
+              instance_literal.selected = this.instances[k].selected;
+              if (this.instances[k].anchor) {
+                instance_literal.strokeColor = '#83E779';
+              }
+            } else {
+              instance_literal.selected = data[d].selected;
+              if (data[d].anchor) {
+                instance_literal.strokeColor = '#83E779';
               }
             }
-            else if(data[d].drawAnchor && data[d].anchor){
-                instance_literal.strokeColor= '#83E779';
-            }
+            //instance_literal.selected = data[d].selected;
 
-            
 
             instance_literal.visible = true;
             this.instance_literals.push(instance_literal);
-           // this.instance_literals.selected = data[d].selected;
-            // console.log('path render signature =' + instance_literal.data.renderSignature);
-            //console.log('length of signature =' + instance_literal.data.renderSignature.length);
-
-
 
           }
         }
@@ -185,42 +183,42 @@ define([
     },
 
     /*selects according render signature
-      * the render signature is a list of values that is generated upon rendering and 
-      * provides a means to track the inerhtiance structure of an instance
-      * index= index at which to slice instance's render signature
-      *  value= string which represents render signature that we are trying to match
-      * path= original path literal that was selected- used to ensure we are selecting the right object
-    */
+     * the render signature is a list of values that is generated upon rendering and
+     * provides a means to track the inerhtiance structure of an instance
+     * index= index at which to slice instance's render signature
+     *  value= string which represents render signature that we are trying to match
+     * path= original path literal that was selected- used to ensure we are selecting the right object
+     */
     selectByValue: function(index, value, path, currentNode) {
       //console.log('select by path value');
       var sIndexes = [];
-    
+
       if (this.containsPath(path)) {
-        
+
         for (var i = 1; i < this.instance_literals.length; i++) {
           //console.log(this.instance_literals[i].data.renderSignature);
-          var compareSig = this.instance_literals[i].data.renderSignature.slice(0,index+1);
+          var compareSig = this.instance_literals[i].data.renderSignature.slice(0, index + 1);
           compareSig = compareSig.join();
           //console.log('compareSig='+compareSig);
           //console.log('valueSig='+value);
           if (compareSig === value) {
-            this.instance_literals[i].selected = true;
-            var last = this.instance_literals[i].data.renderSignature.length-1;
-            console.log('selected render sig:'+ this.instance_literals[i].data.renderSignature);
+            //this.instance_literals[i].selected = true;
+            var last = this.instance_literals[i].data.renderSignature.length - 1;
+            console.log('selected render sig:' + this.instance_literals[i].data.renderSignature);
             var iIndex = this.instance_literals[i].data.renderSignature[last];
             this.instances[iIndex].selected = true;
             var copySig = this.instance_literals[i].data.renderSignature.slice(0);
 
             copySig.pop();
-            console.log('copy sig:'+ copySig);
-            if(copySig.length>0){
+            console.log('copy sig:' + copySig);
+            if (copySig.length > 0) {
               sIndexes.push(copySig);
             }
 
             //console.log('selected path value='+this.instance_literals[i].data.renderSignature);
           }
           //else{
-           // console.log('unselected path value='+this.instance_literals[i].data.renderSignature);
+          // console.log('unselected path value='+this.instance_literals[i].data.renderSignature);
 
           //}
 
@@ -243,7 +241,7 @@ define([
       for (var i = 0; i < this.instance_literals.length; i++) {
         this.instance_literals[i].selected = false;
       }
-        for (var j = 0; j < this.instances.length; j++) {
+      for (var j = 0; j < this.instances.length; j++) {
         this.instances[j].selected = false;
       }
 

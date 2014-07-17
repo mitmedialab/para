@@ -60,7 +60,7 @@ define([
           if (this.currentNode.containsPath(path)) {
                        this.currentPath = path;
             this.trigger('setSelection', path);
-
+            this.trigger('currentRender');
 
             if (event.modifiers.shift) {
               this.trigger('shiftClick',this.selectedNode);
