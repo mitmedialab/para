@@ -3,17 +3,18 @@
  */
 define([
     'models/behaviors/BaseBehavior',
-    'models/PaperManager'
+    'models/PaperManager',
+    'utils/TrigFunc'
   ],
 
-  function(BaseBehavior, PaperManager) {
+  function(BaseBehavior, PaperManager, TrigFunc) {
     var paper = PaperManager.getPaperInstance();
     var RadialDistributeBehavior = BaseBehavior.extend({
       name: 'radial',
       type: 'distribution',
 
       initialize: function() {
-       
+      
       },
 
       update: function() {
@@ -26,6 +27,8 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       distribute: function() {
+         console.log("trig function=");
+         console.log(TrigFunc);
         //console.log('distributing instances');
         if (this.children.length > 0) {
           for (var z = 0; z < this.children.length; z++) {
@@ -36,9 +39,9 @@ define([
               var pointA = child.instances[0].position;
               var pointB = child.instances[child.instances.length - 1].position;
               
-              var dist = this.getDistance(pointA,pointB);
+              var dist = TrigFunc.distance(pointA,pointB);
               var rad = dist/2;
-              var origin=  this.getMidpoint(pointA,pointB);
+              var origin=  TrigFunc.midpoint(pointA,pointB);
 
                 var scaffoldEllipse=  new paper.Path.Circle(new paper.Point(origin.x,origin.y),rad);
     
@@ -85,20 +88,7 @@ define([
           }
         }
 
-      },
-
-      getMidpoint: function(p1, p2){
-        var x = (p1.x+p2.x)/2;
-        var y = (p1.y+p2.y)/2;
-
-        return {x:x,y:y};
-    },
-
-    getDistance: function(p1,p2){
-      var distance = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-      return distance;
-    }
-
+      }
 
     });
 

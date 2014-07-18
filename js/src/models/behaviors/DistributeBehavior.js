@@ -2,10 +2,11 @@
  */
 define([
     'models/behaviors/BaseBehavior',
-    'models/PaperManager'
+    'models/PaperManager',
+    'utils/TrigFunc'
   ],
 
-  function(BaseBehavior, PaperManager) {
+  function(BaseBehavior, PaperManager, TrigFunc) {
     var paper = PaperManager.getPaperInstance();
     var DistributeBehavior = BaseBehavior.extend({
       paper: null,
@@ -36,7 +37,8 @@ define([
 
               var pointA = child.instances[0].position;
               var pointB = child.instances[child.instances.length - 1].position;
-
+              var selected = child.getFirstSelectedInstance();
+              
                /* var scaffoldLine =  new paper.Path();
     
               
@@ -58,7 +60,10 @@ define([
              // console.log(pointB);
               var xDiff = (pointB.x - pointA.x) / (num-1);
               var yDiff = (pointB.y - pointA.y) / (num-1);
-
+              var dist = TrigFunc.distance(pointA,{x:pointA.x+xDiff,y:pointA.y+yDiff});
+              if(selected && !selected.anchor){
+                this.checkDistance(child.instances[0],selected,dist,child);
+              }
             for(var j=0;j<num;j++){
                  child.instances[j].update({
                   scale:0.5
@@ -85,6 +90,20 @@ define([
             }
           }
         }
+
+      },
+
+      checkDistance: function(start,selected,tDist,child){
+
+          var dist = TrigFunc.distance(start.position,selected.position);
+          console.log("num copies="+this.copyNum);
+          if(dist<tDist){
+           this.copyNum++;
+            console.log("incrementing copy")
+          }
+          console.log('selected Distance ='+dist);
+          console.log('target Distance ='+tDist);
+
 
       }
 

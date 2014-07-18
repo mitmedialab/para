@@ -31,13 +31,13 @@ define([
     /*mousedown event
      */
     mouseDown: function(event) {
-      console.log(event.modifiers);
+    
       if (!event.modifiers.shift) {
         if (this.currentNode) {
          this.currentNode.deselectAll();
 
         }
-        this.currentPath = [];
+        this.currentPaths = [];
         this.currentNode = null;
         this.selectedNodes = [];
       }

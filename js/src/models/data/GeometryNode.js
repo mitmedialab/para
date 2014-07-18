@@ -253,6 +253,17 @@ define([
       }
     },
 
+    //returns first selected instance
+    getFirstSelectedInstance: function(){
+      for(var i=0;i<this.instances.length;i++){
+          if(this.instances[i].selected){
+            return this.instances[i];
+          }
+      }
+      return null;
+
+    },
+
     //checks to see if path literal is contained by any children
     containsPath: function(path) {
       for (var i = 0; i < this.children.length; i++) {

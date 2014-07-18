@@ -97,7 +97,7 @@ this.event_bus = event_bus;
     },
 
     moveUpNode: function(){
-      //console.log('moveUpNode');
+      console.log('moveUpNode');
       this.setCurrentNode(currentNode);
        console.log('current node type='+currentNode.type);
        this.rootRender();

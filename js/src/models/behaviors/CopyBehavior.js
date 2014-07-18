@@ -32,17 +32,15 @@ define([
                // console.log('creating copy of type, number:'+child.type+','+newCopy);
 
                 for (var i = 0; i < newCopy; i++) {
-                  var instance = child.createInstance(child.instances[0]);
-                  var x  = (i+1) * 20+ Math.random()*60;
-                  var y = x;
+                  var target= child.getFirstSelectedInstance();
+                  if(!target){
+                    console.log("no selected instance found, making copy from first");
+                    target = child.instances[0];
+                  }
+                  var instance = child.createInstance(target);
+          
                   instance.copy=true;
-                  instance.update({
-                    position: {
-                      x: instance.position.x+x,
-                      y: instance.position.y+y
-                    }
-                  });
-                  
+                  instance.anchor=false;
                 }
               } else if (numInstances > this.copyNum) {
                 for (var k = 0; k < numInstances - this.copyNum; k++) {
