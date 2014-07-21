@@ -6,20 +6,24 @@ define([
   'underscore',
   'backbone',
   'models/data/GeometryNode',
+    'models/data/PathNode',
+
   'models/tools/ToolCollection',
   'models/tools/PenToolModel',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
+  'models/PaperManager'
  
 
 
-], function($, _, Backbone, GeometryNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel) {
+], function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, PaperManager) {
   var rootNode,
     currentNode,
     toolCollection,
     penTool,
     polyTool,
-    selectTool;
+    selectTool,
+    paper;
 
 
 
@@ -30,6 +34,7 @@ define([
     },
 
     initialize: function(event_bus) {
+      paper = PaperManager.getPaperInstance();
       penTool = new PenToolModel({
         id: 'penTool'
       });
@@ -68,6 +73,18 @@ this.event_bus = event_bus;
       rootNode.type = 'root';
       currentNode = rootNode;
 
+      var path =  new paper.Path();
+      path .strokeColor = 'red';
+
+      path.add(new paper.Point(0,0));
+      path.add(new paper.Point(500,500));
+      var conditional_line = new PathNode();
+
+      conditional_line.name = 'path_cond';
+    
+      conditional_line.createInstanceFromPath(path);
+      this.nodeAdded(conditional_line);
+      this.rootRender();
 
     },
 
@@ -97,7 +114,7 @@ this.event_bus = event_bus;
     },
 
     moveUpNode: function(){
-      console.log('moveUpNode');
+      //console.log('moveUpNode');
       this.setCurrentNode(currentNode);
        console.log('current node type='+currentNode.type);
        this.rootRender();

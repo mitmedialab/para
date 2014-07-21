@@ -61,6 +61,21 @@ define([
 
     },
 
+    createInstanceAt: function(data,index){
+        var instance;
+      if (data) {
+        instance = data.clone();
+      } else {
+        instance = new Instance();
+      }
+      this.instances.splice(index,0,instance);
+      return instance;
+    },
+
+    removeInstanceAt: function(index){
+      this.instances.splice(index,1);
+    },
+
 
     //updates instances according to data and the passes the updated instances to child function
 
@@ -257,7 +272,7 @@ define([
     getFirstSelectedInstance: function(){
       for(var i=0;i<this.instances.length;i++){
           if(this.instances[i].selected){
-            return this.instances[i];
+            return {instance:this.instances[i],index:i};
           }
       }
       return null;

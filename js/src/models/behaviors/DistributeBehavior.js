@@ -37,6 +37,11 @@ define([
 
               var pointA = child.instances[0].position;
               var pointB = child.instances[child.instances.length - 1].position;
+              if(TrigFunc.equals(pointA,pointB)){
+                child.instances[child.instances.length - 1].position.x+=40;
+                child.instances[child.instances.length - 1].position.y+=40;
+                pointB = child.instances[child.instances.length - 1].position;
+              }
               var selected = child.getFirstSelectedInstance();
               
                /* var scaffoldLine =  new paper.Path();
@@ -55,21 +60,20 @@ define([
 
          
 
-             // console.log("point a and b");
-             // console.log(pointA);
-             // console.log(pointB);
+           
               var xDiff = (pointB.x - pointA.x) / (num-1);
               var yDiff = (pointB.y - pointA.y) / (num-1);
               var dist = TrigFunc.distance(pointA,{x:pointA.x+xDiff,y:pointA.y+yDiff});
-              if(selected && !selected.anchor){
-                this.checkDistance(child.instances[0],selected,dist,child);
-              }
-            for(var j=0;j<num;j++){
-                 child.instances[j].update({
-                  scale:0.5
+              if(selected){
+                if(selected.index === 1){
+                  this.checkDistanceIncrement(child.instances[0],selected.instance,dist,child);
+                }
+                else if(selected.index==child.instances.length-2){
+                  this.checkDistanceDecrement(child.instances[0],selected.instance,dist,child);
 
-              });
-            }
+                }
+              }
+           
               for (var i = 1; i < num-1; i++) {
                 //console.log(location);
                 var x = pointA.x + xDiff * i;
@@ -97,9 +101,14 @@ define([
 
           var dist = TrigFunc.distance(start.position,selected.position);
           console.log("num copies="+this.copyNum);
-          if(dist<tDist){
+          if(dist<tDist+20){
            this.copyNum++;
-            console.log("incrementing copy")
+            console.log("incrementing copy");
+          }
+          else if(dist>tDist+20){
+             this.copyNum--;
+             console.log("decrementing copy");
+          
           }
           console.log('selected Distance ='+dist);
           console.log('target Distance ='+tDist);

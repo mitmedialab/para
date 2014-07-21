@@ -1,14 +1,16 @@
 /*CopyBehavior.js
-iteratively changes scale from start to end
+creates correct number of copies
  */
 define([
     'models/behaviors/BaseBehavior',
-    'models/data/Instance'
+    'models/data/Instance',
+    'utils/TrigFunc'
+
 
 
   ],
 
-  function(BaseBehavior, Instance) {
+  function(BaseBehavior, Instance, TrigFunc) {
 
     var CopyBehavior = BaseBehavior.extend({
       copyNum: 2,
@@ -32,20 +34,35 @@ define([
                // console.log('creating copy of type, number:'+child.type+','+newCopy);
 
                 for (var i = 0; i < newCopy; i++) {
-                  var target= child.getFirstSelectedInstance();
-                  if(!target){
-                    console.log("no selected instance found, making copy from first");
+                  var instanceSelect = child.getFirstSelectedInstance();
+                  var target, index;
+                   if(!instanceSelect){
                     target = child.instances[0];
+                    index = 1;
+                   }
+                   else{
+                    target= instanceSelect.instance;
+                    index = instanceSelect.index+1;
                   }
-                  var instance = child.createInstance(target);
-          
+                
+                   // console.log("no selected instance found, making copy from first");
+                    //target = child.instances[0];
+                  
+                  var instance = child.createInstanceAt(target,index);
+                 // console.log("creating instance"+instance);
                   instance.copy=true;
                   instance.anchor=false;
+                  instance.selected= false;
                 }
               } else if (numInstances > this.copyNum) {
                 for (var k = 0; k < numInstances - this.copyNum; k++) {
-                  child.instances.pop();
+                  var removeIndex = child.instances.length-3;
+                  //console.log("remove index = "+removeIndex);
+                  if(removeIndex>=0){
 
+                    child.removeInstanceAt(removeIndex);
+                  }
+                  //TODO: what happens when there are only 2 instances left?
                 }
               }
               child.instances[0].anchor=true;
@@ -77,6 +94,36 @@ define([
       setCopyNum: function(data) {
         this.copyNum = data;
 
+
+
+      },
+
+       checkDistanceIncrement: function(start,selected,tDist){
+
+          var dist = TrigFunc.distance(start.position,selected.position);
+          console.log("num copies="+this.copyNum);
+          if(dist<tDist+20){
+           this.copyNum++;
+            console.log("incrementing copy");
+          }
+         
+          console.log('selected Distance ='+dist);
+          console.log('target Distance ='+tDist);
+
+
+      },
+
+       checkDistanceDecrement: function(start,selected,tDist){
+
+          var dist = TrigFunc.distance(start.position,selected.position);
+          console.log("num copies="+this.copyNum);
+            if(dist>tDist+20){
+             this.copyNum--;
+             console.log("decrementing copy");
+          
+          }
+          console.log('selected Distance ='+dist);
+          console.log('target Distance ='+tDist);
 
 
       }
