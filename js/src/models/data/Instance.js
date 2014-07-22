@@ -65,6 +65,7 @@ define([
 			
 			}
 			if(data.rotation){
+				console.log("updating rotation");
 				this.rotation=data.rotation;
 			}
 

@@ -38,25 +38,30 @@ define([
 
               var pointA = child.instances[0].position;
               var pointB = child.instances[child.instances.length - 1].position;
-              
+               if(TrigFunc.equals(pointA,pointB)){
+                child.instances[child.instances.length - 1].position.x+=40;
+                child.instances[child.instances.length - 1].position.y+=40;
+                pointB = child.instances[child.instances.length - 1].position;
+              }
               var dist = TrigFunc.distance(pointA,pointB);
               var rad = dist/2;
               var origin=  TrigFunc.midpoint(pointA,pointB);
 
-                var scaffoldEllipse=  new paper.Path.Circle(new paper.Point(origin.x,origin.y),rad);
+               /* var scaffoldEllipse=  new paper.Path.Circle(new paper.Point(origin.x,origin.y),rad);
     
               
                  scaffoldEllipse.strokeColor = '#83E779';
               
-                this.scaffold.push(scaffoldEllipse);
+                this.scaffolds.push(scaffoldEllipse);
                 var pointAC = new paper.Path.Circle(new paper.Point(pointA.x,pointA.y),5);
                  var pointBC = new paper.Path.Circle(new paper.Point(pointB.x,pointB.y),5);
                 pointAC.fillColor =  '#83E779';
                 pointBC.fillColor =  '#83E779';
                 this.scaffold.push(pointAC);
-                this.scaffold.push(pointBC);
+                this.scaffold.push(pointBC);*/
 
                 var theta = Math.PI*2/num;
+                var angle = 360/num;
                 var first = Math.round(num/2);
               for (var i = 1; i < first; i++) {
                   //console.log("first="+i);
@@ -66,7 +71,8 @@ define([
                 child.instances[i].update({
                   position: {
                     x: x,
-                    y: y
+                    y: y,
+                    rotation:angle*(i+0.5)
                   }
                 });
               }
@@ -79,7 +85,8 @@ define([
                 child.instances[i].update({
                   position: {
                     x: x,
-                    y: y
+                    y: y,
+                    rotation:angle*(i+1.5)
                   }
                 });
               }

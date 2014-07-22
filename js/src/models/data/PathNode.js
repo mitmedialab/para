@@ -56,6 +56,7 @@ define([
       instance.closed = path.closed;
       path.instanceParentIndex=this.instances.length-1;
       this.instance_literals.push(path);
+      path.instanceIndex = this.instance_literals.length-1;
       //  console.log('createPathInstance');
       //console.log(instance.position);
       path.nodeParent = this;
@@ -119,11 +120,16 @@ define([
 
       //called when path data is modified 
     updatePath:function(path){
-      if(this.instance_literals[0]!=path){
-        this.instance_literals[0].remove();
-        this.instance_literals.slice(0,1);
-      }
-      this.instance_literals[0]=path;
+      console.log("updating path to");
+      var newPath = path.clone();
+     newPath.strokeColor='black';
+    newPath.instanceParentIndex=path.instanceParentIndex;
+     // path.position.x=0;
+     // path.position.y=0;
+   
+      this.instance_literals.shift();
+      this.instance_literals.unshift(newPath);
+      
     },
 
 
@@ -149,6 +155,8 @@ define([
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
             instance_literal.scale(this.instances[k].scale* data[d].scale);
+            instance_literal.rotate(this.instances[k].rotation+ data[d].rotation);
+
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
               if (this.instances[k].anchor) {
@@ -165,6 +173,7 @@ define([
 
             instance_literal.visible = this.instances[k].visible;
             this.instance_literals.push(instance_literal);
+            instance_literal.instanceIndex = this.instance_literals.length-1;
 
           }
         }
@@ -174,14 +183,17 @@ define([
           var instance_literal = path_literal.clone();
           instance_literal.nodeParent = this;
           instance_literal.instanceParentIndex = z;
+
           instance_literal.position.x = this.instances[z].position.x;
           instance_literal.position.y = this.instances[z].position.y;
+            instance_literal.rotate(this.instances[z].rotation);
           instance_literal.scale(this.instances[z].scale);
           instance_literal.visible = this.instances[z].visible;
           instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);
           //this.instance_literals.selected = this.instances[z].selected;
           this.instance_literals.push(instance_literal);
+            instance_literal.instanceIndex = this.instance_literals.length-1;
         }
       }
       path_literal.visible = false;

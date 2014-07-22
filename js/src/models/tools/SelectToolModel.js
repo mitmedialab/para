@@ -9,7 +9,7 @@ define([
   'models/PaperManager'
 
 ], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
-  var segment, paper;
+  var segment, instanceIndex, paper;
 
 
   var hitOptions = {
@@ -26,6 +26,7 @@ define([
       paper = PaperManager.getPaperInstance();
       this.selectedNodes = [];
       this.currentPaths = [];
+      this.segmentMod = false;
     },
 
     /*mousedown event
@@ -39,6 +40,7 @@ define([
         }
         this.currentPaths = [];
         this.currentNode = null;
+        segment=null;
         this.selectedNodes = [];
       }
       var paper = PaperManager.getPaperInstance();
@@ -57,9 +59,12 @@ define([
       if (hitResult) {
 
         var path = hitResult.item;
+        instanceIndex = path.instanceIndex;
+
         if (hitResult.type == 'segment') {
             console.log("segment selected");
-              segment = hitResult.segment;
+
+              segment = hitResult.segment.index;
             }
         //this sets currentNode depending on current selection level in tree
         this.trigger('nodeSelected', path);
@@ -81,6 +86,7 @@ define([
             
           }
         }
+        this.trigger('rootRender');
 
       }
      
@@ -106,21 +112,32 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-      if (this.currentPath) {
-
-
-      }
+      /*if (this.segmentMod) {
+        this.segmentMod = false
+        this.currentPaths[0].nodeParent.updatePath(this.currentPaths[0]);
+        this.trigger('rootRender');
+      }*/
     },
 
     //mouse drag event
     mouseDrag: function(event) {
+      if (this.currentPaths.length > 0) {
       if (segment) {
-        segment.point = segment.point.add(event.delta);
-        this.currentPath.nodeParent.updatePath(this.currentPath);
-        this.trigger('rootRender');
+        if (this.currentNode) {
+            var selPath =  this.selectedNodes[this.selectedNodes.length-1].instance_literals[instanceIndex];
+            var selSegment = selPath.segments[segment];
+            selSegment.point = selSegment.point.add(event.delta);
+            selPath.nodeParent.updatePath(selPath);
+              this.currentNode.update([{}]);
+             this.trigger('rootRender');
+      
+              //this.segmentMod = true;
+            }
+            
+        //this.trigger('rootRender');
       
       } 
-      else if (this.currentPaths.length > 0) {
+      else {
       
         if (this.currentNode) {
       
@@ -138,6 +155,7 @@ define([
        
 
       }
+    }
     },
 
     //mouse move event
