@@ -23,7 +23,9 @@ define([
 			this.drawAnchor=false;
 			this.selected= false;
 			this.copy= false;
-			this.hidden = false;
+			//index of instance that was used to create this instance (for instances created upon render)
+			this.instanceParentIndex = 0;
+			
 			//array that contains the path of inheritance from a render;
 			this.renderSignature = [];
 			Backbone.Model.apply(this, arguments);
@@ -40,7 +42,9 @@ define([
 			this.anchor= false;
 			this.selected= false;
 			this.closed = false;
-			this.hidden=false;
+			this.instanceParentIndex = 0;
+
+			
 		},
 
 

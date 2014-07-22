@@ -16,6 +16,7 @@ define([
       update: function() {
        // console.log("distribution update");
         this.clearScaffolds();
+        this.setVisible(true);
         this.distribute();
 
 
@@ -83,13 +84,16 @@ define([
                 });
               }
 
-              for(var j=0;j<child.instances.length;j++){
-               // console.log('conditional check at '+ j);
+              for(var j=0;j<child.instance_literals.length;j++){
 
-                var result = this.checkConditions(child.instances[j]);
+                var result = this.checkConditions(child.instance_literals[j]);
                
-                child.instances[j].visible=result;
-                // console.log("visible="+result);
+
+               // child.instances[j].visible=result;
+             if(!result){ 
+                child.instances[child.instance_literals[j].instanceParentIndex].visible = result;
+                console.log('visible='+result+":"+j);
+              }
                
               }
 

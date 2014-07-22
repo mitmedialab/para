@@ -150,10 +150,22 @@ define([
       }
     },
 
+    //shows or hides all instances
+    setVisible: function(v){
+      for(var j=0;j<this.instances.length;j++){
+        this.instances[j].visible=v;
+      }
+
+      for (var i = 0; i < this.children.length; i++) {
+        this.children[i].setVisible(v);
+      }
+    },
+
+
     clear: function() {
       this.instance_literals = [];
-      this.drawAnchor = false;
-
+      
+      
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].clear();
       }
@@ -176,8 +188,9 @@ define([
             var u_instance = this.instances[j].clone();
             u_instance.renderSignature = data[i].renderSignature.slice(0);
             u_instance.renderSignature.push(j);
+            u_instance.instanceParentIndex = j;
             u_instance.render(data[i]);
-            u_instance.drawAnchors = this.drawAnchors;
+           
             if (this.nodeParent == currentNode) {
               u_instance.selected = this.instances[j].selected;
               u_instance.anchor = this.instances[j].anchor;

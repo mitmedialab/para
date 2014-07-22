@@ -247,7 +247,7 @@ this.event_bus = event_bus;
 
     canvasMouseWheel: function(event) {
 
-      var selectedTool = toolCollection.get(this.get('state'));
+     /* var selectedTool = toolCollection.get(this.get('state'));
       var currentlySelected = selectedTool.path.instanceParent.nodeParent;
       if (!_.has(currentlySelected, 'copyNum')) {
         //console.log('no behavior, assigning copy and distribute');
@@ -262,7 +262,7 @@ this.event_bus = event_bus;
         currentlySelected.setCopyNum(currentlySelected.copyNum + 1);
       }
 
-      currentlySelected.update();
+      currentlySelected.update();*/
 
 
 

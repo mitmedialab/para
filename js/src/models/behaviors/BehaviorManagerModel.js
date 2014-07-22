@@ -19,7 +19,8 @@ define([
       this.event_bus = event_bus;
       this.listenTo(this.event_bus, 'openMenu', this.openMenu);
       this.listenTo(this.event_bus, 'sendTestObj', this.testObj);
-      this.conditional_line==null;
+      this.conditional_line=null;
+      this.test= true;
     },
 
     newBehavior: function(node, type) {
@@ -58,7 +59,10 @@ define([
 
         }
         var linearBehavior = new DistributeBehavior();
-        linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
+        if(this.test){
+          linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
+          this.test=false;
+        }
          console.log('lineartype=' +linearBehavior.type);
         behaviorNode.extendBehavior(linearBehavior, 'update');
         behaviorNode.update([{}]);

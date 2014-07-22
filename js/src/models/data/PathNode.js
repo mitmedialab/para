@@ -20,6 +20,7 @@ define([
     type: 'path',
 
 
+
     constructor: function() {
       //array to store actual paper.js objects
 
@@ -53,6 +54,7 @@ define([
       instance.position.x = path.position.x;
       instance.position.y = path.position.y;
       instance.closed = path.closed;
+      path.instanceParentIndex=this.instances.length-1;
       this.instance_literals.push(path);
       //  console.log('createPathInstance');
       //console.log(instance.position);
@@ -81,14 +83,15 @@ define([
     /*clears out all but first of literal paths*/
     clear: function() {
       //console.log('clear called');
-
+      /* for(var i=0;i<this.instances.length;i++){
+        this.instances[i].visible=true;
+      }*/
       for (var j = 1; j < this.instance_literals.length; j++) {
         // console.log(this.instance_literals[j]);
         this.instance_literals[j].remove();
 
       }
       this.instance_literals.splice(1, this.instance_literals.length);
-      this.drawAnchor = false;
       //console.log('num of literals:'+this.instance_literals.length); 
 
       // console.log('num of drawn children='+paper.project.activeLayer.children.length);
@@ -130,6 +133,7 @@ define([
 
             var instance_literal = path_literal.clone();
             instance_literal.nodeParent = this;
+            instance_literal.instanceParentIndex = k;
             instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
             instance_literal.data.renderSignature.push(k);
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
@@ -159,10 +163,11 @@ define([
 
           var instance_literal = path_literal.clone();
           instance_literal.nodeParent = this;
+          instance_literal.instanceParentIndex = z;
           instance_literal.position.x = this.instances[z].position.x;
           instance_literal.position.y = this.instances[z].position.y;
           instance_literal.scale(this.instances[z].scale);
-          instance_literal.visible = this.instances[k].visible;
+          instance_literal.visible = this.instances[z].visible;
           instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);
           //this.instance_literals.selected = this.instances[z].selected;
