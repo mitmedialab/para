@@ -18,6 +18,8 @@ define([
     initialize: function(event_bus) {
       this.event_bus = event_bus;
       this.listenTo(this.event_bus, 'openMenu', this.openMenu);
+      this.listenTo(this.event_bus, 'sendTestObj', this.testObj);
+      this.conditional_line==null;
     },
 
     newBehavior: function(node, type) {
@@ -26,7 +28,7 @@ define([
       var behaviorNode;
       if(nodeParent.type=='behavior'){
         behaviorNode = node.nodeParent;
-        console.log("parent is a behavior node");
+        console.log('parent is a behavior node');
       }
       else{
          behaviorNode  = new BehaviorNode();
@@ -34,9 +36,9 @@ define([
       nameVal++;
       behaviorNode.addChildNode(node);
       this.event_bus.trigger('nodeAdded', behaviorNode);
-        console.log("no behavior parent, creating one");
+        console.log('no behavior parent, creating one');
       }
-      console.log("behaviors="+behaviorNode.behaviors);
+      console.log('behaviors='+behaviorNode.behaviors);
       if (type === 'copy') {
         //console.log('creating copy behavior');
         var copyBehavior = new CopyBehavior();
@@ -46,17 +48,18 @@ define([
       } else if (type === 'linear') {
         //console.log('creating linear behavior');
         var containsCopy=behaviorNode.containsBehaviorType('copy');
-        console.log("contains copy="+containsCopy); 
+        console.log('contains copy='+containsCopy); 
         if (containsCopy===false) {
           var copyBehavior = new CopyBehavior();
           copyBehavior.setCopyNum(3);
           behaviorNode.extendBehavior(copyBehavior, 'update');
           behaviorNode.update([{}]);
-          console.log("copytype=" +copyBehavior.type);
+          console.log('copytype=' +copyBehavior.type);
 
         }
         var linearBehavior = new DistributeBehavior();
-         console.log("lineartype=" +linearBehavior.type);
+        linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
+         console.log('lineartype=' +linearBehavior.type);
         behaviorNode.extendBehavior(linearBehavior, 'update');
         behaviorNode.update([{}]);
       } else if (type == 'radial') {
@@ -80,7 +83,14 @@ define([
 
       
 
+    },
+
+    testObj: function(tO){
+      console.log("test object is set");
+      this.conditional_line= tO;
     }
+
+
 
 
 

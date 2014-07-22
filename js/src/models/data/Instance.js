@@ -13,6 +13,7 @@ define([
 		 constructor: function() {
 			this.visible= true;
 			this.scale= 1;
+			this.closed = false;
 			this.position= {
 				x: 0,
 				y: 0
@@ -22,6 +23,7 @@ define([
 			this.drawAnchor=false;
 			this.selected= false;
 			this.copy= false;
+			this.hidden = false;
 			//array that contains the path of inheritance from a render;
 			this.renderSignature = [];
 			Backbone.Model.apply(this, arguments);
@@ -37,6 +39,8 @@ define([
 			this.rotation= 0;
 			this.anchor= false;
 			this.selected= false;
+			this.closed = false;
+			this.hidden=false;
 		},
 
 

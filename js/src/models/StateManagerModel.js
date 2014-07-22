@@ -74,17 +74,17 @@ this.event_bus = event_bus;
       currentNode = rootNode;
 
       var path =  new paper.Path();
-      path .strokeColor = 'red';
+      path.strokeColor = 'red';
 
       path.add(new paper.Point(0,0));
       path.add(new paper.Point(500,500));
       var conditional_line = new PathNode();
-
       conditional_line.name = 'path_cond';
     
       conditional_line.createInstanceFromPath(path);
       this.nodeAdded(conditional_line);
       this.rootRender();
+      this.event_bus.trigger('sendTestObj',conditional_line);
 
     },
 
@@ -92,6 +92,7 @@ this.event_bus = event_bus;
       toolCollection.get(this.get('state')).reset();
 
       this.set('state', state);
+
 
     },
 
@@ -158,7 +159,8 @@ this.event_bus = event_bus;
     },
 
     rootRender: function(){
-      //console.log('called root render');
+     //console.log('called root render');
+    
       rootNode.clear();
       rootNode.render(null,currentNode);
     },

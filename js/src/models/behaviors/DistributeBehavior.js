@@ -7,20 +7,16 @@ define([
   ],
 
   function(BaseBehavior, PaperManager, TrigFunc) {
-    var paper = PaperManager.getPaperInstance();
     var DistributeBehavior = BaseBehavior.extend({
       paper: null,
       name: 'linear',
       type: 'distribution',
 
-      initialize: function() {
-        this.paper = PaperManager.getPaperInstance();
-      },
-
+     
       update: function() {
        // console.log("distribution update");
         this.clearScaffolds();
-      this.distribute();
+        this.distribute();
 
 
       },
@@ -28,7 +24,7 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       distribute: function() {
-       // console.log("distributing instances");
+       //console.log("distributing instances");
         if (this.children.length > 0) {
           for (var z = 0; z < this.children.length; z++) {
             if (this.children[z] !== null) {
@@ -87,6 +83,16 @@ define([
                 });
               }
 
+              for(var j=0;j<child.instances.length;j++){
+               // console.log('conditional check at '+ j);
+
+                var result = this.checkConditions(child.instances[j]);
+               
+                child.instances[j].visible=result;
+                // console.log("visible="+result);
+               
+              }
+
 
               /*if (this.getParentNode != parent) {
         parent.addChildNode(this);
@@ -100,18 +106,18 @@ define([
       checkDistance: function(start,selected,tDist,child){
 
           var dist = TrigFunc.distance(start.position,selected.position);
-          console.log("num copies="+this.copyNum);
+         // console.log("num copies="+this.copyNum);
           if(dist<tDist+20){
            this.copyNum++;
-            console.log("incrementing copy");
+          //  console.log("incrementing copy");
           }
           else if(dist>tDist+20){
              this.copyNum--;
-             console.log("decrementing copy");
+          //   console.log("decrementing copy");
           
           }
-          console.log('selected Distance ='+dist);
-          console.log('target Distance ='+tDist);
+         // console.log('selected Distance ='+dist);
+          //console.log('target Distance ='+tDist);
 
 
       }

@@ -3,12 +3,14 @@
  */
 
 define([
-		'toolbox'
+		'toolbox',
+		'utils/Vec2D'
 
 	],
 
-	function(Toolbox) {
-
+	function(Toolbox, Vec2D) {
+		
+		
 		var TrigFunc = Toolbox.Base.extend({
 			
 
@@ -37,6 +39,23 @@ define([
 					y: y
 				};
 			};
+
+		//determines if point is on left or right of line
+		TrigFunc.side = function(pA,pB,pM){
+			
+			var position = (pB.x - pA.x) * (pM.y -pA.y) - (pB.y - pA.y) * (pM.x - pA.x);   
+			//console.log("position=");
+			//console.log(position);
+			if(position>0){
+				return 1;
+			}
+			else if(position<0){
+				return -1;
+
+			}
+
+			return 0;
+		};
 
 		return TrigFunc;
 	});

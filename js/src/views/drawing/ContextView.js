@@ -54,7 +54,7 @@ var template,source, menuX, menuY, currentNode;
     },
 
     newBehavior: function(){
-        console.log( this.$('#behavior-types-menu').html());
+       
         this.$('#behavior-types-menu').css({
         visibility: 'visible',
         left: 100,

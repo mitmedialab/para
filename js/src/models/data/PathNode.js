@@ -9,9 +9,10 @@ define([
   'underscore',
   'models/data/GeometryNode',
   'models/data/Instance',
-  'models/PaperManager'
+  'models/PaperManager',
+  'utils/TrigFunc'
 
-], function(_, GeometryNode, Instance, PaperManager) {
+], function(_, GeometryNode, Instance, PaperManager, TrigFunc) {
   //drawable paper.js path object that is stored in the pathnode
   // var paper = PaperManager.getPaperInstance();
   var PathNode = GeometryNode.extend({
@@ -51,6 +52,7 @@ define([
 
       instance.position.x = path.position.x;
       instance.position.y = path.position.y;
+      instance.closed = path.closed;
       this.instance_literals.push(path);
       //  console.log('createPathInstance');
       //console.log(instance.position);
@@ -147,7 +149,7 @@ define([
             //instance_literal.selected = data[d].selected;
 
 
-            instance_literal.visible = true;
+            instance_literal.visible = this.instances[k].visible;
             this.instance_literals.push(instance_literal);
 
           }
@@ -160,7 +162,7 @@ define([
           instance_literal.position.x = this.instances[z].position.x;
           instance_literal.position.y = this.instances[z].position.y;
           instance_literal.scale(this.instances[z].scale);
-          instance_literal.visible = true;
+          instance_literal.visible = this.instances[k].visible;
           instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);
           //this.instance_literals.selected = this.instances[z].selected;
@@ -205,13 +207,13 @@ define([
           if (compareSig === value) {
             //this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length - 1;
-            console.log('selected render sig:' + this.instance_literals[i].data.renderSignature);
+           // console.log('selected render sig:' + this.instance_literals[i].data.renderSignature);
             var iIndex = this.instance_literals[i].data.renderSignature[last];
             this.instances[iIndex].selected = true;
             var copySig = this.instance_literals[i].data.renderSignature.slice(0);
 
             copySig.pop();
-            console.log('copy sig:' + copySig);
+           // console.log('copy sig:' + copySig);
             if (copySig.length > 0) {
               sIndexes.push(copySig);
             }
@@ -255,6 +257,37 @@ define([
       this.trigger('change:mouseUp', this);
 
     },
+
+      /* placeholder functions for leftOf, rightOf geometric checks */
+    instanceSide: function(instance){
+      for(var i=0;i<this.instances.length;i++){
+        var side, pA, pB, pM;
+        if(this.instances[i].closed){ 
+        
+          pA = {x:this.instances[i].position.x,y:0};
+          pB = {x:this.instances[i].position.x,y:100};
+     
+
+        }
+        else{
+          var path_literal = this.instance_literals[i+1];
+         // console.log("path_literal=");
+        //  console.log(path_literal);
+         // console.log(path_literal.segments);
+          pA = {x:path_literal.segments[0].point.x,y:path_literal.segments[0].point.y};
+          pB = {x:path_literal.segments[path_literal.segments.length-1].point.x,y:path_literal.segments[path_literal.segments.length-1].point.y};
+         
+        }
+
+          pM = instance.position;
+          side = TrigFunc.side(pA,pB,pM);
+         // console.log("side="+side);
+          return side;
+
+      }
+    }
+
+
 
 
   });

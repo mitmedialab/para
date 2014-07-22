@@ -98,6 +98,9 @@ define([
           //  console.log(instance.position);
         }
       }
+      for (var k = 0; k <this.children.length; k++) {
+        this.children[k].update([{}]);
+      }
 
 
     },
@@ -333,7 +336,13 @@ define([
       return false;
 
 
-    }
+    },
+
+    /* placeholder functions for leftOf, rightOf geometric checks */
+    instanceSide: function(instance){
+      console.log("calling geom instance side");
+      return -1;
+    },
 
 
 
