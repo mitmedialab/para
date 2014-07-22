@@ -28,7 +28,7 @@ define([
     */
 
       this.instances = [];
-      this.scaffold = [];
+      this.scaffolds = [];
       this.instance_literals = [];
       this.anchors = [];
       this.behaviors = [];
@@ -124,6 +124,7 @@ define([
 
     },
 
+  
     reset: function() {
       for (var j = 0; j < this.instances.length; j++) {
         this.instances[j].reset();
@@ -181,15 +182,20 @@ define([
     render: function(data, currentNode) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data
-
+      //console.log("geom render");
+      //console.log(data);
       if (data) {
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
             var u_instance = this.instances[j].clone();
-            u_instance.renderSignature = data[i].renderSignature.slice(0);
-            u_instance.renderSignature.push(j);
-            u_instance.instanceParentIndex = j;
-            u_instance.render(data[i]);
+            console.log("data at "+ i);
+            console.log(data[i]);
+            if(data[i].renderSignature){
+              u_instance.renderSignature = data[i].renderSignature.slice(0);
+            }
+              u_instance.renderSignature.push(j);
+              u_instance.instanceParentIndex = j;
+             u_instance.render(data[i]);
            
             if (this.nodeParent == currentNode) {
               u_instance.selected = this.instances[j].selected;

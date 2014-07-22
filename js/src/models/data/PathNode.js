@@ -117,6 +117,16 @@ define([
 
     },
 
+      //called when path data is modified 
+    updatePath:function(path){
+      if(this.instance_literals[0]!=path){
+        this.instance_literals[0].remove();
+        this.instance_literals.slice(0,1);
+      }
+      this.instance_literals[0]=path;
+    },
+
+
     /* renders instances of the original path
      * render data contains an array of objects containing
      * position, scale and rotation data for each instance

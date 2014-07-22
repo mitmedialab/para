@@ -44,7 +44,7 @@ define([
         //console.log('creating copy behavior');
         var copyBehavior = new CopyBehavior();
         copyBehavior.setCopyNum(2);
-        behaviorNode.extendBehavior(copyBehavior, 'update');
+        behaviorNode.extendBehavior(copyBehavior, ['update']);
         behaviorNode.update([{}]);
       } else if (type === 'linear') {
         //console.log('creating linear behavior');
@@ -53,18 +53,18 @@ define([
         if (containsCopy===false) {
           var copyBehavior = new CopyBehavior();
           copyBehavior.setCopyNum(3);
-          behaviorNode.extendBehavior(copyBehavior, 'update');
+          behaviorNode.extendBehavior(copyBehavior, ['update']);
           behaviorNode.update([{}]);
           console.log('copytype=' +copyBehavior.type);
 
         }
         var linearBehavior = new DistributeBehavior();
         if(this.test){
-          linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
+          linearBehavior.addCondition(null,'rightOf',this.conditional_line,null);
           this.test=false;
         }
          console.log('lineartype=' +linearBehavior.type);
-        behaviorNode.extendBehavior(linearBehavior, 'update');
+        behaviorNode.extendBehavior(linearBehavior, ['update']);
         behaviorNode.update([{}]);
       } else if (type == 'radial') {
        // console.log('creating  radial behavior');
@@ -72,12 +72,12 @@ define([
         if (!behaviorNode.containsBehaviorType('copy')) {
           var copyBehavior = new CopyBehavior();
           copyBehavior.setCopyNum(20);
-          behaviorNode.extendBehavior(copyBehavior, 'update');
+          behaviorNode.extendBehavior(copyBehavior, ['update']);
           behaviorNode.update([{}]);
 
         }
         var radialBehavior = new RadialDistributeBehavior();
-        behaviorNode.extendBehavior(radialBehavior, 'update');
+        behaviorNode.extendBehavior(radialBehavior, ['update']);
         behaviorNode.update([{}]);
       }
       behaviorNode.update([{}]);

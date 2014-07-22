@@ -57,6 +57,10 @@ define([
       if (hitResult) {
 
         var path = hitResult.item;
+        if (hitResult.type == 'segment') {
+            console.log("segment selected");
+              segment = hitResult.segment;
+            }
         //this sets currentNode depending on current selection level in tree
         this.trigger('nodeSelected', path);
 
@@ -74,14 +78,12 @@ define([
             }
 
 
-            if (hitResult.type == 'segment') {
-              segment = hitResult.segment;
-            }
+            
           }
         }
 
       }
-      this.trigger('rootRender');
+     
 
     },
 
@@ -114,7 +116,8 @@ define([
     mouseDrag: function(event) {
       if (segment) {
         segment.point = segment.point.add(event.delta);
-
+        this.currentPath.nodeParent.updatePath(this.currentPath);
+        this.trigger('rootRender');
       
       } 
       else if (this.currentPaths.length > 0) {

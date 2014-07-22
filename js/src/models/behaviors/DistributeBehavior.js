@@ -3,12 +3,13 @@
 define([
     'models/behaviors/BaseBehavior',
     'models/PaperManager',
-    'utils/TrigFunc'
+    'utils/TrigFunc',
+    'models/behaviors/Scaffold'
   ],
 
-  function(BaseBehavior, PaperManager, TrigFunc) {
+  function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {
+    var paper = PaperManager.getPaperInstance();
     var DistributeBehavior = BaseBehavior.extend({
-      paper: null,
       name: 'linear',
       type: 'distribution',
 
@@ -41,22 +42,25 @@ define([
               }
               var selected = child.getFirstSelectedInstance();
               
-               /* var scaffoldLine =  new paper.Path();
-    
-              
-                 scaffoldLine.strokeColor = '#83E779';
+                var scaffoldLine =  new paper.Path();
+                scaffoldLine.strokeColor = '#83E779';
                 scaffoldLine.add(new paper.Point(pointA.x,pointA.y));
                 scaffoldLine.add(new paper.Point(pointB.x,pointB.y));
-                this.scaffold.push(scaffoldLine);
+                var scaffoldA = new Scaffold(scaffoldLine);
+                this.scaffolds.push(scaffoldA);
+
+
                 var pointAC = new paper.Path.Circle(new paper.Point(pointA.x,pointA.y),5);
-                 var pointBC = new paper.Path.Circle(new paper.Point(pointB.x,pointB.y),5);
                 pointAC.fillColor =  '#83E779';
+                var scaffoldB = new Scaffold(pointAC);
+                this.scaffolds.push(scaffoldB);
+               
+                var pointBC = new paper.Path.Circle(new paper.Point(pointB.x,pointB.y),5);
                 pointBC.fillColor =  '#FF0000';
-                this.scaffold.push(pointAC);
-                this.scaffold.push(pointBC);*/
+                var scaffoldC = new Scaffold(pointBC);
+                this.scaffolds.push(scaffoldC);
 
-         
-
+  
            
               var xDiff = (pointB.x - pointA.x) / (num-1);
               var yDiff = (pointB.y - pointA.y) / (num-1);
@@ -92,7 +96,7 @@ define([
                // child.instances[j].visible=result;
              if(!result){ 
                 child.instances[child.instance_literals[j].instanceParentIndex].visible = result;
-                console.log('visible='+result+":"+j);
+                console.log('visible='+result+':'+j);
               }
                
               }

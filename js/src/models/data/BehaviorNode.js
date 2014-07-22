@@ -22,11 +22,11 @@ define([
 	function(_, $, GeometryNode, DistributeBehavior) {
 
 		var BehaviorNode = GeometryNode.extend({
-			scaffold: [],
+			
 			type: 'behavior',
 
 			//registers overriding function for update methods- determined by parent node
-			extendBehavior: function(from, methodName) {
+			extendBehavior: function(from, methods) {
 				this.behaviors.push(from);
 				// if the method is defined on from ...
 				// we add those methods which exists on `from` but not on `to` to the latter
@@ -35,7 +35,8 @@ define([
 				_.defaults(this.events, from.events);
 				// console.log(this);
 				// console.log(from);
-
+				for(var i=0;i<methods.length;i++){
+					var methodName = methods;
 				if (!_.isUndefined(from[methodName])) {
 					// console.log('setting methods');
 					var old = this[methodName];
@@ -55,15 +56,16 @@ define([
 
 					};
 				}
+			}
 
 			},
 
 			clearScaffolds: function(){
-      			for (var j = 0; j < this.scaffold.length; j++) {
-       				 this.scaffold[j].remove();
+      			for (var j = 0; j < this.scaffolds.length; j++) {
+       				 this.scaffolds[j].clear();
 
       		}
-      			this.scaffold = [];
+      			this.scaffolds = [];
 
 			},
 

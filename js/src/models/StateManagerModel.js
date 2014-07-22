@@ -76,8 +76,8 @@ this.event_bus = event_bus;
       var path =  new paper.Path();
       path.strokeColor = 'red';
 
-      path.add(new paper.Point(0,0));
-      path.add(new paper.Point(500,500));
+      path.add(new paper.Point(0,350));
+      path.add(new paper.Point(500,350));
       var conditional_line = new PathNode();
       conditional_line.name = 'path_cond';
     
