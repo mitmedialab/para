@@ -62,7 +62,7 @@ define([
         instanceIndex = path.instanceIndex;
 
         if (hitResult.type == 'segment') {
-            console.log("segment selected");
+            //console.log("segment selected");
 
               segment = hitResult.segment.index;
             }
@@ -144,7 +144,7 @@ define([
       
           for (var i = 0; i < this.selectedNodes.length; i++) {
 
-           
+            console.log("updating selected Node at"+i);
             this.selectedNodes[i].updateSelected([{
               position: {
                 x: event.delta.x,

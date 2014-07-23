@@ -51,6 +51,7 @@ define([
 		//only called on a update function- 
 		//sets instances' properties to that of the data
 		update: function(data){
+			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
 			if(data.position){
 				//console.log('prior position =');
 				//console.log(this.position);
@@ -80,6 +81,9 @@ define([
 		render: function(data) {
 			//console.log("update called with data:");
 			//cloconsole.log(data);
+			if(this.nodeParent){
+				console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
+			}
 			if(data.position){
 				//console.log('prior position =');
 				//console.log(this.position);

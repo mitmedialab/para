@@ -59,7 +59,7 @@ define([
 			isExcluded: function(index){
 				for(var i=0;i<this.excludes.length;i++){
 					if(this.excludes[i]===index){
-						console.log("excluded found");
+						//console.log("excluded found");
 						return true;
 					}
 				}

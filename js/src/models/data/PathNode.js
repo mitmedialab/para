@@ -58,7 +58,7 @@ define([
       this.instance_literals.push(path);
       path.instanceIndex = this.instance_literals.length - 1;
       //  console.log('createPathInstance');
-      //console.log(instance.position);
+      //console.log(instance.position);      
       path.nodeParent = this;
       return instance;
     },
@@ -336,7 +336,7 @@ define([
         for (var j = 0; j < paths.length; j++) {
           if (paths[j].visible && !this.containsPath(paths[j])) {
             if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
-              console.log('do nothing');
+             // console.log('do nothing');
             } else {
               // console.log("checking at:"+j);
               //console.log("checking instance at"+i);
@@ -344,7 +344,7 @@ define([
               //console.log("intersections:");
               // console.log(intersections);
               if (ints.length > 0) {
-                console.log('intersection found');
+               // console.log('intersection found');
                 return paths[j];
               }
             }

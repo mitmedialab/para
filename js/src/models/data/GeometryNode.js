@@ -56,7 +56,9 @@ define([
       } else {
         instance = new Instance();
       }
+      instance.nodeParent=this;
       this.instances.push(instance);
+      instance.index = this.instances.length-1;
       return instance;
 
     },
@@ -68,7 +70,12 @@ define([
       } else {
         instance = new Instance();
       }
+      instance.nodeParent=this;
+
       this.instances.splice(index,0,instance);
+       for(var i=0;i<this.instances.length;i++){
+        this.instances[i].index =i;
+       }
       return instance;
     },
 
@@ -98,17 +105,25 @@ define([
           //  console.log(instance.position);
         }
       }
-      for (var k = 0; k <this.children.length; k++) {
-        this.children[k].update([{}]);
-      }
+  
+     
+      
 
 
+    },
+
+    updateChildren: function(data){
+      console.log("update children");
+       this.update(data);
+        for (var k = 0; k <this.children.length; k++) {
+          this.children[k].update([{}]);
+        }
     },
 
     updateSelected: function(data) {
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
-          console.log('found selected instance at:' + j);
+          //console.log('found selected instance at:' + j);
           for (var i = 0; i < data.length; i++) {
             var instance = this.instances[j];
             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
@@ -182,13 +197,14 @@ define([
     render: function(data, currentNode) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data
-      //console.log("geom render");
+      //console.log('geom render');
       //console.log(data);
       if (data) {
+          // console.log('geom render with data');
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
             var u_instance = this.instances[j].clone();
-            //console.log("data at "+ i);
+            //console.log('data at '+ i);
             //console.log(data[i]);
             if(data[i].renderSignature){
               u_instance.renderSignature = data[i].renderSignature.slice(0);
@@ -215,6 +231,8 @@ define([
           this.children[k].render(this.instance_literals, currentNode);
         }
       } else {
+
+
         for (var f = 0; f < this.children.length; f++) {
 
           this.children[f].render(this.instances, currentNode);
@@ -250,7 +268,7 @@ define([
             for (var j = 0; j < results.length; j++) {
               if (results[j].length > 0) {
                 var last = results[j].length - 1;
-               // console.log("selecting instance at" + last);
+               // console.log('selecting instance at' + last);
                 this.instances[results[j][last]].selected = true;
 
                 results[j].pop();
@@ -373,7 +391,7 @@ define([
     },
 
     checkIntersection: function(){
-      console.log('geom check intersection');
+     // console.log('geom check intersection');
       for (var i=0;i<this.children.length;i++){
         var intersection = this.children[i].checkIntersection();
         if(intersection!==null){

@@ -78,8 +78,8 @@ this.event_bus = event_bus;
       var path =  new paper.Path();
       path.strokeColor = 'red';
 
-      path.add(new paper.Point(0,0));
-      path.add(new paper.Point(500,500));
+      path.add(new paper.Point(300,0));
+      path.add(new paper.Point(800,300));
 
      /* var path2 =  new paper.Path();
       path2.strokeColor = 'green';
@@ -141,7 +141,7 @@ this.event_bus = event_bus;
       //console.log('move down node');
       var children = currentNode.children;
       for(var i=0;i<children.length;i++){
-        if(children[i].containsPath(path)){
+        if(children[i].containsPath(path)&&children[i].type!='path'){
          // console.log('found path at child'+i);
             currentNode = children[i];
            toolCollection.get(this.get('state')).currentNode = children[i];
