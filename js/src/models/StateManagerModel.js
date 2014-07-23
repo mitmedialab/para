@@ -42,6 +42,7 @@ define([
       selectTool = new SelectToolModel({
         id: 'selectTool'
       });
+      selectTool.event_bus = event_bus;
       polyTool = new PolyToolModel({
         id: 'polyTool'
       });

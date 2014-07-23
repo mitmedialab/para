@@ -57,8 +57,9 @@ define([
 
 			//checks to see if index is in the excluded array
 			isExcluded: function(index){
-				for(var i=0;i>this.excludes.length;i++){
+				for(var i=0;i<this.excludes.length;i++){
 					if(this.excludes[i]===index){
+						console.log("excluded found");
 						return true;
 					}
 				}

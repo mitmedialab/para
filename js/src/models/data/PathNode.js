@@ -54,9 +54,9 @@ define([
       instance.position.x = path.position.x;
       instance.position.y = path.position.y;
       instance.closed = path.closed;
-      path.instanceParentIndex=this.instances.length-1;
+      path.instanceParentIndex = this.instances.length - 1;
       this.instance_literals.push(path);
-      path.instanceIndex = this.instance_literals.length-1;
+      path.instanceIndex = this.instance_literals.length - 1;
       //  console.log('createPathInstance');
       //console.log(instance.position);
       path.nodeParent = this;
@@ -118,18 +118,18 @@ define([
 
     },
 
-      //called when path data is modified 
-    updatePath:function(path){
+    //called when path data is modified 
+    updatePath: function(path) {
       console.log("updating path to");
       var newPath = path.clone();
-     newPath.strokeColor='black';
-    newPath.instanceParentIndex=path.instanceParentIndex;
-     // path.position.x=0;
-     // path.position.y=0;
-   
+      newPath.strokeColor = 'black';
+      newPath.instanceParentIndex = path.instanceParentIndex;
+      // path.position.x=0;
+      // path.position.y=0;
+
       this.instance_literals.shift();
       this.instance_literals.unshift(newPath);
-      
+
     },
 
 
@@ -154,8 +154,8 @@ define([
             instance_literal.data.renderSignature.push(k);
             instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
-            instance_literal.scale(this.instances[k].scale* data[d].scale);
-            instance_literal.rotate(this.instances[k].rotation+ data[d].rotation);
+            instance_literal.scale(this.instances[k].scale * data[d].scale);
+            instance_literal.rotate(this.instances[k].rotation + data[d].rotation);
 
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
@@ -173,7 +173,7 @@ define([
 
             instance_literal.visible = this.instances[k].visible;
             this.instance_literals.push(instance_literal);
-            instance_literal.instanceIndex = this.instance_literals.length-1;
+            instance_literal.instanceIndex = this.instance_literals.length - 1;
 
           }
         }
@@ -186,14 +186,14 @@ define([
 
           instance_literal.position.x = this.instances[z].position.x;
           instance_literal.position.y = this.instances[z].position.y;
-            instance_literal.rotate(this.instances[z].rotation);
+          instance_literal.rotate(this.instances[z].rotation);
           instance_literal.scale(this.instances[z].scale);
           instance_literal.visible = this.instances[z].visible;
           instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);
           //this.instance_literals.selected = this.instances[z].selected;
           this.instance_literals.push(instance_literal);
-            instance_literal.instanceIndex = this.instance_literals.length-1;
+          instance_literal.instanceIndex = this.instance_literals.length - 1;
         }
       }
       path_literal.visible = false;
@@ -234,13 +234,13 @@ define([
           if (compareSig === value) {
             //this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length - 1;
-           // console.log('selected render sig:' + this.instance_literals[i].data.renderSignature);
+            // console.log('selected render sig:' + this.instance_literals[i].data.renderSignature);
             var iIndex = this.instance_literals[i].data.renderSignature[last];
             this.instances[iIndex].selected = true;
             var copySig = this.instance_literals[i].data.renderSignature.slice(0);
 
             copySig.pop();
-           // console.log('copy sig:' + copySig);
+            // console.log('copy sig:' + copySig);
             if (copySig.length > 0) {
               sIndexes.push(copySig);
             }
@@ -285,65 +285,80 @@ define([
 
     },
 
-      /* placeholder functions for leftOf, rightOf geometric checks */
-    instanceSide: function(instance){
-      for(var i=0;i<this.instances.length;i++){
+    /* placeholder functions for leftOf, rightOf geometric checks */
+    instanceSide: function(instance) {
+      for (var i = 0; i < this.instances.length; i++) {
         var side, pA, pB, pM;
-        if(this.instances[i].closed){ 
-        
-          pA = {x:this.instances[i].position.x,y:0};
-          pB = {x:this.instances[i].position.x,y:100};
-     
+        if (this.instances[i].closed) {
+
+          pA = {
+            x: this.instances[i].position.x,
+            y: 0
+          };
+          pB = {
+            x: this.instances[i].position.x,
+            y: 100
+          };
+
+
+        } else {
+          var path_literal = this.instance_literals[i + 1];
+          // console.log("path_literal=");
+          //  console.log(path_literal);
+          // console.log(path_literal.segments);
+          pA = {
+            x: path_literal.segments[0].point.x,
+            y: path_literal.segments[0].point.y
+          };
+          pB = {
+            x: path_literal.segments[path_literal.segments.length - 1].point.x,
+            y: path_literal.segments[path_literal.segments.length - 1].point.y
+          };
 
         }
-        else{
-          var path_literal = this.instance_literals[i+1];
-         // console.log("path_literal=");
-        //  console.log(path_literal);
-         // console.log(path_literal.segments);
-          pA = {x:path_literal.segments[0].point.x,y:path_literal.segments[0].point.y};
-          pB = {x:path_literal.segments[path_literal.segments.length-1].point.x,y:path_literal.segments[path_literal.segments.length-1].point.y};
-         
-        }
 
-          pM = instance.position;
-          side = TrigFunc.side(pA,pB,pM);
-         // console.log("side="+side);
-          return side;
+        pM = instance.position;
+        side = TrigFunc.side(pA, pB, pM);
+        // console.log("side="+side);
+        return side;
 
       }
-    }, 
+    },
 
     //checks for intersection and returns the first path found
-      checkIntersection: function(){
-        console.log("num of instances to check"+this.instance_literals.length);
-      for (var i=1;i<this.instance_literals.length;i++){
+    checkIntersection: function() {
+      // console.log("num of instances to check"+this.instance_literals.length);
+      for (var i = 1; i < this.instance_literals.length; i++) {
         var instance_literal = this.instance_literals[i];
-          console.log("registering at"+i);
+        //   console.log("registering at"+i);
         var paths = paper.project.activeLayer.children;
         //console.log("paths to check:"+paths.length);
-        for(var j=0;j<paths.length;j++){
-          if(paths[j].visible && !this.containsPath(paths[j])){
-            // console.log("checking at:"+j);
-            console.log("checking instance at"+i);
-            var ints = paths[j].getIntersections(instance_literal);
-            //console.log("intersections:");
-           // console.log(intersections);
-            if (ints.length>0){
-             return paths[j];
+        for (var j = 0; j < paths.length; j++) {
+          if (paths[j].visible && !this.containsPath(paths[j])) {
+            if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
+              console.log('do nothing');
+            } else {
+              // console.log("checking at:"+j);
+              //console.log("checking instance at"+i);
+              var ints = paths[j].getIntersections(instance_literal);
+              //console.log("intersections:");
+              // console.log(intersections);
+              if (ints.length > 0) {
+                console.log('intersection found');
+                return paths[j];
+              }
             }
           }
 
         }
-       /* if(intersection!=null){
+        /* if(intersection!=null){
           return intersection'
           
         }*/
-         
+
       }
       return null;
     }
-
 
 
 

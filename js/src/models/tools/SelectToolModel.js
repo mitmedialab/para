@@ -115,7 +115,7 @@ define([
      for (var i = 0; i < this.selectedNodes.length; i++) {
            var intersection = this.selectedNodes[i].checkIntersection();
             if(intersection){
-                console.log('intersection found');
+                this.event_bus.trigger('newBehavior',[intersection.nodeParent,this.selectedNodes[i]],'followPath');
               }
       }
     },

@@ -20,13 +20,14 @@ define([
       this.event_bus = event_bus;
       this.listenTo(this.event_bus, 'openMenu', this.openMenu);
       this.listenTo(this.event_bus, 'sendTestObj', this.testObj);
+      this.listenTo(this.event_bus, 'newBehavior', this.newBehavior);
       this.conditional_line=null;
       this.test= true;
     },
 
     newBehavior: function(nodes, type) {
-      console.log("total num of nodes="+nodes.length);
-      console.log(nodes);
+      //console.log("total num of nodes="+nodes.length);
+      //console.log(nodes);
       var nodeParent = nodes[0].nodeParent;
       var behaviorNode;
       if(nodeParent.type=='behavior'){
@@ -82,7 +83,8 @@ define([
         behaviorNode.update([{}]);
       }
       else if (type == 'followPath') {
-        behaviorNode.getBehaviorByName('copy').exclude(0);
+        console.log('follow path behavior called');
+        behaviorNode.exclude(0);
         var followPathBehavior = new FollowPathBehavior(nodes[0]);
         behaviorNode.extendBehavior(followPathBehavior, ['update']);
       }

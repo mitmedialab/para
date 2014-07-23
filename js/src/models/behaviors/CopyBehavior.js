@@ -45,11 +45,11 @@ define([
                     index = instanceSelect.index+1;
                   }
                 
-                   // console.log("no selected instance found, making copy from first");
+                   // console.log('no selected instance found, making copy from first');
                     //target = child.instances[0];
                   
                   var instance = child.createInstanceAt(target,index);
-                 // console.log("creating instance"+instance);
+                 // console.log('creating instance'+instance);
                   instance.copy=true;
                   instance.anchor=false;
                   instance.selected= false;
@@ -57,7 +57,7 @@ define([
               } else if (numInstances > this.copyNum) {
                 for (var k = 0; k < numInstances - this.copyNum; k++) {
                   var removeIndex = child.instances.length-3;
-                  //console.log("remove index = "+removeIndex);
+                  //console.log('remove index = '+removeIndex);
                   if(removeIndex>=0){
 
                     child.removeInstanceAt(removeIndex);
@@ -101,14 +101,14 @@ define([
        checkDistanceIncrement: function(start,selected,tDist){
 
           var dist = TrigFunc.distance(start.position,selected.position);
-          console.log("num copies="+this.copyNum);
+          console.log('num copies='+this.copyNum);
           if(dist<tDist+20){
            this.copyNum++;
-            console.log("incrementing copy");
+            console.log('incrementing copy');
           }
           /*else if(dist>tDist+20){
              this.copyNum--;
-             console.log("decrementing copy");
+             console.log('decrementing copy');
           }*/
          
           console.log('selected Distance ='+dist);
@@ -120,10 +120,10 @@ define([
        checkDistanceDecrement: function(start,selected,tDist){
 
           var dist = TrigFunc.distance(start.position,selected.position);
-          console.log("num copies="+this.copyNum);
+          console.log('num copies='+this.copyNum);
             if(dist>tDist+20){
              this.copyNum--;
-             console.log("decrementing copy");
+             console.log('decrementing copy');
           
           }
           console.log('selected Distance ='+dist);
@@ -133,14 +133,17 @@ define([
       },
 
       exclude: function(excludeIndex){
+        console.log('num of children in copy:'+this.children.length);
         var child = this.children[excludeIndex];
         if(child!==null){
          for(var i=child.instances.length-1;i>0;i--){
               child.removeInstanceAt(i);
+              console.log('removing instance at:'+i);
          }
          child.instances[0].anchor=false;
         }
-        BaseBehavior.prototype.exclude.call(this,excludeIndex);
+        this.excludes.push(excludeIndex);
+        //BaseBehavior.prototype.exclude.call(this,excludeIndex);
       }
 
 
