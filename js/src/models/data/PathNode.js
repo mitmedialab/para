@@ -120,14 +120,25 @@ define([
 
     //called when path data is modified 
     updatePath: function(path) {
-      console.log("updating path to");
+     // console.log("updating path to");
       var newPath = path.clone();
       newPath.strokeColor = 'black';
       newPath.instanceParentIndex = path.instanceParentIndex;
        //newPath.position.x=this.instance_literals[0].x;
        //newPath.position.y=this.instance_literals[0].x;
 
-      this.instance_literals.shift();
+      var removedItem = this.instance_literals.shift();
+      var removedBounds = removedItem.bounds;
+      var newBounds = newPath.bounds;
+      var wD = removedBounds.width-newBounds.width;
+      var hD =  removedBounds.height-newBounds.height;
+      //console.log("diff="+wD+","+hD);
+      newPath.position.x = removedItem.position.x-wD;
+      newPath.position.y = removedItem.position.y-hD;
+      
+      newPath.rotate(0-this.instances[removedItem.instanceParentIndex].rotation);
+      removedItem.remove();
+      removedItem = null;
       this.instance_literals.unshift(newPath);
 
     },
@@ -334,6 +345,7 @@ define([
         var paths = paper.project.activeLayer.children;
         //console.log("paths to check:"+paths.length);
         for (var j = 0; j < paths.length; j++) {
+
           if (paths[j].visible && !this.containsPath(paths[j])) {
             if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
              // console.log('do nothing');

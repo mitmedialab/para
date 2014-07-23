@@ -66,7 +66,7 @@ define([
 			
 			}
 			if(data.rotation){
-				console.log("updating rotation");
+				//console.log("updating rotation");
 				this.rotation=data.rotation;
 			}
 
@@ -81,9 +81,9 @@ define([
 		render: function(data) {
 			//console.log("update called with data:");
 			//cloconsole.log(data);
-			if(this.nodeParent){
-				console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
-			}
+			//if(this.nodeParent){
+				//console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
+			//}
 			if(data.position){
 				//console.log('prior position =');
 				//console.log(this.position);

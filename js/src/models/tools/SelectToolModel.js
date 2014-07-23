@@ -9,7 +9,8 @@ define([
   'models/PaperManager'
 
 ], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
-  var segment, instanceIndex, paper;
+  var segment, instanceIndex;
+  var paper = PaperManager.getPaperInstance();
 
 
   var hitOptions = {
@@ -43,7 +44,7 @@ define([
         segment=null;
         this.selectedNodes = [];
       }
-      var paper = PaperManager.getPaperInstance();
+      
       segment = null;
 
       var hitResult = paper.project.hitTest(event.point, hitOptions);
@@ -112,11 +113,13 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
+      if(event.modifiers.shift){
      for (var i = 0; i < this.selectedNodes.length; i++) {
            var intersection = this.selectedNodes[i].checkIntersection();
             if(intersection){
                 this.event_bus.trigger('newBehavior',[intersection.nodeParent,this.selectedNodes[i]],'followPath');
               }
+        }
       }
     },
 
@@ -131,7 +134,8 @@ define([
             selPath.nodeParent.updatePath(selPath);
               this.currentNode.update([{}]);
              this.trigger('rootRender');
-      
+            console.log('numPaths=' + paper.project.activeLayer.children.length);
+
               //this.segmentMod = true;
             }
             
@@ -144,7 +148,7 @@ define([
       
           for (var i = 0; i < this.selectedNodes.length; i++) {
 
-            console.log("updating selected Node at"+i);
+            //console.log("updating selected Node at"+i);
             this.selectedNodes[i].updateSelected([{
               position: {
                 x: event.delta.x,

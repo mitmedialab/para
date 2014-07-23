@@ -20,7 +20,7 @@ define([
       update: function() {
         this.clearScaffolds();
         this.distribute();
-
+        console.log("numPaths="+paper.project.activeLayer.children.length);
 
       },
 
