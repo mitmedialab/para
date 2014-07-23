@@ -316,19 +316,21 @@ define([
 
     //checks for intersection and returns the first path found
       checkIntersection: function(){
+        console.log("num of instances to check"+this.instance_literals.length);
       for (var i=1;i<this.instance_literals.length;i++){
         var instance_literal = this.instance_literals[i];
-       
+          console.log("registering at"+i);
         var paths = paper.project.activeLayer.children;
         //console.log("paths to check:"+paths.length);
         for(var j=0;j<paths.length;j++){
           if(paths[j].visible && !this.containsPath(paths[j])){
             // console.log("checking at:"+j);
+            console.log("checking instance at"+i);
             var ints = paths[j].getIntersections(instance_literal);
             //console.log("intersections:");
            // console.log(intersections);
             if (ints.length>0){
-              return paths[j];
+             return paths[j];
             }
           }
 
@@ -337,8 +339,9 @@ define([
           return intersection'
           
         }*/
-         return null;
+         
       }
+      return null;
     }
 
 
