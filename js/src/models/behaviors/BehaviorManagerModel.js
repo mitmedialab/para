@@ -8,9 +8,10 @@ define([
   'models/data/BehaviorNode',
   'models/behaviors/CopyBehavior',
   'models/behaviors/DistributeBehavior',
-  'models/behaviors/RadialDistributeBehavior'
+  'models/behaviors/RadialDistributeBehavior',
+  'models/behaviors/FollowPathBehavior'
 
-], function($, _, Backbone, BehaviorNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior) {
+], function($, _, Backbone, BehaviorNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior) {
   var nameVal = 0;
   var BehaviorManagerModel = Backbone.Model.extend({
 
@@ -23,34 +24,37 @@ define([
       this.test= true;
     },
 
-    newBehavior: function(node, type) {
-      console.log('node=' + node);
-      var nodeParent = node.nodeParent;
+    newBehavior: function(nodes, type) {
+      console.log("total num of nodes="+nodes.length);
+      console.log(nodes);
+      var nodeParent = nodes[0].nodeParent;
       var behaviorNode;
       if(nodeParent.type=='behavior'){
-        behaviorNode = node.nodeParent;
-        console.log('parent is a behavior node');
+        behaviorNode = nodes[0].nodeParent;
+        //console.log('parent is a behavior node');
       }
       else{
          behaviorNode  = new BehaviorNode();
       behaviorNode.name = 'Behavior_' + nameVal;
       nameVal++;
-      behaviorNode.addChildNode(node);
-      this.event_bus.trigger('nodeAdded', behaviorNode);
-        console.log('no behavior parent, creating one');
+      for(var i=0;i<nodes.length;i++){
+        behaviorNode.addChildNode(nodes[i]);
       }
-      console.log('behaviors='+behaviorNode.behaviors);
+        
+      }
+      this.event_bus.trigger('nodeAdded', behaviorNode);
+
+      //console.log('behaviors='+behaviorNode.behaviors);
+
       if (type === 'copy') {
         //console.log('creating copy behavior');
         var copyBehavior = new CopyBehavior();
         copyBehavior.setCopyNum(2);
         behaviorNode.extendBehavior(copyBehavior, ['update']);
         behaviorNode.update([{}]);
-      } else if (type === 'linear') {
-        //console.log('creating linear behavior');
-        var containsCopy=behaviorNode.containsBehaviorType('copy');
-        console.log('contains copy='+containsCopy); 
-        if (containsCopy===false) {
+      } else{
+          var containsCopy=behaviorNode.containsBehaviorType('copy');
+          if (containsCopy===false) {
           var copyBehavior = new CopyBehavior();
           copyBehavior.setCopyNum(3);
           behaviorNode.extendBehavior(copyBehavior, ['update']);
@@ -58,39 +62,44 @@ define([
           console.log('copytype=' +copyBehavior.type);
 
         }
+       if (type === 'linear') {
+     
+      
+        
+        
         var linearBehavior = new DistributeBehavior();
         if(this.test){
           linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
           this.test=false;
         }
-         console.log('lineartype=' +linearBehavior.type);
+        // console.log('lineartype=' +linearBehavior.type);
         behaviorNode.extendBehavior(linearBehavior, ['update']);
         behaviorNode.update([{}]);
       } else if (type == 'radial') {
-       // console.log('creating  radial behavior');
-
-        if (!behaviorNode.containsBehaviorType('copy')) {
-          var copyBehavior = new CopyBehavior();
-          copyBehavior.setCopyNum(20);
-          behaviorNode.extendBehavior(copyBehavior, ['update']);
-          behaviorNode.update([{}]);
-
-        }
+       
         var radialBehavior = new RadialDistributeBehavior();
         behaviorNode.extendBehavior(radialBehavior, ['update']);
         behaviorNode.update([{}]);
       }
+      else if (type == 'followPath') {
+        behaviorNode.getBehaviorByName('copy').exclude(0);
+        var followPathBehavior = new FollowPathBehavior(nodes[0]);
+        behaviorNode.extendBehavior(followPathBehavior, ['update']);
+      }
+    }
+    
+
       behaviorNode.update([{}]);
       this.event_bus.trigger('rootRender');
 
-      this.event_bus.trigger('moveDownNode', node.instance_literals[1]);
+      this.event_bus.trigger('moveDownNode', nodes[0].instance_literals[1]);
 
       
 
     },
 
     testObj: function(tO){
-      console.log("test object is set");
+    // console.log('test object is set');
       this.conditional_line= tO;
     }
 

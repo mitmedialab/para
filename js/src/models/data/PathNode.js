@@ -14,7 +14,7 @@ define([
 
 ], function(_, GeometryNode, Instance, PaperManager, TrigFunc) {
   //drawable paper.js path object that is stored in the pathnode
-  // var paper = PaperManager.getPaperInstance();
+  var paper = PaperManager.getPaperInstance();
   var PathNode = GeometryNode.extend({
 
     type: 'path',
@@ -311,6 +311,33 @@ define([
          // console.log("side="+side);
           return side;
 
+      }
+    }, 
+
+    //checks for intersection and returns the first path found
+      checkIntersection: function(){
+      for (var i=1;i<this.instance_literals.length;i++){
+        var instance_literal = this.instance_literals[i];
+       
+        var paths = paper.project.activeLayer.children;
+        //console.log("paths to check:"+paths.length);
+        for(var j=0;j<paths.length;j++){
+          if(paths[j].visible && !this.containsPath(paths[j])){
+            // console.log("checking at:"+j);
+            var ints = paths[j].getIntersections(instance_literal);
+            //console.log("intersections:");
+           // console.log(intersections);
+            if (ints.length>0){
+              return paths[j];
+            }
+          }
+
+        }
+       /* if(intersection!=null){
+          return intersection'
+          
+        }*/
+         return null;
       }
     }
 

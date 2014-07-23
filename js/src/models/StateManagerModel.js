@@ -35,6 +35,7 @@ define([
 
     initialize: function(event_bus) {
       paper = PaperManager.getPaperInstance();
+      console.log(paper.project);
       penTool = new PenToolModel({
         id: 'penTool'
       });
@@ -76,14 +77,27 @@ this.event_bus = event_bus;
       var path =  new paper.Path();
       path.strokeColor = 'red';
 
-      path.add(new paper.Point(500,0));
-      path.add(new paper.Point(1300,500));
+      path.add(new paper.Point(0,0));
+      path.add(new paper.Point(500,500));
+
+     /* var path2 =  new paper.Path();
+      path2.strokeColor = 'green';
+
+      path2.add(new paper.Point(500,0));
+      path2.add(new paper.Point(0,500));*/
+   
+
       var conditional_line = new PathNode();
       conditional_line.name = 'path_cond';
-    
+      
       conditional_line.createInstanceFromPath(path);
+     
       this.nodeAdded(conditional_line);
       this.rootRender();
+        /*       var intersections = conditional_line.checkIntersection();
+
+       console.log("test intersection=");
+      console.log(intersections);*/
       this.event_bus.trigger('sendTestObj',conditional_line);
 
     },

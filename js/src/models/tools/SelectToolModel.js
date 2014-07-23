@@ -112,11 +112,12 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-      /*if (this.segmentMod) {
-        this.segmentMod = false
-        this.currentPaths[0].nodeParent.updatePath(this.currentPaths[0]);
-        this.trigger('rootRender');
-      }*/
+     for (var i = 0; i < this.selectedNodes.length; i++) {
+           var intersection = this.selectedNodes[i].checkIntersection();
+            if(intersection){
+                console.log('intersection found');
+              }
+      }
     },
 
     //mouse drag event
@@ -142,6 +143,8 @@ define([
         if (this.currentNode) {
       
           for (var i = 0; i < this.selectedNodes.length; i++) {
+
+           
             this.selectedNodes[i].updateSelected([{
               position: {
                 x: event.delta.x,
@@ -151,6 +154,7 @@ define([
           }
           this.currentNode.update([{}]);
           this.trigger('rootRender');
+
         }
        
 

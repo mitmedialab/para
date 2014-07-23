@@ -2,68 +2,75 @@
  */
 define([
     'models/behaviors/BaseBehavior',
+    'models/PaperManager',
+    'utils/TrigFunc',
+    'models/behaviors/Scaffold'
   ],
 
-  function(BaseBehavior) {
+  function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {
 
     var FollowPathBehavior = BaseBehavior.extend({
 
-
-      setup: function(data) {
-        var num = 10;
-       // console.log('follow path behavior setup called');
-        this.createInstances(num - 1, false);
+      constructor: function(pathChild) {
+        console.log("follow path initialized");
+        this.pathChild = pathChild;
 
       },
+
 
       update: function() {
-      //  console.log('follow path behavior update called');
-       // console.log(this.nodeParent.nodeParent);
-        if(this.nodeParent.nodeParent){
-          this.followPath(this.nodeParent.instances[0].data);
+        for(var i=0;i<this.pathChild.instance_literals.length;i++){
+            this.followPath(instance_literal[i]);
         }
-
       },
+
 
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(path) {
+        if (this.children.length > 1) {
+          for (var z = 0; z < this.children.length; z++) {
+            if (this.children[z] != this.pathChild) {
+              var child = this.children[z];
+              var num = child.instances.length;
+              var testPath= path.clone();
 
-        //this.path.strokeColor = 'red';
-        var num = this.instances.length;
-        var maxDist = path.length / num;
+              var indexA = path.getNearestLocation(child.instances[0].position).index;
+              var indexB =  path.getNearestPoint(child.instances[child.instances.length - 1].position).index;
+              testPath.removeSegments(0,indexA);
+              testPath.removeSegments(indexB,testPath.segments.length);
+              var maxDist =  testPath.length/num;
 
-        var position = path.clone();
+            
+             testPath.flatten(maxDist);
 
-        position.flatten(maxDist);
+              //console.log(position);
+              var location;
+              for (var i = 0; i < num; i++) {
+                //console.log(location);
+                var location_n = {x:testPath.segments[i].x,y:testPath.segments[i].y};
+                var instance = child.instances[i];
+                //instance.resetRotation();
+                /*if (location) {
 
-        //console.log(position);
-        var location;
-        for (var i = 0; i < num; i++) {
-          //console.log(location);
-          var location_n = position.segments[i].point;
-          var instance = this.instances[i];
-          instance.resetRotation();
-          if (location) {
+                  var delta = location_n.subtract(location);
+                  delta.angle += 90;
 
-            var delta = location_n.subtract(location);
-            delta.angle += 90;
+                  instance.rotate(delta.angle);
 
-            instance.rotate(delta.angle);
-
-          }
-          instance.setPosition(location_n);
-
-
-
-          location = location_n;
-        }
-        /*if (this.getParentNode != parent) {
+                }*/
+                instance.update({position:location_n});
+                location = location_n;
+              }
+              /*if (this.getParentNode != parent) {
         parent.addChildNode(this);
       }*/
-        position.remove();
+              testPath.remove();
+              testPath = null;
 
-
+            }
+          }
+        }
       }
 
     });

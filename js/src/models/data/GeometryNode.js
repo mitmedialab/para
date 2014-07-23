@@ -188,8 +188,8 @@ define([
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
             var u_instance = this.instances[j].clone();
-            console.log("data at "+ i);
-            console.log(data[i]);
+            //console.log("data at "+ i);
+            //console.log(data[i]);
             if(data[i].renderSignature){
               u_instance.renderSignature = data[i].renderSignature.slice(0);
             }
@@ -245,7 +245,7 @@ define([
         if (this.children[i].containsPath(path)) {
           var results = this.children[i].selectByValue(index, value, path, currentNode);
          // console.log('select by value results=' + results);
-          console.log(results);
+        //  console.log(results);
           if (this != currentNode) {
             for (var j = 0; j < results.length; j++) {
               if (results[j].length > 0) {
@@ -342,6 +342,15 @@ define([
 
     },
 
+    getBehaviorByName: function(name){
+       for (var i = 0; i < this.behaviors.length; i++) {
+        if (this.behaviors[i].name === name) {
+          return this.behaviors[i];
+        }
+      }
+      return null;
+    },
+
     containsBehaviorName: function(name) {
       var indexes = [];
       for (var i = 0; i < this.behaviors.length; i++) {
@@ -359,9 +368,20 @@ define([
 
     /* placeholder functions for leftOf, rightOf geometric checks */
     instanceSide: function(instance){
-      console.log("calling geom instance side");
+      console.log('calling geom instance side');
       return -1;
     },
+
+    checkIntersection: function(){
+      console.log('geom check intersection');
+      for (var i=0;i<this.children.length;i++){
+        var intersection = this.children[i].checkIntersection();
+        if(intersection!==null){
+          return intersection;
+
+        }
+      }
+    }
 
 
 

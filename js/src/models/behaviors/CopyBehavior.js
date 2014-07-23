@@ -25,7 +25,7 @@ define([
 
         if (this.children.length > 0) {
           for (var z = 0; z < this.children.length; z++) {
-            if (this.children[z] !== null) {
+            if (this.children[z] !== null && !this.isExcluded(z)) {
               var child = this.children[z];
 
               var numInstances = child.instances.length;
@@ -106,6 +106,10 @@ define([
            this.copyNum++;
             console.log("incrementing copy");
           }
+          /*else if(dist>tDist+20){
+             this.copyNum--;
+             console.log("decrementing copy");
+          }*/
          
           console.log('selected Distance ='+dist);
           console.log('target Distance ='+tDist);
@@ -126,6 +130,17 @@ define([
           console.log('target Distance ='+tDist);
 
 
+      },
+
+      exclude: function(excludeIndex){
+        var child = this.children[excludeIndex];
+        if(child!==null){
+         for(var i=child.instances.length-1;i>0;i--){
+              child.removeInstanceAt(i);
+         }
+         child.instances[0].anchor=false;
+        }
+        BaseBehavior.prototype.exclude.call(this,excludeIndex);
       }
 
 

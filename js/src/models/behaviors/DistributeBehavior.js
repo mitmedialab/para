@@ -69,7 +69,7 @@ define([
                 if(selected.index === 1){
                   this.checkDistanceIncrement(child.instances[0],selected.instance,dist,child);
                 }
-                else if(selected.index==child.instances.length-2){
+               else if(selected.index==child.instances.length-2){
                   this.checkDistanceDecrement(child.instances[0],selected.instance,dist,child);
 
                 }

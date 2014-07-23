@@ -13,15 +13,11 @@ define([
 			name: 'base',
 			type: 'none',
 
-
-			events: {
-
+			constructor:function(){
+				this.excludes = [];
+				console.log('base behavior constructor called');
 			},
-
-			/*adds a condition string. Strings should be formatted as code:
-			 * instance.position.x < 100 & instance.position.y <100;
-			 *
-			 */
+			
 
 			addConstraint: function(constraint){
 
@@ -46,9 +42,31 @@ define([
 			checkConstraints: function(constraint, instance){
 
 			},
+			//adds indexes of children to exclude from behavior
+			exclude: function(excludeIndex){
+				this.excludes.push(excludeIndex);
+			},
+			//includes a child  that was previously excluded from behavior
+			include: function(excludeIndex){
+				for(var i=this.excludes.length-1;i>-1;i--){
+					if(this.excludes[i]===excludeIndex){
+						this.excludes.splice(i,1);
+					}
+				}
+			},
+
+			//checks to see if index is in the excluded array
+			isExcluded: function(index){
+				for(var i=0;i>this.excludes.length;i++){
+					if(this.excludes[i]===index){
+						return true;
+					}
+				}
+				return false;
+			},
 
 			render: function(){
-				console.log("behavior_render");
+				console.log('behavior_render');
 				//console.log("behavior data="+ data);
 				//console.log("behavior node="+ currentNode);
 				/* if (this.nodeParent == currentNode) {

@@ -66,7 +66,7 @@ var template,source, menuX, menuY, currentNode;
     addBehavior: function(event){
       var id = $(event.toElement).attr('id');
       if(id){
-        this.model.newBehavior(currentNode,id);
+        this.model.newBehavior([currentNode],id);
       }
     },
 
