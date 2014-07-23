@@ -62,9 +62,9 @@ define([
         instanceIndex = path.instanceIndex;
 
         if (hitResult.type == 'segment') {
-            //console.log("segment selected");
 
               segment = hitResult.segment.index;
+          
             }
         //this sets currentNode depending on current selection level in tree
         this.trigger('nodeSelected', path);
@@ -123,7 +123,7 @@ define([
     //mouse drag event
     mouseDrag: function(event) {
       if (this.currentPaths.length > 0) {
-      if (segment) {
+      if (segment!==null) {
         if (this.currentNode) {
             var selPath =  this.selectedNodes[this.selectedNodes.length-1].instance_literals[instanceIndex];
             var selSegment = selPath.segments[segment];
@@ -138,7 +138,7 @@ define([
         //this.trigger('rootRender');
       
       } 
-      else {
+     else {
       
         if (this.currentNode) {
       

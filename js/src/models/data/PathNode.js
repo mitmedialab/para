@@ -124,8 +124,8 @@ define([
       var newPath = path.clone();
       newPath.strokeColor = 'black';
       newPath.instanceParentIndex = path.instanceParentIndex;
-      // path.position.x=0;
-      // path.position.y=0;
+       //newPath.position.x=this.instance_literals[0].x;
+       //newPath.position.y=this.instance_literals[0].x;
 
       this.instance_literals.shift();
       this.instance_literals.unshift(newPath);
