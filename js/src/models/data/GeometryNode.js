@@ -63,7 +63,7 @@ define([
        
         children.push(this.children[k].exportJSON());
        }
-       for(var m=0;m<this.behaviors.length;i++){
+       for(var m=0;m<this.behaviors.length;m++){
           //behaviors.push(this.behaviors[i].exportJSON());
        }
        data.instances  = jInstances;

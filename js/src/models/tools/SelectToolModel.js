@@ -72,7 +72,6 @@ define([
 
         //checks to make sure path is within current node
         if (this.selectedNodes.length > 0) {
-          this.selectedNodes[0].exportJSON();
           if (this.currentNode.containsPath(path)) {
             if (this.currentPaths.indexOf(path) == -1) {
               this.currentPaths.push(path);
