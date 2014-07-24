@@ -42,23 +42,24 @@ define([
               }
               var selected = child.getFirstSelectedInstance();
               
-                var scaffoldLine =  new paper.Path();
-                scaffoldLine.strokeColor = '#83E779';
+                /*var scaffoldLine =  new paper.Path();
+                scaffoldLine.strokeColor = '#00CFFF';
+                scaffoldLine.strokeWidth = 4;
                 scaffoldLine.add(new paper.Point(pointA.x,pointA.y));
                 scaffoldLine.add(new paper.Point(pointB.x,pointB.y));
-                var scaffoldA = new Scaffold(scaffoldLine);
-                this.scaffolds.push(scaffoldA);
+               // var scaffoldA = new Scaffold(scaffoldLine);
+                this.scaffolds.push(scaffoldLine);
 
 
                 var pointAC = new paper.Path.Circle(new paper.Point(pointA.x,pointA.y),5);
                 pointAC.fillColor =  '#83E779';
-                var scaffoldB = new Scaffold(pointAC);
-                this.scaffolds.push(scaffoldB);
+                //var scaffoldB = new Scaffold(pointAC);
+                this.scaffolds.push(pointAC);
                
                 var pointBC = new paper.Path.Circle(new paper.Point(pointB.x,pointB.y),5);
                 pointBC.fillColor =  '#FF0000';
-                var scaffoldC = new Scaffold(pointBC);
-                this.scaffolds.push(scaffoldC);
+               // var scaffoldC = new Scaffold(pointBC);
+                this.scaffolds.push(pointBC);*/
 
   
            

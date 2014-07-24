@@ -64,7 +64,7 @@ define([
         children.push(this.children[k].exportJSON());
        }
        for(var m=0;m<this.behaviors.length;i++){
-          behaviors.push(this.behaviors[i].exportJSON());
+          //behaviors.push(this.behaviors[i].exportJSON());
        }
        data.instances  = jInstances;
         data.instance_literals  = lInstances;

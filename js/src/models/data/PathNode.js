@@ -172,11 +172,13 @@ define([
               instance_literal.selected = this.instances[k].selected;
               if (this.instances[k].anchor) {
                 instance_literal.strokeColor = '#83E779';
+                 instance_literal.strokeWidth = 4;
               }
             } else {
               instance_literal.selected = data[d].selected;
               if (data[d].anchor) {
                 instance_literal.strokeColor = '#83E779';
+                instance_literal.strokeWidth = 4;
               }
             }
             //instance_literal.selected = data[d].selected;
