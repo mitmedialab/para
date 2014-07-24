@@ -294,6 +294,11 @@ this.event_bus = event_bus;
 
     },
 
+    save: function(){
+      var data = rootNode.exportJSON();
+      console.log(JSON.stringify(data));
+    }
+
 
 
   });

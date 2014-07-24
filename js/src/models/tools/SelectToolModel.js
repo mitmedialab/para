@@ -33,18 +33,18 @@ define([
     /*mousedown event
      */
     mouseDown: function(event) {
-    
+
       if (!event.modifiers.shift) {
         if (this.currentNode) {
-         this.currentNode.deselectAll();
+          this.currentNode.deselectAll();
 
         }
         this.currentPaths = [];
         this.currentNode = null;
-        segment=null;
+        segment = null;
         this.selectedNodes = [];
       }
-      
+
       segment = null;
 
       var hitResult = paper.project.hitTest(event.point, hitOptions);
@@ -64,18 +64,19 @@ define([
 
         if (hitResult.type == 'segment') {
 
-              segment = hitResult.segment.index;
-          
-            }
+          segment = hitResult.segment.index;
+
+        }
         //this sets currentNode depending on current selection level in tree
         this.trigger('nodeSelected', path);
 
         //checks to make sure path is within current node
         if (this.selectedNodes.length > 0) {
+          this.selectedNodes[0].exportJSON();
           if (this.currentNode.containsPath(path)) {
-            if(this.currentPaths.indexOf(path)==-1){
-               this.currentPaths.push(path);
-             }
+            if (this.currentPaths.indexOf(path) == -1) {
+              this.currentPaths.push(path);
+            }
             this.trigger('setSelection', path);
 
 
@@ -84,13 +85,13 @@ define([
             }
 
 
-            
+
           }
         }
         this.trigger('rootRender');
 
       }
-     
+
 
     },
 
@@ -113,12 +114,12 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-      if(event.modifiers.shift){
-     for (var i = 0; i < this.selectedNodes.length; i++) {
-           var intersection = this.selectedNodes[i].checkIntersection();
-            if(intersection){
-                this.event_bus.trigger('newBehavior',[intersection.nodeParent,this.selectedNodes[i]],'followPath');
-              }
+      if (event.modifiers.shift) {
+        for (var i = 0; i < this.selectedNodes.length; i++) {
+          var intersection = this.selectedNodes[i].checkIntersection();
+          if (intersection) {
+            this.event_bus.trigger('newBehavior', [intersection.nodeParent, this.selectedNodes[i]], 'followPath');
+          }
         }
       }
     },
@@ -126,44 +127,45 @@ define([
     //mouse drag event
     mouseDrag: function(event) {
       if (this.currentPaths.length > 0) {
-      if (segment!==null) {
-        if (this.currentNode) {
-            var selPath =  this.selectedNodes[this.selectedNodes.length-1].instance_literals[instanceIndex];
-            var selSegment = selPath.segments[segment];
-            selSegment.point = selSegment.point.add(event.delta);
-            selPath.nodeParent.updatePath(selPath);
+        if (segment !== null) {
+          if (this.currentNode) {
+            var selPath = this.selectedNodes[this.selectedNodes.length - 1].instance_literals[instanceIndex];
+            if (selPath) {
+              var selSegment = selPath.segments[segment];
+              selSegment.point = selSegment.point.add(event.delta);
+              selPath.nodeParent.updatePath(selPath);
               this.currentNode.update([{}]);
-             this.trigger('rootRender');
-            console.log('numPaths=' + paper.project.activeLayer.children.length);
-
-              //this.segmentMod = true;
+              this.trigger('rootRender');
+              console.log('numPaths=' + paper.project.activeLayer.children.length);
             }
-            
-        //this.trigger('rootRender');
-      
-      } 
-     else {
-      
-        if (this.currentNode) {
-      
-          for (var i = 0; i < this.selectedNodes.length; i++) {
 
-            //console.log("updating selected Node at"+i);
-            this.selectedNodes[i].updateSelected([{
-              position: {
-                x: event.delta.x,
-                y: event.delta.y
-              }
-            }]);
+            //this.segmentMod = true;
           }
-          this.currentNode.update([{}]);
-          this.trigger('rootRender');
+
+          //this.trigger('rootRender');
+
+        } else {
+
+          if (this.currentNode) {
+
+            for (var i = 0; i < this.selectedNodes.length; i++) {
+
+              //console.log("updating selected Node at"+i);
+              this.selectedNodes[i].updateSelected([{
+                position: {
+                  x: event.delta.x,
+                  y: event.delta.y
+                }
+              }]);
+            }
+            this.currentNode.update([{}]);
+            this.trigger('rootRender');
+
+          }
+
 
         }
-       
-
       }
-    }
     },
 
     //mouse move event

@@ -16,6 +16,7 @@ define([
 
 
     type: 'geometry',
+  
     constructor: function() {
       /* instances contain objects that provide geometric info
     * this is propogated down to the leaves of the tree to 
@@ -30,7 +31,6 @@ define([
       this.instances = [];
       this.scaffolds = [];
       this.instance_literals = [];
-      this.anchors = [];
       this.behaviors = [];
 
 
@@ -41,6 +41,37 @@ define([
     initialize: function() {
 
       this.createInstance();
+    },
+
+    exportJSON: function(){
+      this.set({
+       type: this.type
+      });
+       var data = this.toJSON();
+       var jInstances = [];
+       var children = [];
+        var lInstances = [];
+       var behaviors = [];
+       for(var i=0;i<this.instances.length;i++){
+       
+        jInstances.push(this.instances[i].exportJSON());
+       }
+       for(var j=0;j<this.instance_literals.length;j++){
+        lInstances.push(this.instance_literals[j].exportJSON());
+       }
+       for(var k=0;k<this.children.length;k++){
+       
+        children.push(this.children[k].exportJSON());
+       }
+       for(var m=0;m<this.behaviors.length;i++){
+          behaviors.push(this.behaviors[i].exportJSON());
+       }
+       data.instances  = jInstances;
+        data.instance_literals  = lInstances;
+         data.children  = children;
+         data.behaviors = behaviors;
+      // console.log(JSON.stringify(data));
+       return data;
     },
 
 
@@ -93,8 +124,6 @@ define([
         parentType = this.nodeParent.type;
         // console.log('parent type='+this.nodeParent.type);
       }
-
-
       for (var j = 0; j < this.instances.length; j++) {
         for (var i = 0; i < data.length; i++) {
           var instance = this.instances[j];
@@ -328,20 +357,6 @@ define([
       }
       return false;
     },
-
-    //clears all anchors from array
-    removeAnchors: function() {
-      this.anchors = [];
-    },
-
-    /*called when instance is toggled to or from an anchor- 
-     *stores reference to child node which has been designated as an anchor
-     */
-
-    anchorUpdated: function(instanceNum) {
-
-    },
-
 
     containsBehaviorType: function(type) {
       var indexes = [];

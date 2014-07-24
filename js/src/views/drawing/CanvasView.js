@@ -12,6 +12,8 @@ define([
  var paper = PaperManager.getPaperInstance('canvas');
  var tool = new  paper.Tool();
  var mouseDown = false;
+ var saveKey = 83;
+ var loadKey = 76;
   var CanvasView = Backbone.View.extend({
     //
    
@@ -85,8 +87,8 @@ define([
     canvasKeypress: function(event){
      // console.log('keypress called');
       //console.log(event.keyCode);
-      if(event.keyCode == 27){
-        this.model.escapeEvent();
+      if(event.keyCode == saveKey){
+        this.model.save();
       }
     },
 

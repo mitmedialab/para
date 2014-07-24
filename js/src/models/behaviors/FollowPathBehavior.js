@@ -55,7 +55,7 @@ define([
               var offset = cA.distance;
 
               //console.log(testPath.segments);
-              if (testPath) {
+             
                 var finalPath = testPath.split(cA);
                 if (finalPath === null) {
                   finalPath = testPath;
@@ -108,7 +108,7 @@ define([
                 child.instances[num - 1].update({
                   rotation: endDelta.angle
                 });
-              }
+              
               /*if (this.getParentNode != parent) {
         parent.addChildNode(this);
       }*/

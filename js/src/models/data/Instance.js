@@ -5,8 +5,9 @@
 
 define([
 	'underscore',
+	'jquery',
 	'backbone',
-], function(_, Backbone) {
+], function(_, $,Backbone) {
 
 	var Instance = Backbone.Model.extend({
 
@@ -25,7 +26,7 @@ define([
 			this.copy= false;
 			//index of instance that was used to create this instance (for instances created upon render)
 			this.instanceParentIndex = 0;
-			
+			this.index = null;
 			//array that contains the path of inheritance from a render;
 			this.renderSignature = [];
 			Backbone.Model.apply(this, arguments);
@@ -43,8 +44,23 @@ define([
 			this.selected= false;
 			this.closed = false;
 			this.instanceParentIndex = 0;
+			this.index = null
 
 			
+		},
+
+		exportJSON: function(){
+			console.log(this.renderSignature);
+			this.set({
+				closed:this.closed,
+				position:this.position,
+				visible:this.visible,
+				scale:this.scale,
+				rotation: this.rotation,
+				renderSignature:JSON.stringify(this.renderSignature),
+				index: this.index,
+			});
+			return this.toJSON();
 		},
 
 
