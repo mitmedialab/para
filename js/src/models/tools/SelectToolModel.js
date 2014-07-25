@@ -132,7 +132,7 @@ define([
             if (selPath) {
               var selSegment = selPath.segments[segment];
               selSegment.point = selSegment.point.add(event.delta);
-              selPath.nodeParent.updatePath(selPath);
+              selPath.nodeParent.updatePath(selPath,event.delta);
               this.currentNode.update([{}]);
               this.trigger('rootRender');
               console.log('numPaths=' + paper.project.activeLayer.children.length);
@@ -144,7 +144,7 @@ define([
           //this.trigger('rootRender');
 
         } else {
-
+          console.log("dragging entire shape");
           if (this.currentNode) {
 
             for (var i = 0; i < this.selectedNodes.length; i++) {
@@ -157,7 +157,7 @@ define([
                 }
               }]);
             }
-            this.currentNode.updateChildren([{}]);
+            this.currentNode.update([{}]);
             this.trigger('rootRender');
 
           }

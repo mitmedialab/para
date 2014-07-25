@@ -41,10 +41,9 @@ define([
               path.sendToBack();
               var num = child.instances.length;
               var testPath = path.clone();
-              //console.log(testPath.segments);
-            
-              var locA = testPath.getNearestPoint(child.instances[0].position);
 
+              var locA = testPath.getNearestPoint(child.instances[0].position);
+              var locB = testPath.getNearestPoint(child.instances[num - 1].position);
               var cA = testPath.getNearestLocation(child.instances[0].position);
               var cB = testPath.getNearestLocation(child.instances[child.instances.length - 1].position);
               /*var pc = new paper.Path.Circle(locA,5);
@@ -53,70 +52,69 @@ define([
                var pd = new paper.Path.Circle(cA.segment.point,5);
               pd.fillColor ='green';
               this.scaffolds.push(pd);*/
-              
+
               var offset = cA.distance;
 
               //console.log(testPath.segments);
-             
-                var finalPath = testPath.split(cA);
-                if (finalPath === null) {
-                  finalPath = testPath;
-                }
-                else{
-                  testPath.remove();
-                  tail=null;
-                }
+              var finalPath;
+              if (!locA.equals(testPath.firstSegment.point)) {
+                finalPath = testPath.split(cA);
+                testPath.remove();
+              } else {
+                finalPath = testPath;
+              }
 
+              if (!locB.equals(finalPath.lastSegment.point)) {
                 var tail = finalPath.split(cB);
-                if(tail){
+                if (tail) {
                   tail.remove();
-                  tail=null;
                 }
-                var maxDist = finalPath.length / (num - 1);
-                //console.log('maxDist='+maxDist);
 
-                finalPath.flatten(maxDist);
-
-                //console.log(position);
-                var location = finalPath.segments[0].point;
-                //console.log('testPath=');
-                //console.log(testPath.segments);
-                for (var i = 1; i < num - 1; i++) {
-                  //console.log(location);
-
-                  var location_n = finalPath.segments[i].point;
-                  var instance = child.instances[i];
-                  //instance.resetRotation();
+              }
 
 
-                  var delta = location_n.subtract(location);
-                  //delta.angle += 90;
+              var maxDist = finalPath.length / (num - 1);
 
-                  instance.update({
-                    position: {
-                      x: location_n.x,
-                      y: location_n.y
-                    },
-                    rotation: delta.angle
-                  });
+              finalPath.flatten(maxDist);
 
-                  location = location_n;
-                }
-                var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
-                child.instances[0].update({
-                  rotation: startDelta.angle
+              var location = finalPath.segments[0].point;
+
+              for (var i = 1; i < num - 1; i++) {
+                //console.log(location);
+
+                var location_n = finalPath.segments[i].point;
+                var instance = child.instances[i];
+                //instance.resetRotation();
+
+
+                var delta = location_n.subtract(location);
+                //delta.angle += 90;
+
+                instance.update({
+                  position: {
+                    x: location_n.x,
+                    y: location_n.y
+                  },
+                  rotation: delta.angle
                 });
 
-                var endDelta = finalPath.segments[num - 1].point.subtract(location);
-                child.instances[num - 1].update({
-                  rotation: endDelta.angle
-                });
-              
+                location = location_n;
+              }
+              var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
+              child.instances[0].update({
+                rotation: startDelta.angle
+              });
+
+              var endDelta = finalPath.segments[num - 1].point.subtract(location);
+              child.instances[num - 1].update({
+                rotation: endDelta.angle
+              });
+
               /*if (this.getParentNode != parent) {
         parent.addChildNode(this);
       }*/
               finalPath.remove();
-             finalPath= null;
+              finalPath = null;
 
               //console.log("test path is removed");
 

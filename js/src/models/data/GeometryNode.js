@@ -425,6 +425,15 @@ define([
       }
     },
 
+      clearScaffolds: function() {
+        for (var j = 0; j < this.scaffolds.length; j++) {
+          this.scaffolds[j].remove();
+
+        }
+        this.scaffolds = [];
+
+      },
+
 
 
 

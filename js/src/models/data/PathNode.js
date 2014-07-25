@@ -88,6 +88,7 @@ define([
       /* for(var i=0;i<this.instances.length;i++){
         this.instances[i].visible=true;
       }*/
+      this.clearScaffolds();
       for (var j = 1; j < this.instance_literals.length; j++) {
         // console.log(this.instance_literals[j]);
         this.instance_literals[j].remove();
@@ -120,10 +121,8 @@ define([
     },
 
     //called when path data is modified 
-    updatePath: function(path) {
-     // console.log("updating path to");
-
-
+    updatePath: function(path,delta) {
+     // console.log('updating path to');
       var newPath = path.clone();
      try {
       newPath.instanceParentIndex = path.instanceParentIndex;
@@ -132,16 +131,30 @@ define([
 
       var removedItem = this.instance_literals.shift();
       var removedBounds = removedItem.bounds;
+      var ruP = removedBounds.topLeft;
       var newBounds = newPath.bounds;
-      var wD = removedBounds.width-newBounds.width;
-      var hD =  removedBounds.height-newBounds.height;
-      //console.log("diff="+wD+","+hD);
+      var nuP = newBounds.topLeft;
+        /* console.log('=========== removed path ===========' );
+      console.log(ruP);
+      console.log(removedItem.position);
+      console.log(removedBounds.width+','+removedBounds.height);
+      console.log('=========== new path ===========' );
+      console.log(nuP);
+      console.log(newPath.position);
+      console.log(newBounds.width+','+newBounds.height);*/
+      var wD = (newBounds.width-removedBounds.width)/2;
+      var hD =  (newBounds.height-removedBounds.height)/2;
+      console.log('diff='+wD+','+hD);
       newPath.anchor= false;
-      newPath.position.x = removedItem.position.x-wD;
-      newPath.position.y = removedItem.position.y-hD;
-      
+      if(!this.instances[newPath.instanceParentIndex].anchor){
+          this.instances[newPath.instanceParentIndex].update({position:{x:path.position.x,y:path.position.y}});
+        }
+      //newPath.position.x = removedItem.position.x+wD;
+     // newPath.position.y = removedItem.position.y+hD;
+     // console.log('=========== new path updated ===========' );
+      //console.log(newPath.position);
       newPath.rotate(0-this.instances[removedItem.instanceParentIndex].rotation);
-
+      
       removedItem.remove();
       removedItem = null;
       this.instance_literals.unshift(newPath);
@@ -189,8 +202,20 @@ define([
           
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
+              /*if(instance_literal.selected){
+                var bbox = new paper.Path.Rectangle(instance_literal.bounds);
+                bbox.strokeColor = 'red';
+                this.scaffolds.push(bbox);
+
+              }*/
               if (this.instances[k].anchor) {
+                if(k==0){
                 instance_literal.strokeColor = '#83E779';
+              }
+              else{
+              instance_literal.strokeColor = '#FF0000';
+
+              }
                 if(instance_literal.strokeWidth<3){
                   instance_literal.strokeWidth=3;
                 }
@@ -351,7 +376,7 @@ define([
 
         } else {
           var path_literal = this.instance_literals[i + 1];
-          // console.log("path_literal=");
+          // console.log('path_literal=');
           //  console.log(path_literal);
           // console.log(path_literal.segments);
           pA = {
@@ -367,7 +392,7 @@ define([
 
         pM = instance.position;
         side = TrigFunc.side(pA, pB, pM);
-        // console.log("side="+side);
+        // console.log('side='+side);
         return side;
 
       }
@@ -375,22 +400,22 @@ define([
 
     //checks for intersection and returns the first path found
     checkIntersection: function() {
-      // console.log("num of instances to check"+this.instance_literals.length);
+      // console.log('num of instances to check'+this.instance_literals.length);
       for (var i = 1; i < this.instance_literals.length; i++) {
         var instance_literal = this.instance_literals[i];
-        //   console.log("registering at"+i);
+        //   console.log('registering at'+i);
         var paths = paper.project.activeLayer.children;
-        //console.log("paths to check:"+paths.length);
+        //console.log('paths to check:'+paths.length);
         for (var j = 0; j < paths.length; j++) {
 
           if (paths[j].visible && !this.containsPath(paths[j])) {
             if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
              // console.log('do nothing');
             } else {
-              // console.log("checking at:"+j);
-              //console.log("checking instance at"+i);
+              // console.log('checking at:'+j);
+              //console.log('checking instance at'+i);
               var ints = paths[j].getIntersections(instance_literal);
-              //console.log("intersections:");
+              //console.log('intersections:');
               // console.log(intersections);
               if (ints.length > 0) {
                // console.log('intersection found');

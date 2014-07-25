@@ -77,7 +77,9 @@ define([
         behaviorNode.extendBehavior(linearBehavior, ['update']);
         behaviorNode.update([{}]);
       } else if (type == 'radial') {
+       behaviorNode.copyNum = 10;
        
+
         var radialBehavior = new RadialDistributeBehavior();
         behaviorNode.extendBehavior(radialBehavior, ['update']);
         behaviorNode.update([{}]);

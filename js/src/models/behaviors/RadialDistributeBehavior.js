@@ -20,7 +20,6 @@ define([
       update: function() {
         this.clearScaffolds();
         this.distribute();
-        console.log("numPaths="+paper.project.activeLayer.children.length);
 
       },
 
@@ -63,34 +62,45 @@ define([
                 var theta = Math.PI*2/num;
                 var angle = 360/num;
                 var first = Math.round(num/2);
+               
               for (var i = 1; i < first; i++) {
-                  //console.log("first="+i);
+                  //console.log("first="+angle*i);
                 var x = Math.cos(theta*(i+0.5))*rad+origin.x;
                 var y = Math.sin(theta*(i+0.5))*rad+origin.y;
 
                 child.instances[i].update({
                   position: {
                     x: x,
-                    y: y,
-                    rotation:angle*(i+0.5)
-                  }
+                    y: y
+                  },
+                  rotation:angle*(i+0.5)+90
                 });
-              }
 
+
+                if(i===1){
+                  child.instances[num-1].update({rotation:child.instances[1].rotation-angle});
+                }
+                
+              }
+        
             for (var i = first; i < num-1; i++) {
-                  // console.log("second="+(i+1));
+               //  console.log("second="+angle*i);
                 var x = Math.cos(theta*(i+1.5))*rad+origin.x;
                 var y = Math.sin(theta*(i+1.5))*rad+origin.y;
 
                 child.instances[i].update({
                   position: {
                     x: x,
-                    y: y,
-                    rotation:angle*(i+1.5)
-                  }
+                    y: y
+                    
+                  },
+                  rotation:angle*(i+1.5)+90
                 });
+                if(i===first){
+                  child.instances[0].update({rotation:child.instances[first].rotation-angle});
+                }
               }
-            
+
             }
           }
         }

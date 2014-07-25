@@ -212,6 +212,7 @@ this.event_bus = event_bus;
     */
     determineSelectionPoint: function(selected) {
       //console.log('determining selection point');
+      if(selected.nodeParent){
       if (selected.nodeParent == currentNode) {
        toolCollection.get(this.get('state')).currentNode = currentNode;
          if(toolCollection.get(this.get('state')).selectedNodes.indexOf(selected)==-1){
@@ -224,6 +225,7 @@ this.event_bus = event_bus;
       } else {
         this.determineSelectionPoint(selected.nodeParent);
       }
+    }
     },
 
 
