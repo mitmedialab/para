@@ -14,7 +14,8 @@ require.config({
         "handlebars"  : "../../bower_components/handlebars/handlebars",
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "justmath": "../../bower_components/JustMath.js/JustMath",
-        "sylvester": "../../bower_components/sylvester/sylvester"
+        "sylvester": "../../bower_components/sylvester/sylvester",
+        "minicolors":"../../bower_components/jquery-minicolors/jquery.minicolors"
     },
     
     shim: {
@@ -41,6 +42,9 @@ require.config({
         },
         sylvester:{
           exports:'Sylvester'
+        },
+        minicolors:{
+          exports:'Minicolors'
         }
        
     },

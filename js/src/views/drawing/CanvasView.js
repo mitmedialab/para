@@ -14,7 +14,7 @@ define([
  var mouseDown = false;
  var saveKey = 83;
  var loadKey = 76;
-  var CanvasView = Backbone.View.extend({
+var CanvasView = Backbone.View.extend({
     //
    
     defaults:{
@@ -85,10 +85,13 @@ define([
   /* canvas event functions */
 
     canvasKeypress: function(event){
-     // console.log('keypress called');
-      //console.log(event.keyCode);
+      console.log(event.keyCode);
       if(event.keyCode == saveKey){
         this.model.save();
+      }
+      if(event.keyCode === 46 || event.keyCode===8){
+        console.log("deleting");  
+        this.model.deleteObject();
       }
     },
 

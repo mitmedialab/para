@@ -282,7 +282,12 @@ define([
     },
 
     
-
+    deleteNode: function(){
+      for(var i=this.children.length-1;i>-1;i--){
+        this.children[i].deleteNode();
+      }
+      this.nodeParent.removeChildNode(this);
+    },
 
     //selects according render signature
     selectByValue: function(index, value, path, currentNode) {
@@ -414,7 +419,9 @@ define([
 
         }
       }
-    }
+    },
+
+
 
 
 

@@ -85,7 +85,9 @@ background-color:#D9E8F5;
 }
 
 #prop-menu{
-min-height:520px;
+min-height:700px;
+padding:30px;
+padding-top:15px;
 }
 
 #object-menu{

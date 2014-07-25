@@ -143,6 +143,7 @@ define([
                 if (node !== null) {
                     node.setParentNode(this);
                     this.children.push(node);
+                    node.index = this.children.length-1;
 
                     return true;
                 }
@@ -166,6 +167,15 @@ define([
                     }
                 }
                 return false;
+            },
+
+            removeChildAt: function(i){
+                if (this.children[i] !==null) {
+                            this.children[i].removeParentNode();
+                            this.children.splice(i, 1);
+                            return true;
+
+                }
             },
 
             //recursively searches all sub this.children for child to remove- depth first. Not very efficient. double check to see if this is actually working correctly...

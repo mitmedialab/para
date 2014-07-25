@@ -38,7 +38,7 @@ define([
       var toolView = new ToolView({el:'#toolbar',model:stateManager});
       var propertyView = new PropertyView({el:'#prop-menu',model:stateManager});
        var contextView = new ContextView({el:'#context-menu',model:behaviorManagerModel},event_bus);
-
+       propertyView.render();
        
 
         //bind update event to canvas view

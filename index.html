@@ -14,19 +14,23 @@
   <meta name="author" content="">
   <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
 
-  <title>Sketch 1</title>
+  <title>Semaphore</title>
 
   <!-- Bootstrap core CSS -->
   <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="bower_components/jquery-minicolors/jquery.minicolors.css">
 
   <!-- Custom styles for this template -->
   <link href="css/basic.css" rel="stylesheet">
+  <link href="bower_components/bootstrap-slider/slider.css" rel="stylesheet">
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
       <![endif]-->
+   
+
     </head>
 
     <body>
@@ -57,7 +61,7 @@
         <div class="navbar navbar-default" role="navigation">
           <div class="container-fluid">
             <div class="navbar-header">
-              <a class="navbar-brand" href="#">Sketch 1</a>
+              <a class="navbar-brand" href="#">Semaphore</a>
             </div>
             <div id = "toolbar" class="navbar-collapse collapse">
               <button  class="btn btn-default btn-tool" id="selectTool"><span><img src="images/select_tool_icon.png" width="28" height="28"/></li>
@@ -91,7 +95,24 @@
                   <div class="row">
                    
                     <div id = "prop-menu" class ="col-md-12">
-                        <script id="property-list-template" type="text/x-handlebars-template">
+
+            <div class="form-group">
+              <label for="hidden-input">Fill</label>
+              <br>
+              <input type="text" id="fill" class="form-control demo" value="#db913d">
+            </div>
+             <div class="form-group">
+              <label for="hidden-input">Stroke</label>
+              <br>
+              <input type="text" id="stroke" class="form-control demo" value="#db913d">
+            </div>
+               <div class="form-group">
+                  <label for="hidden-input">Stroke Weight</label>
+              <br>
+            <input id = "strokeSlider" type="text" class="span2" value="" data-slider-min="1" data-slider-max="40" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after">
+          </div>
+         
+                       <!-- <script id="property-list-template" type="text/x-handlebars-template">
                         <form>
                         <div class="row">
                             <div class = "span12">{{#parent.exists}}parent:<a>{{parent.name}}{{/parent.exists}}</a></div>
@@ -114,14 +135,14 @@
                             <div class = "col-md-4">weight: {{weight}}</div>
                         </div>
                         </form>
-                    </script>
+                    </script>-->
                     </div>
                   </div>
                   
 
-                  <div class = "row">
+                  <!--<div class = "row">
                     <div id = "object-menu" class ="col-md-12"></div>
-                  </div>
+                  </div>-->
 
                 </div>
               </div><!--/master row -->
@@ -131,10 +152,44 @@
     ================================================== 
     Placed at the end of the document so the pages load faster -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/handlebars/handlebars.js" type="text/javascript"></script> 
+    <script src="bower_components/bootstrap-slider/bootstrap-slider.js"></script>
+    <script src="bower_components/jquery-minicolors/jquery.minicolors.min.js"></script>
+
+      <script>
+    
+$(document).ready( function() {
+
+           $('#strokeSlider').slider();
+           $('#strokeSlider').on('slide', function(slideEvt) {
+            $('#strokeSlider').trigger('stroke-change');
+        });
+
+
+         $('.demo').each( function() {   
+           $(this).minicolors({
+          control: $(this).attr('data-control') || 'hue',
+          defaultValue: $(this).attr('data-defaultValue') || '',
+          inline: $(this).attr('data-inline') === 'true',
+          letterCase: $(this).attr('data-letterCase') || 'lowercase',
+          opacity: $(this).attr('data-opacity'),
+          position: $(this).attr('data-position') || 'bottom left',
+          change: function(hex, opacity) {
+            if( !hex ) return;
+            if( opacity ) hex += ', ' + opacity;
+             $(this).trigger('color-change');
+          },
+          theme: 'bootstrap'
+        });
+         });
+    });
+      </script>
 
     <!-- main application script -->
     <script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>
+
+
 </body>
 </html>

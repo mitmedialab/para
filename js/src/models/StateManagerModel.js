@@ -297,6 +297,51 @@ this.event_bus = event_bus;
     save: function(){
       var data = rootNode.exportJSON();
       console.log(JSON.stringify(data));
+    },
+
+    updateStroke: function(width){
+      if(selectTool.selectedNodes.length>0){
+        for(var i=0;i<selectTool.selectedNodes.length;i++){
+         selectTool.selectedNodes[i].updateSelected([{strokeWidth:Number(width)}]);
+        }
+      }
+      currentNode.update([{}]);
+      this.rootRender();
+     paper.view.draw();  
+    },
+
+     updateColor: function(color,type){
+      console.log("update color");
+      if(selectTool.selectedNodes.length>0){
+        
+        var update;
+        if(type=='stroke'){
+          update = [{strokeColor:color}];
+        }
+        else{
+          update = [{fillColor:color}];
+
+        }
+        for(var i=0;i<selectTool.selectedNodes.length;i++){
+          
+         selectTool.selectedNodes[i].updateSelected(update);
+        }
+      }
+      currentNode.update([{}]);
+      this.rootRender();
+     paper.view.draw();  
+    },
+
+    deleteObject: function(){
+      console.log("delete");
+       if(selectTool.selectedNodes.length>0){
+        for(var i=0;i<selectTool.selectedNodes.length;i++){
+         selectTool.selectedNodes[i].deleteNode();
+        }
+      }
+      currentNode.update([{}]);
+      this.rootRender();
+     paper.view.draw();  
     }
 
 

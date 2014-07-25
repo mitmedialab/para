@@ -24,6 +24,9 @@ define([
 			this.drawAnchor=false;
 			this.selected= false;
 			this.copy= false;
+			this.strokeColor = 'black';
+			this.fillColor = 'white';
+			this.strokeWidth = 0;
 			//index of instance that was used to create this instance (for instances created upon render)
 			this.instanceParentIndex = 0;
 			this.index = null;
@@ -59,6 +62,10 @@ define([
 				rotation: this.rotation,
 				renderSignature:JSON.stringify(this.renderSignature),
 				index: this.index,
+				strokeWidth: this.strokeWidth,
+				fillColor: this.fillColor,
+				strokeColor: this.strokeColor
+
 			});
 			return this.toJSON();
 		},
@@ -85,6 +92,17 @@ define([
 				//console.log("updating rotation");
 				this.rotation=data.rotation;
 			}
+			if(data.strokeWidth){
+				this.strokeWidth =data.strokeWidth;
+			}
+			if(data.strokeColor){
+				this.strokeColor= data.strokeColor;
+			}
+			if(data.fillColor){
+				this.fillColor = data.fillColor;
+			}
+			
+
 
 
 
@@ -119,6 +137,16 @@ define([
 			if(data.selected){
 				this.selected = data.selected;
 			}
+			if(data.strokeWidth){
+				this.strokeWidth =data.strokeWidth;
+				console.log("instance stroke width="+this.strokeWidth);
+			}
+			if(data.strokeColor){
+				this.strokeColor= data.strokeColor;
+			}
+			if(data.fillColor){
+				this.fillColor = data.fillColor;
+			}
 
 
 		},
@@ -133,6 +161,9 @@ define([
 			newInstance.anchor = this.anchor;
 			newInstance.selected = this.selected;
 			newInstance.visible = true;
+			newInstance.strokeWidth = this.strokeWidth;
+			newInstance.strokeColor = this.strokeColor;
+			newInstance.fillColor = this.fillColor;
 			return newInstance;
 
 		}

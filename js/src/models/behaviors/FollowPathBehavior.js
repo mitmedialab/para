@@ -37,6 +37,7 @@ define([
             if (this.children[z] != this.pathChild) {
               var child = this.children[z];
               child.name = 'path_child';
+              path.sendToBack();
               var num = child.instances.length;
               var testPath = path.clone();
               //console.log(testPath.segments);

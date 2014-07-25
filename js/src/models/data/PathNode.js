@@ -53,6 +53,7 @@ define([
 
       instance.position.x = path.position.x;
       instance.position.y = path.position.y;
+      instance.strokeWidth =1;
       instance.closed = path.closed;
       path.instanceParentIndex = this.instances.length - 1;
       this.instance_literals.push(path);
@@ -122,7 +123,7 @@ define([
     updatePath: function(path) {
      // console.log("updating path to");
       var newPath = path.clone();
-      newPath.strokeColor = 'black';
+     try {
       newPath.instanceParentIndex = path.instanceParentIndex;
        //newPath.position.x=this.instance_literals[0].x;
        //newPath.position.y=this.instance_literals[0].x;
@@ -133,13 +134,20 @@ define([
       var wD = removedBounds.width-newBounds.width;
       var hD =  removedBounds.height-newBounds.height;
       //console.log("diff="+wD+","+hD);
+      newPath.anchor= false;
       newPath.position.x = removedItem.position.x-wD;
       newPath.position.y = removedItem.position.y-hD;
       
       newPath.rotate(0-this.instances[removedItem.instanceParentIndex].rotation);
+
       removedItem.remove();
       removedItem = null;
       this.instance_literals.unshift(newPath);
+      }
+      catch(err){
+        newPath.remove();
+        console.log('error in update path'+err);
+      }
 
     },
 
@@ -167,18 +175,30 @@ define([
             instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
             instance_literal.scale(this.instances[k].scale * data[d].scale);
             instance_literal.rotate(this.instances[k].rotation + data[d].rotation);
-
+            instance_literal.strokeColor = this.instances[k].strokeColor;
+            if(instance_literal.closed){
+              instance_literal.fillColor = this.instances[k].fillColor;
+            }
+            instance_literal.strokeWidth = this.instances[k].strokeWidth+data[d].strokeWidth;
+            if(instance_literal.strokeWidth===0){
+                  instance_literal.strokeWidth=1;
+            }
+          
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
               if (this.instances[k].anchor) {
                 instance_literal.strokeColor = '#83E779';
-                 instance_literal.strokeWidth = 4;
+                if(instance_literal.strokeWidth<3){
+                  instance_literal.strokeWidth=3;
+                }
               }
             } else {
               instance_literal.selected = data[d].selected;
               if (data[d].anchor) {
                 instance_literal.strokeColor = '#83E779';
-                instance_literal.strokeWidth = 4;
+                if(instance_literal.strokeWidth<3){
+                  instance_literal.strokeWidth=3;
+                }
               }
             }
             //instance_literal.selected = data[d].selected;
@@ -268,6 +288,18 @@ define([
         }
       }
       return sIndexes;
+    },
+
+    deleteNode: function(){
+      for(var i=this.children.length-1;i>-1;i--){
+        this.children[i].deleteNode();
+        this.removeChildAt(i);
+      }
+      for(var i=0;i<this.instance_literals.length;i++){
+        this.instance_literals[i].remove();
+        this.instance_literals[i]=null;
+      }
+      this.nodeParent.removeChildNode(this);
     },
 
 
