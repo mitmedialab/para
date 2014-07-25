@@ -18,7 +18,7 @@ define([
   var PathNode = GeometryNode.extend({
 
     type: 'path',
-
+    name: 'none',
 
 
     constructor: function() {
@@ -110,7 +110,7 @@ define([
             //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
             //console.log(instance.position);
             instance.render(data[i]);
-            //console.log('after update');
+            //console.log('after update'); 
             //console.log(instance.position);
           }
         }
@@ -122,6 +122,8 @@ define([
     //called when path data is modified 
     updatePath: function(path) {
      // console.log("updating path to");
+
+
       var newPath = path.clone();
      try {
       newPath.instanceParentIndex = path.instanceParentIndex;
@@ -159,6 +161,7 @@ define([
      *index of the instance used to render the path
      */
     render: function(data, currentNode) {
+         console.log('path_render: '+this.name);
       var path_literal = this.getLiteral();
 
       if (data) {

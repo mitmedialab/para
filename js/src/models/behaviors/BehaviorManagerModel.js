@@ -69,10 +69,10 @@ define([
         
         
         var linearBehavior = new DistributeBehavior();
-       /* if(this.test){
+       
           linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
           this.test=false;
-        }*/
+        
         // console.log('lineartype=' +linearBehavior.type);
         behaviorNode.extendBehavior(linearBehavior, ['update']);
         behaviorNode.update([{}]);

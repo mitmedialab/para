@@ -119,6 +119,7 @@ define([
 
     update: function(data) {
       // console.log('update for:'+this.type);
+       console.log('update: '+this.name);
       var parentType = '';
       if (this.nodeParent) {
         parentType = this.nodeParent.type;
@@ -145,6 +146,7 @@ define([
       console.log("update children");
        this.update(data);
         for (var k = 0; k <this.children.length; k++) {
+          console.log(k);
           this.children[k].update([{}]);
         }
     },
@@ -226,7 +228,9 @@ define([
     render: function(data, currentNode) {
       // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data
-      //console.log('geom render');
+      if(this.type!='root'){
+        console.log('geom render');
+      }
       //console.log(data);
       if (data) {
           // console.log('geom render with data');

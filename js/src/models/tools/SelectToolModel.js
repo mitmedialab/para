@@ -157,7 +157,7 @@ define([
                 }
               }]);
             }
-            this.currentNode.update([{}]);
+            this.currentNode.updateChildren([{}]);
             this.trigger('rootRender');
 
           }

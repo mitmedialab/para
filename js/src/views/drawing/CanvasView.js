@@ -89,7 +89,7 @@ var CanvasView = Backbone.View.extend({
       if(event.keyCode == saveKey){
         this.model.save();
       }
-      if(event.keyCode === 46 || event.keyCode===8){
+      if(event.keyCode === 67){
         console.log("deleting");  
         this.model.deleteObject();
       }

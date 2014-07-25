@@ -19,7 +19,6 @@ define([
 
 
       update: function() {
-       // console.log('following path');
         this.clearScaffolds();
         for (var i = 1; i < this.pathChild.instance_literals.length; i++) {
           this.followPath(this.pathChild.instance_literals[i]);
@@ -32,11 +31,13 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(path) {
+        console.log('following path');
         if (this.children.length > 1) {
           for (var z = 0; z < this.children.length; z++) {
             if (this.children[z] != this.pathChild) {
               var child = this.children[z];
               child.name = 'path_child';
+              path.nodeParent.name = "parent_path";
               path.sendToBack();
               var num = child.instances.length;
               var testPath = path.clone();
@@ -82,6 +83,7 @@ define([
                 //console.log(testPath.segments);
                 for (var i = 1; i < num - 1; i++) {
                   //console.log(location);
+
                   var location_n = finalPath.segments[i].point;
                   var instance = child.instances[i];
                   //instance.resetRotation();

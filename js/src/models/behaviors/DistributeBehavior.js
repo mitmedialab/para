@@ -90,14 +90,16 @@ define([
               }
 
               for(var j=0;j<child.instance_literals.length;j++){
+                console.log('visible='+result+':'+j);
 
                 var result = this.checkConditions(child.instance_literals[j]);
-               
+                
+                console.log('visible='+result+':'+j);
 
                // child.instances[j].visible=result;
              if(!result){ 
                 child.instances[child.instance_literals[j].instanceParentIndex].visible = result;
-                console.log('visible='+result+':'+j);
+                //console.log('visible='+result+':'+j);
               }
                
               }
