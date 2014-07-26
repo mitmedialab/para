@@ -89,12 +89,17 @@ define([
                 });
               }
 
+                for (var i = 0; i < num; i++) {
+                    console.log("linear path position:");
+                    console.log(child.instances[i].position);
+                }
+
               for(var j=0;j<child.instance_literals.length;j++){
-                console.log('visible='+result+':'+j);
+                //console.log('visible='+result+':'+j);
 
                 var result = this.checkConditions(child.instance_literals[j]);
                 
-                console.log('visible='+result+':'+j);
+                //console.log('visible='+result+':'+j);
 
                // child.instances[j].visible=result;
              if(!result){ 

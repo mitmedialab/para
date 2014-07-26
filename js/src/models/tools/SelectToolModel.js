@@ -144,7 +144,6 @@ define([
           //this.trigger('rootRender');
 
         } else {
-          console.log("dragging entire shape");
           if (this.currentNode) {
 
             for (var i = 0; i < this.selectedNodes.length; i++) {

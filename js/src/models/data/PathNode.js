@@ -51,9 +51,9 @@ define([
     createInstanceFromPath: function(path) {
       var instance = this.createInstance();
 
-      instance.position.x = path.position.x;
-      instance.position.y = path.position.y;
-      instance.strokeWidth =1;
+      instance.position.x = path.bounds.topLeft.x;
+      instance.position.y = path.bounds.topRight.y;
+      instance.strokeWidth = 1;
       instance.closed = path.closed;
       path.instanceParentIndex = this.instances.length - 1;
       this.instance_literals.push(path);
@@ -121,19 +121,19 @@ define([
     },
 
     //called when path data is modified 
-    updatePath: function(path,delta) {
-     // console.log('updating path to');
+    updatePath: function(path, delta) {
+      // console.log('updating path to');
       var newPath = path.clone();
-     try {
-      newPath.instanceParentIndex = path.instanceParentIndex;
-       //newPath.position.x=this.instance_literals[0].x;
-       //newPath.position.y=this.instance_literals[0].x;
+      try {
+        newPath.instanceParentIndex = path.instanceParentIndex;
+        //newPath.position.x=this.instance_literals[0].x;
+        //newPath.position.y=this.instance_literals[0].x;
 
-      var removedItem = this.instance_literals.shift();
-      var removedBounds = removedItem.bounds;
-      var ruP = removedBounds.topLeft;
-      var newBounds = newPath.bounds;
-      var nuP = newBounds.topLeft;
+        var removedItem = this.instance_literals.shift();
+        var removedBounds = removedItem.bounds;
+        var ruP = removedBounds.topLeft;
+        var newBounds = newPath.bounds;
+        var nuP = newBounds.topLeft;
         /* console.log('=========== removed path ===========' );
       console.log(ruP);
       console.log(removedItem.position);
@@ -142,26 +142,30 @@ define([
       console.log(nuP);
       console.log(newPath.position);
       console.log(newBounds.width+','+newBounds.height);*/
-      var wD = (newBounds.width-removedBounds.width)/2;
-      var hD =  (newBounds.height-removedBounds.height)/2;
-      console.log('diff='+wD+','+hD);
-      newPath.anchor= false;
-      if(!this.instances[newPath.instanceParentIndex].anchor){
-          this.instances[newPath.instanceParentIndex].update({position:{x:path.position.x,y:path.position.y}});
-        }
-      //newPath.position.x = removedItem.position.x+wD;
-     // newPath.position.y = removedItem.position.y+hD;
-     // console.log('=========== new path updated ===========' );
-      //console.log(newPath.position);
-      newPath.rotate(0-this.instances[removedItem.instanceParentIndex].rotation);
-      
-      removedItem.remove();
-      removedItem = null;
-      this.instance_literals.unshift(newPath);
-      }
-      catch(err){
+        var wD = (newBounds.width - removedBounds.width) / 2;
+        var hD = (newBounds.height - removedBounds.height) / 2;
+        console.log('diff=' + wD + ',' + hD);
+        newPath.anchor = false;
+        /*if (!this.instances[newPath.instanceParentIndex].anchor) {
+          this.instances[newPath.instanceParentIndex].update({
+            position: {
+              x: path.bounds.topLeft.x,
+              y: path.bounds.topLeft.y
+            }
+          });
+        }*/
+        //newPath.position.x = removedItem.position.x+wD;
+        // newPath.position.y = removedItem.position.y+hD;
+        // console.log('=========== new path updated ===========' );
+        //console.log(newPath.position);
+        newPath.rotate(0 - this.instances[removedItem.instanceParentIndex].rotation);
+
+        removedItem.remove();
+        removedItem = null;
+        this.instance_literals.unshift(newPath);
+      } catch (err) {
         newPath.remove();
-        console.log('error in update path'+err);
+        console.log('error in update path' + err);
       }
 
     },
@@ -174,7 +178,7 @@ define([
      *index of the instance used to render the path
      */
     render: function(data, currentNode) {
-         console.log('path_render: '+this.name);
+      console.log('path_render: ' + this.name);
       var path_literal = this.getLiteral();
 
       if (data) {
@@ -187,19 +191,19 @@ define([
             instance_literal.instanceParentIndex = k;
             instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
             instance_literal.data.renderSignature.push(k);
-            instance_literal.position.x = this.instances[k].position.x + data[d].position.x;
-            instance_literal.position.y = this.instances[k].position.y + data[d].position.y;
+            instance_literal.position.x = this.instances[k].position.x + instance_literal.bounds.width / 2 + data[d].position.x;
+            instance_literal.position.y = this.instances[k].position.y + instance_literal.bounds.height / 2 + data[d].position.y;
             instance_literal.scale(this.instances[k].scale * data[d].scale);
             instance_literal.rotate(this.instances[k].rotation + data[d].rotation);
             instance_literal.strokeColor = this.instances[k].strokeColor;
-            if(instance_literal.closed){
+            if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
             }
-            instance_literal.strokeWidth = this.instances[k].strokeWidth+data[d].strokeWidth;
-            if(instance_literal.strokeWidth===0){
-                  instance_literal.strokeWidth=1;
+            instance_literal.strokeWidth = this.instances[k].strokeWidth + data[d].strokeWidth;
+            if (instance_literal.strokeWidth === 0) {
+              instance_literal.strokeWidth = 1;
             }
-          
+
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
               /*if(instance_literal.selected){
@@ -209,23 +213,22 @@ define([
 
               }*/
               if (this.instances[k].anchor) {
-                if(k==0){
-                instance_literal.strokeColor = '#83E779';
-              }
-              else{
-              instance_literal.strokeColor = '#FF0000';
+                if (k === 0) {
+                  instance_literal.strokeColor = '#83E779';
+                } else {
+                  instance_literal.strokeColor = '#FF0000';
 
-              }
-                if(instance_literal.strokeWidth<3){
-                  instance_literal.strokeWidth=3;
+                }
+                if (instance_literal.strokeWidth < 3) {
+                  instance_literal.strokeWidth = 3;
                 }
               }
             } else {
               instance_literal.selected = data[d].selected;
               if (data[d].anchor) {
                 instance_literal.strokeColor = '#83E779';
-                if(instance_literal.strokeWidth<3){
-                  instance_literal.strokeWidth=3;
+                if (instance_literal.strokeWidth < 3) {
+                  instance_literal.strokeWidth = 3;
                 }
               }
             }
@@ -318,14 +321,14 @@ define([
       return sIndexes;
     },
 
-    deleteNode: function(){
-      for(var i=this.children.length-1;i>-1;i--){
+    deleteNode: function() {
+      for (var i = this.children.length - 1; i > -1; i--) {
         this.children[i].deleteNode();
         this.removeChildAt(i);
       }
-      for(var i=0;i<this.instance_literals.length;i++){
+      for (var i = 0; i < this.instance_literals.length; i++) {
         this.instance_literals[i].remove();
-        this.instance_literals[i]=null;
+        this.instance_literals[i] = null;
       }
       this.nodeParent.removeChildNode(this);
     },
@@ -409,27 +412,28 @@ define([
         for (var j = 0; j < paths.length; j++) {
 
           if (paths[j].visible && !this.containsPath(paths[j])) {
-            if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
-             // console.log('do nothing');
-            } else {
-              // console.log('checking at:'+j);
-              //console.log('checking instance at'+i);
-              var ints = paths[j].getIntersections(instance_literal);
-              //console.log('intersections:');
-              // console.log(intersections);
-              if (ints.length > 0) {
-               // console.log('intersection found');
-                return paths[j];
+            if (paths[j].nodeParent) {
+              if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
+                // console.log('do nothing');
+              } else {
+                // console.log('checking at:'+j);
+                //console.log('checking instance at'+i);
+                var ints = paths[j].getIntersections(instance_literal);
+                //console.log('intersections:');
+                // console.log(intersections);
+                if (ints.length > 0) {
+                  // console.log('intersection found');
+                  return paths[j];
+                }
               }
             }
-          }
 
-        }
-        /* if(intersection!=null){
+          }
+          /* if(intersection!=null){
           return intersection'
           
         }*/
-
+        }
       }
       return null;
     }

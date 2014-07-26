@@ -7,10 +7,12 @@ define([
   'jquery',
   'underscore',
   'models/data/SceneNode',
-  'models/data/Instance'
+  'models/data/Instance',
+      'models/PaperManager'
 
-], function($, _, SceneNode, Instance) {
-  //paperjs group object
+
+], function($, _, SceneNode, Instance, PaperManager) {
+  var paper = PaperManager.getPaperInstance();
 
   var GeometryNode = SceneNode.extend({
 
@@ -42,6 +44,122 @@ define([
 
       this.createInstance();
     },
+
+    addChildNode: function(node){
+     SceneNode.prototype.addChildNode.apply(this, arguments);
+      if(this.type!='root'){
+    var left = this.children[0].getLeft();
+      var top = this.children[0].getRight();
+     for(var i=1;i<this.children.length;i++){
+          var l = this.children[1].getLeft();
+          var t = this.children[1].getTop();
+          if(l<left){
+          left = l;
+          }
+          if(t<top){
+          top=t;
+          }
+        }
+      for(var j=0;j<this.instances.length;j++){
+        this.instances[j].render({position:{x:left,y:top}});
+      }
+
+      for(var k=0;k<this.children.length;k++){
+        this.children[k].clear();
+        this.children[k].increment([{position:{x:0-left,y:0-top}}]);
+      }
+    }
+
+    },
+
+    getLeft: function(){
+      var left =this.instances[0].position.x;
+      for(var i=1;i<this.instances.length;i++){
+        var l = this.instances[i].position.x;
+        if(l<left){
+          left = l;
+        }
+      }
+      return left;
+    },
+
+    getRight: function(){
+      var right =this.instances[0].position.x;
+      for(var i=1;i<this.instances.length; i++){
+        var r = this.instances[i].position.x;
+        if(r>right){
+          right=r;
+        }
+      }
+      return right;
+    },
+
+    getTop: function(){
+      var top =this.instances[0].position.y;
+      for(var i=1;i<this.instances.length; i++){
+        var r = this.instances[i].position.y;
+        if(r<top){
+          top=r;
+        }
+      }
+      return top;
+    },
+
+    getBottom: function(){
+         var bottom =this.instances[0].position.y;
+      for(var i=1;i<this.instances.length; i++){
+        var r = this.instances[i].position.y;
+        if(r>bottom){
+          bottom=r;
+        }
+      }
+      return bottom;
+    },
+
+   /* getLeft: function(){
+      var left =this.children[0].getLeft();
+      for(var i=1;i<this.children.length;i++){
+        var l = this.children[i].getLeft();
+        if(l<left){
+          left = l;
+        }
+      }
+      return left;
+    },
+
+    getRight: function(){
+      var right =this.children[0].getRight();
+      for(var i=1;i<this.children.length; i++){
+        var r = this.children[i].getRight();
+        if(r<right){
+          right=r;
+        }
+      }
+      return right;
+    },
+
+    getTop: function(){
+      var top =this.children[0].getTop();
+      for(var i=1;i<this.children.length; i++){
+        var r = this.children[i].getTop();
+        if(r<top){
+          top=r;
+        }
+      }
+      return top;
+    },
+
+    getBottom: function(){
+         var bottom =this.children[0].getBottom();
+      for(var i=1;i<this.children.length; i++){
+        var r = this.children[i].getBottom();
+        if(r<bottom){
+          bottom=r;
+        }
+      }
+      return bottom;
+    },*/
+
 
     exportJSON: function(){
       this.set({
@@ -142,6 +260,22 @@ define([
 
     },
 
+    increment: function(data) {
+      // console.log('update for:'+this.type);
+    
+      for (var j = 0; j < this.instances.length; j++) {
+        for (var i = 0; i < data.length; i++) {
+          var instance = this.instances[j];
+          //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
+          // console.log(instance.position);
+          instance.render(data[i]);
+          //console.log('after update');
+          //  console.log(instance.position);
+        }
+      }
+
+    },
+
     updateChildren: function(data){
       console.log("update children");
        this.update(data);
@@ -211,7 +345,7 @@ define([
 
     clear: function() {
       this.instance_literals = [];
-      
+      this.clearScaffolds();
       
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].clear();
@@ -254,6 +388,9 @@ define([
                u_instance.anchor = data[i].anchor;
             }
             this.instance_literals.push(u_instance);
+            var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,10);
+                dot.fillColor = 'red';
+                this.scaffolds.push(dot);
 
           }
         }

@@ -56,8 +56,8 @@ define([
               var offset = cA.distance;
 
               //console.log(testPath.segments);
-              var finalPath;
-              if (!locA.equals(testPath.firstSegment.point)) {
+              var finalPath = testPath;
+             /* if (!locA.equals(testPath.firstSegment.point)) {
                 finalPath = testPath.split(cA);
                 testPath.remove();
               } else {
@@ -70,7 +70,7 @@ define([
                   tail.remove();
                 }
 
-              }
+              }*/
 
 
               var maxDist = finalPath.length / (num - 1);
@@ -79,7 +79,7 @@ define([
 
               var location = finalPath.segments[0].point;
 
-              for (var i = 1; i < num - 1; i++) {
+              for (var i = 0; i < num; i++) {
                 //console.log(location);
 
                 var location_n = finalPath.segments[i].point;
@@ -95,14 +95,14 @@ define([
                     x: location_n.x,
                     y: location_n.y
                   },
-                  rotation: delta.angle
+                  //rotation: delta.angle
                 });
 
                 location = location_n;
               }
               var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
               child.instances[0].update({
-                rotation: startDelta.angle
+                //rotation: startDelta.angle
               });
 
               var endDelta = finalPath.segments[num - 1].point.subtract(location);
