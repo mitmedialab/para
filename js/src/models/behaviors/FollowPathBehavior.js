@@ -37,6 +37,8 @@ define([
             if (this.children[z] != this.pathChild) {
               var child = this.children[z];
               child.name = 'path_child';
+              var left = child.getChildrenLeft();
+              var top = child.getChildrenTop();
               path.nodeParent.name = "parent_path";
               path.sendToBack();
               var num = child.instances.length;
@@ -86,17 +88,23 @@ define([
                 var instance = child.instances[i];
                 //instance.resetRotation();
 
+         /* var dot = new paper.Path.Circle(location_n,5);
+                dot.fillColor = 'blue ';
+                this.scaffolds.push(dot);*/
 
+          
                 var delta = location_n.subtract(location);
                 //delta.angle += 90;
-
+                console.log("child left,top"+left+","+top); 
+                var difference = {x:location_n.x-left,y:location_n.y-top};
                 instance.update({
-                  position: {
-                    x: location_n.x,
-                    y: location_n.y
-                  },
+                  position: difference,
                   //rotation: delta.angle
                 });
+                console.log("difference=");
+                console.log(difference);
+
+                //child.resetChildren(i,difference);
 
                 location = location_n;
               }

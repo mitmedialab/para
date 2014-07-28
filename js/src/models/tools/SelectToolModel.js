@@ -133,7 +133,7 @@ define([
               var selSegment = selPath.segments[segment];
               selSegment.point = selSegment.point.add(event.delta);
               selPath.nodeParent.updatePath(selPath,event.delta);
-              this.currentNode.update([{}]);
+              this.trigger('rootUpdate');
               this.trigger('rootRender');
               console.log('numPaths=' + paper.project.activeLayer.children.length);
             }
@@ -156,7 +156,7 @@ define([
                 }
               }]);
             }
-            this.currentNode.update([{}]);
+            this.trigger('rootUpdate');
             this.trigger('rootRender');
 
           }

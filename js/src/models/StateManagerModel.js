@@ -35,7 +35,6 @@ define([
 
     initialize: function(event_bus) {
       paper = PaperManager.getPaperInstance();
-      console.log(paper.project);
       penTool = new PenToolModel({
         id: 'penTool'
       });
@@ -59,6 +58,8 @@ this.event_bus = event_bus;
 
       this.listenTo(toolCollection, 'optionClick', this.openMenu);
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
+            this.listenTo(toolCollection, 'rootUpdate', this.rootUpdate);
+
       this.listenTo(toolCollection, 'currentRender', this.currentRender);
 
 
@@ -147,8 +148,7 @@ this.event_bus = event_bus;
            toolCollection.get(this.get('state')).currentNode = children[i];
         }
       }
-      console.log('current node type='+currentNode.type);
-        // console.log('current node is root='+('root'===currentNode.type));
+      //console.log('current node type='+currentNode.type);
        this.rootRender();
     },
 
@@ -180,6 +180,12 @@ this.event_bus = event_bus;
       rootNode.render(null,currentNode);
     },
 
+    rootUpdate: function(){
+     //console.log('called root render');
+    
+      rootNode.update([{}]);
+      
+    },
     currentRender: function(){
       //console.log('called current render');
       currentNode.clear();

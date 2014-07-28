@@ -47,31 +47,9 @@ define([
 
     addChildNode: function(node){
      SceneNode.prototype.addChildNode.apply(this, arguments);
-      if(this.type!='root'){
-    var left = this.children[0].getLeft();
-      var top = this.children[0].getRight();
-     for(var i=1;i<this.children.length;i++){
-          var l = this.children[1].getLeft();
-          var t = this.children[1].getTop();
-          if(l<left){
-          left = l;
-          }
-          if(t<top){
-          top=t;
-          }
-        }
-      for(var j=0;j<this.instances.length;j++){
-        this.instances[j].render({position:{x:left,y:top}});
-      }
-
-      for(var k=0;k<this.children.length;k++){
-        this.children[k].clear();
-        this.children[k].increment([{position:{x:0-left,y:0-top}}]);
-      }
-    }
-
     },
 
+  
     getLeft: function(){
       var left =this.instances[0].position.x;
       for(var i=1;i<this.instances.length;i++){
@@ -116,7 +94,8 @@ define([
       return bottom;
     },
 
-   /* getLeft: function(){
+    getChildrenLeft: function(){
+      if(this.children.length>0){
       var left =this.children[0].getLeft();
       for(var i=1;i<this.children.length;i++){
         var l = this.children[i].getLeft();
@@ -125,9 +104,12 @@ define([
         }
       }
       return left;
+    }else{
+      return 0;
+    }
     },
 
-    getRight: function(){
+    getChildrenRight: function(){
       var right =this.children[0].getRight();
       for(var i=1;i<this.children.length; i++){
         var r = this.children[i].getRight();
@@ -138,7 +120,9 @@ define([
       return right;
     },
 
-    getTop: function(){
+    getChildrenTop: function(){
+     if(this.children.length>0){
+
       var top =this.children[0].getTop();
       for(var i=1;i<this.children.length; i++){
         var r = this.children[i].getTop();
@@ -146,10 +130,13 @@ define([
           top=r;
         }
       }
-      return top;
+      return top;}
+      else{
+      return 0;
+    }
     },
 
-    getBottom: function(){
+    getChildrenBottom: function(){
          var bottom =this.children[0].getBottom();
       for(var i=1;i<this.children.length; i++){
         var r = this.children[i].getBottom();
@@ -158,7 +145,7 @@ define([
         }
       }
       return bottom;
-    },*/
+    },
 
 
     exportJSON: function(){
@@ -253,6 +240,10 @@ define([
           //  console.log(instance.position);
         }
       }
+      for (var k = 0; k <this.children.length; k++) {
+          console.log(k);
+          this.children[k].update([{}]);
+        }
   
      
       
@@ -284,6 +275,13 @@ define([
           this.children[k].update([{}]);
         }
     },
+    //sets instances relative to a given set of geometric properties
+   /* setInstancesRelative: function(index,relativePos){
+      for(var i=0;i<this.instances.length;i++){
+        //if this.instances[i].instanceParent
+      }
+
+    },*/
 
     updateSelected: function(data) {
       for (var j = 0; j < this.instances.length; j++) {
@@ -388,7 +386,7 @@ define([
                u_instance.anchor = data[i].anchor;
             }
             this.instance_literals.push(u_instance);
-            var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,10);
+            var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,5);
                 dot.fillColor = 'red';
                 this.scaffolds.push(dot);
 

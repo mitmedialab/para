@@ -43,6 +43,8 @@ define([
 
     },
 
+
+
     /*called when drawing of the path is complete. 
      * Removes the path and creates one instance
      * in original path location*/
@@ -52,7 +54,7 @@ define([
       var instance = this.createInstance();
 
       instance.position.x = path.bounds.topLeft.x;
-      instance.position.y = path.bounds.topRight.y;
+      instance.position.y = path.bounds.topLeft.y;
       instance.strokeWidth = 1;
       instance.closed = path.closed;
       path.instanceParentIndex = this.instances.length - 1;
@@ -185,7 +187,6 @@ define([
         for (var k = 0; k < this.instances.length; k++) {
 
           for (var d = 0; d < data.length; d++) {
-
             var instance_literal = path_literal.clone();
             instance_literal.nodeParent = this;
             instance_literal.instanceParentIndex = k;
@@ -238,7 +239,9 @@ define([
             instance_literal.visible = this.instances[k].visible;
             this.instance_literals.push(instance_literal);
             instance_literal.instanceIndex = this.instance_literals.length - 1;
-
+            /*var dot = new paper.Path.Circle(this.instances[k].position.x+data[d].position.x,this.instances[k].position.y+data[d].position.y,5);
+                dot.fillColor = 'green';
+                this.scaffolds.push(dot);*/
           }
         }
       } else {

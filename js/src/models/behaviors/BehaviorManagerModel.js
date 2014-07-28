@@ -87,7 +87,7 @@ define([
       else if (type == 'followPath') {
         console.log('follow path behavior called');
         behaviorNode.exclude(0);
-        behaviorNode.copyNum = 6;
+        behaviorNode.copyNum = 3;
         var followPathBehavior = new FollowPathBehavior(nodes[0]);
         behaviorNode.extendBehavior(followPathBehavior, ['update']);
       }
