@@ -537,6 +537,91 @@ console.log("render: "+this.type);
 
       },
 
+//registers overriding function for overriding methods- determined by parent node- this calls new method first
+      extendBehaviorFirst: function(from, methods) {
+        if (!this.containsBehaviorName(from.name)) {
+          this.behaviors.push(from);
+          // if the method is defined on from ...
+          // we add those methods which exists on `from` but not on `to` to the latter
+          _.defaults(this, from);
+          // … and we do the same for events
+          _.defaults(this.events, from.events);
+          // console.log(this);
+          // console.log(from);
+          for (var i = 0; i < methods.length; i++) {
+            var methodName = methods;
+            if (!_.isUndefined(from[methodName])) {
+              // console.log('setting methods');
+              var old = this[methodName];
+
+              // ... we create a new function on to
+              this[methodName] = function() {
+
+                // and then call the method on `from`
+                var rArgs = from[methodName].apply(this, arguments);
+                 var oldReturn;
+                if(rArgs){
+                // wherein we first call the method which exists on `to`
+                oldReturn = old.apply(this, rArgs);
+              }
+              else {
+                oldReturn = old.apply(this, arguments);
+              }
+
+                // and then return the expected result,
+                // i.e. what the method on `to` returns
+                return oldReturn;
+
+              };
+            }
+          }
+        }
+
+      },
+
+      //registers overriding function for overriding methods- determined by parent node- this calls new method second
+      extendBehaviorSecond: function(from, methods) {
+        if (!this.containsBehaviorName(from.name)) {
+          this.behaviors.push(from);
+          // if the method is defined on from ...
+          // we add those methods which exists on `from` but not on `to` to the latter
+          _.defaults(this, from);
+          // … and we do the same for events
+          _.defaults(this.events, from.events);
+          // console.log(this);
+          // console.log(from);
+          for (var i = 0; i < methods.length; i++) {
+            var methodName = methods;
+            if (!_.isUndefined(from[methodName])) {
+              // console.log('setting methods');
+              var old = this[methodName];
+
+              // ... we create a new function on to
+              this[methodName] = function() {
+
+                // and then call the method on `from`
+                var rArgs = old.apply(this, arguments);
+                 var newReturn;
+                if(rArgs){
+                // wherein we first call the method which exists on `to`
+                newReturn = from[methodName].apply(this, rArgs);
+              }
+              else {
+                 newReturn = from[methodName].apply(this, arguments);
+              }
+
+                // and then return the expected result,
+                // i.e. what the method on `to` returns
+                return  newReturn;
+
+              };
+            }
+          }
+        }
+
+      },
+
+    
 
 
 

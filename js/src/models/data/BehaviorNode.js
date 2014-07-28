@@ -25,51 +25,7 @@ define([
 
 			type: 'behavior',
 
-			//registers overriding function for update methods- determined by parent node
-			extendBehavior: function(from, methods) {
-				if (!this.containsBehaviorName(from.name)) {
-					this.behaviors.push(from);
-					// if the method is defined on from ...
-					// we add those methods which exists on `from` but not on `to` to the latter
-					_.defaults(this, from);
-					// … and we do the same for events
-					_.defaults(this.events, from.events);
-					// console.log(this);
-					// console.log(from);
-					for (var i = 0; i < methods.length; i++) {
-						var methodName = methods;
-						if (!_.isUndefined(from[methodName])) {
-							// console.log('setting methods');
-							var old = this[methodName];
-
-							// ... we create a new function on to
-							this[methodName] = function() {
-
-								// and then call the method on `from`
-								from[methodName].apply(this, arguments);
-
-								// wherein we first call the method which exists on `to`
-								var oldReturn = old.apply(this, arguments);
-
-								// and then return the expected result,
-								// i.e. what the method on `to` returns
-								return oldReturn;
-
-							};
-						}
-					}
-				}
-
-			},
-
-			clearScaffolds: function() {
-				for (var j = 0; j < this.scaffolds.length; j++) {
-					this.scaffolds[j].clear();
-
-				}
-				this.scaffolds = [];
-
-			},
+			
 
 
 

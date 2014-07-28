@@ -18,36 +18,36 @@ define([
 
 
       update: function(data) {
-        console.log("follow path update: "+ this.type);
+        //console.log('follow path update: '+ this.type);
         this.clearScaffolds();
-        for (var i = 1; i < this.pathChild.instance_literals.length; i++) {
-          this.followPath(this.pathChild.instance_literals[i]);
-        }
+      
+          var zeroedPath = this.pathChild.getLiteral().clone();
+          zeroedPath.position.x =0+zeroedPath.bounds.width/2;
+          zeroedPath.position.y=0+zeroedPath.bounds.height/2;
+          this.followPath(zeroedPath);
+         
+        
+        //return [data,currentNode];
 
       },
 
-
-
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(path) {
-        if (this.children.length > 1) {
-          for (var z = 0; z < this.children.length; z++) {
-            if (this.children[z] != this.pathChild) {
-              var child = this.children[z];
-              child.name = 'path_child';
-              var left = child.getChildrenLeft();
-              var top = child.getChildrenTop();
-              var thisLeft = this.getLeft();
-              var thisTop = this.getTop();
-              path.nodeParent.name = "parent_path";
-              path.sendToBack();
-              var num = child.instances.length;
-              var testPath = path.clone();
 
-              var locA = testPath.getNearestPoint(child.instances[0].position);
-              var locB = testPath.getNearestPoint(child.instances[num - 1].position);
-              var cA = testPath.getNearestLocation(child.instances[0].position);
-              var cB = testPath.getNearestLocation(child.instances[child.instances.length - 1].position);
+            
+            //  path.sendToBack();
+              var num = this.instances.length;
+                 var finalPath;
+
+             if(this.instances[0].position.x==this.instances[num-1].position.x &&this.instances[0].position.y==this.instances[num-1].position.y){
+                finalPath = path;
+             }
+             else{
+              var locA =path.getNearestPoint(this.instances[0].position);
+              var cA = path.getNearestLocation(this.instances[0].position);
+             var locB = path.getNearestPoint(this.instances[num - 1].position);
+                var cB = path.getNearestLocation(this.instances[this.instances.length - 1].position);
+
               /*var pc = new paper.Path.Circle(locA,5);
               pc.fillColor ='red';
               this.scaffolds.push(pc);
@@ -57,24 +57,30 @@ define([
 
               var offset = cA.distance;
 
-              var finalPath = testPath;
-             /* if (!locA.equals(testPath.firstSegment.point)) {
-                finalPath = testPath.split(cA);
-                testPath.remove();
+           
+             if (!locA.equals( path.firstSegment.point)) {
+                finalPath =  path.split(cA);
+                path.remove();
               } else {
-                finalPath = testPath;
+                finalPath =  path;
               }
 
+              
               if (!locB.equals(finalPath.lastSegment.point)) {
                 var tail = finalPath.split(cB);
                 if (tail) {
                   tail.remove();
                 }
 
-              }*/
-
-
-              var maxDist = finalPath.length / (num - 1);
+              }
+            }
+              var maxDist;
+              if(!finalPath.closed){
+                maxDist = finalPath.length / (num - 1);
+              }
+              else{
+                 maxDist = finalPath.length / (num);
+              }
 
               finalPath.flatten(maxDist);
 
@@ -83,7 +89,7 @@ define([
               for (var i = 0; i < num; i++) {
 
                 var location_n = finalPath.segments[i].point;
-                var instance = child.instances[i];
+                var instance = this.instances[i];
                 //instance.resetRotation();
 
          /* var dot = new paper.Path.Circle(location_n,5);
@@ -92,25 +98,25 @@ define([
 
           
                 var delta = location_n.subtract(location);
-                //console.log("child left,top"+left+","+top); 
-                var difference = {x:location_n.x-left-thisLeft,y:location_n.y-top-thisTop};
+                //console.log('child left,top'+left+','+top); 
+                var difference = {x:location_n.x,y:location_n.y};
                 instance.update({
                   position: difference,
                   //rotation: delta.angle
                 });
-                console.log("difference=");
-                console.log(difference);
+                //console.log('difference=');
+                //console.log(difference);
 
 
                 location = location_n;
               }
               var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
-              child.instances[0].update({
+              this.instances[0].update({
                 //rotation: startDelta.angle
               });
 
               var endDelta = finalPath.segments[num - 1].point.subtract(location);
-              child.instances[num - 1].update({
+              this.instances[num - 1].update({
                 rotation: endDelta.angle
               });
 
@@ -119,10 +125,10 @@ define([
               finalPath = null;
 
 
-            }
+            
           }
-        }
-      }
+        
+      
 
     });
 

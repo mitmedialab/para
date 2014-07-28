@@ -51,14 +51,14 @@ define([
         //console.log('creating copy behavior');
         var copyBehavior = new CopyBehavior();
         copyBehavior.setCopyNum(2);
-        behaviorNode.extendBehavior(copyBehavior, ['update']);
+        behaviorNode.extendBehaviorFirst(copyBehavior, ['update']);
         behaviorNode.update([{}]);
       } else{
           var containsCopy=behaviorNode.containsBehaviorType('copy');
           if (containsCopy===false) {
           var copyBehavior = new CopyBehavior();
           copyBehavior.setCopyNum(3);
-          behaviorNode.extendBehavior(copyBehavior, ['update']);
+          behaviorNode.extendBehaviorFirst(copyBehavior, ['update']);
           behaviorNode.update([{}]);
           console.log('copytype=' +copyBehavior.type);
 
@@ -74,22 +74,24 @@ define([
          // this.test=false;
         
         // console.log('lineartype=' +linearBehavior.type);
-        behaviorNode.extendBehavior(linearBehavior, ['update']);
+        behaviorNode.extendBehaviorFirst(linearBehavior, ['update']);
         behaviorNode.update([{}]);
       } else if (type == 'radial') {
        behaviorNode.copyNum = 10;
        
 
         var radialBehavior = new RadialDistributeBehavior();
-        behaviorNode.extendBehavior(radialBehavior, ['update']);
+        behaviorNode.extendBehaviorFirst(radialBehavior, ['update']);
         behaviorNode.update([{}]);
       }
       else if (type == 'followPath') {
         console.log('follow path behavior called');
         behaviorNode.exclude(0);
-        behaviorNode.copyNum = 3;
+        behaviorNode.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
+        nodes[0].instances[0].position={x:0,y:0};
+        behaviorNode.copyNum = 10;
         var followPathBehavior = new FollowPathBehavior(nodes[0]);
-        behaviorNode.extendBehavior(followPathBehavior, ['update']);
+        nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
       }
     }
     
