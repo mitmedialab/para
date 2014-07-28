@@ -70,7 +70,7 @@ define([
         
         var linearBehavior = new DistributeBehavior();
        
-          //linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
+        linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
          // this.test=false;
         
         // console.log('lineartype=' +linearBehavior.type);

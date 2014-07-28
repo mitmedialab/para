@@ -14,7 +14,8 @@ define([
 			conditions: [],
 			name: 'base',
 			type: 'none',
-			
+			 copyNum: 2,
+
 
 			constructor:function(){
 				this.excludes = [];

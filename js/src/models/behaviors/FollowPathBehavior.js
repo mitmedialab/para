@@ -89,9 +89,9 @@ define([
             var selected = this.getFirstSelectedInstance();
              if (selected) {
                 if (selected.index === 1) {
-                  this.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this);
+                  this.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
                 } else if (selected.index == this.instances.length - 2) {
-                  this.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this);
+                  this.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
 
                 }
               }
@@ -136,10 +136,6 @@ define([
 
               finalPath.remove();
               finalPath = null;
-
-
-
-
 
             
           }
