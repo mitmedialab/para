@@ -106,17 +106,7 @@ define([
 
       },
 
-      checkDistance: function(start, selected, tDist, child) {
-
-        var dist = TrigFunc.distance(start.position, selected.position);
-        if (dist < tDist + 20) {
-          this.copyNum++;
-        } else if (dist > tDist + 20) {
-          this.copyNum--;
-
-        }
-     
-      }
+      
 
 
     });

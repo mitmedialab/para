@@ -98,39 +98,7 @@ define([
 
       },
 
-       checkDistanceIncrement: function(start,selected,tDist){
-
-          var dist = TrigFunc.distance(start.position,selected.position);
-          console.log('num copies='+this.copyNum);
-          if(dist<tDist+20){
-           this.copyNum++;
-            console.log('incrementing copy');
-          }
-          /*else if(dist>tDist+20){
-             this.copyNum--;
-             console.log('decrementing copy');
-          }*/
-         
-          console.log('selected Distance ='+dist);
-          console.log('target Distance ='+tDist);
-
-
-      },
-
-       checkDistanceDecrement: function(start,selected,tDist){
-
-          var dist = TrigFunc.distance(start.position,selected.position);
-          console.log('num copies='+this.copyNum);
-            if(dist>tDist+20){
-             this.copyNum--;
-             console.log('decrementing copy');
-          
-          }
-          console.log('selected Distance ='+dist);
-          console.log('target Distance ='+tDist);
-
-
-      },
+       
 
       exclude: function(excludeIndex){
         console.log('num of children in copy:'+this.children.length);

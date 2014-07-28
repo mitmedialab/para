@@ -11,8 +11,9 @@ define([
     var paper = PaperManager.getPaperInstance();
     var FollowPathBehavior = BaseBehavior.extend({
 
-      constructor: function(pathChild) {
+      constructor: function(pathChild,rotate) {
         this.pathChild = pathChild;
+        this.toggleRotate=rotate; 
 
       },
 
@@ -33,7 +34,7 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(path) {
-
+      
             
             //  path.sendToBack();
               var num = this.instances.length;
@@ -84,6 +85,16 @@ define([
 
               finalPath.flatten(maxDist);
 
+
+            var selected = this.getFirstSelectedInstance();
+             if (selected) {
+                if (selected.index === 1) {
+                  this.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this);
+                } else if (selected.index == this.instances.length - 2) {
+                  this.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this);
+
+                }
+              }
               var location = finalPath.segments[0].point;
 
               for (var i = 0; i < num; i++) {
@@ -96,33 +107,38 @@ define([
                 dot.fillColor = 'blue ';
                 this.scaffolds.push(dot);*/
 
-          
+                
                 var delta = location_n.subtract(location);
                 //console.log('child left,top'+left+','+top); 
                 var difference = {x:location_n.x,y:location_n.y};
                 instance.update({
                   position: difference,
-                  //rotation: delta.angle
+
                 });
+                if(this.toggleRotate){
+                  console.log("rotation is active");
+                   instance.update({
+                  rotation: delta.angle
+                });
+                }
                 //console.log('difference=');
                 //console.log(difference);
 
 
                 location = location_n;
               }
+                if(this.toggleRotate){
               var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
               this.instances[0].update({
-                //rotation: startDelta.angle
+                rotation: startDelta.angle
               });
+            }
 
-              var endDelta = finalPath.segments[num - 1].point.subtract(location);
-              this.instances[num - 1].update({
-                rotation: endDelta.angle
-              });
-
-      
               finalPath.remove();
               finalPath = null;
+
+
+
 
 
             

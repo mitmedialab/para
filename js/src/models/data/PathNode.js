@@ -142,7 +142,7 @@ define([
      */
     render: function(data, currentNode) {
       var path_literal = this.getLiteral();
-      console.log("render: "+this.type);
+     // console.log("render: "+this.type);
       if (data) {
         for (var k = 0; k < this.instances.length; k++) {
 
@@ -155,7 +155,7 @@ define([
             instance_literal.position.x = this.instances[k].position.x + instance_literal.bounds.width / 2 + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + instance_literal.bounds.height / 2 + data[d].position.y;
             instance_literal.scale(this.instances[k].scale * data[d].scale);
-            instance_literal.rotate(this.instances[k].rotation + data[d].rotation);
+            instance_literal.rotate(this.instances[k].rotation + data[d].rotation, instance_literal.bounds.topLeft);
             instance_literal.strokeColor = this.instances[k].strokeColor;
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
@@ -191,6 +191,9 @@ define([
 
 
             instance_literal.visible = this.instances[k].visible;
+            if (this.nodeParent != currentNode && this.follow) {
+              instance_literal.visible=false;
+            }
             this.instance_literals.push(instance_literal);
             instance_literal.instanceIndex = this.instance_literals.length - 1;
             /*var dot = new paper.Path.Circle(this.instances[k].position.x+data[d].position.x,this.instances[k].position.y+data[d].position.y,5);

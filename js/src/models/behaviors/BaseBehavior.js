@@ -3,15 +3,18 @@ base class for all behaviors */
 
 define([
 		'toolbox',
-		'models/data/Condition'
+		'models/data/Condition',
+		    'utils/TrigFunc'
+
 	],
 
-	function(Toolbox, Condition) {
+	function(Toolbox, Condition, TrigFunc) {
 
 		var BaseBehavior = Toolbox.Base.extend({
 			conditions: [],
 			name: 'base',
 			type: 'none',
+			
 
 			constructor:function(){
 				this.excludes = [];
@@ -70,7 +73,41 @@ define([
 				 		this.scaffolds[i].render(data[0]);
 				 }
 			}*/
-		}
+		},
+
+		checkDistanceIncrement: function(start,selected,tDist){
+
+          var dist = TrigFunc.distance(start.position,selected.position);
+          console.log('num copies='+this.copyNum);
+          if(dist<tDist+20){
+           this.copyNum++;
+            console.log('incrementing copy');
+          }
+          /*else if(dist>tDist+20){
+             this.copyNum--;
+             console.log('decrementing copy');
+          }*/
+         
+          console.log('selected Distance ='+dist);
+          console.log('target Distance ='+tDist);
+
+
+      },
+
+       checkDistanceDecrement: function(start,selected,tDist){
+
+          var dist = TrigFunc.distance(start.position,selected.position);
+          console.log('num copies='+this.copyNum);
+            if(dist>tDist+20){
+             this.copyNum--;
+             console.log('decrementing copy');
+          
+          }
+          console.log('selected Distance ='+dist);
+          console.log('target Distance ='+tDist);
+
+
+      },
 
 		});
 

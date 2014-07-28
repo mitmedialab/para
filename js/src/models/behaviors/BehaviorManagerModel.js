@@ -90,8 +90,15 @@ define([
         behaviorNode.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
         nodes[0].instances[0].position={x:0,y:0};
         behaviorNode.copyNum = 10;
-        var followPathBehavior = new FollowPathBehavior(nodes[0]);
+        var followPathBehavior;
+        if(nodes[1].children.length===0){
+          followPathBehavior = new FollowPathBehavior(nodes[0],true);
+        }
+        else{
+          followPathBehavior = new FollowPathBehavior(nodes[0],false);
+        }
         nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
+        nodes[0].follow=true;
       }
     }
     

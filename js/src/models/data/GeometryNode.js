@@ -18,7 +18,7 @@ define([
 
 
     type: 'geometry',
-  
+   
     constructor: function() {
       /* instances contain objects that provide geometric info
     * this is propogated down to the leaves of the tree to 
@@ -34,6 +34,7 @@ define([
       this.scaffolds = [];
       this.instance_literals = [];
       this.behaviors = [];
+      this.follow= false;
 
 
       SceneNode.apply(this, arguments);
@@ -231,7 +232,7 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-      console.log("geom update: "+ this.type);
+      //console.log("geom update: "+ this.type);
       var parentType = '';
       if (this.nodeParent) {
         parentType = this.nodeParent.type;
@@ -265,7 +266,7 @@ define([
     },
 
     updateSelected: function(data) {
-    console.log("geom update selected: "+ this.type);
+    //console.log("geom update selected: "+ this.type);
     console.log(data);
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
@@ -339,7 +340,7 @@ define([
     render: function(data, currentNode) {
       //first create array of new instances that contain propogated updated data
      
-console.log("render: "+this.type);
+//console.log("render: "+this.type);
  if (data) {
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
@@ -360,9 +361,9 @@ console.log("render: "+this.type);
                u_instance.anchor = data[i].anchor;
             }
             this.instance_literals.push(u_instance);
-            var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,5);
+            /*var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,5);
                 dot.fillColor = 'red';
-                this.scaffolds.push(dot);
+                this.scaffolds.push(dot);*/
 
           }
         }
