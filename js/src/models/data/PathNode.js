@@ -22,19 +22,12 @@ define([
 
 
     constructor: function() {
-      //array to store actual paper.js objects
 
       GeometryNode.apply(this, arguments);
-      //console.log('number of nodes='+SceneNode.numNodeInstances);
     },
 
-    //mixin: Utils.nodeMixin,
 
     initialize: function() {
-
-      //intialize array to store instances
-
-
 
     },
 
@@ -48,8 +41,6 @@ define([
     /*called when drawing of the path is complete. 
      * Removes the path and creates one instance
      * in original path location*/
-
-
     createInstanceFromPath: function(path) {
       var instance = this.createInstance();
 
@@ -60,8 +51,6 @@ define([
       path.instanceParentIndex = this.instances.length - 1;
       this.instance_literals.push(path);
       path.instanceIndex = this.instance_literals.length - 1;
-      //  console.log('createPathInstance');
-      //console.log(instance.position);      
       path.nodeParent = this;
       return instance;
     },
@@ -86,45 +75,17 @@ define([
 
     /*clears out all but first of literal paths*/
     clear: function() {
-      //console.log('clear called');
-      /* for(var i=0;i<this.instances.length;i++){
-        this.instances[i].visible=true;
-      }*/
       this.clearScaffolds();
       for (var j = 1; j < this.instance_literals.length; j++) {
-        // console.log(this.instance_literals[j]);
         this.instance_literals[j].remove();
 
       }
       this.instance_literals.splice(1, this.instance_literals.length);
-      //console.log('num of literals:'+this.instance_literals.length); 
-
-      // console.log('num of drawn children='+paper.project.activeLayer.children.length);
-
-    },
-
-    updateSelected: function(data) {
-      // console.log('update selected path:'+this.instances.length);
-      for (var j = 0; j < this.instances.length; j++) {
-        if (this.instances[j].selected) {
-          //console.log('found selected instance at:'+j);
-          for (var i = 0; i < data.length; i++) {
-            var instance = this.instances[j];
-            //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-            //console.log(instance.position);
-            instance.render(data[i]);
-            //console.log('after update'); 
-            //console.log(instance.position);
-          }
-        }
-      }
-
 
     },
 
     //called when path data is modified 
     updatePath: function(path, delta) {
-      // console.log('updating path to');
       var newPath = path.clone();
       try {
         newPath.instanceParentIndex = path.instanceParentIndex;
@@ -146,7 +107,7 @@ define([
       console.log(newBounds.width+','+newBounds.height);*/
         var wD = (newBounds.width - removedBounds.width) / 2;
         var hD = (newBounds.height - removedBounds.height) / 2;
-        console.log('diff=' + wD + ',' + hD);
+        //console.log('diff=' + wD + ',' + hD);
         newPath.anchor = false;
         /*if (!this.instances[newPath.instanceParentIndex].anchor) {
           this.instances[newPath.instanceParentIndex].update({
@@ -180,9 +141,8 @@ define([
      *index of the instance used to render the path
      */
     render: function(data, currentNode) {
-      console.log('path_render: ' + this.name);
       var path_literal = this.getLiteral();
-
+      console.log("render: "+this.type);
       if (data) {
         for (var k = 0; k < this.instances.length; k++) {
 
@@ -207,12 +167,7 @@ define([
 
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
-              /*if(instance_literal.selected){
-                var bbox = new paper.Path.Rectangle(instance_literal.bounds);
-                bbox.strokeColor = 'red';
-                this.scaffolds.push(bbox);
-
-              }*/
+          
               if (this.instances[k].anchor) {
                 if (k === 0) {
                   instance_literal.strokeColor = '#83E779';
@@ -233,7 +188,6 @@ define([
                 }
               }
             }
-            //instance_literal.selected = data[d].selected;
 
 
             instance_literal.visible = this.instances[k].visible;
@@ -258,7 +212,6 @@ define([
           instance_literal.visible = this.instances[z].visible;
           instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);
-          //this.instance_literals.selected = this.instances[z].selected;
           this.instance_literals.push(instance_literal);
           instance_literal.instanceIndex = this.instance_literals.length - 1;
         }
@@ -287,37 +240,26 @@ define([
      * path= original path literal that was selected- used to ensure we are selecting the right object
      */
     selectByValue: function(index, value, path, currentNode) {
-      //console.log('select by path value');
       var sIndexes = [];
 
       if (this.containsPath(path)) {
 
         for (var i = 1; i < this.instance_literals.length; i++) {
-          //console.log(this.instance_literals[i].data.renderSignature);
           var compareSig = this.instance_literals[i].data.renderSignature.slice(0, index + 1);
           compareSig = compareSig.join();
-          //console.log('compareSig='+compareSig);
-          //console.log('valueSig='+value);
+         
           if (compareSig === value) {
-            //this.instance_literals[i].selected = true;
             var last = this.instance_literals[i].data.renderSignature.length - 1;
-            // console.log('selected render sig:' + this.instance_literals[i].data.renderSignature);
             var iIndex = this.instance_literals[i].data.renderSignature[last];
             this.instances[iIndex].selected = true;
             var copySig = this.instance_literals[i].data.renderSignature.slice(0);
 
             copySig.pop();
-            // console.log('copy sig:' + copySig);
             if (copySig.length > 0) {
               sIndexes.push(copySig);
             }
-
-            //console.log('selected path value='+this.instance_literals[i].data.renderSignature);
+     
           }
-          //else{
-          // console.log('unselected path value='+this.instance_literals[i].data.renderSignature);
-
-          //}
 
         }
       }
@@ -382,9 +324,7 @@ define([
 
         } else {
           var path_literal = this.instance_literals[i + 1];
-          // console.log('path_literal=');
-          //  console.log(path_literal);
-          // console.log(path_literal.segments);
+        
           pA = {
             x: path_literal.segments[0].point.x,
             y: path_literal.segments[0].point.y
@@ -398,7 +338,6 @@ define([
 
         pM = instance.position;
         side = TrigFunc.side(pA, pB, pM);
-        // console.log('side='+side);
         return side;
 
       }
@@ -406,36 +345,23 @@ define([
 
     //checks for intersection and returns the first path found
     checkIntersection: function() {
-      // console.log('num of instances to check'+this.instance_literals.length);
       for (var i = 1; i < this.instance_literals.length; i++) {
         var instance_literal = this.instance_literals[i];
-        //   console.log('registering at'+i);
         var paths = paper.project.activeLayer.children;
-        //console.log('paths to check:'+paths.length);
         for (var j = 0; j < paths.length; j++) {
 
           if (paths[j].visible && !this.containsPath(paths[j])) {
             if (paths[j].nodeParent) {
               if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
-                // console.log('do nothing');
               } else {
-                // console.log('checking at:'+j);
-                //console.log('checking instance at'+i);
                 var ints = paths[j].getIntersections(instance_literal);
-                //console.log('intersections:');
-                // console.log(intersections);
                 if (ints.length > 0) {
-                  // console.log('intersection found');
                   return paths[j];
                 }
               }
             }
 
           }
-          /* if(intersection!=null){
-          return intersection'
-          
-        }*/
         }
       }
       return null;

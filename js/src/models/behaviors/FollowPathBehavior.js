@@ -12,18 +12,17 @@ define([
     var FollowPathBehavior = BaseBehavior.extend({
 
       constructor: function(pathChild) {
-        //console.log('follow path initialized');
         this.pathChild = pathChild;
 
       },
 
 
-      update: function() {
+      update: function(data) {
+        console.log("follow path update: "+ this.type);
         this.clearScaffolds();
         for (var i = 1; i < this.pathChild.instance_literals.length; i++) {
           this.followPath(this.pathChild.instance_literals[i]);
         }
-
 
       },
 
@@ -31,7 +30,6 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(path) {
-        console.log('following path');
         if (this.children.length > 1) {
           for (var z = 0; z < this.children.length; z++) {
             if (this.children[z] != this.pathChild) {
@@ -39,6 +37,8 @@ define([
               child.name = 'path_child';
               var left = child.getChildrenLeft();
               var top = child.getChildrenTop();
+              var thisLeft = this.getLeft();
+              var thisTop = this.getTop();
               path.nodeParent.name = "parent_path";
               path.sendToBack();
               var num = child.instances.length;
@@ -57,7 +57,6 @@ define([
 
               var offset = cA.distance;
 
-              //console.log(testPath.segments);
               var finalPath = testPath;
              /* if (!locA.equals(testPath.firstSegment.point)) {
                 finalPath = testPath.split(cA);
@@ -82,7 +81,6 @@ define([
               var location = finalPath.segments[0].point;
 
               for (var i = 0; i < num; i++) {
-                //console.log(location);
 
                 var location_n = finalPath.segments[i].point;
                 var instance = child.instances[i];
@@ -94,9 +92,8 @@ define([
 
           
                 var delta = location_n.subtract(location);
-                //delta.angle += 90;
-                console.log("child left,top"+left+","+top); 
-                var difference = {x:location_n.x-left,y:location_n.y-top};
+                //console.log("child left,top"+left+","+top); 
+                var difference = {x:location_n.x-left-thisLeft,y:location_n.y-top-thisTop};
                 instance.update({
                   position: difference,
                   //rotation: delta.angle
@@ -104,7 +101,6 @@ define([
                 console.log("difference=");
                 console.log(difference);
 
-                //child.resetChildren(i,difference);
 
                 location = location_n;
               }
@@ -118,13 +114,10 @@ define([
                 rotation: endDelta.angle
               });
 
-              /*if (this.getParentNode != parent) {
-        parent.addChildNode(this);
-      }*/
+      
               finalPath.remove();
               finalPath = null;
 
-              //console.log("test path is removed");
 
             }
           }

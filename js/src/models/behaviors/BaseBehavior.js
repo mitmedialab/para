@@ -15,7 +15,6 @@ define([
 
 			constructor:function(){
 				this.excludes = [];
-				console.log('base behavior constructor called');
 			},
 			
 
@@ -26,11 +25,9 @@ define([
 			addCondition: function(propA,operator,targetB,propB) {
 				var condition = new Condition(propA,operator,targetB,propB);
 				this.conditions.push(condition);
-				console.log(condition);
 			},
 
 			checkConditions: function(instance) {
-				//console.log('total num of conditions=' + this.conditions.length);
 				for (var i = 0; i < this.conditions.length; i++) {
 					 if(!this.conditions[i].evaluate(instance)) {
 						return false;
@@ -59,7 +56,6 @@ define([
 			isExcluded: function(index){
 				for(var i=0;i<this.excludes.length;i++){
 					if(this.excludes[i]===index){
-						console.log("excluded found");
 						return true;
 					}
 				}
@@ -67,7 +63,6 @@ define([
 			},
 
 			render: function(){
-				console.log('behavior_render');
 				//console.log("behavior data="+ data);
 				//console.log("behavior node="+ currentNode);
 				/* if (this.nodeParent == currentNode) {

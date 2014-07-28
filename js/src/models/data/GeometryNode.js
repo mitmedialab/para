@@ -110,6 +110,7 @@ define([
     },
 
     getChildrenRight: function(){
+     if(this.children.length>0){
       var right =this.children[0].getRight();
       for(var i=1;i<this.children.length; i++){
         var r = this.children[i].getRight();
@@ -118,6 +119,10 @@ define([
         }
       }
       return right;
+    }
+    else{
+      return 0;
+    }
     },
 
     getChildrenTop: function(){
@@ -137,6 +142,7 @@ define([
     },
 
     getChildrenBottom: function(){
+      if(this.children.length>0){
          var bottom =this.children[0].getBottom();
       for(var i=1;i<this.children.length; i++){
         var r = this.children[i].getBottom();
@@ -145,6 +151,10 @@ define([
         }
       }
       return bottom;
+    }
+    else{
+      return 0;
+    }
     },
 
 
@@ -185,7 +195,6 @@ define([
      * in original path location
      */
     createInstance: function(data) {
-      //should it create a copy node here with a value of 1? no, that produces an infinite chain...
       var instance;
       if (data) {
         instance = data.clone();
@@ -221,27 +230,20 @@ define([
 
 
     //updates instances according to data and the passes the updated instances to child function
-
     update: function(data) {
-      // console.log('update for:'+this.type);
-       console.log('update: '+this.name);
+      console.log("geom update: "+ this.type);
       var parentType = '';
       if (this.nodeParent) {
         parentType = this.nodeParent.type;
-        // console.log('parent type='+this.nodeParent.type);
       }
       for (var j = 0; j < this.instances.length; j++) {
         for (var i = 0; i < data.length; i++) {
           var instance = this.instances[j];
-          //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-          // console.log(instance.position);
-          instance.update(data[i]);
-          //console.log('after update');
-          //  console.log(instance.position);
+         instance.update(data[i]);
+        
         }
       }
       for (var k = 0; k <this.children.length; k++) {
-          console.log(k);
           this.children[k].update([{}]);
         }
   
@@ -252,48 +254,25 @@ define([
     },
 
     increment: function(data) {
-      // console.log('update for:'+this.type);
-    
+
       for (var j = 0; j < this.instances.length; j++) {
         for (var i = 0; i < data.length; i++) {
           var instance = this.instances[j];
-          //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-          // console.log(instance.position);
           instance.render(data[i]);
-          //console.log('after update');
-          //  console.log(instance.position);
         }
       }
 
     },
-
-    updateChildren: function(data){
-      console.log("update children");
-       this.update(data);
-        for (var k = 0; k <this.children.length; k++) {
-          console.log(k);
-          this.children[k].update([{}]);
-        }
-    },
-    //sets instances relative to a given set of geometric properties
-   /* setInstancesRelative: function(index,relativePos){
-      for(var i=0;i<this.instances.length;i++){
-        //if this.instances[i].instanceParent
-      }
-
-    },*/
 
     updateSelected: function(data) {
+    console.log("geom update selected: "+ this.type);
+    console.log(data);
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
-          //console.log('found selected instance at:' + j);
           for (var i = 0; i < data.length; i++) {
+            console.log("updating selected instance at"+j);
             var instance = this.instances[j];
-            //console.log('instance ' +this.type+'_'+parentType+'_'+instance.copy+' position on reg update:');
-            //console.log(instance.position);
             instance.render(data[i]);
-            //console.log('after update');
-            //console.log(instance.position);
           }
         }
       }
@@ -329,7 +308,7 @@ define([
       }
     },
 
-    //shows or hides all instances
+    /*shows or hides all instances*/
     setVisible: function(v){
       for(var j=0;j<this.instances.length;j++){
         this.instances[j].visible=v;
@@ -358,19 +337,14 @@ define([
      *index of the instance used to render the path
      */
     render: function(data, currentNode) {
-      // console.log('num of instances:'+this.type+': '+this.instances.length);
       //first create array of new instances that contain propogated updated data
-      if(this.type!='root'){
-        console.log('geom render');
-      }
-      //console.log(data);
-      if (data) {
-          // console.log('geom render with data');
+     
+console.log("render: "+this.type);
+ if (data) {
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
             var u_instance = this.instances[j].clone();
-            //console.log('data at '+ i);
-            //console.log(data[i]);
+          
             if(data[i].renderSignature){
               u_instance.renderSignature = data[i].renderSignature.slice(0);
             }
@@ -430,18 +404,15 @@ define([
 
     //selects according render signature
     selectByValue: function(index, value, path, currentNode) {
-      //console.log('select by geom value');
       var sIndexes = [];
       for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].containsPath(path)) {
           var results = this.children[i].selectByValue(index, value, path, currentNode);
-         // console.log('select by value results=' + results);
-        //  console.log(results);
+       
           if (this != currentNode) {
             for (var j = 0; j < results.length; j++) {
               if (results[j].length > 0) {
                 var last = results[j].length - 1;
-               // console.log('selecting instance at' + last);
                 this.instances[results[j][last]].selected = true;
 
                 results[j].pop();
@@ -459,7 +430,6 @@ define([
 
     //selects or deselects all path instances
     selectAll: function() {
-      //console.log('calling geometry select all'+ isSelect);
       for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].selected = true;
       }
@@ -472,7 +442,6 @@ define([
 
     //selects or deselects all path instances
     deselectAll: function() {
-      //console.log('calling geometry select all'+ isSelect);
       for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].selected = false;
       }
@@ -502,10 +471,10 @@ define([
       return false;
     },
 
+    //checks to see if behavior type has been added to this instance
     containsBehaviorType: function(type) {
       var indexes = [];
       for (var i = 0; i < this.behaviors.length; i++) {
-        //console.log('behavior_type='+this.behaviors[i].type);
         if (this.behaviors[i].type === type) {
 
           indexes.push(i);
@@ -514,11 +483,11 @@ define([
       if (indexes.length > 0) {
         return indexes;
       }
-      console.log('returning false for behavior');
       return false;
 
     },
 
+    //returns first behavior that matches name
     getBehaviorByName: function(name){
        for (var i = 0; i < this.behaviors.length; i++) {
         if (this.behaviors[i].name === name) {
@@ -528,6 +497,7 @@ define([
       return null;
     },
 
+    //checks by name to see if behavior type has been added to this instance
     containsBehaviorName: function(name) {
       var indexes = [];
       for (var i = 0; i < this.behaviors.length; i++) {
@@ -545,12 +515,10 @@ define([
 
     /* placeholder functions for leftOf, rightOf geometric checks */
     instanceSide: function(instance){
-      console.log('calling geom instance side');
       return -1;
     },
 
     checkIntersection: function(){
-     // console.log('geom check intersection');
       for (var i=0;i<this.children.length;i++){
         var intersection = this.children[i].checkIntersection();
         if(intersection!==null){

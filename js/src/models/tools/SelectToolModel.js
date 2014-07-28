@@ -48,13 +48,11 @@ define([
       segment = null;
 
       var hitResult = paper.project.hitTest(event.point, hitOptions);
+     
       //deselect everything
       var children = paper.project.activeLayer.children;
       for (var i = 0; i < children.length; i++) {
-        //if(children[i].data.instanceParent){
-        //if(!children[i].data.instanceParent.anchor){
         children[i].selected = false;
-        // } //}
       }
 
       if (hitResult) {
@@ -78,12 +76,9 @@ define([
             }
             this.trigger('setSelection', path);
 
-
             if (event.modifiers.option) {
               this.trigger('optionClick', this.selectedNodes[this.selectedNodes.length - 1]);
             }
-
-
 
           }
         }
@@ -95,18 +90,10 @@ define([
     },
 
     dblClick: function(event) {
-      // console.log('double click');
       if (this.currentPaths.length > 0) {
-
         this.trigger('moveDownNode', this.currentPaths[this.currentPaths.length - 1]);
-
-
-
-        //  this.path.instanceParent.isAnchor(!this.path.instanceParent.anchor);
       } else {
         this.trigger('moveUpNode');
-        //console.log('current node is set in select tool to='+this.currentNode.type);
-
       }
     },
 
@@ -135,20 +122,15 @@ define([
               selPath.nodeParent.updatePath(selPath,event.delta);
               this.trigger('rootUpdate');
               this.trigger('rootRender');
-              console.log('numPaths=' + paper.project.activeLayer.children.length);
             }
-
-            //this.segmentMod = true;
           }
 
-          //this.trigger('rootRender');
 
         } else {
           if (this.currentNode) {
 
             for (var i = 0; i < this.selectedNodes.length; i++) {
-
-              //console.log("updating selected Node at"+i);
+              console.log("selected at "+i);
               this.selectedNodes[i].updateSelected([{
                 position: {
                   x: event.delta.x,
@@ -156,6 +138,7 @@ define([
                 }
               }]);
             }
+            console.log("calling root update");
             this.trigger('rootUpdate');
             this.trigger('rootRender');
 

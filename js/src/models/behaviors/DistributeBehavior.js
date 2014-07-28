@@ -13,9 +13,9 @@ define([
       name: 'linear',
       type: 'distribution',
 
-     
+
       update: function() {
-       // console.log("distribution update");
+        // console.log("distribution update");
         this.clearScaffolds();
         this.setVisible(true);
         this.distribute();
@@ -26,7 +26,7 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       distribute: function() {
-       //console.log("distributing instances");
+        //console.log("distributing instances");
         if (this.children.length > 0) {
           for (var z = 0; z < this.children.length; z++) {
             if (this.children[z] !== null) {
@@ -35,14 +35,14 @@ define([
 
               var pointA = child.instances[0].position;
               var pointB = child.instances[child.instances.length - 1].position;
-              if(TrigFunc.equals(pointA,pointB)){
-                child.instances[child.instances.length - 1].position.x+=40;
-                child.instances[child.instances.length - 1].position.y+=40;
+              if (TrigFunc.equals(pointA, pointB)) {
+                child.instances[child.instances.length - 1].position.x += 40;
+                child.instances[child.instances.length - 1].position.y += 40;
                 pointB = child.instances[child.instances.length - 1].position;
               }
               var selected = child.getFirstSelectedInstance();
-              
-                /*var scaffoldLine =  new paper.Path();
+
+              /*var scaffoldLine =  new paper.Path();
                 scaffoldLine.strokeColor = '#00CFFF';
                 scaffoldLine.strokeWidth = 4;
                 scaffoldLine.add(new paper.Point(pointA.x,pointA.y));
@@ -61,22 +61,24 @@ define([
                // var scaffoldC = new Scaffold(pointBC);
                 this.scaffolds.push(pointBC);*/
 
-  
-           
-              var xDiff = (pointB.x - pointA.x) / (num-1);
-              var yDiff = (pointB.y - pointA.y) / (num-1);
-              var dist = TrigFunc.distance(pointA,{x:pointA.x+xDiff,y:pointA.y+yDiff});
-              if(selected){
-                if(selected.index === 1){
-                  this.checkDistanceIncrement(child.instances[0],selected.instance,dist,child);
-                }
-               else if(selected.index==child.instances.length-2){
-                  this.checkDistanceDecrement(child.instances[0],selected.instance,dist,child);
+
+
+              var xDiff = (pointB.x - pointA.x) / (num - 1);
+              var yDiff = (pointB.y - pointA.y) / (num - 1);
+              var dist = TrigFunc.distance(pointA, {
+                x: pointA.x + xDiff,
+                y: pointA.y + yDiff
+              });
+              if (selected) {
+                if (selected.index === 1) {
+                  this.checkDistanceIncrement(child.instances[0], selected.instance, dist, child);
+                } else if (selected.index == child.instances.length - 2) {
+                  this.checkDistanceDecrement(child.instances[0], selected.instance, dist, child);
 
                 }
               }
-           
-              for (var i = 1; i < num-1; i++) {
+
+              for (var i = 1; i < num - 1; i++) {
                 //console.log(location);
                 var x = pointA.x + xDiff * i;
                 var y = pointA.y + yDiff * i;
@@ -89,53 +91,31 @@ define([
                 });
               }
 
-                for (var i = 0; i < num; i++) {
-                    console.log("linear path position:");
-                    console.log(child.instances[i].position);
-                }
-
-              for(var j=0;j<child.instance_literals.length;j++){
-                //console.log('visible='+result+':'+j);
+              for (var j = 0; j < child.instance_literals.length; j++) {
 
                 var result = this.checkConditions(child.instance_literals[j]);
-                
-                //console.log('visible='+result+':'+j);
+                if (!result) {
+                  child.instances[child.instance_literals[j].instanceParentIndex].visible = result;
 
-               // child.instances[j].visible=result;
-             if(!result){ 
-                child.instances[child.instance_literals[j].instanceParentIndex].visible = result;
-                //console.log('visible='+result+':'+j);
+                }
+
               }
-               
-              }
-
-
-              /*if (this.getParentNode != parent) {
-        parent.addChildNode(this);
-      }*/
             }
           }
         }
 
       },
 
-      checkDistance: function(start,selected,tDist,child){
+      checkDistance: function(start, selected, tDist, child) {
 
-          var dist = TrigFunc.distance(start.position,selected.position);
-         // console.log("num copies="+this.copyNum);
-          if(dist<tDist+20){
-           this.copyNum++;
-          //  console.log("incrementing copy");
-          }
-          else if(dist>tDist+20){
-             this.copyNum--;
-          //   console.log("decrementing copy");
-          
-          }
-         // console.log('selected Distance ='+dist);
-          //console.log('target Distance ='+tDist);
+        var dist = TrigFunc.distance(start.position, selected.position);
+        if (dist < tDist + 20) {
+          this.copyNum++;
+        } else if (dist > tDist + 20) {
+          this.copyNum--;
 
-
+        }
+     
       }
 
 

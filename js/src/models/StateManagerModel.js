@@ -123,27 +123,22 @@ this.event_bus = event_bus;
     //callback triggered when tool adds new node
     nodeAdded: function(node) {
       //console.log('node added: '+ node.type);
- 
       currentNode.addChildNode(node);
-           //console.log('number of children on root='+currentNode.getNumChildren());
       toolCollection.get(this.get('state')).currentNode = node;
 
     },
 
     moveUpNode: function(){
-      //console.log('moveUpNode');
       this.setCurrentNode(currentNode);
-       console.log('current node type='+currentNode.type);
+       //console.log('current node type='+currentNode.type);
        this.rootRender();
     },
 
     //moves down based on path
     moveDownNode: function(path){
-      //console.log('move down node');
       var children = currentNode.children;
       for(var i=0;i<children.length;i++){
         if(children[i].containsPath(path)&&children[i].type!='path'){
-         // console.log('found path at child'+i);
             currentNode = children[i];
            toolCollection.get(this.get('state')).currentNode = children[i];
         }
@@ -158,16 +153,13 @@ this.event_bus = event_bus;
     * sends this as the starting value for selecting other relevant paths based on the current node
     */
    setSelection: function(path){
-     // console.log('set selection');
    
       var index  = currentNode.getLevelInTree(rootNode,0);
-      //console.log("selection level="+level);
-      //console.log("render signature of path="+path.data.renderSignature);
+     
       if(path.data.renderSignature[index]!==null){
         var value = path.data.renderSignature.slice(0,index+1);
         value = value.join();
 
-        //console.log("selection value="+value);
         currentNode.selectByValue(index,value, path, currentNode);
       }
      
@@ -304,7 +296,7 @@ this.event_bus = event_bus;
 
     save: function(){
       var data = rootNode.exportJSON();
-      console.log(JSON.stringify(data));
+      //console.log(JSON.stringify(data));
     },
 
     updateStroke: function(width){
