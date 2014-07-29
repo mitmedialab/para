@@ -6,12 +6,14 @@ define([
   'underscore',
   'backbone',
   'models/data/BehaviorNode',
+      'utils/TrigFunc',
+
   'models/behaviors/CopyBehavior',
   'models/behaviors/DistributeBehavior',
   'models/behaviors/RadialDistributeBehavior',
   'models/behaviors/FollowPathBehavior'
 
-], function($, _, Backbone, BehaviorNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior) {
+], function($, _, Backbone, BehaviorNode, TrigFunc, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior) {
   var nameVal = 0;
   var BehaviorManagerModel = Backbone.Model.extend({
 
@@ -23,6 +25,24 @@ define([
       this.listenTo(this.event_bus, 'newBehavior', this.newBehavior);
       this.conditional_line=null;
       this.test= true;
+    },
+
+    newCondition: function(nodes,conditional_node){
+      console.log("adding behavioral condition");
+      conditional_node.instances[0].strokeColor = '#FF0000';
+      conditional_node.instances[0].strokeWidth = 5;
+
+      for(var i=0;i<nodes.length;i++){
+              console.log(nodes[0]);
+
+        nodes[0].addCondition(null,'color',conditional_node,null);
+        nodes[0].update([{}]);
+
+      }
+
+
+      
+
     },
 
     newBehavior: function(nodes, type) {
@@ -70,7 +90,6 @@ define([
         
         var linearBehavior = new DistributeBehavior();
        
-        linearBehavior.addCondition(null,'leftOf',this.conditional_line,null);
          // this.test=false;
         
         // console.log('lineartype=' +linearBehavior.type);
@@ -83,6 +102,16 @@ define([
         var radialBehavior = new RadialDistributeBehavior();
         behaviorNode.extendBehaviorFirst(radialBehavior, ['update']);
         behaviorNode.update([{}]);
+        /*var pointA = nodes[0].instances[0].position;
+        var pointB = nodes[0].instances[nodes[0].instances.length - 1].position;
+        var midPoint = TrigFunc.midpoint(pointA,pointB);
+        var oldPosition = behaviorNode.instances[0].position;
+        var diff = TrigFunc.subtract(oldPosition,midPoint);
+        behaviorNode.instances[0].position=midPoint;
+        for(var i=0;i<nodes[0].instances.length;i++){
+          nodes[0].render({position:diff});
+        }*/
+
       }
       else if (type == 'followPath') {
         console.log('follow path behavior called');
@@ -114,7 +143,7 @@ define([
 
     testObj: function(tO){
     // console.log('test object is set');
-      this.conditional_line= tO;
+      //this.conditional_line= tO;
     }
 
 

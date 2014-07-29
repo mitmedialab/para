@@ -76,17 +76,17 @@ this.event_bus = event_bus;
       rootNode.type = 'root';
       currentNode = rootNode;
 
-      var path =  new paper.Path();
+      /*var path =  new paper.Path();
       path.strokeColor = 'red';
 
       path.add(new paper.Point(300,0));
       path.add(new paper.Point(800,300));
 
-     /* var path2 =  new paper.Path();
+     var path2 =  new paper.Path();
       path2.strokeColor = 'green';
 
       path2.add(new paper.Point(500,0));
-      path2.add(new paper.Point(0,500));*/
+      path2.add(new paper.Point(0,500));
    
 
       var conditional_line = new PathNode();
@@ -94,13 +94,13 @@ this.event_bus = event_bus;
       
       conditional_line.createInstanceFromPath(path);
      
-      this.nodeAdded(conditional_line);
+      this.nodeAdded(conditional_line);*/
       this.rootRender();
         /*       var intersections = conditional_line.checkIntersection();
 
        console.log("test intersection=");
       console.log(intersections);*/
-      this.event_bus.trigger('sendTestObj',conditional_line);
+      //this.event_bus.trigger('sendTestObj',conditional_line);
 
     },
 
@@ -161,6 +161,7 @@ this.event_bus = event_bus;
         value = value.join();
 
         currentNode.selectByValue(index,value, path, currentNode);
+
       }
      
     },
@@ -201,6 +202,7 @@ this.event_bus = event_bus;
     //callback triggered when select tool selects shape
     nodeSelected: function(selected) {
       this.determineSelectionPoint(selected);
+
     },
 
    /*recursively follows parent hierarchy upwards to find correct selection point 
@@ -215,6 +217,9 @@ this.event_bus = event_bus;
        toolCollection.get(this.get('state')).currentNode = currentNode;
          if(toolCollection.get(this.get('state')).selectedNodes.indexOf(selected)==-1){
             toolCollection.get(this.get('state')).selectedNodes.push(selected);
+            console.log("selected node");
+            this.event_bus.trigger('nodeSelected',selected);
+
           }
         return;
       }
@@ -296,6 +301,7 @@ this.event_bus = event_bus;
 
     save: function(){
       var data = rootNode.exportJSON();
+      this.exportSVG();
       //console.log(JSON.stringify(data));
     },
 
@@ -342,9 +348,11 @@ this.event_bus = event_bus;
       currentNode.update([{}]);
       this.rootRender();
      paper.view.draw();  
+    },
+
+ exportSVG: function(){
+      console.log(paper.project.exportSVG( { asString: true} ));
     }
-
-
 
   });
 

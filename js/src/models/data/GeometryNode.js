@@ -8,10 +8,11 @@ define([
   'underscore',
   'models/data/SceneNode',
   'models/data/Instance',
-      'models/PaperManager'
+      'models/PaperManager',
+      'models/data/Condition',
 
 
-], function($, _, SceneNode, Instance, PaperManager) {
+], function($, _, SceneNode, Instance, PaperManager,Condition) {
   var paper = PaperManager.getPaperInstance();
 
   var GeometryNode = SceneNode.extend({
@@ -35,6 +36,8 @@ define([
       this.instance_literals = [];
       this.behaviors = [];
       this.follow= false;
+      this.conditions= [];
+
 
 
       SceneNode.apply(this, arguments);
@@ -244,6 +247,7 @@ define([
         
         }
       }
+     
       for (var k = 0; k <this.children.length; k++) {
           this.children[k].update([{}]);
         }
@@ -360,13 +364,15 @@ define([
               u_instance.selected = data[i].selected;
                u_instance.anchor = data[i].anchor;
             }
+           
             this.instance_literals.push(u_instance);
-            /*var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,5);
+            var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,5);
                 dot.fillColor = 'red';
-                this.scaffolds.push(dot);*/
+                this.scaffolds.push(dot);
 
           }
         }
+     
 
 
         for (var k = 0; k < this.children.length; k++) {
@@ -619,6 +625,28 @@ define([
             }
           }
         }
+
+      },
+
+      addConstraint: function(constraint){
+
+      }, 
+
+      addCondition: function(propA,operator,targetB,propB) {
+        var condition = new Condition(propA,operator,targetB,propB);
+        this.conditions.push(condition);
+      },
+
+      checkConditions: function(instance) {
+        for (var i = 0; i < this.conditions.length; i++) {
+           if(!this.conditions[i].evaluate(instance)) {
+            return false;
+          }
+        }
+        return true;
+      },
+
+      checkConstraints: function(constraint, instance){
 
       },
 

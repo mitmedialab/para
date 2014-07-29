@@ -23,6 +23,10 @@ define([
 			return false;
 		};
 
+		TrigFunc.subtract = function(p1,p2){
+			return {x:p1.x-p2.x,y:p1.y-p2.y};
+		};
+
 		TrigFunc.distance= function(p1, p2) {
 			//console.log("p1="+p1);
 			//console.log("p2="+p2);

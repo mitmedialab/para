@@ -122,7 +122,7 @@ define([
         // console.log('=========== new path updated ===========' );
         //console.log(newPath.position);
         newPath.rotate(0 - this.instances[removedItem.instanceParentIndex].rotation);
-
+        //newPath.matrix.reset();
         removedItem.remove();
         removedItem = null;
         this.instance_literals.unshift(newPath);
@@ -152,9 +152,10 @@ define([
             instance_literal.instanceParentIndex = k;
             instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
             instance_literal.data.renderSignature.push(k);
+            //instance_literal.transform(this.instances[k].matrix);
             instance_literal.position.x = this.instances[k].position.x + instance_literal.bounds.width / 2 + data[d].position.x;
             instance_literal.position.y = this.instances[k].position.y + instance_literal.bounds.height / 2 + data[d].position.y;
-            instance_literal.scale(this.instances[k].scale * data[d].scale);
+            instance_literal.scale(this.instances[k].scale * data[d].scale,instance_literal.bounds.topLeft);
             instance_literal.rotate(this.instances[k].rotation + data[d].rotation, instance_literal.bounds.topLeft);
             instance_literal.strokeColor = this.instances[k].strokeColor;
             if (instance_literal.closed) {
@@ -191,11 +192,14 @@ define([
 
 
             instance_literal.visible = this.instances[k].visible;
+          
             if (this.nodeParent != currentNode && this.follow) {
               instance_literal.visible=false;
             }
             this.instance_literals.push(instance_literal);
             instance_literal.instanceIndex = this.instance_literals.length - 1;
+            //console.log('path matrix');
+            //console.log(instance_literal.matrix);
             /*var dot = new paper.Path.Circle(this.instances[k].position.x+data[d].position.x,this.instances[k].position.y+data[d].position.y,5);
                 dot.fillColor = 'green';
                 this.scaffolds.push(dot);*/

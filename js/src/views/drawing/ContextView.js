@@ -16,9 +16,9 @@ var template,source, menuX, menuY, currentNode;
     initialize: function(obj, event_bus) {
       //listen to update view statements from model to re-render view
       //this.listenTo(this.model,'updateView',this.render);
-
-      this.listenTo(event_bus, 'canvasMouseMove', this.setMenuPosition);
-      this.listenTo(event_bus, 'openMenu', this.showMenu);
+      this.event_bus = event_bus;
+      this.listenTo(this.event_bus, 'canvasMouseMove', this.setMenuPosition);
+      this.listenTo(this.event_bus, 'openMenu', this.showMenu);
       this.visible = false;
         source = $('#menu-template').html();
       template = Handlebars.compile(source);
@@ -30,6 +30,8 @@ var template,source, menuX, menuY, currentNode;
       'mousedown': 'mouseDown',
       'click #close-btn':'hideMenu',
       'click #new-behavior-btn':'newBehavior',
+      'click #new-cond-btn':'newCondition',
+
       'click #behavior-types-menu': 'addBehavior'
     },
 
@@ -63,11 +65,24 @@ var template,source, menuX, menuY, currentNode;
       //this.model.newBehavior(currentNode);
     },
 
+     newCondition: function(){
+            console.log("new condition");
+
+      this.listenToOnce(this.event_bus, 'nodeSelected', this.addCondition);
+      //this.model.newBehavior(currentNode);
+    },
+
     addBehavior: function(event){
       var id = $(event.toElement).attr('id');
       if(id){
         this.model.newBehavior([currentNode],id);
       }
+    },
+
+    addCondition: function(selected){
+      console.log("adding condition");
+      this.model.newCondition([currentNode],selected);
+      console.log(selected);
     },
 
     generateBehaviors: function(){

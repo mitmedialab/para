@@ -7,7 +7,9 @@ define([
 	'underscore',
 	'jquery',
 	'backbone',
-], function(_, $,Backbone) {
+	'models/PaperManager'
+], function(_, $,Backbone, PaperManager) {
+ var paper = PaperManager.getPaperInstance();
 
 	var Instance = Backbone.Model.extend({
 
@@ -33,7 +35,8 @@ define([
 			//array that contains the path of inheritance from a render;
 			this.renderSignature = [];
 			Backbone.Model.apply(this, arguments);
-		 },
+			this.matrix = new paper.Matrix();
+					 },
 		reset: function() {
 			//console.log("reset instance");
 			this.visible= true;
@@ -47,7 +50,7 @@ define([
 			this.selected= false;
 			this.closed = false;
 			this.instanceParentIndex = 0;
-			this.index = null
+			this.index = null;
 
 			
 		},
@@ -124,6 +127,8 @@ define([
 
 				this.position.x+=data.position.x;
 				this.position.y+=data.position.y;
+				this.matrix = this.matrix.translate(new paper.Point(data.position.x,data.position.y));
+
 				//console.log('updated position=');
 				//console.log(this.position);
 			}

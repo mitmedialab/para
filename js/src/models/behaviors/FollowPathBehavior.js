@@ -89,9 +89,9 @@ define([
             var selected = this.getFirstSelectedInstance();
              if (selected) {
                 if (selected.index === 1) {
-                  this.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
+                  this.nodeParent.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
                 } else if (selected.index == this.instances.length - 2) {
-                  this.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
+                  this.nodeParent.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
 
                 }
               }
@@ -107,12 +107,12 @@ define([
                 dot.fillColor = 'blue ';
                 this.scaffolds.push(dot);*/
 
-                
+                instance.visible=true;
                 var delta = location_n.subtract(location);
                 //console.log('child left,top'+left+','+top); 
                 var difference = {x:location_n.x,y:location_n.y};
                 instance.update({
-                  position: difference,
+                  position: difference
 
                 });
                 if(this.toggleRotate){
@@ -138,8 +138,16 @@ define([
               finalPath = null;
 
             
-          }
-        
+           for (var j = 0; j < this.instance_literals.length; j++) {
+
+                var result = this.nodeParent.checkConditions(this.instance_literals[j]);
+                if (!result) {
+                  this.instances[this.instance_literals[j].instanceParentIndex].visible = result;
+
+                }
+              }
+          
+        }
       
 
     });
