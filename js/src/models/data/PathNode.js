@@ -111,6 +111,11 @@ define([
         var instance_pos = this.instances[path.instanceParentIndex].position;
         var diff = TrigFunc.subtract({x:nuP.x,y:nuP.y},instance_pos);
        
+       
+       console.log("rotation=")
+       console.log(this.instances[path.instanceParentIndex].rotation);
+       var reverseRot =  this.instances[removedItem.instanceParentIndex].rotation;
+       newPath.rotate(0 - reverseRot.angle, new paper.Point(reverseRot.x,reverseRot.y));
        newPath.position.x = 0;
        newPath.position.y =0;
        newPath.translate(newPath.bounds.width/2,newPath.bounds.height/2);

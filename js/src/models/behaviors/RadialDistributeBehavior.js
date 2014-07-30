@@ -75,7 +75,7 @@ define([
                 
               for (var i = 1; i < num; i++) {
                
-                console.log('angle='+angle*(i));
+                //console.log('angle='+angle*(i));
                 var position = TrigFunc.polarToCart(rad,(angle*i)+startAngle);
                 var x = position.x+origin.x;
                 var y = position.y+origin.y;
