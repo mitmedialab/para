@@ -65,7 +65,7 @@ define([
                 }
               }
               child.instances[0].anchor=true;
-              child.instances[child.instances.length-1].anchor=true;
+              //child.instances[child.instances.length-1].anchor=true;
             }
           }
         }

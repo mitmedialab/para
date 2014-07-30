@@ -44,13 +44,19 @@ define([
     createInstanceFromPath: function(path) {
       var instance = this.createInstance();
       var position = {x:path.bounds.topLeft.x, y:path.bounds.topLeft.y};
+      var width = path.bounds.width;
+      var height = path.bounds.height;  
       instance.update({position:position,
+        width: width,
+        height: height,
         strokeWidth:path.strokeWidth,
         strokeColor:path.strokeColor,
         fillColor:path.fillColor, 
         closed:path.closed});
       path.position.x =0;
       path.position.y =0;
+     
+
       path.translate(path.bounds.width/2,path.bounds.height/2);
       this.instance_literals.push(path);
       path.instanceParentIndex = this.instances.length - 1;
@@ -90,30 +96,33 @@ define([
     },
 
     //called when path data is modified 
-    updatePath: function(path, delta) {
+    updatePath: function(path) {
       var newPath = path.clone();
       try {
         newPath.instanceParentIndex = path.instanceParentIndex;
     
         var removedItem = this.instance_literals.shift();
         var removedBounds = removedItem.bounds;
+        
         var ruP = removedBounds.topLeft;
         var newBounds = newPath.bounds;
         var nuP = newBounds.topLeft;
-     
-        var wD = (newBounds.width - removedBounds.width) / 2;
-        var hD = (newBounds.height - removedBounds.height) / 2;
-     
-        newPath.anchor = false;
         
-        newPath.position.x = 0;
+        var instance_pos = this.instances[path.instanceParentIndex].position;
+        var diff = TrigFunc.subtract({x:nuP.x,y:nuP.y},instance_pos);
+       
+       newPath.position.x = 0;
        newPath.position.y =0;
        newPath.translate(newPath.bounds.width/2,newPath.bounds.height/2);
-        // console.log('=========== new path updated ===========' );
-        //console.log(newPath.position);
-        newPath.rotate(0 - this.instances[removedItem.instanceParentIndex].rotation);
+   
+        //newPath.rotate(0 - this.instances[removedItem.instanceParentIndex].rotation);
         //newPath.matrix.reset();
-        this.instances[removedItem.instanceParentIndex].increment({position:{x:wD,h:hD}});
+
+        this.instances[removedItem.instanceParentIndex].increment({position:diff});
+        for(var i=0;i<this.instances.length;i++){
+          this.instances[i].update({width:newPath.bounds.width,height:newPath.bounds.height});
+        }
+
         removedItem.remove();
         removedItem = null;
         this.instance_literals.unshift(newPath);
@@ -143,7 +152,7 @@ define([
             instance_literal.instanceParentIndex = k;
             instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
             instance_literal.data.renderSignature.push(k);
-            var nInstance = this.instances[k].clone();
+            var nInstance = this.instances[k];
             nInstance.render(data[d]);
             instance_literal.transform(nInstance.matrix);
             instance_literal.strokeColor = this.instances[k].strokeColor;
@@ -201,8 +210,8 @@ define([
           instance_literal.nodeParent = this;
           instance_literal.instanceParentIndex = z;
 
-        var nInstance = this.instances[z].clone();
-          
+        var nInstance = this.instances[z];
+          nInstance.render({});
           instance_literal.transform(nInstance.matrix);
           instance_literal.rotate(this.instances[z].rotation);
           instance_literal.scale(this.instances[z].scale);

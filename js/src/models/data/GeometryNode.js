@@ -216,12 +216,12 @@ define([
         var instance;
       if (data) {
         instance = data.clone();
-        instance.anchor = false;
+       
       } else {
         instance = new Instance();
       }
       instance.nodeParent=this;
-
+      instance.anchor = false;
       this.instances.splice(index,0,instance);
        for(var i=0;i<this.instances.length;i++){
         this.instances[i].index =i;
@@ -356,7 +356,8 @@ define([
             }
               u_instance.renderSignature.push(j);
               u_instance.instanceParentIndex = j;
-             u_instance.render(data[i]);
+             
+              u_instance.render(data[i]);
            
             if (this.nodeParent == currentNode) {
               u_instance.selected = this.instances[j].selected;
@@ -382,7 +383,9 @@ define([
         }
       } else {
 
-
+        for (var f= 0; f< this.instances.length; f++) {
+          this.instances[f].render({});
+        }
         for (var f = 0; f < this.children.length; f++) {
 
           this.children[f].render(this.instances, currentNode);

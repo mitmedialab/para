@@ -119,7 +119,7 @@ define([
             if (selPath) {
               var selSegment = selPath.segments[segment];
               selSegment.point = selSegment.point.add(event.delta);
-              selPath.nodeParent.updatePath(selPath,event.delta);
+              selPath.nodeParent.updatePath(selPath,instanceIndex);
               this.trigger('rootUpdate');
               this.trigger('rootRender');
             }
