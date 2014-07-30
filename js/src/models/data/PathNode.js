@@ -43,16 +43,21 @@ define([
      * in original path location*/
     createInstanceFromPath: function(path) {
       var instance = this.createInstance();
-
-      instance.position.x = path.bounds.topLeft.x;
-      instance.position.y = path.bounds.topLeft.y;
-      instance.strokeWidth = 1;
-      instance.closed = path.closed;
-      path.instanceParentIndex = this.instances.length - 1;
+      var position = {x:path.bounds.topLeft.x, y:path.bounds.topLeft.y};
+      instance.update({position:position,
+        strokeWidth:path.strokeWidth,
+        strokeColor:path.strokeColor,
+        fillColor:path.fillColor, 
+        closed:path.closed});
+      path.position.x =0;
+      path.position.y =0;
+      path.translate(path.bounds.width/2,path.bounds.height/2);
       this.instance_literals.push(path);
+      path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
       path.nodeParent = this;
       return instance;
+
     },
 
 
@@ -89,40 +94,26 @@ define([
       var newPath = path.clone();
       try {
         newPath.instanceParentIndex = path.instanceParentIndex;
-        //newPath.position.x=this.instance_literals[0].x;
-        //newPath.position.y=this.instance_literals[0].x;
-
+    
         var removedItem = this.instance_literals.shift();
         var removedBounds = removedItem.bounds;
         var ruP = removedBounds.topLeft;
         var newBounds = newPath.bounds;
         var nuP = newBounds.topLeft;
-        /* console.log('=========== removed path ===========' );
-      console.log(ruP);
-      console.log(removedItem.position);
-      console.log(removedBounds.width+','+removedBounds.height);
-      console.log('=========== new path ===========' );
-      console.log(nuP);
-      console.log(newPath.position);
-      console.log(newBounds.width+','+newBounds.height);*/
+     
         var wD = (newBounds.width - removedBounds.width) / 2;
         var hD = (newBounds.height - removedBounds.height) / 2;
-        //console.log('diff=' + wD + ',' + hD);
+     
         newPath.anchor = false;
-        /*if (!this.instances[newPath.instanceParentIndex].anchor) {
-          this.instances[newPath.instanceParentIndex].update({
-            position: {
-              x: path.bounds.topLeft.x,
-              y: path.bounds.topLeft.y
-            }
-          });
-        }*/
-        //newPath.position.x = removedItem.position.x+wD;
-        // newPath.position.y = removedItem.position.y+hD;
+        
+        newPath.position.x = 0;
+       newPath.position.y =0;
+       newPath.translate(newPath.bounds.width/2,newPath.bounds.height/2);
         // console.log('=========== new path updated ===========' );
         //console.log(newPath.position);
         newPath.rotate(0 - this.instances[removedItem.instanceParentIndex].rotation);
         //newPath.matrix.reset();
+        this.instances[removedItem.instanceParentIndex].increment({position:{x:wD,h:hD}});
         removedItem.remove();
         removedItem = null;
         this.instance_literals.unshift(newPath);
@@ -152,11 +143,9 @@ define([
             instance_literal.instanceParentIndex = k;
             instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
             instance_literal.data.renderSignature.push(k);
-            //instance_literal.transform(this.instances[k].matrix);
-            instance_literal.position.x = this.instances[k].position.x + instance_literal.bounds.width / 2 + data[d].position.x;
-            instance_literal.position.y = this.instances[k].position.y + instance_literal.bounds.height / 2 + data[d].position.y;
-            instance_literal.scale(this.instances[k].scale * data[d].scale,instance_literal.bounds.topLeft);
-            instance_literal.rotate(this.instances[k].rotation + data[d].rotation, instance_literal.bounds.topLeft);
+            var nInstance = this.instances[k].clone();
+            nInstance.render(data[d]);
+            instance_literal.transform(nInstance.matrix);
             instance_literal.strokeColor = this.instances[k].strokeColor;
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
@@ -212,8 +201,9 @@ define([
           instance_literal.nodeParent = this;
           instance_literal.instanceParentIndex = z;
 
-          instance_literal.position.x = this.instances[z].position.x;
-          instance_literal.position.y = this.instances[z].position.y;
+        var nInstance = this.instances[z].clone();
+          
+          instance_literal.transform(nInstance.matrix);
           instance_literal.rotate(this.instances[z].rotation);
           instance_literal.scale(this.instances[z].scale);
           instance_literal.visible = this.instances[z].visible;

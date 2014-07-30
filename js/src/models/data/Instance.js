@@ -104,6 +104,44 @@ define([
 			if(data.fillColor){
 				this.fillColor = data.fillColor;
 			}
+			if(data.closed){
+				this.closed = data.closed;
+			}
+			
+
+
+
+
+		},
+
+		increment: function(data){
+			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
+			if(data.position){
+				//console.log('prior position =');
+				//console.log(this.position);
+
+				this.position.x+=data.position.x;
+				this.position.y+=data.position.y;
+				//console.log('updated position=');
+				//console.log(this.position);
+			}
+			if(data.scale){
+				this.scale*=data.scale;
+			
+			}
+			if(data.rotation){
+				//console.log("updating rotation");
+				this.rotation+=data.rotation;
+			}
+			if(data.strokeWidth){
+				this.strokeWidth+=data.strokeWidth;
+			}
+			if(data.strokeColor){
+				this.strokeColor= data.strokeColor;
+			}
+			if(data.fillColor){
+				this.fillColor = data.fillColor;
+			}
 			
 
 
@@ -121,17 +159,22 @@ define([
 			//if(this.nodeParent){
 				//console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
 			//}
+			this.matrix.reset();
 			if(data.position){
 				//console.log('prior position =');
 				//console.log(this.position);
 
-				this.position.x+=data.position.x;
-				this.position.y+=data.position.y;
-				this.matrix = this.matrix.translate(new paper.Point(data.position.x,data.position.y));
+			
+				
+				this.matrix = this.matrix.translate(new paper.Point(this.position.x+data.position.x,this.position.y+data.position.y));
 
 				//console.log('updated position=');
 				//console.log(this.position);
 			}
+			else{
+				this.matrix = this.matrix.translate(new paper.Point(this.position.x,this.position.y));
+			}
+
 			if(data.scale){
 				this.scale*=data.scale;
 			
@@ -169,6 +212,7 @@ define([
 			newInstance.strokeWidth = this.strokeWidth;
 			newInstance.strokeColor = this.strokeColor;
 			newInstance.fillColor = this.fillColor;
+			newInstance.matrix = this.matrix.clone();
 			return newInstance;
 
 		}

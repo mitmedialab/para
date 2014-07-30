@@ -278,7 +278,7 @@ define([
           for (var i = 0; i < data.length; i++) {
             console.log("updating selected instance at"+j);
             var instance = this.instances[j];
-            instance.render(data[i]);
+            instance.increment(data[i]);
           }
         }
       }
