@@ -216,6 +216,7 @@ define([
         var instance;
       if (data) {
         instance = data.clone();
+        instance.anchor = false;
       } else {
         instance = new Instance();
       }
@@ -367,7 +368,7 @@ define([
            
             this.instance_literals.push(u_instance);
             var dot = new paper.Path.Circle(u_instance.position.x,u_instance.position.y,5);
-                dot.fillColor = 'red';
+                dot.fillColor = '#00CFFF';
                 this.scaffolds.push(dot);
 
           }
@@ -406,6 +407,7 @@ define([
       for(var i=this.children.length-1;i>-1;i--){
         this.children[i].deleteNode();
       }
+      this.clear();
       this.nodeParent.removeChildNode(this);
     },
 

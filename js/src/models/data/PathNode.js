@@ -192,10 +192,10 @@ define([
 
 
             instance_literal.visible = this.instances[k].visible;
-          
-            if (this.nodeParent != currentNode && this.follow) {
+
+           /* if (this.nodeParent != currentNode && this.follow) {
               instance_literal.visible=false;
-            }
+            }*/
             this.instance_literals.push(instance_literal);
             instance_literal.instanceIndex = this.instance_literals.length - 1;
             //console.log('path matrix');

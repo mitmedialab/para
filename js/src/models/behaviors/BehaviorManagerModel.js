@@ -30,7 +30,7 @@ define([
     newCondition: function(nodes,conditional_node){
       console.log("adding behavioral condition");
       conditional_node.instances[0].strokeColor = '#FF0000';
-      conditional_node.instances[0].strokeWidth = 5;
+      conditional_node.instances[0].strokeWidth = 4;
 
       for(var i=0;i<nodes.length;i++){
               console.log(nodes[0]);
@@ -118,7 +118,7 @@ define([
         behaviorNode.exclude(0);
         behaviorNode.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
         nodes[0].instances[0].position={x:0,y:0};
-        behaviorNode.copyNum = 10;
+        behaviorNode.copyNum = 4;
         var followPathBehavior;
         if(nodes[1].children.length===0){
           followPathBehavior = new FollowPathBehavior(nodes[0],true);
