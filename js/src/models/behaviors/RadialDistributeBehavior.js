@@ -14,8 +14,9 @@ define([
       type: 'distribution',
 
       initialize: function() {
-      
+        
       },
+
 
       update: function() {
         this.clearScaffolds();
@@ -23,6 +24,29 @@ define([
 
       },
 
+//average children's midpoints
+      /*findMidpoint: function(){
+        var midpoints = [];
+        for (var z = 0; z < this.children.length; z++) {
+          var child = this.children[z];
+              var num = child.instances.length;
+         var middle = Math.round(num/2);
+              var pointA = child.instances[0].position;
+              var pointB = child.instances[middle].position;
+                child.instances[middle].anchor = true;
+                child.instances[num-1].anchor=false;
+               if(TrigFunc.equals(pointA,pointB)){
+                child.instances[middle].position.x-=1;
+                //child.instances[child.instances.length - 1].position.y+=5;
+                pointB = child.instances[middle].position;
+              }
+              var origin=  TrigFunc.midpoint(pointA,pointB);
+              midpoints.push(origin);
+            }
+          var midpoint = TrigFunc.average(midpoints);
+          return midpoint;
+      },
+*/
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       distribute: function() {

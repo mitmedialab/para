@@ -53,7 +53,48 @@ define([
      SceneNode.prototype.addChildNode.apply(this, arguments);
     },
 
-  
+
+
+   /* resetRelativePosition: function(){
+      var leftX=this.children[0].instances[0].position.x;
+      var topY=this.children[0].instances[0].position.y;
+      var rightX =this.children[0].instances[0].position.x+this.children[0].instances[0].width;
+      var bottomY=this.children[0].instances[0].position.y+this.children[0].instances[0].height;
+
+      for(var i=0;i<this.children.length;i++){
+        var child = this.children[i];
+          for(var j=0;j<child.instances.length;j++){
+            var instance = child.instances[j];
+            var lX = instance.position.x;
+            var tY = instance.position.y;
+            var rX = instance.position.x+instance.width;
+            var bY = instance.position.y+instance.height;
+            leftX = (lX<leftX) ? lX : leftX;
+            topY = (tY<topY) ? tY : topY;
+            rightX = (rX>rightX) ? rX : rightX;
+            bottomY = (bY>bottomY) ? bY : bottomY;   
+          }
+      }
+
+      for(var i=0;i<this.children.length;i++){
+        var child = this.children[i];
+          for(var j=0;j<child.instances.length;j++){
+            var diff = TrigFunc.subtract({x:leftX,y:topY},this.instances[i].position);
+          }
+      }
+
+      for(var i=0;i<this.instances.length;i++){
+        this.instances[i].update({
+          width:rightX-leftX,
+          height: bottomY-topY
+        });
+        var add = TrigFunc.subtract({x:leftX,y:topY},this.instances[i].position);
+        this.instances[i].increment({position:diff});
+      }
+      
+        
+    },*/
+
     getLeft: function(){
       var left =this.instances[0].position.x;
       for(var i=1;i<this.instances.length;i++){
@@ -233,6 +274,16 @@ define([
       this.instances.splice(index,1);
     },
 
+    getInstancesofParent: function(index){
+      var iInstances = [];
+      for(var i=0;i<this.instances.length;i++){
+        if(this.instances[i].instanceParentIndex===index){
+          iInstances.push(this.instances[i]);
+        }
+      }
+      return iInstances;
+    },
+
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
@@ -271,7 +322,6 @@ define([
     },
 
     updateSelected: function(data) {
-    console.log(data);
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
           for (var i = 0; i < data.length; i++) {
@@ -348,13 +398,13 @@ define([
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
             var u_instance = this.instances[j].clone();
-          
+            this.instances[j].instanceParentIndex = i;
             if(data[i].renderSignature){
               u_instance.renderSignature = data[i].renderSignature.slice(0);
             }
               u_instance.renderSignature.push(j);
               u_instance.instanceParentIndex = j;
-             
+              
               u_instance.render(data[i]);
            
             if (this.nodeParent == currentNode) {

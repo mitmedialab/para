@@ -101,6 +101,33 @@ define([
 			};
 		};
 
+
+		TrigFunc.add = function(p1, p2) {
+			return {
+				x: p1.x + p2.x,
+				y: p1.y + p2.y
+			};
+		};
+
+		TrigFunc.average = function(points) {
+			if (points.length === 0) {
+				return null;
+			} else if (points.length === 1) {
+				return points[0];
+			} else {
+				var average = points[0];
+				for (var i = 1; i < points.length; i++) {
+					average = average.add(points[i]);
+				}
+				var x = average.x / points.length;
+				var y = average.y / points.length;
+				return {
+					x: x,
+					y: y
+				};
+			}
+		};
+
 		TrigFunc.distance = function(p1, p2) {
 			//console.log("p1="+p1);
 			//console.log("p2="+p2);

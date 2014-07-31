@@ -144,6 +144,8 @@ define([
         for (var k = 0; k < this.instances.length; k++) {
 
           for (var d = 0; d < data.length; d++) {
+            this.instances[k].instanceParentIndex = d;
+
             var instance_literal = path_literal.clone();
             instance_literal.nodeParent = this;
             instance_literal.instanceParentIndex = k;
