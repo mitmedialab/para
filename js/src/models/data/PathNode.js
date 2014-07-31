@@ -100,26 +100,29 @@ define([
 
     },
 
-    //called when path data is modified 
+    //called when path points are modified 
     updatePath: function(index,delta) {
       var newPath = this.masterPath.clone();
 
+      //update the path
        var selSegment = newPath.segments[index];
       selSegment.point = selSegment.point.add(delta);
     
-       
+       var topLeftOld = this.masterPath.bounds.topLeft;
+       var topLeftNew = newPath.bounds.topLeft;
+       //calcualte differences between old and new positions
+       var diff = TrigFunc.subtract({x:topLeftNew.x,y:topLeftNew.y},{x:topLeftOld.x,y:topLeftOld.y});
 
-   
-       
-       newPath.position.x = 0;
-       newPath.position.y =0;
-       newPath.translate(newPath.bounds.width/2,newPath.bounds.height/2);
-   
+       //set position to upper left corner
+       newPath.position.x = 0+newPath.bounds.width/2
+       newPath.position.y =0+newPath.bounds.height/2
+
         for(var i=0;i<this.instances.length;i++){
           this.instances[i].update({width:newPath.bounds.width,height:newPath.bounds.height});
+          this.instances[i].increment({position:diff});
         }
 
-       
+       //swap out old master for new
         this.masterPath.remove();
         this.masterPath = newPath;
         newPath.visible = false;
@@ -241,19 +244,16 @@ define([
      */
     selectByValue: function(index, value, path, currentNode) {
       var sIndexes = [];
-        console.log("value="+value)
 
       if (this.containsPath(path)) {
 
         for (var i = 0; i < this.instance_literals.length; i++) {
           var compareSig = this.instance_literals[i].data.renderSignature.slice(0, index + 1);
           compareSig = compareSig.join();
-         console.log("compareSig="+compareSig);
           if (compareSig === value) {
             var last = this.instance_literals[i].data.renderSignature.length - 1;
             var iIndex = this.instance_literals[i].data.renderSignature[last];
             this.instances[iIndex].selected = true;
-            console.log("selecting index at "+ iIndex);
             var copySig = this.instance_literals[i].data.renderSignature.slice(0);
 
             copySig.pop();

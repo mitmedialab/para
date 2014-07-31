@@ -271,12 +271,10 @@ define([
     },
 
     updateSelected: function(data) {
-    console.log("geom update selected: "+ this.type);
     console.log(data);
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
           for (var i = 0; i < data.length; i++) {
-            console.log("updating selected instance at"+j);
             var instance = this.instances[j];
             instance.increment(data[i]);
           }

@@ -155,9 +155,9 @@ this.event_bus = event_bus;
    setSelection: function(path){
    
       var index  = currentNode.getLevelInTree(rootNode,0);
-     
+     console.log(path.data.renderSignature);
       if(path.data.renderSignature[index]!==null){
-        var value = path.data.renderSignature.slice(0,index);
+        var value = path.data.renderSignature.slice(0,index+1);
         value = value.join();
 
         currentNode.selectByValue(index,value, path, currentNode);
