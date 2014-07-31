@@ -155,6 +155,7 @@ define([
             nInstance.render(data[d]);
             instance_literal.transform(nInstance.matrix);
             instance_literal.strokeColor = this.instances[k].strokeColor;
+            console.log("stroke ="+this.instances[k].strokeColor);
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
             }

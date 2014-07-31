@@ -327,6 +327,7 @@ define([
           for (var i = 0; i < data.length; i++) {
             var instance = this.instances[j];
             instance.increment(data[i]);
+        
           }
         }
       }

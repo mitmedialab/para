@@ -36,7 +36,7 @@ define([
 			this.copy= false;
 			this.strokeColor = 'black';
 			this.fillColor = 'white';
-			this.strokeWidth = 0;
+			this.strokeWidth = 1;
 			//index of instance that was used to create this instance (for instances created upon render)
 			this.instanceParentIndex = 0;
 			this.index = null;
@@ -172,12 +172,14 @@ define([
 				this.rotation+=data.rotation;
 			}
 			if(data.strokeWidth){
-				this.strokeWidth+=data.strokeWidth;
+				this.strokeWidth =data.strokeWidth;
 			}
 			if(data.strokeColor){
 				this.strokeColor= data.strokeColor;
+				console.log("stroke ="+this.strokeColor);
 			}
 			if(data.fillColor){
+				
 				this.fillColor = data.fillColor;
 			}
 			this.midpoint.x = this.position.x+this.width/2;
@@ -229,7 +231,7 @@ define([
 			if(data.selected){
 				this.selected = data.selected;
 			}
-			if(data.strokeWidth){
+			/*if(data.strokeWidth){
 				this.strokeWidth =data.strokeWidth;
 			}
 			if(data.strokeColor){
@@ -237,7 +239,7 @@ define([
 			}
 			if(data.fillColor){
 				this.fillColor = data.fillColor;
-			}
+			}*/
 
 
 
