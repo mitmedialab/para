@@ -24,6 +24,7 @@ define([
     constructor: function() {
 
       GeometryNode.apply(this, arguments);
+      this.masterPath = null;
     },
 
 
@@ -32,7 +33,7 @@ define([
     },
 
     getLiteral: function() {
-      return this.instance_literals[0];
+      return this.masterPath;
 
     },
 
@@ -58,7 +59,11 @@ define([
      
 
       path.translate(path.bounds.width/2,path.bounds.height/2);
-      this.instance_literals.push(path);
+     
+     
+      this.masterPath =path;
+      this.masterPath.visible = false;
+      
       path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
       path.nodeParent = this;
@@ -87,54 +92,38 @@ define([
     /*clears out all but first of literal paths*/
     clear: function() {
       this.clearScaffolds();
-      for (var j = 1; j < this.instance_literals.length; j++) {
+      for (var j = 0; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
 
       }
-      this.instance_literals.splice(1, this.instance_literals.length);
+      this.instance_literals = [];
 
     },
 
     //called when path data is modified 
-    updatePath: function(path) {
-      var newPath = path.clone();
-      try {
-        newPath.instanceParentIndex = path.instanceParentIndex;
+    updatePath: function(index,delta) {
+      var newPath = this.masterPath.clone();
+
+       var selSegment = newPath.segments[index];
+      selSegment.point = selSegment.point.add(delta);
     
-        var removedItem = this.instance_literals.shift();
-        var removedBounds = removedItem.bounds;
-        
-        var ruP = removedBounds.topLeft;
-        var newBounds = newPath.bounds;
-        var nuP = newBounds.topLeft;
-        
-        var instance_pos = this.instances[path.instanceParentIndex].position;
-        var diff = TrigFunc.subtract({x:nuP.x,y:nuP.y},instance_pos);
        
+
+   
        
-       console.log("rotation=")
-       console.log(this.instances[path.instanceParentIndex].rotation);
-       var reverseRot =  this.instances[removedItem.instanceParentIndex].rotation;
-       newPath.rotate(0 - reverseRot.angle, new paper.Point(reverseRot.x,reverseRot.y));
        newPath.position.x = 0;
        newPath.position.y =0;
        newPath.translate(newPath.bounds.width/2,newPath.bounds.height/2);
    
-        //newPath.rotate(0 - this.instances[removedItem.instanceParentIndex].rotation);
-        //newPath.matrix.reset();
-
-        this.instances[removedItem.instanceParentIndex].increment({position:diff});
         for(var i=0;i<this.instances.length;i++){
           this.instances[i].update({width:newPath.bounds.width,height:newPath.bounds.height});
         }
 
-        removedItem.remove();
-        removedItem = null;
-        this.instance_literals.unshift(newPath);
-      } catch (err) {
-        newPath.remove();
-        console.log('error in update path' + err);
-      }
+       
+        this.masterPath.remove();
+        this.masterPath = newPath;
+        newPath.visible = false;
+      
 
     },
 
@@ -227,7 +216,6 @@ define([
           instance_literal.instanceIndex = this.instance_literals.length - 1;
         }
       }
-      path_literal.visible = false;
 
     },
 
@@ -237,6 +225,7 @@ define([
     containsPath: function(path) {
       for (var i = 0; i < this.instance_literals.length; i++) {
         if (this.instance_literals[i].equals(path)) {
+          console.log("contains path found");
           return true;
         }
       }
@@ -252,17 +241,19 @@ define([
      */
     selectByValue: function(index, value, path, currentNode) {
       var sIndexes = [];
+        console.log("value="+value)
 
       if (this.containsPath(path)) {
 
-        for (var i = 1; i < this.instance_literals.length; i++) {
+        for (var i = 0; i < this.instance_literals.length; i++) {
           var compareSig = this.instance_literals[i].data.renderSignature.slice(0, index + 1);
           compareSig = compareSig.join();
-         
+         console.log("compareSig="+compareSig);
           if (compareSig === value) {
             var last = this.instance_literals[i].data.renderSignature.length - 1;
             var iIndex = this.instance_literals[i].data.renderSignature[last];
             this.instances[iIndex].selected = true;
+            console.log("selecting index at "+ iIndex);
             var copySig = this.instance_literals[i].data.renderSignature.slice(0);
 
             copySig.pop();

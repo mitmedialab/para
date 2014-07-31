@@ -59,7 +59,7 @@ define([
 
         var path = hitResult.item;
         instanceIndex = path.instanceIndex;
-
+        console.log("instanceIndex="+path.instanceIndex);
         if (hitResult.type == 'segment') {
 
           segment = hitResult.segment.index;
@@ -118,8 +118,8 @@ define([
             var selPath = this.selectedNodes[this.selectedNodes.length - 1].instance_literals[instanceIndex];
             if (selPath) {
               var selSegment = selPath.segments[segment];
-              selSegment.point = selSegment.point.add(event.delta);
-              selPath.nodeParent.updatePath(selPath,instanceIndex);
+              //selSegment.point = selSegment.point.add(event.delta);
+              selPath.nodeParent.updatePath(segment,event.delta);
               this.trigger('rootUpdate');
               this.trigger('rootRender');
             }

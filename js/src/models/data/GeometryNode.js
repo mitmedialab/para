@@ -271,7 +271,7 @@ define([
     },
 
     updateSelected: function(data) {
-    //console.log("geom update selected: "+ this.type);
+    console.log("geom update selected: "+ this.type);
     console.log(data);
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
