@@ -68,11 +68,10 @@ define([
 
     reviseOrigin: function() {
 
-      console.log("revising origin for "+this.type);
+  
 
       var childUL = this.getChildrenUpperLeft();
-      console.log('child upper left for ' + this.type + '=');
-      console.log(childUL);
+    
         var xDiff = childUL.x - this.upperLeft.x;
         var yDiff = childUL.y - this.upperLeft.y;
         for (var i = 0; i < this.instances.length; i++) {
@@ -87,10 +86,27 @@ define([
           //this.children[j].reviseOrigin({x:xDiff,y:yDiff});
         }
        this.setOrigin();
-       
+
       console.log('upperLeft for ' + this.type + '=');
       console.log(this.upperLeft);
       
+    },
+
+    setChildrenRelative: function(){
+      var childUL = this.getChildrenUpperLeft();
+      console.log('child upper left for ' + this.type + '=');
+      console.log(childUL);
+
+        for (var i = 0; i < this.instances.length; i++) {
+          this.instances[i].delta.x += childUL.x;
+          this.instances[i].delta.y += childUL.y;
+        }
+        for (var j = 0; j < this.children.length; j++) {
+          this.children[j].moveRelative({
+            x: 0 - childUL.x,
+            y: 0 - childUL.y
+          });
+        }
     },
 
     moveRelative: function(delta) {
@@ -295,6 +311,9 @@ define([
       for (var k = 0; k < this.children.length; k++) {
         this.children[k].update([{}]);
       }
+ if (this.nodeParent !== null && this.nodeParent.type !== 'root') {
+      this.nodeParent.setChildrenRelative();
+    }
 
      /* this.setOrigin();
       if (this.nodeParent !== null && this.nodeParent.type !== 'root') {
