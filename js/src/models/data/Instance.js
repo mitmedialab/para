@@ -23,6 +23,11 @@ define([
 				x: 0,
 				y: 0
 			};
+
+			this.delta ={
+				x:0,
+				y:0
+			};
 			this.midpoint = {
 				x: 0,
 				y: 0
@@ -103,6 +108,16 @@ define([
 				//console.log('updated position=');
 				//console.log(this.position);
 			}
+
+			if(data.delta){
+				//console.log('prior position =');
+				//console.log(this.position);
+
+				this.delta.x=data.delta.x;
+				this.delta.y=data.delta.y;
+				//console.log('updated position=');
+				//console.log(this.position);
+			}
 			if(data.width){
 				this.width=data.width;
 			}
@@ -154,12 +169,12 @@ define([
 
 		increment: function(data){
 			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
-			if(data.position){
+			if(data.delta){
 				//console.log('prior position =');
 				//console.log(this.position);
 
-				this.position.x+=data.position.x;
-				this.position.y+=data.position.y;
+				this.delta.x+=data.delta.x;
+				this.delta.y+=data.delta.y;
 				//console.log('updated position=');
 				//console.log(this.position);
 			}
@@ -169,7 +184,7 @@ define([
 			}
 			if(data.rotation){
 				//console.log("updating rotation");
-				this.rotation+=data.rotation;
+				this.rotation+=data.rotation.angle;
 			}
 			if(data.strokeWidth){
 				this.strokeWidth =data.strokeWidth;
@@ -190,6 +205,10 @@ define([
 
 		},
 
+		getRelativePos: function(){
+			return {x:this.position.x+this.delta.x,y:this.position.y+this.delta.y};
+		},
+
 	
 
 		/*only called on a render function-
@@ -201,9 +220,12 @@ define([
 				//console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
 			//}
 			this.matrix.reset();
+ 				
 			
 			if(data.matrix){
-				this.matrix.concatenate(data.matrix);
+				this.matrix.concatenate(data.matrix);			
+
+
 			}
 			/*if(data.position){
 				//console.log('prior position =');
@@ -218,9 +240,23 @@ define([
 			}
 			else{*/
 			
-				this.matrix = this.matrix.rotate(this.rotation.angle,this.rotation.x,this.rotation.y);
-				this.matrix = this.matrix.translate(new paper.Point(this.position.x,this.position.y));
-
+				this.matrix = this.matrix.translate(new paper.Point(this.delta.x,this.delta.y));
+				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x+this.width/2,this.position.y+this.height/2);
+				var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
+			if(this.nodeParent.type!=='root'){
+				 uLP.fillColor = 'green';
+				 if(this.nodeParent.type==='behavior'){
+				 	 uLP.fillColor = 'red';
+				 }
+				 var mP = new paper.Path.Circle(this.position.x+this.width/2,this.position.y+this.height/2,3);
+				
+				 mP.fillColor='purple';
+				 this.nodeParent.scaffolds.push(uLP);
+				  this.nodeParent.scaffolds.push(mP);
+				uLP.transform(this.matrix);
+				mP.transform(this.matrix);
+			}
+				
 			//}
 
 			if(data.scale){
@@ -248,6 +284,10 @@ define([
 		clone: function(){
 			var newInstance = new Instance();
 			newInstance.position = {x:0,y:0};
+			newInstance.delta = {x:0,y:0};
+			newInstance.delta.x= this.delta.x;
+			newInstance.delta.y= this.delta.y;
+
 			newInstance.position.x = this.position.x;
 			newInstance.position.y = this.position.y;
 			newInstance.scale = this.scale;
@@ -261,6 +301,7 @@ define([
 			newInstance.anchor = this.anchor;
 			newInstance.selected = this.selected;
 			newInstance.visible = true;
+			newInstance.nodeParent = this.nodeParent;
 			newInstance.strokeWidth = this.strokeWidth;
 			newInstance.strokeColor = this.strokeColor;
 			newInstance.fillColor = this.fillColor;

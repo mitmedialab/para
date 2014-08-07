@@ -115,24 +115,24 @@ define([
                   position: difference
 
                 });
-                if(this.toggleRotate){
+               /* if(this.toggleRotate){
                   console.log("rotation is active");
                    instance.update({
                   rotation: delta.angle
                 });
-                }
+                }*/
                 //console.log('difference=');
                 //console.log(difference);
 
 
                 location = location_n;
               }
-                if(this.toggleRotate){
+             /*   if(this.toggleRotate){
               var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
               this.instances[0].update({
                 rotation: startDelta.angle
               });
-            }
+            }*/
 
               finalPath.remove();
               finalPath = null;

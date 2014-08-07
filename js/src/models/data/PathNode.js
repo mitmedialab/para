@@ -44,10 +44,12 @@ define([
      * in original path location*/
     createInstanceFromPath: function(path) {
       var instance = this.createInstance();
-      var position = {x:path.bounds.topLeft.x, y:path.bounds.topLeft.y};
+      var delta = {x:path.bounds.topLeft.x, y:path.bounds.topLeft.y};
+      var rotation = {angle:0};
       var width = path.bounds.width;
       var height = path.bounds.height;  
-      instance.update({position:position,
+      instance.update({delta:delta,
+        rotation: rotation,
         width: width,
         height: height,
         strokeWidth:path.strokeWidth,
@@ -56,7 +58,7 @@ define([
         closed:path.closed});
       path.position.x =0;
       path.position.y =0;
-     
+
 
       path.translate(path.bounds.width/2,path.bounds.height/2);
      
@@ -67,6 +69,7 @@ define([
       path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
       path.nodeParent = this;
+      this.setOrigin();
       return instance;
 
     },
@@ -119,7 +122,7 @@ define([
 
         for(var i=0;i<this.instances.length;i++){
           this.instances[i].update({width:newPath.bounds.width,height:newPath.bounds.height});
-          this.instances[i].increment({position:diff});
+          this.instances[i].increment({delta:diff});
         }
 
        //swap out old master for new
@@ -350,7 +353,7 @@ define([
 
     //checks for intersection and returns the first path found
     checkIntersection: function() {
-      for (var i = 1; i < this.instance_literals.length; i++) {
+      for (var i = 0; i < this.instance_literals.length; i++) {
         var instance_literal = this.instance_literals[i];
         var paths = paper.project.activeLayer.children;
         for (var j = 0; j < paths.length; j++) {

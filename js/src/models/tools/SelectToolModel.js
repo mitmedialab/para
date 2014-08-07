@@ -132,7 +132,7 @@ define([
             for (var i = 0; i < this.selectedNodes.length; i++) {
               console.log("selected at "+i);
               this.selectedNodes[i].updateSelected([{
-                position: {
+               delta: {
                   x: event.delta.x,
                   y: event.delta.y
                 }
