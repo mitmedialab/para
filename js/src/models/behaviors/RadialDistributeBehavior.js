@@ -31,14 +31,14 @@ define([
           var child = this.children[z];
               var num = child.instances.length;
          var middle = Math.round(num/2);
-              var pointA = child.instances[0].position;
-              var pointB = child.instances[middle].position;
+              var pointA = child.instances[0].delta;
+              var pointB = child.instances[middle].delta;
                 child.instances[middle].anchor = true;
                 child.instances[num-1].anchor=false;
                if(TrigFunc.equals(pointA,pointB)){
-                child.instances[middle].position.x-=1;
-                //child.instances[child.instances.length - 1].position.y+=5;
-                pointB = child.instances[middle].position;
+                child.instances[middle].delta.x-=1;
+                //child.instances[child.instances.length - 1].delta.y+=5;
+                pointB = child.instances[middle].delta;
               }
               var origin=  TrigFunc.midpoint(pointA,pointB);
               midpoints.push(origin);
@@ -57,14 +57,14 @@ define([
               var child = this.children[z];
               var num = child.instances.length;
               var middle = Math.round(num/2);
-              var pointA = child.instances[0].position;
-              var pointB = child.instances[middle].position;
+              var pointA = child.instances[0].delta;
+              var pointB = child.instances[middle].delta;
                 child.instances[middle].anchor = true;
                 child.instances[num-1].anchor=false;
                if(TrigFunc.equals(pointA,pointB)){
-                child.instances[middle].position.x-=1;
-                //child.instances[child.instances.length - 1].position.y+=5;
-                pointB = child.instances[middle].position;
+                child.instances[middle].delta.x-=1;
+                //child.instances[child.instances.length - 1].delta.y+=5;
+                pointB = child.instances[middle].delta;
               }
               var dist = TrigFunc.distance(pointA,pointB);
               var rad = dist/2;
@@ -105,7 +105,7 @@ define([
                 var y = position.y+origin.y;
                   if(i!=middle){
                 child.instances[i].update({
-                  position: {
+                 delta: {
                     x: x,
                     y: y
                   },

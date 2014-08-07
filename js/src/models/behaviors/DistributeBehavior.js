@@ -33,12 +33,12 @@ define([
               var child = this.children[z];
               var num = child.instances.length;
 
-              var pointA = child.instances[0].position;
-              var pointB = child.instances[child.instances.length - 1].position;
+              var pointA = child.instances[0].delta;
+              var pointB = child.instances[child.instances.length - 1].delta;
               if (TrigFunc.equals(pointA, pointB)) {
-                child.instances[child.instances.length - 1].position.x += 40;
-                child.instances[child.instances.length - 1].position.y += 40;
-                pointB = child.instances[child.instances.length - 1].position;
+                child.instances[child.instances.length - 1].delta.x += 40;
+                child.instances[child.instances.length - 1].delta.y += 40;
+                pointB = child.instances[child.instances.length - 1].delta;
               }
               var selected = child.getFirstSelectedInstance();
 
@@ -84,7 +84,7 @@ define([
                 var y = pointA.y + yDiff * i;
 
                 child.instances[i].update({
-                  position: {
+                  delta: {
                     x: x,
                     y: y
                   }
