@@ -127,7 +127,6 @@ define([
           followPathBehavior = new FollowPathBehavior(nodes[0],false);
         }
         nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
-        nodes[0].follow=true;
       }
     }
     

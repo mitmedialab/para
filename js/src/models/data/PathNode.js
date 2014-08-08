@@ -69,7 +69,7 @@ define([
       path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
       path.nodeParent = this;
-      this.setOrigin();
+      this.updateOrigin();
       return instance;
 
     },
@@ -197,16 +197,9 @@ define([
 
             instance_literal.visible = this.instances[k].visible;
 
-           /* if (this.nodeParent != currentNode && this.follow) {
-              instance_literal.visible=false;
-            }*/
+          
             this.instance_literals.push(instance_literal);
             instance_literal.instanceIndex = this.instance_literals.length - 1;
-            //console.log('path matrix');
-            //console.log(instance_literal.matrix);
-            /*var dot = new paper.Path.Circle(this.instances[k].position.x+data[d].position.x,this.instances[k].position.y+data[d].position.y,5);
-                dot.fillColor = 'green';
-                this.scaffolds.push(dot);*/
           }
         }
       } else {

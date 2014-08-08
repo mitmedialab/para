@@ -1,5 +1,5 @@
 /*GeometryNode.js
- * base class for geometry object
+ * base class for geometry object in scene node.
  * extends SceneNode
  */
 
@@ -17,106 +17,134 @@ define([
 
   var GeometryNode = SceneNode.extend({
 
-
     type: 'geometry',
 
+    /* constructor 
+     * instances: array for storing instances of this object
+     * scaffolds: array for scaffold objects (helper information and paths)
+     * instance_literals: array that stores instances that are created at render
+     * upperLeft: default origin of this, used for geometric transforms
+     */
     constructor: function() {
-      /* instances contain objects that provide geometric info
-    * this is propogated down to the leaves of the tree to 
-    * draw the actual shapes 
-    {  position: x,y coordinates of instance
-        scale: scale of instance
-        rotation: rotation of instance
-        selected: boolean indicating selection state          
-    }
-    */
 
       this.instances = [];
       this.scaffolds = [];
       this.instance_literals = [];
       this.behaviors = [];
-      this.follow = false;
       this.conditions = [];
       this.upperLeft = {
         x: 0,
         y: 0
       };
 
-
-
       SceneNode.apply(this, arguments);
     },
 
 
+    /* initialization
+     * creates one instance by default
+     */
     initialize: function() {
 
       this.createInstance();
     },
 
+    /* addChildNode
+     * extends SceneNode addChildNode
+     * adds child and resets origin to upperLeft of all child instances
+     * moves children relative to this new origin
+     */
     addChildNode: function(node) {
       SceneNode.prototype.addChildNode.apply(this, arguments);
-      if(this.type!=='root'){
-          this.reviseOrigin();
+      //do not change origin if this is the root node
+      if (this.type !== 'root') {
+        this.addChildOrigin();
       }
     },
 
+    /* addChildOrigin
+     * adds child and resets origin to upperLeft of all child instances
+     * moves children relative to this new origin
+     */
+    addChildOrigin: function() {
+      var childUL = this.getChildrenUpperLeft();
+      var xDiff = childUL.x - this.upperLeft.x;
+      var yDiff = childUL.y - this.upperLeft.y;
 
-    setOrigin: function() {
+      for (var i = 0; i < this.instances.length; i++) {
+        this.instances[i].increment({delta:{x:xDiff,y:yDiff}});
+      }
+      for (var j = 0; j < this.children.length; j++) {
+        this.children[j].increment({delta:{
+          x: -xDiff,
+          y: -yDiff
+        }
+        });
+      }
+      //reset upper left position
       this.getUpperLeft();
     },
 
 
-    reviseOrigin: function() {
-
-  
-
+     /* updateOrigin
+     * similar to above, but called on an update
+     * increments the parent instances by child origin and
+     * moves all child instances relative to the parent
+     */
+    updateOrigin: function() {
       var childUL = this.getChildrenUpperLeft();
-    
-        var xDiff = childUL.x - this.upperLeft.x;
-        var yDiff = childUL.y - this.upperLeft.y;
-        for (var i = 0; i < this.instances.length; i++) {
-          this.instances[i].delta.x += xDiff;
-          this.instances[i].delta.y += yDiff;
-        }
-        for (var j = 0; j < this.children.length; j++) {
-          this.children[j].moveRelative({
-            x: 0 - xDiff,
-            y: 0 - yDiff
-          });
-          //this.children[j].reviseOrigin({x:xDiff,y:yDiff});
-        }
-       this.setOrigin();
-
-      console.log('upperLeft for ' + this.type + '=');
-      console.log(this.upperLeft);
-      
-    },
-
-    setChildrenRelative: function(){
-      var childUL = this.getChildrenUpperLeft();
-      console.log('child upper left for ' + this.type + '=');
-      console.log(childUL);
-
-        for (var i = 0; i < this.instances.length; i++) {
-          this.instances[i].delta.x += childUL.x;
-          this.instances[i].delta.y += childUL.y;
-        }
-        for (var j = 0; j < this.children.length; j++) {
-          this.children[j].moveRelative({
-            x: 0 - childUL.x,
-            y: 0 - childUL.y
-          });
-        }
-    },
-
-    moveRelative: function(delta) {
       for (var i = 0; i < this.instances.length; i++) {
-        this.instances[i].increment({
-          delta: delta
+        this.instances[i].increment({delta:childUL});
+      
+      }
+      for (var j = 0; j < this.children.length; j++) {
+        this.children[j].increment({
+          delta:{x: -childUL.x,
+          y: -childUL.y
+          }
         });
       }
     },
 
+
+    /*increment
+     * increments all instances by a delta
+     */
+    increment: function(delta) {
+      for (var i = 0; i < this.instances.length; i++) {
+        this.instances[i].increment(delta);
+      }
+    },
+
+  /* getUpperLeft
+    * returns the current cumulative upper left origin by
+    * iterating over the origins of all the instances
+    */
+    getUpperLeft: function() {
+      var relPos = this.instances[0].getRelativePos();
+      var left = relPos.x;
+      var top = relPos.y;
+
+      for (var i = 1; i < this.instances.length; i++) {
+        var rp = this.instances[i].getRelativePos();
+        var l = rp.x;
+        var t = rp.y;
+        left = l < left ? l : left;
+        top = t < top ? t : top;
+
+      }
+      this.upperLeft = {
+        x: left,
+        y: top
+      };
+
+      return this.upperLeft;
+    },
+
+    /* getChildrenUpperLeft
+    * gets the cumulative upper left of all children
+    * should be 0,0 if children are positioned relatively
+    */
     getChildrenUpperLeft: function() {
       if (this.children.length === 0) {
         return {
@@ -145,67 +173,10 @@ define([
     },
 
 
-    /* resetRelativePosition: function(){
-      var leftX=this.children[0].instances[0].position.x;
-      var topY=this.children[0].instances[0].position.y;
-      var rightX =this.children[0].instances[0].position.x+this.children[0].instances[0].width;
-      var bottomY=this.children[0].instances[0].position.y+this.children[0].instances[0].height;
-
-      for(var i=0;i<this.children.length;i++){
-        var child = this.children[i];
-          for(var j=0;j<child.instances.length;j++){
-            var instance = child.instances[j];
-            var lX = instance.position.x;
-            var tY = instance.position.y;
-            var rX = instance.position.x+instance.width;
-            var bY = instance.position.y+instance.height;
-            leftX = (lX<leftX) ? lX : leftX;
-            topY = (tY<topY) ? tY : topY;
-            rightX = (rX>rightX) ? rX : rightX;
-            bottomY = (bY>bottomY) ? bY : bottomY;   
-          }
-      }
-
-      for(var i=0;i<this.children.length;i++){
-        var child = this.children[i];
-          for(var j=0;j<child.instances.length;j++){
-            var diff = TrigFunc.subtract({x:leftX,y:topY},this.instances[i].position);
-          }
-      }
-
-      for(var i=0;i<this.instances.length;i++){
-        this.instances[i].update({
-          width:rightX-leftX,
-          height: bottomY-topY
-        });
-        var add = TrigFunc.subtract({x:leftX,y:topY},this.instances[i].position);
-        this.instances[i].increment({position:diff});
-      }
-      
-        
-    },*/
-
-    getUpperLeft: function() {
-      var relPos = this.instances[0].getRelativePos();
-      var left = relPos.x;
-      var top = relPos.y;
-
-      for (var i = 1; i < this.instances.length; i++) {
-        var rp = this.instances[i].getRelativePos();
-        var l = rp.x;
-        var t = rp.y;
-        left = l < left ? l : left;
-        top = t < top ? t : top;
-
-      }
-      this.upperLeft = {
-        x: left,
-        y: top
-      };
-
-      return this.upperLeft;
-    },
-
+    /* exportJSON
+    * returns this node as a JSON object
+    * TODO: create an export JSON method for Behaviors
+    */
     exportJSON: function() {
       this.set({
         type: this.type
@@ -238,10 +209,10 @@ define([
     },
 
 
-    /*called when drawing of the path is complete. 
-     * Removes the path and creates one instance
-     * in original path location
-     */
+    /*createInstance
+    * creates a new instance and pushes it into the instance array
+    * optionally creates an instance as a clone of an existing one
+    */
     createInstance: function(data) {
       var instance;
       if (data) {
@@ -252,7 +223,7 @@ define([
       instance.nodeParent = this;
       this.instances.push(instance);
       instance.index = this.instances.length - 1;
-      this.setOrigin();
+      this.getUpperLeft();
       return instance;
 
     },
@@ -271,12 +242,12 @@ define([
       for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].index = i;
       }
-      this.setOrigin();
+       this.getUpperLeft();
       return instance;
     },
 
     removeInstanceAt: function(index) {
-      this.setOrigin();
+      this.getUpperLeft();
       this.instances.splice(index, 1);
     },
 
@@ -293,7 +264,7 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-      console.log("geom update: " + this.type);
+      console.log('geom update: ' + this.type);
       var parentType = '';
       if (this.nodeParent) {
         parentType = this.nodeParent.type;
@@ -306,33 +277,13 @@ define([
 
         }
       }
-    
+
 
       for (var k = 0; k < this.children.length; k++) {
         this.children[k].update([{}]);
       }
- if (this.nodeParent !== null && this.nodeParent.type !== 'root') {
-      this.nodeParent.setChildrenRelative();
-    }
-
-     /* this.setOrigin();
       if (this.nodeParent !== null && this.nodeParent.type !== 'root') {
-        this.nodeParent.reviseOrigin();
-      }
-      console.log('revised upperLeft for ' + this.type + '=');
-      console.log(this.upperLeft);*/
-
-
-
-    },
-
-    increment: function(data) {
-
-      for (var j = 0; j < this.instances.length; j++) {
-        for (var i = 0; i < data.length; i++) {
-          var instance = this.instances[j];
-          instance.render(data[i]);
-        }
+        this.nodeParent.updateOrigin();
       }
 
     },
@@ -412,7 +363,7 @@ define([
     render: function(data, currentNode) {
       //first create array of new instances that contain propogated updated data
 
-      //console.log("render: "+this.type);
+      //console.log('render: '+this.type);
       if (data) {
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
@@ -472,7 +423,7 @@ define([
 
 
     deleteNode: function() {
-      console.log("deleting type:"+this.type);
+      console.log('deleting type:' + this.type);
       for (var i = this.children.length - 1; i >= 0; i--) {
         this.children[i].clearObjects();
         this.children[i].deleteNode();
@@ -611,7 +562,7 @@ define([
     },
 
     clearScaffolds: function() {
-      console.log("called clear scaffolds for "+this.type);
+      console.log('called clear scaffolds for ' + this.type);
       for (var j = 0; j < this.scaffolds.length; j++) {
         this.scaffolds[j].remove();
 
@@ -620,8 +571,8 @@ define([
 
     },
 
-     addScaffold: function(scaffold) {
-    this.scaffolds.push(scaffold);
+    addScaffold: function(scaffold) {
+      this.scaffolds.push(scaffold);
 
     },
 
