@@ -119,14 +119,11 @@ define([
         behaviorNode.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
         nodes[0].instances[0].position={x:0,y:0};
         behaviorNode.copyNum = 4;
-        var followPathBehavior;
-        if(nodes[1].children.length===0){
-          followPathBehavior = new FollowPathBehavior(nodes[0],true);
-        }
-        else{
-          followPathBehavior = new FollowPathBehavior(nodes[0],false);
-        }
-        nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
+        var followPathBehavior=new FollowPathBehavior(nodes[0]);
+        
+       // nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
+          // nodes[1].extendBehaviorFirst(followPathBehavior, ['calculate']);
+              nodes[1].extendBehaviorFirst(followPathBehavior, ['clean']);
       }
     }
     

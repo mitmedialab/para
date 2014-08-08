@@ -3,65 +3,50 @@
 define([
     'models/behaviors/BaseBehavior',
     'models/PaperManager',
-    'utils/TrigFunc',
-    'models/behaviors/Scaffold'
-  ],
+    'utils/TrigFunc'
+    ],
 
-  function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {
+  function(BaseBehavior, PaperManager, TrigFunc) {
     var paper = PaperManager.getPaperInstance();
     var FollowPathBehavior = BaseBehavior.extend({
 
-      constructor: function(pathChild,rotate) {
+      constructor: function(pathChild) {
         this.pathChild = pathChild;
-        this.toggleRotate=true; 
-
+        this.finalPath = null;
+        this.location = 0;
       },
 
 
 
-
-      update: function(data) {
-       
-      
-          var zeroedPath = this.pathChild.getLiteral().clone();
+      update: function(data){
+          console.log("update follow path");
+         var zeroedPath = this.pathChild.getLiteral().clone();
           zeroedPath.position.x =0+zeroedPath.bounds.width/2;
           zeroedPath.position.y=0+zeroedPath.bounds.height/2;
-          this.followPath(zeroedPath);
-         
-        
-
-      },
-
-      //projects a set of instances along a parent path- needs to be moved to mixin
-      followPath: function(path) {
-      
-            
-              var num = this.instances.length;
-                 var finalPath;
-
-             if(this.instances[0].delta.x==this.instances[num-1].delta.x &&this.instances[0].delta.y==this.instances[num-1].delta.y){
-                finalPath = path;
+           var num = this.instances.length;
+                    if(this.instances[0].delta.x==this.instances[num-1].delta.x &&this.instances[0].delta.y==this.instances[num-1].delta.y){
+                this.finalPath = zeroedPath;
              }
              else{
-              var locA =path.getNearestPoint(this.instances[0].delta);
-              var cA = path.getNearestLocation(this.instances[0].delta);
-             var locB = path.getNearestPoint(this.instances[num - 1].delta);
-                var cB = path.getNearestLocation(this.instances[this.instances.length - 1].delta);
+              var locA =zeroedPath.getNearestPoint(this.instances[0].delta);
+              var cA =zeroedPath.getNearestLocation(this.instances[0].delta);
+             var locB = zeroedPath.getNearestPoint(this.instances[num - 1].delta);
+                var cB = zeroedPath.getNearestLocation(this.instances[this.instances.length - 1].delta);
 
 
               var offset = cA.distance;
 
            
-             if (!locA.equals( path.firstSegment.point)) {
-                finalPath =  path.split(cA);
-                path.remove();
+             if (!locA.equals( zeroedPath.firstSegment.point)) {
+                this.finalPath =  zeroedPath.split(cA);
+                zeroedPath.remove();
               } else {
-                finalPath =  path;
+               this.finalPath =  zeroedPath;
               }
 
               
-              if (!locB.equals(finalPath.lastSegment.point)) {
-                var tail = finalPath.split(cB);
+              if (!locB.equals(this.finalPath.lastSegment.point)) {
+                var tail = this.finalPath.split(cB);
                 if (tail) {
                   tail.remove();
                 }
@@ -69,14 +54,14 @@ define([
               }
             }
               var maxDist;
-              if(!finalPath.closed){
-                maxDist = finalPath.length / (num - 1);
+              if(!this.finalPath.closed){
+                maxDist = this.finalPath.length / (num - 1);
               }
               else{
-                 maxDist = finalPath.length / (num);
+                 maxDist = this.finalPath.length / (num);
               }
 
-              finalPath.flatten(maxDist);
+              this.finalPath.flatten(maxDist);
 
 
             var selected = this.getFirstSelectedInstance();
@@ -88,12 +73,31 @@ define([
 
                 }
               }
-              var location = finalPath.segments[0].point;
+              this.location = this.finalPath.segments[0].point;
+      },
 
-              for (var i = 0; i < num; i++) {
 
-                var location_n = finalPath.segments[i].point;
-                var instance = this.instances[i];
+      calculate: function(data, index){
+          console.log("calculate follow path");
+        console.log("follow path for index:"+index);
+          this.followPath(index);
+      },
+
+      clean: function(data){
+           console.log("clean follow path");
+         var startDelta = this.finalPath.segments[1].point.subtract(this.finalPath.segments[0].point);
+              this.instances[0].update({
+                rotation:{angle:startDelta.angle}
+              });
+          this.finalPath.remove();
+          this.finalPath = null;
+
+      },
+
+      //projects a set of instances along a parent path- needs to be moved to mixin
+      followPath: function(index) {
+                var location_n = this.finalPath.segments[index].point;
+                var instance = this.instances[index];
                 instance.visible=true;
                 var delta = location_n.subtract(location);
                 var difference = {x:location_n.x,y:location_n.y};
@@ -102,28 +106,8 @@ define([
                   rotation: {angle:delta.angle},
                   scale:0.5,
                 });
-                location = location_n;
-              }
-               
-              var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
-              this.instances[0].update({
-                rotation:{angle:startDelta.angle}
-              });
-            
-
-              finalPath.remove();
-              finalPath = null;
-
-            
-           for (var j = 0; j < this.instance_literals.length; j++) {
-
-                var result = this.nodeParent.checkConditions(this.instance_literals[j]);
-                if (!result) {
-                  this.instances[this.instance_literals[j].instanceParentIndex].visible = result;
-
-                }
-              }
-          
+                this.location = location_n;
+              
         }
       
 

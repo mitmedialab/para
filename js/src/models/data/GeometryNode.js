@@ -258,28 +258,37 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-      var parentType = '';
-      if (this.nodeParent) {
-        parentType = this.nodeParent.type;
-      }
+       console.log("update geom");
+      this.loop(data);
 
+    },
+
+   loop: function(data){
       for (var j = 0; j < this.instances.length; j++) {
-        for (var i = 0; i < data.length; i++) {
-          var instance = this.instances[j];
+        this.calculate(data,j);
+      }
+    },
+
+    calculate: function(data, index){
+       console.log("geom calculate for index:"+index);
+      for (var i = 0; i < data.length; i++) {
+          var instance = this.instances[index];
           instance.update(data[i]);
 
         }
-      }
+        this.clean(data);
+    },
 
-
+    clean: function(data){
+        console.log("clean geom");
       for (var k = 0; k < this.children.length; k++) {
         this.children[k].update([{}]);
       }
       if (this.nodeParent !== null && this.nodeParent.type !== 'root') {
         this.nodeParent.updateOrigin();
       }
-
     },
+
 
     updateSelected: function(data) {
 
