@@ -21,8 +21,7 @@ define([
 
 
       update: function(data) {
-        //console.log('follow path update: '+ this.type);
-        this.clearScaffolds();
+       
       
           var zeroedPath = this.pathChild.getLiteral().clone();
           zeroedPath.position.x =0+zeroedPath.bounds.width/2;
@@ -30,7 +29,6 @@ define([
           this.followPath(zeroedPath);
          
         
-        //return [data,currentNode];
 
       },
 
@@ -38,7 +36,6 @@ define([
       followPath: function(path) {
       
             
-            //  path.sendToBack();
               var num = this.instances.length;
                  var finalPath;
 
@@ -51,12 +48,6 @@ define([
              var locB = path.getNearestPoint(this.instances[num - 1].delta);
                 var cB = path.getNearestLocation(this.instances[this.instances.length - 1].delta);
 
-              /*var pc = new paper.Path.Circle(locA,5);
-              pc.fillColor ='red';
-              this.scaffolds.push(pc);
-               var pd = new paper.Path.Circle(cA.segment.point,5);
-              pd.fillColor ='green';
-              this.scaffolds.push(pd);*/
 
               var offset = cA.distance;
 
@@ -103,38 +94,22 @@ define([
 
                 var location_n = finalPath.segments[i].point;
                 var instance = this.instances[i];
-                //instance.resetRotation();
-
-         /* var dot = new paper.Path.Circle(location_n,5);
-                dot.fillColor = 'blue ';
-                this.scaffolds.push(dot);*/
-
                 instance.visible=true;
                 var delta = location_n.subtract(location);
-                //console.log('child left,top'+left+','+top); 
                 var difference = {x:location_n.x,y:location_n.y};
                 instance.update({
-                  delta: difference
-
+                  delta: difference,
+                  rotation: {angle:delta.angle},
+                  scale:0.5,
                 });
-                if(this.toggleRotate){
-                  console.log("rotation is active");
-                   instance.update({
-                  rotation: {angle:delta.angle}
-                });
-                }
-                //console.log('difference=');
-                //console.log(difference);
-
-
                 location = location_n;
               }
-               if(this.toggleRotate){
+               
               var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
               this.instances[0].update({
                 rotation:{angle:startDelta.angle}
               });
-            }
+            
 
               finalPath.remove();
               finalPath = null;

@@ -59,7 +59,6 @@ define([
 
         var path = hitResult.item;
         instanceIndex = path.instanceIndex;
-        console.log("instanceIndex="+path.instanceIndex);
         if (hitResult.type == 'segment') {
 
           segment = hitResult.segment.index;
@@ -130,7 +129,6 @@ define([
           if (this.currentNode) {
 
             for (var i = 0; i < this.selectedNodes.length; i++) {
-              console.log("selected at "+i);
               this.selectedNodes[i].updateSelected([{
                delta: {
                   x: event.delta.x,
@@ -138,7 +136,6 @@ define([
                 }
               }]);
             }
-            console.log("calling root update");
             this.trigger('rootUpdate');
             this.trigger('rootRender');
 

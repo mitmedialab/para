@@ -69,7 +69,7 @@ define([
       path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
       path.nodeParent = this;
-      this.updateOrigin();
+        this.getUpperLeft();
       return instance;
 
     },
@@ -94,16 +94,13 @@ define([
 
     /*clears out all but first of literal paths*/
     clearObjects: function() {
-      console.log("called clear for path node");
 
       for (var j = 0; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
 
       }
       this.instance_literals = [];
-      console.log(this.scaffolds.length);
       GeometryNode.prototype.clearObjects.apply(this, arguments);
-      console.log(this.scaffolds.length);
     },
 
     //called when path points are modified 
@@ -161,7 +158,6 @@ define([
             nInstance.render(data[d]);
             instance_literal.transform(nInstance.matrix);
             instance_literal.strokeColor = this.instances[k].strokeColor;
-            console.log("stroke ="+this.instances[k].strokeColor);
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
             }
@@ -230,7 +226,6 @@ define([
     containsPath: function(path) {
       for (var i = 0; i < this.instance_literals.length; i++) {
         if (this.instance_literals[i].equals(path)) {
-          console.log("contains path found");
           return true;
         }
       }
@@ -288,16 +283,9 @@ define([
 
     },
 
-
-    //update triggers change event in mouseup
-    mouseUpInstance: function() {
-
-      this.trigger('change:mouseUp', this);
-
-    },
-
     /* placeholder functions for leftOf, rightOf geometric checks */
     instanceSide: function(instance) {
+      
       for (var i = 0; i < this.instances.length; i++) {
         var side, pA, pB, pM;
         if (this.instances[i].closed) {

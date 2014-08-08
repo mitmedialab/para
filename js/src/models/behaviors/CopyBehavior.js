@@ -99,12 +99,11 @@ define([
        
 
       exclude: function(excludeIndex){
-        console.log('num of children in copy:'+this.children.length);
+     
         var child = this.children[excludeIndex];
         if(child!==null){
          for(var i=child.instances.length-1;i>0;i--){
               child.removeInstanceAt(i);
-              console.log('removing instance at:'+i);
          }
          child.instances[0].anchor=false;
         }

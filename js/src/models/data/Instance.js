@@ -214,7 +214,6 @@ define([
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 		render: function(data) {
-			console.log("render called for instance of "+this.nodeParent.type);
 			//cloconsole.log(data);
 			//if(this.nodeParent){
 				//console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
@@ -241,9 +240,11 @@ define([
 			else{*/
 			
 				this.matrix = this.matrix.translate(new paper.Point(this.delta.x,this.delta.y));
+				this.matrix = this.matrix.scale(this.scale);
+
 				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
 				var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
-			if(this.nodeParent.type!=='root'){
+			/*if(this.nodeParent.type!=='root'){
 				 uLP.fillColor = 'green';
 				 if(this.nodeParent.type==='behavior'){
 				 	 uLP.fillColor = 'red';
@@ -255,7 +256,7 @@ define([
 				 this.nodeParent.addScaffold(mP);
 				uLP.transform(this.matrix);
 				mP.transform(this.matrix);
-			}
+			}*/
 				
 			//}
 

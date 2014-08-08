@@ -155,7 +155,6 @@ this.event_bus = event_bus;
    setSelection: function(path){
    
       var index  = currentNode.getLevelInTree(rootNode,0);
-     console.log(path.data.renderSignature);
       if(path.data.renderSignature[index]!==null){
         var value = path.data.renderSignature.slice(0,index+1);
         value = value.join();
@@ -217,7 +216,7 @@ this.event_bus = event_bus;
        toolCollection.get(this.get('state')).currentNode = currentNode;
          if(toolCollection.get(this.get('state')).selectedNodes.indexOf(selected)==-1){
             toolCollection.get(this.get('state')).selectedNodes.push(selected);
-            console.log("selected node");
+         
             this.event_bus.trigger('nodeSelected',selected);
 
           }

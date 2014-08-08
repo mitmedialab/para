@@ -204,7 +204,6 @@ define([
       data.instance_literals = lInstances;
       data.children = children;
       data.behaviors = behaviors;
-      // console.log(JSON.stringify(data));
       return data;
     },
 
@@ -213,7 +212,7 @@ define([
     * creates a new instance and pushes it into the instance array
     * optionally creates an instance as a clone of an existing one
     */
-    createInstance: function(data) {
+    createInstance: function(data ,index) {
       var instance;
       if (data) {
         instance = data.clone();
@@ -221,29 +220,24 @@ define([
         instance = new Instance();
       }
       instance.nodeParent = this;
-      this.instances.push(instance);
-      instance.index = this.instances.length - 1;
+      if(!index){
+        this.instances.push(instance);
+        instance.index = this.instances.length - 1;
+      }
+      else{
+        this.instances.splice(index, 0, instance);
+      for (var i = 0; i < this.instances.length; i++) {
+        this.instances[i].index = i;
+      }
+      }
+
       this.getUpperLeft();
       return instance;
 
     },
 
     createInstanceAt: function(data, index) {
-      var instance;
-      if (data) {
-        instance = data.clone();
-
-      } else {
-        instance = new Instance();
-      }
-      instance.nodeParent = this;
-      instance.anchor = false;
-      this.instances.splice(index, 0, instance);
-      for (var i = 0; i < this.instances.length; i++) {
-        this.instances[i].index = i;
-      }
-       this.getUpperLeft();
-      return instance;
+      return this.createInstance(data,index);
     },
 
     removeInstanceAt: function(index) {
@@ -264,7 +258,6 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-      console.log('geom update: ' + this.type);
       var parentType = '';
       if (this.nodeParent) {
         parentType = this.nodeParent.type;
@@ -423,7 +416,7 @@ define([
 
 
     deleteNode: function() {
-      console.log('deleting type:' + this.type);
+     
       for (var i = this.children.length - 1; i >= 0; i--) {
         this.children[i].clearObjects();
         this.children[i].deleteNode();
@@ -562,7 +555,6 @@ define([
     },
 
     clearScaffolds: function() {
-      console.log('called clear scaffolds for ' + this.type);
       for (var j = 0; j < this.scaffolds.length; j++) {
         this.scaffolds[j].remove();
 
