@@ -13,9 +13,11 @@ define([
 
       constructor: function(pathChild,rotate) {
         this.pathChild = pathChild;
-        this.toggleRotate=rotate; 
+        this.toggleRotate=true; 
 
       },
+
+
 
 
       update: function(data) {
@@ -40,14 +42,14 @@ define([
               var num = this.instances.length;
                  var finalPath;
 
-             if(this.instances[0].position.x==this.instances[num-1].position.x &&this.instances[0].position.y==this.instances[num-1].position.y){
+             if(this.instances[0].delta.x==this.instances[num-1].delta.x &&this.instances[0].delta.y==this.instances[num-1].delta.y){
                 finalPath = path;
              }
              else{
-              var locA =path.getNearestPoint(this.instances[0].position);
-              var cA = path.getNearestLocation(this.instances[0].position);
-             var locB = path.getNearestPoint(this.instances[num - 1].position);
-                var cB = path.getNearestLocation(this.instances[this.instances.length - 1].position);
+              var locA =path.getNearestPoint(this.instances[0].delta);
+              var cA = path.getNearestLocation(this.instances[0].delta);
+             var locB = path.getNearestPoint(this.instances[num - 1].delta);
+                var cB = path.getNearestLocation(this.instances[this.instances.length - 1].delta);
 
               /*var pc = new paper.Path.Circle(locA,5);
               pc.fillColor ='red';
@@ -112,27 +114,27 @@ define([
                 //console.log('child left,top'+left+','+top); 
                 var difference = {x:location_n.x,y:location_n.y};
                 instance.update({
-                  position: difference
+                  delta: difference
 
                 });
-               /* if(this.toggleRotate){
+                if(this.toggleRotate){
                   console.log("rotation is active");
                    instance.update({
-                  rotation: delta.angle
+                  rotation: {angle:delta.angle}
                 });
-                }*/
+                }
                 //console.log('difference=');
                 //console.log(difference);
 
 
                 location = location_n;
               }
-             /*   if(this.toggleRotate){
+               if(this.toggleRotate){
               var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);
               this.instances[0].update({
-                rotation: startDelta.angle
+                rotation:{angle:startDelta.angle}
               });
-            }*/
+            }
 
               finalPath.remove();
               finalPath = null;

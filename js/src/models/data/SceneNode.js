@@ -153,7 +153,7 @@ define([
             },
             //removes child node from list of this.children- does not delete the removed child!
             removeChildNode: function(node) {
-                // console.log("number of this.children="+this.children.length);
+                 console.log("number of this.children="+this.children.length);
                 if (node !== null && this.children.length > 0) {
                     // console.log("attempting to remove");
                     for (var i = 0; i < this.children.length; i++) {
@@ -161,6 +161,8 @@ define([
                         if (this.children[i] == node) {
                             this.children[i].removeParentNode();
                             this.children.splice(i, 1);
+                            console.log("number of this.children="+this.children.length);
+
                             return true;
 
                         }

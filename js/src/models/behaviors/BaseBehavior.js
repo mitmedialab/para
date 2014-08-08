@@ -78,7 +78,7 @@ define([
 
 		checkDistanceIncrement: function(start,selected,tDist){
 
-          var dist = TrigFunc.distance(start.position,selected.position);
+          var dist = TrigFunc.distance(start.delta,selected.delta);
           console.log('num copies='+this.copyNum);
           if(dist<tDist+20){
            this.copyNum++;
@@ -96,8 +96,8 @@ define([
       },
 
        checkDistanceDecrement: function(start,selected,tDist){
-
-          var dist = TrigFunc.distance(start.position,selected.position);
+       		console.log("check distance decrement");
+          var dist = TrigFunc.distance(start.delta,selected.delta);
           console.log('num copies='+this.copyNum);
             if(dist>tDist+20){
              this.copyNum--;

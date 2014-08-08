@@ -393,12 +393,12 @@ define([
     },
 
 
-    clear: function() {
+    clearObjects: function() {
       this.instance_literals = [];
       this.clearScaffolds();
 
       for (var i = 0; i < this.children.length; i++) {
-        this.children[i].clear();
+        this.children[i].clearObjects();
       }
 
     },
@@ -472,10 +472,12 @@ define([
 
 
     deleteNode: function() {
-      for (var i = this.children.length - 1; i > -1; i--) {
+      console.log("deleting type:"+this.type);
+      for (var i = this.children.length - 1; i >= 0; i--) {
+        this.children[i].clearObjects();
         this.children[i].deleteNode();
       }
-      this.clear();
+      this.clearObjects();
       this.nodeParent.removeChildNode(this);
     },
 
@@ -609,11 +611,17 @@ define([
     },
 
     clearScaffolds: function() {
+      console.log("called clear scaffolds for "+this.type);
       for (var j = 0; j < this.scaffolds.length; j++) {
         this.scaffolds[j].remove();
 
       }
       this.scaffolds = [];
+
+    },
+
+     addScaffold: function(scaffold) {
+    this.scaffolds.push(scaffold);
 
     },
 

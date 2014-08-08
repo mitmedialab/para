@@ -169,7 +169,7 @@ this.event_bus = event_bus;
     rootRender: function(){
      //console.log('called root render');
     
-      rootNode.clear();
+      rootNode.clearObjects();
       rootNode.render(null,currentNode);
     },
 
@@ -181,7 +181,7 @@ this.event_bus = event_bus;
     },
     currentRender: function(){
       //console.log('called current render');
-      currentNode.clear();
+      currentNode.clearObjects();
       currentNode.render(null,currentNode);
     },
     //callback triggered when tool navigates to specific node in tree;
@@ -266,23 +266,6 @@ this.event_bus = event_bus;
     },
 
     canvasMouseWheel: function(event) {
-
-     /* var selectedTool = toolCollection.get(this.get('state'));
-      var currentlySelected = selectedTool.path.instanceParent.nodeParent;
-      if (!_.has(currentlySelected, 'copyNum')) {
-        //console.log('no behavior, assigning copy and distribute');
-      //  var copyBehavior = new CopyBehavior();
-        //var distributeBehavior = new DistributeBehavior();
-        //distributeBehavior.initialize();
-      //  copyBehavior.setCopyNum(2);
-        //currentlySelected.extendBehavior(distributeBehavior, 'update');
-        //currentlySelected.extendBehavior(copyBehavior, 'update');
-      } else {
-        //console.log('behavior exists. updating num');
-        currentlySelected.setCopyNum(currentlySelected.copyNum + 1);
-      }
-
-      currentlySelected.update();*/
 
 
 

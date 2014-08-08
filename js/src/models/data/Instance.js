@@ -214,7 +214,7 @@ define([
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 		render: function(data) {
-			//console.log("update called with data:");
+			console.log("render called for instance of "+this.nodeParent.type);
 			//cloconsole.log(data);
 			//if(this.nodeParent){
 				//console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
@@ -241,7 +241,7 @@ define([
 			else{*/
 			
 				this.matrix = this.matrix.translate(new paper.Point(this.delta.x,this.delta.y));
-				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x+this.width/2,this.position.y+this.height/2);
+				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
 				var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
 			if(this.nodeParent.type!=='root'){
 				 uLP.fillColor = 'green';
@@ -251,8 +251,8 @@ define([
 				 var mP = new paper.Path.Circle(this.position.x+this.width/2,this.position.y+this.height/2,3);
 				
 				 mP.fillColor='purple';
-				 this.nodeParent.scaffolds.push(uLP);
-				  this.nodeParent.scaffolds.push(mP);
+				 this.nodeParent.addScaffold(uLP);
+				 this.nodeParent.addScaffold(mP);
 				uLP.transform(this.matrix);
 				mP.transform(this.matrix);
 			}
@@ -287,7 +287,6 @@ define([
 			newInstance.delta = {x:0,y:0};
 			newInstance.delta.x= this.delta.x;
 			newInstance.delta.y= this.delta.y;
-
 			newInstance.position.x = this.position.x;
 			newInstance.position.y = this.position.y;
 			newInstance.scale = this.scale;

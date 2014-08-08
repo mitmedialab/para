@@ -93,14 +93,17 @@ define([
     },
 
     /*clears out all but first of literal paths*/
-    clear: function() {
-      this.clearScaffolds();
+    clearObjects: function() {
+      console.log("called clear for path node");
+
       for (var j = 0; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
 
       }
       this.instance_literals = [];
-
+      console.log(this.scaffolds.length);
+      GeometryNode.prototype.clearObjects.apply(this, arguments);
+      console.log(this.scaffolds.length);
     },
 
     //called when path points are modified 
@@ -274,20 +277,6 @@ define([
       return sIndexes;
     },
 
-    deleteNode: function() {
-      for (var i = this.children.length - 1; i > -1; i--) {
-        this.children[i].deleteNode();
-        this.removeChildAt(i);
-      }
-      for (var i = 0; i < this.instance_literals.length; i++) {
-        this.instance_literals[i].remove();
-        this.instance_literals[i] = null;
-      }
-      this.nodeParent.removeChildNode(this);
-    },
-
-
-
     //selects or deselects all path instances
     selectAll: function() {
       for (var i = 0; i < this.instance_literals.length; i++) {
@@ -321,17 +310,17 @@ define([
         if (this.instances[i].closed) {
 
           pA = {
-            x: this.instances[i].position.x,
+            x: this.instances[i].delta.x,
             y: 0
           };
           pB = {
-            x: this.instances[i].position.x,
+            x: this.instances[i].delta.x,
             y: 100
           };
 
 
         } else {
-          var path_literal = this.instance_literals[i + 1];
+          var path_literal = this.getLiteral();
         
           pA = {
             x: path_literal.segments[0].point.x,
@@ -345,6 +334,7 @@ define([
         }
 
         pM = instance.position;
+        
         side = TrigFunc.side(pA, pB, pM);
         return side;
 
