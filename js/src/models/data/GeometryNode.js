@@ -577,9 +577,18 @@ define([
 
     },
 
+    wrapBehavior: function(from){
+       _.defaults(this, from);
+        // … and we do the same for events
+        _.defaults(this.events, from.events);
+
+        from.call(this);
+    },
+
     //registers overriding function for overriding methods- determined by parent node- this calls new method first
     extendBehaviorFirst: function(from, methods) {
-      if (!this.containsBehaviorName(from.name)) {
+      //if (!this.containsBehaviorName(from.name)) {
+       
         this.behaviors.push(from);
         // if the method is defined on from ...
         // we add those methods which exists on `from` but not on `to` to the latter
@@ -589,11 +598,16 @@ define([
         // console.log(this);
         // console.log(from);
         for (var i = 0; i < methods.length; i++) {
-          var methodName = methods;
+          var methodName = methods[i];
+          console.log("extending behavior with method:"+methodName);
+
           if (!_.isUndefined(from[methodName])) {
             // console.log('setting methods');
             var old = this[methodName];
-
+            console.log("old method");
+            console.log(old);
+            console.log("new method");
+            console.log(from[methodName]);
             // ... we create a new function on to
             this[methodName] = function() {
 
@@ -612,9 +626,11 @@ define([
               return oldReturn;
 
             };
+                   
+             console.log(this[methodName]);
           }
         }
-      }
+      //}
 
     },
 

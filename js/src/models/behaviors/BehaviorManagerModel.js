@@ -123,7 +123,8 @@ define([
         
        // nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
           // nodes[1].extendBehaviorFirst(followPathBehavior, ['calculate']);
-              nodes[1].extendBehaviorFirst(followPathBehavior, ['clean']);
+          nodes[1].wrapBehavior(followPathBehavior);
+              //nodes[1].extendBehaviorFirst(followPathBehavior, ['calculate','update','clean']);
       }
     }
     
