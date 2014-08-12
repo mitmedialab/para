@@ -100,21 +100,15 @@ define([
        
 
         var radialBehavior = new RadialDistributeBehavior();
-         _.defaults(behaviorNode, radialBehavior);
-
-        behaviorNode.override('update',followPathBehavior.update);
-        behaviorNode.override('calculate',followPathBehavior.calculate);
-        behaviorNode.override('clean',followPathBehavior.clean);
-        behaviorNode.update([{}]);
-        /*var pointA = nodes[0].instances[0].position;
-        var pointB = nodes[0].instances[nodes[0].instances.length - 1].position;
-        var midPoint = TrigFunc.midpoint(pointA,pointB);
-        var oldPosition = behaviorNode.instances[0].position;
-        var diff = TrigFunc.subtract(oldPosition,midPoint);
-        behaviorNode.instances[0].position=midPoint;
-        for(var i=0;i<nodes[0].instances.length;i++){
-          nodes[0].render({position:diff});
-        }*/
+         _.defaults(nodes[0], radialBehavior);
+         for(var j=0;j<nodes.length;j++){
+          nodes[j].override('update',radialBehavior.update);
+          nodes[j].override('calculate',radialBehavior.calculate);
+          nodes[j].override('clean',radialBehavior.clean);
+          nodes[j].update([{}]);
+       }
+       
+      
 
       }
       else if (type == 'followPath') {
