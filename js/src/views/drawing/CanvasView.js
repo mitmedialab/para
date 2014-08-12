@@ -14,6 +14,10 @@ define([
  var mouseDown = false;
  var saveKey = 83;
  var loadKey = 76;
+ var spaceKey = 91;
+ var clearKey = 67;
+ var space = false;
+ var last = {x:0,y:0};
 var CanvasView = Backbone.View.extend({
     //
    
@@ -42,7 +46,8 @@ var CanvasView = Backbone.View.extend({
         'mousedown': 'canvasMouseDown',
         'mouseup' : 'canvasMouseUp',
         'mousemove': 'canvasMouseMove',
-        'keydown': 'canvasKeypress',
+        'keydown': 'canvasKeydown',
+        'keyup': 'canvasKeyup',
          'mouseenter': 'enter',
         'mouseleave': 'leave',
         'mousewheel': 'canvasMousewheel',
@@ -63,19 +68,22 @@ var CanvasView = Backbone.View.extend({
     toolMouseDown: function(event){
       //this.target. model.toolMouseDown(event);
       //console.log(event);
-      this.parent.model.toolMouseDown(event);
+      this.parent.model.toolMouseDown(event,space);
     },
 
     toolMouseUp: function(event){
-      this.parent.model.toolMouseUp(event);
+      this.parent.model.toolMouseUp(event,space);
       //console.log("tool mouse up:"+ event);
     },
 
     toolMouseDrag: function(event){
-      this.parent.model.toolMouseDrag(event);
+      //console.log("space = "+space);
+      this.parent.model.toolMouseDrag(event,space);
+
       //console.log("tool mouse drag:"+ event);
     },
 
+  
     toolMouseMove: function(event){
       this.parent.model.toolMouseMove(event);
       //console.log("tool mouse drag:"+ event);
@@ -84,15 +92,30 @@ var CanvasView = Backbone.View.extend({
   
   /* canvas event functions */
 
-    canvasKeypress: function(event){
+    canvasKeydown: function(event){
       console.log(event.keyCode);
       if(event.keyCode == saveKey){
         this.model.save();
       }
-      if(event.keyCode === 67){
-        console.log("deleting");  
+      if(event.keyCode === clearKey){
         this.model.deleteObject();
       }
+      if(event.keyCode=== spaceKey){
+        //console.log("setting space to true")
+        space = true;
+      }
+
+    },
+
+    canvasKeyup: function(event){
+      console.log(event.keyCode);
+    
+      if(event.keyCode=== spaceKey){
+               // console.log("setting space to false")
+
+        space = false;
+      }
+
     },
 
     //enter and leave functions manage keyboard events by focusing the canvas elemennt
@@ -117,35 +140,41 @@ var CanvasView = Backbone.View.extend({
       //this.model.canvasMouseDown(event);
     },
 
-    canvasMouseDrag: function(event){
-     // console.log(event);
+    canvasMouseUp: function(event){
+    //console.log(event);
      mouseDown = false;
-      this.model.canvasMouseDrag(event);
+    // this.event_bus.trigger('shiftClick',event);
+      //this.model.canvasMouseDown(event);
     },
 
+
     canvasMouseMove: function(event){
-     this.event_bus.trigger('canvasMouseMove',event);
+      this.event_bus.trigger('canvasMouseMove',event);
+
       if(mouseDown){
-        //console.log("mouse drag event: "+event);
-        //this.model.canvasMouseDrag(event);
+        var delta = {x:event.offsetX-last.x,y:event.offsetY-last.y};
+        this.model.canvasMouseDrag(delta,space);
       }
       else{
         //console.log("mouse move event: "+event);
        // this.model.canvasMouseMove(event);
       }
-
+      last.x = event.offsetX;
+      last.y = event.offsetY;
 
     },
 
     canvasMousewheel: function(event){
       //console.log(event.originalEvent.deltaY);
-      this.model.canvasMouseWheel(event);
+      this.model.canvasMouseWheel(event,space);
 
     },
 
     canvasDblclick: function(event){
       this.model.canvasDblclick(event);
-    }
+    },
+
+  
 
   });
 

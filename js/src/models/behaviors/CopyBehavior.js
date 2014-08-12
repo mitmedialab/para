@@ -68,38 +68,15 @@ define([
             }
           }
         }
-
-        /*var numInstances = this.instances.length;
-          for (var j = 0; j < data.length; j++) {
-          if (numInstances < this.copyNum) {
-            for (var i = 0; i < this.copyNum - numInstances; i++) {
-
-              this.instances.push(new Instance());
-               var x = i * 20;
-              var y = x;
-              this.instances[i].update({position:{x:x,y:y}});
-            }
-          } else if (numInstances > this.copyNum) {
-              for (var k = 0; k < numInstances - this.copyNum; k++) {
-                this.instances.pop();
-              }
-            }
-          }
-           console.log('number of copies = ' + this.instances.length);*/
-
       },
 
       setCopyNum: function(data) {
         this.copyNum = data;
-
-
-
       },
 
        
 
       exclude: function(excludeIndex){
-     
         var child = this.children[excludeIndex];
         if(child!==null){
          for(var i=child.instances.length-1;i>0;i--){
@@ -108,7 +85,6 @@ define([
          child.instances[0].anchor=false;
         }
         this.excludes.push(excludeIndex);
-        //BaseBehavior.prototype.exclude.call(this,excludeIndex);
       }
 
 

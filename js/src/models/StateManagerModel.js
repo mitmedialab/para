@@ -23,7 +23,8 @@ define([
     penTool,
     polyTool,
     selectTool,
-    paper;
+    paper,
+    mousePos;
 
 
 
@@ -95,13 +96,11 @@ this.event_bus = event_bus;
       conditional_line.createInstanceFromPath(path);
      
       this.nodeAdded(conditional_line);*/
-      var numChildren = paper.project.activeLayer.children.length;
-      console.log("total number of children="+numChildren);
-      console.log( paper.project.activeLayer.children)
+    
       this.rootRender();
         /*       var intersections = conditional_line.checkIntersection();
 
-       console.log("test intersection=");
+       console.log('test intersection=');
       console.log(intersections);*/
       //this.event_bus.trigger('sendTestObj',conditional_line);
 
@@ -175,8 +174,8 @@ this.event_bus = event_bus;
       rootNode.render(null,currentNode);
 
       var numChildren = paper.project.activeLayer.children.length;
-      console.log("total number of children="+numChildren);
-      console.log( paper.project.activeLayer.children)
+      console.log('total number of children='+numChildren);
+      console.log( paper.project.activeLayer.children);
     },
 
     rootUpdate: function(){
@@ -246,33 +245,97 @@ this.event_bus = event_bus;
     },
 
     //triggered by paper tool on a mouse down event
-    toolMouseDown: function(event) {
+    toolMouseDown: function(event, space) {
+      if(!space){
       var selectedTool = toolCollection.get(this.get('state'));
       selectedTool.mouseDown(event);
+    }
 
 
     },
 
-    toolMouseUp: function(event) {
+    toolMouseUp: function(event, space) {
+      if(!space){
       var selectedTool = toolCollection.get(this.get('state'));
       selectedTool.mouseUp(event);
+    }
 
     },
 
 
-    toolMouseDrag: function(event) {
-      var selectedTool = toolCollection.get(this.get('state'));
-      selectedTool.mouseDrag(event);
+    toolMouseDrag: function(event, space) {
+      if(!space){
+        var selectedTool = toolCollection.get(this.get('state'));
+        selectedTool.mouseDrag(event);
+      }
+      
+    },
+
+   canvasMouseDrag: function(delta, space) {
+      if(space){
+        console.log( paper.view.zoom );
+       var inverseDelta=new paper.Point(-delta.x/paper.view.zoom,-delta.y/paper.view.zoom);
+        paper.view.scrollBy(inverseDelta);
+         event.preventDefault();
+        //paper.view.draw();
+        
+      }
+     
+      
+    },
+
+    changeZoom: function(oldZoom, delta, c, p){
+      var newZoom = this.calcZoom(oldZoom, delta);
+      var beta = oldZoom / newZoom;
+      var pc = p.subtract(c);
+      var a = p.subtract(pc.multiply(beta)).subtract(c);
+      return{z:newZoom, o:a};
+    },
+
+    calcZoom: function(oldZoom, delta){
+      var factor = 1.05;
+      if (delta < 0){
+        return oldZoom * factor;
+      }
+      if (delta > 0){
+        return oldZoom/factor;
+      }
+    },
+      changeCenter: function(oldCenter, delta, factor){
+      var offset = new paper.Point(-delta.x, -delta.y);
+     // offset = offset.multiply(factor);
+      var newCenter = oldCenter.add(offset);
+      console.log(newCenter);
+      return newCenter;
+
     },
 
 
-    toolMouseMove: function(event) {
+
+    toolMouseMove: function(event,space) {
+      if(!space){
       var selectedTool = toolCollection.get(this.get('state'));
       selectedTool.mouseMove(event);
+    }
+     
+     
     },
 
-    canvasMouseWheel: function(event) {
+    canvasMouseWheel: function(event, space, mousePos) {
+     if(space){
+       var delta = event.originalEvent.wheelDelta;  //paper.view.center
+       var mousePos = new paper.Point(event.offsetX,event.offsetY); 
 
+       
+        var viewPosition = paper.view.viewToProject(mousePos);
+        console.log(viewPosition);
+        var data =this.changeZoom(paper.view.zoom, delta, paper.view.center, viewPosition);
+        paper.view.zoom = data.z;
+        paper.view.center = paper.view.center.add(data.o);
+        event.preventDefault();
+        paper.view.draw();
+      }
+    
 
 
     },
@@ -306,7 +369,7 @@ this.event_bus = event_bus;
     },
 
      updateColor: function(color,type){
-      console.log("update color");
+      console.log('update color');
       if(selectTool.selectedNodes.length>0){
         
         var update;
@@ -328,7 +391,7 @@ this.event_bus = event_bus;
     },
 
     deleteObject: function(){
-      console.log("delete");
+      console.log('delete');
        if(selectTool.selectedNodes.length>0){
         for(var i=0;i<selectTool.selectedNodes.length;i++){
          selectTool.selectedNodes[i].deleteNode();
