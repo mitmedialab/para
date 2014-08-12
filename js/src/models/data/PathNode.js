@@ -94,9 +94,10 @@ define([
 
     /*clears out all but first of literal paths*/
     clearObjects: function() {
-
+      
       for (var j = 0; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
+        console.log("clearing instance literal at:"+j)
 
       }
       this.instance_literals = [];
@@ -156,7 +157,7 @@ define([
             instance_literal.data.renderSignature.push(k);
             var nInstance = this.instances[k];
             nInstance.render(data[d]);
-            instance_literal.transform(nInstance.matrix);
+            instance_literal = instance_literal.transform(nInstance.matrix);
             instance_literal.strokeColor = this.instances[k].strokeColor;
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
@@ -207,9 +208,7 @@ define([
 
         var nInstance = this.instances[z];
           nInstance.render({});
-          instance_literal.transform(nInstance.matrix);
-          instance_literal.rotate(this.instances[z].rotation);
-          instance_literal.scale(this.instances[z].scale);
+          instance_literal = instance_literal.transform(nInstance.matrix);
           instance_literal.visible = this.instances[z].visible;
           instance_literal.data.renderSignature = [];
           instance_literal.data.renderSignature.push(z);

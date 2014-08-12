@@ -13,10 +13,9 @@ define([
       constructor: function(pathChild) {
         this.pathChild = pathChild;
         this.finalPath = null;
+        this.startAngle=0;
         this.location = 0;
       },
-
-
 
       update: function(data){
           console.log("update follow path");
@@ -74,23 +73,20 @@ define([
                 }
               }
               this.location = this.finalPath.segments[0].point;
+              this.startAngle = this.finalPath.segments[1].point.subtract(location).angle;
       },
 
 
       calculate: function(data, index){
-          console.log("calculate follow path");
-        console.log("follow path for index:"+index);
+       
           this.followPath(index);
       },
 
       clean: function(data){
            console.log("clean follow path");
-         var startDelta = this.finalPath.segments[1].point.subtract(this.finalPath.segments[0].point);
-              this.instances[0].update({
-                rotation:{angle:startDelta.angle}
-              });
           this.finalPath.remove();
           this.finalPath = null;
+        
 
       },
 
@@ -100,13 +96,16 @@ define([
                 var instance = this.instances[index];
                 instance.visible=true;
                 var delta = location_n.subtract(location);
+
+                
                 var difference = {x:location_n.x,y:location_n.y};
                 instance.update({
                   delta: difference,
-                  rotation: {angle:delta.angle},
-                  scale:0.5,
+                  rotation: {angle:delta.angle-this.startAngle},
                 });
+                
                 this.location = location_n;
+                
               
         }
       

@@ -95,6 +95,9 @@ this.event_bus = event_bus;
       conditional_line.createInstanceFromPath(path);
      
       this.nodeAdded(conditional_line);*/
+      var numChildren = paper.project.activeLayer.children.length;
+      console.log("total number of children="+numChildren);
+      console.log( paper.project.activeLayer.children)
       this.rootRender();
         /*       var intersections = conditional_line.checkIntersection();
 
@@ -170,6 +173,10 @@ this.event_bus = event_bus;
     
       rootNode.clearObjects();
       rootNode.render(null,currentNode);
+
+      var numChildren = paper.project.activeLayer.children.length;
+      console.log("total number of children="+numChildren);
+      console.log( paper.project.activeLayer.children)
     },
 
     rootUpdate: function(){

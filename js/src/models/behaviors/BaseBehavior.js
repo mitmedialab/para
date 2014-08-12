@@ -2,15 +2,16 @@
 base class for all behaviors */
 
 define([
-		'toolbox',
+		 'underscore',
+    		'backbone',
 		'models/data/Condition',
 		    'utils/TrigFunc'
 
 	],
 
-	function(Toolbox, Condition, TrigFunc) {
+	function(_, Backbone, Condition, TrigFunc) {
 
-		var BaseBehavior = Toolbox.Base.extend({
+		var BaseBehavior = Backbone.Model.extend({
 			conditions: [],
 			name: 'base',
 			type: 'none',

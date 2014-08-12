@@ -1,0 +1,25 @@
+/*FillBehavior.js
+ */
+define([
+    'models/behaviors/BaseBehavior',
+    'models/PaperManager',
+    'utils/TrigFunc',
+    'models/behaviors/Scaffold'
+  ],
+
+  function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {
+    var paper = PaperManager.getPaperInstance();
+    var FollowPathBehavior = BaseBehavior.extend({
+
+      constructor: function(pathChild,rotate) {
+       
+
+      },
+
+
+
+
+      update: function(data) {
+      }
+    });
+  });

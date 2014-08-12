@@ -102,7 +102,6 @@ define([
 			if(data.position){
 				//console.log('prior position =');
 				//console.log(this.position);
-
 				this.position.x=data.position.x;
 				this.position.y=data.position.y;
 				//console.log('updated position=');
@@ -243,8 +242,8 @@ define([
 				this.matrix = this.matrix.scale(this.scale);
 
 				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
-				var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
-			/*if(this.nodeParent.type!=='root'){
+				/*var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
+			if(this.nodeParent.type!=='root'){
 				 uLP.fillColor = 'green';
 				 if(this.nodeParent.type==='behavior'){
 				 	 uLP.fillColor = 'red';

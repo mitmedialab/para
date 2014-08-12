@@ -100,7 +100,11 @@ define([
        
 
         var radialBehavior = new RadialDistributeBehavior();
-        behaviorNode.extendBehaviorFirst(radialBehavior, ['update']);
+         _.defaults(behaviorNode, radialBehavior);
+
+        behaviorNode.override('update',followPathBehavior.update);
+        behaviorNode.override('calculate',followPathBehavior.calculate);
+        behaviorNode.override('clean',followPathBehavior.clean);
         behaviorNode.update([{}]);
         /*var pointA = nodes[0].instances[0].position;
         var pointB = nodes[0].instances[nodes[0].instances.length - 1].position;
@@ -123,8 +127,11 @@ define([
         
        // nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
           // nodes[1].extendBehaviorFirst(followPathBehavior, ['calculate']);
-          nodes[1].wrapBehavior(followPathBehavior);
-              //nodes[1].extendBehaviorFirst(followPathBehavior, ['calculate','update','clean']);
+          _.defaults(nodes[1], followPathBehavior);
+
+        nodes[1].override('update',followPathBehavior.update);
+        nodes[1].override('calculate',followPathBehavior.calculate);
+        nodes[1].override('clean',followPathBehavior.clean);
       }
     }
     

@@ -24,6 +24,8 @@ define([
 
       },
 
+      
+
 //average children's midpoints
       /*findMidpoint: function(){
         var midpoints = [];

@@ -264,9 +264,13 @@ define([
     },
 
    loop: function(data){
+      console.log("loop geom");
+
       for (var j = 0; j < this.instances.length; j++) {
         this.calculate(data,j);
       }
+      this.clean(data);
+
     },
 
     calculate: function(data, index){
@@ -276,7 +280,6 @@ define([
           instance.update(data[i]);
 
         }
-        this.clean(data);
     },
 
     clean: function(data){
@@ -577,13 +580,20 @@ define([
 
     },
 
-    wrapBehavior: function(from){
-       _.defaults(this, from);
-        // … and we do the same for events
-        _.defaults(this.events, from.events);
 
-        from.call(this);
+   override: function(methodName, callback) {
+      var composed= this.before(callback);
+      this[methodName] = composed(this[methodName]);
     },
+
+    before: function (extraBehavior) {
+   return function(original) {
+    return function() {
+      extraBehavior.apply(this, arguments);
+      return original.apply(this, arguments);
+    };
+  };
+},
 
     //registers overriding function for overriding methods- determined by parent node- this calls new method first
     extendBehaviorFirst: function(from, methods) {
@@ -599,15 +609,11 @@ define([
         // console.log(from);
         for (var i = 0; i < methods.length; i++) {
           var methodName = methods[i];
-          console.log("extending behavior with method:"+methodName);
 
           if (!_.isUndefined(from[methodName])) {
             // console.log('setting methods');
             var old = this[methodName];
-            console.log("old method");
-            console.log(old);
-            console.log("new method");
-            console.log(from[methodName]);
+           
             // ... we create a new function on to
             this[methodName] = function() {
 
@@ -627,7 +633,6 @@ define([
 
             };
                    
-             console.log(this[methodName]);
           }
         }
       //}
