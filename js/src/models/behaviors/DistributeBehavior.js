@@ -4,109 +4,66 @@ define([
     'models/behaviors/BaseBehavior',
     'models/PaperManager',
     'utils/TrigFunc',
-    'models/behaviors/Scaffold'
   ],
 
-  function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {
+  function(BaseBehavior, PaperManager, TrigFunc) {
     var paper = PaperManager.getPaperInstance();
     var DistributeBehavior = BaseBehavior.extend({
       name: 'linear',
       type: 'distribution',
 
-
-      update: function() {
-        // console.log("distribution update");
-        this.clearScaffolds();
-        this.setVisible(true);
-        this.distribute();
-
-
+      initialize: function() {
+        this.pointA=null;
+        this.pointB =null;
+        this.xDiff= 0;
+        this.yDiff = 0;
       },
 
 
-      //projects a set of instances along a parent path- needs to be moved to mixin
-      distribute: function() {
-        //console.log("distributing instances");
-        if (this.children.length > 0) {
-          for (var z = 0; z < this.children.length; z++) {
-            if (this.children[z] !== null) {
-              var child = this.children[z];
-              var num = child.instances.length;
 
-              var pointA = child.instances[0].delta;
-              var pointB = child.instances[child.instances.length - 1].delta;
-              if (TrigFunc.equals(pointA, pointB)) {
-                child.instances[child.instances.length - 1].delta.x += 40;
-                child.instances[child.instances.length - 1].delta.y += 40;
-                pointB = child.instances[child.instances.length - 1].delta;
-              }
-              var selected = child.getFirstSelectedInstance();
+      update: function(data) {
+        var num = this.instances.length;
+        this.pointA = this.instances[0].delta;
+        this.pointB = this.instances[num - 1].delta;
+        if (TrigFunc.equals(this.pointA, this.pointB)) {
+          this.instances[num - 1].delta.x += 40;
+          this.instances[num - 1].delta.y += 40;
+          this.pointB = this.instances[num - 1].delta;
+        }
+        var selected = this.getFirstSelectedInstance();
+       this.xDiff = (this.pointB.x - this.pointA.x) / (num - 1);
+      this.yDiff = (this.pointB.y - this.pointA.y) / (num - 1);
+        var dist = TrigFunc.distance(this.pointA, {
+          x: this.pointA.x + this.xDiff,
+          y: this.pointA.y + this.yDiff
+        });
+        if (selected) {
+          if (selected.index === 1) {
+            this.nodeParent.checkDistanceIncrement(this.instances[0], selected.instance, dist, this.nodeParent);
+          } else if (selected.index == num - 2) {
+            this.nodeParent.checkDistanceDecrement(this.instances[0], selected.instance, dist, this.nodeParent);
 
-              /*var scaffoldLine =  new paper.Path();
-                scaffoldLine.strokeColor = '#00CFFF';
-                scaffoldLine.strokeWidth = 4;
-                scaffoldLine.add(new paper.Point(pointA.x,pointA.y));
-                scaffoldLine.add(new paper.Point(pointB.x,pointB.y));
-               // var scaffoldA = new Scaffold(scaffoldLine);
-                this.scaffolds.push(scaffoldLine);
-
-
-                var pointAC = new paper.Path.Circle(new paper.Point(pointA.x,pointA.y),5);
-                pointAC.fillColor =  '#83E779';
-                //var scaffoldB = new Scaffold(pointAC);
-                this.scaffolds.push(pointAC);
-               
-                var pointBC = new paper.Path.Circle(new paper.Point(pointB.x,pointB.y),5);
-                pointBC.fillColor =  '#FF0000';
-               // var scaffoldC = new Scaffold(pointBC);
-                this.scaffolds.push(pointBC);*/
-
-
-
-              var xDiff = (pointB.x - pointA.x) / (num - 1);
-              var yDiff = (pointB.y - pointA.y) / (num - 1);
-              var dist = TrigFunc.distance(pointA, {
-                x: pointA.x + xDiff,
-                y: pointA.y + yDiff
-              });
-              if (selected) {
-                if (selected.index === 1) {
-                  this.checkDistanceIncrement(child.instances[0], selected.instance, dist, child);
-                } else if (selected.index == child.instances.length - 2) {
-                  this.checkDistanceDecrement(child.instances[0], selected.instance, dist, child);
-
-                }
-              }
-
-              for (var i = 1; i < num - 1; i++) {
-                //console.log(location);
-                var x = pointA.x + xDiff * i;
-                var y = pointA.y + yDiff * i;
-
-                child.instances[i].update({
-                  delta: {
-                    x: x,
-                    y: y
-                  }
-                });
-              }
-
-              for (var j = 0; j < child.instance_literals.length; j++) {
-
-                var result = this.checkConditions(child.instance_literals[j]);
-                if (!result) {
-                  child.instances[child.instance_literals[j].instanceParentIndex].visible = result;
-
-                }
-
-              }
-            }
           }
         }
+      },
+
+      calculate: function(data, index) {
+        var x = this.pointA.x + this.xDiff * index;
+        var y = this.pointA.y + this.yDiff * index;
+
+        this.instances[index].update({
+          delta: {
+            x: x,
+            y: y
+          }
+        });
 
       },
 
-      
+      clean: function(data) {
+
+      }
+
 
 
     });

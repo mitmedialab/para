@@ -84,17 +84,14 @@ define([
 
         }
        if (type === 'linear') {
-     
-      
-        
-        
         var linearBehavior = new DistributeBehavior();
-       
-         // this.test=false;
-        
-        // console.log('lineartype=' +linearBehavior.type);
-        behaviorNode.extendBehaviorFirst(linearBehavior, ['update']);
-        behaviorNode.update([{}]);
+        _.defaults(nodes[0], linearBehavior);
+         for(var j=0;j<nodes.length;j++){
+          nodes[j].override('update',linearBehavior.update);
+          nodes[j].override('calculate',linearBehavior.calculate);
+          nodes[j].override('clean',linearBehavior.clean);
+          nodes[j].update([{}]);
+       }
       } else if (type == 'radial') {
        behaviorNode.copyNum = 10;
        
@@ -108,8 +105,6 @@ define([
           nodes[j].update([{}]);
        }
        
-      
-
       }
       else if (type == 'followPath') {
         console.log('follow path behavior called');
