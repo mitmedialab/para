@@ -14,9 +14,9 @@ define([
  var mouseDown = false;
  var saveKey = 83;
  var loadKey = 76;
- var spaceKey = 91;
+ var panKey = 91;
  var clearKey = 67;
- var space = false;
+ var pan = false;
  var last = {x:0,y:0};
 var CanvasView = Backbone.View.extend({
     //
@@ -68,17 +68,17 @@ var CanvasView = Backbone.View.extend({
     toolMouseDown: function(event){
       //this.target. model.toolMouseDown(event);
       //console.log(event);
-      this.parent.model.toolMouseDown(event,space);
+      this.parent.model.toolMouseDown(event,pan);
     },
 
     toolMouseUp: function(event){
-      this.parent.model.toolMouseUp(event,space);
+      this.parent.model.toolMouseUp(event,pan);
       //console.log("tool mouse up:"+ event);
     },
 
     toolMouseDrag: function(event){
-      //console.log("space = "+space);
-      this.parent.model.toolMouseDrag(event,space);
+      //console.log("pan = "+pan);
+      this.parent.model.toolMouseDrag(event,pan);
 
       //console.log("tool mouse drag:"+ event);
     },
@@ -100,20 +100,18 @@ var CanvasView = Backbone.View.extend({
       if(event.keyCode === clearKey){
         this.model.deleteObject();
       }
-      if(event.keyCode=== spaceKey){
-        //console.log("setting space to true")
-        space = true;
+      if(event.keyCode=== panKey){
+        //console.log("setting pan to true")
+        pan = true;
       }
 
     },
 
     canvasKeyup: function(event){
-      console.log(event.keyCode);
+      //console.log(event.keyCode);
     
-      if(event.keyCode=== spaceKey){
-               // console.log("setting space to false")
-
-        space = false;
+      if(event.keyCode=== panKey){
+        pan = false;
       }
 
     },
@@ -153,7 +151,7 @@ var CanvasView = Backbone.View.extend({
 
       if(mouseDown){
         var delta = {x:event.offsetX-last.x,y:event.offsetY-last.y};
-        this.model.canvasMouseDrag(delta,space);
+        this.model.canvasMouseDrag(delta,pan);
       }
       else{
         //console.log("mouse move event: "+event);
@@ -166,7 +164,7 @@ var CanvasView = Backbone.View.extend({
 
     canvasMousewheel: function(event){
       //console.log(event.originalEvent.deltaY);
-      this.model.canvasMouseWheel(event,space);
+      this.model.canvasMouseWheel(event,pan);
 
     },
 

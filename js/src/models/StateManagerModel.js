@@ -12,11 +12,12 @@ define([
   'models/tools/PenToolModel',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
-  'models/PaperManager'
+  'models/PaperManager',
+  'filesaver'
  
 
 
-], function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, PaperManager) {
+], function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, PaperManager, FileSaver) {
   var rootNode,
     currentNode,
     toolCollection,
@@ -35,6 +36,7 @@ define([
     },
 
     initialize: function(event_bus) {
+      //console.log(new FileSaver());
       paper = PaperManager.getPaperInstance();
       penTool = new PenToolModel({
         id: 'penTool'
@@ -122,6 +124,11 @@ this.event_bus = event_bus;
 
     },
 
+    resetTools: function(){
+      toolCollection.get(this.get('state')).reset();
+
+    },
+
     //callback triggered when tool adds new node
     nodeAdded: function(node) {
       //console.log('node added: '+ node.type);
@@ -174,8 +181,9 @@ this.event_bus = event_bus;
       rootNode.render(null,currentNode);
 
       var numChildren = paper.project.activeLayer.children.length;
-      console.log('total number of children='+numChildren);
-      console.log( paper.project.activeLayer.children);
+      this.trigger('renderComplete');
+     // console.log('total number of children='+numChildren);
+     // console.log( paper.project.activeLayer.children);
     },
 
     rootUpdate: function(){
@@ -245,8 +253,8 @@ this.event_bus = event_bus;
     },
 
     //triggered by paper tool on a mouse down event
-    toolMouseDown: function(event, space) {
-      if(!space){
+    toolMouseDown: function(event, pan) {
+      if(!pan){
       var selectedTool = toolCollection.get(this.get('state'));
       selectedTool.mouseDown(event);
     }
@@ -254,8 +262,8 @@ this.event_bus = event_bus;
 
     },
 
-    toolMouseUp: function(event, space) {
-      if(!space){
+    toolMouseUp: function(event, pan) {
+      if(!pan){
       var selectedTool = toolCollection.get(this.get('state'));
       selectedTool.mouseUp(event);
     }
@@ -263,17 +271,16 @@ this.event_bus = event_bus;
     },
 
 
-    toolMouseDrag: function(event, space) {
-      if(!space){
+    toolMouseDrag: function(event, pan) {
+      if(!pan){
         var selectedTool = toolCollection.get(this.get('state'));
         selectedTool.mouseDrag(event);
       }
       
     },
 
-   canvasMouseDrag: function(delta, space) {
-      if(space){
-        console.log( paper.view.zoom );
+   canvasMouseDrag: function(delta, pan) {
+      if(pan){
        var inverseDelta=new paper.Point(-delta.x/paper.view.zoom,-delta.y/paper.view.zoom);
         paper.view.scrollBy(inverseDelta);
          event.preventDefault();
@@ -305,15 +312,14 @@ this.event_bus = event_bus;
       var offset = new paper.Point(-delta.x, -delta.y);
      // offset = offset.multiply(factor);
       var newCenter = oldCenter.add(offset);
-      console.log(newCenter);
       return newCenter;
 
     },
 
 
 
-    toolMouseMove: function(event,space) {
-      if(!space){
+    toolMouseMove: function(event,pan) {
+      if(!pan){
       var selectedTool = toolCollection.get(this.get('state'));
       selectedTool.mouseMove(event);
     }
@@ -321,14 +327,13 @@ this.event_bus = event_bus;
      
     },
 
-    canvasMouseWheel: function(event, space, mousePos) {
-     if(space){
+    canvasMouseWheel: function(event, pan, mousePos) {
+     if(pan){
        var delta = event.originalEvent.wheelDelta;  //paper.view.center
        var mousePos = new paper.Point(event.offsetX,event.offsetY); 
 
        
         var viewPosition = paper.view.viewToProject(mousePos);
-        console.log(viewPosition);
         var data =this.changeZoom(paper.view.zoom, delta, paper.view.center, viewPosition);
         paper.view.zoom = data.z;
         paper.view.center = paper.view.center.add(data.o);
@@ -351,10 +356,18 @@ this.event_bus = event_bus;
 
     },
 
-    save: function(){
+    save: function(filename){
+      
+
       var data = rootNode.exportJSON();
-      this.exportSVG();
-      //console.log(JSON.stringify(data));
+      var blob = new Blob([JSON.stringify(data)], {type: 'text/plain;charset=utf-8'});
+      var fileSaver = new FileSaver(blob,filename);
+    },
+
+     export: function(filename){
+      var data =paper.project.exportSVG( { asString: true});
+      var blob = new Blob([data], {type: 'image/svg+xml'});
+      var fileSaver = new FileSaver(blob,filename);
     },
 
     updateStroke: function(width){
@@ -391,7 +404,6 @@ this.event_bus = event_bus;
     },
 
     deleteObject: function(){
-      console.log('delete');
        if(selectTool.selectedNodes.length>0){
         for(var i=0;i<selectTool.selectedNodes.length;i++){
          selectTool.selectedNodes[i].deleteNode();
@@ -401,10 +413,6 @@ this.event_bus = event_bus;
       this.rootRender();
      paper.view.draw();  
     },
-
- exportSVG: function(){
-      console.log(paper.project.exportSVG( { asString: true} ));
-    }
 
   });
 

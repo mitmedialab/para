@@ -19,7 +19,7 @@ define([
   	},
 
   	reset: function(){
-  
+      this.trigger('rootRender');
   	},
 
   	//mousedown event

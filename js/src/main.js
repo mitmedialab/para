@@ -15,7 +15,8 @@ require.config({
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "justmath": "../../bower_components/JustMath.js/JustMath",
         "sylvester": "../../bower_components/sylvester/sylvester",
-        "minicolors":"../../bower_components/jquery-minicolors/jquery.minicolors"
+        "minicolors":"../../bower_components/jquery-minicolors/jquery.minicolors",
+        "filesaver": "../../bower_components/FileSaver/FileSaver"
     },
     
     shim: {
@@ -45,6 +46,9 @@ require.config({
         },
         minicolors:{
           exports:'Minicolors'
+        },
+        filesaver:{
+          exports:'filesaver'
         }
        
     },
