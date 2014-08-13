@@ -22,7 +22,6 @@ define([
 
 
       update: function(data) {
-                console.log("distUpdate");
 
         var num = this.instances.length;
         this.pointA = this.instances[0].delta;

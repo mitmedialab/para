@@ -110,6 +110,17 @@ define([
 			}*/
 		},
 
+
+		distributionReset: function(){
+			
+		for(var i=0;i<this.instances.length;i++){
+			this.instances[i].rotation.angle=0;
+			console.log("resetting distribuiton at"+i);
+
+		}
+			
+		},
+
 		checkDistanceIncrement: function(start,selected,tDist){
 
           var dist = TrigFunc.distance(start.delta,selected.delta);

@@ -14,14 +14,16 @@ define([
 
 ], function($, _, SceneNode, Instance, PaperManager, Condition) {
   var paper = PaperManager.getPaperInstance();
-  
+
   Function.prototype.clone = function() {
     var that = this;
-    var temp = function temporary() { return that.apply(this, arguments); };
-    for(var key in this) {
-        if (this.hasOwnProperty(key)) {
-            temp[key] = this[key];
-        }
+    var temp = function temporary() {
+      return that.apply(this, arguments);
+    };
+    for (var key in this) {
+      if (this.hasOwnProperty(key)) {
+        temp[key] = this[key];
+      }
     }
     return temp;
   };
@@ -57,12 +59,11 @@ define([
      * creates one instance by default
      */
     initialize: function(data) {
-      if(!data){
+      if (!data) {
         this.createInstance();
-      }
-      else{
+      } else {
         var dInstances = data.instances;
-        for(var i =0;i<dInstances.length;i++){
+        for (var i = 0; i < dInstances.length; i++) {
           var instance = this.createInstance();
           instance.parseJSON(dInstances[i]);
         }
@@ -216,10 +217,9 @@ define([
           name: this.name
         });
         jdata = this.toJSON();
+      } else {
+        jdata = data;
       }
-        else{
-            jdata= data;
-          }
 
       var jInstances = [];
       var children = [];
@@ -234,16 +234,16 @@ define([
         children.push(this.children[k].exportJSON());
       }
       for (var m = 0; m < this.behaviors.length; m++) {
-        behaviors.push(this.behaviors[m].exportJSON()); 
+        behaviors.push(this.behaviors[m].exportJSON());
       }
-     jdata.instances = jInstances;
+      jdata.instances = jInstances;
       jdata.instance_literals = lInstances;
       jdata.children = children;
       jdata.behaviors = behaviors;
       return jdata;
     },
 
-   
+
 
     /*createInstance
      * creates a new instance and pushes it into the instance array
@@ -531,7 +531,7 @@ define([
       for (var i = 0; i < this.instances.length; i++) {
         if (this.instances[i].selected) {
           return this.instances[i];
-          
+
         }
       }
       return null;
@@ -572,6 +572,12 @@ define([
         }
       }
       return null;
+    },
+
+    getBehaviorByType: function(type){
+      return _.filter(this.behaviors,function(behavior){
+        return behavior.behavior.type===type;
+      });
     },
 
     //checks by name to see if behavior type has been added to this instance
@@ -619,72 +625,94 @@ define([
 
     },
 
-    addBehavior: function(behavior,methods, index){
+    addBehavior: function(behavior, methods, index) {
       _.defaults(this, behavior);
-      if(index){
-        if(index==='last'){
-          this.behaviors.push({behavior:behavior,methods:methods});
-        }
-        else{
-          this.behaviors.splice(index,0,{behavior:behavior,methods:methods});
+      if (index) {
+        if (index === 'last') {
+          this.behaviors.push({
+            behavior: behavior,
+            methods: methods
+          });
+        } else {
+          this.behaviors.splice(index, 0, {
+            behavior: behavior,
+            methods: methods
+          });
 
         }
+      } else {
+        this.behaviors.splice(this.behaviors.length - 2, 0, {
+          behavior: behavior,
+          methods: methods
+        });
       }
-      else{
-        this.behaviors.splice(this.behaviors.length-2,0,{behavior:behavior,methods:methods});
-      }
-      for(var i=0;i<methods.length;i++){
+      for (var i = 0; i < methods.length; i++) {
         this.override(methods[i]);
       }
     },
 
-    override: function(methodName) {
-      console.log("overriding:"+methodName);
-      if(!this.methodOverriden(methodName)){
-        this.originalMethods.push({name:methodName,method:this[methodName].clone()});
-      }
-      var applicableBehaviors = this.getBehaviorsWithMethod(methodName);
-      this[methodName]= this.getOriginal(methodName);
-         
-      for(var i=0;i<applicableBehaviors.length;i++){
-         console.log('overriding='+methodName+ "with "+ applicableBehaviors[i].behavior.name);
-          console.log('applicable=');
-         console.log(applicableBehaviors[i].behavior);
-        var extraBehavior = applicableBehaviors[i].behavior[methodName];
-         console.log('extra=');
-         console.log(extraBehavior);
-         var composed = this.before(extraBehavior);
-         console.log('composed=');
-         console.log(composed);
-         this[methodName] = composed(this[methodName]);
+    removeBehavior: function(name) {
+
+      var toRemove = _.filter(this.behaviors, function(behavior) {
+        return behavior.behavior.name === name;
+      });
+      console.log(toRemove);
+      this.behaviors = _.filter(this.behaviors, function(behavior) {
+        return behavior.behavior.name !== name;
+      });
+
+      for (var i = 0; i < toRemove.length; i++) {
+        //TODO: fix this hack- will remove user defined rotation
+        if(toRemove[i].behavior.type==='distribution'){
+          this.distributionReset();
+        }
+        var methods = toRemove[i].methods;
+        for (var j = 0; j < methods.length; j++) {
+          this.override(methods[j]);
+        }
       }
     },
 
-    methodOverriden: function(methodName){
-      for(var i=0;i<this.originalMethods.length;i++){
-        if(this.originalMethods[i].name === methodName){
+    override: function(methodName) {
+      if (!this.methodOverriden(methodName)) {
+        this.originalMethods.push({
+          name: methodName,
+          method: this[methodName].clone()
+        });
+      }
+      var applicableBehaviors = this.getBehaviorsWithMethod(methodName);
+      this[methodName] = this.getOriginal(methodName);
+
+      for (var i = 0; i < applicableBehaviors.length; i++) {
+        var extraBehavior = applicableBehaviors[i].behavior[methodName];
+        var composed = this.before(extraBehavior);
+        this[methodName] = composed(this[methodName]);
+      }
+    },
+
+    methodOverriden: function(methodName) {
+      for (var i = 0; i < this.originalMethods.length; i++) {
+        if (this.originalMethods[i].name === methodName) {
           return true;
         }
       }
       return false;
     },
 
-    getOriginal: function(methodName){
-      for(var i=0;i<this.originalMethods.length;i++){
-        if(this.originalMethods[i].name === methodName){
+    getOriginal: function(methodName) {
+      for (var i = 0; i < this.originalMethods.length; i++) {
+        if (this.originalMethods[i].name === methodName) {
           return this.originalMethods[i].method.clone();
         }
       }
       return null;
     },
 
-    getBehaviorsWithMethod: function(methodName){
-      return _.filter(this.behaviors, function(behavior){ 
-          console.log("searching for method name="+methodName);
-          var found = $.inArray(methodName,behavior.methods);
-          console.log("found="+found!=-1);
-          return found !==-1;
-        });
+    getBehaviorsWithMethod: function(methodName) {
+      return _.filter(this.behaviors, function(behavior) {
+        var found = $.inArray(methodName, behavior.methods);
+        return found !== -1;
+      });
     },
 
     before: function(extraBehavior) {
@@ -696,7 +724,7 @@ define([
       };
     },
 
-    
+
 
     addConstraint: function(constraint) {
 

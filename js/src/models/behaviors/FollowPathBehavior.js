@@ -9,7 +9,8 @@ define([
   function(BaseBehavior, PaperManager, TrigFunc) {
     var paper = PaperManager.getPaperInstance();
     var FollowPathBehavior = BaseBehavior.extend({
-
+      name: 'followpath',
+      type: 'distribution',
       constructor: function(pathChild) {
         this.pathChild = pathChild;
         this.finalPath = null;
@@ -18,7 +19,6 @@ define([
       },
 
       update: function(data){
-          console.log("update follow path");
          var zeroedPath = this.pathChild.getLiteral().clone();
           zeroedPath.position.x =0+zeroedPath.bounds.width/2;
           zeroedPath.position.y=0+zeroedPath.bounds.height/2;
@@ -83,7 +83,6 @@ define([
       },
 
       clean: function(data){
-           console.log("clean follow path");
           this.finalPath.remove();
           this.finalPath = null;
         

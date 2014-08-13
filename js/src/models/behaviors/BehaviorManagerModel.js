@@ -37,7 +37,7 @@ define([
       }
     },
 
-    newBehavior: function(nodes, type, data) {
+    newBehavior: function(nodes, name, data) {
      //create a parent if none exists
       var nodeParent = nodes[0].nodeParent;
       var behaviorNode;
@@ -59,36 +59,48 @@ define([
 
       //console.log('behaviors='+behaviorNode.behaviors);
 
-      if (type === 'copy') {
+      if (name === 'copy') {
         this.addCopyBehavior(nodes,2,data);
       }
 
-      else if(type=='linear'){
+      else if(name=='linear'){
        if(!data){
-          this.addCopyBehavior(nodes,3);
+          if(!nodes[0].copyNum){
+            this.addCopyBehavior(nodes,3);
+          }
+          else{
+             this.addCopyBehavior(nodes);
+          }
         }
         this.addLinearBehavior(nodes,data);
        
       }
-      else if (type =='radial'){
+      else if (name =='radial'){
         if(!data){
-          this.addCopyBehavior(nodes,6);
+          if(!nodes[0].copyNum){
+            this.addCopyBehavior(nodes,6);
+          }
+          else{
+             this.addCopyBehavior(nodes);
+          }
         }
         this.addRadialBehavior(nodes,data);
       }  
-      else if (type == 'followPath') {
+      else if (name == 'followpath') {
          if(!data){
-          this.addCopyBehavior(nodes,4);
+          if(!nodes[0].copyNum){
+            this.addCopyBehavior(nodes,4);
+          }
+          else{
+             this.addCopyBehavior(nodes);
+          }
         }
           this.addFollowPathBehavior(nodes,data);
       
         }
-    
-    
-
+  
       behaviorNode.update([{}]);
       this.event_bus.trigger('rootRender');
-
       this.event_bus.trigger('moveDownNode', nodes[0].instance_literals[1]);
 
       
@@ -108,7 +120,9 @@ define([
           node.setCopyNum(data.copyNum);
         }
         else{
-          node.setCopyNum(copyNum);
+          if(copyNum){
+            node.setCopyNum(copyNum);
+          }
         }
         node.update([{}]);
       }
@@ -140,14 +154,15 @@ define([
           var containsDist=node.containsBehaviorType('distribution');
           var containsLin = node.containsBehaviorName('radial');
           if(containsDist && !containsLin){
-            //TODO: code to remove a behavior here
+            var toRemove = node.getBehaviorByType('distribution');
+            for(var j =0;j<toRemove.length;j++){
+              console.log('removing behavior at:'+i+','+toRemove[j].behavior.name);
+              node.removeBehavior(toRemove[j].behavior.name);
+            }
           }
-         else{
-            node.addBehavior(radialBehavior);
-            node.override('update',radialBehavior.update);
-            node.override('calculate',radialBehavior.calculate);
-            node.override('clean',radialBehavior.clean);
-        }
+       
+          node.addBehavior(radialBehavior,['update','calculate','clean']);
+       
       }
     },
 
@@ -158,11 +173,16 @@ define([
           var containsDist=node.containsBehaviorType('distribution');
           var containsLin = node.containsBehaviorName('linear');
           if(containsDist && !containsLin){
-            //TODO: code to remove a behavior here
+            var toRemove = node.getBehaviorByType('distribution');
+            for(var j =0;j<toRemove.length;j++){
+            console.log('removing behavior at:'+i+','+toRemove[j].behavior.name);
+
+              node.removeBehavior(toRemove[j].behavior.name);
+            }
           }
-         else{
-            node.addBehavior(linearBehavior,  ['update','calculate','clean']);
-        }
+        
+          node.addBehavior(linearBehavior,['update','calculate','clean']);
+        
       }
     },
 
