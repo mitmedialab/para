@@ -81,17 +81,36 @@ define([
 			this.set({
 				closed:this.closed,
 				position:this.position,
+				delta: this.delta,
+				midpoint: this.midpoint,
+				width: this.width,
+				height: this.height,
+				anchor: this.anchor,
 				visible:this.visible,
 				scale:this.scale,
 				rotation: this.rotation,
-				renderSignature:JSON.stringify(this.renderSignature),
-				index: this.index,
 				strokeWidth: this.strokeWidth,
 				fillColor: this.fillColor,
 				strokeColor: this.strokeColor
 
 			});
 			return this.toJSON();
+		},
+
+		parseJSON: function(data){
+			this.closed = data.closed;
+			this.position = data.position;
+			this.delta = data.delta;
+			this.midpoint = data.midpoint;
+			this.width = data.width;
+			this.height= data.height;
+			this.anchor =  data.anchor;
+			this.visible = data.visible;
+			this.scale = data.scale;
+			this.rotation = data.rotation;
+			this.strokeWidth = data.strokeWidth;
+			this.fillColor = data.fillColor;
+			this.strokeColor = data.strokeColor;
 		},
 
 
@@ -190,7 +209,6 @@ define([
 			}
 			if(data.strokeColor){
 				this.strokeColor= data.strokeColor;
-				console.log("stroke ="+this.strokeColor);
 			}
 			if(data.fillColor){
 				

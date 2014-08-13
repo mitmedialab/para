@@ -22,6 +22,8 @@ define([
 
 
       update: function(data) {
+                console.log("distUpdate");
+
         var num = this.instances.length;
         this.pointA = this.instances[0].delta;
         this.pointB = this.instances[num - 1].delta;
@@ -39,9 +41,9 @@ define([
         });
         if (selected) {
           if (selected.index === 1) {
-            this.nodeParent.checkDistanceIncrement(this.instances[0], selected.instance, dist, this.nodeParent);
+            this.checkDistanceIncrement(this.instances[0], selected, dist, this);
           } else if (selected.index == num - 2) {
-            this.nodeParent.checkDistanceDecrement(this.instances[0], selected.instance, dist, this.nodeParent);
+            this.checkDistanceDecrement(this.instances[0], selected, dist, this);
 
           }
         }

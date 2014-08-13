@@ -5,15 +5,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'models/data/BehaviorNode',
-      'utils/TrigFunc',
-
+  'utils/TrigFunc',
+  'models/data/GeometryNode',
   'models/behaviors/CopyBehavior',
   'models/behaviors/DistributeBehavior',
   'models/behaviors/RadialDistributeBehavior',
   'models/behaviors/FollowPathBehavior'
 
-], function($, _, Backbone, BehaviorNode, TrigFunc, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior) {
+], function($, _, Backbone, TrigFunc, GeometryNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior) {
   var nameVal = 0;
   var BehaviorManagerModel = Backbone.Model.extend({
 
@@ -28,101 +27,63 @@ define([
     },
 
     newCondition: function(nodes,conditional_node){
-      console.log("adding behavioral condition");
       conditional_node.instances[0].strokeColor = '#FF0000';
       conditional_node.instances[0].strokeWidth = 4;
 
       for(var i=0;i<nodes.length;i++){
-              console.log(nodes[0]);
-
         nodes[0].addCondition(null,'color',conditional_node,null);
         nodes[0].update([{}]);
 
       }
-
-
-      
-
     },
 
-    newBehavior: function(nodes, type) {
-      //console.log("total num of nodes="+nodes.length);
-      //console.log(nodes);
+    newBehavior: function(nodes, type, data) {
+     //create a parent if none exists
       var nodeParent = nodes[0].nodeParent;
       var behaviorNode;
       if(nodeParent.type=='behavior'){
         behaviorNode = nodes[0].nodeParent;
-        //console.log('parent is a behavior node');
       }
       else{
-         behaviorNode  = new BehaviorNode();
-      behaviorNode.name = 'Behavior_' + nameVal;
-      nameVal++;
-      for(var i=0;i<nodes.length;i++){
-        behaviorNode.addChildNode(nodes[i]);
+        behaviorNode  = new GeometryNode();
+        behaviorNode.name = 'Behavior_' + nameVal;
+        behaviorNode.type = 'behavior';
+        nameVal++;
+
+        for(var i=0;i<nodes.length;i++){
+          behaviorNode.addChildNode(nodes[i]);
+        }
+        this.event_bus.trigger('nodeAdded', behaviorNode);
+
       }
-        
-      }
-      this.event_bus.trigger('nodeAdded', behaviorNode);
 
       //console.log('behaviors='+behaviorNode.behaviors);
 
       if (type === 'copy') {
-        //console.log('creating copy behavior');
-        var copyBehavior = new CopyBehavior();
-        copyBehavior.setCopyNum(2);
-        behaviorNode.extendBehaviorFirst(copyBehavior, ['update']);
-        behaviorNode.update([{}]);
-      } else{
-          var containsCopy=behaviorNode.containsBehaviorType('copy');
-          if (containsCopy===false) {
-          var copyBehavior = new CopyBehavior();
-          copyBehavior.setCopyNum(3);
-          behaviorNode.extendBehaviorFirst(copyBehavior, ['update']);
-          behaviorNode.update([{}]);
-          console.log('copytype=' +copyBehavior.type);
+        this.addCopyBehavior(nodes,2,data);
+      }
 
+      else if(type=='linear'){
+       if(!data){
+          this.addCopyBehavior(nodes,3);
         }
-       if (type === 'linear') {
-        var linearBehavior = new DistributeBehavior();
-        nodes[0].addBehavior(linearBehavior);
-         for(var j=0;j<nodes.length;j++){
-          nodes[j].override('update',linearBehavior.update);
-          nodes[j].override('calculate',linearBehavior.calculate);
-          nodes[j].override('clean',linearBehavior.clean);
-          nodes[j].update([{}]);
-       }
-      } else if (type == 'radial') {
-       behaviorNode.copyNum = 10;
-       
-
-        var radialBehavior = new RadialDistributeBehavior();
-       nodes[0].addBehavior(radialBehavior);
-         for(var j=0;j<nodes.length;j++){
-          nodes[j].override('update',radialBehavior.update);
-          nodes[j].override('calculate',radialBehavior.calculate);
-          nodes[j].override('clean',radialBehavior.clean);
-          nodes[j].update([{}]);
-       }
+        this.addLinearBehavior(nodes,data);
        
       }
+      else if (type =='radial'){
+        if(!data){
+          this.addCopyBehavior(nodes,6);
+        }
+        this.addRadialBehavior(nodes,data);
+      }  
       else if (type == 'followPath') {
-        console.log('follow path behavior called');
-        behaviorNode.exclude(0);
-        behaviorNode.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
-        nodes[0].instances[0].position={x:0,y:0};
-        behaviorNode.copyNum = 4;
-        var followPathBehavior=new FollowPathBehavior(nodes[0]);
-        
-       // nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
-          // nodes[1].extendBehaviorFirst(followPathBehavior, ['calculate']);
-        nodes[1].addBehavior(followPathBehavior);
-
-        nodes[1].override('update',followPathBehavior.update);
-        nodes[1].override('calculate',followPathBehavior.calculate);
-        nodes[1].override('clean',followPathBehavior.clean);
-      }
-    }
+         if(!data){
+          this.addCopyBehavior(nodes,4);
+        }
+          this.addFollowPathBehavior(nodes,data);
+      
+        }
+    
     
 
       behaviorNode.update([{}]);
@@ -134,12 +95,78 @@ define([
 
     },
 
-    testObj: function(tO){
-    // console.log('test object is set');
-      //this.conditional_line= tO;
-    }
 
+    addCopyBehavior: function(nodes,copyNum,data){
+      var copyBehavior = new CopyBehavior();
+      for(var i=0;i<nodes.length;i++){
+        var node = nodes[i];
+        var containsCopy=node.containsBehaviorType('copy');
+        if(!containsCopy){  
+          nodes[i].addBehavior(copyBehavior,['update'],'last');
+        }
+        if(data){
+          node.setCopyNum(data.copyNum);
+        }
+        else{
+          node.setCopyNum(copyNum);
+        }
+        node.update([{}]);
+      }
+    },
 
+    addFollowPathBehavior: function(nodes,data){
+        nodes[0].copyNum=1;
+        nodes[0].nodeParent.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
+        nodes[0].instances[0].position={x:0,y:0};
+        var followPathBehavior;
+        var start = 1;
+        if(data){
+          //assumes that path child is always the first child
+          followPathBehavior=new FollowPathBehavior(nodes.nodeParent.getChildAt(0));
+          start = 0;
+        }
+        else{
+          followPathBehavior=new FollowPathBehavior(nodes[0]);
+        }
+        for(var i=start;i<nodes.length;i++){
+          nodes[i].addBehavior(followPathBehavior, ['update','calculate','clean']);
+        }
+    },
+
+    addRadialBehavior: function(nodes,data){
+      var radialBehavior = new RadialDistributeBehavior();
+       for(var i=0;i<nodes.length;i++){
+          var node = nodes[i];
+          var containsDist=node.containsBehaviorType('distribution');
+          var containsLin = node.containsBehaviorName('radial');
+          if(containsDist && !containsLin){
+            //TODO: code to remove a behavior here
+          }
+         else{
+            node.addBehavior(radialBehavior);
+            node.override('update',radialBehavior.update);
+            node.override('calculate',radialBehavior.calculate);
+            node.override('clean',radialBehavior.clean);
+        }
+      }
+    },
+
+    addLinearBehavior: function(nodes,data){
+      var linearBehavior = new DistributeBehavior();
+         for(var i=0;i<nodes.length;i++){
+          var node = nodes[i];
+          var containsDist=node.containsBehaviorType('distribution');
+          var containsLin = node.containsBehaviorName('linear');
+          if(containsDist && !containsLin){
+            //TODO: code to remove a behavior here
+          }
+         else{
+            node.addBehavior(linearBehavior,  ['update','calculate','clean']);
+        }
+      }
+    },
+
+   
 
 
 

@@ -35,7 +35,7 @@ define([
       'state': 'selectTool',
     },
 
-    initialize: function(event_bus) {
+    initialize: function(event_bus, behaviorManager) {
       //console.log(new FileSaver());
       paper = PaperManager.getPaperInstance();
       penTool = new PenToolModel({
@@ -48,6 +48,7 @@ define([
       polyTool = new PolyToolModel({
         id: 'polyTool'
       });
+      this.behaviorManager = behaviorManager;
 
 this.event_bus = event_bus;
 
@@ -374,7 +375,37 @@ this.event_bus = event_bus;
     load: function(loadObj){
       rootNode.deleteChildren();
       var children = loadObj.children;
-      console.log(children);
+     this.parseJSON(rootNode,children);
+     this.rootUpdate();
+     this.rootRender();
+      //console.log(children);
+    },
+
+    parseJSON: function (currentNode,data){
+      for(var i=0;i<data.length;i++){
+        var type = data[i].type;
+        var node;
+        switch(type){
+          case 'path':
+          node = new PathNode(data[i]);
+          break; 
+         default:
+          node = new GeometryNode(data[i]);
+          break; 
+        }
+        node.type = type;
+        node.name = data[i].name;
+        for(var j=0;j<data[i].behaviors;j++){
+          var behavior = data[i].behaviors[j];
+          this.behaviorManager.newBehavior(node,behavior.type,behavior);
+        }
+        currentNode.addChildNode(node);
+        if(data[i].children.length>0){
+          this.parseJSON(node,data[i].children);
+        }
+
+
+      }
     },
 
     updateStroke: function(width){

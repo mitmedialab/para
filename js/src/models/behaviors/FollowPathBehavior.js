@@ -66,9 +66,9 @@ define([
             var selected = this.getFirstSelectedInstance();
              if (selected) {
                 if (selected.index === 1) {
-                  this.nodeParent.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
+                  this.checkDistanceIncrement(this.instances[0], selected, maxDist, this);
                 } else if (selected.index == this.instances.length - 2) {
-                  this.nodeParent.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this.nodeParent);
+                  this.checkDistanceDecrement(this.instances[0], selected, maxDist, this);
 
                 }
               }

@@ -14,6 +14,17 @@ define([
 
 ], function($, _, SceneNode, Instance, PaperManager, Condition) {
   var paper = PaperManager.getPaperInstance();
+  
+  Function.prototype.clone = function() {
+    var that = this;
+    var temp = function temporary() { return that.apply(this, arguments); };
+    for(var key in this) {
+        if (this.hasOwnProperty(key)) {
+            temp[key] = this[key];
+        }
+    }
+    return temp;
+  };
 
   var GeometryNode = SceneNode.extend({
 
@@ -31,6 +42,7 @@ define([
       this.scaffolds = [];
       this.instance_literals = [];
       this.behaviors = [];
+      this.originalMethods = [];
       this.conditions = [];
       this.upperLeft = {
         x: 0,
@@ -44,9 +56,18 @@ define([
     /* initialization
      * creates one instance by default
      */
-    initialize: function() {
+    initialize: function(data) {
+      if(!data){
+        this.createInstance();
+      }
+      else{
+        var dInstances = data.instances;
+        for(var i =0;i<dInstances.length;i++){
+          var instance = this.createInstance();
+          instance.parseJSON(dInstances[i]);
+        }
+      }
 
-      this.createInstance();
     },
 
     /* addChildNode
@@ -187,9 +208,8 @@ define([
      * TODO: create an export JSON method for Behaviors
      */
     exportJSON: function(data) {
-      console.log("calling geom export");
       console.log(data);
-      var jdata
+      var jdata;
       if (!data) {
         this.set({
           type: this.type,
@@ -223,6 +243,7 @@ define([
       return jdata;
     },
 
+   
 
     /*createInstance
      * creates a new instance and pushes it into the instance array
@@ -251,6 +272,7 @@ define([
 
     },
 
+
     createInstanceAt: function(data, index) {
       return this.createInstance(data, index);
     },
@@ -273,13 +295,13 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-      console.log("update geom");
+      //console.log("update geom");
       this.loop(data);
 
     },
 
     loop: function(data) {
-      console.log("loop geom");
+      //console.log("loop geom");
 
       for (var j = 0; j < this.instances.length; j++) {
         this.calculate(data, j);
@@ -289,7 +311,7 @@ define([
     },
 
     calculate: function(data, index) {
-      console.log("geom calculate for index:" + index);
+      //console.log("geom calculate for index:" + index);
       for (var i = 0; i < data.length; i++) {
         var instance = this.instances[index];
         instance.update(data[i]);
@@ -298,7 +320,7 @@ define([
     },
 
     clean: function(data) {
-      console.log("clean geom");
+      //console.log("clean geom");
       for (var k = 0; k < this.children.length; k++) {
         this.children[k].update([{}]);
       }
@@ -411,8 +433,6 @@ define([
           }
         }
 
-
-
         for (var k = 0; k < this.children.length; k++) {
 
           this.children[k].render(this.instance_literals, currentNode);
@@ -510,10 +530,8 @@ define([
     getFirstSelectedInstance: function() {
       for (var i = 0; i < this.instances.length; i++) {
         if (this.instances[i].selected) {
-          return {
-            instance: this.instances[i],
-            index: i
-          };
+          return this.instances[i];
+          
         }
       }
       return null;
@@ -534,7 +552,7 @@ define([
     containsBehaviorType: function(type) {
       var indexes = [];
       for (var i = 0; i < this.behaviors.length; i++) {
-        if (this.behaviors[i].type === type) {
+        if (this.behaviors[i].behavior.type === type) {
 
           indexes.push(i);
         }
@@ -549,8 +567,8 @@ define([
     //returns first behavior that matches name
     getBehaviorByName: function(name) {
       for (var i = 0; i < this.behaviors.length; i++) {
-        if (this.behaviors[i].name === name) {
-          return this.behaviors[i];
+        if (this.behaviors[i].behavior.name === name) {
+          return this.behaviors[i].behavior;
         }
       }
       return null;
@@ -560,7 +578,7 @@ define([
     containsBehaviorName: function(name) {
       var indexes = [];
       for (var i = 0; i < this.behaviors.length; i++) {
-        if (this.behaviors[i].name === name) {
+        if (this.behaviors[i].behavior.name === name) {
           indexes.push(i);
         }
       }
@@ -601,14 +619,72 @@ define([
 
     },
 
-    addBehavior: function(behavior){
+    addBehavior: function(behavior,methods, index){
       _.defaults(this, behavior);
-      this.behaviors.push(behavior);
+      if(index){
+        if(index==='last'){
+          this.behaviors.push({behavior:behavior,methods:methods});
+        }
+        else{
+          this.behaviors.splice(index,0,{behavior:behavior,methods:methods});
+
+        }
+      }
+      else{
+        this.behaviors.splice(this.behaviors.length-2,0,{behavior:behavior,methods:methods});
+      }
+      for(var i=0;i<methods.length;i++){
+        this.override(methods[i]);
+      }
     },
 
-    override: function(methodName, callback) {
-      var composed = this.before(callback);
-      this[methodName] = composed(this[methodName]);
+    override: function(methodName) {
+      console.log("overriding:"+methodName);
+      if(!this.methodOverriden(methodName)){
+        this.originalMethods.push({name:methodName,method:this[methodName].clone()});
+      }
+      var applicableBehaviors = this.getBehaviorsWithMethod(methodName);
+      this[methodName]= this.getOriginal(methodName);
+         
+      for(var i=0;i<applicableBehaviors.length;i++){
+         console.log('overriding='+methodName+ "with "+ applicableBehaviors[i].behavior.name);
+          console.log('applicable=');
+         console.log(applicableBehaviors[i].behavior);
+        var extraBehavior = applicableBehaviors[i].behavior[methodName];
+         console.log('extra=');
+         console.log(extraBehavior);
+         var composed = this.before(extraBehavior);
+         console.log('composed=');
+         console.log(composed);
+         this[methodName] = composed(this[methodName]);
+      }
+    },
+
+    methodOverriden: function(methodName){
+      for(var i=0;i<this.originalMethods.length;i++){
+        if(this.originalMethods[i].name === methodName){
+          return true;
+        }
+      }
+      return false;
+    },
+
+    getOriginal: function(methodName){
+      for(var i=0;i<this.originalMethods.length;i++){
+        if(this.originalMethods[i].name === methodName){
+          return this.originalMethods[i].method.clone();
+        }
+      }
+      return null;
+    },
+
+    getBehaviorsWithMethod: function(methodName){
+      return _.filter(this.behaviors, function(behavior){ 
+          console.log("searching for method name="+methodName);
+          var found = $.inArray(methodName,behavior.methods);
+          console.log("found="+found!=-1);
+          return found !==-1;
+        });
     },
 
     before: function(extraBehavior) {
@@ -620,90 +696,7 @@ define([
       };
     },
 
-    //registers overriding function for overriding methods- determined by parent node- this calls new method first
-    extendBehaviorFirst: function(from, methods) {
-      //if (!this.containsBehaviorName(from.name)) {
-
-      this.behaviors.push(from);
-      // if the method is defined on from ...
-      // we add those methods which exists on `from` but not on `to` to the latter
-      _.defaults(this, from);
-      // … and we do the same for events
-      _.defaults(this.events, from.events);
-      // console.log(this);
-      // console.log(from);
-      for (var i = 0; i < methods.length; i++) {
-        var methodName = methods[i];
-
-        if (!_.isUndefined(from[methodName])) {
-          // console.log('setting methods');
-          var old = this[methodName];
-
-          // ... we create a new function on to
-          this[methodName] = function() {
-
-            // and then call the method on `from`
-            var rArgs = from[methodName].apply(this, arguments);
-            var oldReturn;
-            if (rArgs) {
-              // wherein we first call the method which exists on `to`
-              oldReturn = old.apply(this, rArgs);
-            } else {
-              oldReturn = old.apply(this, arguments);
-            }
-
-            // and then return the expected result,
-            // i.e. what the method on `to` returns
-            return oldReturn;
-
-          };
-
-        }
-      }
-      //}
-
-    },
-
-    //registers overriding function for overriding methods- determined by parent node- this calls new method second
-    extendBehaviorSecond: function(from, methods) {
-      if (!this.containsBehaviorName(from.name)) {
-        this.behaviors.push(from);
-        // if the method is defined on from ...
-        // we add those methods which exists on `from` but not on `to` to the latter
-        _.defaults(this, from);
-        // … and we do the same for events
-        _.defaults(this.events, from.events);
-        // console.log(this);
-        // console.log(from);
-        for (var i = 0; i < methods.length; i++) {
-          var methodName = methods;
-          if (!_.isUndefined(from[methodName])) {
-            // console.log('setting methods');
-            var old = this[methodName];
-
-            // ... we create a new function on to
-            this[methodName] = function() {
-
-              // and then call the method on `from`
-              var rArgs = old.apply(this, arguments);
-              var newReturn;
-              if (rArgs) {
-                // wherein we first call the method which exists on `to`
-                newReturn = from[methodName].apply(this, rArgs);
-              } else {
-                newReturn = from[methodName].apply(this, arguments);
-              }
-
-              // and then return the expected result,
-              // i.e. what the method on `to` returns
-              return newReturn;
-
-            };
-          }
-        }
-      }
-
-    },
+    
 
     addConstraint: function(constraint) {
 

@@ -24,11 +24,24 @@ define([
     constructor: function() {
 
       GeometryNode.apply(this, arguments);
-      this.masterPath = null;
+      if(!this.masterPath){
+        this.masterPath = null;
+      }
+
     },
 
 
-    initialize: function() {
+    initialize: function(data) {
+      if(data){
+        console.log("creating path node");
+        console.log(data);
+        var path = new paper.Path();
+        path.importJSON(data.masterPath);
+        this.masterPath = path;
+        GeometryNode.prototype.initialize.apply(this, arguments);
+        console.log(this.getLiteral());
+
+      }
 
     },
 
@@ -38,7 +51,7 @@ define([
     },
 
     exportJSON: function(data) {
-      console.log("calling path export");
+     
       console.log(data);
       var jdata;
       if (!data) {
@@ -65,7 +78,8 @@ define([
       var delta = {x:path.bounds.topLeft.x, y:path.bounds.topLeft.y};
       var rotation = {angle:0};
       var width = path.bounds.width;
-      var height = path.bounds.height;  
+      var height = path.bounds.height; 
+      console.log("width="+width+", height="+height); 
       instance.update({delta:delta,
         rotation: rotation,
         width: width,
