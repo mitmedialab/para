@@ -37,7 +37,25 @@ define([
 
     },
 
+    exportJSON: function(data) {
+      console.log("calling path export");
+      console.log(data);
+      var jdata;
+      if (!data) {
+        this.set({
+          type: this.type,
+          name: this.name
+        });
+        jdata = this.toJSON();
+      }
+        else{
+            jdata= data;
+          }
 
+      jdata.masterPath = this.masterPath.exportJSON();
+       console.log(jdata);
+      return GeometryNode.prototype.exportJSON.apply(this, [jdata]);
+    },
 
     /*called when drawing of the path is complete. 
      * Removes the path and creates one instance
@@ -97,7 +115,7 @@ define([
       
       for (var j = 0; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
-        console.log("clearing instance literal at:"+j)
+        //console.log('clearing instance literal at:'+j)
 
       }
       this.instance_literals = [];
@@ -118,8 +136,8 @@ define([
        var diff = TrigFunc.subtract({x:topLeftNew.x,y:topLeftNew.y},{x:topLeftOld.x,y:topLeftOld.y});
 
        //set position to upper left corner
-       newPath.position.x = 0+newPath.bounds.width/2
-       newPath.position.y =0+newPath.bounds.height/2
+       newPath.position.x = 0+newPath.bounds.width/2;
+       newPath.position.y =0+newPath.bounds.height/2;
 
         for(var i=0;i<this.instances.length;i++){
           this.instances[i].update({width:newPath.bounds.width,height:newPath.bounds.height});

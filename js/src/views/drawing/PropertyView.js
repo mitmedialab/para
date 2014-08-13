@@ -86,10 +86,11 @@ define([
     load: function(event){
      var file = event.target.files[0];
      var reader = new FileReader();
+     reader.parent = this;
     reader.onload = (function(theFile) {
         return function(e) {
           // Render thumbnail.
-          console.log(JSON.parse(e.target.result));
+         this.parent.model.load(JSON.parse(e.target.result));
         };
       })(file);
     reader.readAsText(file);

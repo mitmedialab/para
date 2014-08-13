@@ -85,7 +85,7 @@ define([
         }
        if (type === 'linear') {
         var linearBehavior = new DistributeBehavior();
-        _.defaults(nodes[0], linearBehavior);
+        nodes[0].addBehavior(linearBehavior);
          for(var j=0;j<nodes.length;j++){
           nodes[j].override('update',linearBehavior.update);
           nodes[j].override('calculate',linearBehavior.calculate);
@@ -97,7 +97,7 @@ define([
        
 
         var radialBehavior = new RadialDistributeBehavior();
-         _.defaults(nodes[0], radialBehavior);
+       nodes[0].addBehavior(radialBehavior);
          for(var j=0;j<nodes.length;j++){
           nodes[j].override('update',radialBehavior.update);
           nodes[j].override('calculate',radialBehavior.calculate);
@@ -116,7 +116,7 @@ define([
         
        // nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);
           // nodes[1].extendBehaviorFirst(followPathBehavior, ['calculate']);
-          _.defaults(nodes[1], followPathBehavior);
+        nodes[1].addBehavior(followPathBehavior);
 
         nodes[1].override('update',followPathBehavior.update);
         nodes[1].override('calculate',followPathBehavior.calculate);

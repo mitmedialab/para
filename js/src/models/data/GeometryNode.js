@@ -72,13 +72,19 @@ define([
       var yDiff = childUL.y - this.upperLeft.y;
 
       for (var i = 0; i < this.instances.length; i++) {
-        this.instances[i].increment({delta:{x:xDiff,y:yDiff}});
+        this.instances[i].increment({
+          delta: {
+            x: xDiff,
+            y: yDiff
+          }
+        });
       }
       for (var j = 0; j < this.children.length; j++) {
-        this.children[j].increment({delta:{
-          x: -xDiff,
-          y: -yDiff
-        }
+        this.children[j].increment({
+          delta: {
+            x: -xDiff,
+            y: -yDiff
+          }
         });
       }
       //reset upper left position
@@ -86,7 +92,7 @@ define([
     },
 
 
-     /* updateOrigin
+    /* updateOrigin
      * similar to above, but called on an update
      * increments the parent instances by child origin and
      * moves all child instances relative to the parent
@@ -94,13 +100,16 @@ define([
     updateOrigin: function() {
       var childUL = this.getChildrenUpperLeft();
       for (var i = 0; i < this.instances.length; i++) {
-        this.instances[i].increment({delta:childUL});
-      
+        this.instances[i].increment({
+          delta: childUL
+        });
+
       }
       for (var j = 0; j < this.children.length; j++) {
         this.children[j].increment({
-          delta:{x: -childUL.x,
-          y: -childUL.y
+          delta: {
+            x: -childUL.x,
+            y: -childUL.y
           }
         });
       }
@@ -116,10 +125,10 @@ define([
       }
     },
 
-  /* getUpperLeft
-    * returns the current cumulative upper left origin by
-    * iterating over the origins of all the instances
-    */
+    /* getUpperLeft
+     * returns the current cumulative upper left origin by
+     * iterating over the origins of all the instances
+     */
     getUpperLeft: function() {
       var relPos = this.instances[0].getRelativePos();
       var left = relPos.x;
@@ -142,9 +151,9 @@ define([
     },
 
     /* getChildrenUpperLeft
-    * gets the cumulative upper left of all children
-    * should be 0,0 if children are positioned relatively
-    */
+     * gets the cumulative upper left of all children
+     * should be 0,0 if children are positioned relatively
+     */
     getChildrenUpperLeft: function() {
       if (this.children.length === 0) {
         return {
@@ -174,14 +183,24 @@ define([
 
 
     /* exportJSON
-    * returns this node as a JSON object
-    * TODO: create an export JSON method for Behaviors
-    */
-    exportJSON: function() {
-      this.set({
-        type: this.type
-      });
-      var data = this.toJSON();
+     * returns this node as a JSON object
+     * TODO: create an export JSON method for Behaviors
+     */
+    exportJSON: function(data) {
+      console.log("calling geom export");
+      console.log(data);
+      var jdata
+      if (!data) {
+        this.set({
+          type: this.type,
+          name: this.name
+        });
+        jdata = this.toJSON();
+      }
+        else{
+            jdata= data;
+          }
+
       var jInstances = [];
       var children = [];
       var lInstances = [];
@@ -190,29 +209,26 @@ define([
 
         jInstances.push(this.instances[i].exportJSON());
       }
-      for (var j = 0; j < this.instance_literals.length; j++) {
-        lInstances.push(this.instance_literals[j].exportJSON());
-      }
       for (var k = 0; k < this.children.length; k++) {
 
         children.push(this.children[k].exportJSON());
       }
       for (var m = 0; m < this.behaviors.length; m++) {
-        //behaviors.push(this.behaviors[i].exportJSON());
+        behaviors.push(this.behaviors[m].exportJSON()); 
       }
-      data.instances = jInstances;
-      data.instance_literals = lInstances;
-      data.children = children;
-      data.behaviors = behaviors;
-      return data;
+     jdata.instances = jInstances;
+      jdata.instance_literals = lInstances;
+      jdata.children = children;
+      jdata.behaviors = behaviors;
+      return jdata;
     },
 
 
     /*createInstance
-    * creates a new instance and pushes it into the instance array
-    * optionally creates an instance as a clone of an existing one
-    */
-    createInstance: function(data ,index) {
+     * creates a new instance and pushes it into the instance array
+     * optionally creates an instance as a clone of an existing one
+     */
+    createInstance: function(data, index) {
       var instance;
       if (data) {
         instance = data.clone();
@@ -220,15 +236,14 @@ define([
         instance = new Instance();
       }
       instance.nodeParent = this;
-      if(!index){
+      if (!index) {
         this.instances.push(instance);
         instance.index = this.instances.length - 1;
-      }
-      else{
+      } else {
         this.instances.splice(index, 0, instance);
-      for (var i = 0; i < this.instances.length; i++) {
-        this.instances[i].index = i;
-      }
+        for (var i = 0; i < this.instances.length; i++) {
+          this.instances[i].index = i;
+        }
       }
 
       this.getUpperLeft();
@@ -237,7 +252,7 @@ define([
     },
 
     createInstanceAt: function(data, index) {
-      return this.createInstance(data,index);
+      return this.createInstance(data, index);
     },
 
     removeInstanceAt: function(index) {
@@ -258,32 +273,32 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-       console.log("update geom");
+      console.log("update geom");
       this.loop(data);
 
     },
 
-   loop: function(data){
+    loop: function(data) {
       console.log("loop geom");
 
       for (var j = 0; j < this.instances.length; j++) {
-        this.calculate(data,j);
+        this.calculate(data, j);
       }
       this.clean(data);
 
     },
 
-    calculate: function(data, index){
-       console.log("geom calculate for index:"+index);
+    calculate: function(data, index) {
+      console.log("geom calculate for index:" + index);
       for (var i = 0; i < data.length; i++) {
-          var instance = this.instances[index];
-          instance.update(data[i]);
+        var instance = this.instances[index];
+        instance.update(data[i]);
 
-        }
+      }
     },
 
-    clean: function(data){
-        console.log("clean geom");
+    clean: function(data) {
+      console.log("clean geom");
       for (var k = 0; k < this.children.length; k++) {
         this.children[k].update([{}]);
       }
@@ -427,8 +442,14 @@ define([
     },
 
 
+    deleteChildren: function() {
+      for (var i = this.children.length - 1; i >= 0; i--) {
+        this.children[i].deleteNode();
+      }
+    },
+
     deleteNode: function() {
-     
+
       for (var i = this.children.length - 1; i >= 0; i--) {
         this.children[i].clearObjects();
         this.children[i].deleteNode();
@@ -580,61 +601,65 @@ define([
 
     },
 
+    addBehavior: function(behavior){
+      _.defaults(this, behavior);
+      this.behaviors.push(behavior);
+    },
 
-   override: function(methodName, callback) {
-      var composed= this.before(callback);
+    override: function(methodName, callback) {
+      var composed = this.before(callback);
       this[methodName] = composed(this[methodName]);
     },
 
-    before: function (extraBehavior) {
-   return function(original) {
-    return function() {
-      extraBehavior.apply(this, arguments);
-      return original.apply(this, arguments);
-    };
-  };
-},
+    before: function(extraBehavior) {
+      return function(original) {
+        return function() {
+          extraBehavior.apply(this, arguments);
+          return original.apply(this, arguments);
+        };
+      };
+    },
 
     //registers overriding function for overriding methods- determined by parent node- this calls new method first
     extendBehaviorFirst: function(from, methods) {
       //if (!this.containsBehaviorName(from.name)) {
-       
-        this.behaviors.push(from);
-        // if the method is defined on from ...
-        // we add those methods which exists on `from` but not on `to` to the latter
-        _.defaults(this, from);
-        // … and we do the same for events
-        _.defaults(this.events, from.events);
-        // console.log(this);
-        // console.log(from);
-        for (var i = 0; i < methods.length; i++) {
-          var methodName = methods[i];
 
-          if (!_.isUndefined(from[methodName])) {
-            // console.log('setting methods');
-            var old = this[methodName];
-           
-            // ... we create a new function on to
-            this[methodName] = function() {
+      this.behaviors.push(from);
+      // if the method is defined on from ...
+      // we add those methods which exists on `from` but not on `to` to the latter
+      _.defaults(this, from);
+      // … and we do the same for events
+      _.defaults(this.events, from.events);
+      // console.log(this);
+      // console.log(from);
+      for (var i = 0; i < methods.length; i++) {
+        var methodName = methods[i];
 
-              // and then call the method on `from`
-              var rArgs = from[methodName].apply(this, arguments);
-              var oldReturn;
-              if (rArgs) {
-                // wherein we first call the method which exists on `to`
-                oldReturn = old.apply(this, rArgs);
-              } else {
-                oldReturn = old.apply(this, arguments);
-              }
+        if (!_.isUndefined(from[methodName])) {
+          // console.log('setting methods');
+          var old = this[methodName];
 
-              // and then return the expected result,
-              // i.e. what the method on `to` returns
-              return oldReturn;
+          // ... we create a new function on to
+          this[methodName] = function() {
 
-            };
-                   
-          }
+            // and then call the method on `from`
+            var rArgs = from[methodName].apply(this, arguments);
+            var oldReturn;
+            if (rArgs) {
+              // wherein we first call the method which exists on `to`
+              oldReturn = old.apply(this, rArgs);
+            } else {
+              oldReturn = old.apply(this, arguments);
+            }
+
+            // and then return the expected result,
+            // i.e. what the method on `to` returns
+            return oldReturn;
+
+          };
+
         }
+      }
       //}
 
     },

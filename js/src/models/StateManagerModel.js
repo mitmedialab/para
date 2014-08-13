@@ -365,9 +365,16 @@ this.event_bus = event_bus;
     },
 
      export: function(filename){
+
       var data =paper.project.exportSVG( { asString: true});
       var blob = new Blob([data], {type: 'image/svg+xml'});
       var fileSaver = new FileSaver(blob,filename);
+    },
+
+    load: function(loadObj){
+      rootNode.deleteChildren();
+      var children = loadObj.children;
+      console.log(children);
     },
 
     updateStroke: function(width){

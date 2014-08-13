@@ -2,6 +2,7 @@
 base class for all behaviors */
 
 define([
+	'jquery',
 		 'underscore',
     		'backbone',
 		'models/data/Condition',
@@ -9,10 +10,9 @@ define([
 
 	],
 
-	function(_, Backbone, Condition, TrigFunc) {
+	function($,_, Backbone, Condition, TrigFunc) {
 
 		var BaseBehavior = Backbone.Model.extend({
-			conditions: [],
 			name: 'base',
 			type: 'none',
 			 copyNum: 2,
@@ -20,7 +20,40 @@ define([
 
 			constructor:function(){
 				this.excludes = [];
+				this.conditions = [];
+				this.constraints=[];
 			},
+
+			 initialize: function() {
+    		},
+
+
+			exportJSON: function(data) {
+      			var jdata;
+      			if(!data){
+      				
+     				jdata = {};
+     				jdata.type = this.type;
+     				jdata.name = this.name;
+     			}
+     			else{
+     				jdata= data;
+     			}
+
+      			var jconditions = [];
+      			var jconstraints = [];
+      			for (var i = 0; i < this.conditions.length; i++) {
+        			//constraints.push(this.constrants[i].exportJSON());
+      			}
+      			for (var j = 0; j < this.constraints.length; j++) {
+        			//constraints.push(this.constrants[i].exportJSON());
+      			}
+   
+      			jdata.conditions = jconditions;
+      			jdata.constraints = jconstraints;
+      			return jdata;
+    		},
+
 			
 
 			addConstraint: function(constraint){
