@@ -17,7 +17,8 @@ define([
     initialize: function(){
       //listen to update view statements from model to re-render view
       this.listenTo(this.model,'updateView',this.render);
-        
+        this.listenTo(this.model,'removeItem',this.removeItem);
+        this.listenTo(this.model,'disableSave',this.disableSave);
  
   },
 
@@ -27,8 +28,10 @@ define([
     'stroke-change': 'strokeChange',
     'change #text-filename': 'nameChange',
     'click #save': 'save',
+    'click #saveFile': 'saveFile',
     'click #export': 'export',
-    'change #load' : 'load'
+    'change #upload' : 'loadFile',
+    'change #fileselect': 'load'
     },
 
     render: function(){
@@ -52,10 +55,47 @@ define([
       this.model.updateStroke(event.target.value);
     },
 
-    save: function(event){
-     var filename = $('#text-filename').val();
+    save: function(){
+     
+      var filename = $('#text-filename').val();
       if(filename!=[]){
-        this.listenToOnce(this.model,'renderComplete',this.enableSave);
+        this.listenToOnce(this.model,'renderComplete',function(){
+           var id  = this.model.save(filename);
+           this.addSelectIndex(id,filename);
+        });
+        this.model.resetTools();
+      }
+      else{
+        alert('please enter a name for your file');
+      }
+      
+    },
+
+    addSelectIndex: function(id, filename){
+
+          $('#fileselect').prepend('<option value='+id+'>'+filename+'</option>');
+          $('#fileselect option:first').prop('selected', true); 
+          $('#text-filename').val(filename);
+
+    },
+
+    load: function(){
+      var id =  $('#fileselect option:selected').val();
+      var filename = $('#fileselect option:selected').text();
+      this.model.loadLocal(id);
+      $('#text-filename').val(filename);
+    },
+
+    saveFile: function(){
+     var id =  $('#fileselect option:selected').val();
+      var filename = $('#text-filename').val();
+      if(filename!=[]){
+        this.listenToOnce(this.model,'renderComplete',function(){
+          var newId = this.model.saveFile(id,filename);
+          if(newId!=id){
+            this.addSelectIndex(newId,filename);
+          }
+       });
         this.model.resetTools();
       }
       else{
@@ -63,11 +103,17 @@ define([
       }
     },
 
-     enableSave: function(event){
+
+    removeItem: function(id){
+      console.log('removing:'+id);
+       $('#fileselect option[value='+id+']').remove();  
+    },
+
+     enableSave: function(){
         this.model.save($('#text-filename').val());
     },
 
-    export: function(event){
+    export: function(){
      var filename = $('#text-filename').val();
       if(filename!=[]){
         this.listenToOnce(this.model,'renderComplete',this.enableExport);
@@ -78,28 +124,29 @@ define([
       }
     },
     
-    enableExport: function(event){
+    enableExport: function(){
       this.model.export($('#text-filename').val());
     },
 
 
-    load: function(event){
+    loadFile: function(event){
      var file = event.target.files[0];
-     var reader = new FileReader();
-     reader.parent = this;
-    reader.onload = (function(theFile) {
-        return function(e) {
-          // Render thumbnail.
-         this.parent.model.load(JSON.parse(e.target.result));
-        };
-      })(file);
-    reader.readAsText(file);
+     
+      this.listenToOnce(this.model,'loadComplete',function(id,fileName){
+          this.addSelectIndex(id,fileName);
+
+      });
+       this.model.loadFile(file);
 
     },
-    nameChange: function(event){
+    nameChange: function(){
       //console.log("updating name to:"+ $('#obj-name').val());
       console.log($('#text-filename').val());
       //this.model.updateSelected({name:$('#obj-name').val()});
+    },
+    disableSave: function(disable){
+      $('#save').attr('disabled', disable);
+        $('#saveFile').attr('disabled', false);
     }
 
   });

@@ -45,6 +45,8 @@ define([
         this.currentPath.remove();
         this.currentPath = null;
       }
+      this.trigger('rootRender');
+
     },
 
 //method to determine location of handle for current segment

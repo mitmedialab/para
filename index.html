@@ -29,7 +29,7 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
       <![endif]-->
-   
+
 
     </head>
 
@@ -37,20 +37,20 @@
       <div id="context-menu",class="floating-menu">
         <div id = "main-menu">
           <script id="menu-template" type="text/x-handlebars-template">
-            <div class="row" id="title-bar">
-              <div id="name">{{name}}</div>
-              <div id="close"><button id="close-btn">x</button></div>
-            </div>
-            <div class="row">
-              <div id="behavior-menu">behaviors</div>
-              {{behavior-menu}}
-              <div><a id="new-behavior-btn">new behavior +</a></div>
-            </div>
-            <div class="row">
-              <div id="cond-menu">conditionals</div>
-              {{cond-menu}}
-              <div><a id="new-cond-btn">new conditional +</a></div>
-            </div>
+          <div class="row" id="title-bar">
+          <div id="name">{{name}}</div>
+          <div id="close"><button id="close-btn">x</button></div>
+          </div>
+          <div class="row">
+          <div id="behavior-menu">behaviors</div>
+          {{behavior-menu}}
+          <div><a id="new-behavior-btn">new behavior +</a></div>
+          </div>
+          <div class="row">
+          <div id="cond-menu">conditionals</div>
+          {{cond-menu}}
+          <div><a id="new-cond-btn">new conditional +</a></div>
+          </div>
           </script>
         </div>
         <div id="behavior-types-menu">
@@ -78,77 +78,64 @@
 
             </div>
 
-              <!--draw container, contains canvas and object and property menus -->
-              <div id = "draw-container" class="container"><!--draw container-->
+            <!--draw container, contains canvas and object and property menus -->
+            <div id = "draw-container" class="container"><!--draw container-->
 
-                <div class = "row"> <!--master-row -->
+              <div class = "row"> <!--master-row -->
 
-                 <div class="col-md-9"> <!--large column -->
-                   <div class = "row"> <!--row-->
-                     <div class = "col-md-12" id = "group-menu"><!--group-menu-->
-                    </div><!--/group-menu-->
-                  </div><!--/row-->
-                    <div class = "row"> <!--row-->
+               <div class="col-md-9"> <!--large column -->
+                 <div class = "row"> <!--row-->
+                   <div class = "col-md-12" id = "group-menu"><!--group-menu-->
+                   </div><!--/group-menu-->
+                 </div><!--/row-->
+                 <div class = "row"> <!--row-->
 
-                    <div class = "col-md-12" id = "canvas-container"><!--canvas-container-->
-                       <span><canvas id="canvas"></canvas></span>
-                    </div><!--/canvas-container-->
-                  </div><!--/row-->
-                 </div> <!--/large column-->
+                  <div class = "col-md-12" id = "canvas-container"><!--canvas-container-->
+                   <span><canvas id="canvas"></canvas></span>
+                 </div><!--/canvas-container-->
+               </div><!--/row-->
+             </div> <!--/large column-->
 
-                 <div class="col-md-3">
-                  <div class="row">
-                   
-                    <div id = "prop-menu" class ="col-md-12">
-                        <div class="form-group">
-                           
-        <form id="text-options">
-            <label>Filename <input type="text" class="filename" id="text-filename" placeholder="my_drawing"/></label>
-             <input type="button" id="save" value="save"/>
-              <input type="button" id ="export" value="download svg"/>
-              <label>Load file <input type="file" accept=".txt" id="load" name="files" single /></label> <output id="loaded"></output>
-            </form>
-            </div>
-            <div class="form-group">
-              <label for="hidden-input">Fill</label>
-              <br>
-              <input type="text" id="fill" class="form-control demo" value="#db913d">
-            </div>
-             <div class="form-group">
-              <label for="hidden-input">Stroke</label>
-              <br>
-              <input type="text" id="stroke" class="form-control demo" value="#db913d">
-            </div>
-               <div class="form-group">
-                  <label for="hidden-input">Stroke Weight</label>
-              <br>
-            <input id = "strokeSlider" type="text" class="span2" value="" data-slider-min="1" data-slider-max="40" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after">
-          </div>
-         
-                       <!-- <script id="property-list-template" type="text/x-handlebars-template">
-                        <form>
-                        <div class="row">
-                            <div class = "span12">{{#parent.exists}}parent:<a>{{parent.name}}{{/parent.exists}}</a></div>
-                        </div>
-                         <div class="row">
-                            <div class = "span12">name: <input type="text" id="obj-name" value={{name}}></div>
-                        </div>
+             <div class="col-md-3">
+              <div class="row">
 
-                         <div class="row">
-                            <div class = "col-md-6">x: {{x}}</div>
-                            <div class = "col-md-6">y: {{y}}</div>
+                <div id = "prop-menu" class ="col-md-12">
+                 
+                    <form id="text-options">
+                       <div class="form-group">
+                      <label>name <input class="form-control" type="text" class="filename" id="text-filename" placeholder="my_drawing"/></label>
+
+                      <select id ="fileselect" class="form-control"></select>
                         </div>
-                         <div class="row">
-                            <div class = "col-md-6">width: {{width}}</div>
-                            <div class = "col-md-6">height: {{height}}</div>
+                     <div class="form-group">
+                      <input type="button" id="save" value="save" disabled="true"/>
+                       <input type="button" id="saveFile" value="save to computer" disabled="true"/>
+                       </div>
+                    
+                     <div class="form-group">
+                      <input type="button" id ="export" value="download svg"/>
                         </div>
-                         <div class="row">
-                            <div class = "col-md-4">stroke: {{strokeColor}}</div>
-                            <div class = "col-md-4">fill: {{fillColor}}</div>
-                            <div class = "col-md-4">weight: {{weight}}</div>
-                        </div>
-                        </form>
-                    </script>-->
+                     <div class="form-group">
+                      <label>upload file from desktop<input class="form-group" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
+                    </div>
+                    </form>
+                 
+
+                  <div class="form-group">
+                    <label for="hidden-input">Fill</label>
+                    <br>
+                    <input type="text" id="fill" class="form-control demo" value="#db913d">
+                  </div>
+                  <div class="form-group">
+                    <label for="hidden-input">Stroke</label>
+                    <br>
+                    <input type="text" id="stroke" class="form-control demo" value="#db913d">
+                  </div>
+                  <div class="form-group">
+                    <label for="hidden-input">Stroke Weight</label>
+                    <br>
+                    <input id = "strokeSlider" type="text" class="span2" value="" data-slider-min="1" data-slider-max="40" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after">
+                    <div/>
                     </div>
                   </div>
                   
@@ -160,7 +147,7 @@
                 </div>
               </div><!--/master row -->
             </div><!--/draw container-->
-    
+
     <!-- Bootstrap core JavaScript
     ================================================== 
     Placed at the end of the document so the pages load faster -->
@@ -171,9 +158,10 @@
     <script src="bower_components/handlebars/handlebars.js" type="text/javascript"></script> 
     <script src="bower_components/bootstrap-slider/bootstrap-slider.js"></script>
     <script src="bower_components/jquery-minicolors/jquery.minicolors.min.js"></script>
-      <script>
+
+    <script>
     
-$(document).ready( function() {
+    $(document).ready( function() {
 
 
 // Check for the various File API support.
@@ -183,34 +171,33 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
   alert('The File APIs are not fully supported in this browser.');
 }
 
-           $('#strokeSlider').slider();
-           $('#strokeSlider').on('slide', function(slideEvt) {
-            $('#strokeSlider').trigger('stroke-change');
-        });
+$('#strokeSlider').slider();
+$('#strokeSlider').on('slide', function(slideEvt) {
+  $('#strokeSlider').trigger('stroke-change');
+});
 
 
-         $('.demo').each( function() {   
-           $(this).minicolors({
-          control: $(this).attr('data-control') || 'hue',
-          defaultValue: $(this).attr('data-defaultValue') || '',
-          inline: $(this).attr('data-inline') === 'true',
-          letterCase: $(this).attr('data-letterCase') || 'lowercase',
-          opacity: $(this).attr('data-opacity'),
-          position: $(this).attr('data-position') || 'bottom left',
-          change: function(hex, opacity) {
-            if( !hex ) return;
-            if( opacity ) hex += ', ' + opacity;
-             $(this).trigger('color-change');
-          },
-          theme: 'bootstrap'
-        });
-         });
-    });
-      </script>
+$('.demo').each( function() {   
+ $(this).minicolors({
+  control: $(this).attr('data-control') || 'hue',
+  defaultValue: $(this).attr('data-defaultValue') || '',
+  inline: $(this).attr('data-inline') === 'true',
+  letterCase: $(this).attr('data-letterCase') || 'lowercase',
+  opacity: $(this).attr('data-opacity'),
+  position: $(this).attr('data-position') || 'bottom left',
+  change: function(hex, opacity) {
+    if( !hex ) return;
+    if( opacity ) hex += ', ' + opacity;
+    $(this).trigger('color-change');
+  },
+  theme: 'bootstrap'
+});
+});
+});
+    </script>
 
     <!-- main application script -->
     <script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>
 
-
-</body>
-</html>
+  </body>
+  </html>

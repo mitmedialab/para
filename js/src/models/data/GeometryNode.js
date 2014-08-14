@@ -209,8 +209,7 @@ define([
      * TODO: create an export JSON method for Behaviors
      */
     exportJSON: function(data) {
-      console.log(data);
-      var jdata;
+        var jdata;
       if (!data) {
         this.set({
           type: this.type,
@@ -313,7 +312,6 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-      console.log("update geom");
       this.loop(data);
 
     },

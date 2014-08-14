@@ -52,7 +52,6 @@ define([
 
     exportJSON: function(data) {
      
-      console.log(data);
       var jdata;
       if (!data) {
         this.set({
