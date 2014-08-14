@@ -19,7 +19,11 @@ define([
       },
 
       update: function(data){
+<<<<<<< Updated upstream
         console.log("follow path update");
+=======
+        console.log("follow path update"+ this.name);
+>>>>>>> Stashed changes
          var zeroedPath = this.pathChild.getLiteral().clone();
           zeroedPath.position.x =0+zeroedPath.bounds.width/2;
           zeroedPath.position.y=0+zeroedPath.bounds.height/2;
