@@ -19,6 +19,7 @@ define([
       },
 
       update: function(data){
+        console.log("follow path update");
          var zeroedPath = this.pathChild.getLiteral().clone();
           zeroedPath.position.x =0+zeroedPath.bounds.width/2;
           zeroedPath.position.y=0+zeroedPath.bounds.height/2;

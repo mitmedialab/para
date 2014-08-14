@@ -234,7 +234,25 @@ define([
         children.push(this.children[k].exportJSON());
       }
       for (var m = 0; m < this.behaviors.length; m++) {
-        behaviors.push(this.behaviors[m].exportJSON());
+        var b = this.behaviors[m].behavior.exportJSON();
+        //TODO: Fix this hack
+        if(this.behaviors[m].behavior.type==='copy'){
+          b.copyNum = this.instances.length;
+        }
+        var jconditions = [];
+        var jconstraints = [];
+        for (var f = 0; f< this.conditions.length; f++) {
+          //constraints.push(this.constrants[i].exportJSON());
+        }
+        for (var g= 0; g < this.constraints.length; g++) {
+          //constraints.push(this.constrants[i].exportJSON());
+        }
+        
+
+        b.conditions = jconditions;
+        b.constraints = jconstraints;
+
+        behaviors.push(b);
       }
       jdata.instances = jInstances;
       jdata.instance_literals = lInstances;
@@ -295,7 +313,7 @@ define([
 
     //updates instances according to data and the passes the updated instances to child function
     update: function(data) {
-      //console.log("update geom");
+      console.log("update geom");
       this.loop(data);
 
     },

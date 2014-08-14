@@ -12,12 +12,16 @@ define([
   'models/tools/PenToolModel',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
+     'models/behaviors/BehaviorManagerModel',
+
   'models/PaperManager',
+
+
   'filesaver'
  
 
 
-], function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, PaperManager, FileSaver) {
+], function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, BehaviorManagerModel,PaperManager, FileSaver) {
   var rootNode,
     currentNode,
     toolCollection,
@@ -50,7 +54,7 @@ define([
       });
       this.behaviorManager = behaviorManager;
 
-this.event_bus = event_bus;
+        this.event_bus = event_bus;
 
       toolCollection = new ToolCollection([penTool, selectTool, polyTool]);
       this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
@@ -74,7 +78,7 @@ this.event_bus = event_bus;
 
 
       this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
-
+      this.behaviorManager = new BehaviorManagerModel(event_bus);
       
       rootNode = new GeometryNode();
       rootNode.type = 'root';
@@ -395,11 +399,13 @@ this.event_bus = event_bus;
         }
         node.type = type;
         node.name = data[i].name;
-        for(var j=0;j<data[i].behaviors;j++){
-          var behavior = data[i].behaviors[j];
-          this.behaviorManager.newBehavior(node,behavior.type,behavior);
-        }
         currentNode.addChildNode(node);
+        for(var j=0;j<data[i].behaviors.length;j++){
+          var behavior = data[i].behaviors[j];
+          console.log("parsing behavior:"+behavior.name);
+          this.behaviorManager.newBehavior([node],behavior.name,behavior);
+        }
+        
         if(data[i].children.length>0){
           this.parseJSON(node,data[i].children);
         }

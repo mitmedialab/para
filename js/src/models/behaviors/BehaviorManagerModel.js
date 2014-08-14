@@ -39,6 +39,8 @@ define([
 
     newBehavior: function(nodes, name, data) {
      //create a parent if none exists
+             console.log("adding behavior");
+
       var nodeParent = nodes[0].nodeParent;
       var behaviorNode;
       if(nodeParent.type=='behavior'){
@@ -76,6 +78,7 @@ define([
        
       }
       else if (name =='radial'){
+        console.log("adding radial behavior");
         if(!data){
           if(!nodes[0].copyNum){
             this.addCopyBehavior(nodes,6);
@@ -129,14 +132,14 @@ define([
     },
 
     addFollowPathBehavior: function(nodes,data){
-        nodes[0].copyNum=1;
+        nodes[0].setCopyNum(1)
         nodes[0].nodeParent.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
         nodes[0].instances[0].position={x:0,y:0};
         var followPathBehavior;
         var start = 1;
         if(data){
-          //assumes that path child is always the first child
-          followPathBehavior=new FollowPathBehavior(nodes.nodeParent.getChildAt(0));
+          console.log('follow path data');
+          followPathBehavior=new FollowPathBehavior(nodes[0].nodeParent.getChildAt(0));
           start = 0;
         }
         else{
