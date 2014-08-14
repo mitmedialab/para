@@ -132,7 +132,7 @@ define([
     },
 
     addFollowPathBehavior: function(nodes,data){
-        nodes[0].setCopyNum(1)
+        nodes[0].copyNum = 1;
         nodes[0].nodeParent.instances[0].position={x:nodes[0].instances[0].position.x,y:nodes[0].instances[0].position.y};
         nodes[0].instances[0].position={x:0,y:0};
         var followPathBehavior;

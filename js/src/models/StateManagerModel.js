@@ -39,7 +39,7 @@ define([
       'state': 'selectTool',
     },
 
-    initialize: function(event_bus, behaviorManager) {
+    initialize: function(event_bus) {
       //console.log(new FileSaver());
       paper = PaperManager.getPaperInstance();
       penTool = new PenToolModel({
@@ -52,7 +52,7 @@ define([
       polyTool = new PolyToolModel({
         id: 'polyTool'
       });
-      this.behaviorManager = behaviorManager;
+     
 
         this.event_bus = event_bus;
 
@@ -78,7 +78,6 @@ define([
 
 
       this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
-      this.behaviorManager = new BehaviorManagerModel(event_bus);
       
       rootNode = new GeometryNode();
       rootNode.type = 'root';
@@ -403,7 +402,7 @@ define([
         for(var j=0;j<data[i].behaviors.length;j++){
           var behavior = data[i].behaviors[j];
           console.log("parsing behavior:"+behavior.name);
-          this.behaviorManager.newBehavior([node],behavior.name,behavior);
+          this.event_bus.trigger('newBehavior',[node],behavior.name,behavior);
         }
         
         if(data[i].children.length>0){

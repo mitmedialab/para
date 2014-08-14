@@ -30,9 +30,9 @@ define([
         
         //event bus for passing events between views
         var event_bus = _({}).extend(Backbone.Events);
-  var behaviorManagerModel = new BehaviorManagerModel(event_bus);
+      var behaviorManagerModel = new BehaviorManagerModel(event_bus);
        var stateManager = new StateManagerModel(event_bus);
-       stateManager.behaviorManager = behaviorManagerModel;
+     
       
         //setup the canvas view
       var canvasView = new CanvasView({el:'#canvas-container',model:stateManager},event_bus);
