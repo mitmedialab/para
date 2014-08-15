@@ -38,14 +38,14 @@ define([
           x: this.pointA.x + this.xDiff,
           y: this.pointA.y + this.yDiff
         });
-        if (selected) {
+        /*if (selected) {
           if (selected.index === 1) {
             this.checkDistanceIncrement(this.instances[0], selected, dist, this);
           } else if (selected.index == num - 2) {
             this.checkDistanceDecrement(this.instances[0], selected, dist, this);
 
           }
-        }
+        }*/
       },
 
       calculate: function(data, index) {

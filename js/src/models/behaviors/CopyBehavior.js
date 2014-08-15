@@ -38,7 +38,7 @@ define([
           var newCopy = this.copyNum - numInstances;
 
           for (var i = 0; i < newCopy; i++) {
-            var selected = this.getFirstSelectedInstance();
+            var selected = this.instances[this.instances.length-1];
             var index;
             if (!selected) {
               selected = this.instances[0];
@@ -56,6 +56,7 @@ define([
             var instance = this.createInstanceAt(selected, index);
             // console.log('creating instance'+instance);
             instance.copy = true;
+            instance.increment({delta:{x:10,y:10}});
             instance.anchor = false;
             instance.selected = false;
           }
@@ -78,7 +79,6 @@ define([
 
       setCopyNum: function(data) {
         this.copyNum = data;
-        console.log("copyNum="+this.copyNum);
       },
     });
 

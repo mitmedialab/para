@@ -133,7 +133,8 @@ define([
                delta: {
                   x: event.delta.x,
                   y: event.delta.y
-                }
+                },
+                relative: event.point
               }]);
             }
             this.trigger('rootUpdate');

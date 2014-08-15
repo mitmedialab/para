@@ -65,14 +65,14 @@ define([
 
 
             var selected = this.getFirstSelectedInstance();
-             if (selected) {
+           /*  if (selected) {
                 if (selected.index === 1) {
                   this.checkDistanceIncrement(this.instances[0], selected, maxDist, this);
                 } else if (selected.index == this.instances.length - 2) {
                   this.checkDistanceDecrement(this.instances[0], selected, maxDist, this);
 
                 }
-              }
+              }*/
               this.location = this.finalPath.segments[0].point;
               this.startAngle = this.finalPath.segments[1].point.subtract(location).angle;
       },
@@ -98,7 +98,11 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(index) {
+          //console.log("handles for "+index);
                 var location_n = this.finalPath.segments[index].point;
+                //console.log(this.finalPath.segments.handleOut);
+               // console.log(this.finalPath.segments.handleIn);
+                console.log(index);
                 var instance = this.instances[index];
                 instance.visible=true;
                 var delta = location_n.subtract(location);

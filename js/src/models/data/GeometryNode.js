@@ -10,9 +10,11 @@ define([
   'models/data/Instance',
   'models/PaperManager',
   'models/data/Condition',
+    'models/behaviors/CopyBehavior',
 
 
-], function($, _, SceneNode, Instance, PaperManager, Condition) {
+
+], function($, _, SceneNode, Instance, PaperManager, Condition, CopyBehavior) {
   var paper = PaperManager.getPaperInstance();
 
   Function.prototype.clone = function() {
@@ -68,6 +70,10 @@ define([
           instance.parseJSON(dInstances[i]);
         }
       }
+
+    /*  var copyBehavior = new CopyBehavior();
+      this.addBehavior(copyBehavior,['update'],'last');
+      this.setCopyNum(1);*/
 
     },
 

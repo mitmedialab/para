@@ -130,9 +130,9 @@ define([
 			if(data.delta){
 				//console.log('prior position =');
 				//console.log(this.position);
-
-				this.delta.x=data.delta.x;
+			this.delta.x=data.delta.x;
 				this.delta.y=data.delta.y;
+
 				//console.log('updated position=');
 				//console.log(this.position);
 			}
@@ -185,15 +185,24 @@ define([
 
 		},
 
-		increment: function(data){
+		increment: function(data,relativePoint){
 			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
+			
 			if(data.delta){
 				//console.log('prior position =');
 				//console.log(this.position);
-
-				this.delta.x+=data.delta.x;
-				this.delta.y+=data.delta.y;
-				//console.log('updated position=');
+				var point  = new paper.Point(data.delta.x,data.delta.y);
+				/*console.log("vector angle:"+point.angle);
+				var matrixRotation = this.matrix.rotation;
+				console.log("matrix rotation:"+matrixRotation);
+				var matrixTranslation = this.matrix.translation
+				console.log("matrix translation:"+matrixTranslation);
+				point.angle = point.angle-matrixRotation;
+				console.log("vector angle:"+point.angle);*/
+				
+				this.delta.x+=point.x;
+				this.delta.y+=point.y;
+								//console.log('updated position=');
 				//console.log(this.position);
 			}
 			if(data.scale){

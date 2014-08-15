@@ -306,7 +306,8 @@ define([
     },
 
     canvasMouseWheel: function(event, pan) {
-      console.log(pan);
+            console.log(  event.originalEvent.wheelDelta);
+
       if (pan) {
         var delta = event.originalEvent.wheelDelta; //paper.view.center
         var mousePos = new paper.Point(event.offsetX, event.offsetY);
@@ -317,6 +318,13 @@ define([
         paper.view.center = paper.view.center.add(data.o);
         event.preventDefault();
         paper.view.draw();
+      }
+      else{
+        var update = 1;
+        if( event.originalEvent.wheelDelta<0){
+          update = -1;
+        }
+        this.updateCopyNum(update);
       }
 
 
@@ -499,6 +507,19 @@ define([
         for (var i = 0; i < selectTool.selectedNodes.length; i++) {
 
           selectTool.selectedNodes[i].updateSelected(update);
+        }
+      }
+      currentNode.update([{}]);
+      this.rootRender();
+      paper.view.draw();
+    },
+
+    updateCopyNum: function(number){
+      if (selectTool.selectedNodes.length > 0) {
+
+        for (var i = 0; i < selectTool.selectedNodes.length; i++) {
+
+          selectTool.selectedNodes[i].copyNum+=number;
         }
       }
       currentNode.update([{}]);
