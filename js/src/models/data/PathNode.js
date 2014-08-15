@@ -24,7 +24,7 @@ define([
     constructor: function() {
 
       GeometryNode.apply(this, arguments);
-      if(!this.masterPath){
+      if (!this.masterPath) {
         this.masterPath = null;
       }
 
@@ -32,7 +32,7 @@ define([
 
 
     initialize: function(data) {
-      if(data){
+      if (data) {
         console.log("creating path node");
         console.log(data);
         var path = new paper.Path();
@@ -51,7 +51,7 @@ define([
     },
 
     exportJSON: function(data) {
-     
+
       var jdata;
       if (!data) {
         this.set({
@@ -59,13 +59,12 @@ define([
           name: this.name
         });
         jdata = this.toJSON();
+      } else {
+        jdata = data;
       }
-        else{
-            jdata= data;
-          }
 
       jdata.masterPath = this.masterPath.exportJSON();
-       console.log(jdata);
+      console.log(jdata);
       return GeometryNode.prototype.exportJSON.apply(this, [jdata]);
     },
 
@@ -74,33 +73,40 @@ define([
      * in original path location*/
     createInstanceFromPath: function(path) {
       var instance = this.createInstance();
-      var delta = {x:path.bounds.topLeft.x, y:path.bounds.topLeft.y};
-      var rotation = {angle:0};
+      var delta = {
+        x: path.bounds.topLeft.x,
+        y: path.bounds.topLeft.y
+      };
+      var rotation = {
+        angle: 0
+      };
       var width = path.bounds.width;
-      var height = path.bounds.height; 
-      console.log("width="+width+", height="+height); 
-      instance.update({delta:delta,
+      var height = path.bounds.height;
+      console.log("width=" + width + ", height=" + height);
+      instance.update({
+        delta: delta,
         rotation: rotation,
         width: width,
         height: height,
-        strokeWidth:path.strokeWidth,
-        strokeColor:path.strokeColor,
-        fillColor:path.fillColor, 
-        closed:path.closed});
-      path.position.x =0;
-      path.position.y =0;
+        strokeWidth: path.strokeWidth,
+        strokeColor: path.strokeColor,
+        fillColor: path.fillColor,
+        closed: path.closed
+      });
+      path.position.x = 0;
+      path.position.y = 0;
 
 
-      path.translate(path.bounds.width/2,path.bounds.height/2);
-     
-     
-      this.masterPath =path;
+      path.translate(path.bounds.width / 2, path.bounds.height / 2);
+
+
+      this.masterPath = path;
       this.masterPath.visible = false;
-      
+
       path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
       path.nodeParent = this;
-        this.getUpperLeft();
+      this.getUpperLeft();
       return instance;
 
     },
@@ -125,7 +131,7 @@ define([
 
     /*clears out all but first of literal paths*/
     clearObjects: function() {
-      
+
       for (var j = 0; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
         //console.log('clearing instance literal at:'+j)
@@ -136,32 +142,57 @@ define([
     },
 
     //called when path points are modified 
-    updatePath: function(index,delta) {
+    updatePath: function(index, delta, handle) {
       var newPath = this.masterPath.clone();
 
       //update the path
-       var selSegment = newPath.segments[index];
-      selSegment.point = selSegment.point.add(delta);
-    
-       var topLeftOld = this.masterPath.bounds.topLeft;
-       var topLeftNew = newPath.bounds.topLeft;
-       //calcualte differences between old and new positions
-       var diff = TrigFunc.subtract({x:topLeftNew.x,y:topLeftNew.y},{x:topLeftOld.x,y:topLeftOld.y});
+      var selSegment = newPath.segments[index];
+      if (handle === null) {
 
-       //set position to upper left corner
-       newPath.position.x = 0+newPath.bounds.width/2;
-       newPath.position.y =0+newPath.bounds.height/2;
+        selSegment.point = selSegment.point.add(delta);
+      } else {
+        if (handle === 'handle-in') {
 
-        for(var i=0;i<this.instances.length;i++){
-          this.instances[i].update({width:newPath.bounds.width,height:newPath.bounds.height});
-          this.instances[i].increment({delta:diff});
+          selSegment.handleIn = selSegment.handleIn.add(delta);
+          selSegment.handleOut = selSegment.handleOut.subtract(delta);
+
+        } else {
+          selSegment.handleOut = selSegment.handleOut.add(delta);
+          selSegment.handleIn = selSegment.handleIn.subtract(delta);
+
         }
+      }
 
-       //swap out old master for new
-        this.masterPath.remove();
-        this.masterPath = newPath;
-        newPath.visible = false;
-      
+      var topLeftOld = this.masterPath.bounds.topLeft;
+      var topLeftNew = newPath.bounds.topLeft;
+      //calcualte differences between old and new positions
+      var diff = TrigFunc.subtract({
+        x: topLeftNew.x,
+        y: topLeftNew.y
+      }, {
+        x: topLeftOld.x,
+        y: topLeftOld.y
+      });
+
+      //set position to upper left corner
+      newPath.position.x = 0 + newPath.bounds.width / 2;
+      newPath.position.y = 0 + newPath.bounds.height / 2;
+
+      for (var i = 0; i < this.instances.length; i++) {
+        this.instances[i].update({
+          width: newPath.bounds.width,
+          height: newPath.bounds.height
+        });
+        this.instances[i].increment({
+          delta: diff
+        });
+      }
+
+      //swap out old master for new
+      this.masterPath.remove();
+      this.masterPath = newPath;
+      newPath.visible = false;
+
 
     },
 
@@ -174,7 +205,7 @@ define([
      */
     render: function(data, currentNode) {
       var path_literal = this.getLiteral();
-     // console.log("render: "+this.type);
+      // console.log("render: "+this.type);
       if (data) {
         for (var k = 0; k < this.instances.length; k++) {
 
@@ -200,7 +231,10 @@ define([
 
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
-          
+              if(instance_literal.selected){
+                instance_literal.fullySelected = true;
+              }
+
               if (this.instances[k].anchor) {
                 if (k === 0) {
                   instance_literal.strokeColor = '#83E779';
@@ -225,7 +259,7 @@ define([
 
             instance_literal.visible = this.instances[k].visible;
 
-          
+
             this.instance_literals.push(instance_literal);
             instance_literal.instanceIndex = this.instance_literals.length - 1;
           }
@@ -237,7 +271,7 @@ define([
           instance_literal.nodeParent = this;
           instance_literal.instanceParentIndex = z;
 
-        var nInstance = this.instances[z];
+          var nInstance = this.instances[z];
           nInstance.render({});
           instance_literal = instance_literal.transform(nInstance.matrix);
           instance_literal.visible = this.instances[z].visible;
@@ -287,7 +321,7 @@ define([
             if (copySig.length > 0) {
               sIndexes.push(copySig);
             }
-     
+
           }
 
         }
@@ -315,7 +349,7 @@ define([
 
     /* placeholder functions for leftOf, rightOf geometric checks */
     instanceSide: function(instance) {
-      
+
       for (var i = 0; i < this.instances.length; i++) {
         var side, pA, pB, pM;
         if (this.instances[i].closed) {
@@ -332,7 +366,7 @@ define([
 
         } else {
           var path_literal = this.getLiteral();
-        
+
           pA = {
             x: path_literal.segments[0].point.x,
             y: path_literal.segments[0].point.y
@@ -345,7 +379,7 @@ define([
         }
 
         pM = instance.position;
-        
+
         side = TrigFunc.side(pA, pB, pM);
         return side;
 
@@ -361,8 +395,7 @@ define([
 
           if (paths[j].visible && !this.containsPath(paths[j])) {
             if (paths[j].nodeParent) {
-              if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {
-              } else {
+              if (paths[j].nodeParent.nodeParent === this.nodeParent && this.nodeParent.type === 'behavior') {} else {
                 var ints = paths[j].getIntersections(instance_literal);
                 if (ints.length > 0) {
                   return paths[j];

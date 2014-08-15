@@ -38,7 +38,7 @@ define([
           var newCopy = this.copyNum - numInstances;
 
           for (var i = 0; i < newCopy; i++) {
-            var selected = this.instances[this.instances.length-1];
+            var selected = this.instances[this.instances.length - 1];
             var index;
             if (!selected) {
               selected = this.instances[0];
@@ -56,7 +56,12 @@ define([
             var instance = this.createInstanceAt(selected, index);
             // console.log('creating instance'+instance);
             instance.copy = true;
-            instance.increment({delta:{x:10,y:10}});
+            instance.increment({
+              delta: {
+                x: 10,
+                y: 10
+              }
+            });
             instance.anchor = false;
             instance.selected = false;
           }
@@ -71,7 +76,7 @@ define([
             //TODO: what happens when there are only 2 instances left?
           }
         }
-        this.instances[0].anchor = true;
+
         //child.instances[child.instances.length-1].anchor=true;
 
 
@@ -80,6 +85,17 @@ define([
       setCopyNum: function(data) {
         this.copyNum = data;
       },
+      incrementCopyNum: function(data) {
+        this.copyNum += data;
+        if (this.copyNum < 2) {
+          if (this.containsBehaviorType('distribution')) {
+            this.copyNum = 2;
+          }
+          if (this.copyNum < 1) {
+            this.copyNum = 1;
+          }
+        }
+      }
     });
 
 

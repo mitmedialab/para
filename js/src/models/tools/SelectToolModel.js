@@ -9,13 +9,14 @@ define([
   'models/PaperManager'
 
 ], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
-  var segment, instanceIndex;
+  var segment, instanceIndex, handle;
   var paper = PaperManager.getPaperInstance();
 
 
   var hitOptions = {
     segments: true,
     stroke: true,
+    handles: true,
     fill: true,
     tolerance: 5
   };
@@ -42,6 +43,7 @@ define([
         this.currentPaths = [];
         this.currentNode = null;
         segment = null;
+        handle = null;
         this.selectedNodes = [];
       }
 
@@ -59,11 +61,18 @@ define([
 
         var path = hitResult.item;
         instanceIndex = path.instanceIndex;
+        console.log(hitResult);
         if (hitResult.type == 'segment') {
 
           segment = hitResult.segment.index;
 
+
         }
+        else if(hitResult.type =='handle-in'|| hitResult.type =='handle-out'){
+          handle= hitResult.type;
+          segment = hitResult.segment.index;
+        }
+
         //this sets currentNode depending on current selection level in tree
         this.trigger('nodeSelected', path);
 
@@ -118,7 +127,7 @@ define([
             if (selPath) {
               var selSegment = selPath.segments[segment];
               //selSegment.point = selSegment.point.add(event.delta);
-              selPath.nodeParent.updatePath(segment,event.delta);
+              selPath.nodeParent.updatePath(segment,event.delta,handle);
               this.trigger('rootUpdate');
               this.trigger('rootRender');
             }

@@ -521,7 +521,7 @@ define([
 
         for (var i = 0; i < selectTool.selectedNodes.length; i++) {
 
-          selectTool.selectedNodes[i].copyNum+=number;
+          selectTool.selectedNodes[i].incrementCopyNum(number);
         }
       }
       currentNode.update([{}]);
