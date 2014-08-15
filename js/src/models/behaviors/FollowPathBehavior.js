@@ -81,6 +81,12 @@ define([
       calculate: function(data, index){
        
           this.followPath(index);
+          if (index===0|| index===this.instances.length-1){
+          this.instances[index].anchor=true;
+        }
+        else{
+          this.instances[index].anchor=false;
+        }
       },
 
       clean: function(data){

@@ -54,6 +54,12 @@ define([
         var x = position.x + this.origin.x;
         var y = position.y + this.origin.y;
         var iAngle = this.angle * (index) + this.startAngle;
+        if (index===0|| index===this.middle){
+          this.instances[index].anchor=true;
+        }
+        else{
+          this.instances[index].anchor=false;
+        }
         if (index != this.middle) {
          this.instances[index].update({
             delta: {

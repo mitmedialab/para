@@ -9,15 +9,12 @@ define([
 
   function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {
     var paper = PaperManager.getPaperInstance();
-    var FollowPathBehavior = BaseBehavior.extend({
-
-      constructor: function(pathChild,rotate) {
-       
-
+    var FillBehavior = BaseBehavior.extend({
+      name: 'fill',
+      type: 'style',
+      constructor: function() {
+        this.color = null;
       },
-
-
-
 
       update: function(data) {
 
@@ -28,7 +25,11 @@ define([
       },
 
       clean: function(data){
-        
+
+      },
+
+      setColor: function(color){
+
       }
 
     });

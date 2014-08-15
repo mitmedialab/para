@@ -51,7 +51,12 @@ define([
       calculate: function(data, index) {
         var x = this.pointA.x + this.xDiff * index;
         var y = this.pointA.y + this.yDiff * index;
-
+        if (index===0|| index===this.instances.length-1){
+          this.instances[index].anchor=true;
+        }
+        else{
+          this.instances[index].anchor=false;
+        }
         this.instances[index].update({
           delta: {
             x: x,
