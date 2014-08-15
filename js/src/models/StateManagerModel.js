@@ -426,7 +426,9 @@ define([
       rootNode.deleteChildren();
       var children = loadObj.children;
       this.parseJSON(rootNode, children);
-      this.setCurrentNode(rootNode);
+      if(rootNode.children.length>0){ 
+        this.setCurrentNode(rootNode.children[0]);
+      }
       this.rootUpdate();
       this.rootRender();
       paper.view.draw();  
