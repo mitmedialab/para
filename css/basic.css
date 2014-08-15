@@ -7,11 +7,11 @@ html{
 
 body{
 	
-
+background-color: #494949;
 }
 
 .container{
-	width:1000px;
+	width:1500px;
 }
 .clearfix{
 
@@ -52,6 +52,10 @@ body{
 .container-fluid{
 	padding-right: 0;
 
+}
+
+#master-container{
+	margin-top: 50px;
 }
 
 span:hover{
@@ -146,6 +150,9 @@ min-height: 200px;
 }
 
 #canvas{
-	min-height:700px;
-	width: 726px; /* this is bad, fix it */
+	min-height:695px;
+	width: 1100px; /* this is bad, fix it */
 }
+
+
+

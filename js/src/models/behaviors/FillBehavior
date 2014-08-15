@@ -20,6 +20,16 @@ define([
 
 
       update: function(data) {
+
+      },
+
+      calculate: function(data){
+
+      },
+
+      clean: function(data){
+        
       }
+
     });
   });

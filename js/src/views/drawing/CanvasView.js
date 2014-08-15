@@ -108,7 +108,7 @@ var CanvasView = Backbone.View.extend({
     },
 
     canvasKeyup: function(event){
-      //console.log(event.keyCode);
+      console.log(event.keyCode);
     
       if(event.keyCode=== panKey){
         pan = false;
