@@ -38,7 +38,11 @@ background-color: #494949;
   padding-right: 0;
  
 }
+#instructions{
+	background-color: #fff;
+	padding: 40px;
 
+}
 
 .navbar{
 	margin:0;
@@ -55,7 +59,7 @@ background-color: #494949;
 }
 
 #master-container{
-	margin-top: 50px;
+	
 }
 
 span:hover{
@@ -153,6 +157,11 @@ min-height: 200px;
 #canvas{
 	min-height:695px;
 	width: 1100px; /* this is bad, fix it */
+}
+
+.navbar-header h2{
+	margin: 0;
+	margin-top: 8px;
 }
 
 
