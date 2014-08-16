@@ -7,7 +7,8 @@ define([
   'underscore',
   'backbone',
   'handlebars',
-  'minicolors'  
+  'minicolors',
+  'slider'  
  
 
 ], function($, _, Backbone,Handlebars){
@@ -25,6 +26,11 @@ define([
         this.listenTo(this.model,'selectionReset',this.selectionReset);
          this.currentPaths = [];
 
+
+$('#strokeSlider').slider();
+$('#strokeSlider').on('slide', function(slideEvt) {
+  $('#strokeSlider').trigger('stroke-change');
+});
  
 $('.demo').each( function() {   
  $(this).minicolors({
@@ -175,7 +181,7 @@ $('.demo').each( function() {
       this.currentPaths.push(path);
       var fill = this.currentPaths[0].fillColor;
        var stroke = this.currentPaths[0].strokeColor;
-             var width = this.currentPaths[0].strokeWeight;
+             var width = this.currentPaths[0].strokeWidth;
 
       if(fill){
        $('#fill').minicolors('value',fill.toCSS(true));
@@ -184,7 +190,8 @@ $('.demo').each( function() {
           $('#stroke').minicolors('value',stroke.toCSS(true));
         }
         if(width){
-
+          console.log("setting slider");
+           $('#strokeSlider').slider('setValue',width, false);
         }
      
       for(var i=0;i<this.currentPaths.length;i++){

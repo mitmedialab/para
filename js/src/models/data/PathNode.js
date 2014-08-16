@@ -236,6 +236,12 @@ define([
             else{
               instance_literal.fillColor= data[d].fillColor;
             }
+            if(!data[d].strokeColor){
+               instance_literal.strokeColor= nInstance.strokeColor;
+            }
+            else{
+              instance_literal.strokeColor= data[d].strokeColor;
+            }
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
               if (instance_literal.selected) {
@@ -256,7 +262,13 @@ define([
             } else {
               instance_literal.selected = data[d].selected;
               if (data[d].anchor) {
-                instance_literal.strokeColor = '#83E779';
+                if (d===0){ 
+                  instance_literal.strokeColor = '#83E779';
+                }
+                else{
+                   instance_literal.strokeColor = '#FF0000';
+
+                }
                 if (instance_literal.strokeWidth < 3) {
                   instance_literal.strokeWidth = 3;
                 }

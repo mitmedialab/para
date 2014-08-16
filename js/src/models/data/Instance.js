@@ -39,7 +39,7 @@ define([
 			this.drawAnchor=false;
 			this.selected= false;
 			this.copy= false;
-			this.strokeColor = 'black';
+			this.strokeColor = null;
 			this.fillColor = null
 			this.strokeWidth = 1;
 			//index of instance that was used to create this instance (for instances created upon render)
@@ -214,13 +214,16 @@ define([
 				this.rotation+=data.rotation.angle;
 			}
 			if(data.strokeWidth){
+
 				this.strokeWidth =data.strokeWidth;
 			}
 			if(data.strokeColor){
 				this.strokeColor= data.strokeColor;
+				console.log("setting stroke color to"+this.strokeColor);
+
 			}
 			if(data.fillColor){
-				console.log("setting fill color");
+			
 				this.fillColor = data.fillColor;
 			}
 			this.midpoint.x = this.position.x+this.width/2;

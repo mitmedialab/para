@@ -10,13 +10,13 @@ require.config({
         "paper" : "../../bower_components/paper/dist/paper-full",
         "backbone" : "../../bower_components/backbone/backbone",
         "underscore" : "../../bower_components/underscore/underscore",
-        "mustache"  : "../../bower_components/mustache.js/mustache",
         "handlebars"  : "../../bower_components/handlebars/handlebars",
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "justmath": "../../bower_components/JustMath.js/JustMath",
         "sylvester": "../../bower_components/sylvester/sylvester",
         "minicolors":"../../bower_components/jquery-minicolors/jquery.minicolors",
-        "filesaver": "../../bower_components/FileSaver/FileSaver"
+        "filesaver": "../../bower_components/FileSaver/FileSaver",
+        "slider": "../../bower_components/bootstrap-slider/bootstrap-slider"
     },
     
     shim: {
@@ -49,6 +49,9 @@ require.config({
           exports:'filesaver'
         },
         'minicolors': {     //<-- cookie depends on Jquery and exports nothing
+        deps: ['jquery']
+        },
+         'slider': {     //<-- cookie depends on Jquery and exports nothing
         deps: ['jquery']
         }
        

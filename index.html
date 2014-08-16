@@ -156,7 +156,6 @@
     <script src="bower_components/FileSaver/FileSaver.js" type="text/javascript"></script> 
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/handlebars/handlebars.js" type="text/javascript"></script> 
-    <script src="bower_components/bootstrap-slider/bootstrap-slider.js"></script>
 
     <script>
     
@@ -170,10 +169,6 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
   alert('The File APIs are not fully supported in this browser.');
 }
 
-$('#strokeSlider').slider();
-$('#strokeSlider').on('slide', function(slideEvt) {
-  $('#strokeSlider').trigger('stroke-change');
-});
 
 
 
