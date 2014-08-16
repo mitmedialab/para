@@ -19,12 +19,12 @@ define([
 
        //called when node is assigned the behavior
       setup: function(data) {
-        //console.log('scale behavior interesection found called');
+        ////console.log('scale behavior interesection found called');
 
       },
 
       update: function() {
-       // console.log('scale behavior update called');
+       // //console.log('scale behavior update called');
         if(this.nodeParent.nodeParent){
           this.iterativeScale(this.getParentNode().instances[0].data);
         }
@@ -33,7 +33,7 @@ define([
 
       //called when node is updated
       updateInstanceAt: function(i) {
-       // console.log('scale behavior update called');
+       // //console.log('scale behavior update called');
         if(this.nodeParent.nodeParent){
           this.scale(i);
         }
@@ -49,20 +49,20 @@ define([
         var scaleAmt = (max - min) / (num - 1);
         var currentScale = startScale;
         for (var i = 0; i < num; i++) {
-          //console.log(currentScale);
+          ////console.log(currentScale);
           var instance = this.instances[i];
           instance.resetStrokeColor();
           instance.resetScale();
           var conditionState = this.checkConditions(instance);
-          console.log('condition state=' + conditionState);
-          console.log('x pos =' + instance.position.x);
+          //console.log('condition state=' + conditionState);
+          //console.log('x pos =' + instance.position.x);
 
           if (conditionState) {
             instance.data.strokeColor = 'red';
             instance.scale(currentScale);
           } 
           currentScale -= scaleAmt;
-          console.log("currentScale="+currentScale);
+          //console.log("currentScale="+currentScale);
         }
 
 

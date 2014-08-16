@@ -51,7 +51,7 @@ define([
 			this.matrix = new paper.Matrix();
 					 },
 		reset: function() {
-			//console.log("reset instance");
+			////console.log("reset instance");
 			this.visible= true;
 			this.scale= 1;
 			this.position= {
@@ -77,7 +77,7 @@ define([
 		},
 
 		exportJSON: function(){
-			console.log(this.renderSignature);
+			//console.log(this.renderSignature);
 			this.set({
 				closed:this.closed,
 				position:this.position,
@@ -117,24 +117,24 @@ define([
 		//only called on a update function- 
 		//sets instances' properties to that of the data
 		update: function(data){
-			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
+			////console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
 			if(data.position){
-				//console.log('prior position =');
-				//console.log(this.position);
+				////console.log('prior position =');
+				////console.log(this.position);
 				this.position.x=data.position.x;
 				this.position.y=data.position.y;
-				//console.log('updated position=');
-				//console.log(this.position);
+				////console.log('updated position=');
+				////console.log(this.position);
 			}
 
 			if(data.delta){
-				//console.log('prior position =');
-				//console.log(this.position);
+				////console.log('prior position =');
+				////console.log(this.position);
 			this.delta.x=data.delta.x;
 				this.delta.y=data.delta.y;
 
-				//console.log('updated position=');
-				//console.log(this.position);
+				////console.log('updated position=');
+				////console.log(this.position);
 			}
 			if(data.width){
 				this.width=data.width;
@@ -147,7 +147,7 @@ define([
 			
 			}
 			if(data.rotation){
-				//console.log("updating rotation");
+				////console.log("updating rotation");
 				this.rotation.angle=data.rotation.angle;
 				if(data.rotation.x){
 					this.rotation.x = data.rotation.x;
@@ -186,31 +186,31 @@ define([
 		},
 
 		increment: function(data,relativePoint){
-			console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
+			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
 			
 			if(data.delta){
-				//console.log('prior position =');
-				//console.log(this.position);
+				////console.log('prior position =');
+				////console.log(this.position);
 				var point  = new paper.Point(data.delta.x,data.delta.y);
-				/*console.log("vector angle:"+point.angle);
+				/*//console.log("vector angle:"+point.angle);
 				var matrixRotation = this.matrix.rotation;
-				console.log("matrix rotation:"+matrixRotation);
+				//console.log("matrix rotation:"+matrixRotation);
 				var matrixTranslation = this.matrix.translation
-				console.log("matrix translation:"+matrixTranslation);
+				//console.log("matrix translation:"+matrixTranslation);
 				point.angle = point.angle-matrixRotation;
-				console.log("vector angle:"+point.angle);*/
+				//console.log("vector angle:"+point.angle);*/
 				
 				this.delta.x+=point.x;
 				this.delta.y+=point.y;
-								//console.log('updated position=');
-				//console.log(this.position);
+								////console.log('updated position=');
+				////console.log(this.position);
 			}
 			if(data.scale){
 				this.scale*=data.scale;
 			
 			}
 			if(data.rotation){
-				//console.log("updating rotation");
+				////console.log("updating rotation");
 				this.rotation+=data.rotation.angle;
 			}
 			if(data.strokeWidth){
@@ -219,7 +219,7 @@ define([
 			}
 			if(data.strokeColor){
 				this.strokeColor= data.strokeColor;
-				console.log("setting stroke color to"+this.strokeColor);
+				//console.log("setting stroke color to"+this.strokeColor);
 
 			}
 			if(data.fillColor){
@@ -243,9 +243,9 @@ define([
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 		render: function(data) {
-			//cloconsole.log(data);
+			//clo//console.log(data);
 			//if(this.nodeParent){
-				//console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
+				////console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
 			//}
 			this.matrix.reset();
  				
@@ -256,15 +256,15 @@ define([
 
 			}
 			/*if(data.position){
-				//console.log('prior position =');
-				//console.log(this.position);
+				////console.log('prior position =');
+				////console.log(this.position);
 
 			
 				
 				this.matrix = this.matrix.translate(new paper.Point(this.position.x+data.position.x,this.position.y+data.position.y));
 
-				//console.log('updated position=');
-				//console.log(this.position);
+				////console.log('updated position=');
+				////console.log(this.position);
 			}
 			else{*/
 			

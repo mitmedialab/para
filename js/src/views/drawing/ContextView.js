@@ -66,7 +66,7 @@ var template,source, menuX, menuY, currentNode;
     },
 
      newCondition: function(){
-            console.log("new condition");
+            //console.log("new condition");
 
       this.listenToOnce(this.event_bus, 'nodeSelected', this.addCondition);
       //this.model.newBehavior(currentNode);
@@ -80,9 +80,9 @@ var template,source, menuX, menuY, currentNode;
     },
 
     addCondition: function(selected){
-      console.log("adding condition");
+      //console.log("adding condition");
       this.model.newCondition([currentNode],selected);
-      console.log(selected);
+      //console.log(selected);
     },
 
     generateBehaviors: function(){
@@ -112,7 +112,7 @@ var template,source, menuX, menuY, currentNode;
     },
 
     nameChange: function() {
-      //console.log("updating name to:"+ $('#obj-name').val());
+      ////console.log("updating name to:"+ $('#obj-name').val());
       this.model.updateSelected({
         name: $('#obj-name').val()
       });

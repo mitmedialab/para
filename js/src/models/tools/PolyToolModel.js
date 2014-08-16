@@ -22,7 +22,7 @@ define([
       *if it has not, create a new one and trigger a shapeAdded event
       */
       mouseDown : function(event) {
-        console.log("poly tool mouse down");
+        //console.log("poly tool mouse down");
           /*if (!currentPath) {
             currentPath = new PathNode({name:'path1'});
             this.trigger('change:shapeAdded');

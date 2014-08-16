@@ -323,7 +323,7 @@ define([
     },
 
     loop: function(data) {
-      //console.log("loop geom");
+      ////console.log("loop geom");
 
       for (var j = 0; j < this.instances.length; j++) {
         this.calculate(data, j);
@@ -333,7 +333,7 @@ define([
     },
 
     calculate: function(data, index) {
-      //console.log("geom calculate for index:" + index);
+      ////console.log("geom calculate for index:" + index);
       for (var i = 0; i < data.length; i++) {
         var instance = this.instances[index];
         instance.update(data[i]);
@@ -342,7 +342,7 @@ define([
     },
 
     clean: function(data) {
-      //console.log("clean geom");
+      ////console.log("clean geom");
       for (var k = 0; k < this.children.length; k++) {
         this.children[k].update([{}]);
       }
@@ -353,11 +353,11 @@ define([
 
 
     updateSelected: function(data) {
-      console.log('update selected');
+      //console.log('update selected');
 
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
-          console.log("updating selected instance at"+j);
+          //console.log("updating selected instance at"+j);
           for (var i = 0; i < data.length; i++) {
             var instance = this.instances[j];
             instance.increment(data[i]);
@@ -429,7 +429,7 @@ define([
     render: function(data, currentNode) {
       //first create array of new instances that contain propogated updated data
 
-      //console.log('render: '+this.type);
+      ////console.log('render: '+this.type);
       if (data) {
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
@@ -681,7 +681,7 @@ define([
       var toRemove = _.filter(this.behaviors, function(behavior) {
         return behavior.behavior.name === name;
       });
-      console.log(toRemove);
+      //console.log(toRemove);
       this.behaviors = _.filter(this.behaviors, function(behavior) {
         return behavior.behavior.name !== name;
       });

@@ -20,7 +20,7 @@ define([
       this.listenTo(this.model,'updateView',this.render);
       
        shapeToolModel = new ShapeToolModel({type:"Shape"})
-      console.log(shapeToolModel.type);
+      //console.log(shapeToolModel.type);
        this.children = {
         toolView: new ToolView({collection: this.collection}),
         propertyView: new PropertyView({collection:this.collection}),

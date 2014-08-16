@@ -89,8 +89,8 @@ define([
 			},
 
 			render: function() {
-				//console.log("behavior data="+ data);
-				//console.log("behavior node="+ currentNode);
+				////console.log("behavior data="+ data);
+				////console.log("behavior node="+ currentNode);
 				/* if (this.nodeParent == currentNode) {
 				 	for(var i=0;i<this.scaffolds.length;i++){
 				 		this.scaffolds[i].render(data[0]);
@@ -103,7 +103,7 @@ define([
 
 				for (var i = 0; i < this.instances.length; i++) {
 					this.instances[i].rotation.angle = 0;
-					console.log("resetting distribuiton at" + i);
+					//console.log("resetting distribuiton at" + i);
 
 				}
 
@@ -112,33 +112,33 @@ define([
 			checkDistanceIncrement: function(start, selected, tDist) {
 
 				var dist = TrigFunc.distance(start.delta, selected.delta);
-				console.log('num copies=' + this.copyNum);
+				//console.log('num copies=' + this.copyNum);
 				if (dist < tDist + 20) {
 					this.copyNum++;
-					console.log('incrementing copy');
+					//console.log('incrementing copy');
 				}
 				/*else if(dist>tDist+20){
              this.copyNum--;
-             console.log('decrementing copy');
+             //console.log('decrementing copy');
           }*/
 
-				console.log('selected Distance =' + dist);
-				console.log('target Distance =' + tDist);
+				//console.log('selected Distance =' + dist);
+				//console.log('target Distance =' + tDist);
 
 
 			},
 
 			checkDistanceDecrement: function(start, selected, tDist) {
-				console.log("check distance decrement");
+				//console.log("check distance decrement");
 				var dist = TrigFunc.distance(start.delta, selected.delta);
-				console.log('num copies=' + this.copyNum);
+				//console.log('num copies=' + this.copyNum);
 				if (dist > tDist + 20) {
 					this.copyNum--;
-					console.log('decrementing copy');
+					//console.log('decrementing copy');
 
 				}
-				console.log('selected Distance =' + dist);
-				console.log('target Distance =' + tDist);
+				//console.log('selected Distance =' + dist);
+				//console.log('target Distance =' + tDist);
 
 
 			},

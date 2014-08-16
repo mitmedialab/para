@@ -129,8 +129,8 @@ define([
 		};
 
 		TrigFunc.distance = function(p1, p2) {
-			//console.log("p1="+p1);
-			//console.log("p2="+p2);
+			////console.log("p1="+p1);
+			////console.log("p2="+p2);
 			var distance = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 			return distance;
 		};
@@ -149,8 +149,8 @@ define([
 		TrigFunc.side = function(pA, pB, pM) {
 
 			var position = (pB.x - pA.x) * (pM.y - pA.y) - (pB.y - pA.y) * (pM.x - pA.x);
-			//console.log("position=");
-			//console.log(position);
+			////console.log("position=");
+			////console.log(position);
 			if (position > 0) {
 				return 1;
 			} else if (position < 0) {

@@ -46,7 +46,7 @@ define([
         handle = null;
         this.selectedNodes = [];
         this.trigger('selectionReset');
-        console.log("setting selected nodes to null");
+        //console.log("setting selected nodes to null");
       }
 
       segment = null;
@@ -63,7 +63,7 @@ define([
 
         var path = hitResult.item;
         instanceIndex = path.instanceIndex;
-        console.log(hitResult);
+        //console.log(hitResult);
         if (hitResult.type == 'segment') {
 
           segment = hitResult.segment.index;

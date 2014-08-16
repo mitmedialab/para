@@ -56,7 +56,7 @@ var CanvasView = Backbone.View.extend({
 
 
    render: function(){
-      //console.log("paper is being drawn");
+      ////console.log("paper is being drawn");
       paper.view.draw();  
     
  
@@ -67,33 +67,33 @@ var CanvasView = Backbone.View.extend({
 
     toolMouseDown: function(event){
       //this.target. model.toolMouseDown(event);
-      //console.log(event);
+      ////console.log(event);
       this.parent.model.toolMouseDown(event,pan);
     },
 
     toolMouseUp: function(event){
       this.parent.model.toolMouseUp(event,pan);
-      //console.log("tool mouse up:"+ event);
+      ////console.log("tool mouse up:"+ event);
     },
 
     toolMouseDrag: function(event){
-      //console.log("pan = "+pan);
+      ////console.log("pan = "+pan);
       this.parent.model.toolMouseDrag(event,pan);
 
-      //console.log("tool mouse drag:"+ event);
+      ////console.log("tool mouse drag:"+ event);
     },
 
   
     toolMouseMove: function(event){
       this.parent.model.toolMouseMove(event);
-      //console.log("tool mouse drag:"+ event);
+      ////console.log("tool mouse drag:"+ event);
     },
   
   
   /* canvas event functions */
 
     canvasKeydown: function(event){
-      console.log(event.keyCode);
+      //console.log(event.keyCode);
       if(event.keyCode == saveKey){
         this.model.save();
       }
@@ -101,14 +101,14 @@ var CanvasView = Backbone.View.extend({
         this.model.deleteObject();
       }
       if(event.keyCode=== panKey){
-        //console.log("setting pan to true")
+        ////console.log("setting pan to true")
         pan = true;
       }
 
     },
 
     canvasKeyup: function(event){
-      console.log(event.keyCode);
+      //console.log(event.keyCode);
     
       if(event.keyCode=== panKey){
         pan = false;
@@ -132,14 +132,14 @@ var CanvasView = Backbone.View.extend({
     },
 
     canvasMouseDown: function(event){
-    //console.log(event);
+    ////console.log(event);
      mouseDown = true;
     // this.event_bus.trigger('shiftClick',event);
       //this.model.canvasMouseDown(event);
     },
 
     canvasMouseUp: function(event){
-    //console.log(event);
+    ////console.log(event);
      mouseDown = false;
     // this.event_bus.trigger('shiftClick',event);
       //this.model.canvasMouseDown(event);
@@ -154,7 +154,7 @@ var CanvasView = Backbone.View.extend({
         this.model.canvasMouseDrag(delta,pan);
       }
       else{
-        //console.log("mouse move event: "+event);
+        ////console.log("mouse move event: "+event);
        // this.model.canvasMouseMove(event);
       }
       last.x = event.offsetX;
@@ -163,7 +163,7 @@ var CanvasView = Backbone.View.extend({
     },
 
     canvasMousewheel: function(event){
-      //console.log(event.originalEvent.deltaY);
+      ////console.log(event.originalEvent.deltaY);
       this.model.canvasMouseWheel(event,pan);
 
     },

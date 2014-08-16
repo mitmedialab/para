@@ -63,12 +63,12 @@ $('.demo').each( function() {
     },
 
     render: function(){
-      // console.log('property view rendering');back
-       // console.log('source='+$('#property-list-template').html());
+      // //console.log('property view rendering');back
+       // //console.log('source='+$('#property-list-template').html());
        /* var source = $('#property-list-template').html();
         var template = Handlebars.compile(source);
         var properties = this.model.getSelected();
-       // console.log(properties);
+       // //console.log(properties);
         var html = template(properties);
         this.$el.html(html);
         */
@@ -133,7 +133,7 @@ $('.demo').each( function() {
 
 
     removeItem: function(id){
-      console.log('removing:'+id);
+      //console.log('removing:'+id);
        $('#fileselect option[value='+id+']').remove();  
     },
 
@@ -168,8 +168,8 @@ $('.demo').each( function() {
 
     },
     nameChange: function(){
-      //console.log("updating name to:"+ $('#obj-name').val());
-      console.log($('#text-filename').val());
+      ////console.log("updating name to:"+ $('#obj-name').val());
+      //console.log($('#text-filename').val());
       //this.model.updateSelected({name:$('#obj-name').val()});
     },
     disableSave: function(disable){
@@ -190,7 +190,7 @@ $('.demo').each( function() {
           $('#stroke').minicolors('value',stroke.toCSS(true));
         }
         if(width){
-          console.log("setting slider");
+          //console.log("setting slider");
            $('#strokeSlider').slider('setValue',width, false);
         }
      

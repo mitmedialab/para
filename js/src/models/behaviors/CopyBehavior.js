@@ -27,7 +27,7 @@ define([
         } else {
           jdata = data;
         }
-        console.log(jdata);
+        //console.log(jdata);
         return BaseBehavior.prototype.exportJSON.apply(this, [jdata]);
       },
 
@@ -44,17 +44,17 @@ define([
               selected = this.instances[0];
               index = 1;
             } else {
-              console.log('selected:' + selected.index);
+              //console.log('selected:' + selected.index);
               index = selected.index + 1;
-              console.log('index:' + index);
+              //console.log('index:' + index);
 
             }
 
-            // console.log('no selected instance found, making copy from first');
+            // //console.log('no selected instance found, making copy from first');
             //target = child.instances[0];
-            console.log('creating instance at' + index);
+            //console.log('creating instance at' + index);
             var instance = this.createInstanceAt(selected, index);
-            // console.log('creating instance'+instance);
+            // //console.log('creating instance'+instance);
             instance.copy = true;
             instance.increment({
               delta: {
@@ -68,7 +68,7 @@ define([
         } else if (numInstances > this.copyNum) {
           for (var k = 0; k < numInstances - this.copyNum; k++) {
             var removeIndex = this.instances.length > 2 ? this.instances.length - 3 : this.instances.length - 2;
-            //console.log('remove index = '+removeIndex);
+            ////console.log('remove index = '+removeIndex);
             if (removeIndex >= 0) {
 
               this.removeInstanceAt(removeIndex);

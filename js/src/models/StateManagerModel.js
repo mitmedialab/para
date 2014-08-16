@@ -42,7 +42,7 @@ define([
     },
 
     initialize: function(event_bus) {
-      //console.log(new FileSaver());
+      ////console.log(new FileSaver());
       paper = PaperManager.getPaperInstance();
       penTool = new PenToolModel({
         id: 'penTool'
@@ -101,7 +101,7 @@ define([
 
     //returns currently selected object as JSON object. If nothing is selected, returns the root object
     getSelected: function() {
-      ////console.log('attempting to get selected'+rootNode.getChildAt(0));
+      //////console.log('attempting to get selected'+rootNode.getChildAt(0));
       //currentNode = rootNode.getChildAt(0);
       return currentNode.toJSON();
 
@@ -114,7 +114,7 @@ define([
 
     //callback triggered when tool adds new node
     nodeAdded: function(node) {
-      //console.log('node added: '+ node.type);
+      ////console.log('node added: '+ node.type);
       currentNode.addChildNode(node);
       toolCollection.get(this.get('state')).currentNode = node;
 
@@ -122,7 +122,7 @@ define([
 
     moveUpNode: function() {
       this.setCurrentNode(currentNode);
-      //console.log('current node type='+currentNode.type);
+      ////console.log('current node type='+currentNode.type);
       this.rootRender();
     },
 
@@ -135,7 +135,7 @@ define([
           toolCollection.get(this.get('state')).currentNode = children[i];
         }
       }
-      //console.log('current node type='+currentNode.type);
+      ////console.log('current node type='+currentNode.type);
       this.rootRender();
     },
 
@@ -158,19 +158,19 @@ define([
     },
 
     rootRender: function() {
-      //console.log('called root render');
+      ////console.log('called root render');
 
       rootNode.clearObjects();
       rootNode.render(null, currentNode);
 
       // var numChildren = paper.project.activeLayer.children.length;
       this.trigger('renderComplete');
-      // console.log('total number of children='+numChildren);
-      // console.log( paper.project.activeLayer.children);
+      // //console.log('total number of children='+numChildren);
+      // //console.log( paper.project.activeLayer.children);
     },
 
     rootUpdate: function() {
-      //console.log('called root render');
+      ////console.log('called root render');
       this.modified = true;
       this.trigger('disableSave',!this.modified);
 
@@ -178,7 +178,7 @@ define([
 
     },
     currentRender: function() {
-      //console.log('called current render');
+      ////console.log('called current render');
       currentNode.clearObjects();
       currentNode.render(null, currentNode);
     },
@@ -186,10 +186,10 @@ define([
     setCurrentNode: function(node) {
 
       if (node.getParentNode() !== null) {
-        //console.log('current node is set in state to:' +node.getParentNode().type);
+        ////console.log('current node is set in state to:' +node.getParentNode().type);
         currentNode = node.getParentNode();
       } else {
-        //console.log('current node is set in state to:' +currentNode.type);
+        ////console.log('current node is set in state to:' +currentNode.type);
 
 
 
@@ -213,7 +213,7 @@ define([
      * TODO: make this assignment less janky.
      */
     determineSelectionPoint: function(selected) {
-      //console.log('determining selection point');
+      ////console.log('determining selection point');
       if (selected.nodeParent) {
         if (selected.nodeParent == currentNode) {
           toolCollection.get(this.get('state')).currentNode = currentNode;
@@ -314,7 +314,7 @@ define([
     },
 
     canvasMouseWheel: function(event, pan) {
-            console.log(  event.originalEvent.wheelDelta);
+            //console.log(  event.originalEvent.wheelDelta);
 
       if (pan) {
         var delta = event.originalEvent.wheelDelta; //paper.view.center
@@ -351,12 +351,12 @@ define([
     },
 
     saveFile: function(id,filename) {
-      console.log('id='+id);
+      //console.log('id='+id);
       if (this.modified){
         id = this.save(filename);
-         console.log('id='+id);
+         //console.log('id='+id);
      }
-     console.log('id='+id);
+     //console.log('id='+id);
       var data = localStorage[id];
       var blob = new Blob([data], {
         type: 'text/plain;charset=utf-8'
@@ -368,14 +368,14 @@ define([
     save: function(filename) {
 
       var id = Date.now();
-      console.log('saving with name:' + id);
+      //console.log('saving with name:' + id);
       var data = JSON.stringify(rootNode.exportJSON());
 
       this.saveToLocal(id,data);
 
-      console.log(localStorage[id]);
+      //console.log(localStorage[id]);
       this.trigger('localSaveComplete', id);
-      console.log('completed saving');
+      //console.log('completed saving');
       this.modified = false;
       this.trigger('disableSave',!this.modified);
       return id;
@@ -383,7 +383,7 @@ define([
 
     saveToLocal: function(id, data) {
       var saved = false;
-      console.log(localStorage.length);
+      //console.log(localStorage.length);
       while (localStorage.length>undoLimit-1) {
        // try {
          
@@ -398,8 +398,8 @@ define([
           arr.sort(function(a, b) {
             return a.toLowerCase().localeCompare(b.toLowerCase());
           });
-          console.log('array=');
-          console.log(arr);
+          //console.log('array=');
+          //console.log(arr);
           this.trigger('removeItem',arr[0]);
           localStorage.removeItem(arr[0]);
 
@@ -411,10 +411,10 @@ define([
 
 
     loadLocal: function(filename) {
-      console.log('loading with name:' + filename);
+      //console.log('loading with name:' + filename);
 
       var data = localStorage[filename];
-      console.log(data);
+      //console.log(data);
       this.load(JSON.parse(data));
     },
 
@@ -430,7 +430,7 @@ define([
     },
 
     load: function(loadObj) {
-      console.log(loadObj);
+      //console.log(loadObj);
       rootNode.deleteChildren();
       var children = loadObj.children;
       this.parseJSON(rootNode, children);
@@ -500,7 +500,7 @@ define([
     },
 
     updateColor: function(color, type) {
-      console.log('update color');
+      //console.log('update color');
       if (selectTool.selectedNodes.length > 0) {
 
         var update;

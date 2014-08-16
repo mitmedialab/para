@@ -27,7 +27,7 @@ define([
   	},
 
     reset: function(){
-      //console.log('pen tool is reset');
+      ////console.log('pen tool is reset');
       currentSegment = null;
       if(this.currentPath){
       this.currentPath.selected = false;

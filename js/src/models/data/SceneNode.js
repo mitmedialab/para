@@ -17,13 +17,13 @@ define([
                 this.nodeParent = null;
                 this.children = [];
 
-                //console.log("name="+name);
+                ////console.log("name="+name);
 
-                //console.log("parent="+node.name);
+                ////console.log("parent="+node.name);
 
                 SceneNode.numNodeInstances++;
                 Backbone.Model.apply(this, arguments);
-                //console.log("number of nodes="+SceneNode.numNodeInstances);
+                ////console.log("number of nodes="+SceneNode.numNodeInstances);
             },
 
             initialize: function() {
@@ -34,10 +34,10 @@ define([
             //destructor: clears all this.children and sets parent to null
             clear: function() {
 
-                //console.log('clear called');
+                ////console.log('clear called');
                 this.nodeParent = null;
                 for (var i = 0; i < this.children.length; i++) {
-                   // console.log('clearning child of ' + this.name + 'at:' + i);
+                   // //console.log('clearning child of ' + this.name + 'at:' + i);
                     this.children[i].clear();
                     this.children[i] = null;
                 }
@@ -67,10 +67,10 @@ define([
                 var index = this.getIndex();
                 var siblings = this.nodeParent.getChildren();
                 var cut = siblings.splice(index,1);
-                //console.log(cut);
-                //console.log(siblings);
+                ////console.log(cut);
+                ////console.log(siblings);
                 if(cut == this){
-                    //console.log('splice on siblings successfull');
+                    ////console.log('splice on siblings successfull');
                     return siblings;
                 }
                 
@@ -116,7 +116,7 @@ define([
             //sets parent node. 
             //If node already has a parent, it removes itself from the parent's this.children
             setParentNode: function(node) {
-                //console.log('parent='+this.nodeParent);
+                ////console.log('parent='+this.nodeParent);
                 if (node !== null) {
                     if (this.nodeParent !== null) {
                         this.nodeParent.removeChildNode(this);
@@ -153,15 +153,15 @@ define([
             },
             //removes child node from list of this.children- does not delete the removed child!
             removeChildNode: function(node) {
-                 console.log("number of this.children="+this.children.length);
+                 //console.log("number of this.children="+this.children.length);
                 if (node !== null && this.children.length > 0) {
-                    // console.log("attempting to remove");
+                    // //console.log("attempting to remove");
                     for (var i = 0; i < this.children.length; i++) {
 
                         if (this.children[i] == node) {
                             this.children[i].removeParentNode();
                             this.children.splice(i, 1);
-                            console.log("number of this.children="+this.children.length);
+                            //console.log("number of this.children="+this.children.length);
 
                             return true;
 
@@ -182,13 +182,13 @@ define([
 
             //recursively searches all sub this.children for child to remove- depth first. Not very efficient. double check to see if this is actually working correctly...
             recursiveRemoveChildNode: function(node) {
-                //console.log("starting recurse at node:"+this.name);
+                ////console.log("starting recurse at node:"+this.name);
                 if (node !== null && this.children.length > 0) {
                     for (var i = 0; i < this.children.length; i++) {
-                        // console.log("-----checking child at:"+i);
+                        // //console.log("-----checking child at:"+i);
                         if (this.children[i] == node) {
                             this.children.splice(i, 1);
-                           // console.log('found node to remove at parent:' + this.name + ' , index:' + i);
+                           // //console.log('found node to remove at parent:' + this.name + ' , index:' + i);
                             return true;
                         } else {
 

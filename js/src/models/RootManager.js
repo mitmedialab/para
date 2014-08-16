@@ -25,7 +25,7 @@ define([
              var canvas= $('canvas').get(0);
              paperInstance = paper;
              paperInstance.setup(canvas);
-             console.log('setting up paperInstance for'+callerId);
+             //console.log('setting up paperInstance for'+callerId);
         }
         return paperInstance;
     };

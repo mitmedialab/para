@@ -39,7 +39,7 @@ define([
 
     newBehavior: function(nodes, name, data) {
      //create a parent if none exists
-             console.log("adding behavior");
+             //console.log("adding behavior");
 
       var nodeParent = nodes[0].nodeParent;
       var behaviorNode;
@@ -59,7 +59,7 @@ define([
 
       }
 
-      //console.log('behaviors='+behaviorNode.behaviors);
+      ////console.log('behaviors='+behaviorNode.behaviors);
 
       if (name === 'copy') {
         this.addCopyBehavior(nodes,2,data);
@@ -78,7 +78,7 @@ define([
        
       }
       else if (name =='radial'){
-        console.log("adding radial behavior");
+        //console.log("adding radial behavior");
         if(!data){
           if(!nodes[0].copyNum){
             this.addCopyBehavior(nodes,6);
@@ -138,7 +138,7 @@ define([
         var followPathBehavior;
         var start = 1;
         if(data){
-          console.log('follow path data');
+          //console.log('follow path data');
           followPathBehavior=new FollowPathBehavior(nodes[0].nodeParent.getChildAt(0));
           start = 0;
         }
@@ -159,7 +159,7 @@ define([
           if(containsDist && !containsLin){
             var toRemove = node.getBehaviorByType('distribution');
             for(var j =0;j<toRemove.length;j++){
-              console.log('removing behavior at:'+i+','+toRemove[j].behavior.name);
+              //console.log('removing behavior at:'+i+','+toRemove[j].behavior.name);
               node.removeBehavior(toRemove[j].behavior.name);
             }
           }
@@ -178,7 +178,7 @@ define([
           if(containsDist && !containsLin){
             var toRemove = node.getBehaviorByType('distribution');
             for(var j =0;j<toRemove.length;j++){
-            console.log('removing behavior at:'+i+','+toRemove[j].behavior.name);
+            //console.log('removing behavior at:'+i+','+toRemove[j].behavior.name);
 
               node.removeBehavior(toRemove[j].behavior.name);
             }

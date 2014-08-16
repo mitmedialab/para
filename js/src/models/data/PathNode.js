@@ -66,7 +66,6 @@ define([
       }
 
       jdata.masterPath = this.masterPath.exportJSON();
-      console.log(jdata);
       return GeometryNode.prototype.exportJSON.apply(this, [jdata]);
     },
 
@@ -221,7 +220,6 @@ define([
             var nInstance = this.instances[k];
             nInstance.render(data[d]);
             instance_literal = instance_literal.transform(nInstance.matrix);
-            instance_literal.strokeColor = this.instances[k].strokeColor;
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
             }

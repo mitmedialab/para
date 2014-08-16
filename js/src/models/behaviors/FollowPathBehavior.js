@@ -19,7 +19,7 @@ define([
       },
 
       update: function(data){
-        console.log("follow path update"+ this.name);
+        //console.log("follow path update"+ this.name);
          var zeroedPath = this.pathChild.getLiteral().clone();
           zeroedPath.position.x =0+zeroedPath.bounds.width/2;
           zeroedPath.position.y=0+zeroedPath.bounds.height/2;
@@ -98,11 +98,11 @@ define([
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(index) {
-          //console.log("handles for "+index);
+          ////console.log("handles for "+index);
                 var location_n = this.finalPath.segments[index].point;
-                //console.log(this.finalPath.segments.handleOut);
-               // console.log(this.finalPath.segments.handleIn);
-                console.log(index);
+                ////console.log(this.finalPath.segments.handleOut);
+               // //console.log(this.finalPath.segments.handleIn);
+                //console.log(index);
                 var instance = this.instances[index];
                 instance.visible=true;
                 var delta = location_n.subtract(location);
