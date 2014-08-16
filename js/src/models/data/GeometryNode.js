@@ -249,9 +249,9 @@ define([
         for (var f = 0; f< this.conditions.length; f++) {
           //constraints.push(this.constrants[i].exportJSON());
         }
-        for (var g= 0; g < this.constraints.length; g++) {
+        /*for (var g= 0; g < this.constraints.length; g++) {
           //constraints.push(this.constrants[i].exportJSON());
-        }
+        }*/
         
 
         b.conditions = jconditions;
@@ -353,9 +353,11 @@ define([
 
 
     updateSelected: function(data) {
+      console.log('update selected');
 
       for (var j = 0; j < this.instances.length; j++) {
         if (this.instances[j].selected) {
+          console.log("updating selected instance at"+j);
           for (var i = 0; i < data.length; i++) {
             var instance = this.instances[j];
             instance.increment(data[i]);
@@ -649,6 +651,7 @@ define([
 
     addBehavior: function(behavior, methods, index) {
       _.defaults(this, behavior);
+
       if (index) {
         if (index === 'last') {
           this.behaviors.push({

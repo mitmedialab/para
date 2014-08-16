@@ -65,10 +65,12 @@ define([
       this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
       this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
       this.listenTo(toolCollection, 'moveDownNode', this.moveDownNode);
+      this.listenTo(toolCollection, 'selectionReset', this.selectionReset);
 
       this.listenTo(toolCollection, 'optionClick', this.openMenu);
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
       this.listenTo(toolCollection, 'rootUpdate', this.rootUpdate);
+
 
       this.listenTo(toolCollection, 'currentRender', this.currentRender);
      
@@ -197,7 +199,12 @@ define([
     //callback triggered when select tool selects shape
     nodeSelected: function(selected) {
       this.determineSelectionPoint(selected);
+      this.trigger('pathSelected',selected);
 
+    },
+
+    selectionReset: function(){
+      this.trigger('selectionReset');
     },
 
     /*recursively follows parent hierarchy upwards to find correct selection point 
@@ -214,6 +221,7 @@ define([
             toolCollection.get(this.get('state')).selectedNodes.push(selected);
 
             this.event_bus.trigger('nodeSelected', selected);
+
 
           }
           return;

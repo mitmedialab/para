@@ -40,7 +40,7 @@ define([
 			this.selected= false;
 			this.copy= false;
 			this.strokeColor = 'black';
-			this.fillColor = 'white';
+			this.fillColor = null
 			this.strokeWidth = 1;
 			//index of instance that was used to create this instance (for instances created upon render)
 			this.instanceParentIndex = 0;
@@ -186,7 +186,7 @@ define([
 		},
 
 		increment: function(data,relativePoint){
-			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
+			console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
 			
 			if(data.delta){
 				//console.log('prior position =');
@@ -220,7 +220,7 @@ define([
 				this.strokeColor= data.strokeColor;
 			}
 			if(data.fillColor){
-				
+				console.log("setting fill color");
 				this.fillColor = data.fillColor;
 			}
 			this.midpoint.x = this.position.x+this.width/2;

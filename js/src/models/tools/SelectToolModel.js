@@ -45,6 +45,8 @@ define([
         segment = null;
         handle = null;
         this.selectedNodes = [];
+        this.trigger('selectionReset');
+        console.log("setting selected nodes to null");
       }
 
       segment = null;

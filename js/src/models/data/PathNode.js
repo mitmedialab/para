@@ -10,9 +10,10 @@ define([
   'models/data/GeometryNode',
   'models/data/Instance',
   'models/PaperManager',
-  'utils/TrigFunc'
+  'utils/TrigFunc',
+  'models/behaviors/FillBehavior',
 
-], function(_, GeometryNode, Instance, PaperManager, TrigFunc) {
+], function(_, GeometryNode, Instance, PaperManager, TrigFunc, FillBehavior) {
   //drawable paper.js path object that is stored in the pathnode
   var paper = PaperManager.getPaperInstance();
   var PathNode = GeometryNode.extend({
@@ -33,15 +34,16 @@ define([
 
     initialize: function(data) {
       if (data) {
-        console.log("creating path node");
         console.log(data);
         var path = new paper.Path();
         path.importJSON(data.masterPath);
         this.masterPath = path;
         GeometryNode.prototype.initialize.apply(this, arguments);
-        console.log(this.getLiteral());
-
       }
+
+      
+      var fillBehavior = new FillBehavior();
+      this.addBehavior(fillBehavior, ['update']);
 
     },
 
@@ -82,7 +84,6 @@ define([
       };
       var width = path.bounds.width;
       var height = path.bounds.height;
-      console.log("width=" + width + ", height=" + height);
       instance.update({
         delta: delta,
         rotation: rotation,
@@ -229,9 +230,15 @@ define([
               instance_literal.strokeWidth = 1;
             }
 
+            if(!data[d].fillColor){
+               instance_literal.fillColor= nInstance.fillColor;
+            }
+            else{
+              instance_literal.fillColor= data[d].fillColor;
+            }
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
-              if(instance_literal.selected){
+              if (instance_literal.selected) {
                 instance_literal.fullySelected = true;
               }
 

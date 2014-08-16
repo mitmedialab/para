@@ -44,11 +44,12 @@ require.config({
         sylvester:{
           exports:'Sylvester'
         },
-        minicolors:{
-          exports:'Minicolors'
-        },
+       
         filesaver:{
           exports:'filesaver'
+        },
+        'minicolors': {     //<-- cookie depends on Jquery and exports nothing
+        deps: ['jquery']
         }
        
     },

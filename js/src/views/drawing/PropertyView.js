@@ -7,6 +7,7 @@ define([
   'underscore',
   'backbone',
   'handlebars',
+  'minicolors'  
  
 
 ], function($, _, Backbone,Handlebars){
@@ -20,6 +21,27 @@ define([
         this.listenTo(this.model,'removeItem',this.removeItem);
         this.listenTo(this.model,'disableSave',this.disableSave);
  
+         this.listenTo(this.model,'pathSelected',this.pathSelected);
+        this.listenTo(this.model,'selectionReset',this.selectionReset);
+         this.currentPaths = [];
+
+ 
+$('.demo').each( function() {   
+ $(this).minicolors({
+  control: $(this).attr('data-control') || 'hue',
+  defaultValue: $(this).attr('data-defaultValue') || '',
+  inline: $(this).attr('data-inline') === 'true',
+  letterCase: $(this).attr('data-letterCase') || 'lowercase',
+  opacity: $(this).attr('data-opacity'),
+  position: $(this).attr('data-position') || 'bottom left',
+  change: function(hex, opacity) {
+    if( !hex ) {return;}
+    if( opacity ){ hex += ', ' + opacity;}
+    $(this).trigger('color-change');
+  },
+  theme: 'bootstrap'
+});
+});
   },
 
   events: {
@@ -147,6 +169,31 @@ define([
     disableSave: function(disable){
       $('#save').attr('disabled', disable);
         $('#saveFile').attr('disabled', false);
+    },
+
+    pathSelected: function(path){
+      this.currentPaths.push(path);
+      var fill = this.currentPaths[0].fillColor;
+       var stroke = this.currentPaths[0].strokeColor;
+             var width = this.currentPaths[0].strokeWeight;
+
+      if(fill){
+       $('#fill').minicolors('value',fill.toCSS(true));
+     }
+      if(stroke){
+          $('#stroke').minicolors('value',stroke.toCSS(true));
+        }
+        if(width){
+
+        }
+     
+      for(var i=0;i<this.currentPaths.length;i++){
+
+      }
+    },
+
+    selectionReset: function(){
+      this.currentPaths = [];
     }
 
   });
