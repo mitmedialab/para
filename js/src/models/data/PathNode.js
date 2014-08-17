@@ -111,6 +111,13 @@ define([
 
     },
 
+    bringToFront: function(){
+          for (var i=0;i<this.instance_literals.length;i++){
+            this.instance_literals[i].bringToFront();
+          }
+        },
+
+
 
 
     /*sets focus to this instance and unfocuses all siblings*/

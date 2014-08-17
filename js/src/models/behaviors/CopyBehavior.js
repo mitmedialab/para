@@ -56,6 +56,7 @@ define([
             var instance = this.createInstanceAt(selected, index);
             // //console.log('creating instance'+instance);
             instance.copy = true;
+            instance.rotation.angle =0;
             instance.increment({
               delta: {
                 x: 10,
