@@ -64,7 +64,7 @@ define([
         this.addCopyBehavior(nodes, 2, data);
       } else if (name == 'linear') {
         if (!data) {
-          if (!nodes[0].copyNum) {
+          if (nodes[0].copyNum<3) {
             this.addCopyBehavior(nodes, 3);
           } else {
             this.addCopyBehavior(nodes);
@@ -75,16 +75,17 @@ define([
       } else if (name == 'radial') {
         //console.log("adding radial behavior");
         if (!data) {
-          if (!nodes[0].copyNum) {
+          if (nodes[0].copyNum<6) {
             this.addCopyBehavior(nodes, 6);
-          } else {
+          }
+          else {
             this.addCopyBehavior(nodes);
           }
         }
         this.addRadialBehavior(nodes, data);
       } else if (name == 'followpath') {
         if (!data) {
-          if (!nodes[0].copyNum) {
+          if (nodes[0].copyNum<4) {
             this.addCopyBehavior(nodes, 4);
           } else {
             this.addCopyBehavior(nodes);
@@ -104,11 +105,12 @@ define([
 
 
     addCopyBehavior: function(nodes, copyNum, data) {
-      var copyBehavior = new CopyBehavior();
+    
       for (var i = 0; i < nodes.length; i++) {
         var node = nodes[i];
         var containsCopy = node.containsBehaviorType('copy');
         if (!containsCopy) {
+           var copyBehavior = new CopyBehavior();
           nodes[i].addBehavior(copyBehavior, ['update'], 'last');
         }
         if (data) {

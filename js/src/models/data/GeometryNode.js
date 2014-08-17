@@ -78,10 +78,9 @@ define([
         }
       }
 
-      /*  var copyBehavior = new CopyBehavior();
+      var copyBehavior = new CopyBehavior();
       this.addBehavior(copyBehavior,['update'],'last');
-      this.setCopyNum(1);*/
-
+      this.setCopyNum(1); 
     },
 
     setOriginByChild: function(index) {

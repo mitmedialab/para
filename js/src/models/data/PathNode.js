@@ -12,8 +12,9 @@ define([
   'models/PaperManager',
   'utils/TrigFunc',
   'models/behaviors/FillBehavior',
+  'models/behaviors/CopyBehavior'
 
-], function(_, GeometryNode, Instance, PaperManager, TrigFunc, FillBehavior) {
+], function(_, GeometryNode, Instance, PaperManager, TrigFunc, FillBehavior, CopyBehavior) {
   //drawable paper.js path object that is stored in the pathnode
   var paper = PaperManager.getPaperInstance();
   var PathNode = GeometryNode.extend({
@@ -44,6 +45,9 @@ define([
       
       var fillBehavior = new FillBehavior();
       this.addBehavior(fillBehavior, ['update']);
+       var copyBehavior = new CopyBehavior();
+      this.addBehavior(copyBehavior,['update'],'last');
+      this.setCopyNum(1); 
 
     },
 

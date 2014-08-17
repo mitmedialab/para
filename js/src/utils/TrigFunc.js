@@ -137,8 +137,8 @@ define([
 		};
 
 		TrigFunc.midpoint = function(p1, p2) {
-			console.log(p1);
-			console.log(p2);
+			//console.log(p1);
+			//console.log(p2);
 			var x = (p1.x + p2.x) / 2;
 			var y = (p1.y + p2.y) / 2;
 
