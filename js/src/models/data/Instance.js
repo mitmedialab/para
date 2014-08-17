@@ -234,9 +234,18 @@ define([
 
 		},
 
-		getRelativePos: function(){
+		getCenter: function(){
 			return {x:this.position.x+this.delta.x,y:this.position.y+this.delta.y};
 		},
+
+		getUpperLeft: function(){
+			return {x:this.position.x+this.delta.x-this.width/2,y:this.position.y+this.delta.y-this.height/2};
+		},
+
+		getLowerRight: function(){
+			return {x:this.position.x+this.delta.x+this.width/2,y:this.position.y+this.delta.y+this.height/2};
+		},
+
 
 	
 
@@ -272,7 +281,9 @@ define([
 				this.matrix = this.matrix.scale(this.scale);
 
 				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
-				/*var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
+				var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
+								 this.nodeParent.addScaffold(uLP);
+
 			if(this.nodeParent.type!=='root'){
 				 uLP.fillColor = 'green';
 				 if(this.nodeParent.type==='behavior'){
@@ -281,11 +292,10 @@ define([
 				 var mP = new paper.Path.Circle(this.position.x+this.width/2,this.position.y+this.height/2,3);
 				
 				 mP.fillColor='purple';
-				 this.nodeParent.addScaffold(uLP);
 				 this.nodeParent.addScaffold(mP);
 				uLP.transform(this.matrix);
 				mP.transform(this.matrix);
-			}*/
+			}
 				
 			//}
 

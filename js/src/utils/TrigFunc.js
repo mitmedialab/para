@@ -117,7 +117,7 @@ define([
 			} else {
 				var average = points[0];
 				for (var i = 1; i < points.length; i++) {
-					average = average.add(points[i]);
+					average = this.add(average,points[i]);
 				}
 				var x = average.x / points.length;
 				var y = average.y / points.length;
@@ -127,6 +127,7 @@ define([
 				};
 			}
 		};
+
 
 		TrigFunc.distance = function(p1, p2) {
 			////console.log("p1="+p1);

@@ -75,8 +75,8 @@ define([
     createInstanceFromPath: function(path) {
       var instance = this.createInstance();
       var delta = {
-        x: path.bounds.topLeft.x,
-        y: path.bounds.topLeft.y
+        x: path.bounds.center.x,
+        y: path.bounds.center.y
       };
       var rotation = {
         angle: 0
@@ -97,7 +97,7 @@ define([
       path.position.y = 0;
 
 
-      path.translate(path.bounds.width / 2, path.bounds.height / 2);
+      //path.translate(path.bounds.width / 2, path.bounds.height / 2);
 
 
       this.masterPath = path;
@@ -175,8 +175,8 @@ define([
       });
 
       //set position to upper left corner
-      newPath.position.x = 0 + newPath.bounds.width / 2;
-      newPath.position.y = 0 + newPath.bounds.height / 2;
+      newPath.position.x = 0;
+      newPath.position.y = 0;
 
       for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].update({
