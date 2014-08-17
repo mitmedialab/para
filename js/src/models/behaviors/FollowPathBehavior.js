@@ -47,7 +47,7 @@ define([
         var defaultLength = zeroedPath.length;
         if(!zeroedPath.closed){
           if(bOffset<=aOffset){
-          bOffset= aOffset+1;
+          bOffset=aOffset+1;
         }
         if(aOffset>=bOffset){
           aOffset=bOffset-1;
@@ -145,7 +145,8 @@ define([
           y: start.y
         };
         instance.update({
-          delta: difference
+          delta: difference,
+          magnitude:5
         });
        
          instance.update({

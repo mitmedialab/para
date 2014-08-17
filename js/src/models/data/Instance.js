@@ -23,7 +23,7 @@ define([
 				x: 0,
 				y: 0
 			};
-
+			this.magnitude =1 ;
 			this.delta ={
 				x:0,
 				y:0
@@ -277,7 +277,7 @@ define([
 			}
 			else{*/
 			
-				this.matrix = this.matrix.translate(new paper.Point(this.delta.x,this.delta.y));
+				this.matrix = this.matrix.translate(new paper.Point(this.delta.x*this.magnitude,this.delta.y*this.magnitude));
 				this.matrix = this.matrix.scale(this.scale);
 
 				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
