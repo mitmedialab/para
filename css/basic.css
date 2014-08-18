@@ -93,7 +93,7 @@ background-color:#D9E8F5;
 }
 
 #prop-menu{
-min-height:700px;
+min-height:800px;
 padding:30px;
 padding-top:15px;
 }
@@ -103,7 +103,7 @@ min-height: 200px;
 }
 
 #canvas-container{
- min-height: 700px;
+ min-height: 800px;
  line-height: 0;
 
 }
@@ -155,7 +155,7 @@ min-height: 200px;
 }
 
 #canvas{
-	min-height:695px;
+	min-height:795px;
 	width: 875px; /* this is bad, fix it */
 }
 
