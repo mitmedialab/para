@@ -315,9 +315,10 @@ define([
 
     canvasMouseWheel: function(event, pan, modify) {
             //console.log(  event.originalEvent.wheelDelta);
-
+   var delta = event.originalEvent.wheelDelta; //paper.view.center
+   console.log(delta);
       if (pan) {
-        var delta = event.originalEvent.wheelDelta; //paper.view.center
+     
         var mousePos = new paper.Point(event.offsetX, event.offsetY);
 
         var viewPosition = paper.view.viewToProject(mousePos);
@@ -329,12 +330,15 @@ define([
       }
       else if(modify){
          event.preventDefault();
+       // if(delta>3|| delta<-3){
+        
         var update = 1;
         if( event.originalEvent.wheelDelta<0){
           update = -1;
         }
         this.updateCopyNum(update);
-      }
+      //}
+    }
 
 
 

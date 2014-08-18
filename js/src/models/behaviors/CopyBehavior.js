@@ -67,8 +67,12 @@ define([
             instance.selected = false;
           }
         } else if (numInstances > this.copyNum) {
-         
-          for (var k = numInstances-1; k > this.copyNum-1; k--) {
+          var start= numInstances-2;
+          if(!this.containsBehaviorType('distribution')){
+            start = numInstances-1;
+          }
+          
+          for (var k = start; k > this.copyNum-1; k--) {
             //var removeIndex = this.instances.length > 2 ? this.instances.length - 3 : this.instances.length - 2;
             ////console.log('remove index = '+removeIndex);
            
