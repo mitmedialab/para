@@ -97,7 +97,8 @@ define([
 
       behaviorNode.update([{}]);
       this.event_bus.trigger('rootRender');
-      this.event_bus.trigger('moveDownNode', nodes[0].instance_literals[1]);
+      this.event_bus.trigger('moveDownNode', nodes[0].instance_literals[0]);
+
 
 
 
@@ -135,6 +136,7 @@ define([
         x: 0,
         y: 0
       };
+
       var followPathBehavior;
       var start = 1;
       if (data) {
@@ -146,6 +148,7 @@ define([
         }
       } else {
         followPathBehavior = new FollowPathBehavior(nodes[0]);
+          nodes[0].scaffold = true;
         for (var i = start; i < nodes.length; i++) {
           nodes[i].addBehavior(followPathBehavior, ['update', 'calculate', 'clean']);
           nodes[i].instances[0].delta.x = nodes[0].getLiteral().firstSegment.point.x;

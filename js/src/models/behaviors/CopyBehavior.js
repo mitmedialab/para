@@ -56,7 +56,7 @@ define([
             var instance = this.createInstanceAt(selected, index);
             // //console.log('creating instance'+instance);
             instance.copy = true;
-            instance.rotation.angle =0;
+
             instance.increment({
               delta: {
                 x: 10,
@@ -67,13 +67,15 @@ define([
             instance.selected = false;
           }
         } else if (numInstances > this.copyNum) {
-          for (var k = 0; k < numInstances - this.copyNum; k++) {
-            var removeIndex = this.instances.length > 2 ? this.instances.length - 3 : this.instances.length - 2;
+         
+          for (var k = numInstances-1; k > this.copyNum-1; k--) {
+            //var removeIndex = this.instances.length > 2 ? this.instances.length - 3 : this.instances.length - 2;
             ////console.log('remove index = '+removeIndex);
-            if (removeIndex >= 0) {
+           
+           
 
-              this.removeInstanceAt(removeIndex);
-            }
+              this.removeInstanceAt(k);
+            
             //TODO: what happens when there are only 2 instances left?
           }
         }
@@ -96,7 +98,9 @@ define([
             this.copyNum = 1;
           }
         }
+        console.log(this.copyNum);
       }
+      
     });
 
 

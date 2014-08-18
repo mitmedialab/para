@@ -86,6 +86,18 @@ define([
                 return null;
             },
 
+            descendantOf: function(node){
+                for(var i=0;i<this.children.length;i++){
+                    if (this.children[i]===node || this.children[i].descendantOf(node)){
+                        return true;
+                    } 
+                }
+
+                return false;
+
+
+            },
+
             /*returns heierarchal level in tree*/
             getLevelInTree: function(root,level){
                 if(this==root){

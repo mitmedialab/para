@@ -23,7 +23,7 @@ define([
 				x: 0,
 				y: 0
 			};
-			this.magnitude =1 ;
+			this.magnitude =0 ;
 			this.delta ={
 				x:0,
 				y:0
@@ -40,7 +40,7 @@ define([
 			this.selected= false;
 			this.copy= false;
 			this.strokeColor = null;
-			this.fillColor = null
+			this.fillColor = null;
 			this.strokeWidth = 1;
 			//index of instance that was used to create this instance (for instances created upon render)
 			this.instanceParentIndex = 0;
@@ -91,7 +91,8 @@ define([
 				rotation: this.rotation,
 				strokeWidth: this.strokeWidth,
 				fillColor: this.fillColor,
-				strokeColor: this.strokeColor
+				strokeColor: this.strokeColor,
+				magnitude: this.magnitude
 
 			});
 			return this.toJSON();
@@ -111,6 +112,7 @@ define([
 			this.strokeWidth = data.strokeWidth;
 			this.fillColor = data.fillColor;
 			this.strokeColor = data.strokeColor;
+			this.magnitude = data.magnitude;
 		},
 
 
@@ -127,6 +129,9 @@ define([
 				////console.log(this.position);
 			}
 
+			if(data.magnitude){
+				this.magnitude=data.magnitude;
+			}
 			if(data.delta){
 				////console.log('prior position =');
 				////console.log(this.position);
@@ -276,12 +281,13 @@ define([
 				////console.log(this.position);
 			}
 			else{*/
-			
-				this.matrix = this.matrix.translate(new paper.Point(this.delta.x*this.magnitude,this.delta.y*this.magnitude));
+				var delta = new paper.Point(this.delta.x,this.delta.y);
+				delta.length= delta.length+this.magnitude;
+				this.matrix = this.matrix.translate(delta);
 				this.matrix = this.matrix.scale(this.scale);
 
 				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
-				var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
+				/*var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
 								 this.nodeParent.addScaffold(uLP);
 
 			if(this.nodeParent.type!=='root'){
@@ -295,7 +301,7 @@ define([
 				 this.nodeParent.addScaffold(mP);
 				uLP.transform(this.matrix);
 				mP.transform(this.matrix);
-			}
+			}*/
 				
 			//}
 
@@ -340,6 +346,7 @@ define([
 			newInstance.anchor = this.anchor;
 			newInstance.selected = this.selected;
 			newInstance.visible = true;
+			newInstance.magnitude=this.magnitude;
 			newInstance.nodeParent = this.nodeParent;
 			newInstance.strokeWidth = this.strokeWidth;
 			newInstance.strokeColor = this.strokeColor;

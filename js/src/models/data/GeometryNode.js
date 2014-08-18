@@ -41,7 +41,7 @@ define([
      * upperLeft: default origin of this, used for geometric transforms
      */
     constructor: function() {
-
+      this.scaffold= false;
       this.instances = [];
       this.scaffolds = [];
       this.instance_literals = [];
@@ -72,6 +72,7 @@ define([
         this.createInstance();
       } else {
         var dInstances = data.instances;
+        this.scaffold= data.scaffold;
         for (var i = 0; i < dInstances.length; i++) {
           var instance = this.createInstance();
           instance.parseJSON(dInstances[i]);
@@ -329,6 +330,7 @@ define([
       jdata.instance_literals = lInstances;
       jdata.children = children;
       jdata.behaviors = behaviors;
+      jdata.scaffold=this.scaffold;
       return jdata;
     },
 

@@ -313,7 +313,7 @@ define([
 
     },
 
-    canvasMouseWheel: function(event, pan) {
+    canvasMouseWheel: function(event, pan, modify) {
             //console.log(  event.originalEvent.wheelDelta);
 
       if (pan) {
@@ -327,7 +327,7 @@ define([
         event.preventDefault();
         paper.view.draw();
       }
-      else{
+      else if(modify){
         var update = 1;
         if( event.originalEvent.wheelDelta<0){
           update = -1;

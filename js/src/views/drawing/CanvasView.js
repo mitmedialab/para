@@ -15,6 +15,7 @@ define([
  var saveKey = 83;
  var loadKey = 76;
  var panKey = 91;
+var altKey = false;
  var clearKey = 67;
  var pan = false;
  var last = {x:0,y:0};
@@ -38,6 +39,11 @@ var CanvasView = Backbone.View.extend({
       tool.attach('mouseup',this.toolMouseUp);
       tool.attach('mousemove',this.toolMouseMove);
       this.event_bus = event_bus;
+         _.bindAll(this, "canvasKeydown");
+         _.bindAll(this, "canvasKeyup");
+
+         $(document).bind('keydown', this.canvasKeydown);
+          $(document).bind('keyup', this.canvasKeyup);
    
   },
 
@@ -46,8 +52,8 @@ var CanvasView = Backbone.View.extend({
         'mousedown': 'canvasMouseDown',
         'mouseup' : 'canvasMouseUp',
         'mousemove': 'canvasMouseMove',
-        'keydown': 'canvasKeydown',
-        'keyup': 'canvasKeyup',
+        //'keydown': 'canvasKeydown',
+        //'keyup': 'canvasKeyup',
          'mouseenter': 'enter',
         'mouseleave': 'leave',
         'mousewheel': 'canvasMousewheel',
@@ -100,9 +106,12 @@ var CanvasView = Backbone.View.extend({
       if(event.keyCode === clearKey){
         this.model.deleteObject();
       }
-      if(event.keyCode=== panKey){
+      if(event.metaKey){
         ////console.log("setting pan to true")
         pan = true;
+      }
+      if(event.altKey){
+        altKey=true;
       }
 
     },
@@ -110,9 +119,11 @@ var CanvasView = Backbone.View.extend({
     canvasKeyup: function(event){
       //console.log(event.keyCode);
     
-      if(event.keyCode=== panKey){
+      
         pan = false;
-      }
+      
+        altKey=false;
+      
 
     },
 
@@ -164,7 +175,7 @@ var CanvasView = Backbone.View.extend({
 
     canvasMousewheel: function(event){
       ////console.log(event.originalEvent.deltaY);
-      this.model.canvasMouseWheel(event,pan);
+      this.model.canvasMouseWheel(event,pan,altKey);
 
     },
 

@@ -135,6 +135,11 @@ define([
         
       
         var angle = normal.angle;
+        console.log("normal");
+        console.log(normal.angle)
+        console.log(normal.quadrant);
+       var  magnitude=100;
+       
       /* console.log('placement point for:'+index);
         console.log(normal);
         console.log(angle);
@@ -145,8 +150,7 @@ define([
           y: start.y
         };
         instance.update({
-          delta: difference,
-          magnitude:5
+          delta: difference
         });
        
          instance.update({

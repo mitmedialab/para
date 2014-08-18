@@ -42,12 +42,12 @@ define([
         GeometryNode.prototype.initialize.apply(this, arguments);
       }
 
-      
+
       var fillBehavior = new FillBehavior();
       this.addBehavior(fillBehavior, ['update']);
-       var copyBehavior = new CopyBehavior();
-      this.addBehavior(copyBehavior,['update'],'last');
-      this.setCopyNum(1); 
+      var copyBehavior = new CopyBehavior();
+      this.addBehavior(copyBehavior, ['update'], 'last');
+      this.setCopyNum(1);
 
     },
 
@@ -106,6 +106,8 @@ define([
 
       this.masterPath = path;
       this.masterPath.visible = false;
+      this.masterPath.strokeColor = null;
+      this.masterPath.fillColor = null;
 
       path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
@@ -115,12 +117,11 @@ define([
 
     },
 
-    bringToFront: function(){
-          for (var i=0;i<this.instance_literals.length;i++){
-            this.instance_literals[i].bringToFront();
-          }
-        },
-
+    bringToFront: function() {
+      for (var i = 0; i < this.instance_literals.length; i++) {
+        this.instance_literals[i].bringToFront();
+      }
+    },
 
 
 
@@ -174,8 +175,8 @@ define([
         }
       }
 
-      var topLeftOld = this.masterPath.bounds.topLeft;
-      var topLeftNew = newPath.bounds.topLeft;
+      var topLeftOld = this.masterPath.bounds.center;
+      var topLeftNew = newPath.bounds.center;
       //calcualte differences between old and new positions
       var diff = TrigFunc.subtract({
         x: topLeftNew.x,
@@ -202,7 +203,9 @@ define([
       //swap out old master for new
       this.masterPath.remove();
       this.masterPath = newPath;
-      newPath.visible = false;
+      this.masterPath.visible = false;
+      this.masterPath.strokeColor = null;
+      this.masterPath.fillColor = null;
 
 
     },
@@ -230,6 +233,7 @@ define([
             instance_literal.data.renderSignature.push(k);
             var nInstance = this.instances[k];
             nInstance.render(data[d]);
+
             instance_literal = instance_literal.transform(nInstance.matrix);
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
@@ -239,18 +243,19 @@ define([
               instance_literal.strokeWidth = 1;
             }
 
-            if(!data[d].fillColor){
-               instance_literal.fillColor= nInstance.fillColor;
+            if (!data[d].fillColor) {
+              instance_literal.fillColor = nInstance.fillColor;
+            } else {
+              instance_literal.fillColor = data[d].fillColor;
             }
-            else{
-              instance_literal.fillColor= data[d].fillColor;
+            if (!data[d].strokeColor) {
+              instance_literal.strokeColor = nInstance.strokeColor;
+            } else {
+              instance_literal.strokeColor = data[d].strokeColor;
             }
-            if(!data[d].strokeColor){
-               instance_literal.strokeColor= nInstance.strokeColor;
-            }
-            else{
-              instance_literal.strokeColor= data[d].strokeColor;
-            }
+
+            instance_literal.visible = this.instances[k].visible;
+
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
               if (instance_literal.selected) {
@@ -269,13 +274,26 @@ define([
                 }
               }
             } else {
+              if(this.scaffold){
+                instance_literal.visible=false;
+              }
+              var descendant = currentNode.descendantOf(this);
+              if(!descendant){
+                if(instance_literal.fillColor){
+                 instance_literal.fillColor.lightness=0.75;
+               }
+               if(instance_literal.strokeColor){
+                 instance_literal.strokeColor.lightness=0.75;
+               }
+              }
+
+              
               instance_literal.selected = data[d].selected;
               if (data[d].anchor) {
-                if (d===0){ 
+                if (d === 0) {
                   instance_literal.strokeColor = '#83E779';
-                }
-                else{
-                   instance_literal.strokeColor = '#FF0000';
+                } else {
+                  instance_literal.strokeColor = '#FF0000';
 
                 }
                 if (instance_literal.strokeWidth < 3) {
@@ -283,9 +301,8 @@ define([
                 }
               }
             }
-
-
-            instance_literal.visible = this.instances[k].visible;
+         
+            
 
 
             this.instance_literals.push(instance_literal);
