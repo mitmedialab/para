@@ -39,6 +39,7 @@ var CanvasView = Backbone.View.extend({
       tool.attach('mouseup',this.toolMouseUp);
       tool.attach('mousemove',this.toolMouseMove);
       this.event_bus = event_bus;
+      //TODO: this is a hacky way to to detect key events
          _.bindAll(this, "canvasKeydown");
          _.bindAll(this, "canvasKeyup");
 
@@ -123,6 +124,8 @@ var CanvasView = Backbone.View.extend({
         pan = false;
       
         altKey=false;
+
+     
       
 
     },
@@ -174,7 +177,7 @@ var CanvasView = Backbone.View.extend({
     },
 
     canvasMousewheel: function(event){
-      ////console.log(event.originalEvent.deltaY);
+     
       this.model.canvasMouseWheel(event,pan,altKey);
 
     },

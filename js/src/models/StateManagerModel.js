@@ -328,6 +328,7 @@ define([
         paper.view.draw();
       }
       else if(modify){
+         event.preventDefault();
         var update = 1;
         if( event.originalEvent.wheelDelta<0){
           update = -1;
