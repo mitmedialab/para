@@ -12,22 +12,25 @@ define([
   'models/tools/PenToolModel',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
+  'models/tools/RotateToolModel',
   'models/behaviors/BehaviorManagerModel',
 
   'models/PaperManager',
 
 
-  'filesaver'
+  'filesaver',
+'models/datatype/Condition',
+'models/datatype/Generator',
+'models/datatype/Action'],
 
-
-
-], function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, BehaviorManagerModel, PaperManager, FileSaver) {
+ function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, BehaviorManagerModel, PaperManager, FileSaver, Condition,Generator,Action) {
   var rootNode,
     currentNode,
     toolCollection,
     penTool,
     polyTool,
     selectTool,
+    rotateTool,
     paper,
     mousePos;
 
@@ -54,11 +57,14 @@ define([
       polyTool = new PolyToolModel({
         id: 'polyTool'
       });
+      rotateTool = new RotateToolModel({
+        id: 'rotateTool'
+      });
       this.modified = false;
 
       this.event_bus = event_bus;
 
-      toolCollection = new ToolCollection([penTool, selectTool, polyTool]);
+      toolCollection = new ToolCollection([penTool, selectTool, polyTool, rotateTool]);
       this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
       this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
       this.listenTo(toolCollection, 'setSelection', this.setSelection);
@@ -70,6 +76,7 @@ define([
       this.listenTo(toolCollection, 'optionClick', this.openMenu);
       this.listenTo(toolCollection, 'rootRender', this.rootRender);
       this.listenTo(toolCollection, 'rootUpdate', this.rootUpdate);
+       this.listenTo(toolCollection, 'getSelection', this.getSelection);
 
 
       this.listenTo(toolCollection, 'currentRender', this.currentRender);
@@ -88,6 +95,28 @@ define([
       currentNode = rootNode;
       this.rootRender();
      localStorage.clear();
+
+     //test code for generators
+
+     var condition = new Condition();
+     var action = new Action()
+     var generator = new Generator(action,condition);
+
+     /*console.log(generator.tick());
+     console.log(generator.tick());
+     console.log(generator.tick());
+     console.log(generator.tick());
+     console.log(generator.tick());
+     console.log(generator.tick());
+     console.log(generator.tick());
+     console.log(generator.tick());
+    console.log(generator.tick());
+
+     console.log(generator.tick());
+
+     console.log(generator.tick());*/
+
+
 
     },
 
@@ -154,6 +183,12 @@ define([
         currentNode.selectByValue(index, value, path, currentNode);
 
       }
+
+    },
+
+    getSelection: function() {
+
+      toolCollection.get(this.get('state')).selectedNodes = selectTool.selectedNodes;
 
     },
 

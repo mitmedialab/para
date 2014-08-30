@@ -25,7 +25,6 @@ define([
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {}),
 
     initialize: function() {
-      paper = PaperManager.getPaperInstance();
       this.selectedNodes = [];
       this.currentPaths = [];
       this.segmentMod = false;

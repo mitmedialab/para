@@ -23,7 +23,8 @@ define([
      events: {
     'click #selectTool': 'selectToolClick',
     'click #penTool': 'penToolClick',
-    'click #polyTool': 'polyToolClick'
+    'click #polyTool': 'polyToolClick',
+    'click #rotateTool': 'rotateToolClick'
   	},
 
   	 selectToolClick: function(){
@@ -50,6 +51,14 @@ define([
       this.model.setState('polyTool');
 
   	},
+
+    rotateToolClick: function(){
+      this.clearActive();
+      $('#rotateTool').addClass('active');
+      lastSelected = $('#rotateTool');
+      this.model.setState('rotateTool');
+
+    },
 
   	clearActive: function(){
   		if(lastSelected){
