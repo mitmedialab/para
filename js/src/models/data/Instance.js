@@ -305,10 +305,7 @@ define([
 				
 			//}
 
-			if(data.scale){
-				this.scale*=data.scale;
 			
-			}
 			
 			if(data.selected){
 				this.selected = data.selected;

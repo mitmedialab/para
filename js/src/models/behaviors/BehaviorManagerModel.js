@@ -10,9 +10,11 @@ define([
   'models/behaviors/CopyBehavior',
   'models/behaviors/DistributeBehavior',
   'models/behaviors/RadialDistributeBehavior',
-  'models/behaviors/FollowPathBehavior'
+  'models/behaviors/FollowPathBehavior',
+    'models/behaviors/GaussianBehavior'
 
-], function($, _, Backbone, TrigFunc, GeometryNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior) {
+
+], function($, _, Backbone, TrigFunc, GeometryNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior, GaussianBehavior) {
   var nameVal = 0;
   var BehaviorManagerModel = Backbone.Model.extend({
 
@@ -72,7 +74,19 @@ define([
         }
         this.addLinearBehavior(nodes, data);
 
-      } else if (name == 'radial') {
+      }else if (name == 'gaussian') {
+        if (!data) {
+          if (!nodes[0].copyNum) {
+            this.addCopyBehavior(nodes, 10);
+          } else {
+            this.addCopyBehavior(nodes);
+          }
+        }
+        this.addGaussianBehavior(nodes, data);
+
+      }  
+
+      else if (name == 'radial') {
         //console.log("adding radial behavior");
         if (!data) {
           if (!nodes[0].copyNum) {
@@ -195,6 +209,26 @@ define([
       }
     },
 
+
+ addGaussianBehavior: function(nodes, data) {
+      var gaussianBehavior = new GaussianBehavior();
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        var containsDist = node.containsBehaviorType('distribution');
+        var containsLin = node.containsBehaviorName('gaussian');
+        if (containsDist && !containsLin) {
+          var toRemove = node.getBehaviorByType('distribution');
+          for (var j = 0; j < toRemove.length; j++) {
+            //console.log('removing behavior at:'+i+','+toRemove[j].behavior.name);
+
+            node.removeBehavior(toRemove[j].behavior.name);
+          }
+        }
+
+        node.addBehavior(gaussianBehavior, ['update', 'calculate', 'clean']);
+
+      }
+    },
 
 
   });

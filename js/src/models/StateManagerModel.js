@@ -47,8 +47,8 @@ define([
     initialize: function(event_bus) {
       ////console.log(new FileSaver());
       paper = PaperManager.getPaperInstance();
-      var background = new paper.Path();
-      background.importSVG('https://dl.dropboxusercontent.com/u/3699559/bg1.svg');
+      //var background = new paper.Path();
+    //  background.importSVG('https://dl.dropboxusercontent.com/u/3699559/bg1.svg');
       penTool = new PenToolModel({
         id: 'penTool'
       });

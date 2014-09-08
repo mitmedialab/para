@@ -23,6 +23,10 @@ define([
 			return false;
 		};
 
+		TrigFunc.map = function(value, istart, istop, ostart, ostop) {
+	    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+	  }
+
 		TrigFunc.cartToPolar = function(p1, p2) {
 
 			var r = 0;

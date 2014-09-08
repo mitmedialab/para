@@ -9,15 +9,16 @@ define([
   function(BaseBehavior, PaperManager, TrigFunc) {
     var paper = PaperManager.getPaperInstance();
     var GaussianBehavior = BaseBehavior.extend({
-      name: 'linear',
+      name: 'gaussian',
       type: 'distribution',
 
-      initialize: function() {
+      constructor: function() {
         this.pointA = null;
         this.pointB = null;
         this.xDiff = 0;
         this.yDiff = 0;
         this.points = [];
+        console.log('gaussian init');
       },
 
 
@@ -26,7 +27,7 @@ define([
 
   
         var num = this.instances.length;
-        for(var i=0;i<num-2;i++){
+        for(var i=0;i<num;i++){
           this.points.push(this.getGaussianPoints());
         }
 
@@ -62,11 +63,25 @@ define([
       calculate: function(data, index) {
         var px = this.x + ((this.width*0.5) * this.points[index][3]);
         var py = this.y + ((this.height*0.5) * this.points[index][2]);
+         var dist = TrigFunc.distance(this.pointA, {
+          x: px,
+          y: py
+        });
+         var angle = TrigFunc.cartToPolar(this.pointA, {
+          x: px,
+          y: py
+        });
+         console.log('angle=',angle);
+        var scale = TrigFunc.map(dist,0,this.width,1,0.25);
         if (index === 0 || index === this.instances.length - 1) {
           this.instances[index].anchor = true;
+          if(index==this.instances.length - 1){
+            this.instances[index].scale= scale; 
+          }
         } else {
           this.instances[index].anchor = false;
-       
+        this.instances[index].scale= scale;
+       this.instances[index].rotation.angle= angle.theta;
         this.instances[index].update({
           delta: {
             x: px,
