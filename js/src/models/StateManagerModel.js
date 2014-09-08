@@ -47,6 +47,8 @@ define([
     initialize: function(event_bus) {
       ////console.log(new FileSaver());
       paper = PaperManager.getPaperInstance();
+      var background = new paper.Path();
+      background.importSVG('https://dl.dropboxusercontent.com/u/3699559/bg1.svg');
       penTool = new PenToolModel({
         id: 'penTool'
       });
@@ -540,25 +542,31 @@ define([
     },
 
     updateColor: function(color, type) {
-      //console.log('update color');
-      if (selectTool.selectedNodes.length > 0) {
+      console.log('color=',color);
+       var selectedTool = toolCollection.get(this.get('state'));
+
 
         var update;
         if (type == 'stroke') {
           update = [{
-            strokeColor: color
+            strokeColor: '#'+color
           }];
+          selectedTool.strokeColor = '#'+color;
+          console.log("set stroke color to:",color);
+
         } else {
           update = [{
-            fillColor: color
+            fillColor: '#'+color
           }];
-
+          selectedTool.fillColor = '#'+color;
+          console.log("set fill color to",color);
         }
+      
         for (var i = 0; i < selectTool.selectedNodes.length; i++) {
 
           selectTool.selectedNodes[i].updateSelected(update);
         }
-      }
+      
       currentNode.update([{}]);
       this.rootRender();
       paper.view.draw();

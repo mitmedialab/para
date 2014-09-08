@@ -61,7 +61,10 @@ define([
           this.currentPath =  new paper.Path.RegularPolygon(event.point,sideNum,1);
     
          this.currentPath.selected = true;
-         this.currentPath.strokeColor = 'black';
+          this.currentPath.fillColor = this.fillColor;
+          this.currentPath.strokeColor = this.strokeColor;
+
+
         }
       },
 

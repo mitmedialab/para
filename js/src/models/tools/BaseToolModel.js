@@ -13,9 +13,12 @@ define([
   	},
   currentPath: null,
   currentNode: null,
+ 
 
   	constructor: function(){
   		Backbone.Model.apply(this, arguments);
+      this.fillColor =  '#f1a54d';
+      this.strokeColor= '#c6e8ed';
   	},
 
   	reset: function(){

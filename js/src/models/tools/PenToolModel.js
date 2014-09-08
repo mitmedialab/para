@@ -95,8 +95,9 @@ define([
          var paper = PaperManager.getPaperInstance();
           this.currentPath =  new paper.Path();
     
-         this.currentPath .selected = true;
-         this.currentPath .strokeColor = 'black';
+         this.currentPath.selected = true;
+         this.currentPath.strokeColor = this.strokeColor;
+
          
          
 
@@ -110,7 +111,7 @@ define([
             type = result.type;
             if (this.currentPath.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
               mode = 'close';
-
+              this.currentPath.fillColor = this.fillColor;
               this.currentPath.closed = true;
               this.reset();
             }

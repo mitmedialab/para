@@ -264,9 +264,9 @@ define([
 
               if (this.instances[k].anchor) {
                 if (k === 0) {
-                  instance_literal.strokeColor = '#83E779';
+                  instance_literal.strokeColor = '#16a2a6';
                 } else {
-                  instance_literal.strokeColor = '#FF0000';
+                  instance_literal.strokeColor = '#f2682a';
 
                 }
                 if (instance_literal.strokeWidth < 3) {

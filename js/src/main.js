@@ -14,7 +14,9 @@ require.config({
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "justmath": "../../bower_components/JustMath.js/JustMath",
         "sylvester": "../../bower_components/sylvester/sylvester",
-        "minicolors":"../../bower_components/jquery-minicolors/jquery.minicolors",
+        "minicolors": "../../bower_components/jquery-minicolors/jquery.minicolors",
+        "tinycolor": "../../bower_components/tinycolor/tinycolor",
+        "pickacolor": "../../bower_components/pick-a-color/build/1.2.3/js/pick-a-color-1.2.3.min", 
         "filesaver": "../../bower_components/FileSaver/FileSaver",
         "slider": "../../bower_components/bootstrap-slider/bootstrap-slider"
     },
@@ -44,13 +46,24 @@ require.config({
         sylvester:{
           exports:'Sylvester'
         },
-       
+       'minicolors': {     //<-- cookie depends on Jquery and exports nothing
+        deps: ['jquery']
+        },
+        'tinycolor':{
+          deps: ['jquery'],
+          exports: 'Tinycolor'
+        },
+         'pickacolor': {     
+        deps: ['tinycolor'],
+        exports: 'Pickacolor'
+        },
         filesaver:{
           exports:'filesaver'
         },
-        'minicolors': {     //<-- cookie depends on Jquery and exports nothing
-        deps: ['jquery']
-        },
+       
+        
+        
+        
          'slider': {     //<-- cookie depends on Jquery and exports nothing
         deps: ['jquery']
         }

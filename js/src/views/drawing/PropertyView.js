@@ -7,11 +7,13 @@ define([
   'underscore',
   'backbone',
   'handlebars',
+  'tinycolor',
+   'pickacolor',
   'minicolors',
   'slider'  
  
 
-], function($, _, Backbone,Handlebars){
+], function($, _, Backbone,Handlebars, Tinycolor, Pickacolor) {
 
 
   var PropertyView = Backbone.View.extend({
@@ -25,14 +27,23 @@ define([
          this.listenTo(this.model,'pathSelected',this.pathSelected);
         this.listenTo(this.model,'selectionReset',this.selectionReset);
          this.currentPaths = [];
-
+         console.log(Tinycolor)
+         console.log(Pickacolor);
 
 $('#strokeSlider').slider();
 $('#strokeSlider').on('slide', function(slideEvt) {
   $('#strokeSlider').trigger('stroke-change');
 });
  
-$('.demo').each( function() {   
+$('.demo').each( function() {  
+ $(this).pickAColor({
+  showSpectrum:false,
+  showAdvanced:false,
+  showSavedColors: false,
+ });
+});
+
+/*$('.demo').each( function() {   
  $(this).minicolors({
   control: $(this).attr('data-control') || 'hue',
   defaultValue: $(this).attr('data-defaultValue') || '',
@@ -47,12 +58,11 @@ $('.demo').each( function() {
   },
   theme: 'bootstrap'
 });
-});
+});*/
   },
 
   events: {
-    'change #obj-name': 'nameChange',
-    'color-change': 'colorChange',
+    'change': 'colorChange',
     'stroke-change': 'strokeChange',
     'change #text-filename': 'nameChange',
     'click #save': 'save',
@@ -75,7 +85,8 @@ $('.demo').each( function() {
     },
 
     colorChange: function(event){
-      this.model.updateColor(event.target.value,event.target.id);
+      console.log("color change");
+      this.model.updateColor($(event.target).val(),event.target.id);
     
     },
     
@@ -167,11 +178,7 @@ $('.demo').each( function() {
        this.model.loadFile(file);
 
     },
-    nameChange: function(){
-      ////console.log("updating name to:"+ $('#obj-name').val());
-      //console.log($('#text-filename').val());
-      //this.model.updateSelected({name:$('#obj-name').val()});
-    },
+   
     disableSave: function(disable){
       $('#save').attr('disabled', disable);
         $('#saveFile').attr('disabled', false);
@@ -184,10 +191,10 @@ $('.demo').each( function() {
              var width = this.currentPaths[0].strokeWidth;
 
       if(fill){
-       $('#fill').minicolors('value',fill.toCSS(true));
+       $('#fill').val(fill.toCSS(true).substr(1));
      }
       if(stroke){
-          $('#stroke').minicolors('value',stroke.toCSS(true));
+          $('#stroke').val(stroke.toCSS(true).substr(1));
         }
         if(width){
           //console.log("setting slider");
