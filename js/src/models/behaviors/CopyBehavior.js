@@ -57,12 +57,12 @@ define([
             // //console.log('creating instance'+instance);
             instance.copy = true;
 
-            instance.increment({
+            /*instance.increment({
               delta: {
                 x: 10,
                 y: 10
               }
-            });
+            });*/
             instance.anchor = false;
             instance.selected = false;
           }

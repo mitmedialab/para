@@ -576,6 +576,8 @@ define([
     //selects according render signature
     selectByValue: function(index, value, path, currentNode) {
       var sIndexes = [];
+      console.log('index',index,'value',value,'currentNode',currentNode==this);
+
       for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].containsPath(path)) {
           var results = this.children[i].selectByValue(index, value, path, currentNode);
@@ -585,6 +587,7 @@ define([
               if (results[j].length > 0) {
                 var last = results[j].length - 1;
                 this.instances[results[j][last]].selected = true;
+
 
                 results[j].pop();
                 if (results[j].length > 0) {

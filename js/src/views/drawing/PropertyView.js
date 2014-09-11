@@ -27,8 +27,7 @@ define([
          this.listenTo(this.model,'pathSelected',this.pathSelected);
         this.listenTo(this.model,'selectionReset',this.selectionReset);
          this.currentPaths = [];
-         console.log(Tinycolor)
-         console.log(Pickacolor);
+        
 
 $('#strokeSlider').slider();
 $('#strokeSlider').on('slide', function(slideEvt) {

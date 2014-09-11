@@ -206,8 +206,6 @@ define([
       this.masterPath.visible = false;
       this.masterPath.strokeColor = null;
       this.masterPath.fillColor = null;
-
-
     },
 
 
@@ -217,9 +215,9 @@ define([
      * copies the render signature from the data and concats it with the
      *index of the instance used to render the path
      */
-    render: function(data, currentNode) {
+    render: function(data, currentNode, clutch) {
       var path_literal = this.getLiteral();
-      // console.log("render: "+this.type);
+
       if (data) {
         for (var k = 0; k < this.instances.length; k++) {
 
@@ -258,10 +256,6 @@ define([
 
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
-              if (instance_literal.selected) {
-                instance_literal.fullySelected = true;
-              }
-
               if (this.instances[k].anchor) {
                 if (k === 0) {
                   instance_literal.strokeColor = '#16a2a6';
@@ -274,26 +268,30 @@ define([
                 }
               }
             } else {
-              if(this.scaffold){
-                instance_literal.visible=false;
+              if (this.scaffold) {
+                instance_literal.visible = false;
               }
               var descendant = currentNode.descendantOf(this);
-              if(!descendant){
-                if(instance_literal.fillColor){
-                 instance_literal.fillColor.lightness=0.75;
-               }
-               if(instance_literal.strokeColor){
-                 instance_literal.strokeColor.lightness=0.75;
-               }
+              if (!descendant) {
+                if (instance_literal.fillColor) {
+                  instance_literal.fillColor.brightness =  instance_literal.fillColor.brightness+=0.5
+                  instance_literal.fillColor.saturation =  instance_literal.fillColor.saturation-=0.5
+
+                }
+                if (instance_literal.strokeColor) {
+                  instance_literal.strokeColor.brightness =  instance_literal.strokeColor.brightness+=0.5
+                  instance_literal.strokeColor.saturation =  instance_literal.strokeColor.saturation-=0.5
+
+                }
               }
 
-              
+
               instance_literal.selected = data[d].selected;
               if (data[d].anchor) {
                 if (d === 0) {
-                  instance_literal.strokeColor = '#83E779';
+                  instance_literal.strokeColor = '#16a2a6';
                 } else {
-                  instance_literal.strokeColor = '#FF0000';
+                  instance_literal.strokeColor = '#f2682a';
 
                 }
                 if (instance_literal.strokeWidth < 3) {
@@ -301,11 +299,16 @@ define([
                 }
               }
             }
-         
-            
+
 
 
             this.instance_literals.push(instance_literal);
+            console.log("length:",this.instance_literals.length);
+            console.log("user selected =",nInstance.userSelected);
+            if(this.instance_literals.length-1=== nInstance.userSelected){
+              instance_literal.fillColor = 'red';
+            }
+
             instance_literal.instanceIndex = this.instance_literals.length - 1;
           }
         }
@@ -350,10 +353,28 @@ define([
      */
     selectByValue: function(index, value, path, currentNode) {
       var sIndexes = [];
+      var literalParent = null;
+      var exception = -1;
+
+      console.log('index',index,'value',value,'currentNode',currentNode==this);
 
       if (this.containsPath(path)) {
 
         for (var i = 0; i < this.instance_literals.length; i++) {
+          var literalParent = this.instance_literals[i].instanceParentIndex;
+
+          if (this.instance_literals[i] === path) {
+              
+              this.instances[literalParent].userSelected = i;
+              exception = literalParent;
+              //console.log("found matching path at ", i, "parentIndex=", literalParent);
+            }
+
+            else if(literalParent!=exception){
+              //console.log("removed matching path path ", i, "parentIndex=", literalParent);
+              this.instances[literalParent].userSelected = null;
+            }
+
           var compareSig = this.instance_literals[i].data.renderSignature.slice(0, index + 1);
           compareSig = compareSig.join();
           if (compareSig === value) {
