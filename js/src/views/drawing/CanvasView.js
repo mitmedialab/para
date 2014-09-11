@@ -45,6 +45,7 @@ var CanvasView = Backbone.View.extend({
 
          $(document).bind('keydown', this.canvasKeydown);
           $(document).bind('keyup', this.canvasKeyup);
+          $(window).bind('focus',this.setFocus);
    
   },
 
@@ -68,7 +69,13 @@ var CanvasView = Backbone.View.extend({
     
  
     },
+    setFocus: function(){
+        pan = false;
+        panKey = false;
+        altKey = false;
+        
 
+    },
 
     /* tool mouse event functions */
 

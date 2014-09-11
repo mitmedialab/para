@@ -157,7 +157,7 @@ min-height: 200px;
 #canvas{
 	min-height:795px;
 	width: 875px; /* this is bad, fix it */
-	background-color: #3E7991;
+	background-color: #000;
 }
 
 .navbar-header h2{

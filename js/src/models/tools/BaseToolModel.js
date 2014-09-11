@@ -17,8 +17,8 @@ define([
 
   	constructor: function(){
   		Backbone.Model.apply(this, arguments);
-      this.fillColor =  '#f1a54d';
-      this.strokeColor= '#c6e8ed';
+      this.fillColor =  '#fff';
+      this.strokeColor= '#fff';
   	},
 
   	reset: function(){
