@@ -353,7 +353,7 @@ define([
     canvasMouseWheel: function(event, pan, modify) {
             //console.log(  event.originalEvent.wheelDelta);
    var delta = event.originalEvent.wheelDelta; //paper.view.center
-   console.log(delta);
+   
       if (pan) {
      
         var mousePos = new paper.Point(event.offsetX, event.offsetY);

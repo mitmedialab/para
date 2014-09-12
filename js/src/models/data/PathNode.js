@@ -105,6 +105,7 @@ define([
 
 
       this.masterPath = path;
+      this.masterPath.data.tmatrix = new paper.Matrix();
       this.masterPath.visible = false;
       this.masterPath.strokeColor = null;
       this.masterPath.fillColor = null;
@@ -145,20 +146,31 @@ define([
     clearObjects: function() {
 
       for (var j = 0; j < this.instance_literals.length; j++) {
-        this.instance_literals[j].remove();
-        //console.log('clearing instance literal at:'+j)
+        if(!this.instance_literals[j].reset){
+        var matrix = this.instance_literals[j].data.tmatrix;//this.instances[this.instance_literals[j].instanceParentIndex].matrix;
+        var imatrix = matrix.inverted();
 
+        this.instance_literals[j].transform(imatrix);
+        this.instance_literals[j].reset = true;
       }
-      this.instance_literals = [];
-      GeometryNode.prototype.clearObjects.apply(this, arguments);
+
+        //console.log('cleared pos at ', j,'=',this.instance_literals[j].position);
+        //console.log('clearing instance literal at:'+j)
+      }
+      //this.instance_literals = [];
+            this.clearScaffolds();
+
     },
 
     //called when path points are modified 
     updatePath: function(index, delta, handle) {
-      var newPath = this.masterPath.clone();
+      this.clearObjects();
+      var topLeftOld = this.masterPath.bounds.center.clone();
+      var newPath = this.masterPath;
 
       //update the path
-      var selSegment = newPath.segments[index];
+      for(var j=0;j<this.instance_literals.length;j++){
+      var selSegment = this.instance_literals[j].segments[index];
       if (handle === null) {
 
         selSegment.point = selSegment.point.add(delta);
@@ -174,8 +186,9 @@ define([
 
         }
       }
+    }
 
-      var topLeftOld = this.masterPath.bounds.center;
+      
       var topLeftNew = newPath.bounds.center;
       //calcualte differences between old and new positions
       var diff = TrigFunc.subtract({
@@ -201,7 +214,7 @@ define([
       }
 
       //swap out old master for new
-      this.masterPath.remove();
+    
       this.masterPath = newPath;
       this.masterPath.visible = false;
       this.masterPath.strokeColor = null;
@@ -217,14 +230,28 @@ define([
      */
     render: function(data, currentNode, clutch) {
       var path_literal = this.getLiteral();
-
-      if (data) {
+      var revised_literals = [];
+      console.log("\n======rendering path=========");
         for (var k = 0; k < this.instances.length; k++) {
 
           for (var d = 0; d < data.length; d++) {
             this.instances[k].instanceParentIndex = d;
+            var instance_literal;
+            if(this.instance_literals.length>0){
+              console.log("pulling existing instance");
+              instance_literal = this.instance_literals.shift();
+            }
+            else{
+              console.log("making new instance");
+              /*if(revised_literals.length>0){
+                instance_literal = revised_literals[0].clone();
 
-            var instance_literal = path_literal.clone();
+              }
+              else{*/
+                instance_literal = path_literal.clone();
+              //}
+            }
+             console.log("process: total instance literals=",this.instance_literals.length);
             instance_literal.nodeParent = this;
             instance_literal.instanceParentIndex = k;
             instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
@@ -233,6 +260,10 @@ define([
             nInstance.render(data[d]);
 
             instance_literal = instance_literal.transform(nInstance.matrix);
+            instance_literal.reset = false;
+            instance_literal.data.tmatrix= nInstance.matrix.clone();
+            //instance_literal.data.tmatrix.set(nInstance.matrix.a,nInstance.matrix.c,nInstance.matrix.b,nInstance.matrix.d,nInstance.matrix.tx,nInstance.matrix.ty);
+
             if (instance_literal.closed) {
               instance_literal.fillColor = this.instances[k].fillColor;
             }
@@ -274,13 +305,13 @@ define([
               var descendant = currentNode.descendantOf(this);
               if (!descendant) {
                 if (instance_literal.fillColor) {
-                  instance_literal.fillColor.brightness =  instance_literal.fillColor.brightness+=0.5
-                  instance_literal.fillColor.saturation =  instance_literal.fillColor.saturation-=0.5
+                  instance_literal.fillColor.brightness =  instance_literal.fillColor.brightness+=0.5;
+                  instance_literal.fillColor.saturation =  instance_literal.fillColor.saturation-=0.5;
 
                 }
                 if (instance_literal.strokeColor) {
-                  instance_literal.strokeColor.brightness =  instance_literal.strokeColor.brightness+=0.5
-                  instance_literal.strokeColor.saturation =  instance_literal.strokeColor.saturation-=0.5
+                  instance_literal.strokeColor.brightness =  instance_literal.strokeColor.brightness+=0.5;
+                  instance_literal.strokeColor.saturation =  instance_literal.strokeColor.saturation-=0.5;
 
                 }
               }
@@ -302,33 +333,26 @@ define([
 
 
 
-            this.instance_literals.push(instance_literal);
-            console.log("length:",this.instance_literals.length);
+            revised_literals.push(instance_literal);
+            /*console.log("length:",revised_literals.length);
             console.log("user selected =",nInstance.userSelected);
             if(this.instance_literals.length-1=== nInstance.userSelected){
               instance_literal.fillColor = 'red';
-            }
+            }*/
 
-            instance_literal.instanceIndex = this.instance_literals.length - 1;
+            instance_literal.instanceIndex = revised_literals.length - 1;
           }
         }
-      } else {
-        for (var z = 0; z < this.instances.length; z++) {
+       
 
-          var instance_literal = path_literal.clone();
-          instance_literal.nodeParent = this;
-          instance_literal.instanceParentIndex = z;
+      /*while(this.instance_literals.length>0){
+        this.instance_literals.shift();
+      }*/
 
-          var nInstance = this.instances[z];
-          nInstance.render({});
-          instance_literal = instance_literal.transform(nInstance.matrix);
-          instance_literal.visible = this.instances[z].visible;
-          instance_literal.data.renderSignature = [];
-          instance_literal.data.renderSignature.push(z);
-          this.instance_literals.push(instance_literal);
-          instance_literal.instanceIndex = this.instance_literals.length - 1;
-        }
-      }
+      this.instance_literals= revised_literals;
+      console.log("end: total instance literals=",this.instance_literals.length);
+      console.log("======rendering path=========\n");
+      
 
     },
 

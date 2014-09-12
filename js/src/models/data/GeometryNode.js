@@ -480,7 +480,6 @@ define([
 
     clearObjects: function() {
       this.instance_literals = [];
-      this.clearScaffolds();
 
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].clearObjects();
@@ -497,7 +496,7 @@ define([
     render: function(data, currentNode) {
       //first create array of new instances that contain propogated updated data
 
-      ////console.log('render: '+this.type);
+      console.log('render: '+this.type);
       if (data) {
         for (var j = 0; j < this.instances.length; j++) {
           for (var i = 0; i < data.length; i++) {
@@ -659,7 +658,6 @@ define([
         return indexes;
       }
       return false;
-
     },
 
     //returns first behavior that matches name
