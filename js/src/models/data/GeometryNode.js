@@ -478,7 +478,16 @@ define([
     },
 
 
-    clearObjects: function() {
+    resetObjects: function() {
+      this.instance_literals = [];
+
+      for (var i = 0; i < this.children.length; i++) {
+        this.children[i].resetObjects();
+      }
+
+    },
+
+   clearObjects: function() {
       this.instance_literals = [];
 
       for (var i = 0; i < this.children.length; i++) {

@@ -61,7 +61,7 @@ $('.demo').each( function() {
   },
 
   events: {
-    'change': 'colorChange',
+    'color-change': 'colorChange',
     'stroke-change': 'strokeChange',
     'change #text-filename': 'nameChange',
     'click #save': 'save',
@@ -84,12 +84,13 @@ $('.demo').each( function() {
     },
 
     colorChange: function(event){
-      console.log("color change");
+      console.log("colorChange");
       this.model.updateColor($(event.target).val(),event.target.id);
     
     },
     
    strokeChange: function(event){
+      console.log("strokeChange");
       this.model.updateStroke(event.target.value);
     },
 
@@ -184,6 +185,7 @@ $('.demo').each( function() {
     },
 
     pathSelected: function(path){
+      console.log("path selected");
       this.currentPaths.push(path);
       var fill = this.currentPaths[0].fillColor;
        var stroke = this.currentPaths[0].strokeColor;

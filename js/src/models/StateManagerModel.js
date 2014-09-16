@@ -101,7 +101,7 @@ define([
      //test code for generators
 
      var condition = new Condition();
-     var action = new Action()
+     var action = new Action();
      var generator = new Generator(action,condition);
 
      /*console.log(generator.tick());
@@ -197,7 +197,7 @@ define([
     rootRender: function() {
       ////console.log('called root render');
 
-      rootNode.clearObjects();
+      rootNode.resetObjects();
       rootNode.render(null, currentNode);
 
       // var numChildren = paper.project.activeLayer.children.length;
@@ -461,14 +461,27 @@ define([
     },
 
     export: function(filename) {
+      if(rootNode.children.length>0){
+      
+      this.setCurrentNode(rootNode.children[0]);
+      
+        this.listenToOnce(this, 'renderComplete', function() {
 
-      var data = paper.project.exportSVG({
-        asString: true
-      });
-      var blob = new Blob([data], {
-        type: 'image/svg+xml'
-      });
-      var fileSaver = new FileSaver(blob, filename);
+            var data = paper.project.exportSVG({
+              asString: true
+            });
+       
+            var blob = new Blob([data], {
+              type: 'image/svg+xml'
+            });
+            var fileSaver = new FileSaver(blob, filename);
+
+          });
+        this.rootRender();
+
+      }
+      
+
     },
 
     load: function(loadObj) {

@@ -143,7 +143,7 @@ define([
     },
 
     /*clears out all but first of literal paths*/
-    clearObjects: function() {
+    resetObjects: function() {
 
       for (var j = 0; j < this.instance_literals.length; j++) {
         if(!this.instance_literals[j].reset){
@@ -158,9 +158,19 @@ define([
         //console.log('clearing instance literal at:'+j)
       }
       //this.instance_literals = [];
-            this.clearScaffolds();
+      this.clearScaffolds();
 
     },
+
+    clearObjects: function(){
+        for (var j = 0; j < this.instance_literals.length; j++) {
+       this.instance_literals[j].remove();
+      }
+      //this.instance_literals = [];
+      this.clearScaffolds();
+    },
+
+
 
     cloneLiteral: function(literal) {
       var newLiteral;
@@ -180,7 +190,7 @@ define([
     },
     //called when path points are modified 
     updatePath: function(index, delta, handle) {
-      this.clearObjects();
+      this.resetObjects();
       var newPath = this.masterPath;
 
       //update the path
