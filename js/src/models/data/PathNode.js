@@ -162,10 +162,25 @@ define([
 
     },
 
+    cloneLiteral: function(literal) {
+      var newLiteral;
+      if (literal) {
+        newLiteral = literal.clone();
+        console.log("new Literal",newLiteral);
+        var matrix = literal.data.tmatrix.clone();
+        var imatrix = matrix.inverted();
+        newLiteral.transform(imatrix);
+      } else {
+        console.log("copying master")
+        newLiteral = this.getLiteral().clone();
+      }
+      newLiteral.reset = true;
+      return newLiteral;
+
+    },
     //called when path points are modified 
     updatePath: function(index, delta, handle) {
       this.clearObjects();
-      var topLeftOld = this.masterPath.bounds.center.clone();
       var newPath = this.masterPath;
 
       //update the path
@@ -195,8 +210,8 @@ define([
         x: topLeftNew.x,
         y: topLeftNew.y
       }, {
-        x: topLeftOld.x,
-        y: topLeftOld.y
+        x: 0,
+        y: 0
       });
 
       //set position to upper left corner
@@ -231,6 +246,7 @@ define([
     render: function(data, currentNode, clutch) {
       var path_literal = this.getLiteral();
       var revised_literals = [];
+      var lastLiteral = null;
       console.log("\n======rendering path=========");
         for (var k = 0; k < this.instances.length; k++) {
 
@@ -238,20 +254,13 @@ define([
             this.instances[k].instanceParentIndex = d;
             var instance_literal;
             if(this.instance_literals.length>0){
-              console.log("pulling existing instance");
               instance_literal = this.instance_literals.shift();
             }
             else{
-              console.log("making new instance");
-              /*if(revised_literals.length>0){
-                instance_literal = revised_literals[0].clone();
-
-              }
-              else{*/
-                instance_literal = path_literal.clone();
-              //}
+                console.log("last literal=",lastLiteral);
+                instance_literal = this.cloneLiteral(lastLiteral);
+              
             }
-             console.log("process: total instance literals=",this.instance_literals.length);
             instance_literal.nodeParent = this;
             instance_literal.instanceParentIndex = k;
             instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
@@ -334,6 +343,7 @@ define([
 
 
             revised_literals.push(instance_literal);
+            lastLiteral = instance_literal;
             /*console.log("length:",revised_literals.length);
             console.log("user selected =",nInstance.userSelected);
             if(this.instance_literals.length-1=== nInstance.userSelected){
@@ -345,9 +355,9 @@ define([
         }
        
 
-      /*while(this.instance_literals.length>0){
-        this.instance_literals.shift();
-      }*/
+      for(var i=0;i<this.instance_literals.length;i++){
+        this.instance_literals[i].remove();
+      }
 
       this.instance_literals= revised_literals;
       console.log("end: total instance literals=",this.instance_literals.length);
