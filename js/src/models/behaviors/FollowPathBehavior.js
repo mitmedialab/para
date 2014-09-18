@@ -21,7 +21,7 @@ define([
       update: function(data) {
         //console.log('follow path update'+ this.name);
       // console.log('number of target instances for follow path=' + this.instances.length);
-        var zeroedPath = this.pathChild.getLiteral().clone();
+        var zeroedPath = this.pathChild.cloneLiteral(this.pathChild.instance_literals[0]);
 
         zeroedPath.position.x = 0;
         zeroedPath.position.y = 0;
