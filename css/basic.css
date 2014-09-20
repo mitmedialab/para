@@ -1,0 +1,168 @@
+/*stylesheet for first sketch */
+
+html{
+	
+
+}
+
+body{
+	
+background-color: #494949;
+}
+
+.container{
+	width:1200px;
+}
+.clearfix{
+
+}
+
+/*.row {
+  margin-bottom: 0;
+}
+
+.row .row {
+  margin-bottom: 0;
+}*/
+.row{
+	margin-left: 0;
+	margin-right: 0;
+}
+[class*="col-"] {
+  padding-top: 0px;
+  background-color: #eee;
+  background-color: #FFF;
+  border: 1px solid #ddd;
+  border: 1px solid rgba(86,61,124,.2);
+  padding-left: 0;
+  padding-right: 0;
+ 
+}
+#instructions{
+	background-color: #fff;
+	padding: 40px;
+
+}
+
+.navbar{
+	margin:0;
+	margin-left:0px;
+	margin-right:0px;
+	height:48px;
+	background-color: #FFF;
+	border-radius: 0;
+}
+
+.container-fluid{
+	padding-right: 0;
+
+}
+
+#master-container{
+	
+}
+
+span:hover{
+	cursor: default;
+	outline:none;
+    border:none;
+    box-shadow:none;
+}
+span:focus{
+	border:none;
+}
+
+
+#toolbar{
+	float:right;
+	padding: 0;
+}
+
+
+.btn-tool{
+	width:48px;
+	height:48px;
+	padding: 0;
+	border-radius:0;
+}
+
+#group-menu{
+height:30px;
+background-color:#D9E8F5;
+
+}
+
+#prop-menu{
+min-height:800px;
+padding:30px;
+padding-top:15px;
+}
+
+#object-menu{
+min-height: 200px;
+}
+
+#canvas-container{
+ min-height: 800px;
+ line-height: 0;
+
+}
+#canvas-container:focus{
+	outline:none;
+    border:none;
+    box-shadow:none;
+}
+
+#context-menu,  #behavior-types-menu{
+    position: absolute;
+    visibility: hidden;
+    z-index: 2;
+    background-color: #D1D9E0;
+   	min-width:140px;
+   	min-height:60px;
+}
+ #behavior-types-menu{
+ 	z-index:3;
+ }
+
+#context-menu a{
+	cursor: pointer;
+}
+
+#context-menu div.row {
+	padding:6px;
+	min-height: 20px;
+	background-color: #EAF3FA;
+
+}
+
+#context-menu div.row#title-bar {
+	min-height: 30px;
+	background-color: #5CA2B5;
+
+}
+#context-menu #name{
+	
+	color: #FFF;
+	width:100px;
+	float:left;
+}
+
+#context-menu div#close{
+	float:right;
+	font-weight: bolder;
+	width: 30px;
+}
+
+#canvas{
+	min-height:795px;
+	width: 875px; /* this is bad, fix it */
+}
+
+.navbar-header h2{
+	margin: 0;
+	margin-top: 8px;
+}
+
+
+

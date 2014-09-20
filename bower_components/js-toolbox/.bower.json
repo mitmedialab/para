@@ -1,0 +1,13 @@
+{
+  "name": "js-toolbox",
+  "homepage": "https://github.com/jimmydo/js-toolbox",
+  "_release": "3689dfab63",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "3689dfab631893e585fa8f658eafcb8fdcacc644"
+  },
+  "_source": "git://github.com/jimmydo/js-toolbox.git",
+  "_target": "*",
+  "_originalSource": "git://github.com/jimmydo/js-toolbox.git"
+}

@@ -1,0 +1,1885 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"followPath",
+				"followPathBehavior"
+			],
+			[
+				"get",
+				"getLeft"
+			],
+			[
+				"tra",
+				"transform"
+			],
+			[
+				"insta",
+				"instance_literals"
+			],
+			[
+				"to",
+				"toJSON"
+			],
+			[
+				"rotation",
+				"rotationOrigin"
+			],
+			[
+				"node",
+				"nodeParent"
+			],
+			[
+				"co",
+				"concatenate"
+			],
+			[
+				"mid",
+				"midpoint"
+			],
+			[
+				"follow",
+				"FollowPathBehavior"
+			],
+			[
+				"instan",
+				"instanceParentIndex"
+			],
+			[
+				"instanc",
+				"instance_literals"
+			],
+			[
+				"instances",
+				"instances"
+			],
+			[
+				"instance",
+				"instanceParentIndex"
+			],
+			[
+				"inst",
+				"instanceParentIndex"
+			],
+			[
+				"beh",
+				"behaviorNode"
+			],
+			[
+				"method",
+				"methodName"
+			],
+			[
+				"clear",
+				"clearScaffolds"
+			],
+			[
+				"pap",
+				"PaperManager"
+			],
+			[
+				"strok",
+				"strokeColor"
+			],
+			[
+				"key",
+				"keyCode"
+			],
+			[
+				"curre",
+				"currentNode"
+			],
+			[
+				"pare",
+				"instanceParentIndex"
+			],
+			[
+				"event",
+				"event_bus"
+			],
+			[
+				"inter",
+				"intersections"
+			],
+			[
+				"act",
+				"activeLayer"
+			],
+			[
+				"ex",
+				"excludeIndex"
+			],
+			[
+				"remo",
+				"removeInstanceAt"
+			],
+			[
+				"Path",
+				"pathChild"
+			],
+			[
+				"le",
+				"length-1"
+			],
+			[
+				"scaff",
+				"scaffoldLine"
+			],
+			[
+				"Vec",
+				"Vec2"
+			],
+			[
+				"de",
+				"deps"
+			],
+			[
+				"con",
+				"conditional_line"
+			],
+			[
+				"even",
+				"event_bus"
+			],
+			[
+				"tar",
+				"targetVal"
+			],
+			[
+				"num",
+				"numInstances"
+			],
+			[
+				"curren",
+				"currentNode"
+			],
+			[
+				"cop",
+				"copyBehavior"
+			],
+			[
+				"be",
+				"behaviorNode"
+			],
+			[
+				"poi",
+				"pointBC"
+			],
+			[
+				"Poi",
+				"pointAC"
+			],
+			[
+				"sca",
+				"scaffold"
+			],
+			[
+				"a",
+				"anchor"
+			],
+			[
+				"hide",
+				"hideMenu"
+			],
+			[
+				"root",
+				"rootRender"
+			],
+			[
+				"Beh",
+				"behaviorManagerModel"
+			],
+			[
+				"contains",
+				"containsPath"
+			],
+			[
+				"conta",
+				"containsPath"
+			],
+			[
+				"render",
+				"renderSignature"
+			],
+			[
+				"curr",
+				"currentNode"
+			],
+			[
+				"fu",
+				"function"
+			],
+			[
+				"name",
+				"nameVal"
+			],
+			[
+				"symbo",
+				"symbol_literal"
+			],
+			[
+				"current",
+				"currentPathNode"
+			],
+			[
+				"path",
+				"path_literal"
+			],
+			[
+				"canvas",
+				"canvasDblclick"
+			],
+			[
+				"dis",
+				"distributeBehavior"
+			],
+			[
+				"cav",
+				"canvasMousewheel"
+			],
+			[
+				"meth",
+				"methodName"
+			],
+			[
+				"pro",
+				"prototype"
+			],
+			[
+				"intersection",
+				"intersectionFound"
+			],
+			[
+				"interse",
+				"intersectionFound"
+			],
+			[
+				"up",
+				"updateInstances"
+			],
+			[
+				"create",
+				"createInstances"
+			],
+			[
+				"paren",
+				"nodeParent"
+			],
+			[
+				"update",
+				"updateMembers"
+			],
+			[
+				"che",
+				"checkIntersections"
+			],
+			[
+				"currently",
+				"currentlySelected"
+			],
+			[
+				"mousedown",
+				"mousedown"
+			],
+			[
+				"pad",
+				"padding-right"
+			],
+			[
+				"mar",
+				"margin-right"
+			],
+			[
+				"margin",
+				"margin-left"
+			],
+			[
+				"add",
+				"addChildNode"
+			],
+			[
+				"str",
+				"strokeColor"
+			],
+			[
+				"Pa",
+				"PaperManager"
+			],
+			[
+				"Pp",
+				"paper"
+			],
+			[
+				"paper",
+				"PaperMananger"
+			],
+			[
+				"GE",
+				"GeometryNode"
+			],
+			[
+				"di",
+				"display"
+			],
+			[
+				"marg",
+				"margin-bottom"
+			],
+			[
+				"p",
+				"padding"
+			],
+			[
+				"bac",
+				"background-color"
+			],
+			[
+				"margi",
+				"margin-top"
+			],
+			[
+				"ba",
+				"background-color"
+			],
+			[
+				"list",
+				"list-style-type"
+			],
+			[
+				"i",
+				"inline"
+			],
+			[
+				"Geom",
+				"GeometryNode"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "/*Condition.js\n * used to store condition logic\n *\n */\n\ndefine([\n	'underscore',\n	'backbone',\n], function(_, Backbone) {\n\n	var Condition = Backbone.Model.extend({\n\n		 constructor: function() {\n		 	//used to evaluate relationship between propA and propB\n			this.operator = null;\n			//first part of conditional\n			this.propA = null;\n			//second part of conditional\n			this.propB = null;\n			this.target = null;\n		\n			Backbone.Model.apply(this, arguments);\n		 },\n\n		 initialize: function(propA,operator,targetB,propB){\n		 	this.operator = operator;\n			//first part of conditional\n			this.propA = propA;\n			//second part of conditional\n			this.propB = propB;\n			this.target = targetB;\n		\n		 },\n		\n\n		evaluate: function(instance){\n			var instanceVal = eval('instance.'+this.propA);\n			/*if(!this.propB){\n				return instanceVal;\n\n			}*/\n\n		\n				var targetVal;\n				if(this.propB){\n					targetVal = eval('target.'+this.propB);\n				}\n				else{\n					targetVal = this.target;\n				}\n				var result = false;\n				switch (this.operator){\n\n					case '=':\n						result = instanceVal===targetVal;\n					break;\n					case '<':\n						result =instanceVal<targetVal;\n					break;\n					case '<=':\n						result =instanceVal<=targetVal;\n					break;\n					case '>':\n						result =instanceVal>targetVal;\n					break;\n					case '>=':\n						result =instanceVal>=targetVal;\n					break;\n					case '!=':\n						result =instanceVal!=targetVal;\n					break;\n					case 'leftOf':\n						result = targetVal.instanceSide(instance)===1;\n					break;\n					case 'rightOf':\n						result = targetVal.instanceSide(instance)===-1;\n					break;\n					\n					case 'color':\n						console.log(instance);\n						console.log(targetVal.type);\n						var color = targetVal.instances[0].strokeColor;\n						if(color === '#000000'){\n							result = true;\n						}\n						else{\n						var r= this.hexToR(color);\n						var g = this.hexToG(color);\n						if(r>g){\n							result = targetVal.instanceSide(instance)===1;	\n						}\n						else{\n							result = targetVal.instanceSide(instance)===-1;\n\n						}\n					}\n\n				}\n\n				return result;\n			\n\n		},\n\n		hexToR: function (h) {return parseInt((this.cutHex(h)).substring(0,2),16);},\n		hexToG: function (h) {return parseInt((this.cutHex(h)).substring(2,4),16);},\n		hexToB: function (h) {return parseInt((this.cutHex(h)).substring(4,6),16);},\n\n		cutHex:function (h) {return (h.charAt(0)=='#') ? h.substring(1,7):h;}\n	});\n\n	return Condition;\n\n\n\n});",
+			"file": "js/src/models/data/Condition.js",
+			"file_size": 2404,
+			"file_write_time": 1406746672000000,
+			"settings":
+			{
+				"buffer_size": 2410,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/StateManagerModel.js",
+			"settings":
+			{
+				"buffer_size": 9414,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/views/drawing/ToolView.js",
+			"settings":
+			{
+				"buffer_size": 1109,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/tools/BaseToolModel.js",
+			"settings":
+			{
+				"buffer_size": 739,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/tools/PolyToolModel.js",
+			"settings":
+			{
+				"buffer_size": 1135,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/SceneNode.js",
+			"settings":
+			{
+				"buffer_size": 6768,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/router.js",
+			"settings":
+			{
+				"buffer_size": 1809,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/ScaleBehavior.js",
+			"settings":
+			{
+				"buffer_size": 1887,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/tools/PenToolModel.js",
+			"settings":
+			{
+				"buffer_size": 3927,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/scaffold.js",
+			"settings":
+			{
+				"buffer_size": 1424,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/tools/SelectToolModel.js",
+			"settings":
+			{
+				"buffer_size": 4141,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "/*FillBehavior.js\n */\ndefine([\n    'models/behaviors/BaseBehavior',\n    'models/PaperManager',\n    'utils/TrigFunc',\n    'models/behaviors/Scaffold'\n  ],\n\n  function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {\n    var paper = PaperManager.getPaperInstance();\n    var FollowPathBehavior = BaseBehavior.extend({\n\n      constructor: function(pathChild,rotate) {\n       \n\n      },\n\n\n\n\n      update: function(data) {\n        for(var i=0;i<this.children)\n      }\n\n    });\n  });\n",
+			"file": "js/src/models/behaviors/FillBehavior",
+			"file_size": 440,
+			"file_write_time": 1407791930000000,
+			"settings":
+			{
+				"buffer_size": 478,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/GroupNode.js",
+			"settings":
+			{
+				"buffer_size": 434,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/RadialDistributeBehavior.js",
+			"settings":
+			{
+				"buffer_size": 5162,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/BaseBehavior.js",
+			"settings":
+			{
+				"buffer_size": 2779,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/FollowPathBehavior.js",
+			"settings":
+			{
+				"buffer_size": 4068,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/BehaviorManagerModel.js",
+			"settings":
+			{
+				"buffer_size": 5031,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/TrigFunc.js",
+			"settings":
+			{
+				"buffer_size": 2900,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/Instance.js",
+			"settings":
+			{
+				"buffer_size": 7346,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/CopyBehavior.js",
+			"settings":
+			{
+				"buffer_size": 3656,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/views/drawing/PropertyView.js",
+			"settings":
+			{
+				"buffer_size": 1654,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/behaviors/DistributeBehavior.js",
+			"settings":
+			{
+				"buffer_size": 3788,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/BehaviorNode.js",
+			"settings":
+			{
+				"buffer_size": 765,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 35 files for \".clear\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js:\n   17        update: function() {\n   18          // console.log(\"distribution update\");\n   19:         this.clearScaffolds();\n   20          this.setVisible(true);\n   21          this.distribute();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   23        update: function(data) {\n   24          //console.log('follow path update: '+ this.type);\n   25:         this.clearScaffolds();\n   26        \n   27            var zeroedPath = this.pathChild.getLiteral().clone();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/RadialDistributeBehavior.js:\n   20  \n   21        update: function() {\n   22:         this.clearScaffolds();\n   23          this.distribute();\n   24  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/GeometryNode.js:\n  396      clearObjects: function() {\n  397        this.instance_literals = [];\n  398:       this.clearScaffolds();\n  399  \n  400        for (var i = 0; i < this.children.length; i++) {\n  401:         this.children[i].clear();\n  402        }\n  403  \n  ...\n  474      deleteNode: function() {\n  475        for (var i = this.children.length - 1; i > -1; i--) {\n  476:         this.children[i].clearObjects();\n  477          this.children[i].deleteNode();\n  478        }\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js:\n  103        this.instance_literals = [];\n  104        console.log(this.scaffolds.length);\n  105:       GeometryNode.prototype.clearObjects.apply(this, arguments);\n  106        console.log(this.scaffolds.length);\n  107      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/SceneNode.js:\n   39                  for (var i = 0; i < this.children.length; i++) {\n   40                     // console.log('clearning child of ' + this.name + 'at:' + i);\n   41:                     this.children[i].clear();\n   42                      this.children[i] = null;\n   43                  }\n   44  \n   45:                 //this.children.clear();\n   46                  return true;\n   47  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/StateManagerModel.js:\n  170       //console.log('called root render');\n  171      \n  172:       rootNode.clear();\n  173        rootNode.render(null,currentNode);\n  174      },\n  ...\n  182      currentRender: function(){\n  183        //console.log('called current render');\n  184:       currentNode.clear();\n  185        currentNode.render(null,currentNode);\n  186      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js:\n   28  \n   29    	 selectToolClick: function(){\n   30:   		this.clearActive();\n   31    		$('#selectTool').addClass('active');\n   32    		lastSelected = $('#selectTool');\n   ..\n   36  \n   37    	penToolClick: function(){\n   38:   		this.clearActive();\n   39    		$('#penTool').addClass('active');\n   40    		lastSelected = $('#penTool');\n   ..\n   45  \n   46    	polyToolClick: function(){\n   47:   		this.clearActive();\n   48    		$('#polyTool').addClass('active');\n   49    		lastSelected = $('#polyTool');\n\n14 matches across 8 files\n\n\nSearching 35 files for \"clear\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js:\n   17        update: function() {\n   18          // console.log(\"distribution update\");\n   19:         this.clearScaffolds();\n   20          this.setVisible(true);\n   21          this.distribute();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   23        update: function(data) {\n   24          //console.log('follow path update: '+ this.type);\n   25:         this.clearScaffolds();\n   26        \n   27            var zeroedPath = this.pathChild.getLiteral().clone();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/RadialDistributeBehavior.js:\n   20  \n   21        update: function() {\n   22:         this.clearScaffolds();\n   23          this.distribute();\n   24  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/scaffold.js:\n   43  		},\n   44  \n   45: 		clear: function(data){\n   46  			\n   47  			this.instance_literal.remove();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/GeometryNode.js:\n  394  \n  395  \n  396:     clearObjects: function() {\n  397        this.instance_literals = [];\n  398:       this.clearScaffolds();\n  399  \n  400        for (var i = 0; i < this.children.length; i++) {\n  401:         this.children[i].clear();\n  402        }\n  403  \n  ...\n  474      deleteNode: function() {\n  475        for (var i = this.children.length - 1; i > -1; i--) {\n  476:         this.children[i].clearObjects();\n  477          this.children[i].deleteNode();\n  478        }\n  ...\n  610      },\n  611  \n  612:     clearScaffolds: function() {\n  613:       console.log(\"called clear scaffolds for \"+this.type);\n  614        for (var j = 0; j < this.scaffolds.length; j++) {\n  615          this.scaffolds[j].remove();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js:\n   93      },\n   94  \n   95:     /*clears out all but first of literal paths*/\n   96:     clearObjects: function() {\n   97:       console.log(\"called clear for path node\");\n   98  \n   99        for (var j = 0; j < this.instance_literals.length; j++) {\n  ...\n  103        this.instance_literals = [];\n  104        console.log(this.scaffolds.length);\n  105:       GeometryNode.prototype.clearObjects.apply(this, arguments);\n  106        console.log(this.scaffolds.length);\n  107      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/SceneNode.js:\n   32              /*================ SceneNode method defintions ================*/\n   33  \n   34:             //destructor: clears all this.children and sets parent to null\n   35:             clear: function() {\n   36  \n   37:                 //console.log('clear called');\n   38                  this.nodeParent = null;\n   39                  for (var i = 0; i < this.children.length; i++) {\n   40:                    // console.log('clearning child of ' + this.name + 'at:' + i);\n   41:                     this.children[i].clear();\n   42                      this.children[i] = null;\n   43                  }\n   44  \n   45:                 //this.children.clear();\n   46                  return true;\n   47  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/StateManagerModel.js:\n  170       //console.log('called root render');\n  171      \n  172:       rootNode.clear();\n  173        rootNode.render(null,currentNode);\n  174      },\n  ...\n  182      currentRender: function(){\n  183        //console.log('called current render');\n  184:       currentNode.clear();\n  185        currentNode.render(null,currentNode);\n  186      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js:\n   28  \n   29    	 selectToolClick: function(){\n   30:   		this.clearActive();\n   31    		$('#selectTool').addClass('active');\n   32    		lastSelected = $('#selectTool');\n   ..\n   36  \n   37    	penToolClick: function(){\n   38:   		this.clearActive();\n   39    		$('#penTool').addClass('active');\n   40    		lastSelected = $('#penTool');\n   ..\n   45  \n   46    	polyToolClick: function(){\n   47:   		this.clearActive();\n   48    		$('#polyTool').addClass('active');\n   49    		lastSelected = $('#polyTool');\n   ..\n   52    	},\n   53  \n   54:   	clearActive: function(){\n   55    		if(lastSelected){\n   56    			lastSelected.removeClass('active');\n\n26 matches across 9 files\n\n\nSearching 35 files for \"toggleRotat\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   14        constructor: function(pathChild,rotate) {\n   15          this.pathChild = pathChild;\n   16:         this.toggleRotate=rotate; \n   17  \n   18        },\n   ..\n  118  \n  119                  });\n  120:                 if(this.toggleRotate){\n  121                    console.log(\"rotation is active\");\n  122                     instance.update({\n  ...\n  130                  location = location_n;\n  131                }\n  132:                if(this.toggleRotate){\n  133                var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);\n  134                this.instances[0].update({\n\n3 matches in 1 file\n\n\nSearching 35 files for \"checkDistanceIncrement\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior.js:\n   77  		},\n   78  \n   79: 		checkDistanceIncrement: function(start,selected,tDist){\n   80  \n   81            var dist = TrigFunc.distance(start.position,selected.position);\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js:\n   72                /*if (selected) {\n   73                  if (selected.index === 1) {\n   74:                   this.checkDistanceIncrement(child.instances[0], selected.instance, dist, child);\n   75                  } else if (selected.index == child.instances.length - 2) {\n   76                    this.checkDistanceDecrement(child.instances[0], selected.instance, dist, child);\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   92               if (selected) {\n   93                  if (selected.index === 1) {\n   94:                   this.nodeParent.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this.nodeParent);\n   95                  } else if (selected.index == this.instances.length - 2) {\n   96                    this.nodeParent.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this.nodeParent);\n\n3 matches across 3 files\n\n\nSearching 35 files for \".follow\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BehaviorManagerModel.js:\n  128          }\n  129          nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);\n  130:         nodes[0].follow=true;\n  131        }\n  132      }\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   28            zeroedPath.position.x =0+zeroedPath.bounds.width/2;\n   29            zeroedPath.position.y=0+zeroedPath.bounds.height/2;\n   30:           this.followPath(zeroedPath);\n   31           \n   32          \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js:\n  198              instance_literal.visible = this.instances[k].visible;\n  199  \n  200:            /* if (this.nodeParent != currentNode && this.follow) {\n  201                instance_literal.visible=false;\n  202              }*/\n\n3 matches across 3 files\n",
+			"settings":
+			{
+				"buffer_size": 10876,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "js/src/models/data/PathNode.js",
+			"settings":
+			{
+				"buffer_size": 10792,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/GeometryNode.js",
+			"settings":
+			{
+				"buffer_size": 19031,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 287.0,
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"js",
+				"JSHint"
+			],
+			[
+				"j",
+				"JSHint"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 514.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/RootManager.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/CanvasView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/GeometryNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ContextView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/router.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/main.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/utils/Vec2D.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PaperManager.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/BehaviorNode.js",
+		"/Users/jejacobs/Desktop/test2.svg",
+		"/Users/jejacobs/Desktop/test.svg",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/CopyBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/StateManagerModel.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/utils/TrigFunc.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ToolCollection.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/Instance.js",
+		"/Users/jejacobs/Library/Application Support/Sublime Text 2/Packages/JsFormat/JsFormat.sublime-settings",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/ParentBehavior.js",
+		"/Users/jejacobs/Library/Application Support/Sublime Text 2/Packages/JsFormat/Default (OSX).sublime-keymap",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/css/basic.css",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/.gitignore",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/index.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/PropertyView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/DrawingView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/TestNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Utils.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Actions/ParentBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/PathEditing.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Actions/FollowPathAction",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/app.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/BezierTool.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/index2.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ShapeToolModel.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PaperManager",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/canvas.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/PathTool.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/SceneNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PathNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/GeometryNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ShapeToolModel",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ObjectsView",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/.jshintrc",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/README.md",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/DrawingView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/mygenerator.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/snode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/pathsketch.html"
+	],
+	"find":
+	{
+		"height": 74.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
+			"",
+			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"updateOrigin",
+			"console.l",
+			"console.log",
+			";\n",
+			"\n        ",
+			"console.log",
+			"setOrigin",
+			"updateOrigin",
+			"\"",
+			".follow",
+			"follow",
+			"checkDistanceIncrement",
+			"toggleRotat",
+			"c",
+			"clear",
+			".clear",
+			"clearScaffolds",
+			"position",
+			".position",
+			"update",
+			"createInstanceFromPath: function(path)",
+			"createInstanceAt",
+			".update",
+			".matrix",
+			"update",
+			".position",
+			"increment",
+			"console",
+			"this.midpoint",
+			"intersection",
+			"\"",
+			"console.log",
+			"u_data",
+			"\"",
+			"instance_literal",
+			"\"",
+			"path_literal",
+			"instance_literal",
+			"getLiteral",
+			"\"",
+			"= 1",
+			"=1",
+			"containsPath",
+			".selected =",
+			"masterPath",
+			"visible = false",
+			"- 1",
+			"-1",
+			".anchor=true",
+			"/* ",
+			"rotation:",
+			"delta",
+			"updat",
+			"clear",
+			"setSelection",
+			"              this.trigger('rootUpdate');\n",
+			"checkDistanceIncrement",
+			"render",
+			"getLeft",
+			"extendBehavior",
+			"\"",
+			"this.children",
+			"checkIntersection",
+			"check",
+			"\"",
+			"render",
+			".anchors",
+			"removeAnchors",
+			"this.anchors ",
+			"project.active",
+			"prokect.active",
+			"\"",
+			"exclude",
+			"\"",
+			"intersec",
+			"instance_literals.",
+			", ",
+			"'update'",
+			"clearScaffolds",
+			"clearScaffods",
+			"clear",
+			"drawAnchor",
+			"console.log",
+			"Vec2d",
+			"\"",
+			"event_bus",
+			"eventBus",
+			"'+",
+			"BehaviorManagerModel",
+			"\"",
+			"boolB",
+			"boolA",
+			"PathNode",
+			"TrigFunc",
+			"createInstance",
+			";\n",
+			"push",
+			"currentRender",
+			"'currentRender'",
+			"shiftClick",
+			"0.75",
+			"console.log(",
+			"console.log",
+			"\"",
+			"currentRender",
+			".render(",
+			"\"",
+			"DistributeBehavior",
+			".proto",
+			".prototye",
+			"menuY",
+			"open",
+			"openMenu",
+			"behaviorManage",
+			"//selects or deselects all path instances\n    selectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = true;\n      }\n\n    },\n\n    deselectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = false;\n      }\n        for (var i = 0; i < this.instances_.length; i++) {\n        this.instances[i].selected = false;\n      }\n\n    },",
+			"deselectAll",
+			".selected=",
+			".setSelection",
+			"\"",
+			".clear",
+			"clear called",
+			"   \n",
+			"instanceParent",
+			"pathrender",
+			".selected",
+			"\"",
+			"currentNode",
+			"\""
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"'",
+			"delta",
+			".delta",
+			"'",
+			"data[i]",
+			"'",
+			"path_literal",
+			"'",
+			"master",
+			"getMasterPath",
+			"'",
+			"extendBehaviorFirst",
+			"'",
+			"['update']",
+			"Vec2D",
+			"'",
+			"propB",
+			"propA",
+			"'",
+			"//console.log",
+			"this.currentNode",
+			"currentNode",
+			".nodeParent",
+			"'",
+			"this.parent",
+			"this.children",
+			"children",
+			"parent"
+		],
+		"reverse": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 5,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "js/src/models/data/Condition.js",
+					"settings":
+					{
+						"buffer_size": 2410,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1647,
+								1656
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 29.0,
+						"translation.y": 202.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "js/src/models/StateManagerModel.js",
+					"settings":
+					{
+						"buffer_size": 9414,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8197,
+								8197
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3879.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/src/views/drawing/ToolView.js",
+					"settings":
+					{
+						"buffer_size": 1109,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/src/models/tools/BaseToolModel.js",
+					"settings":
+					{
+						"buffer_size": 739,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								361,
+								361
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "js/src/models/tools/PolyToolModel.js",
+					"settings":
+					{
+						"buffer_size": 1135,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1030,
+								1030
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "js/src/models/data/SceneNode.js",
+					"settings":
+					{
+						"buffer_size": 6768,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								75,
+								104
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "js/src/router.js",
+					"settings":
+					{
+						"buffer_size": 1809,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 6,
+			"sheets":
+			[
+				{
+					"buffer": 7,
+					"file": "js/src/models/behaviors/ScaleBehavior.js",
+					"settings":
+					{
+						"buffer_size": 1887,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								921,
+								921
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "js/src/models/tools/PenToolModel.js",
+					"settings":
+					{
+						"buffer_size": 3927,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1052,
+								1052
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "js/src/models/behaviors/scaffold.js",
+					"settings":
+					{
+						"buffer_size": 1424,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1419,
+								1419
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "js/src/models/tools/SelectToolModel.js",
+					"settings":
+					{
+						"buffer_size": 4141,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1794,
+								1797
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1195.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "js/src/models/behaviors/FillBehavior",
+					"settings":
+					{
+						"buffer_size": 478,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								478,
+								478
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "js/src/models/data/GroupNode.js",
+					"settings":
+					{
+						"buffer_size": 434,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								394,
+								394
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "js/src/models/behaviors/RadialDistributeBehavior.js",
+					"settings":
+					{
+						"buffer_size": 5162,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								547,
+								547
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "js/src/models/behaviors/BaseBehavior.js",
+					"settings":
+					{
+						"buffer_size": 2779,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								83,
+								83
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "js/src/models/behaviors/FollowPathBehavior.js",
+					"settings":
+					{
+						"buffer_size": 4068,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2845,
+								2845
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 565.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "js/src/models/behaviors/BehaviorManagerModel.js",
+					"settings":
+					{
+						"buffer_size": 5031,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3322,
+								3322
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 944.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "js/src/utils/TrigFunc.js",
+					"settings":
+					{
+						"buffer_size": 2900,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2598,
+								2602
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 40.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "js/src/models/data/Instance.js",
+					"settings":
+					{
+						"buffer_size": 7346,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5989,
+								5989
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 3243.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 19,
+					"file": "js/src/models/behaviors/CopyBehavior.js",
+					"settings":
+					{
+						"buffer_size": 3656,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3133,
+								3133
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"file": "js/src/views/drawing/PropertyView.js",
+					"settings":
+					{
+						"buffer_size": 1654,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1440,
+								1440
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 21,
+					"file": "js/src/models/behaviors/DistributeBehavior.js",
+					"settings":
+					{
+						"buffer_size": 3788,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3002,
+								3002
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 475.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 22,
+					"file": "js/src/models/data/BehaviorNode.js",
+					"settings":
+					{
+						"buffer_size": 765,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 23,
+					"settings":
+					{
+						"buffer_size": 10876,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										240,
+										246
+									],
+									[
+										554,
+										560
+									],
+									[
+										826,
+										832
+									],
+									[
+										1074,
+										1080
+									],
+									[
+										1194,
+										1200
+									],
+									[
+										1367,
+										1373
+									],
+									[
+										1657,
+										1663
+									],
+									[
+										2049,
+										2055
+									],
+									[
+										2182,
+										2188
+									],
+									[
+										2408,
+										2414
+									],
+									[
+										2601,
+										2607
+									],
+									[
+										2827,
+										2833
+									],
+									[
+										3000,
+										3006
+									],
+									[
+										3168,
+										3174
+									],
+									[
+										3541,
+										3546
+									],
+									[
+										3855,
+										3860
+									],
+									[
+										4127,
+										4132
+									],
+									[
+										4307,
+										4312
+									],
+									[
+										4500,
+										4505
+									],
+									[
+										4587,
+										4592
+									],
+									[
+										4707,
+										4712
+									],
+									[
+										4880,
+										4885
+									],
+									[
+										4996,
+										5001
+									],
+									[
+										5058,
+										5063
+									],
+									[
+										5319,
+										5324
+									],
+									[
+										5374,
+										5379
+									],
+									[
+										5434,
+										5439
+									],
+									[
+										5669,
+										5674
+									],
+									[
+										5982,
+										5987
+									],
+									[
+										6050,
+										6055
+									],
+									[
+										6116,
+										6121
+									],
+									[
+										6293,
+										6298
+									],
+									[
+										6384,
+										6389
+									],
+									[
+										6517,
+										6522
+									],
+									[
+										6743,
+										6748
+									],
+									[
+										6936,
+										6941
+									],
+									[
+										7162,
+										7167
+									],
+									[
+										7335,
+										7340
+									],
+									[
+										7503,
+										7508
+									],
+									[
+										7643,
+										7648
+									],
+									[
+										8030,
+										8041
+									],
+									[
+										8148,
+										8159
+									],
+									[
+										8372,
+										8383
+									],
+									[
+										8735,
+										8757
+									],
+									[
+										9101,
+										9123
+									],
+									[
+										9594,
+										9616
+									],
+									[
+										10173,
+										10180
+									],
+									[
+										10475,
+										10482
+									],
+									[
+										10763,
+										10770
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								9920,
+								9920
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"output_tag": 5,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 4080.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 24,
+					"file": "js/src/models/data/PathNode.js",
+					"settings":
+					{
+						"buffer_size": 10792,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1112,
+								1118
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 875.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 25,
+					"file": "js/src/models/data/GeometryNode.js",
+					"settings":
+					{
+						"buffer_size": 19031,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2472,
+								2484
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3462.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			],
+			[
+				2,
+				0,
+				3,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.24562350217,
+			0.493907582292,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"",
+				"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 272.0,
+	"status_bar_visible": true
+}

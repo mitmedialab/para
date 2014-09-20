@@ -1,0 +1,186 @@
+<html>
+<head>
+<title>JustMath.js Vec2 Examples &amp; Tests</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript" src="https://raw.github.com/dcodeIO/JustMath.js/master/JustMath.min.js"></script>
+<style type="text/css">
+    body { text-align: center; }
+    div.vis { padding: 20px; clear: both; width: 640px; margin: auto; text-align: left; }
+    div.vis .et { float: left; width: 400px; padding-right: 20px; }
+    div.vis canvas { margin-top: 25px; padding: 2px; border: 1px solid #ddd; }
+</style>
+</head>
+
+<body>
+<h1>JustMath.js Vec2 Examples &amp; Tests</h1>
+<div id="res"></div>
+<script type="text/javascript">
+var Vec2 = dcodeIO.JustMath.Vec2;
+
+var names = ["a", "bb", "c", "d", "e"];
+var colors = ["#f00", "#0a0", "#00f", "#f90", "#f09"];
+
+function visualize() {
+    var i;
+    var v = [];
+    var e = document.createElement("div");
+    e.className = "vis";
+    var et = document.createElement("div");
+    et.className = "et";
+    for (i in arguments) {
+        if (typeof(arguments[i]) == "string") {
+            var label;
+            if (i == 0) {
+                label = document.createElement('h2');
+            } else {
+                label = document.createElement('p');
+            }
+            label.innerHTML = arguments[i];
+            et.appendChild(label);
+        } else if (arguments[i] instanceof Vec2) {
+            var el = document.createElement('p');
+            el.style.color = colors[v.length];
+            el.innerHTML = names[v.length]+": "+arguments[i];
+            et.appendChild(el);
+            v.push(arguments[i]);
+        }
+    }
+    e.appendChild(et);
+    var cv = document.createElement("canvas");
+    cv.width = 200;
+    cv.height = 200;
+    cv.style.width = "200px";
+    cv.style.height = "200px";
+    var ctx = cv.getContext("2d");
+    ctx.fillStyle = "#eee";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = "#aaa";
+    ctx.fillText("0/0", 2, 10);
+    ctx.translate(100, 100); // Origin at center
+    ctx.fillStyle = "#666";
+    for (i in v) {
+        var v0 = v[i];
+        var v1 = v0.clone().rotate(Math.PI/4*3).norm().scale(5);
+        var v2 = v0.clone().rotate(-Math.PI/4*3).norm().scale(5);
+        ctx.strokeStyle = colors[i];
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(v0.x, v0.y);
+        if (v0.magSq() > 1) {
+            ctx.lineTo(v0.x+v1.x, v0.y+v1.y);
+            ctx.moveTo(v0.x, v0.y);
+            ctx.lineTo(v0.x+v2.x, v0.y+v2.y);
+        }
+        ctx.stroke();
+    }
+    e.appendChild(cv);
+    document.getElementById("res").appendChild(e);
+}
+
+(function() {
+    var a = new Vec2(50,-50);
+    visualize("Getters", a, "getX: "+ a.getX(), "getY: "+ a.getY(), "getXY: "+ JSON.stringify(a.getXY()));
+})();
+
+(function() {
+    var a = new Vec2(50,-50);
+    var b = new Vec2(a);
+    var c = b.clone();
+    visualize("Copy / Clone / Equals", a, "copied", b, "cloned", c, "a == b == c: "+(a.equals(b) && b.equals(c)));
+})();
+
+(function() {
+    var a = new Vec2( 50,50);
+    var b = new Vec2(-50, 0);
+    var c = a.clone().add(b);
+    visualize("Addition", a, b, "a + b = c", c);
+})();
+
+(function() {
+    var a = new Vec2(50,50);
+    var b = new Vec2(50, 0);
+    var c = a.clone().sub(b);
+    visualize("Subtraction", a, b, "a - b = c", c);
+})();
+
+(function() {
+    var a = new Vec2(50,50);
+    var b = a.clone().inv();
+    visualize("Inversion", a, "inverted", b);
+})();
+
+(function() {
+    var a = new Vec2(50,40);
+    var b = a.clone().ort();
+    visualize("Orthogonality", a, "orthogonal", b);
+})();
+
+(function() {
+    var a = new Vec2(50,50);
+    var b = a.clone().scale(-0.5);
+    visualize("Linear scaling", a, "-0.5 * a = b", b);
+})();
+
+(function() {
+    var a = new Vec2(50,10);
+    var b = new Vec2(10,50);
+    var p = a.dot(b);
+    visualize("Dot product", a, b, "a * b = "+p);
+})();
+
+(function() {
+    var a = new Vec2(50,50);
+    var d1 = a.dir();
+    var b = a.clone().norm();
+    var d2 = b.dir();
+    var m = b.mag();
+    visualize("Normalization / Magnitudes", a, "a / |a| = b", b, "|b| = "+m, "Direction: "+(180*d1/Math.PI)+"° == "+(180*d1/Math.PI)+"°");
+})();
+
+(function() {
+    var a = new Vec2( 50,50);
+    var b = new Vec2(-50,50);
+    var d = a.dist(b);
+    visualize("Distances", a, b, "|a - b| = "+d);
+})();
+
+(function() {
+    var a = new Vec2(50,-50);
+    var b = new Vec2(50, 50);
+    var c = a.clone().lerp(b, -0.25);
+    var d = a.clone().lerp(b, 0.5);
+    var e = a.clone().lerp(b, 1.25);
+    visualize("Interpolation", a, b, "lerp<sub>a</sub>(b, -0.25)", c, "lerp<sub>a</sub>(b, 0.5)", d, "lerp<sub>a</sub>(b, 1.25)", e);
+})();
+
+(function() {
+    var a = new Vec2(60,40);
+    var b = a.clone().rotate(Math.PI/4);
+    var c = a.clone().rotate(Math.PI/4*3);
+    visualize("Rotation", a, "45° clockwise = b", b, "270° clockwise = c", c);
+})();
+
+(function() {
+    var a = new Vec2(60,-60);
+    var b = new Vec2(0,-60);
+    var c = b.clone().project(a);
+    var d = b.clone().reject(a);
+    visualize("Projection / Rejection", a, b, "project<sub>a</sub>(b) = c", c, "reject<sub>a</sub>b = d", d);
+})();
+
+(function() {
+    var a = new Vec2(20,-20);
+    var b = new Vec2(0,-60);
+    var c = b.clone().reflect(a);
+    var d = b.clone().reflect(c);
+    visualize("Reflection (1)", a, b, "reflect<sub>a</sub>(b) = c", c, "reflect<sub>c</sub>(b) = d", d);
+    a = new Vec2(10,30).inv();
+    b = new Vec2(0,-60);
+    c = b.clone().reflect(a);
+    d = a.clone().inv().scale(2);
+    var e = d.clone().reflect(a).scale(0.5);
+    visualize("Reflection (2)", a, b, "reflect<sub>a</sub>(b) = c", c, "!a * 2 = d", d, "reflect<sub>a</sub>(d) * 0.5 = e", e);
+})();
+</script>
+</body>
+</html>

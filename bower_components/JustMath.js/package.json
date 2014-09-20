@@ -1,0 +1,34 @@
+{
+    "name": "justmath",
+    "version": "1.0.1",
+    "author": "Daniel Wirtz <dcode@dcode.io>",
+    "description": "JustMath.js: Two dimensional vector math including a rich toolset for vector operations.",
+    "main": "JustMath.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dcodeIO/JustMath.js.git"
+    },
+    "bugs": {
+        "url": "https://github.com/dcodeIO/JustMath.js/issues"
+    },
+    "keywords": ["vector", "math", "2d"],
+    "dependencies": {
+    },
+    "devDependencies": {
+        "nodeunit": ">=0.7",
+        "closurecompiler": ">=1.1"
+    },
+    "license": "Apache License, Version 2.0",
+    "engines": {
+        "node": ">=0.8"
+    },
+    "scripts": {
+        "prepublish": "npm test",
+        "test": "nodeunit tests/suite.js",
+        
+        "make": "npm run-script compile && npm run-script noexpose && npm test && npm run-script jsdoc",
+        "compile": "ccjs JustMath.js --create_source_map=JustMath.min.map --compilation_level=ADVANCED_OPTIMIZATIONS > JustMath.min.js",
+        "noexpose": "cat JustMath.js | grep -v @expose > JustMath.noexpose.js",
+        "jsdoc": "jsdoc -c jsdoc.json"
+    }
+}

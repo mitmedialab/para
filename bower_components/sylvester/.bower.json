@@ -1,0 +1,14 @@
+{
+  "name": "sylvester",
+  "homepage": "https://github.com/jcoglan/sylvester",
+  "version": "0.1.3",
+  "_release": "0.1.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.1.3",
+    "commit": "499b811ccbeb0091de71240cf3cd041167817dde"
+  },
+  "_source": "git://github.com/jcoglan/sylvester.git",
+  "_target": "0.1.3",
+  "_originalSource": "sylvester"
+}
