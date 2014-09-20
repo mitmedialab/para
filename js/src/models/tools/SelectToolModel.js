@@ -18,7 +18,7 @@ define([
     stroke: true,
     handles: true,
     fill: true,
-    tolerance: 5
+    tolerance: 2
   };
 
   var SelectToolModel = BaseToolModel.extend({

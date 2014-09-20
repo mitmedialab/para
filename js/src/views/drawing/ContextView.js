@@ -20,7 +20,7 @@ var template,source, menuX, menuY, currentNode;
       this.listenTo(this.event_bus, 'canvasMouseMove', this.setMenuPosition);
       this.listenTo(this.event_bus, 'openMenu', this.showMenu);
       this.visible = false;
-        source = $('#menu-template').html();
+      source = $('#menu-template').html();
       template = Handlebars.compile(source);
       
     },
@@ -76,6 +76,7 @@ var template,source, menuX, menuY, currentNode;
       var id = $(event.toElement).attr('id');
       if(id){
         this.model.newBehavior([currentNode],id);
+        this.hideMenu();
       }
     },
 
