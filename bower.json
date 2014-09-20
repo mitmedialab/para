@@ -1,0 +1,38 @@
+{
+  "name": "para",
+  "version": "0.0.1",
+  "homepage": "https://github.com/pixelmaid/para",
+  "authors": [
+    "Jennifer Jacobs <jacobsj@media.mit.edu>"
+  ],
+  "description": "procedural drawing application",
+  "main": "src/main.js",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3.1.1",
+    "backbone": "~1.1.2",
+    "FileSaver": "*",
+    "handlebars": "1.3.0",
+    "jquery": "2.1.1",
+    "JustMath.js": "git://github.com/dcodeIO/JustMath.js.git#68726e8fcc",
+    "jquery-minicolors": "2.1.6",
+    "mustache.js": "0.8.2",
+    "paper": "0.9.19",
+    "raphael": "2.1.2",
+    "requirejs": "2.1.14",
+    "bootstrap-slider": "*",
+    "sylvester": "0.1.3",
+    "js-toolbox": "git://github.com/jimmydo/js-toolbox.git",
+    "underscore": "1.6.0"
+  }
+}
