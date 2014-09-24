@@ -5,10 +5,10 @@ define([
   'underscore',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PathNode',
+  'models/data/PolygonNode',
    'models/PaperManager'
 
-], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
+], function(_, Backbone, BaseToolModel, PolygonNode, PaperManager) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -31,7 +31,8 @@ define([
       if(this.currentPath){
       this.currentPath.selected = false;
         
-        var pathNode  = new PathNode();
+        var pathNode  = new PolygonNode();
+        console.log("poly node=",pathNode);
           pathNode.name = "Path_"+nameVal;
             nameVal++;
         pathNode.createInstanceFromPath(this.currentPath.clone());

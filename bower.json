@@ -30,12 +30,13 @@
     "paper": "0.9.19",
     "raphael": "2.1.2",
     "requirejs": "2.1.14",
-    "bootstrap-slider": "*",
+    "bootstrap-slider": "git://github.com/seiyria/bootstrap-slider.git",
     "sylvester": "0.1.3",
     "js-toolbox": "git://github.com/jimmydo/js-toolbox.git",
     "underscore": "1.6.0",
     "jquery-ui": "1.10.4",
     "tinycolor": "0.9.15",
-    "pick-a-color": "1.2.3"
+    "pick-a-color": "git://github.com/pixelmaid/pick-a-color.git#7127cbeed608da50ccc928fa5d9d3ecad060093e"
   }
+  
 }

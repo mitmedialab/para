@@ -16,9 +16,9 @@ require.config({
         "sylvester": "../../bower_components/sylvester/sylvester",
         "minicolors": "../../bower_components/jquery-minicolors/jquery.minicolors",
         "tinycolor": "../../bower_components/tinycolor/tinycolor",
-        "pickacolor": "../../bower_components/pick-a-color/build/1.2.3/js/pick-a-color-1.2.3.min", 
+        "pickacolor": "../../bower_components/pick-a-color/build/1.2.4/js/pick-a-color-1.2.4.min", 
         "filesaver": "../../bower_components/FileSaver/FileSaver",
-        "slider": "../../bower_components/bootstrap-slider/bootstrap-slider"
+        "slider": "../../bower_components/bootstrap-slider/js/bootstrap-slider"
     },
     
     shim: {

@@ -23,7 +23,7 @@
 
   <!-- Custom styles for this template -->
   <link href="css/basic.css" rel="stylesheet">
-  <link href="bower_components/bootstrap-slider/slider.css" rel="stylesheet">
+  <link href="bower_components/bootstrap-slider/css/bootstrap-slider.css" rel="stylesheet">
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -121,7 +121,13 @@
                       <label>upload file from desktop<input class="form-group" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
                     </div>
                     </form>
-                 
+                 <div class="form-group">
+                    <label for="hidden-input">parameters</label>
+                    <br>
+                    <input id = "parameterSlider" type="text" class="span2" value="" data-slider-min="1" data-slider-max="40" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after">
+                  
+                    
+                    </div>
 
                   <div class="form-group">
                     <label for="hidden-input">Fill</label>

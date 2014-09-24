@@ -30,6 +30,8 @@ define([
         
 
 $('#strokeSlider').slider();
+$('#parameterSlider').slider();
+
 $('#strokeSlider').on('slide', function(slideEvt) {
   $('#strokeSlider').trigger('stroke-change');
 });
