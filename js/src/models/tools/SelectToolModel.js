@@ -66,6 +66,7 @@ define([
         if (hitResult.type == 'segment') {
 
           segment = hitResult.segment.index;
+          segment.fullySelected = true;
 
 
         }

@@ -306,11 +306,17 @@ define([
 
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[k].selected;
+              if(instance_literal.selected){
+                instance_literal.fullySelected = true;
+              }
               if (this.instances[k].anchor) {
                 if (k === 0) {
                   instance_literal.strokeColor = '#16a2a6';
+                  instance_literal.fillColor = '#16a2a6';
+
                 } else {
                   instance_literal.strokeColor = '#f2682a';
+                  instance_literal.fillColor = '#f2682a';
 
                 }
                 if (instance_literal.strokeWidth < 3) {

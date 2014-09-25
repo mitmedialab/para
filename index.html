@@ -121,13 +121,23 @@
                       <label>upload file from desktop<input class="form-group" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
                     </div>
                     </form>
-                 <div class="form-group">
-                    <label for="hidden-input">parameters</label>
+                     <div id = "parameterSliders" class="form-group"> 
+                     <script id="parameterTemplate" type="text/x-handlebars-template">
+               
+                   {{#each paramName}}
+                   
+                    <div class="form-group">
+                    <label id='parameterName'>{{label}}</label>
                     <br>
-                    <input id = "parameterSlider" type="text" class="span2" value="" data-slider-min="1" data-slider-max="40" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after">
+                    <input id = "parameterSlider" type="text" class="span2" value="" data-slider-min={{min}} data-slider-max={{max}} data-slider-step="1" data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
+                  </div>
                   
+                  
+                      {{/each}}
+                     
                     
-                    </div>
+                     </script>
+                     </div>
 
                   <div class="form-group">
                     <label for="hidden-input">Fill</label>

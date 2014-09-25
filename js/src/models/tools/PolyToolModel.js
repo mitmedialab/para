@@ -15,6 +15,8 @@ define([
   var nameVal = 0;
   //segment being drawn, mode of current drawing, type
   var sideNum = 6;
+  var rotationAmt = 0;
+  var scaleAmt = 0;
 
 
   var PolyToolModel = BaseToolModel.extend({
@@ -32,10 +34,11 @@ define([
       this.currentPath.selected = false;
         
         var pathNode  = new PolygonNode();
-        console.log("poly node=",pathNode);
           pathNode.name = "Path_"+nameVal;
             nameVal++;
-        pathNode.createInstanceFromPath(this.currentPath.clone());
+        this.currentPath.rotate(-rotationAmt);
+           console.log("rad=",this.currentPath.bounds.width/2);
+        pathNode.createInstanceFromPath(this.currentPath.clone(),rotationAmt);
         this.trigger('nodeAdded',pathNode);
          this.trigger('rootUpdate');
         this.trigger('rootRender');  
@@ -64,6 +67,7 @@ define([
          this.currentPath.selected = true;
           this.currentPath.fillColor = this.fillColor;
           this.currentPath.strokeColor = this.strokeColor;
+          rotationAmt=0;
 
 
         }
@@ -77,17 +81,19 @@ define([
       
        },
 
-     //mouse drag event - brokem
+     //mouse drag event
      mouseDrag: function(event){
 
        if (this.currentPath) {
         var delta = this.currentPath.position.getDistance(event.point);
         var angle = event.point.subtract(this.currentPath.position).angle;
         var cAngle =this.currentPath.firstSegment.point.subtract(this.currentPath.position).angle; 
-        //console.log(delta);
+       
         var rad = this.currentPath.position.getDistance(this.currentPath.firstSegment.point);
         var scale = delta/rad;
+     
         var rotate = angle-cAngle;
+       rotationAmt+=rotate;
         console.log("mouse angle="+angle);
         console.log("poly angle = "+cAngle);
         console.log("difference="+rotate);

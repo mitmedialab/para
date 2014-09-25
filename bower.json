@@ -36,7 +36,9 @@
     "underscore": "1.6.0",
     "jquery-ui": "1.10.4",
     "tinycolor": "0.9.15",
-    "pick-a-color": "git://github.com/pixelmaid/pick-a-color.git#7127cbeed608da50ccc928fa5d9d3ecad060093e"
+    "pick-a-color": "git://github.com/pixelmaid/pick-a-color.git#7127cbeed608da50ccc928fa5d9d3ecad060093e",
+    "Backbone.Undo": "git://github.com/osartun/Backbone.Undo.js.git"
   }
+
   
 }

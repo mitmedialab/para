@@ -21,8 +21,9 @@ define([
     name: 'none',
 
      constructor: function() {
-
-     PathNode.apply(this, arguments);
+      this.userParams = [{label:'points',max:15,min:3,propertyName:'pointNum'}];
+      this.pointNum = 6;
+      PathNode.apply(this, arguments);
 
     },
 
@@ -31,22 +32,38 @@ define([
         PathNode.prototype.initialize.apply(this, arguments);
       },
 
-   //called when path points are modified 
-   updateSideNum: function(index, sideNum) {
-      this.resetObjects();
-      var newPath = this.masterPath;
 
+      createInstanceFromPath: function(path,rotation, scale){
+        var instance = PathNode.prototype.createInstanceFromPath.apply(this, arguments);
+        instance.rotation.angle = rotation;
+
+      },
+
+   //called when path points are modified 
+   updateParams: function(sideNum) {
+    console.log("update params to",sideNum);
+      this.resetObjects();
+      this.sideNum = sideNum;
       //update the path
       for(var j=0;j<this.instance_literals.length;j++){
-          var instance = this.instance_literals[j];
+         var instance = this.instance_literals[j];
           var rad = instance.bounds.width/2;
           var matrix = instance.data.tmatrix;
 
-          var center = instance.position;
-          instance.remove()
-         var newInstance = new paper.Path.RegularPolygon(event.point,sideNum,rad);
-          newInstance.data.tmatrix = matrix;
-          this.instance_literals[j]= newInstance;
+          var center = new paper.Point(0,0);
+          console.log("center",center);
+          console.log("rad",rad);
+          var width = instance.bounds.width;
+        instance.remove();
+        instance = null;
+        var newInstance = new paper.Path.RegularPolygon(center,sideNum,1);
+        var scale = width/newInstance.bounds.width;
+        newInstance.scale(scale);
+        newInstance.reset= true;
+         this.instance_literals[j] = newInstance;
+         
+      
+          
 
       }
     }

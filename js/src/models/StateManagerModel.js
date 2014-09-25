@@ -161,7 +161,7 @@ define([
     moveDownNode: function(path) {
       var children = currentNode.children;
       for (var i = 0; i < children.length; i++) {
-        if (children[i].containsPath(path) && children[i].type != 'path') {
+        if (children[i].containsPath(path) && children[i].type != 'path'&& children[i].type != 'polygon') {
           currentNode = children[i];
           toolCollection.get(this.get('state')).currentNode = children[i];
         }
@@ -256,7 +256,7 @@ define([
           toolCollection.get(this.get('state')).currentNode = currentNode;
           if (toolCollection.get(this.get('state')).selectedNodes.indexOf(selected) == -1) {
             toolCollection.get(this.get('state')).selectedNodes.push(selected);
-
+            console.log("found selection point");
             this.event_bus.trigger('nodeSelected', selected);
 
 
@@ -269,6 +269,12 @@ define([
           this.determineSelectionPoint(selected.nodeParent);
         }
       }
+    },
+
+    /*returns currently selected shapes*/
+
+    getSelected: function(){
+       return toolCollection.get(this.get('state')).selectedNodes;
     },
 
 
