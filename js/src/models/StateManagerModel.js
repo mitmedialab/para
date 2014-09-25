@@ -13,6 +13,8 @@ define([
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
   'models/tools/RotateToolModel',
+    'models/tools/FollowPathToolModel',
+
   'models/behaviors/BehaviorManagerModel',
 
   'models/PaperManager',
@@ -23,7 +25,7 @@ define([
 'models/datatype/Generator',
 'models/datatype/Action'],
 
- function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, BehaviorManagerModel, PaperManager, FileSaver, Condition,Generator,Action) {
+ function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver, Condition,Generator,Action) {
   var rootNode,
     currentNode,
     toolCollection,
@@ -31,6 +33,7 @@ define([
     polyTool,
     selectTool,
     rotateTool,
+    followPathTool,
     paper,
     mousePos;
 
@@ -62,11 +65,15 @@ define([
       rotateTool = new RotateToolModel({
         id: 'rotateTool'
       });
+      followPathTool = new FollowPathToolModel({
+        id: 'followPathTool'
+      });
+      followPathTool.event_bus = event_bus;
       this.modified = false;
 
       this.event_bus = event_bus;
 
-      toolCollection = new ToolCollection([penTool, selectTool, polyTool, rotateTool]);
+      toolCollection = new ToolCollection([penTool, selectTool, polyTool, rotateTool,followPathTool]);
       this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
       this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
       this.listenTo(toolCollection, 'setSelection', this.setSelection);
@@ -126,17 +133,16 @@ define([
       toolCollection.get(this.get('state')).reset();
 
       this.set('state', state);
+      if(state==='penTool'||'polyTool'){
+          if(currentNode!==rootNode){
+            this.setCurrentNode(rootNode.children[0]);
+          }
 
-
-    },
-
-    //returns currently selected object as JSON object. If nothing is selected, returns the root object
-    getSelected: function() {
-      //////console.log('attempting to get selected'+rootNode.getChildAt(0));
-      //currentNode = rootNode.getChildAt(0);
-      return currentNode.toJSON();
+      }
 
     },
+
+    
 
     resetTools: function() {
       toolCollection.get(this.get('state')).reset();

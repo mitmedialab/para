@@ -35,7 +35,6 @@ define([
 
     initialize: function(data) {
       if (data) {
-        console.log(data);
         var path = new paper.Path();
         path.importJSON(data.masterPath);
         this.masterPath = path;
@@ -176,12 +175,10 @@ define([
       var newLiteral;
       if (literal) {
         newLiteral = literal.clone();
-        console.log("new Literal",newLiteral);
         var matrix = literal.data.tmatrix.clone();
         var imatrix = matrix.inverted();
         newLiteral.transform(imatrix);
       } else {
-        console.log("copying master")
         newLiteral = this.getLiteral().clone();
       }
       newLiteral.reset = true;
@@ -258,16 +255,16 @@ define([
       var revised_literals = [];
       var lastLiteral = null;
       console.log("\n======rendering path=========");
+        for (var d = 0; d < data.length; d++) {
         for (var k = 0; k < this.instances.length; k++) {
 
-          for (var d = 0; d < data.length; d++) {
+         
             this.instances[k].instanceParentIndex = d;
             var instance_literal;
             if(this.instance_literals.length>0){
               instance_literal = this.instance_literals.shift();
             }
             else{
-                console.log("last literal=",lastLiteral);
                 instance_literal = this.cloneLiteral(lastLiteral);
               
             }
@@ -346,8 +343,10 @@ define([
               if (data[d].anchor) {
                 if (d === 0) {
                   instance_literal.strokeColor = '#16a2a6';
+                   instance_literal.fillColor = '#16a2a6';
                 } else {
                   instance_literal.strokeColor = '#f2682a';
+                   instance_literal.fillColor = '#f2682a';
 
                 }
                 if (instance_literal.strokeWidth < 3) {
@@ -375,10 +374,7 @@ define([
         this.instance_literals[i].remove();
       }
 
-      this.instance_literals= revised_literals;
-      console.log("end: total instance literals=",this.instance_literals.length);
-      console.log("======rendering path=========\n");
-      
+      this.instance_literals= revised_literals;      
 
     },
 
@@ -406,7 +402,7 @@ define([
       var literalParent = null;
       var exception = -1;
 
-      console.log('index',index,'value',value,'currentNode',currentNode==this);
+      //console.log('index',index,'value',value,'currentNode',currentNode==this);
 
       if (this.containsPath(path)) {
 

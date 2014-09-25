@@ -19,6 +19,8 @@ define([
 			this.closed = false;
 			this.width = 0;
 			this.height = 0;
+			this.reset = false;
+			this.order = 0;
 			this.position= {
 				x: 0,
 				y: 0

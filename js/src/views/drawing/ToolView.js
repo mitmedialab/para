@@ -24,7 +24,9 @@ define([
     'click #selectTool': 'selectToolClick',
     'click #penTool': 'penToolClick',
     'click #polyTool': 'polyToolClick',
-    'click #rotateTool': 'rotateToolClick'
+    'click #rotateTool': 'rotateToolClick',
+    'click #followPathTool': 'followPathToolClick'
+
   	},
 
   	 selectToolClick: function(){
@@ -34,6 +36,14 @@ define([
       this.model.setState('selectTool');
 
   	},
+
+     followPathToolClick: function(){
+      this.clearActive();
+      $('#followPathTool').addClass('active');
+      lastSelected = $('#followPathTool');
+      this.model.setState('followPathTool');
+
+    },
 
   	penToolClick: function(){
   		this.clearActive();

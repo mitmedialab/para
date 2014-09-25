@@ -479,8 +479,6 @@ define([
 
 
     resetObjects: function() {
-      this.instance_literals = [];
-
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].resetObjects();
       }
@@ -506,32 +504,47 @@ define([
       //first create array of new instances that contain propogated updated data
 
       console.log('render: '+this.type);
+      var revised_literals = [];
+      var lastLiteral = null;
       if (data) {
+         for (var i = 0; i < data.length; i++) {
+
         for (var j = 0; j < this.instances.length; j++) {
-          for (var i = 0; i < data.length; i++) {
-            var u_instance = this.instances[j].clone();
+            var instance_literal = this.instances[j].clone();
+            if(this.instance_literals.length>0){
+              lastLiteral = this.instance_literals.shift();
+              instance_literal.order = lastLiteral.order;
+            }
+            instance_literal.order = lastLiteral === null ? 0: lastLiteral.order;
+
             this.instances[j].instanceParentIndex = i;
             if (data[i].renderSignature) {
-              u_instance.renderSignature = data[i].renderSignature.slice(0);
+              instance_literal.renderSignature = data[i].renderSignature.slice(0);
             }
-            u_instance.renderSignature.push(j);
-            u_instance.instanceParentIndex = j;
+           instance_literal.renderSignature.push(j);
+            instance_literal.instanceParentIndex = j;
 
-            u_instance.render(data[i]);
+            instance_literal.render(data[i]);
 
             if (this.nodeParent == currentNode) {
-              u_instance.selected = this.instances[j].selected;
-              u_instance.anchor = this.instances[j].anchor;
+             instance_literal.selected = this.instances[j].selected;
+              instance_literal.anchor = this.instances[j].anchor;
             } else {
-              u_instance.selected = data[i].selected;
-              u_instance.anchor = data[i].anchor;
+             instance_literal.selected = data[i].selected;
+             instance_literal.anchor = data[i].anchor;
             }
 
-            this.instance_literals.push(u_instance);
-
+            revised_literals.push(instance_literal);
+            lastLiteral = instance_literal;
+            instance_literal.instanceIndex = revised_literals.length - 1;
 
           }
         }
+        for(var i=0;i<this.instance_literals.length;i++){
+          this.instance_literals[i].remove();
+        }
+
+        this.instance_literals= revised_literals;
 
         for (var k = 0; k < this.children.length; k++) {
 
@@ -550,6 +563,7 @@ define([
       if (this.childOrigin > -1) {
         this.children[this.childOrigin].bringToFront();
       }
+
 
     },
 

@@ -21,7 +21,7 @@ define([
     tolerance: 2
   };
 
-  var SelectToolModel = BaseToolModel.extend({
+  var FollowPathToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {}),
 
     initialize: function() {
@@ -48,10 +48,10 @@ define([
         //console.log("setting selected nodes to null");
       }
 
-      segment = null;
+
 
       var hitResult = paper.project.hitTest(event.point, hitOptions);
-     
+
       //deselect everything
       var children = paper.project.activeLayer.children;
       for (var i = 0; i < children.length; i++) {
@@ -63,17 +63,7 @@ define([
         var path = hitResult.item;
         instanceIndex = path.instanceIndex;
         //console.log(hitResult);
-        if (hitResult.type == 'segment') {
 
-          segment = hitResult.segment.index;
-          segment.fullySelected = true;
-
-
-        }
-        else if(hitResult.type =='handle-in'|| hitResult.type =='handle-out'){
-          handle= hitResult.type;
-          segment = hitResult.segment.index;
-        }
 
         //this sets currentNode depending on current selection level in tree
         this.trigger('nodeSelected', path);
@@ -99,35 +89,24 @@ define([
 
     },
 
-    dblClick: function(event) {
-      if (this.currentPaths.length > 0) {
-        this.trigger('moveDownNode', this.currentPaths[this.currentPaths.length - 1]);
-      } else {
-        this.trigger('moveUpNode');
-      }
-    },
+
 
 
     //mouse up event
     mouseUp: function(event) {
-     
+
+      for (var i = 0; i < this.selectedNodes.length; i++) {
+        var intersection = this.selectedNodes[i].checkIntersection();
+        if (intersection) {
+          this.event_bus.trigger('newBehavior', [intersection.nodeParent, this.selectedNodes[i]], 'followpath');
+        }
+      }
+
     },
 
     //mouse drag event
     mouseDrag: function(event) {
-      if (this.currentPaths.length > 0) {
-        if (segment !== null) {
-          if (this.currentNode) {
-            var selPath = this.selectedNodes[this.selectedNodes.length - 1].instance_literals[instanceIndex];
-            if (selPath && selPath.nodeParent.type === 'path') {
-              selPath.nodeParent.updatePath(segment,event.delta,handle);
-              this.trigger('rootUpdate');
-              this.trigger('rootRender');
-            }
-          }
-
-
-        } else {
+     
           if (this.currentNode) {
 
             for (var i = 0; i < this.selectedNodes.length; i++) {
@@ -145,8 +124,8 @@ define([
           }
 
 
-        }
-      }
+        
+      
     },
 
     //mouse move event
@@ -158,6 +137,6 @@ define([
 
   });
 
-  return SelectToolModel;
+  return FollowPathToolModel;
 
 });
