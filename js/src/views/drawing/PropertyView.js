@@ -17,6 +17,10 @@ define([
 
   var template, source;
   var paper = PaperManager.getPaperInstance();
+
+  // TODO: Remove this global when we remove pick-a-color
+  window.tinycolor = Tinycolor;
+
   var PropertyView = Backbone.View.extend({
     //
     initialize: function() {
