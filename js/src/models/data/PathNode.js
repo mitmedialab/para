@@ -152,9 +152,6 @@ define([
           this.instance_literals[j].transform(imatrix);
           this.instance_literals[j].reset = true;
         }
-
-        ////console.log('cleared pos at ', j,'=',this.instance_literals[j].position);
-        ////console.log('clearing instance literal at:'+j)
       }
       //this.instance_literals = [];
       this.clearScaffolds();
@@ -188,50 +185,68 @@ define([
     //called when path points are modified 
     updatePath: function(index, literalIndex, delta, handle) {
       console.log("update path");
-      var matrix = this.instance_literals[literalIndex].data.tmatrix;
 
       var newPath = this.masterPath;
-      var selSegment = this.instance_literals[literalIndex].segments[index];
-      var pointOld = selSegment.point.clone();
-
+      var interfaceinstance = this.instance_literals[literalIndex].clone();
+      var selSegment = interfaceinstance.segments[index];
+    var matrix = this.instance_literals[literalIndex].data.tmatrix;
+      var imatrix = matrix.inverted();
+      var pointDiff;
       if (handle === null) {
 
         
         selSegment.point = selSegment.point.add(delta);
+         interfaceinstance.transform(imatrix);
+            this.resetObjects();
+
+         pointDiff = interfaceinstance.segments[index].point.subtract(this.instance_literals[literalIndex].segments[index].point);
       } else {
         if (handle === 'handle-in') {
 
           selSegment.handleIn = selSegment.handleIn.add(delta);
           selSegment.handleOut = selSegment.handleOut.subtract(delta);
+          interfaceinstance.transform(imatrix);
+            this.resetObjects();
+
+          pointDiff = interfaceinstance.segments[index].handleIn.subtract(this.instance_literals[literalIndex].segments[index].handleIn);
+
 
         } else {
           selSegment.handleOut = selSegment.handleOut.add(delta);
           selSegment.handleIn = selSegment.handleIn.subtract(delta);
+          this.resetObjects();
+
+          interfaceinstance.transform(imatrix);
+         pointDiff = interfaceinstance.segments[index].handleOut.subtract(this.instance_literals[literalIndex].segments[index].handleOut);
+
 
         }
       }
-      var pointDiff = selSegment.point.subtract(pointOld);
+     
+
+
+
+      interfaceinstance.remove();
       //update all paths
-      this.resetObjects();
 
       for (var j = 0; j < this.instance_literals.length; j++) {
-        if (j != literalIndex) {
+        
           var sseg = this.instance_literals[j].segments[index];
           if (handle === null) {
             sseg.point = sseg.point.add(pointDiff);
           } else {
             if (handle === 'handle-in') {
 
-              sseg.handleIn = sseg.handleIn.add(delta);
-              sseg.handleOut = sseg.handleOut.subtract(delta);
+              sseg.handleIn = sseg.handleIn.add(pointDiff);
+              sseg.handleOut = sseg.handleOut.subtract(pointDiff);
 
             } else {
-              sseg.handleOut = sseg.handleOut.add(delta);
-              sseg.handleIn = sseg.handleIn.subtract(delta);
+              sseg.handleOut = sseg.handleOut.add(pointDiff);
+              sseg.handleIn = sseg.handleIn.subtract(pointDiff);
 
             }
           }
-        }
+        
       }
 
 

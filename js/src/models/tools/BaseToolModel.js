@@ -44,6 +44,10 @@ define([
 
      },
 
+     dblClick: function(event) {
+    
+    },
+
      //key down event
      keyDown: function(event){
 
