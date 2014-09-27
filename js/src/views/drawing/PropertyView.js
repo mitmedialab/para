@@ -94,7 +94,7 @@ define([
     paramChange: function(event) {
       var value = $(event.target).attr('data').split(" ")[1];
       value = Number(value.substring(1, value.length - 1));
-      console.log('value=',value)
+      console.log('value=',value);
        var selected = this.model.getSelected();
 
       var s = selected[selected.length - 1];

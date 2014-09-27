@@ -20,12 +20,9 @@ define([
   'models/PaperManager',
 
 
-  'filesaver',
-'models/datatype/Condition',
-'models/datatype/Generator',
-'models/datatype/Action'],
+  'filesaver'],
 
- function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver, Condition,Generator,Action) {
+ function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver) {
   var rootNode,
     currentNode,
     toolCollection,
@@ -34,11 +31,9 @@ define([
     selectTool,
     rotateTool,
     followPathTool,
-    paper,
-    mousePos;
+    paper;
 
-    var undoLimit =15;
-
+    var undoLimit = 15;
 
 
   var StateManagerModel = Backbone.Model.extend({
@@ -105,26 +100,7 @@ define([
       this.rootRender();
      localStorage.clear();
 
-     //test code for generators
-
-     var condition = new Condition();
-     var action = new Action();
-     var generator = new Generator(action,condition);
-
-     /*console.log(generator.tick());
-     console.log(generator.tick());
-     console.log(generator.tick());
-     console.log(generator.tick());
-     console.log(generator.tick());
-     console.log(generator.tick());
-     console.log(generator.tick());
-     console.log(generator.tick());
-    console.log(generator.tick());
-
-     console.log(generator.tick());
-
-     console.log(generator.tick());*/
-
+   
 
 
     },
@@ -419,7 +395,7 @@ define([
       return id;
     },
 
-    save: function(filename) {
+    save: function() {
 
       var id = Date.now();
       //console.log('saving with name:' + id);
