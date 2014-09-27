@@ -238,7 +238,6 @@ define([
           toolCollection.get(this.get('state')).currentNode = currentNode;
           if (toolCollection.get(this.get('state')).selectedNodes.indexOf(selected) == -1) {
             toolCollection.get(this.get('state')).selectedNodes.push(selected);
-            console.log("found selection point");
             this.event_bus.trigger('nodeSelected', selected);
 
 

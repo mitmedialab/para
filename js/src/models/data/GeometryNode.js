@@ -503,7 +503,6 @@ define([
     render: function(data, currentNode) {
       //first create array of new instances that contain propogated updated data
 
-      console.log('render: '+this.type);
       var revised_literals = [];
       var lastLiteral = null;
       if (data) {
@@ -598,7 +597,7 @@ define([
     //selects according render signature
     selectByValue: function(index, value, path, currentNode) {
       var sIndexes = [];
-      console.log('index',index,'value',value,'currentNode',currentNode==this);
+      //console.log('index',index,'value',value,'currentNode',currentNode==this);
 
       for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].containsPath(path)) {
