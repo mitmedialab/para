@@ -45,7 +45,7 @@ define([
         handle = null;
         this.selectedNodes = [];
         this.trigger('selectionReset');
-        //console.log("setting selected nodes to null");
+        ////console.log("setting selected nodes to null");
       }
 
       segment = null;
@@ -62,10 +62,11 @@ define([
 
         var path = hitResult.item;
         instanceIndex = path.instanceIndex;
-        //console.log(hitResult);
+        ////console.log(hitResult);
         if (hitResult.type == 'segment') {
-
+          console.log('hit segment');
           segment = hitResult.segment.index;
+          console.log("segment",segment);
           segment.fullySelected = true;
 
 
@@ -116,11 +117,15 @@ define([
     //mouse drag event
     mouseDrag: function(event) {
       if (this.currentPaths.length > 0) {
+                  console.log("found path")
+
         if (segment !== null) {
+          console.log("found segment")
           if (this.currentNode) {
             var selPath = this.selectedNodes[this.selectedNodes.length - 1].instance_literals[instanceIndex];
-            if (selPath && selPath.nodeParent.type === 'path') {
-              selPath.nodeParent.updatePath(segment,event.delta,handle);
+            if (selPath && (selPath.nodeParent.type === 'path' || selPath.nodeParent.type === 'polygon')) {
+             
+              selPath.nodeParent.updatePath(segment,instanceIndex,event.delta,handle);
               this.trigger('rootUpdate');
               this.trigger('rootRender');
             }

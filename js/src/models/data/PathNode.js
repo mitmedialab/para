@@ -145,25 +145,25 @@ define([
     resetObjects: function() {
 
       for (var j = 0; j < this.instance_literals.length; j++) {
-        if(!this.instance_literals[j].reset){
-        var matrix = this.instance_literals[j].data.tmatrix;//this.instances[this.instance_literals[j].instanceParentIndex].matrix;
-        var imatrix = matrix.inverted();
+        if (!this.instance_literals[j].reset) {
+          var matrix = this.instance_literals[j].data.tmatrix; //this.instances[this.instance_literals[j].instanceParentIndex].matrix;
+          var imatrix = matrix.inverted();
 
-        this.instance_literals[j].transform(imatrix);
-        this.instance_literals[j].reset = true;
-      }
+          this.instance_literals[j].transform(imatrix);
+          this.instance_literals[j].reset = true;
+        }
 
-        //console.log('cleared pos at ', j,'=',this.instance_literals[j].position);
-        //console.log('clearing instance literal at:'+j)
+        ////console.log('cleared pos at ', j,'=',this.instance_literals[j].position);
+        ////console.log('clearing instance literal at:'+j)
       }
       //this.instance_literals = [];
       this.clearScaffolds();
 
     },
 
-    clearObjects: function(){
-        for (var j = 0; j < this.instance_literals.length; j++) {
-       this.instance_literals[j].remove();
+    clearObjects: function() {
+      for (var j = 0; j < this.instance_literals.length; j++) {
+        this.instance_literals[j].remove();
       }
       //this.instance_literals = [];
       this.clearScaffolds();
@@ -186,15 +186,17 @@ define([
 
     },
     //called when path points are modified 
-    updatePath: function(index, delta, handle) {
-      this.resetObjects();
-      var newPath = this.masterPath;
+    updatePath: function(index, literalIndex, delta, handle) {
+      console.log("update path");
+      var matrix = this.instance_literals[literalIndex].data.tmatrix;
 
-      //update the path
-      for(var j=0;j<this.instance_literals.length;j++){
-      var selSegment = this.instance_literals[j].segments[index];
+      var newPath = this.masterPath;
+      var selSegment = this.instance_literals[literalIndex].segments[index];
+      var pointOld = selSegment.point.clone();
+
       if (handle === null) {
 
+        
         selSegment.point = selSegment.point.add(delta);
       } else {
         if (handle === 'handle-in') {
@@ -208,9 +210,31 @@ define([
 
         }
       }
-    }
+      var pointDiff = selSegment.point.subtract(pointOld);
+      //update all paths
+      this.resetObjects();
 
-      
+      for (var j = 0; j < this.instance_literals.length; j++) {
+        if (j != literalIndex) {
+          var sseg = this.instance_literals[j].segments[index];
+          if (handle === null) {
+            sseg.point = sseg.point.add(pointDiff);
+          } else {
+            if (handle === 'handle-in') {
+
+              sseg.handleIn = sseg.handleIn.add(delta);
+              sseg.handleOut = sseg.handleOut.subtract(delta);
+
+            } else {
+              sseg.handleOut = sseg.handleOut.add(delta);
+              sseg.handleIn = sseg.handleIn.subtract(delta);
+
+            }
+          }
+        }
+      }
+
+
       var topLeftNew = newPath.bounds.center;
       //calcualte differences between old and new positions
       var diff = TrigFunc.subtract({
@@ -236,7 +260,7 @@ define([
       }
 
       //swap out old master for new
-    
+
       this.masterPath = newPath;
       this.masterPath.visible = false;
       this.masterPath.strokeColor = null;
@@ -254,127 +278,126 @@ define([
       var path_literal = this.getLiteral();
       var revised_literals = [];
       var lastLiteral = null;
-      console.log("\n======rendering path=========");
-        for (var d = 0; d < data.length; d++) {
+      //console.log("\n======rendering path=========");
+      for (var d = 0; d < data.length; d++) {
         for (var k = 0; k < this.instances.length; k++) {
 
-         
-            this.instances[k].instanceParentIndex = d;
-            var instance_literal;
-            if(this.instance_literals.length>0){
-              instance_literal = this.instance_literals.shift();
-            }
-            else{
-                instance_literal = this.cloneLiteral(lastLiteral);
-              
-            }
-            instance_literal.nodeParent = this;
-            instance_literal.instanceParentIndex = k;
-            instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
-            instance_literal.data.renderSignature.push(k);
-            var nInstance = this.instances[k];
-            nInstance.render(data[d]);
 
-            instance_literal = instance_literal.transform(nInstance.matrix);
-            instance_literal.reset = false;
-            instance_literal.data.tmatrix= nInstance.matrix.clone();
-            //instance_literal.data.tmatrix.set(nInstance.matrix.a,nInstance.matrix.c,nInstance.matrix.b,nInstance.matrix.d,nInstance.matrix.tx,nInstance.matrix.ty);
+          this.instances[k].instanceParentIndex = d;
+          var instance_literal;
+          if (this.instance_literals.length > 0) {
+            instance_literal = this.instance_literals.shift();
+          } else {
+            instance_literal = this.cloneLiteral(lastLiteral);
 
-            if (instance_literal.closed) {
-              instance_literal.fillColor = this.instances[k].fillColor;
-            }
-            instance_literal.strokeWidth = this.instances[k].strokeWidth + data[d].strokeWidth;
-            if (instance_literal.strokeWidth === 0) {
-              instance_literal.strokeWidth = 1;
-            }
+          }
+          instance_literal.nodeParent = this;
+          instance_literal.instanceParentIndex = k;
+          instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
+          instance_literal.data.renderSignature.push(k);
+          var nInstance = this.instances[k];
+          nInstance.render(data[d]);
 
-            if (!data[d].fillColor) {
-              instance_literal.fillColor = nInstance.fillColor;
-            } else {
-              instance_literal.fillColor = data[d].fillColor;
-            }
-            if (!data[d].strokeColor) {
-              instance_literal.strokeColor = nInstance.strokeColor;
-            } else {
-              instance_literal.strokeColor = data[d].strokeColor;
-            }
+          instance_literal = instance_literal.transform(nInstance.matrix);
+          instance_literal.reset = false;
+          instance_literal.data.tmatrix = nInstance.matrix.clone();
+          //instance_literal.data.tmatrix.set(nInstance.matrix.a,nInstance.matrix.c,nInstance.matrix.b,nInstance.matrix.d,nInstance.matrix.tx,nInstance.matrix.ty);
 
-            instance_literal.visible = this.instances[k].visible;
+          if (instance_literal.closed) {
+            instance_literal.fillColor = this.instances[k].fillColor;
+          }
+          instance_literal.strokeWidth = this.instances[k].strokeWidth + data[d].strokeWidth;
+          if (instance_literal.strokeWidth === 0) {
+            instance_literal.strokeWidth = 1;
+          }
 
-            if (this.nodeParent == currentNode) {
-              instance_literal.selected = this.instances[k].selected;
-              if(instance_literal.selected){
-                instance_literal.fullySelected = true;
+          if (!data[d].fillColor) {
+            instance_literal.fillColor = nInstance.fillColor;
+          } else {
+            instance_literal.fillColor = data[d].fillColor;
+          }
+          if (!data[d].strokeColor) {
+            instance_literal.strokeColor = nInstance.strokeColor;
+          } else {
+            instance_literal.strokeColor = data[d].strokeColor;
+          }
+
+          instance_literal.visible = this.instances[k].visible;
+
+          if (this.nodeParent == currentNode) {
+            instance_literal.selected = this.instances[k].selected;
+            if (instance_literal.selected) {
+              instance_literal.fullySelected = true;
+            }
+            if (this.instances[k].anchor) {
+              if (k === 0) {
+                instance_literal.strokeColor = '#16a2a6';
+                instance_literal.fillColor = '#16a2a6';
+
+              } else {
+                instance_literal.strokeColor = '#f2682a';
+                instance_literal.fillColor = '#f2682a';
+
               }
-              if (this.instances[k].anchor) {
-                if (k === 0) {
-                  instance_literal.strokeColor = '#16a2a6';
-                  instance_literal.fillColor = '#16a2a6';
-
-                } else {
-                  instance_literal.strokeColor = '#f2682a';
-                  instance_literal.fillColor = '#f2682a';
-
-                }
-                if (instance_literal.strokeWidth < 3) {
-                  instance_literal.strokeWidth = 3;
-                }
+              if (instance_literal.strokeWidth < 3) {
+                instance_literal.strokeWidth = 3;
               }
-            } else {
-              if (this.scaffold) {
-                instance_literal.visible = false;
+            }
+          } else {
+            if (this.scaffold) {
+              instance_literal.visible = false;
+            }
+            var descendant = currentNode.descendantOf(this);
+            if (!descendant) {
+              if (instance_literal.fillColor) {
+                instance_literal.fillColor.brightness = instance_literal.fillColor.brightness += 0.5;
+                instance_literal.fillColor.saturation = instance_literal.fillColor.saturation -= 0.5;
+
               }
-              var descendant = currentNode.descendantOf(this);
-              if (!descendant) {
-                if (instance_literal.fillColor) {
-                  instance_literal.fillColor.brightness =  instance_literal.fillColor.brightness+=0.5;
-                  instance_literal.fillColor.saturation =  instance_literal.fillColor.saturation-=0.5;
+              if (instance_literal.strokeColor) {
+                instance_literal.strokeColor.brightness = instance_literal.strokeColor.brightness += 0.5;
+                instance_literal.strokeColor.saturation = instance_literal.strokeColor.saturation -= 0.5;
 
-                }
-                if (instance_literal.strokeColor) {
-                  instance_literal.strokeColor.brightness =  instance_literal.strokeColor.brightness+=0.5;
-                  instance_literal.strokeColor.saturation =  instance_literal.strokeColor.saturation-=0.5;
-
-                }
-              }
-
-
-              instance_literal.selected = data[d].selected;
-              if (data[d].anchor) {
-                if (d === 0) {
-                  instance_literal.strokeColor = '#16a2a6';
-                   instance_literal.fillColor = '#16a2a6';
-                } else {
-                  instance_literal.strokeColor = '#f2682a';
-                   instance_literal.fillColor = '#f2682a';
-
-                }
-                if (instance_literal.strokeWidth < 3) {
-                  instance_literal.strokeWidth = 3;
-                }
               }
             }
 
 
+            instance_literal.selected = data[d].selected;
+            if (data[d].anchor) {
+              if (d === 0) {
+                instance_literal.strokeColor = '#16a2a6';
+                instance_literal.fillColor = '#16a2a6';
+              } else {
+                instance_literal.strokeColor = '#f2682a';
+                instance_literal.fillColor = '#f2682a';
 
-            revised_literals.push(instance_literal);
-            lastLiteral = instance_literal;
-            /*console.log("length:",revised_literals.length);
-            console.log("user selected =",nInstance.userSelected);
+              }
+              if (instance_literal.strokeWidth < 3) {
+                instance_literal.strokeWidth = 3;
+              }
+            }
+          }
+
+
+
+          revised_literals.push(instance_literal);
+          lastLiteral = instance_literal;
+          /*//console.log("length:",revised_literals.length);
+            //console.log("user selected =",nInstance.userSelected);
             if(this.instance_literals.length-1=== nInstance.userSelected){
               instance_literal.fillColor = 'red';
             }*/
 
-            instance_literal.instanceIndex = revised_literals.length - 1;
-          }
+          instance_literal.instanceIndex = revised_literals.length - 1;
         }
-       
+      }
 
-      for(var i=0;i<this.instance_literals.length;i++){
+
+      for (var i = 0; i < this.instance_literals.length; i++) {
         this.instance_literals[i].remove();
       }
 
-      this.instance_literals= revised_literals;      
+      this.instance_literals = revised_literals;
 
     },
 
@@ -402,7 +425,7 @@ define([
       var literalParent = null;
       var exception = -1;
 
-      //console.log('index',index,'value',value,'currentNode',currentNode==this);
+      ////console.log('index',index,'value',value,'currentNode',currentNode==this);
 
       if (this.containsPath(path)) {
 
@@ -410,16 +433,14 @@ define([
           var literalParent = this.instance_literals[i].instanceParentIndex;
 
           if (this.instance_literals[i] === path) {
-              
-              this.instances[literalParent].userSelected = i;
-              exception = literalParent;
-              //console.log("found matching path at ", i, "parentIndex=", literalParent);
-            }
 
-            else if(literalParent!=exception){
-              //console.log("removed matching path path ", i, "parentIndex=", literalParent);
-              this.instances[literalParent].userSelected = null;
-            }
+            this.instances[literalParent].userSelected = i;
+            exception = literalParent;
+            ////console.log("found matching path at ", i, "parentIndex=", literalParent);
+          } else if (literalParent != exception) {
+            ////console.log("removed matching path path ", i, "parentIndex=", literalParent);
+            this.instances[literalParent].userSelected = null;
+          }
 
           var compareSig = this.instance_literals[i].data.renderSignature.slice(0, index + 1);
           compareSig = compareSig.join();

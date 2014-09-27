@@ -37,7 +37,7 @@ define([
           pathNode.name = "Path_"+nameVal;
             nameVal++;
         this.currentPath.rotate(-rotationAmt);
-           console.log("rad=",this.currentPath.bounds.width/2);
+           //console.log("rad=",this.currentPath.bounds.width/2);
         pathNode.createInstanceFromPath(this.currentPath.clone(),rotationAmt);
         this.trigger('nodeAdded',pathNode);
          this.trigger('rootUpdate');
@@ -55,7 +55,7 @@ define([
       */
 
       mouseDown : function(event) {
-        console.log("poly mouse down");
+        //console.log("poly mouse down");
           if (!this.currentPath) {
          
           
@@ -94,9 +94,9 @@ define([
      
         var rotate = angle-cAngle;
        rotationAmt+=rotate;
-        console.log("mouse angle="+angle);
-        console.log("poly angle = "+cAngle);
-        console.log("difference="+rotate);
+        //console.log("mouse angle="+angle);
+        //console.log("poly angle = "+cAngle);
+        //console.log("difference="+rotate);
         this.currentPath.scale(scale);
         this.currentPath.rotate(rotate);
          // this.currentPath.rotate(angle);

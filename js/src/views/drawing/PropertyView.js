@@ -30,14 +30,7 @@ define([
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
       this.currentPaths = [];
       source = $('#parameterTemplate').html();
-      console.log('source=', source);
       template = Handlebars.compile(source);
-      /* var context = {paramName: [{label:"a", max:"100"}, {label:"b", max:"200"}]};
-          var html    = template(context);
-           this.$('#parameterSliders').html(html);*/
-
-
-
       $('#strokeSlider').slider();
 
       $('#strokeSlider').on('slide', function(slideEvt) {
@@ -68,19 +61,19 @@ define([
     },
 
     render: function() {
-      // //console.log('property view rendering');back
-      // //console.log('source='+$('#property-list-template').html());
+      // ////console.log('property view rendering');back
+      // ////console.log('source='+$('#property-list-template').html());
       /* var source = $('#property-list-template').html();
         var template = Handlebars.compile(source);
         var properties = this.model.getSelected();
-       // //console.log(properties);
+       // ////console.log(properties);
         var html = template(properties);
         this.$el.html(html);
         */
     },
 
     colorChange: function(event) {
-      console.log("colorChange");
+      //console.log("colorChange");
       this.model.updateColor($(event.target).val(), event.target.id);
 
     },
@@ -94,7 +87,7 @@ define([
     paramChange: function(event) {
       var value = $(event.target).attr('data').split(" ")[1];
       value = Number(value.substring(1, value.length - 1));
-      console.log('value=',value);
+      //console.log('value=',value);
        var selected = this.model.getSelected();
 
       var s = selected[selected.length - 1];
@@ -156,7 +149,7 @@ define([
 
 
     removeItem: function(id) {
-      //console.log('removing:'+id);
+      ////console.log('removing:'+id);
       $('#fileselect option[value=' + id + ']').remove();
     },
 
@@ -196,7 +189,7 @@ define([
     },
 
     pathSelected: function(path) {
-      console.log("path selected");
+      //console.log("path selected");
       this.currentPaths.push(path);
       var fill = this.currentPaths[0].fillColor;
       var stroke = this.currentPaths[0].strokeColor;
@@ -209,7 +202,7 @@ define([
         $('#stroke').val(stroke.toCSS(true).substr(1));
       }
       if (width) {
-        //console.log("setting slider");
+        ////console.log("setting slider");
         $('#strokeSlider').slider('setValue', width, false);
       }
 
@@ -240,7 +233,7 @@ define([
       var context = {
         paramName: params
       };
-      console.log("context", context);
+      //console.log("context", context);
       var html = template(context);
       $('#parameterSliders').html(html);
       $('#parameterSlider').each(function() {
