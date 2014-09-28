@@ -290,8 +290,13 @@ define([
 				this.matrix = this.matrix.scale(this.scale);
 
 				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
-				/*var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
+				var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
 								 this.nodeParent.addScaffold(uLP);
+				var rectPos = new paper.Point(this.position.x-this.width/2,this.position.y-this.height/2);
+				var bb = new paper.Path.Rectangle(rectPos, new paper.Size(this.width,this.height));
+				this.nodeParent.addScaffold(bb);
+				bb.strokeColor='red';
+				bb.transform(this.matrix);
 
 			if(this.nodeParent.type!=='root'){
 				 uLP.fillColor = 'green';
@@ -304,7 +309,7 @@ define([
 				 this.nodeParent.addScaffold(mP);
 				uLP.transform(this.matrix);
 				mP.transform(this.matrix);
-			}*/
+			}
 				
 			//}
 
