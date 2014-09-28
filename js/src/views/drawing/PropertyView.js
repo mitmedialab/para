@@ -9,10 +9,7 @@ define([
   'handlebars',
   'tinycolor',
   'pickacolor',
-  'models/PaperManager',
-  'slider'
-
-
+  'models/PaperManager'
 ], function($, _, Backbone, Handlebars, Tinycolor, Pickacolor,PaperManager) {
 
   var template, source;
@@ -35,9 +32,8 @@ define([
       this.currentPaths = [];
       source = $('#parameterTemplate').html();
       template = Handlebars.compile(source);
-      $('#strokeSlider').slider();
 
-      $('#strokeSlider').on('slide', function(slideEvt) {
+      $('#strokeSlider').on('change', function(slideEvt) {
         $('#strokeSlider').trigger('stroke-change');
       });
 
@@ -83,8 +79,7 @@ define([
     },
 
     strokeChange: function(event) {
-       var value = $(event.target).attr('data').split(" ")[1];
-      value = Number(value.substring(1, value.length - 1));
+       var value = parseInt($(event.target).val(), 10);
       this.model.updateStroke(value);
     },
 
@@ -206,8 +201,8 @@ define([
         $('#stroke').val(stroke.toCSS(true).substr(1));
       }
       if (width) {
-        ////console.log("setting slider");
-        $('#strokeSlider').slider('setValue', width, false);
+        //console.log("setting slider");
+        $('#strokeSlider').val(width);
       }
 
       this.setParams();

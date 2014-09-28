@@ -12,7 +12,6 @@
   <!-- Library CSS -->
   <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="bower_components/pick-a-color/build/1.2.3/css/pick-a-color-1.2.3.min.css">   
-  <link href="bower_components/bootstrap-slider/css/bootstrap-slider.css" rel="stylesheet">
 
   <!-- Page CSS -->
   <link href="css/basic.css" rel="stylesheet">
@@ -138,9 +137,7 @@
                   <div class="form-group">
                     <label for="hidden-input">Stroke Weight</label>
                     <br>
-                    <input id = "strokeSlider" type="text" class="span2" value="" data-slider-min="1" data-slider-max="40" data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after">
-                  
-                    
+                    <input id="strokeSlider" type="range" min="0" max="40">
                     </div>
                      <div class="form-group">
                          <label for="hidden-input">Scaffold</label>
