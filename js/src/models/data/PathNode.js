@@ -226,7 +226,7 @@ define([
 
 
 
-      interfaceinstance.remove();
+     
       //update all paths
 
       for (var j = 0; j < this.instance_literals.length; j++) {
@@ -266,13 +266,15 @@ define([
 
       for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].update({
-          width: newPath.bounds.width,
-          height: newPath.bounds.height
+          width: interfaceinstance.bounds.width,
+          height: interfaceinstance.bounds.height
         });
         this.instances[i].increment({
           delta: diff
         });
       }
+
+       interfaceinstance.remove();
 
       //swap out old master for new
 
