@@ -33,7 +33,7 @@ define([
       source = $('#parameterTemplate').html();
       template = Handlebars.compile(source);
 
-      $('#strokeSlider').on('change', function(slideEvt) {
+      $('#strokeSlider').on('input', function(slideEvt) {
         $('#strokeSlider').trigger('stroke-change');
       });
 
@@ -238,7 +238,7 @@ define([
       $('#parameterSlider').each(function() {
         var slider = $(this);
 
-        slider.on('change', function(slideEvt) {
+        slider.on('input', function(slideEvt) {
         slider.trigger('param-change');
         });
       });
