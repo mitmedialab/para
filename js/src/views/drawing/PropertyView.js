@@ -84,8 +84,8 @@ define([
     },
 
     paramChange: function(event) {
-      var value = $(event.target).attr('data').split(" ")[1];
-      value = Number(value.substring(1, value.length - 1));
+            var value = parseInt($(event.target).val(), 10);
+
       //console.log('value=',value);
        var selected = this.model.getSelected();
 
@@ -237,9 +237,8 @@ define([
       $('#parameterSliders').html(html);
       $('#parameterSlider').each(function() {
         var slider = $(this);
-          slider.slider();
 
-        slider.on('slide', function(slideEvt) {
+        slider.on('change', function(slideEvt) {
         slider.trigger('param-change');
         });
       });
