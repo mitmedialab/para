@@ -185,13 +185,13 @@ define([
     //called when path points are modified 
     updatePath: function(index, literalIndex, delta, handle) {
       console.log("update path");
-
-      var newPath = this.masterPath;
       var interfaceinstance = this.instance_literals[literalIndex].clone();
       var selSegment = interfaceinstance.segments[index];
     var matrix = this.instance_literals[literalIndex].data.tmatrix;
       var imatrix = matrix.inverted();
       var pointDiff;
+      var posDiffX;
+      var posDiffY;
       if (handle === null) {
 
         
@@ -222,15 +222,13 @@ define([
 
         }
       }
-     
-
+    
 
 
      
       //update all paths
-
+      var posDiff;
       for (var j = 0; j < this.instance_literals.length; j++) {
-        
           var sseg = this.instance_literals[j].segments[index];
           if (handle === null) {
             sseg.point = sseg.point.add(pointDiff);
@@ -247,41 +245,28 @@ define([
             }
           }
         
+        posDiff = this.instance_literals[j].position.clone();
+        this.instance_literals[j].position.x =0;
+        this.instance_literals[j].position.y=0;
+        console.log("posDiff=",posDiff);
       }
-
-
-      var topLeftNew = newPath.bounds.center;
-      //calcualte differences between old and new positions
-      var diff = TrigFunc.subtract({
-        x: topLeftNew.x,
-        y: topLeftNew.y
-      }, {
-        x: 0,
-        y: 0
-      });
-
-      //set position to upper left corner
-      newPath.position.x = 0;
-      newPath.position.y = 0;
+      console.log("========================");
 
       for (var i = 0; i < this.instances.length; i++) {
+        var rotation = this.instances[i].matrix.rotation;
+        var pd2= posDiff.rotate(rotation,new paper.Point(0,0));
         this.instances[i].update({
           width: interfaceinstance.bounds.width,
           height: interfaceinstance.bounds.height
         });
         this.instances[i].increment({
-          delta: diff
+          delta: {x:pd2.x,y:pd2.y}
         });
       }
 
        interfaceinstance.remove();
 
       //swap out old master for new
-
-      this.masterPath = newPath;
-      this.masterPath.visible = false;
-      this.masterPath.strokeColor = null;
-      this.masterPath.fillColor = null;
     },
 
 

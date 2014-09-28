@@ -303,8 +303,14 @@ define([
 				 if(this.nodeParent.type==='behavior'){
 				 	 uLP.fillColor = 'red';
 				 }
+				 var size = new paper.Size(100, 100);
+
 				 var mP = new paper.Path.Circle(this.position.x+this.width/2,this.position.y+this.height/2,3);
-				
+				var bb= new paper.Path.Rectangle(this.position.x,this.position.y,size);
+				this.nodeParent.addScaffold(bb);
+				bb.transform(this.matrix);
+				bb.strokeColor='red';
+				bb.strokeWidth=1;
 				 mP.fillColor='purple';
 				 this.nodeParent.addScaffold(mP);
 				uLP.transform(this.matrix);
