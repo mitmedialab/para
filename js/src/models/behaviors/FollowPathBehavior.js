@@ -19,7 +19,7 @@ define([
       },
 
       update: function(data) {
-        //console.log('follow path update'+ this.name);
+        console.log('follow path update'+ this.name);
       // console.log('number of target instances for follow path=' + this.instances.length);
         var zeroedPath = this.pathChild.cloneLiteral(this.pathChild.instance_literals[0]);
 
@@ -32,18 +32,18 @@ define([
         var nA= zeroedPath.getNearestPoint(pA);
         var nB = zeroedPath.getNearestPoint(pB);
        
-        console.log('num='+num);
+        /*console.log('num='+num);
            console.log('pA,pB');
         console.log(pA);
         console.log(pB);
         console.log('na,nB');
         console.log(nA);
-        console.log(nB);
+        console.log(nB);*/
 
         var aOffset = zeroedPath.getOffsetOf(nA);
         var bOffset = zeroedPath.getOffsetOf(nB);
 
-        console.log('aOffset='+aOffset+', bOffset='+bOffset);
+        //console.log('aOffset='+aOffset+', bOffset='+bOffset);
         var defaultLength = zeroedPath.length;
         if(!zeroedPath.closed){
           if(bOffset<=aOffset){
@@ -135,9 +135,9 @@ define([
         
       
         var angle = normal.angle;
-        console.log("normal");
+        /*console.log("normal");
         console.log(normal.angle)
-        console.log(normal.quadrant);
+        console.log(normal.quadrant);*/
        var  magnitude=100;
        
       /* console.log('placement point for:'+index);

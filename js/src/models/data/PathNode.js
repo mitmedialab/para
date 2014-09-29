@@ -26,9 +26,7 @@ define([
     constructor: function() {
 
       GeometryNode.apply(this, arguments);
-      if (!this.masterPath) {
-        this.masterPath = null;
-      }
+     
 
     },
 
@@ -36,8 +34,14 @@ define([
     initialize: function(data) {
       if (data) {
         var path = new paper.Path();
-        path.importJSON(data.masterPath);
-        this.masterPath = path;
+      
+        var lInstances = data.instance_literals;
+       for (var j = 0; j < lInstances.length; j++) {
+        var newLiteral = new paper.Path();
+        newLiteral.importJSON(lInstances[j]);
+       this.instance_literals.push(newLiteral);
+       console.log("adding path",j,newLiteral);
+      }
         GeometryNode.prototype.initialize.apply(this, arguments);
       }
 
@@ -50,10 +54,6 @@ define([
 
     },
 
-    getLiteral: function() {
-      return this.masterPath;
-
-    },
 
     exportJSON: function(data) {
 
@@ -68,7 +68,6 @@ define([
         jdata = data;
       }
 
-      jdata.masterPath = this.masterPath.exportJSON();
       return GeometryNode.prototype.exportJSON.apply(this, [jdata]);
     },
 
@@ -99,20 +98,15 @@ define([
       path.position.x = 0;
       path.position.y = 0;
 
-
+      path.data.tmatrix = instance.matrix.clone();
       //path.translate(path.bounds.width / 2, path.bounds.height / 2);
-
-
-      this.masterPath = path;
-      this.masterPath.data.tmatrix = new paper.Matrix();
-      this.masterPath.visible = false;
-      this.masterPath.strokeColor = null;
-      this.masterPath.fillColor = null;
 
       path.instanceParentIndex = this.instances.length - 1;
       path.instanceIndex = this.instance_literals.length - 1;
+
       path.nodeParent = this;
       this.getUpperLeft();
+      this.instance_literals.push(path);
       return instance;
 
     },
@@ -170,14 +164,13 @@ define([
 
     cloneLiteral: function(literal) {
       var newLiteral;
-      if (literal) {
-        newLiteral = literal.clone();
+      if (!literal) {
+        literal = this.instance_literals[0];
+      } 
+       newLiteral = literal.clone();
         var matrix = literal.data.tmatrix.clone();
         var imatrix = matrix.inverted();
         newLiteral.transform(imatrix);
-      } else {
-        newLiteral = this.getLiteral().clone();
-      }
       newLiteral.reset = true;
       return newLiteral;
 
@@ -277,7 +270,6 @@ define([
      *index of the instance used to render the path
      */
     render: function(data, currentNode, clutch) {
-      var path_literal = this.getLiteral();
       var revised_literals = [];
       var lastLiteral = null;
       //console.log("\n======rendering path=========");

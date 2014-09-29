@@ -109,12 +109,12 @@ define([
       toolCollection.get(this.get('state')).reset();
 
       this.set('state', state);
-      if(state==='penTool'||'polyTool'){
+      /*if(state==='penTool'||'polyTool'){
           if(currentNode!==rootNode){
             this.setCurrentNode(rootNode.children[0]);
           }
 
-      }
+      }*/
 
     },
 

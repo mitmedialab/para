@@ -159,12 +159,13 @@ define([
       } else {
         followPathBehavior = new FollowPathBehavior(nodes[0]);
         nodes[0].scaffold=true;
+        nodes[0].resetObjects();
         for (var i = start; i < nodes.length; i++) {
           nodes[i].addBehavior(followPathBehavior, ['update', 'calculate', 'clean']);
-          nodes[i].instances[0].delta.x = nodes[0].getLiteral().firstSegment.point.x;
-          nodes[i].instances[0].delta.y =  nodes[0].getLiteral().firstSegment.point.y;
-          nodes[i].instances[nodes[i].instances.length-1].delta.x = nodes[0].getLiteral().lastSegment.point.x;
-          nodes[i].instances[nodes[i].instances.length-1].delta.y = nodes[0].getLiteral().lastSegment.point.y;
+          nodes[i].instances[0].delta.x = nodes[0].instance_literals[0].firstSegment.point.x;
+          nodes[i].instances[0].delta.y =  nodes[0].instance_literals[0].firstSegment.point.y;
+          nodes[i].instances[nodes[i].instances.length-1].delta.x = nodes[0].instance_literals[0].lastSegment.point.x;
+          nodes[i].instances[nodes[i].instances.length-1].delta.y = nodes[0].instance_literals[0].lastSegment.point.y;
         }
       }
 

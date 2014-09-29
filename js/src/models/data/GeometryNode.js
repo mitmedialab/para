@@ -301,6 +301,10 @@ define([
 
         jInstances.push(this.instances[i].exportJSON());
       }
+      for (var j = 0; j < this.instance_literals.length; j++) {
+
+        jInstances.push(this.instances[j].exportJSON());
+      }
       for (var k = 0; k < this.children.length; k++) {
 
         children.push(this.children[k].exportJSON());
