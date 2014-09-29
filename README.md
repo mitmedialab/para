@@ -1,7 +1,7 @@
 Para: Procedural drawing with direct manipulation
 =====
 
-Para is a digital illustration tool tool that uses direct manipulation to define and edit procedural artwork. Through creating and altering vector paths, artists can define iterative distributions, parametric constraints. 
+Para is a digital illustration tool tool that uses direct manipulation to define and edit procedural artwork. Through creating and altering vector paths, artists can define iterative distributions and parametric constraints. 
 
 Para began as opensource software in the Creative Technologies Lab at Adobe Research. Currently, Para is under development in the Lifelong Kindergarten Group at the MIT Media Lab. The software is part of a research project in broadening participation in procedural art and design. Para is maintained by Jennifer Jacobs of the MIT Media Lab, with contributions from Joel Brandt and Radomír Měch of Adobe Research.
 
