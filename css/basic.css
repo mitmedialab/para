@@ -11,7 +11,8 @@ background-color: #494949;
 }
 
 .container{
-	width:1200px;
+	width:100%;
+	padding:0;
 }
 .clearfix{
 
@@ -155,8 +156,6 @@ min-height: 200px;
 }
 
 #canvas{
-	min-height:795px;
-	width: 875px; /* this is bad, fix it */
 	background-color: #000;
 }
 

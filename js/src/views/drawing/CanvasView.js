@@ -46,6 +46,7 @@ var CanvasView = Backbone.View.extend({
          $(document).bind('keydown', this.canvasKeydown);
           $(document).bind('keyup', this.canvasKeyup);
           $(window).bind('focus',this.setFocus);
+         $(window).on("resize", this.resizeCanvas);
    
   },
 
@@ -74,6 +75,18 @@ var CanvasView = Backbone.View.extend({
         panKey = false;
         altKey = false;
         
+
+    },
+
+    resizeCanvas: function(){
+    /*  console.log("resize canvas");
+      var htmlCanvas = this.$('canvas');
+      var parent = $('#canvas-container');
+     htmlCanvas.attr({ width: parent.width(), height: parent.height() });
+     // var newSize = new paper.Size(parent.width(),parent.height());*/
+     // paper.viewSize = newSize;
+      paper.view.draw();
+      //console.log(htmlCanvas.width(),htmlCanvas.height())  
 
     },
 
