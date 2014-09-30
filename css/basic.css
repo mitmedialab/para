@@ -63,10 +63,13 @@ background-color: #494949;
 	float:left;
 	background-color: #fff;
 	padding: 5px;
+	padding-left: 10px;
 }
 #help{
 	width:49px;
 	height: 62px;
+	padding: 10px;
+	padding-left: 17px;
 	float:left;
 	background-color: #fff;
 	border-left: 1px solid #eee;
@@ -111,6 +114,10 @@ span:focus{
 height:30px;
 background-color:#D9E8F5;
 
+}
+
+#property-column{
+	width: 288px;
 }
 
 #prop-menu{
