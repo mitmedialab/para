@@ -10,14 +10,15 @@ require.config({
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "tinycolor": "../../bower_components/tinycolor/tinycolor",
         "pickacolor": "../../bower_components/pick-a-color/build/1.2.4/js/pick-a-color-1.2.4.min",
-        "filesaver": "../../bower_components/FileSaver/FileSaver"
+        "filesaver": "../../bower_components/FileSaver/FileSaver",
+        "backbone.undo": "../../bower_components/Backbone.Undo/Backbone.Undo"
     },
   
     shim: {
         "handlebars": {
             exports: "Handlebars"
         },
-
+        
         "toolbox": {
             exports: "Toolbox"
         },

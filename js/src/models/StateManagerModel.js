@@ -5,6 +5,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'backbone.undo',
   'models/data/GeometryNode',
   'models/data/PathNode',
 
@@ -20,9 +21,10 @@ define([
   'models/PaperManager',
 
 
+
   'filesaver'],
 
- function($, _, Backbone, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver) {
+ function($, _, Backbone, UndoManager, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver) {
   var rootNode,
     currentNode,
     toolCollection,
@@ -33,16 +35,19 @@ define([
     followPathTool,
     paper;
 
+     var undoManager = new Backbone.UndoManager();
+
     var undoLimit = 15;
 
 
   var StateManagerModel = Backbone.Model.extend({
-
+    
     defaults: {
       'state': 'selectTool',
     },
 
     initialize: function(event_bus) {
+      
       ////console.log(new FileSaver());
       paper = PaperManager.getPaperInstance();
       //var background = new paper.Path();
@@ -100,7 +105,7 @@ define([
       this.rootRender();
      localStorage.clear();
 
-   
+    undoManager.register(toolCollection);
 
 
     },
@@ -114,7 +119,7 @@ define([
             this.setCurrentNode(rootNode.children[0]);
           }
 
-      }*/
+      }*/ 
 
     },
 

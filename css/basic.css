@@ -49,9 +49,29 @@ background-color: #494949;
 	margin:0;
 	margin-left:0px;
 	margin-right:0px;
-	height:48px;
-	background-color: #FFF;
+	height:62px;
+	width:185px;
+	z-index: 10;
+	top:20px;
+	position:absolute;
+
 	border-radius: 0;
+}
+#logo{
+	width:133px;
+	height: 62px;
+	float:left;
+	background-color: #fff;
+	padding: 5px;
+}
+#help{
+	width:49px;
+	height: 62px;
+	float:left;
+	background-color: #fff;
+	border-left: 1px solid #eee;
+	border-top-right-radius: 0.5em;
+	border-bottom-right-radius: 0.5em;
 }
 
 .container-fluid{

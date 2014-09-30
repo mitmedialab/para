@@ -34,13 +34,14 @@ define([
     initialize: function(data) {
       if (data) {
         var path = new paper.Path();
-      
+        console.log("loading with data", data.instance_literals);
+
         var lInstances = data.instance_literals;
        for (var j = 0; j < lInstances.length; j++) {
         var newLiteral = new paper.Path();
-        newLiteral.importJSON(lInstances[j]);
-       this.instance_literals.push(newLiteral);
-       console.log("adding path",j,newLiteral);
+          newLiteral.importJSON(lInstances[j]);
+          this.instance_literals.push(newLiteral);
+          console.log("adding path",j,newLiteral);
       }
         GeometryNode.prototype.initialize.apply(this, arguments);
       }
@@ -177,7 +178,7 @@ define([
     },
     //called when path points are modified 
     updatePath: function(index, literalIndex, delta, handle) {
-      console.log("update path");
+     // console.log("update path");
       var interfaceinstance = this.instance_literals[literalIndex].clone();
       var selSegment = interfaceinstance.segments[index];
     var matrix = this.instance_literals[literalIndex].data.tmatrix;
@@ -241,9 +242,8 @@ define([
         posDiff = this.instance_literals[j].position.clone();
         this.instance_literals[j].position.x =0;
         this.instance_literals[j].position.y=0;
-        console.log("posDiff=",posDiff);
+        
       }
-      console.log("========================");
 
       for (var i = 0; i < this.instances.length; i++) {
         var rotation = this.instances[i].matrix.rotation;

@@ -302,8 +302,9 @@ define([
         jInstances.push(this.instances[i].exportJSON());
       }
       for (var j = 0; j < this.instance_literals.length; j++) {
+        console.log("adding instance literal at ",j);
 
-        jInstances.push(this.instances[j].exportJSON());
+        lInstances.push(this.instance_literals[j].exportJSON());
       }
       for (var k = 0; k < this.children.length; k++) {
 
