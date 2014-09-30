@@ -9,7 +9,8 @@
 
   <title>Para</title>
 
-  <link href="style.css" rel="stylesheet">
+  <!-- Page CSS -->
+  <link href="css/basic.css" rel="stylesheet">
 
 </head>
 
@@ -44,12 +45,38 @@
       <div class="container" id="master-container">
 
         <!-- Static navbar -->
-        <div class="navbar navbar-default" role="navigation">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <h2>Para</h2>
+        <div class="navbar" role="navigation">
+           
+              <div id = 'logo'>
+                <img src='images/logo.png'/>
+              </div>
+              <a id="helpbtn">
+               <div id = 'help'>
+                <img src='images/dot_btn.png'/>
+              </div>
+            </a>
             </div>
-            <div id = "toolbar" class="navbar-collapse collapse">
+            
+            </div>
+
+            <!--draw container, contains canvas and object and property menus -->
+            <div id = "draw-container" class="container-fixed"><!--draw container-->
+
+              <div class = "row"> <!--master-row -->
+
+               <div class="col-md-10"> <!--large column -->
+              
+                 <div class = "row"> <!--row-->
+
+                  <div class = "col-md-12" id = "canvas-container"><!--canvas-container-->
+                  <span><canvas id="canvas" resize="true"></canvas></span>
+                 </div><!--/canvas-container-->
+               </div><!--/row-->
+             </div> <!--/large column-->
+
+             <div class="col-md-2">
+              <div class="row">
+<div id = "toolbar" class="navbar-collapse collapse">
                 <!-- <button  class="btn btn-default btn-tool" id="generatorTool"><span><img src="images/generator_tool_icon.png" width="28" height="28"/>-->
                    <button  class="btn btn-default btn-tool" id="scaleTool"><span><img src="images/scale_tool_icon.png" width="28" height="28"/>
                 <button  class="btn btn-default btn-tool" id="rotateTool"><span><img src="images/rotate_tool_icon.png" width="28" height="28"/>
@@ -58,29 +85,6 @@
                 <button class="btn btn-default btn-tool" id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/>
                 <button class="btn btn-default btn-tool" id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/>
                   </div><!--/.nav-collapse -->
-                </div><!--/.container-fluid -->
-              </div>
-
-            </div>
-
-            <!--draw container, contains canvas and object and property menus -->
-            <div id = "draw-container" class="container"><!--draw container-->
-
-              <div class = "row"> <!--master-row -->
-
-               <div class="col-md-9"> <!--large column -->
-              
-                 <div class = "row"> <!--row-->
-
-                  <div class = "col-md-12" id = "canvas-container"><!--canvas-container-->
-                  <span><canvas id="canvas"></canvas></span>
-                 </div><!--/canvas-container-->
-               </div><!--/row-->
-             </div> <!--/large column-->
-
-             <div class="col-md-3">
-              <div class="row">
-
                 <div id = "prop-menu" class ="col-md-12">
                  
                     <form id="text-options">
@@ -109,7 +113,7 @@
                     <div class="form-group">
                     <label id='parameterName'>{{label}}</label>
                     <br>
-                    <input id = "parameterSlider" type="text" class="span2" value="" data-slider-min={{min}} data-slider-max={{max}} data-slider-step="1" data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
+                    <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
                   </div>
                   
                   
@@ -133,8 +137,6 @@
                     <label for="hidden-input">Stroke Weight</label>
                     <br>
                     <input id="strokeSlider" type="range" min="0" max="40">
-                  
-                    
                     </div>
                      <div class="form-group">
                          <label for="hidden-input">Scaffold</label>
@@ -153,7 +155,7 @@
           </div>
 
 
-            <div id ='instructions'>
+           <!-- <div id ='instructions'>
       <div class="starter-template">
         <h2>Thanks for trying out Para.</h2>
         <p class="lead">Here's the basics</p>
@@ -193,10 +195,10 @@
   <p class="lead">Who we are</p>
   <p>Para is a research project by <a target="_blank" href='http://media.mit.edu/~jacobsj'>Jennifer Jacobs</a>  and <a target="_blank" href="http://www.adobe.com/technology/people/san-francisco/joel-brandt.html">Joel Brandt.</a> Everything that is broken is most likely Jennifer's fault.</p>
        
-      </div>
+      </div>-->
    
-
     <!-- main application script -->
+     <!-- main application script -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
     <script>
       (function () {
