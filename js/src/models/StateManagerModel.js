@@ -108,9 +108,19 @@ define([
     undoManager.register(toolCollection);
 
 
-    },
+  },
 
-    setState: function(state) {
+  undo: function(){
+
+  },
+
+  redo: function(){
+
+
+  },
+
+
+setState: function(state) {
       toolCollection.get(this.get('state')).reset();
 
       this.set('state', state);
