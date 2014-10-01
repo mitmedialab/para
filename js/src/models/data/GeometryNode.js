@@ -34,6 +34,15 @@ define([
   var GeometryNode = SceneNode.extend({
 
     type: 'geometry',
+
+      defaults: function () {
+      
+
+      return {
+        "isChanging": false
+      }
+      },
+      
     /* constructor 
      * instances: array for storing instances of this object
      * scaffolds: array for scaffold objects (helper information and paths)
@@ -78,11 +87,17 @@ define([
           instance.parseJSON(dInstances[i]);
         }
       }
+      },
+
+      //called on undo or redo
+      reInit: function(data){
+
+      },
 
      /* var copyBehavior = new CopyBehavior();
       this.addBehavior(copyBehavior,['update'],'last');
       this.setCopyNum(1); */
-    },
+   
 
     setOriginByChild: function(index) {
       this.childCenter = index;
@@ -303,8 +318,9 @@ define([
       }
       for (var j = 0; j < this.instance_literals.length; j++) {
         console.log("adding instance literal at ",j);
-
-        lInstances.push(this.instance_literals[j].exportJSON());
+        var literalJSON = this.instance_literals[j].exportJSON();
+        console.log('literalJSON=',literalJSON);
+        lInstances.push(literalJSON);
       }
       for (var k = 0; k < this.children.length; k++) {
 

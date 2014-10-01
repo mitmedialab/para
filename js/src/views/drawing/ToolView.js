@@ -25,9 +25,19 @@ define([
     'click #penTool': 'penToolClick',
     'click #polyTool': 'polyToolClick',
     'click #rotateTool': 'rotateToolClick',
-    'click #followPathTool': 'followPathToolClick'
+    'click #followPathTool': 'followPathToolClick',
+    'click #undoTool': 'undoToolClick',
+    'click #redoTool': 'redoToolClick'
 
   	},
+
+      undoToolClick: function(){
+        this.model.undo();
+      },
+
+      redoToolClick: function(){
+        this.model.redo();
+      },
 
   	 selectToolClick: function(){
   		this.clearActive();
