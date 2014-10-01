@@ -16,17 +16,26 @@ define([
         this.finalPath = null;
         this.startAngle = 0;
         this.location = 0;
+        //this.run=false;
       },
 
       update: function(data) {
         console.log('follow path update'+ this.name);
       // console.log('number of target instances for follow path=' + this.instances.length);
-        var zeroedPath = this.pathChild.cloneLiteral(this.pathChild.instance_literals[0]);
+        var zeroedPath = this.pathChild.cloneLiteral();
 
         zeroedPath.position.x = 0;
         zeroedPath.position.y = 0;
-        
+        this.updateOrigin();
         var num = this.instances.length;
+        /*if(!this.run){
+          console.log("running preset");
+          this.instances[0].delta.x = zeroedPath.segments[0].point.x;
+           this.instances[0].delta.x = zeroedPath.segments[0].point.y;
+            this.instances[num-1].delta.x = zeroedPath.segments[ zeroedPath.segments.length-1].point.x;
+           this.instances[num-1].delta.x = zeroedPath.segments[ zeroedPath.segments.length-1].point.y;
+           this.run = true;
+        }*/
         var pA = new paper.Point(this.instances[0].delta.x,this.instances[0].delta.y);
         var pB = new paper.Point(this.instances[num-1].delta.x,this.instances[num-1].delta.y);
         var nA= zeroedPath.getNearestPoint(pA);
@@ -96,6 +105,8 @@ define([
 
 
       calculate: function(data, index) {
+        console.log('follow path calculate'+ this.name);
+
         this.followPath(index);
       
         if (index === 0 || index === this.instances.length - 1) {
@@ -108,13 +119,17 @@ define([
       },
 
       clean: function(data) {
+
         this.finalPath.remove();
         this.finalPath = null;
+                console.log('follow path clean'+ this.name);
+
 
       },
 
       //projects a set of instances along a parent path- needs to be moved to mixin
       followPath: function(index) {
+
         var instance = this.instances[index];
         var start = this.finalPath.segments[index].point;
 

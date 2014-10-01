@@ -96,11 +96,13 @@ define([
     mouseUp: function(event) {
 
       for (var i = 0; i < this.selectedNodes.length; i++) {
+        if(!this.selectedNodes[i].containsBehaviorName('followpath')){
         var intersection = this.selectedNodes[i].checkIntersection();
         if (intersection) {
           this.event_bus.trigger('newBehavior', [intersection.nodeParent, this.selectedNodes[i]], 'followpath');
         }
       }
+    }
 
     },
 

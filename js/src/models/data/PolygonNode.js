@@ -33,11 +33,7 @@ define([
       },
 
 
-      createInstanceFromPath: function(path,rotation, scale){
-        var instance = PathNode.prototype.createInstanceFromPath.apply(this, arguments);
-        instance.rotation.angle = rotation;
-
-      },
+    
 
    //called when path points are modified 
    updateParams: function(sideNum) {

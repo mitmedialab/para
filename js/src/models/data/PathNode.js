@@ -109,8 +109,8 @@ define([
       path.data.tmatrix = instance.matrix.clone();
       //path.translate(path.bounds.width / 2, path.bounds.height / 2);
 
-      path.data.instanceParentIndex = this.instances.length - 1;
-      path.data.instanceIndex = this.instance_literals.length - 1;
+      path.instanceParentIndex = this.instances.length - 1;
+      path.instanceIndex = this.instance_literals.length - 1;
 
       path.nodeParent = this;
       this.getUpperLeft();
@@ -176,9 +176,12 @@ define([
         literal = this.instance_literals[0];
       } 
        newLiteral = literal.clone();
+       newLiteral.nodeParent = literal.nodeParent;
+       newLiteral.instanceParentIndex = literal.instanceParentIndex;
         var matrix = literal.data.tmatrix.clone();
         var imatrix = matrix.inverted();
         newLiteral.transform(imatrix);
+
       newLiteral.reset = true;
       return newLiteral;
 
@@ -293,7 +296,7 @@ define([
 
           }
           instance_literal.nodeParent = this;
-          instance_literal.data.instanceParentIndex = k;
+          instance_literal.instanceParentIndex = k;
           instance_literal.data.renderSignature = data[d].renderSignature.slice(0);
           instance_literal.data.renderSignature.push(k);
           var nInstance = this.instances[k];
@@ -389,7 +392,7 @@ define([
               instance_literal.fillColor = 'red';
             }*/
 
-          instance_literal.data.instanceIndex = revised_literals.length - 1;
+          instance_literal.instanceIndex = revised_literals.length - 1;
         }
       }
 
@@ -431,7 +434,7 @@ define([
       if (this.containsPath(path)) {
 
         for (var i = 0; i < this.instance_literals.length; i++) {
-          var literalParent = this.instance_literals[i].data.instanceParentIndex;
+          var literalParent = this.instance_literals[i].instanceParentIndex;
 
           if (this.instance_literals[i] === path) {
 

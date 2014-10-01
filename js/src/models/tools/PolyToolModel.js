@@ -36,9 +36,10 @@ define([
         var pathNode  = new PolygonNode();
           pathNode.name = "Path_"+nameVal;
             nameVal++;
-        this.currentPath.rotate(-rotationAmt);
+       this.currentPath.rotate(-rotationAmt);
            //console.log("rad=",this.currentPath.bounds.width/2);
-        pathNode.createInstanceFromPath(this.currentPath.clone(),rotationAmt);
+        var instance = pathNode.createInstanceFromPath(this.currentPath.clone());
+        instance.rotation.angle = rotationAmt;
         this.trigger('nodeAdded',pathNode);
          this.trigger('rootUpdate');
         this.trigger('rootRender');  

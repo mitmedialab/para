@@ -317,9 +317,9 @@ define([
         jInstances.push(this.instances[i].exportJSON());
       }
       for (var j = 0; j < this.instance_literals.length; j++) {
-        console.log("adding instance literal at ",j);
+        //console.log("adding instance literal at ",j);
         var literalJSON = this.instance_literals[j].exportJSON();
-        console.log('literalJSON=',literalJSON);
+        //console.log('literalJSON=',literalJSON);
         lInstances.push(literalJSON);
       }
       for (var k = 0; k < this.children.length; k++) {
