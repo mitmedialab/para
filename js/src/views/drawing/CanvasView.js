@@ -15,6 +15,9 @@ define([
  var saveKey = 83;
  var loadKey = 76;
  var panKey = 91;
+ var rootKey = 82;
+ var clutchKey = 72;
+ var groupKey = 71;
 var altKey = false;
  var clearKey = 67;
  var pan = false;
@@ -120,7 +123,7 @@ var CanvasView = Backbone.View.extend({
   /* canvas event functions */
 
     canvasKeydown: function(event){
-      //console.log(event.keyCode);
+      console.log(event.keyCode);
       if(event.keyCode == saveKey){
         this.model.save();
       }
@@ -133,6 +136,15 @@ var CanvasView = Backbone.View.extend({
       }
       if(event.altKey){
         altKey=true;
+      }
+      if(event.keyCode === rootKey){
+        this.model.moveToRoot();
+      }
+      if(event.keyCode === groupKey){
+        this.model.group();
+      }
+      if(event.keyCode === clutchKey){
+        this.model.toggleClutch();
       }
 
     },

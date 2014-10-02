@@ -67,8 +67,7 @@ define([
           console.log('hit segment');
           segment = hitResult.segment.index;
           console.log("segment",segment);
-          segment.fullySelected = true;
-
+       
 
         }
         else if(hitResult.type =='handle-in'|| hitResult.type =='handle-out'){

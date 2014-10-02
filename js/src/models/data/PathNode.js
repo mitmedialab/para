@@ -32,11 +32,11 @@ define([
 
 
     initialize: function(data) {
-      if (data) {
+      /*if (data) {
       this.clearObjects();
       GeometryNode.prototype.initialize.apply(this, arguments);
         var path = new paper.Path();
-        console.log("loading with data", data.instance_literals);
+        
 
         var lInstances = data.instance_literals;
        for (var j = 0; j < lInstances.length; j++) {
@@ -51,7 +51,7 @@ define([
 
           console.log("adding path",j,newLiteral);
         }
-      }
+      }*/
 
 
       var fillBehavior = new FillBehavior();
@@ -66,20 +66,20 @@ define([
        this.clearObjects();
       GeometryNode.prototype.undoRedo.apply(this, arguments);
         var path = new paper.Path();
-        console.log("loading with data", data.instance_literals);
+        //console.log("loading with data", data.instance_literals);
 
         var lInstances = data.instance_literals;
        for (var j = 0; j < lInstances.length; j++) {
         var newLiteral = new paper.Path();
-                console.log('initJSON=',lInstances[j]);
+                //console.log('initJSON=',lInstances[j]);
 
           newLiteral.importJSON(lInstances[j]);
-          console.log(newLiteral);
+         // console.log(newLiteral);
           newLiteral.nodeParent=this;
           newLiteral.instanceParentIndex = lInstances[j].instanceParentIndex;
           this.instance_literals.push(newLiteral);
 
-          console.log("adding path",j,newLiteral);
+         // console.log("adding path",j,newLiteral);
         }
       },
 
@@ -87,7 +87,7 @@ define([
 
 
     exportJSON: function(data) {
-      console.log("path export json")
+      //console.log("path export json")
       var jdata;
       if (!data) {
         this.set({
@@ -353,19 +353,17 @@ define([
 
           if (this.nodeParent == currentNode) {
             instance_literal.selected = this.instances[k].selected;
-            if (instance_literal.selected) {
-              instance_literal.fullySelected = true;
-            }
+            
             if (this.instances[k].anchor) {
-              if (k === 0) {
-                instance_literal.strokeColor = '#16a2a6';
-                instance_literal.fillColor = '#16a2a6';
-
-              } else {
-                instance_literal.strokeColor = '#f2682a';
+           
+                if(instance_literal.fillColor){
                 instance_literal.fillColor = '#f2682a';
-
               }
+              else{
+                 instance_literal.strokeColor = '#f2682a';
+              }
+
+              
               if (instance_literal.strokeWidth < 3) {
                 instance_literal.strokeWidth = 3;
               }
@@ -390,24 +388,86 @@ define([
 
 
             instance_literal.selected = data[d].selected;
-            if (data[d].anchor) {
-              if (d === 0) {
-                instance_literal.strokeColor = '#16a2a6';
-                instance_literal.fillColor = '#16a2a6';
-              } else {
-                instance_literal.strokeColor = '#f2682a';
-                instance_literal.fillColor = '#f2682a';
 
+            if (data[d].anchor) {
+                if(instance_literal.fillColor){
+                instance_literal.fillColor = '#f2682a';
               }
+              else{
+                 instance_literal.strokeColor = '#f2682a';
+              }
+
+               // instance_literal.fillColor = '#f2682a';
+              
               if (instance_literal.strokeWidth < 3) {
                 instance_literal.strokeWidth = 3;
               }
             }
           }
-
-
-
+          
+            if( instance_literal.fillColor){
+                instance_literal.fillColor.alpha = 1;
+              }
+                if( instance_literal.strokeColor){
+                instance_literal.strokeColor.alpha = 1;
+              }
           revised_literals.push(instance_literal);
+         /* if(data[d].userSelected){
+            if(k===data[d].userSelected){
+            instance_literal.selectedColor = 'red';
+          }
+          else{
+            instance_literal.selectedColor = 'blue';
+          }
+
+          }
+          else{*/
+         if (this.nodeParent == currentNode) {
+          if(revised_literals.length-1===nInstance.userSelected){
+           // instance_literal.selectedColor = 'red';
+          }
+          else{
+            if(clutch==1){
+              if( instance_literal.fillColor){
+                instance_literal.fillColor.alpha = 0.25;
+              }
+              
+                if( instance_literal.strokeColor){
+                instance_literal.strokeColor.alpha = 0.25;
+              }
+              
+                //instance_literal.selectedColor = 'blue';
+
+            }
+            else if(clutch==2){
+              instance_literal.visible = false;
+              instance_literal.selected = false;
+            }
+            }
+
+
+          //}
+        }
+        else{
+          if(!instance_literal.selected){
+           if(clutch==1){
+             if( instance_literal.fillColor){
+                instance_literal.fillColor.alpha = 0.25;
+              }
+              
+                if( instance_literal.strokeColor){
+                instance_literal.strokeColor.alpha = 0.25;
+              }
+                //instance_literal.selectedColor = 'blue';
+
+            }
+            else if(clutch==2){
+              instance_literal.visible = false;
+              instance_literal.selected = false;
+            
+            }
+          }
+        }
           lastLiteral = instance_literal;
           /*//console.log("length:",revised_literals.length);
             //console.log("user selected =",nInstance.userSelected);
@@ -462,6 +522,7 @@ define([
           if (this.instance_literals[i] === path) {
 
             this.instances[literalParent].userSelected = i;
+            console.log("selecting path at ",i);
             exception = literalParent;
             ////console.log("found matching path at ", i, "parentIndex=", literalParent);
           } else if (literalParent != exception) {

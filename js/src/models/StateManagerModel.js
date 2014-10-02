@@ -34,7 +34,8 @@ define([
       selectTool,
       rotateTool,
       followPathTool,
-      paper;
+      paper,
+      clutch;
 
     var undoManager;
 
@@ -48,7 +49,8 @@ define([
       },
 
       initialize: function(event_bus) {
-
+        //clutch which controls 
+        clutch=0;
         ////console.log(new FileSaver());
         paper = PaperManager.getPaperInstance();
         //var background = new paper.Path();
@@ -158,6 +160,22 @@ define([
 
       },
 
+      toggleClutch: function(){
+        switch(clutch){
+          case 0:
+            clutch=1;
+          break;
+          case 1:
+            clutch = 2;
+            break;
+          case 2:
+            clutch =0;
+            break;
+        }
+        this.rootRender();
+
+      },
+
       rootChange: function(change){
         rootNode.set("isChanging", change);
 
@@ -168,12 +186,10 @@ define([
         toolCollection.get(this.get('state')).reset();
 
         this.set('state', state);
-        /*if(state==='penTool'||'polyTool'){
-          if(currentNode!==rootNode){
-            this.setCurrentNode(rootNode.children[0]);
-          }
+        if(state==='penTool'||'polyTool'){
+          this.moveToRoot();
 
-      }*/
+      }
 
       },
 
@@ -200,6 +216,12 @@ define([
         this.rootRender();
       },
 
+      moveToRoot: function(){
+         if(currentNode!==rootNode){
+            this.setCurrentNode(rootNode.children[0]);
+          }
+          this.rootRender();
+      },
       //moves down based on path
       moveDownNode: function(path) {
         var children = currentNode.children;
@@ -241,7 +263,7 @@ define([
         ////console.log('called root render');
 
         rootNode.resetObjects();
-        rootNode.render(null, currentNode);
+        rootNode.render(null, currentNode, clutch);
 
         // var numChildren = paper.project.activeLayer.children.length;
         this.trigger('renderComplete');

@@ -40,7 +40,7 @@ define([
 			this.anchor= false;
 			this.drawAnchor=false;
 			this.selected= false;
-			this.userSelected = null;
+			this.userSelected = null
 			this.copy= false;
 			this.strokeColor = null;
 			this.fillColor = null;

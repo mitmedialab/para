@@ -28,7 +28,6 @@ define([
     },
 
     initialize: function(data) {
-   
         PathNode.prototype.initialize.apply(this, arguments);
       },
 

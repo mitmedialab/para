@@ -338,7 +338,7 @@ define([
       for (var i = 0; i < this.instances.length; i++) {
         var instanceJSON = this.instances[i].exportJSON();
         jInstances.push(instanceJSON);
-        console.log('instanceJSON=', instanceJSON);
+       
 
       }
       for (var j = 0; j < this.instance_literals.length; j++) {
@@ -555,7 +555,7 @@ define([
      * copies the render signature from the data and concats it with the
      *index of the instance used to render the path
      */
-    render: function(data, currentNode) {
+    render: function(data, currentNode, clutch) {
       //first create array of new instances that contain propogated updated data
 
       var revised_literals = [];
@@ -583,6 +583,8 @@ define([
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[j].selected;
               instance_literal.anchor = this.instances[j].anchor;
+              
+              
             } else {
               instance_literal.selected = data[i].selected;
               instance_literal.anchor = data[i].anchor;
@@ -602,7 +604,7 @@ define([
 
         for (var k = 0; k < this.children.length; k++) {
 
-          this.children[k].render(this.instance_literals, currentNode);
+          this.children[k].render(this.instance_literals, currentNode, clutch);
         }
       } else {
 
@@ -611,7 +613,7 @@ define([
         }
         for (var f = 0; f < this.children.length; f++) {
 
-          this.children[f].render(this.instances, currentNode);
+          this.children[f].render(this.instances, currentNode, clutch);
         }
       }
       if (this.childOrigin > -1) {
@@ -659,6 +661,18 @@ define([
           var results = this.children[i].selectByValue(index, value, path, currentNode);
 
           if (this != currentNode) {
+            /*var childInstances = this.children[i].instances;
+             for(var k=0;k<childInstances.length;k++){
+              console.log("looking at ",k);
+                if(childInstances[k].userSelected!=null){
+                  this.instances[childInstances[k].instanceParentIndex].userSelected=childInstances[k].instanceParentIndex;
+                  console.log("user selecting instance at ",childInstances[k].instanceParentIndex);
+
+                }
+                else{
+                   this.instances[childInstances[k].instanceParentIndex].userSelected=null;
+                }
+             }*/
             for (var j = 0; j < results.length; j++) {
               if (results[j].length > 0) {
                 var last = results[j].length - 1;
@@ -674,7 +688,9 @@ define([
           }
 
         }
+
       }
+
       return sIndexes;
     },
 
@@ -694,6 +710,7 @@ define([
     deselectAll: function() {
       for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].selected = false;
+        this.instances[i].userSelected = null;
       }
       for (var j = 0; j < this.children.length; j++) {
         this.children[j].deselectAll();
