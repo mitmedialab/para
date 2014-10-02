@@ -33,18 +33,24 @@ define([
 
     initialize: function(data) {
       if (data) {
-      
+      this.clearObjects();
+      GeometryNode.prototype.initialize.apply(this, arguments);
         var path = new paper.Path();
         console.log("loading with data", data.instance_literals);
 
         var lInstances = data.instance_literals;
        for (var j = 0; j < lInstances.length; j++) {
         var newLiteral = new paper.Path();
+                console.log('initJSON=',lInstances[j]);
+
           newLiteral.importJSON(lInstances[j]);
+          console.log(newLiteral);
+          newLiteral.nodeParent=this;
+          newLiteral.instanceParentIndex = lInstances[j].instanceParentIndex;
           this.instance_literals.push(newLiteral);
+
           console.log("adding path",j,newLiteral);
-      }
-        GeometryNode.prototype.initialize.apply(this, arguments);
+        }
       }
 
 
@@ -56,15 +62,32 @@ define([
 
     },
 
-      //called on undo or redo
-     reInit: function(data){
-        
+    undoRedo: function(data){
+       this.clearObjects();
+      GeometryNode.prototype.undoRedo.apply(this, arguments);
+        var path = new paper.Path();
+        console.log("loading with data", data.instance_literals);
+
+        var lInstances = data.instance_literals;
+       for (var j = 0; j < lInstances.length; j++) {
+        var newLiteral = new paper.Path();
+                console.log('initJSON=',lInstances[j]);
+
+          newLiteral.importJSON(lInstances[j]);
+          console.log(newLiteral);
+          newLiteral.nodeParent=this;
+          newLiteral.instanceParentIndex = lInstances[j].instanceParentIndex;
+          this.instance_literals.push(newLiteral);
+
+          console.log("adding path",j,newLiteral);
+        }
       },
 
+     
 
 
     exportJSON: function(data) {
-
+      console.log("path export json")
       var jdata;
       if (!data) {
         this.set({
@@ -164,7 +187,7 @@ define([
       for (var j = 0; j < this.instance_literals.length; j++) {
         this.instance_literals[j].remove();
       }
-      //this.instance_literals = [];
+      this.instance_literals = [];
       this.clearScaffolds();
     },
 

@@ -93,9 +93,7 @@ define([
 
           }
         }
-        for(var i=0;i<this.selectedNodes.length;i++){
-          this.selectedNodes[i].set("isChanging", true);
-        }
+        this.trigger('rootChange',true);
         this.trigger('rootRender');
 
       }
@@ -114,9 +112,7 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-      for(var i=0;i<this.selectedNodes.length;i++){
-          this.selectedNodes[i].set("isChanging", false);
-        }
+      this.trigger('rootChange',false);
     },
 
     //mouse drag event

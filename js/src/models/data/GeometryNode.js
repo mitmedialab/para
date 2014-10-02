@@ -35,14 +35,14 @@ define([
 
     type: 'geometry',
 
-      defaults: function () {
-      
+    defaults: function() {
+
 
       return {
         "isChanging": false
-      }
-      },
-      
+      };
+    },
+
     /* constructor 
      * instances: array for storing instances of this object
      * scaffolds: array for scaffold objects (helper information and paths)
@@ -50,7 +50,7 @@ define([
      * upperLeft: default origin of this, used for geometric transforms
      */
     constructor: function() {
-      this.scaffold= false;
+      this.scaffold = false;
       this.instances = [];
       this.scaffolds = [];
       this.instance_literals = [];
@@ -79,25 +79,48 @@ define([
     initialize: function(data) {
       if (!data) {
         this.createInstance();
-      } else {
+      } /*else {
+        this.instance_literals = [];
+        this.instances = [];
         var dInstances = data.instances;
-        this.scaffold= data.scaffold;
+        this.scaffold = data.scaffold;
         for (var i = 0; i < dInstances.length; i++) {
           var instance = this.createInstance();
           instance.parseJSON(dInstances[i]);
+          console.log("adding instance", i, instance);
+        }
+        this.upperLeft = $.extend(true, {}, data.upperLeft);
+        this.center = $.extend(true, {}, data.center);
+        this.childCenter = data.childCenter;
+
+
+      }*/
+    },
+
+    undoRedo: function(data){
+      if(this.type!='root'){
+        this.instance_literals = [];
+        this.instances = [];
+        var dInstances = data.instances;
+        this.scaffold = data.scaffold;
+        for (var i = 0; i < dInstances.length; i++) {
+          var instance = this.createInstance();
+          instance.parseJSON(dInstances[i]);
+          console.log("adding instance", i, instance);
+        }
+        this.upperLeft = $.extend(true, {}, data.upperLeft);
+        this.center = $.extend(true, {}, data.center);
+        this.childCenter = data.childCenter;
+      }
+      if (data.children.length > 0) {
+        for(var j=0;j<data.children.length;j++){
+          this.children[j].undoRedo(data.children[j]);
         }
       }
-      },
 
-      //called on undo or redo
-      reInit: function(data){
 
-      },
+    },
 
-     /* var copyBehavior = new CopyBehavior();
-      this.addBehavior(copyBehavior,['update'],'last');
-      this.setCopyNum(1); */
-   
 
     setOriginByChild: function(index) {
       this.childCenter = index;
@@ -292,9 +315,9 @@ define([
     },
 
 
+
     /* exportJSON
      * returns this node as a JSON object
-     * TODO: create an export JSON method for Behaviors
      */
     exportJSON: function(data) {
       var jdata;
@@ -313,13 +336,19 @@ define([
       var lInstances = [];
       var behaviors = [];
       for (var i = 0; i < this.instances.length; i++) {
+        var instanceJSON = this.instances[i].exportJSON();
+        jInstances.push(instanceJSON);
+        console.log('instanceJSON=', instanceJSON);
 
-        jInstances.push(this.instances[i].exportJSON());
       }
       for (var j = 0; j < this.instance_literals.length; j++) {
         //console.log("adding instance literal at ",j);
-        var literalJSON = this.instance_literals[j].exportJSON();
-        //console.log('literalJSON=',literalJSON);
+        var literalJSON = this.instance_literals[j].exportJSON({
+          asString: false,
+          precision: 5
+        });
+        literalJSON.instanceParentIndex = this.instance_literals[j].instanceParentIndex;
+
         lInstances.push(literalJSON);
       }
       for (var k = 0; k < this.children.length; k++) {
@@ -347,11 +376,16 @@ define([
 
         behaviors.push(b);
       }
+
+
       jdata.instances = jInstances;
       jdata.instance_literals = lInstances;
       jdata.children = children;
       jdata.behaviors = behaviors;
-      jdata.scaffold=this.scaffold;
+      jdata.scaffold = this.scaffold;
+      jdata.upperLeft = $.extend(true, {}, this.upperLeft);
+      jdata.center = $.extend(true, {}, this.center);
+      jdata.childCenter = this.childCenter;
       return jdata;
     },
 
@@ -506,7 +540,7 @@ define([
 
     },
 
-   clearObjects: function() {
+    clearObjects: function() {
       this.instance_literals = [];
 
       for (var i = 0; i < this.children.length; i++) {
@@ -527,31 +561,31 @@ define([
       var revised_literals = [];
       var lastLiteral = null;
       if (data) {
-         for (var i = 0; i < data.length; i++) {
+        for (var i = 0; i < data.length; i++) {
 
-        for (var j = 0; j < this.instances.length; j++) {
+          for (var j = 0; j < this.instances.length; j++) {
             var instance_literal = this.instances[j].clone();
-            if(this.instance_literals.length>0){
+            if (this.instance_literals.length > 0) {
               lastLiteral = this.instance_literals.shift();
               instance_literal.order = lastLiteral.order;
             }
-            instance_literal.order = lastLiteral === null ? 0: lastLiteral.order;
+            instance_literal.order = lastLiteral === null ? 0 : lastLiteral.order;
 
             this.instances[j].instanceParentIndex = i;
             if (data[i].renderSignature) {
               instance_literal.renderSignature = data[i].renderSignature.slice(0);
             }
-           instance_literal.renderSignature.push(j);
+            instance_literal.renderSignature.push(j);
             instance_literal.instanceParentIndex = j;
 
             instance_literal.render(data[i]);
 
             if (this.nodeParent == currentNode) {
-             instance_literal.selected = this.instances[j].selected;
+              instance_literal.selected = this.instances[j].selected;
               instance_literal.anchor = this.instances[j].anchor;
             } else {
-             instance_literal.selected = data[i].selected;
-             instance_literal.anchor = data[i].anchor;
+              instance_literal.selected = data[i].selected;
+              instance_literal.anchor = data[i].anchor;
             }
 
             revised_literals.push(instance_literal);
@@ -560,11 +594,11 @@ define([
 
           }
         }
-        for(var i=0;i<this.instance_literals.length;i++){
+        for (var i = 0; i < this.instance_literals.length; i++) {
           this.instance_literals[i].remove();
         }
 
-        this.instance_literals= revised_literals;
+        this.instance_literals = revised_literals;
 
         for (var k = 0; k < this.children.length; k++) {
 
@@ -811,6 +845,21 @@ define([
           this.override(methods[j]);
         }
       }
+    },
+
+    removeAllBehaviors: function() {
+      for (var i = 0; i < this.behaviors.length; i++) {
+        //TODO: fix this hack- will remove user defined rotation
+        if (this.behaviors[i].behavior.type === 'distribution') {
+          this.distributionReset();
+        }
+        var methods = this.behaviors[i].methods;
+        for (var j = 0; j < methods.length; j++) {
+          this.override(methods[j]);
+        }
+      }
+      this.behaviors = [];
+
     },
 
     override: function(methodName) {

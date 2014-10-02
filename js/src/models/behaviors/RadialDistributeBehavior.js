@@ -23,6 +23,19 @@ define([
 
       },
 
+     /*exportJSON: function(){
+      //console.log(this.renderSignature);
+      this.set({
+         middle: this.middle,
+        rad: this.rad,
+        origin: jQuery.extend(true, {}, this.origin);
+        startAngle: this.startAngle =0;
+        this.angle = 0;
+      });
+      return this.toJSON();
+    },*/
+
+   
 
       update: function() {
         var num = this.instances.length;

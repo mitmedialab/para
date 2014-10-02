@@ -85,6 +85,8 @@ define([
 
         this.listenTo(toolCollection, 'optionClick', this.openMenu);
         this.listenTo(toolCollection, 'rootRender', this.rootRender);
+        this.listenTo(toolCollection, 'rootChange', this.rootChange);
+
         this.listenTo(toolCollection, 'rootUpdate', this.rootUpdate);
         this.listenTo(toolCollection, 'getSelection', this.getSelection);
 
@@ -122,10 +124,10 @@ define([
             }
           },
           "undo": function(model, before, after, options) {
-            model.reInit(before);
+            model.undoRedo(before);
           },
           "redo": function(model, before, after, options) {
-            model.reInit(after);
+            model.undoRedo(after);
           }
 
           
@@ -141,11 +143,23 @@ define([
       undo: function() {
         console.log("action is available",undoManager.isAvailable());
         undoManager.undo();
+        this.rootUpdate();
+        this.rootRender();
+        paper.view.draw();
 
       },
 
       redo: function() {
         undoManager.redo();
+         this.rootUpdate();
+        this.rootRender();
+        paper.view.draw();
+
+
+      },
+
+      rootChange: function(change){
+        rootNode.set("isChanging", change);
 
       },
 
@@ -173,9 +187,10 @@ define([
       //callback triggered when tool adds new node
       nodeAdded: function(node) {
         ////console.log('node added: '+ node.type);
-        undoManager.register(node);
+      //rootNode.set("isChanging", true);
         currentNode.addChildNode(node);
         toolCollection.get(this.get('state')).currentNode = node;
+          // rootNode.set("isChanging", false);
 
       },
 
@@ -568,7 +583,6 @@ define([
           if (data[i].children.length > 0) {
             this.parseJSON(node, data[i].children);
           }
-
 
         }
       },

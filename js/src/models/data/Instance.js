@@ -83,15 +83,15 @@ define([
 			//console.log(this.renderSignature);
 			this.set({
 				closed:this.closed,
-				position:this.position,
-				delta: this.delta,
+				position:{x:this.position.x,y:this.position.y},
+				delta: {x:this.delta.x,y:this.delta.y},
 				midpoint: this.midpoint,
 				width: this.width,
 				height: this.height,
 				anchor: this.anchor,
 				visible:this.visible,
 				scale:this.scale,
-				rotation: this.rotation,
+				rotation: {angle:this.rotation.angle,x:this.rotation.x,y:this.rotation.y},
 				strokeWidth: this.strokeWidth,
 				fillColor: this.fillColor,
 				strokeColor: this.strokeColor,
