@@ -1,43 +1,53 @@
 (function () {
     "use strict";
 
+    var COOKIE_KEY = "para-userid";
+
+    var config = require("./config"),
+        logger = require("./logger"),
+        HTTPError = require("./httperror");
+
     var connect = require("connect"),
         morgan = require("morgan"),
         bodyParser = require("body-parser"),
         cookieParser = require("cookie-parser"),
-        serveStatic = require("serve-static"),
-        finalhandler = require("finalhandler"),
-        resolve = require("path").resolve;
+        serveStatic = require("serve-static");
 
     var app = connect();
 
-    var bp = bodyParser.urlencoded({extended: false}),
-        cp = cookieParser();
+    app.use(morgan(config.logFormat));
 
-
-
-    app.use(morgan("dev"));
-
+    // First, make sure requests to "/log" are POSTs. If not, don't bother
+    // parsing cookies or body.
     app.use("/log", function (req, res, next) {
         if (req.method !== "POST") {
-            return next();
+            res.setHeader("Allow", "POST");
+            return next(new HTTPError("Requests to /log must be POSTs", 405));
+        }
+        return next();
+    });
+
+    app.use("/log", cookieParser());
+    app.use("/log", bodyParser.json());
+
+    app.use("/log", function (req, res, next) {
+        if (!(req.cookies[COOKIE_KEY] && typeof(req.body) === "object")) {
+            return next(new HTTPError("Request parameters missing", 400));
         }
 
-        bp(req, res, function () {
-            cp(req, res, function () {
+        logger.log(req.body, req.cookies[COOKIE_KEY], req.socket.address().address, function (err) {
+            if (err) {
+                return next(new HTTPError("Server error", 500));
+            } else {
                 res.setHeader("Content-type", "text/plain");
-                res.end("Your body:\n" + JSON.stringify(req.body, null, "  ") +
-                    "\nYour cookies:\n" + JSON.stringify(req.cookies, null, "  ") + "\n");
-            });
+                res.end("ok");
+                return next();
+            }
         });
     });
 
-    var serve = serveStatic(resolve(__dirname, "..", "build"), {"index": ["index.html", "index.htm"]});
 
-    app.use("/", function (req, res) {
-        var done = finalhandler(req, res);
-        serve(req, res, done);
-    });
+    app.use("/", serveStatic(config.staticPath, {"index": ["index.html", "index.htm"]}));
 
     module.exports = app;
 
