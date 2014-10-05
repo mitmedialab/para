@@ -29,7 +29,8 @@
     "underscore": "1.6.0",
     "Backbone.Undo": "git://github.com/osartun/Backbone.Undo.js.git",
     "iris-color-picker" : "git://github.com/Automattic/Iris.git",
-    "jqueryui":"git://github.com/components/jqueryui.git"
+    "jqueryui":"git://github.com/components/jqueryui.git",
+    "jquery-cookie": "~1.4.1"
   },
   "resolutions": {
     "backbone": "1.1.2",
