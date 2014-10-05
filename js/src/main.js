@@ -10,8 +10,9 @@ require.config({
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "filesaver": "../../bower_components/FileSaver/FileSaver",
         "backbone.undo": "../../bower_components/Backbone.Undo/Backbone.Undo",
-         "jquery-ui" : "../../bower_components/jqueryui/jquery-ui.min",
-        "iris-color-picker": "../../bower_components/iris-color-picker/dist/iris.min"
+        "jquery-ui" : "../../bower_components/jqueryui/jquery-ui",
+        "iris-color-picker": "../../bower_components/iris-color-picker/dist/iris",
+        "jquery-cookie" : "../bower_components/jquery-cookie/jquery.cookie"
     },
   
     shim: {
@@ -31,6 +32,6 @@ require.config({
 
 });
 
-require(["jquery", "backbone", "underscore", "handlebars"], function () {
+require(["jquery", "jquery-ui", "backbone", "underscore", "handlebars"], function () {
     require(["app"]);
 });

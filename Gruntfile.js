@@ -33,11 +33,7 @@ module.exports = function (grunt) {
         cssmin: {
             combine: {
                 files: {
-                    "build/style.css": [
-                        "bower_components/bootstrap/dist/css/bootstrap.min.css",
-                        "bower_components/pick-a-color/build/1.2.3/css/pick-a-color-1.2.3.min.css",
-                        "css/basic.css"
-                    ]
+                    "build/style.css": ["css/basic.css"]
                 }
             }
         },
