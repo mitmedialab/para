@@ -19,7 +19,6 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "3.1.1",
     "backbone": "1.1.2",
     "FileSaver": "*",
     "handlebars": "1.3.0",
@@ -35,7 +34,6 @@
     "jqueryui":"git://github.com/components/jqueryui.git"
   },
   "resolutions": {
-    "bootstrap": "3.1.1",
     "backbone": "1.1.2",
     "jquery": "2.1.1",
     "underscore": "1.6.0"
