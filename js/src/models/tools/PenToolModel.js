@@ -28,6 +28,7 @@ define([
 
     reset: function(){
       ////console.log('pen tool is reset');
+      this.trigger('rootChange',true);
       currentSegment = null;
       if(this.currentPath){
       this.currentPath.selected = false;
@@ -45,6 +46,8 @@ define([
         this.currentPath.remove();
         this.currentPath = null;
       }
+       
+        this.trigger('rootChange',false);
       this.trigger('rootRender');
 
     },

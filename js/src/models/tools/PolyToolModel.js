@@ -31,6 +31,7 @@ define([
     reset: function(){
     
       if(this.currentPath){
+          this.trigger('rootChange',true);
       this.currentPath.selected = false;
         
         var pathNode  = new PolygonNode();
@@ -46,6 +47,7 @@ define([
         this.currentPath.remove();
         this.currentPath = null;
       }
+        this.trigger('rootChange',false);
       this.trigger('rootRender');
 
     },

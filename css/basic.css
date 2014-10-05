@@ -111,10 +111,11 @@ white-space: nowrap;
 .btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
 color: #333;
 background-color: #cccccc;
-border-color: #B2B2B2;
 }
 
 .btn-tool{
+	border: none;
+
 	width:36px;
 	height:36px;
 	padding: 0;

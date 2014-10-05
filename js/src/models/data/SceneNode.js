@@ -153,6 +153,7 @@ define([
             addChildNode: function(node) {
 
                 if (node !== null) {
+                    console.log("adding node",node.type);
                     node.setParentNode(this);
                     this.children.push(node);
                     node.index = this.children.length-1;

@@ -32,7 +32,7 @@ define([
 
 
     initialize: function(data) {
-      /*if (data) {
+      if (data) {
       this.clearObjects();
       GeometryNode.prototype.initialize.apply(this, arguments);
         var path = new paper.Path();
@@ -51,14 +51,7 @@ define([
 
           console.log("adding path",j,newLiteral);
         }
-      }*/
-
-
-      var fillBehavior = new FillBehavior();
-      this.addBehavior(fillBehavior, ['update']);
-      /*var copyBehavior = new CopyBehavior();
-      this.addBehavior(copyBehavior, ['update'], 'last');
-      this.setCopyNum(1);*/
+      }
 
     },
 

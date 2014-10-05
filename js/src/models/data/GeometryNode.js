@@ -79,7 +79,7 @@ define([
     initialize: function(data) {
       if (!data) {
         this.createInstance();
-      } /*else {
+      } else {
         this.instance_literals = [];
         this.instances = [];
         var dInstances = data.instances;
@@ -94,7 +94,7 @@ define([
         this.childCenter = data.childCenter;
 
 
-      }*/
+      }
     },
 
     undoRedo: function(data){
@@ -112,11 +112,33 @@ define([
         this.center = $.extend(true, {}, data.center);
         this.childCenter = data.childCenter;
       }
+
+      if(this.children.length>data.children.length){
+        var diff = this.children.length-data.children.length;
+
+        for(var k=0;k<diff;k++){
+          this.children[this.children.length-1].deleteNode();
+
+        }
+      }
+      else if(this.children.length<data.children.length){
+        var diff = data.children.length-this.children.length;
+
+        var missingChildren = data.children.slice(diff-1,data.children.length);
+        console.log('missingChildren',missingChildren); 
+        this.trigger('parseJSON',this, missingChildren);
+        
+
+      }
+
+      
       if (data.children.length > 0) {
         for(var j=0;j<data.children.length;j++){
           this.children[j].undoRedo(data.children[j]);
         }
       }
+
+
 
 
     },
@@ -583,8 +605,8 @@ define([
             if (this.nodeParent == currentNode) {
               instance_literal.selected = this.instances[j].selected;
               instance_literal.anchor = this.instances[j].anchor;
-              
-              
+
+
             } else {
               instance_literal.selected = data[i].selected;
               instance_literal.anchor = data[i].anchor;

@@ -8,7 +8,7 @@ define([
     'backbone.undo',
     'models/data/GeometryNode',
     'models/data/PathNode',
-
+    'models/data/PolygonNode',
     'models/tools/ToolCollection',
     'models/tools/PenToolModel',
     'models/tools/PolyToolModel',
@@ -25,7 +25,7 @@ define([
     'filesaver'
   ],
 
-  function($, _, Backbone, UndoManager, GeometryNode, PathNode, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver) {
+  function($, _, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode,ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver) {
     var rootNode,
       currentNode,
       toolCollection,
@@ -108,6 +108,8 @@ define([
 
         rootNode = new GeometryNode();
         rootNode.type = 'root';
+        this.listenTo(rootNode, 'parseJSON', this.parseJSON);
+
         currentNode = rootNode;
         this.rootRender();
 
@@ -586,12 +588,16 @@ define([
       },
 
       parseJSON: function(currentNode, data) {
+        console.log('parse json',currentNode,data);
         for (var i = 0; i < data.length; i++) {
           var type = data[i].type;
           var node;
           switch (type) {
             case 'path':
               node = new PathNode(data[i]);
+              break;
+               case 'polygon':
+              node = new PolygonNode(data[i]);
               break;
             default:
               node = new GeometryNode(data[i]);

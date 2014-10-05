@@ -93,7 +93,7 @@ define([
 
           }
         }
-        this.trigger('rootChange',false);
+        this.trigger('rootChange',true);
         this.trigger('rootRender');
 
       }
