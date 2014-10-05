@@ -7,17 +7,12 @@ define([
   'underscore',
   'backbone',
   'handlebars',
-  'tinycolor',
-  'pickacolor',
+  'iris-color-picker',
   'models/PaperManager'
-], function($, _, Backbone, Handlebars, Tinycolor, Pickacolor,PaperManager) {
+], function($, _, Backbone, Handlebars, IrisColorPicker, PaperManager) {
 
   var template, source;
   var paper = PaperManager.getPaperInstance();
-
-  // TODO: Remove this global when we remove pick-a-color
-  window.tinycolor = Tinycolor;
-
   var PropertyView = Backbone.View.extend({
     //
     initialize: function() {
@@ -33,31 +28,56 @@ define([
       source = $('#parameterTemplate').html();
       template = Handlebars.compile(source);
 
+
+      $('#fillColorBlock').addClass('color-block-selected');
+      $('#fillColorBlock').css('background-color', 'white');
+      $('#fill').val('#ffffff');
+      $('#strokeColorBlock').css('background-color', 'black');
+      $('#stroke').val('#000000');
       $('#strokeSlider').on('input', function(slideEvt) {
         $('#strokeSlider').trigger('stroke-change');
       });
 
-      $('.demo').each(function() {
-        $(this).pickAColor({
-          showSpectrum: false,
-          showAdvanced: false,
-          showSavedColors: false,
+      $('#color-window').each(function() {
+        $(this).iris({
+          palettes: ['#fff',
+         '#000',
+          '#0E3D63',
+         
+        '#16A2A6',
+          '#C6E8ED',
+          '#BC2028',
+         '#F0576D',
+          '#F2682A',
+          '#F1A54D',
+         '#FEE4BF'],
+          hide: false,
+          color: '#fff',
+          change: function(event, ui) {
+            $(this).trigger('colorChange', event, ui);
+          }
         });
       });
-
 
     },
 
     events: {
-      'color-change': 'colorChange',
       'stroke-change': 'strokeChange',
-       'param-change': 'paramChange',
+      'param-change': 'paramChange',
       'change #text-filename': 'nameChange',
       'click #save': 'save',
       'click #saveFile': 'saveFile',
       'click #export': 'export',
       'change #upload': 'loadFile',
-      'change #fileselect': 'load'
+      'change #fileselect': 'load',
+      'colorChange': 'colorChange',
+      'click #fillColorBlock': 'toggleFillStroke',
+      'click #strokeColorBlock': 'toggleFillStroke',
+      'change #fill': 'colorInputChange',
+      'change #stroke': 'colorInputChange',
+      'click #no-color': 'clearColor',
+
+
     },
 
     render: function() {
@@ -72,25 +92,121 @@ define([
         */
     },
 
-    colorChange: function(event) {
-      //console.log("colorChange");
-      this.model.updateColor($(event.target).val(), event.target.id);
+    clearColor:function(event){
+       if ($('#fillColorBlock').hasClass('color-block-selected')) {
+        $('#fillColorBlock').addClass('remove-color');
+        $('#fill').val("#");
+        this.model.updateColor(-1, 'fill');
+
+      } else {
+        $('#strokeColorBlock').addClass('remove-color');
+        $('#stroke').val("#");
+        this.model.updateColor(-1, 'stroke');
+
+      }
+    },
+
+    colorInputChange: function(event) {
+      var color = $(event.target).val();
+      var id = $(event.target).attr('id');
+      if (id == 'fill') {
+        $('#fillColorBlock').css('background-color', color);
+        if ($('#fillColorBlock').hasClass('color-block-selected')) {
+          $('#color-window').iris('color', color);
+        }
+      }
+      if (id == 'stroke') {
+        $('#strokeColorBlock').css('background-color', color);
+
+        if ($('#strokeColorBlock').hasClass('color-block-selected')) {
+          $('#color-window').iris('color', color);
+        }
+      }
+      this.model.updateColor(color, id);
 
     },
 
+    colorChange: function(event, ui) {
+
+      var color = $('#color-window').iris('color');
+      if ($('#fillColorBlock').hasClass('color-block-selected')) {
+          $('#fillColorBlock').removeClass('remove-color');
+        $('#fillColorBlock').css('background-color', color);
+        $('#fill').val(color);
+        this.model.updateColor(color, 'fill');
+
+      } else {
+           $('#strokeColorBlock').removeClass('remove-color');
+        $('#strokeColorBlock').css('background-color', color);
+        $('#stroke').val(color);
+        this.model.updateColor(color, 'stroke');
+
+      }
+
+
+    },
+
+    pathSelected: function(path) {
+      //console.log("path selected");
+      this.currentPaths.push(path);
+      //TODO: reference instance value not path value
+      var fill = this.currentPaths[0].fillColor;
+      var stroke = this.currentPaths[0].strokeColor;
+      var width = this.currentPaths[0].strokeWidth;
+
+      if (fill) {
+        $('#fillColorBlock').css('background-color', fill.toCSS(true));
+        $('#fill').val(fill.toCSS(true));
+        if ($('#fillColorBlock').hasClass('color-block-selected')) {
+          $('#color-window').iris('color', fill.toCSS(true));
+        }
+      }
+      if (stroke) {
+        $('#strokeColorBlock').css('background-color', stroke.toCSS(true));
+        $('#stroke').val(stroke.toCSS(true));
+        if ($('#strokeColorBlock').hasClass('color-block-selected')) {
+          $('#color-window').iris('color', stroke.toCSS(true));
+        }
+      }
+      if (width) {
+        //console.log("setting slider");
+        $('#strokeSlider').val(width);
+      }
+
+      this.setParams();
+    },
+
+
+    toggleFillStroke: function(event) {
+      var id = event.target.id;
+      if (id == 'fillColorBlock') {
+        $('#strokeColorBlock').removeClass('color-block-selected');
+        $('#fillColorBlock').addClass('color-block-selected');
+         if( !$('#fillColorBlock').hasClass('remove-color')){
+            $('#color-window').iris('color', $('#fillColorBlock').css('background-color'));
+          }
+      } else {
+        $('#strokeColorBlock').addClass('color-block-selected');
+        $('#fillColorBlock').removeClass('color-block-selected');
+        if( !$('#strokeColorBlock').hasClass('remove-color')){
+          $('#color-window').iris('color', $('#strokeColorBlock').css('background-color'));
+        }
+      }
+    },
+
     strokeChange: function(event) {
-       var value = parseInt($(event.target).val(), 10);
+      var value = parseInt($(event.target).val(), 10);
       this.model.updateStroke(value);
     },
 
     paramChange: function(event) {
-            var value = parseInt($(event.target).val(), 10);
+      var value = parseInt($(event.target).val(), 10);
 
       //console.log('value=',value);
-       var selected = this.model.getSelected();
+      var selected = this.model.getSelected();
 
       var s = selected[selected.length - 1];
-      if(s){
+      if (s) {
         s.updateParams(value);
       }
       this.model.rootUpdate();
@@ -187,26 +303,6 @@ define([
       $('#saveFile').attr('disabled', false);
     },
 
-    pathSelected: function(path) {
-      //console.log("path selected");
-      this.currentPaths.push(path);
-      var fill = this.currentPaths[0].fillColor;
-      var stroke = this.currentPaths[0].strokeColor;
-      var width = this.currentPaths[0].strokeWidth;
-
-      if (fill) {
-        $('#fill').val(fill.toCSS(true).substr(1));
-      }
-      if (stroke) {
-        $('#stroke').val(stroke.toCSS(true).substr(1));
-      }
-      if (width) {
-        //console.log("setting slider");
-        $('#strokeSlider').val(width);
-      }
-
-      this.setParams();
-    },
 
     //triggered when StateManager finds selection point
     setParams: function() {
@@ -239,7 +335,7 @@ define([
         var slider = $(this);
 
         slider.on('input', function(slideEvt) {
-        slider.trigger('param-change');
+          slider.trigger('param-change');
         });
       });
 
@@ -249,8 +345,8 @@ define([
 
     selectionReset: function() {
       this.currentPaths = [];
-       $('#parameterSliders').empty();
-    
+      $('#parameterSliders').empty();
+
     }
 
   });

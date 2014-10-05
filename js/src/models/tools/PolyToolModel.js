@@ -64,10 +64,9 @@ define([
 
           var paper = PaperManager.getPaperInstance();
           this.currentPath =  new paper.Path.RegularPolygon(event.point,sideNum,1);
-    
+       
          this.currentPath.selected = true;
-          this.currentPath.fillColor = this.fillColor;
-          this.currentPath.strokeColor = this.strokeColor;
+         
           rotationAmt=0;
 
 
@@ -100,6 +99,17 @@ define([
         //console.log("difference="+rotate);
         this.currentPath.scale(scale);
         this.currentPath.rotate(rotate);
+        this.currentPath.strokeWidth = this.style.strokeWidth;
+         this.currentPath.strokeColor = this.style.strokeColor;
+         this.currentPath.fillColor = this.style.fillColor;
+         if(this.fillColor==-1){
+          this.currentPath.style.fillColor = null;
+
+         }
+         if(this.strokeColor==-1){
+          this.currentPath.style.strokeColor = null;
+
+         }
          // this.currentPath.rotate(angle);
        }
 

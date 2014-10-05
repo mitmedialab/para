@@ -9,203 +9,208 @@
 
   <title>Para</title>
 
-  <!-- Library CSS -->
-  <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="bower_components/pick-a-color/build/1.2.3/css/pick-a-color-1.2.3.min.css">   
-
+ 
   <!-- Page CSS -->
   <link href="css/basic.css" rel="stylesheet">
 
 </head>
 
-    <body>
-      <div id="context-menu",class="floating-menu">
-        <div id = "main-menu">
-          <script id="menu-template" type="text/x-handlebars-template">
-          <div class="row" id="title-bar">
-          <div id="name">{{name}}</div>
-          <div id="close"><button id="close-btn">x</button></div>
-          </div>
-          <div class="row">
-          <div id="behavior-menu">behaviors</div>
-          {{behavior-menu}}
-          <div><a id="new-behavior-btn">new behavior +</a></div>
-          </div>
-          <div class="row">
-          <div id="cond-menu">conditionals</div>
-          {{cond-menu}}
-          <div><a id="new-cond-btn">new conditional +</a></div>
-          </div>
-          </script>
-        </div>
-        <div id="behavior-types-menu">
-          <div class="row"><a id="copy">copy</a></div>  
-          <div class="row"><a id="linear">linear distribution</a></div> 
-          <div class="row"><a id="radial">radial distribution</a></div> 
-          <div class="row"><a id="gaussian">normal distribution</a></div> 
-        </div>
+<body>
+  <div id="context-menu",class="floating-menu section_background">
+    <div id = "main-menu">
+      <script id="menu-template" type="text/x-handlebars-template">
+      <div class="row" id="title-bar">
+      <div id="name">{{name}}</div>
+      <div id="close"><button id="close-btn">x</button></div>
+      </div>
+      <div class="row">
+      <div id="behavior-menu">behaviors</div>
+      {{behavior-menu}}
+      <div><a id="new-behavior-btn">new behavior +</a></div>
+      </div>
+      <div class="row">
+      <div id="cond-menu">conditionals</div>
+      {{cond-menu}}
+      <div><a id="new-cond-btn">new conditional +</a></div>
+      </div>
+      </script>
+    </div>
+    <div id="behavior-types-menu">
+      <div class="row"><a id="copy">copy</a></div>  
+      <div class="row"><a id="linear">linear distribution</a></div> 
+      <div class="row"><a id="radial">radial distribution</a></div> 
+      <div class="row"><a id="gaussian">normal distribution</a></div> 
+    </div>
+  </div>
+
+
+
+
+<!--======================= CANVAS =======================-->
+<!--draw container, contains canvas and object and property menus -->
+<div id = "draw-container" class="container-fixed"><!--draw container-->
+  <div id = "canvas-container"><!--canvas-container-->
+    <span><canvas id="canvas" resize="true"></canvas></span>
+  </div><!--/canvas-container-->
+</div>  <!--/draw container-->
+
+   <!--======================= MENU BAR=======================-->
+<div  class ='menubar-container section-background' >
+<div ></div>
+</div>
+
+<div class="properties-container" >
+
+  
+ 
+   <!--======================= TOOLBAR=======================-->
+
+ <aside class="toolbar-pop-over" style="display: block;">
+  <div id = "toolbar">
+    <button class="btn btn-default btn-tool" id="redoTool"><img src="images/redo_icon.png" width="28" height="28"/></button>
+    <button class="btn btn-default btn-tool" id="undoTool"><img src="images/undo_icon.png" width="28" height="28"/></button>
+    <button  class="btn btn-default btn-tool" id="scaleTool"><span><img src="images/scale_tool_icon.png" width="28" height="28"/></button>
+    <button  class="btn btn-default btn-tool" id="rotateTool"><span><img src="images/rotate_tool_icon.png" width="28" height="28"/></button>
+    <button  class="btn btn-default btn-tool" id="followPathTool"><span><img src="images/follow_path_icon.png" width="28" height="28"/></button>
+    <button  class="btn btn-default btn-tool" id="selectTool"><span><img src="images/select_tool_icon.png" width="28" height="28"/></button>
+    <button class="btn btn-default btn-tool" id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/></button>
+    <button class="btn btn-default btn-tool" id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/></button>
+  </div>
+  </aside> <!-- /toolbar-->
+  <div id = 'prop-menu' class="properties">
+
+      <!--======================= COLOR MENU =======================-->
+ <section id = "color-menu">
+  <header >
+                    <h2>
+                      Style
+                    </h2>
+                    <div class="clearfix"></div>
+                </header>
+  <div  class="section-background">
+   <div class="form-group color-form-group">
+
+    <label for="hidden-input">Fill</label>
+    <br>
+    <a id="fillColorBlock" class='color-block'></a>
+
+  <input type="text" id='fill' class='color' value="#fff" />
+  </div>
+
+  <div class="form-group color-form-group">
+    <label for="hidden-input">Stroke</label>
+    <br>
+    <a id="strokeColorBlock" class='color-block'></a>
+
+     <input type="text" id='stroke' class='color' value="#fff" />
+
+  </div>
+   <div class="form-group color-form-group">
+    <a id="no-color" class='color-block remove-color'></a>
+  </div>
+  <div class='clearfix'></div>
+  <div id="color-chooser"><div id="color-window"></div></div>
+  <div class="container" id="master-container">
+
+  
+
+</div>
+  <div class="form-group">
+    <label for="hidden-input">Stroke Weight</label>
+    <br>
+
+
+    <input id="strokeSlider" type="range" min="0" max="40">
+
+  </div>
+  <div class="form-group">
+   <label for="hidden-input">Scaffold</label>
+   <input type="checkbox" name="scaffold" value="scaffold">
+ </div>
+</div>
+</section><!--/colorMenu-->
+   
+
+  <!--======================= PARAMETER MENU =======================-->
+
+  <section> 
+  
+ <header >
+                    <h2>
+                       Parameters
+                    </h2>
+                    <div class="clearfix"></div>
+                </header>
+  <div id = "parameterSliders" class="section-background">
+   <script id="parameterTemplate" type="text/x-handlebars-template">
+
+   {{#each paramName}}
+
+   <div class="form-group">
+   <label id='parameterName'>{{label}}</label>
+   <br>
+   <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
+   </div>
+
+
+   {{/each}}
+
+
+   </script>
+ </div>
+ </section><!--parameterSlider-->
+
+
+
+<!--======================= SAVE MENU =======================-->
+
+ <section id = "save-menu ">
+  <header >
+              <h2>Save</h2>
+                    <div class="clearfix"></div>
+                </header>
+  <div  class="section-background">
+      
+       <div class="form-group">
+        <label>name <input class="form-control" type="text" class="filename" id="text-filename" placeholder="my_drawing"/></label>
+
+        <select id ="fileselect" class="form-control"></select>
+      </div>
+      <div class="form-group">
+        <input type="button" id="save" value="save" disabled="true"/>
       </div>
 
-      <div class="container" id="master-container">
+  </section> <!--/save-menu-->
 
-        <!-- Static navbar -->
-        <div class="navbar" role="navigation">
-           
-              <div id = 'logo'>
-                <img src='images/logo.png'/>
-              </div>
-              <a id="helpbtn">
-               <div id = 'help'>
-                <img src='images/dot_btn.png'/>
-              </div>
-            </a>
-            </div>
-            
-            </div>
+  <!--======================= EXPORT MENU =======================-->
 
-            <!--draw container, contains canvas and object and property menus -->
-            <div id = "draw-container" class="container-fixed"><!--draw container-->
+ <section id = "save-menu ">
+  <header >
+              <h2>Export</h2>
+                    <div class="clearfix"></div>
+                </header>
+  <div  class="section-background">
+    
+      <div class="form-group">
+        <input type="button" id="saveFile" value="download file" disabled="true"/>
+      </div>
+      <div class="form-group">
+        <label>upload file from desktop<input class="form-group" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
+      </div>
+      <div class="form-group">
+        <input type="button" id ="export" value="export svg"/>
+      </div>
+      </div>
+  </section> <!--/save-menu-->
+</div><!--/properties-->
 
-              <div class = "row"> <!--master-row -->
-
-               <div class="col-md-10"> <!--large column -->
-              
-                 <div class = "row"> <!--row-->
-
-                  <div class = "col-md-12" id = "canvas-container"><!--canvas-container-->
-                  <span><canvas id="canvas" resize="true"></canvas></span>
-                 </div><!--/canvas-container-->
-               </div><!--/row-->
-             </div> <!--/large column-->
-
-             <div class="col-md-2">
-              <div class="row">
-<div id = "toolbar" class="navbar-collapse collapse">
-                <!-- <button  class="btn btn-default btn-tool" id="generatorTool"><span><img src="images/generator_tool_icon.png" width="28" height="28"/>-->
-                    
-                          <button class="btn btn-default btn-tool" id="redoTool"><img src="images/redo_icon.png" width="28" height="28"/>
-                            <button class="btn btn-default btn-tool" id="undoTool"><img src="images/undo_icon.png" width="28" height="28"/>
-                   <button  class="btn btn-default btn-tool" id="scaleTool"><span><img src="images/scale_tool_icon.png" width="28" height="28"/>
-                <button  class="btn btn-default btn-tool" id="rotateTool"><span><img src="images/rotate_tool_icon.png" width="28" height="28"/>
-                  <button  class="btn btn-default btn-tool" id="followPathTool"><span><img src="images/follow_path_icon.png" width="28" height="28"/>
-              <button  class="btn btn-default btn-tool" id="selectTool"><span><img src="images/select_tool_icon.png" width="28" height="28"/>
-                <button class="btn btn-default btn-tool" id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/>
-                <button class="btn btn-default btn-tool" id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/>
-                  </div><!--/.nav-collapse -->
-                <div id = "prop-menu" class ="col-md-12">
-                 
-                    <form id="text-options">
-                       <div class="form-group">
-                      <label>name <input class="form-control" type="text" class="filename" id="text-filename" placeholder="my_drawing"/></label>
-
-                      <select id ="fileselect" class="form-control"></select>
-                        </div>
-                     <div class="form-group">
-                      <input type="button" id="save" value="save" disabled="true"/>
-                       <input type="button" id="saveFile" value="save to computer" disabled="true"/>
-                       </div>
-                    
-                     <div class="form-group">
-                      <input type="button" id ="export" value="download svg"/>
-                        </div>
-                     <div class="form-group">
-                      <label>upload file from desktop<input class="form-group" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
-                    </div>
-                    </form>
-                     <div id = "parameterSliders" class="form-group"> 
-                     <script id="parameterTemplate" type="text/x-handlebars-template">
-               
-                   {{#each paramName}}
-                   
-                    <div class="form-group">
-                    <label id='parameterName'>{{label}}</label>
-                    <br>
-                    <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
-                  </div>
-                  
-                  
-                      {{/each}}
-                     
-                    
-                     </script>
-                     </div>
-
-                  <div class="form-group">
-                    <label for="hidden-input">Fill</label>
-                    <br>
-                    <input type="text" id="fill" class="form-control demo" value="fff">
-                  </div>
-                  <div class="form-group">
-                    <label for="hidden-input">Stroke</label>
-                    <br>
-                    <input type="text" id="stroke" class="form-control demo" value="fff">
-                  </div>
-                  <div class="form-group">
-                    <label for="hidden-input">Stroke Weight</label>
-                    <br>
-                    <input id="strokeSlider" type="range" min="0" max="40">
-                    </div>
-                     <div class="form-group">
-                         <label for="hidden-input">Scaffold</label>
-                    <input type="checkbox" name="scaffold" value="scaffold">
-                  </div>
-                  </div>
-                  
-
-                  <!--<div class = "row">
-                    <div id = "object-menu" class ="col-md-12"></div>
-                  </div>-->
-
-                </div>
-              </div><!--/master row -->
-            </div><!--/draw container-->
-          </div>
+ 
 
 
-           <!-- <div id ='instructions'>
-      <div class="starter-template">
-        <h2>Thanks for trying out Para.</h2>
-        <p class="lead">Here's the basics</p>
-        <ul>
-     <li>Use the pen tool to draw shapes using bezier curves.  <img src="images/pen_tool_icon.png" width="25" height="25"/> </li>
-       <li>Use the select tool to select and manipulate shapes. <img src="images/select_tool_icon.png" width="25" height="25"/></li>
-       <li>Pan and zoom by holding down the command key (⌘) and clicking and dragging for pan, or using the mouse wheel to zoom.</li>
-       <li>Save a version of your drawing by entering a name in the righthand panel and selecting  <strong>save</strong>. You can download a version of your saved file to your computer by selecting <strong>save to computer.</strong></li>
-         <li>You can load a locally saved file by selecting it from the dropdown menu. To load in a file saved on your computer, select the <strong>upload file from desktop</strong> option.</li>
-          <li>Export an svg of your file with the <strong>download svg</strong> option, and edit it in your favorite vector software. A heads up, you will not be able to re-import this svg into Para after you're done.</li>
-       </ul>
-        <p class="lead">Here's the important stuff</p>
-    <ul>
-      <li>Create distributions of shapes by selecting a shape while holding the <strong>alt</strong> key to pull up the modifier menu and select <strong>add behavior</strong>. 
-       <li> Selecting <strong>copy</strong> will create a single copy of your shape.</li>
-      <li>Selecting <strong>linear distribution</strong> will create a linear pattern of shapes.</li>
-      <li>Selecting <strong>radial distribution</strong> will create a radial pattern of shapes. </li>
-     <li> You can adjust distributions by dragging the red and green shapes.</li>
-     <li>Create a distribution of shapes along a path by dragging a shape over a path while holding <strong>SHIFT</strong> and releasing it.</li>
-     <li>To edit a distribution, double click on any shape in it. This will move you down a level in the heirarchy of the drawing (sort of like moving between groups in illustrator). Double click outside the distribution to move back up.</li>
-     <li>Create multi-level distributions and use the double clicking mechanism to edit them </li>
-    <li> Changing one shape or distribution will change all the copies of it accordingly. This is a feature, not a bug.</li>
+</div>
 
-     </ul>
+<!-- main application script -->
+<script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>
 
-    <p class="lead">Here's the bad news</p>
-    <ul>
-      <li> Para is a prototype, meaning it's very rough and there's a lot of bugs. We're sorry in advance. Here's someone you can <a href='mailto:jejacobs@adobe.com'>complain to.</a> </li>
-      <li> Para is not optimized, so if you create a billion shapes in your drawing, it's going to start moving very slowly</li>
-    </ul>
-
-    <p class="lead">Here's the good news</p>
-    <ul>
-      <li> Para is open-source software. Take a look: <a target="_blank" href='https://github.com/pixelmaid/para'>github.com/pixelmaid/para</a> </li>
-      <li> We're continuing to work to add features, fix bugs, and make Para awesome. If you have ideas for features you'd like to see, <a href='mailto:jejacobs@adobe.com'> we'd love to hear from you.</a> </li>
-    </ul>
-  <p class="lead">Who we are</p>
-  <p>Para is a research project by <a target="_blank" href='http://media.mit.edu/~jacobsj'>Jennifer Jacobs</a>  and <a target="_blank" href="http://www.adobe.com/technology/people/san-francisco/joel-brandt.html">Joel Brandt.</a> Everything that is broken is most likely Jennifer's fault.</p>
-       
-      </div>-->
-   
-    <!-- main application script -->
-    <script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>
-
-  </body>
-  </html>
+</body>
+</html>

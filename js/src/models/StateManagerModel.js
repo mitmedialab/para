@@ -70,12 +70,13 @@ define([
         });
         followPathTool = new FollowPathToolModel({
           id: 'followPathTool'
+          
         });
         followPathTool.event_bus = event_bus;
         this.modified = false;
 
         this.event_bus = event_bus;
-
+      
         toolCollection = new ToolCollection([penTool, selectTool, polyTool, rotateTool, followPathTool]);
         this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
         this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
@@ -610,6 +611,8 @@ define([
       },
 
       updateStroke: function(width) {
+          var selectedTool = toolCollection.get(this.get('state'));
+          selectedTool.style.strokeWidth = width;
         if (selectTool.selectedNodes.length > 0) {
           for (var i = 0; i < selectTool.selectedNodes.length; i++) {
             selectTool.selectedNodes[i].updateSelected([{
@@ -625,23 +628,26 @@ define([
       updateColor: function(color, type) {
         console.log('color=', color);
         var selectedTool = toolCollection.get(this.get('state'));
-
+       
 
         var update;
         if (type == 'stroke') {
           update = [{
-            strokeColor: '#' + color
+            strokeColor: color
           }];
-          selectedTool.strokeColor = '#' + color;
+        
+
+         selectedTool.style.strokeColor = color;
           console.log("set stroke color to:", color);
 
         } else {
           update = [{
-            fillColor: '#' + color
+            fillColor: color
           }];
-          selectedTool.fillColor = '#' + color;
+          selectedTool.style.fillColor = color;
           console.log("set fill color to", color);
         }
+        console.log(update);
 
         for (var i = 0; i < selectTool.selectedNodes.length; i++) {
 

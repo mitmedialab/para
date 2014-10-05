@@ -176,6 +176,7 @@ define([
 
           this.instance_literals[j].transform(imatrix);
           this.instance_literals[j].reset = true;
+             
         }
       }
       //this.instance_literals = [];
@@ -424,6 +425,10 @@ define([
           else{*/
          if (this.nodeParent == currentNode) {
           if(revised_literals.length-1===nInstance.userSelected){
+            if(nInstance.selected){
+              instance_literal.fullySelected = true;
+            }
+            //instance_literal.fullySelected = true;
            // instance_literal.selectedColor = 'red';
           }
           else{

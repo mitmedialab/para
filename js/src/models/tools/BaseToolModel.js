@@ -8,7 +8,10 @@ define([
 ], function(_, Backbone) {
   
 
-  var BaseToolModel = Backbone.Model.extend({
+  var BaseToolModel = Backbone.Model.extend({ 
+  style:{ fillColor: '#fff',
+    strokeColor: '#000',
+    strokeWidth: 1,},
  	defaults: {
   	},
   currentPath: null,
@@ -17,8 +20,7 @@ define([
 
   	constructor: function(){
   		Backbone.Model.apply(this, arguments);
-      this.fillColor =  '#fff';
-      this.strokeColor= '#fff';
+     
   	},
 
   	reset: function(){
@@ -55,6 +57,7 @@ define([
 
 
   });
+  
 
   return BaseToolModel;
 

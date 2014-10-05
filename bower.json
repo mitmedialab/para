@@ -30,7 +30,9 @@
     "underscore": "1.6.0",
     "tinycolor": "0.9.15",
     "pick-a-color": "git://github.com/pixelmaid/pick-a-color.git#7127cbeed608da50ccc928fa5d9d3ecad060093e",
-    "Backbone.Undo": "git://github.com/osartun/Backbone.Undo.js.git"
+    "Backbone.Undo": "git://github.com/osartun/Backbone.Undo.js.git",
+    "iris-color-picker" : "git://github.com/Automattic/Iris.git",
+    "jqueryui":"git://github.com/components/jqueryui.git"
   },
   "resolutions": {
     "bootstrap": "3.1.1",

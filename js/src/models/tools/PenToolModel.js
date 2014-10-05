@@ -96,8 +96,17 @@ define([
           this.currentPath =  new paper.Path();
     
          this.currentPath.selected = true;
-         this.currentPath.strokeColor = this.strokeColor;
+     this.currentPath.strokeWidth = this.style.strokeWidth;
+         this.currentPath.strokeColor = this.style.strokeColor;
+         this.currentPath.fillColor = this.style.fillColor;
+         if(this.fillColor==-1){
+          this.currentPath.style.fillColor = null;
 
+         }
+         if(this.strokeColor==-1){
+          this.currentPath.style.strokeColor = null;
+
+         }
          
          
 
@@ -111,7 +120,7 @@ define([
             type = result.type;
             if (this.currentPath.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
               mode = 'close';
-              this.currentPath.fillColor = this.fillColor;
+             
               this.currentPath.closed = true;
               this.reset();
             }

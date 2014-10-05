@@ -20,6 +20,7 @@ define([
         this.origin= null;
         this.startAngle =0;
         this.angle = 0;
+        this.start = true;
 
       },
 
@@ -50,6 +51,10 @@ define([
         }
         var dist = TrigFunc.distance(pointA, pointB);
         this.rad = dist / 2;
+        if(this.start && this.rad<20){
+          this.rad = 20;
+          this.start=false;
+        }
         this.origin = TrigFunc.midpoint(pointA, pointB);
         this.angle = 360 / num;
         this.startAngle = TrigFunc.cartToPolar(this.origin, pointA).theta;

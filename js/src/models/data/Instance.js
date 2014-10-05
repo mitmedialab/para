@@ -226,13 +226,22 @@ define([
 				this.strokeWidth =data.strokeWidth;
 			}
 			if(data.strokeColor){
+				if(data.strokeColor==-1){
+					this.strokeColor=null;
+				}
+				else{
 				this.strokeColor= data.strokeColor;
+				}
 				//console.log("setting stroke color to"+this.strokeColor);
 
 			}
 			if(data.fillColor){
-			
+			if(data.fillColor==-1){
+					this.fillColor=null;
+				}
+				else{
 				this.fillColor = data.fillColor;
+				}
 			}
 			this.midpoint.x = this.position.x+this.width/2;
 			this.midpoint.y = this.position.y+this.height/2;
