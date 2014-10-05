@@ -27,7 +27,8 @@ module.exports = function (grunt) {
         copy: {
             //paper: { src: "bower_components/paper/dist/paper-full.min.js", dest: "build/js/paper-full.min.js" },
             html: { src: "index-build.html", dest: "build/index.html" },
-            images: { expand: true, cwd: "images", src: "**", dest: "build/images/" }
+            images: { expand: true, cwd: "images", src: "**", dest: "build/images/" },
+            fonts: { expand: true, cwd: "fonts", src: "**", dest: "build/fonts/" }
         },
         cssmin: {
             combine: {
@@ -72,7 +73,7 @@ module.exports = function (grunt) {
     grunt.registerTask("test", ["jshint", "jscs"]);
 
     grunt.registerTask("build", [
-        "test", "clean", "copy:html", "copy:images", "cssmin", "requirejs"
+        "test", "clean", "copy:html", "copy:images", "copy:fonts", "cssmin", "requirejs"
     ]);
 
     grunt.registerTask("default", ["test"]);
