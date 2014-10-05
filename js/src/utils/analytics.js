@@ -1,8 +1,8 @@
 define(["version", "jquery", "jquery-cookie"], function (version, $) {
     "use strict";
 
-    var MAX_BUFFERED_EVENTS = 10,
-        MAX_BUFFERED_WAIT = 100000, // 100 seconds
+    var MAX_BUFFERED_EVENTS = 50,
+        MAX_BUFFERED_WAIT = 30000, // 30 seconds
         COOKIE_KEY = "para-userid",
         COOKIE_EXPIRATION = 365, // 1 year
         FAILED_KEY = "para-failed-submissions",
