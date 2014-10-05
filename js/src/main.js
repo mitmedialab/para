@@ -31,6 +31,6 @@ require.config({
 
 });
 
-require(["jquery", "backbone", "underscore", "handlebars"], function () {
+require(["jquery", "jquery-ui", "backbone", "underscore", "handlebars"], function () {
     require(["app"]);
 });
