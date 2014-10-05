@@ -100,6 +100,7 @@ define([
         var intersection = this.selectedNodes[i].checkIntersection();
         if (intersection) {
           this.event_bus.trigger('newBehavior', [intersection.nodeParent, this.selectedNodes[i]], 'followpath');
+          this.trigger('setState','selectTool');
         }
       }
     }

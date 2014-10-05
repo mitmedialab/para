@@ -9,7 +9,7 @@ define([
   'views/drawing/PropertyView',
   'views/drawing/ContextView',
   'models/StateManagerModel',
-   'models/behaviors/BehaviorManagerModel'
+   'models/behaviors/BehaviorManagerModel',
 
 ], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, StateManagerModel,BehaviorManagerModel)  {
   

@@ -40,7 +40,7 @@ var CanvasView = Backbone.View.extend({
       tool.attach('mousedown',this.toolMouseDown);
       tool.attach('mousedrag',this.toolMouseDrag);
       tool.attach('mouseup',this.toolMouseUp);
-      tool.attach('mousemove',this.toolMouseMove);
+     // tool.attach('mousemove',this.toolMouseMove);
       this.event_bus = event_bus;
       //TODO: this is a hacky way to to detect key events
          _.bindAll(this, "canvasKeydown");

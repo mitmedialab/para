@@ -67,14 +67,14 @@
 
  <aside class="toolbar-pop-over" style="display: block;">
   <div id = "toolbar">
-    <button class="btn btn-default btn-tool" id="redoTool"><img src="images/redo_icon.png" width="28" height="28"/></button>
-    <button class="btn btn-default btn-tool" id="undoTool"><img src="images/undo_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="scaleTool"><span><img src="images/scale_tool_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="rotateTool"><span><img src="images/rotate_tool_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="followPathTool"><span><img src="images/follow_path_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="selectTool"><span><img src="images/select_tool_icon.png" width="28" height="28"/></button>
-    <button class="btn btn-default btn-tool" id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/></button>
-    <button class="btn btn-default btn-tool" id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/></button>
+    <button title="redo" class="btn btn-default btn-tool" id="redoTool"><img src="images/redo_icon.png" width="28" height="28"/></button>
+    <button title="undo" class="btn btn-default btn-tool" id="undoTool"><img src="images/undo_icon.png" width="28" height="28"/></button>
+    <button title="scale" class="btn btn-default btn-tool" id="scaleTool"><span><img src="images/scale_tool_icon.png" width="28" height="28"/></button>
+    <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"><span><img src="images/rotate_tool_icon.png" width="28" height="28"/></button>
+    <button  title="distribute" class="btn btn-default btn-tool" id="followPathTool"><span><img src="images/follow_path_icon.png" width="28" height="28"/></button>
+    <button  title="select" class="btn btn-default btn-tool" id="selectTool"><span><img src="images/select_tool_icon.png" width="28" height="28"/></button>
+    <button  title="pen" class="btn btn-default btn-tool" id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/></button>
+    <button title="polygon" class="btn btn-default btn-tool" id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/></button>
   </div>
   </aside> <!-- /toolbar-->
   <div id = 'prop-menu' class="properties">
@@ -119,8 +119,9 @@
     <label for="hidden-input">Stroke Weight</label>
     <br>
 
-
+<form>
     <input id="strokeSlider" type="range" min="0" max="40">
+  </form>
 
   </div>
   <div class="form-group">

@@ -95,6 +95,7 @@ define([
 
 
         this.listenTo(toolCollection, 'currentRender', this.currentRender);
+        this.listenTo(toolCollection, 'setState', this.setState);
 
 
         this.listenTo(event_bus, 'nodeAdded', this.nodeAdded);
@@ -187,7 +188,8 @@ define([
         toolCollection.get(this.get('state')).reset();
 
         this.set('state', state);
-        if(state==='penTool'||'polyTool'){
+        if(state==='penTool'|| state==='polyTool'){
+          console.log('move to root');  
           this.moveToRoot();
 
       }

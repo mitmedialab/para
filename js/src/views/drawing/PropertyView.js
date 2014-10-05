@@ -34,7 +34,7 @@ define([
       $('#fill').val('#ffffff');
       $('#strokeColorBlock').css('background-color', 'black');
       $('#stroke').val('#000000');
-      $('#strokeSlider').on('input', function(slideEvt) {
+      $('#strokeSlider').on('change mousemove', function() {
         $('#strokeSlider').trigger('stroke-change');
       });
 
