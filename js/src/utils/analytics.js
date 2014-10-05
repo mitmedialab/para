@@ -1,4 +1,4 @@
-define(["jquery", "jquery-cookie"], function ($) {
+define(["version", "jquery", "jquery-cookie"], function (version, $) {
     "use strict";
 
     var MAX_BUFFERED_EVENTS = 10,
@@ -64,7 +64,7 @@ define(["jquery", "jquery-cookie"], function ($) {
         $(window).bind("blur", submit);
 
         // Create a start event and immediately submit it (along with any prior failed submits)
-        log("start", {"user-agent": window.navigator.userAgent});
+        log("start", {"user-agent": window.navigator.userAgent, "version": version});
         submit();
     };
 

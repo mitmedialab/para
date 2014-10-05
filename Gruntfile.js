@@ -13,6 +13,7 @@ module.exports = function (grunt) {
                 "package.json",
                 "*.js",
                 // "js/**/*.js",
+                "test/**/*.js",
                 "server/**/*.js"
             ]
         },
