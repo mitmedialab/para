@@ -1,11 +1,11 @@
 require.config({
+    baseUrl : "js/src",
+
     paths : {
-        // Note: Paths must also be added to index-build.html
-        // CDN paths must be added to the Gruntfile as "empty:"
         "jquery" : "../../bower_components/jquery/dist/jquery",
         "backbone" : "../../bower_components/backbone/backbone",
         "underscore" : "../../bower_components/underscore/underscore",
-        "handlebars"  : "../../bower_components/handlebars/handlebars",
+        "handlebars"  : "../../bower_components/handlebars/handlebars.amd",
         "paper" : "../../bower_components/paper/dist/paper-full",
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "filesaver": "../../bower_components/FileSaver/FileSaver",
@@ -15,23 +15,15 @@ require.config({
         "jquery-cookie" : "../bower_components/jquery-cookie/jquery.cookie"
     },
   
-    shim: {
-        "handlebars": {
-            exports: "Handlebars"
-        },
-        
+    shim: {       
         "toolbox": {
             exports: "Toolbox"
         },
-
+        "backbone.undo": {
+            deps: ["backbone"]
+        },
         "iris-color-picker":{
-            deps: ["jquery", "jquery-ui"],
-            exports: "IrisColorPicker"
+            deps: ["jquery", "jquery-ui"]
         }
     }
-
-});
-
-require(["jquery", "jquery-ui", "backbone", "underscore", "handlebars"], function () {
-    require(["app"]);
 });

@@ -25,7 +25,6 @@ module.exports = function (grunt) {
 
         clean: ["./build"],
         copy: {
-            //paper: { src: "bower_components/paper/dist/paper-full.min.js", dest: "build/js/paper-full.min.js" },
             html: { src: "index-build.html", dest: "build/index.html" },
             images: { expand: true, cwd: "images", src: "**", dest: "build/images/" },
             fonts: { expand: true, cwd: "fonts", src: "**", dest: "build/fonts/" }
@@ -40,17 +39,15 @@ module.exports = function (grunt) {
         requirejs: {
             compile: {
                 options: {
-                    mainConfigFile: "js/src/main.js",
+                    paths: { "requirejs" : "../../bower_components/requirejs/require" },
+                    include : "requirejs",
+                    insertRequire : ["app"],
+                    mainConfigFile: "js/src/config.js",
                     baseUrl: "js/src/",
-                    paths : {
-                        "jquery" : "empty:",
-                        "backbone" : "empty:",
-                        "underscore" : "empty:",
-                        "handlebars"  : "empty:"
-                    },
                     name: "app",
-                    out: "build/js/app.js",
+                    out: "build/js/para.js",
                     // optimize: "none",
+                    wrapShim: true,
                     useStrict: true
                 }
             }
@@ -69,7 +66,7 @@ module.exports = function (grunt) {
     grunt.registerTask("test", ["jshint", "jscs"]);
 
     grunt.registerTask("build", [
-        "test", "clean", "copy:html", "copy:images", "copy:fonts", "cssmin", "requirejs"
+        "test", "clean", "copy", "cssmin", "requirejs"
     ]);
 
     grunt.registerTask("default", ["test"]);

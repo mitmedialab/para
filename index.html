@@ -205,13 +205,12 @@
   </section> <!--/save-menu-->
 </div><!--/properties-->
 
- 
-
-
 </div>
 
 <!-- main application script -->
-<script data-main="js/src/main" src="bower_components/requirejs/require.js"></script>
+<script src="bower_components/requirejs/require.js"></script>
+<script src="js/src/config.js"></script>
+<script>require(["app"]);</script>
 
 </body>
 </html>

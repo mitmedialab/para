@@ -26,7 +26,7 @@ define([
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
       this.currentPaths = [];
       source = $('#parameterTemplate').html();
-      template = Handlebars.compile(source);
+      template = Handlebars.default.compile(source);
 
 
       $('#fillColorBlock').addClass('color-block-selected');
