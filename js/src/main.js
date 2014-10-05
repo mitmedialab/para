@@ -3,7 +3,6 @@ require.config({
         // Note: Paths must also be added to index-build.html
         // CDN paths must be added to the Gruntfile as "empty:"
         "jquery" : "../../bower_components/jquery/dist/jquery",
-        "jquery-ui" : "../../bower_components/jqueryui/jquery-ui.min",
         "backbone" : "../../bower_components/backbone/backbone",
         "underscore" : "../../bower_components/underscore/underscore",
         "handlebars"  : "../../bower_components/handlebars/handlebars",
@@ -11,6 +10,7 @@ require.config({
         "toolbox": "../../bower_components/js-toolbox/toolbox",
         "filesaver": "../../bower_components/FileSaver/FileSaver",
         "backbone.undo": "../../bower_components/Backbone.Undo/Backbone.Undo",
+         "jquery-ui" : "../../bower_components/jqueryui/jquery-ui.min",
         "iris-color-picker": "../../bower_components/iris-color-picker/dist/iris.min"
     },
   
@@ -31,6 +31,6 @@ require.config({
 
 });
 
-require(["jquery", "jquery-ui", "backbone", "underscore", "handlebars"], function () {
+require(["jquery", "backbone", "underscore", "handlebars"], function () {
     require(["app"]);
 });

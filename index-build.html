@@ -217,13 +217,13 @@
 
           paths : {
               "jquery" : "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min",
-              "jquery-ui" : "../../bower_components/jqueryui/jquery-ui.min",
               "backbone" : "//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min",
               "underscore" : "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min",
               "handlebars": "//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min",
               "paper" : "../../bower_components/paper/dist/paper-full",
               "toolbox": "../../bower_components/js-toolbox/toolbox",
               "filesaver": "../../bower_components/FileSaver/FileSaver",
+              "jquery-ui" : "../../bower_components/jqueryui/jquery-ui.min",
               "iris-color-picker": "../../bower_components/iris-color-picker/dist/iris.min"
           },
           
@@ -247,7 +247,7 @@
 
         });
 
-        require(["jquery", "jquery-ui","backbone", "underscore", "handlebars"], function () {
+        require(["jquery","backbone", "underscore", "handlebars"], function () {
           require(["app"]);
         });
       }());
