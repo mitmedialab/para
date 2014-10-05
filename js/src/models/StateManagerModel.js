@@ -669,11 +669,15 @@ define([
 
       updateCopyNum: function(number) {
         if (selectTool.selectedNodes.length > 0) {
+          this.rootChange(true);
 
           for (var i = 0; i < selectTool.selectedNodes.length; i++) {
 
             selectTool.selectedNodes[i].incrementCopyNum(number);
           }
+          this.rootChange(false);
+
+
         }
         currentNode.update([{}]);
         this.rootRender();

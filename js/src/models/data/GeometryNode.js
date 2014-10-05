@@ -95,6 +95,7 @@ define([
 
 
       }
+
     },
 
     undoRedo: function(data){
@@ -102,6 +103,7 @@ define([
         this.instance_literals = [];
         this.instances = [];
         var dInstances = data.instances;
+        this.copyNum = data.instances.length;
         this.scaffold = data.scaffold;
         for (var i = 0; i < dInstances.length; i++) {
           var instance = this.createInstance();
@@ -131,7 +133,11 @@ define([
 
       }
 
-      
+    /*  for (var j = 0; j < data.behaviors.length; j++) {
+            var behavior = data.behaviors[j];
+            this.behaviors[j].undoRedo(data[j].behavior);
+          }
+      */
       if (data.children.length > 0) {
         for(var j=0;j<data.children.length;j++){
           this.children[j].undoRedo(data.children[j]);

@@ -56,6 +56,7 @@ define([
     },
 
     undoRedo: function(data){
+      console.log('path_undo_redo',data.instance_literals.length);
        this.clearObjects();
       GeometryNode.prototype.undoRedo.apply(this, arguments);
         var path = new paper.Path();
@@ -72,7 +73,7 @@ define([
           newLiteral.instanceParentIndex = lInstances[j].instanceParentIndex;
           this.instance_literals.push(newLiteral);
 
-         // console.log("adding path",j,newLiteral);
+          console.log("adding path",j,newLiteral);
         }
       },
 
@@ -243,9 +244,6 @@ define([
 
         }
       }
-    
-
-
      
       //update all paths
       var posDiff;

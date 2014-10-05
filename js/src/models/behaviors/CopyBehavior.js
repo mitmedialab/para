@@ -24,11 +24,16 @@ define([
           jdata = {};
           jdata.type = this.type;
           jdata.name = this.name;
+          jdata.copyNum=this.copyNum;
         } else {
           jdata = data;
         }
         //console.log(jdata);
         return BaseBehavior.prototype.exportJSON.apply(this, [jdata]);
+      },
+
+      undoRedo: function(data){
+        this.copyNum=data.copyNum;
       },
 
       update: function(data) {
