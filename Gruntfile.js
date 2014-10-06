@@ -26,15 +26,19 @@ module.exports = function (grunt) {
 
         clean: ["./build"],
         copy: {
-            html: { src: "index-build.html", dest: "build/index.html" },
+            html: { src: "para-build.html", dest: "build/para.html" },
+            landing: { src: "index.html", dest: "build/index.html" },
             images: { expand: true, cwd: "images", src: "**", dest: "build/images/" },
             fonts: { expand: true, cwd: "fonts", src: "**", dest: "build/fonts/" }
         },
         cssmin: {
-            combine: {
-                files: {
-                    "build/style/style.css": ["css/basic.css"]
-                }
+            all: {
+                files: [{
+                    expand: true,
+                    cwd: "style/",
+                    src: ["*.css"],
+                    dest: "build/style/"
+                }]
             }
         },
         requirejs: {

@@ -1,230 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Para</title>
+    <title>Para</title>
 
- 
-  <!-- Page CSS -->
-  <link href="css/basic.css" rel="stylesheet">
-
+    <link href="style/landing.css" rel="stylesheet">
 </head>
 
 <body>
-  <div id="context-menu",class="floating-menu section_background">
-    <div id = "main-menu">
-      <script id="menu-template" type="text/x-handlebars-template">
-      <div class="row" id="title-bar">
-      <div id="name">{{name}}</div>
-      <div id="close"><button id="close-btn">x</button></div>
-      </div>
-      <div class="row">
-      <div id="behavior-menu">behaviors</div>
-      {{behavior-menu}}
-      <div><a id="new-behavior-btn">new behavior +</a></div>
-      </div>
-      <div class="row">
-      <div id="cond-menu">conditionals</div>
-      {{cond-menu}}
-      <div><a id="new-cond-btn">new conditional +</a></div>
-      </div>
-      </script>
+<div class="logo-wrapper">
+    <div class="logo-center">
+        <div class="logo">
+        </div>
     </div>
-    <div id="behavior-types-menu">
-      <div class="row"><a id="copy">copy</a></div>  
-      <div class="row"><a id="linear">linear distribution</a></div> 
-      <div class="row"><a id="radial">radial distribution</a></div> 
-      <div class="row"><a id="gaussian">normal distribution</a></div> 
+</div>
+<div class="header">
+</div>
+<div class="content-wrapper">
+    <div class="content">
+        <a class="launch-btn" href="para.html" target="_blank">Launch Para</a>
+        
+        <p>Para is a prototype digital illustration tool tool that uses direct manipulation to define and edit procedural artwork. Through creating and altering vector paths, artists can define iterative distributions and parametric constraints.</p>
+
+        <p>Para was started in the Creative Technologies Lab at Adobe Research. Currently, Para is under development in the Lifelong Kindergarten Group at the MIT Media Lab with continued contributions from Adobe Research. The software is part of a research project in broadening participation in procedural art and design. The project is hosted on GitHub, and is available for use under the MIT software license.</p>
     </div>
-  </div>
-
-
-
-
-<!--======================= CANVAS =======================-->
-<!--draw container, contains canvas and object and property menus -->
-<div id = "draw-container"><!--draw container-->
-  <div id = "canvas-container"><!--canvas-container-->
-    <span><canvas id="canvas" resize='true'></canvas></span>
-  </div><!--/canvas-container-->
-</div>  <!--/draw container-->
-
-   <!--======================= MENU BAR=======================-->
-<div  class ='menubar-container section-background' >
-<div ></div>
 </div>
-
-<div class="properties-container" >
-
-  
- 
-   <!--======================= TOOLBAR=======================-->
-
- <aside class="toolbar-pop-over" style="display: block;">
-  <div id = "toolbar">
-    <button title="redo" class="btn btn-default btn-tool" id="redoTool"></button>
-    <button title="undo" class="btn btn-default btn-tool" id="undoTool"></button>
-    <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button>
-    <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"></button>
-    <button title="distribute" class="btn btn-default btn-tool" id="followPathTool"></button>
-    <button title="select" class="btn btn-default btn-tool" id="selectTool"><span></button>
-    <button title="pen" class="btn btn-default btn-tool" id="penTool"></button>
-    <button title="polygon" class="btn btn-default btn-tool" id="polyTool"></button>
-    <button title="ellipse" class="btn btn-default btn-tool" id="ellipseTool"><span></button>
-    <button title="rectangle" class="btn btn-default btn-tool" id="rectangleTool"></button>
-    <button title="generate" class="btn btn-default btn-tool" id="generateTool"></button>
-  </div>
-  </aside> <!-- /toolbar-->
-  <div id = 'prop-menu' class="properties">
-
-      <!--======================= COLOR MENU =======================-->
- <section id = "color-menu">
-  <header >
-                    <h2>
-                      Style
-                    </h2>
-                    <div class="clearfix"></div>
-                </header>
-  <div  class="section-background">
-   <div class="form-group color-form-group">
-
-    <label for="hidden-input">Fill</label>
-    <br>
-    <a id="fillColorBlock" class='color-block'></a>
-
-  <input type="text" id='fill' class='color' value="#fff" />
-  </div>
-
-  <div class="form-group color-form-group">
-    <label for="hidden-input">Stroke</label>
-    <br>
-    <a id="strokeColorBlock" class='color-block'></a>
-
-     <input type="text" id='stroke' class='color' value="#fff" />
-
-  </div>
-   <div class="form-group color-form-group">
-    <a id="no-color" class='color-block remove-color'></a>
-  </div>
-  <div class='clearfix'></div>
-  <div id="color-chooser"><div id="color-window"></div></div>
-  <div class="container" id="master-container">
-
-  
-
-</div>
-  <div class="form-group">
-    <label for="hidden-input">Stroke Weight</label>
-    <br>
-
-<form>
-    <input id="strokeSlider" type="range" value='1' min="0" max="40">
-  </form>
-
-  </div>
-  <div class="form-group">
-   <label for="hidden-input">Scaffold</label>
-   <input type="checkbox" name="scaffold" value="scaffold">
- </div>
-</div>
-</section><!--/colorMenu-->
-   
-
-  <!--======================= PARAMETER MENU =======================-->
-
-  <section> 
-  
- <header >
-                    <h2>
-                       Parameters
-                    </h2>
-                    <div class="clearfix"></div>
-                </header>
-  <div id = "parameters" class="section-background">
-   <script id="parameterTemplate" type="text/x-handlebars-template">
-
-   {{#each paramName}}
-
-   <div class="form-group">
-   <label id='parameterName'>{{label}}</label>
-   <br>
-   <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
-   </div>
-
-
-   {{/each}}
-   {{#each behaviorName}}
-  
-   <div class="form-group">
-    <button id ={{label}} class='behaviorRemove'>x</button>
-   <label id='behaviorName'>{{label}}</label>
-  
-   <br>
-   </div>
-
-
-   {{/each}}
-
-
-   </script>
- </div>
- </section><!--parameterSlider-->
-
-
-
-<!--======================= SAVE MENU =======================-->
-
- <section id = "save-menu ">
-  <header >
-              <h2>Save</h2>
-                    <div class="clearfix"></div>
-                </header>
-  <div  class="section-background">
-      
-       <div class="form-group">
-        <label>name <input class="form-control" type="text" class="filename" id="text-filename" placeholder="my_drawing"/></label>
-
-        <select id ="fileselect" class="form-control"></select>
-      </div>
-      <div class="form-group">
-        <input type="button" id="save" value="save" disabled="true"/>
-      </div>
-
-  </section> <!--/save-menu-->
-
-  <!--======================= EXPORT MENU =======================-->
-
- <section id = "save-menu ">
-  <header >
-              <h2>Export</h2>
-                    <div class="clearfix"></div>
-                </header>
-  <div  class="section-background">
-    
-      <div class="form-group">
-        <input type="button" id="saveFile" value="download file" disabled="true"/>
-      </div>
-      <div class="form-group">
-        <label>upload file from desktop<input class="form-group" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
-      </div>
-      <div class="form-group">
-        <input type="button" id ="export" value="export svg"/>
-      </div>
-      </div>
-  </section> <!--/save-menu-->
-</div><!--/properties-->
-
-</div>
-
-<!-- main application script -->
-<script src="bower_components/requirejs/require.js"></script>
-<script src="js/src/config.js"></script>
-<script>require(["app"]);</script>
-
 </body>
+
 </html>
