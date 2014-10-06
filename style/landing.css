@@ -80,6 +80,9 @@ body {
     background-color: #fff;
     color: rgb(242, 97, 1);
     cursor: pointer;
+    text-decoration: none;
+    width: 200px;
+    text-align: center;
 }
 
 .launch-btn:hover {
