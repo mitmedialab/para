@@ -45,13 +45,13 @@ module.exports = function (grunt) {
             compile: {
                 options: {
                     paths: { "requirejs" : "../../bower_components/requirejs/require" },
-                    include : "requirejs",
-                    insertRequire : ["app"],
+                    include : ["requirejs", "app"],
+                    insertRequire : ["uiloader"],
                     mainConfigFile: "js/src/config.js",
                     baseUrl: "js/src/",
-                    name: "app",
+                    name: "uiloader",
                     out: "build/js/para.js",
-                    // optimize: "none",
+                    optimize: "none",
                     wrapShim: true,
                     useStrict: true
                 }
