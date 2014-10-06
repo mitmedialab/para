@@ -145,7 +145,9 @@ define([
            track: true,
         register: rootNode
       });
-
+ 
+        this.zeroedZoom = paper.view.zoom;
+        this.zeroedPan = paper.view.center.clone();
 
       },
 
@@ -393,8 +395,11 @@ define([
 
       canvasMouseDrag: function(delta, pan) {
         if (pan) {
+          console.log('paper start',paper.view.center);
           var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
           paper.view.scrollBy(inverseDelta);
+          console.log('paper end',paper.view.center);
+
           event.preventDefault();
         }
       },
@@ -544,6 +549,10 @@ define([
         if (rootNode.children.length > 0) {
 
           this.setCurrentNode(rootNode.children[0]);
+          var currentZoom= paper.view.zoom;
+          var currentPan = paper.view.center.clone();
+          paper.view.zoom = this.zeroedZoom;
+          paper.view.center = this.zeroedPan.clone();
 
           this.listenToOnce(this, 'renderComplete', function() {
 
@@ -555,6 +564,11 @@ define([
               type: 'image/svg+xml'
             });
             var fileSaver = new FileSaver(blob, filename);
+          paper.view.zoom = currentZoom;
+          paper.view.center = currentPan;
+
+
+          paper.view.draw();
 
           });
           this.rootRender();
