@@ -28,9 +28,10 @@
     "js-toolbox": "git://github.com/jimmydo/js-toolbox.git",
     "underscore": "1.6.0",
     "Backbone.Undo": "git://github.com/osartun/Backbone.Undo.js.git",
-    "iris-color-picker" : "git://github.com/Automattic/Iris.git",
-    "jqueryui":"git://github.com/components/jqueryui.git",
-    "jquery-cookie": "~1.4.1"
+    "iris-color-picker": "git://github.com/Automattic/Iris.git",
+    "jqueryui": "git://github.com/components/jqueryui.git",
+    "jquery-cookie": "~1.4.1",
+    "requirejs-text": "~2.0.12"
   },
   "resolutions": {
     "backbone": "1.1.2",
