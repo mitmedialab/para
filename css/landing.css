@@ -1,0 +1,97 @@
+@font-face {
+    font-family: "Source Sans Pro Extra Light";
+    src: url('../fonts/SourceSansPro-ExtraLight.otf.woff');
+}
+
+body {
+    font-family: "Source Sans Pro Extra Light";
+    background-color: #fff;
+    margin: 0px;
+    padding: 0px;
+}
+
+.logo-wrapper {
+    position: fixed;
+    width: 100%;
+    height: 50px;
+    z-index: 2;
+}
+
+.logo-center {
+    width: 700px;
+    margin: auto;
+    height: 50px;
+}
+
+.logo {
+    position: relative;
+    width: 700px;
+    height: 50px;
+    background-image: url(../images/para.svg);
+    background-repeat: no-repeat;
+    background-position: 0px 10px;
+    background-size: 80px;
+    background-attachment: local;   
+}
+
+.header {
+    height: 200px;
+    width: 100%;
+    background-color: rgb(92, 162, 181);
+    background-image: url(../images/hexagons.svg);
+    background-size: 3000px;
+    display: block;
+    position: fixed;
+    z-index: 0;
+}
+
+.header {
+
+}
+
+.content-wrapper {
+    width: 100%;
+    background-color: #fff;
+    display: block;
+    position: relative;
+    top: 200px;
+    z-index: 1;
+}
+
+.content {
+    background-color: #fff;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 20px;
+    width: 700px;
+    height: 2000px;
+}
+
+.launch-btn {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 15px 70px 15px 70px;
+    display: block;
+    font-size: 20px;
+    font-family: "Source Sans Pro Extra Light";
+    border: thin solid rgb(242, 97, 1);
+    background-color: #fff;
+    color: rgb(242, 97, 1);
+    cursor: pointer;
+}
+
+.launch-btn:hover {
+    background-color: rgb(217, 232, 245);
+}
+
+p {
+    padding-left: 100px;
+    padding-right: 100px;
+    padding-top: 30px;
+    padding-bottom: 0px;
+    margin: 0px;
+    font-size: 20px;
+    line-height: 30px;
+}
