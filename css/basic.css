@@ -24,9 +24,10 @@ box-sizing: border-box;
 }
 
 
-html{
-	
-
+html, body{
+	 width:  100%;
+  height: 100%;
+  margin: 0px;
 }
 
 h2{
@@ -164,13 +165,13 @@ background-color: #cccccc;
 	background-position-y: -324px;
 }
 #ellipseTool {
-	background-position-y: -216px;
+	background-position-y: 0px;
 }
 #rectangleTool {
 	background-position-y: -36px;
 }
 #generateTool {
-	background-position-y: -324px;
+	background-position-y: -216px;
 }
 
 #rangechaser {
@@ -208,7 +209,7 @@ select{
 	min-width:200px;
 }
 .properties-container {
-    right: -10px;
+    right: 0px;
     top: 40px;
     bottom: 0;
     width: 260px;
@@ -220,7 +221,7 @@ select{
 .menubar-container{
     top: 0;
     bottom: 0;
-    right:-10px;
+    right:0px;
     width: 100%;
     height:40px;
     position: absolute;
@@ -397,14 +398,14 @@ min-height: 200px;
 }
 
 #canvas-container{
- min-height: 800px;
- line-height: 0;
-
+ overflow-x: hidden;
 }
 #canvas-container:focus{
 	outline:none;
     border:none;
     box-shadow:none;
+   
+
 }
 
 #context-menu,  #behavior-types-menu{
@@ -458,6 +459,7 @@ min-height: 200px;
 
 #canvas{
 	background-color: #232323;
+   
 }
 .input-group-addon{
 	padding:0 l
@@ -473,7 +475,7 @@ border: none;
 
 
 .form-group {
-margin-bottom: 15px;
+margin-bottom: 10px;
 }
 
 

@@ -82,8 +82,13 @@ var CanvasView = Backbone.View.extend({
     },
 
     resizeCanvas: function(){
-    /*  console.log("resize canvas");
-      var htmlCanvas = this.$('canvas');
+      var c =  $('#canvas');
+      console.log('canvas',c);
+       c.attr('width', $(window).attr('innerWidth'));
+       c.attr('height', $(window).attr('innerHeight'));
+
+  console.log("resize canvas",$(window).attr('innerWidth'));
+      /*    var htmlCanvas = this.$('canvas');
       var parent = $('#canvas-container');
      htmlCanvas.attr({ width: parent.width(), height: parent.height() });
      // var newSize = new paper.Size(parent.width(),parent.height());*/
