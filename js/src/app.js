@@ -1,4 +1,4 @@
-define(["jquery", "router"], function ($, Router) {
+define(["jquery", "router", "utils/analytics"], function ($, Router) {
     $(function () {
         Router.initialize();
     });
