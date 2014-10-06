@@ -4,9 +4,10 @@
 define([
   'jquery',
   'underscore',
-  'backbone'
+  'backbone',
+  'utils/analytics'
 
-], function($, _, Backbone){
+], function($, _, Backbone, analytics){
 
   var lastSelected;
   var ToolView = Backbone.View.extend({
@@ -33,6 +34,7 @@ define([
 
       undoToolClick: function(){
         this.model.undo();
+        analytics.log('undo','undoClick');
       },
 
       redoToolClick: function(){
