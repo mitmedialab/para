@@ -9,6 +9,15 @@
     box-shadow: none;
 }
 
+button {
+    background: none;
+    border: none;
+    color: #aaa;
+    padding: 0;
+    cursor: pointer;
+
+}
+
 * {
 
 box-sizing: border-box;

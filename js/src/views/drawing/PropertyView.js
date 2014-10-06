@@ -22,7 +22,6 @@ define([
       this.listenTo(this.model, 'disableSave', this.disableSave);
 
       this.listenTo(this.model, 'pathSelected', this.pathSelected);
-      this.listenTo(this.model, 'nodeSelected', this.setParamSliders);
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
       this.currentPaths = [];
       source = $('#parameterTemplate').html();
@@ -76,6 +75,7 @@ define([
       'change #fill': 'colorInputChange',
       'change #stroke': 'colorInputChange',
       'click #no-color': 'clearColor',
+      'click .behaviorRemove': 'removeBehavior'
 
 
     },
@@ -90,6 +90,11 @@ define([
         var html = template(properties);
         this.$el.html(html);
         */
+    },
+
+    removeBehavior:function(event){
+     var name = $(event.target).attr('id');
+      this.model.removeBehavior(name);
     },
 
     clearColor:function(event){
@@ -307,11 +312,15 @@ define([
     //triggered when StateManager finds selection point
     setParams: function() {
 
-      var params = [];
+      var propertyParams = [];
+      var behaviorParams = [];
+      var context = {};
       var selected = this.model.getSelected();
 
       var s = selected[selected.length - 1];
+      if(s){
       var userParams = s.userParams;
+      var behaviors = s.behaviors
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
 
@@ -322,15 +331,26 @@ define([
             val: s[userParams[i].propertyName],
             propertyName: userParams[i].propertyName
           };
-          params.push(data);
+          propertyParams.push(data);
         }
       }
-      var context = {
-        paramName: params
+      
+
+    for (var i = 0; i < behaviors.length; i++) {
+
+          var data = {
+            label: behaviors[i].behavior.name
+          };
+          behaviorParams.push(data);
+        }
+     context = {
+        paramName: propertyParams,
+        behaviorName: behaviorParams
       };
+    }
       //console.log("context", context);
       var html = template(context);
-      $('#parameterSliders').html(html);
+      $('#parameters').html(html);
       $('#parameterSlider').each(function() {
         var slider = $(this);
 
@@ -345,7 +365,7 @@ define([
 
     selectionReset: function() {
       this.currentPaths = [];
-      $('#parameterSliders').empty();
+      $('#parameters').empty();
 
     }
 

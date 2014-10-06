@@ -99,12 +99,15 @@ define([
 
 
         this.listenTo(event_bus, 'nodeAdded', this.nodeAdded);
+        this.listenTo(event_bus,  'rootUpdate', this.rootUpdate);
 
         this.listenTo(event_bus, 'rootRender', this.rootRender);
         //this.listenTo(event_bus, 'currentRender', this.currentRender);
 
 
         this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
+        this.listenTo(event_bus, 'moveUpNode', this.moveUpNode);
+
 
         rootNode = new GeometryNode();
         rootNode.type = 'root';
@@ -206,11 +209,14 @@ define([
       },
 
       //callback triggered when tool adds new node
-      nodeAdded: function(node) {
+      nodeAdded: function(node, noChangeTool) {
         ////console.log('node added: '+ node.type);
       //rootNode.set("isChanging", true);
         currentNode.addChildNode(node);
-        toolCollection.get(this.get('state')).currentNode = node;
+        if(!noChangeTool){
+          console.log("changing current node");
+          toolCollection.get(this.get('state')).currentNode = node;
+        }
           // rootNode.set("isChanging", false);
 
       },
@@ -684,10 +690,20 @@ define([
         paper.view.draw();
       },
 
+      removeBehavior: function(behaviorName){
+        var s = selectTool.selectedNodes[selectTool.selectedNodes.length-1];
+        if(s){
+        this.event_bus.trigger('removeBehavior',s,behaviorName);
+      
+      }
+      },
+
       deleteObject: function() {
         if (selectTool.selectedNodes.length > 0) {
           for (var i = 0; i < selectTool.selectedNodes.length; i++) {
-            selectTool.selectedNodes[i].deleteNode();
+            if(!selectTool.selectedNodes[i].isFollowPath){
+              selectTool.selectedNodes[i].deleteNode();
+            }
           }
         }
         currentNode.update([{}]);

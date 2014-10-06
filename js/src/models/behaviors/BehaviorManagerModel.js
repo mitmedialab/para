@@ -11,7 +11,7 @@ define([
   'models/behaviors/DistributeBehavior',
   'models/behaviors/RadialDistributeBehavior',
   'models/behaviors/FollowPathBehavior',
-    'models/behaviors/GaussianBehavior'
+  'models/behaviors/GaussianBehavior'
 
 
 ], function($, _, Backbone, TrigFunc, GeometryNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior, GaussianBehavior) {
@@ -24,6 +24,8 @@ define([
       this.listenTo(this.event_bus, 'openMenu', this.openMenu);
       this.listenTo(this.event_bus, 'sendTestObj', this.testObj);
       this.listenTo(this.event_bus, 'newBehavior', this.newBehavior);
+      this.listenTo(this.event_bus, 'removeBehavior', this.removeBehavior);
+
       this.conditional_line = null;
       this.test = true;
     },
@@ -74,7 +76,7 @@ define([
         }
         this.addLinearBehavior(nodes, data);
 
-      }else if (name == 'gaussian') {
+      } else if (name == 'gaussian') {
         if (!data) {
           if (!nodes[0].copyNum) {
             this.addCopyBehavior(nodes, 10);
@@ -84,9 +86,7 @@ define([
         }
         this.addGaussianBehavior(nodes, data);
 
-      }  
-
-      else if (name == 'radial') {
+      } else if (name == 'radial') {
         //console.log("adding radial behavior");
         if (!data) {
           if (!nodes[0].copyNum) {
@@ -138,6 +138,7 @@ define([
 
     addFollowPathBehavior: function(nodes, data) {
       nodes[0].copyNum = 1;
+      nodes[0].isFollowPath= true;
       nodes[0].nodeParent.instances[0].position = {
         x: nodes[0].instances[0].position.x,
         y: nodes[0].instances[0].position.y
@@ -158,15 +159,16 @@ define([
         }
       } else {
         followPathBehavior = new FollowPathBehavior(nodes[0]);
-        nodes[0].scaffold=true;
+        nodes[0].scaffold = true;
         nodes[0].resetObjects();
         for (var i = start; i < nodes.length; i++) {
           nodes[i].resetObjects();
+         nodes[i].isFollowPath= true;
           nodes[i].addBehavior(followPathBehavior, ['update', 'calculate', 'clean']);
           nodes[i].instances[0].delta.x = nodes[0].instance_literals[0].firstSegment.point.x;
-          nodes[i].instances[0].delta.y =  nodes[0].instance_literals[0].firstSegment.point.y;
-          nodes[i].instances[nodes[i].instances.length-1].delta.x = nodes[0].instance_literals[0].lastSegment.point.x;
-          nodes[i].instances[nodes[i].instances.length-1].delta.y = nodes[0].instance_literals[0].lastSegment.point.y;
+          nodes[i].instances[0].delta.y = nodes[0].instance_literals[0].firstSegment.point.y;
+          nodes[i].instances[nodes[i].instances.length - 1].delta.x = nodes[0].instance_literals[0].lastSegment.point.x;
+          nodes[i].instances[nodes[i].instances.length - 1].delta.y = nodes[0].instance_literals[0].lastSegment.point.y;
         }
       }
 
@@ -214,7 +216,7 @@ define([
     },
 
 
- addGaussianBehavior: function(nodes, data) {
+    addGaussianBehavior: function(nodes, data) {
       var gaussianBehavior = new GaussianBehavior();
       for (var i = 0; i < nodes.length; i++) {
         var node = nodes[i];
@@ -234,6 +236,51 @@ define([
       }
     },
 
+
+    removeBehavior: function(s, behaviorName) {
+      s.removeAllAnchors();
+      if (behaviorName == 'copy') {
+        s.removeAllBehaviors();
+        s.copyNum = 1;
+      } else {
+        s.removeBehavior(behaviorName);
+        if (behaviorName == 'followpath') {
+          this.event_bus.trigger('moveUpNode');
+          var nodeParent = s.nodeParent;
+          var delta = jQuery.extend(true, {}, nodeParent.instances[0].delta);
+          console.log('childUL', delta);
+
+          
+          var pathChild = nodeParent.removeChildAt(0);
+          var followChild = nodeParent.removeChildAt(0);
+          pathChild.isFollowPath= false;
+          followChild.isFollowPath= false;
+          pathChild.removeAllAnchors();
+        
+          followChild.increment({
+            delta: delta
+          });
+          pathChild.increment({
+            delta: delta
+          });
+          pathChild.scaffold = false;
+          console.log('pathChild followChild', pathChild, followChild);
+          nodeParent.deleteNode();
+          console.log('pathChild followChild', pathChild, followChild);
+
+          this.event_bus.trigger('nodeAdded', pathChild, true);
+          this.event_bus.trigger('nodeAdded', followChild, true);
+
+        }
+
+
+
+      }
+      this.event_bus.trigger('rootUpdate');
+
+      this.event_bus.trigger('rootRender');
+
+    }
 
   });
   return BehaviorManagerModel;

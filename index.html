@@ -120,7 +120,7 @@
     <br>
 
 <form>
-    <input id="strokeSlider" type="range" min="0" max="40">
+    <input id="strokeSlider" type="range" value='1' min="0" max="40">
   </form>
 
   </div>
@@ -142,7 +142,7 @@
                     </h2>
                     <div class="clearfix"></div>
                 </header>
-  <div id = "parameterSliders" class="section-background">
+  <div id = "parameters" class="section-background">
    <script id="parameterTemplate" type="text/x-handlebars-template">
 
    {{#each paramName}}
@@ -151,6 +151,17 @@
    <label id='parameterName'>{{label}}</label>
    <br>
    <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
+   </div>
+
+
+   {{/each}}
+   {{#each behaviorName}}
+  
+   <div class="form-group">
+    <button id ={{label}} class='behaviorRemove'>x</button>
+   <label id='behaviorName'>{{label}}</label>
+  
+   <br>
    </div>
 
 

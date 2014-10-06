@@ -57,6 +57,7 @@ define([
       this.behaviors = [];
       this.originalMethods = [];
       this.conditions = [];
+      this.isFollowPath =false;
       this.upperLeft = {
         x: 0,
         y: 0
@@ -67,7 +68,7 @@ define([
         y: 0
       };
       this.childCenter = -1;
-
+      this.childUL = {};
 
       SceneNode.apply(this, arguments);
     },
@@ -204,18 +205,18 @@ define([
      * moves all child instances relative to the parent
      */
     updateOrigin: function() {
-      var childUL = this.getChildrenCenter();
+      this.childUL = this.getChildrenCenter();
       for (var i = 0; i < this.instances.length; i++) {
         this.instances[i].increment({
-          delta: childUL
+          delta: this.childUL
         });
 
       }
       for (var j = 0; j < this.children.length; j++) {
         this.children[j].increment({
           delta: {
-            x: -childUL.x,
-            y: -childUL.y
+            x: -this.childUL.x,
+            y: -this.childUL.y
           }
         });
       }
@@ -232,6 +233,14 @@ define([
       }
     },
 
+    /*removeAllAnchors
+    * removes any anchor settings for instances
+    */
+    removeAllAnchors: function() {
+      for (var i = 0; i < this.instances.length; i++) {
+        this.instances[i].anchor=false;
+      }
+    },
 
     bringToFront: function() {
       for (var i = 0; i < this.children.length; i++) {

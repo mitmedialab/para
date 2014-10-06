@@ -173,10 +173,10 @@ define([
 
                         if (this.children[i] == node) {
                             this.children[i].removeParentNode();
-                            this.children.splice(i, 1);
+                            var child = this.children.splice(i, 1)[0];
                             //console.log("number of this.children="+this.children.length);
 
-                            return true;
+                            return child;
 
                         }
                     }
@@ -187,8 +187,8 @@ define([
             removeChildAt: function(i){
                 if (this.children[i] !==null) {
                             this.children[i].removeParentNode();
-                            this.children.splice(i, 1);
-                            return true;
+                           var child= this.children.splice(i, 1)[0];
+                            return child
 
                 }
             },
