@@ -114,17 +114,56 @@ background-color: #cccccc;
 }
 
 .btn-tool{
-
 	width:36px;
 	height:36px;
 	padding: 0;
 	border-radius:0;
 	border-bottom: solid 1px #B2B2B2;
+	background-image: url(../images/icons.svg);
+	background-size: 36px 396px;
+	background-repeat: no-repeat;
+	background-position-x: 0px;
+	background-position-y: 0px;
 }
 .btn-tool.active{
 		background-color: rgba(238, 238, 238, 0.88);
 
 }
+
+#redoTool {
+	background-position-y: -108px;
+}
+#undoTool {
+	background-position-y: -72px;
+}
+#scaleTool {
+	background-position-y: -144px;
+}
+#rotateTool {
+	background-position-y: -252px;
+}
+#followPathTool {
+	background-position-y: -180px;
+}
+#selectTool {
+	background-position-y: -360px;
+}
+#penTool {
+	background-position-y: -288px;
+}
+#polyTool {
+	background-position-y: -324px;
+}
+#ellipseTool {
+	background-position-y: -216px;
+}
+#rectangleTool {
+	background-position-y: -36px;
+}
+#generateTool {
+	background-position-y: -324px;
+}
+
 #rangechaser {
 
     position: absolute;

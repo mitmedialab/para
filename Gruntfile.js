@@ -33,7 +33,7 @@ module.exports = function (grunt) {
         cssmin: {
             combine: {
                 files: {
-                    "build/style.css": ["css/basic.css"]
+                    "build/style/style.css": ["css/basic.css"]
                 }
             }
         },

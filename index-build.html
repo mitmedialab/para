@@ -10,7 +10,7 @@
   <title>Para</title>
 
   <!-- Page CSS -->
-  <link href="style.css" rel="stylesheet">
+  <link href="style/style.css" rel="stylesheet">
 
 </head>
 
@@ -66,14 +66,17 @@
 
  <aside class="toolbar-pop-over" style="display: block;">
   <div id = "toolbar">
-    <button class="btn btn-default btn-tool" id="redoTool"><img src="images/redo_icon.png" width="28" height="28"/></button>
-    <button class="btn btn-default btn-tool" id="undoTool"><img src="images/undo_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="scaleTool"><span><img src="images/scale_tool_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="rotateTool"><span><img src="images/rotate_tool_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="followPathTool"><span><img src="images/follow_path_icon.png" width="28" height="28"/></button>
-    <button  class="btn btn-default btn-tool" id="selectTool"><span><img src="images/select_tool_icon.png" width="28" height="28"/></button>
-    <button class="btn btn-default btn-tool" id="penTool"><img src="images/pen_tool_icon.png" width="28" height="28"/></button>
-    <button class="btn btn-default btn-tool" id="polyTool"><img src="images/poly_tool_icon.png" width="28" height="28"/></button>
+    <button title="redo" class="btn btn-default btn-tool" id="redoTool"></button>
+    <button title="undo" class="btn btn-default btn-tool" id="undoTool"></button>
+    <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button>
+    <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"></button>
+    <button title="distribute" class="btn btn-default btn-tool" id="followPathTool"></button>
+    <button title="select" class="btn btn-default btn-tool" id="selectTool"><span></button>
+    <button title="pen" class="btn btn-default btn-tool" id="penTool"></button>
+    <button title="polygon" class="btn btn-default btn-tool" id="polyTool"></button>
+    <button title="ellipse" class="btn btn-default btn-tool" id="ellipseTool"><span></button>
+    <button title="rectangle" class="btn btn-default btn-tool" id="rectangleTool"></button>
+    <button title="generate" class="btn btn-default btn-tool" id="generateTool"></button>
   </div>
   </aside> <!-- /toolbar-->
   <div id = 'prop-menu' class="properties">
