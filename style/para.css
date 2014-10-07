@@ -127,13 +127,31 @@ input[type="range"]:active::-webkit-slider-thumb {
     position: relative; 
 }
 
-.menubar-container, .toolbar-container, .properties-container {
+.menubar-container {
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: hidden;
     max-height: 100%;
     position: fixed;
 }
 
+.toolbar-container, .properties-container {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: static;    
+}
+
+.toolbar-container {
+    float: left;
+}
+
+.right-panel-container {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position: fixed;
+    top: 40px;
+    right: 0px;
+    bottom: 0px; 
+}
 
 
 .btn {
@@ -227,10 +245,7 @@ select{
 }
 .properties-container {
     right: 0px;
-    top: 40px;
-    bottom: 0px;
     width: 224px;
-    overflow-y: scroll;
 }
 #toolbar{
 	border-right: solid 1px #B2B2B2;
@@ -293,22 +308,13 @@ section {
     box-sizing: border-box;
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.95);
 }
-.toolbar-container {
-    top: 40px;
-    right: 224px;
-    width: 36px;
-    border-color: white ;
-    box-sizing: border-box;
-}
 .properties {
     right: 0;
     top: 0;
     bottom: 0;
     width: 224px;
     height: 100%;
-    position: absolute;
     color: #34332F;
-
 }
 
 

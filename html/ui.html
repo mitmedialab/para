@@ -35,162 +35,165 @@
   <div ></div>
   </div>
 
-  <!--======================= TOOLBAR=======================-->
-  <div class="toolbar-container" style="display: block;">
-  <div id = "toolbar">
-    <button title="redo" class="btn btn-default btn-tool" id="redoTool"></button>
-    <button title="undo" class="btn btn-default btn-tool" id="undoTool"></button>
-    <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button>
-    <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"></button>
-    <button title="distribute" class="btn btn-default btn-tool" id="followPathTool"></button>
-    <button title="select" class="btn btn-default btn-tool" id="selectTool"><span></button>
-    <button title="pen" class="btn btn-default btn-tool" id="penTool"></button>
-    <button title="polygon" class="btn btn-default btn-tool" id="polyTool"></button>
-    <button title="ellipse" class="btn btn-default btn-tool" id="ellipseTool"><span></button>
-    <button title="rectangle" class="btn btn-default btn-tool" id="rectangleTool"></button>
-    <button title="generate" class="btn btn-default btn-tool" id="generateTool"></button>
-  </div>
-  </div> <!-- /toolbar-->
+  <div class="right-panel-container">
 
-
-  <div class="properties-container" >
-    <div id = 'prop-menu' class="properties">
-
-        <!--======================= COLOR MENU =======================-->
-   <section id = "color-menu">
-    <header >
-                      <h2>
-                        Style
-                      </h2>
-                      <div class="clearfix"></div>
-                  </header>
-    <div  class="section-background">
-     <div class="form-group color-form-group">
-
-      <label for="hidden-input">Fill</label>
-      <br>
-      <a id="fillColorBlock" class='color-block'></a>
-
-    <input type="text" id='fill' class='color' value="#fff" />
+    <!--======================= TOOLBAR=======================-->
+    <div class="toolbar-container" style="display: block;">
+    <div id = "toolbar">
+      <button title="redo" class="btn btn-default btn-tool" id="redoTool"></button>
+      <button title="undo" class="btn btn-default btn-tool" id="undoTool"></button>
+      <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button>
+      <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"></button>
+      <button title="distribute" class="btn btn-default btn-tool" id="followPathTool"></button>
+      <button title="select" class="btn btn-default btn-tool" id="selectTool"><span></button>
+      <button title="pen" class="btn btn-default btn-tool" id="penTool"></button>
+      <button title="polygon" class="btn btn-default btn-tool" id="polyTool"></button>
+      <button title="ellipse" class="btn btn-default btn-tool" id="ellipseTool"><span></button>
+      <button title="rectangle" class="btn btn-default btn-tool" id="rectangleTool"></button>
+      <button title="generate" class="btn btn-default btn-tool" id="generateTool"></button>
     </div>
-
-    <div class="form-group color-form-group">
-      <label for="hidden-input">Stroke</label>
-      <br>
-      <a id="strokeColorBlock" class='color-block'></a>
-
-       <input type="text" id='stroke' class='color' value="#fff" />
-
-    </div>
-     <div class="form-group color-form-group">
-      <a id="no-color" class='color-block remove-color'></a>
-    </div>
-    <div class='clearfix'></div>
-    <div id="color-chooser"><div id="color-window"></div></div>
-    <div class="container" id="master-container">
-
-    
-
-  </div>
-    <div class="form-group">
-      <label for="hidden-input">Stroke Weight</label>
-      <br>
-
-  <form>
-      <input id="strokeSlider" type="range" value='1' min="0" max="40">
-    </form>
-
-    </div>
-    <div class="form-group">
-     <label for="hidden-input">Scaffold</label>
-     <input type="checkbox" name="scaffold" value="scaffold">
-   </div>
-  </div>
-  </section><!--/colorMenu-->
-     
-
-    <!--======================= PARAMETER MENU =======================-->
-
-    <section> 
-    
-   <header >
-                      <h2>
-                         Parameters
-                      </h2>
-                      <div class="clearfix"></div>
-                  </header>
-    <div id = "parameters" class="section-background">
-     <script id="parameterTemplate" type="text/x-handlebars-template">
-
-     {{#each paramName}}
-
-     <div class="form-group">
-     <label id='parameterName'>{{label}}</label>
-     <br>
-     <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
-     </div>
+    </div> <!-- /toolbar-->
 
 
-     {{/each}}
-     {{#each behaviorName}}
-    
-     <div class="form-group">
-      <button id ={{label}} class='behaviorRemove'>x</button>
-     <label id='behaviorName'>{{label}}</label>
-    
-     <br>
-     </div>
+    <div class="properties-container" >
+      <div id = 'prop-menu' class="properties">
 
+          <!--======================= COLOR MENU =======================-->
+     <section id = "color-menu">
+      <header >
+                        <h2>
+                          Style
+                        </h2>
+                        <div class="clearfix"></div>
+                    </header>
+      <div  class="section-background">
+       <div class="form-group color-form-group">
 
-     {{/each}}
+        <label for="hidden-input">Fill</label>
+        <br>
+        <a id="fillColorBlock" class='color-block'></a>
 
+      <input type="text" id='fill' class='color' value="#fff" />
+      </div>
 
-     </script>
-   </div>
-   </section><!--parameterSlider-->
+      <div class="form-group color-form-group">
+        <label for="hidden-input">Stroke</label>
+        <br>
+        <a id="strokeColorBlock" class='color-block'></a>
 
+         <input type="text" id='stroke' class='color' value="#fff" />
 
+      </div>
+       <div class="form-group color-form-group">
+        <a id="no-color" class='color-block remove-color'></a>
+      </div>
+      <div class='clearfix'></div>
+      <div id="color-chooser"><div id="color-window"></div></div>
+      <div class="container" id="master-container">
 
-  <!--======================= SAVE MENU =======================-->
-
-   <section id = "save-menu ">
-    <header >
-                <h2>Save</h2>
-                      <div class="clearfix"></div>
-                  </header>
-    <div  class="section-background">
-        
-         <div class="form-group">
-          <label>name <input class="form-control filename" type="text" id="text-filename" placeholder="my_drawing"/></label>
-
-          <select id ="fileselect" class="form-control"></select>
-        </div>
-        <div class="form-group">
-          <input type="button" id="save" value="save" disabled="true"/>
-        </div>
-
-    </section> <!--/save-menu-->
-
-    <!--======================= EXPORT MENU =======================-->
-
-   <section id = "save-menu ">
-    <header >
-                <h2>Export</h2>
-                      <div class="clearfix"></div>
-                  </header>
-    <div  class="section-background">
       
-        <div class="form-group">
-          <input type="button" id="saveFile" value="download file" disabled="true"/>
-        </div>
-        <div class="form-group">
-          <label>upload file from desktop<input class="form-group custom-file-input" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
-        </div>
-        <div class="form-group">
-          <input type="button" id ="export" value="export svg"/>
-        </div>
-        </div>
-    </section> <!--/save-menu-->
-  </div><!--/properties-->
+
+    </div>
+      <div class="form-group">
+        <label for="hidden-input">Stroke Weight</label>
+        <br>
+
+    <form>
+        <input id="strokeSlider" type="range" value='1' min="0" max="40">
+      </form>
+
+      </div>
+      <div class="form-group">
+       <label for="hidden-input">Scaffold</label>
+       <input type="checkbox" name="scaffold" value="scaffold">
+     </div>
+    </div>
+    </section><!--/colorMenu-->
+       
+
+      <!--======================= PARAMETER MENU =======================-->
+
+      <section> 
+      
+     <header >
+                        <h2>
+                           Parameters
+                        </h2>
+                        <div class="clearfix"></div>
+                    </header>
+      <div id = "parameters" class="section-background">
+       <script id="parameterTemplate" type="text/x-handlebars-template">
+
+       {{#each paramName}}
+
+       <div class="form-group">
+       <label id='parameterName'>{{label}}</label>
+       <br>
+       <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
+       </div>
+
+
+       {{/each}}
+       {{#each behaviorName}}
+      
+       <div class="form-group">
+        <button id ={{label}} class='behaviorRemove'>x</button>
+       <label id='behaviorName'>{{label}}</label>
+      
+       <br>
+       </div>
+
+
+       {{/each}}
+
+
+       </script>
+     </div>
+     </section><!--parameterSlider-->
+
+
+
+    <!--======================= SAVE MENU =======================-->
+
+     <section id = "save-menu ">
+      <header >
+                  <h2>Save</h2>
+                        <div class="clearfix"></div>
+                    </header>
+      <div  class="section-background">
+          
+           <div class="form-group">
+            <label>name <input class="form-control filename" type="text" id="text-filename" placeholder="my_drawing"/></label>
+
+            <select id ="fileselect" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <input type="button" id="save" value="save" disabled="true"/>
+          </div>
+
+      </section> <!--/save-menu-->
+
+      <!--======================= EXPORT MENU =======================-->
+
+     <section id = "save-menu ">
+      <header >
+                  <h2>Export</h2>
+                        <div class="clearfix"></div>
+                    </header>
+      <div  class="section-background">
+        
+          <div class="form-group">
+            <input type="button" id="saveFile" value="download file" disabled="true"/>
+          </div>
+          <div class="form-group">
+            <label>upload file from desktop<input class="form-group custom-file-input" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
+          </div>
+          <div class="form-group">
+            <input type="button" id ="export" value="export svg"/>
+          </div>
+          </div>
+      </section> <!--/save-menu-->
+    </div><!--/properties-->
+  </div><!--/right-panel-container-->
 </div><!--/uicontainer-->
 </div>
