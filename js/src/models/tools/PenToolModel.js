@@ -6,9 +6,11 @@ define([
   'backbone',
   'models/tools/BaseToolModel',
   'models/data/PathNode',
-   'models/PaperManager'
+   'models/PaperManager',
+     'utils/analytics'
 
-], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
+
+], function(_, Backbone, BaseToolModel, PathNode, PaperManager,analytics) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -16,6 +18,7 @@ define([
   //segment being drawn, mode of current drawing, type
   var currentSegment, mode, type;
 
+  var eventType = 'shapeAdded';
 
   var PenToolModel = BaseToolModel.extend({
   	  defaults:_.extend({},BaseToolModel.prototype.defaults,  {
@@ -49,6 +52,8 @@ define([
        
         this.trigger('rootChange',false);
       this.trigger('rootRender');
+      analytics.log(eventType,{type:eventType,id:'path',action:'add'});
+
 
     },
 

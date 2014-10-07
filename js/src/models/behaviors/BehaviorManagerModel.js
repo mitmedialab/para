@@ -11,11 +11,14 @@ define([
   'models/behaviors/DistributeBehavior',
   'models/behaviors/RadialDistributeBehavior',
   'models/behaviors/FollowPathBehavior',
-  'models/behaviors/GaussianBehavior'
+  'models/behaviors/GaussianBehavior',
+    'utils/analytics'
 
 
-], function($, _, Backbone, TrigFunc, GeometryNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior, GaussianBehavior) {
+], function($, _, Backbone, TrigFunc, GeometryNode, CopyBehavior, DistributeBehavior, RadialDistributeBehavior, FollowPathBehavior, GaussianBehavior,analytics) {
   var nameVal = 0;
+    var eventType = 'behavior';
+
   var BehaviorManagerModel = Backbone.Model.extend({
 
 
@@ -118,6 +121,8 @@ define([
 
 
     addCopyBehavior: function(nodes, copyNum, data) {
+      analytics.log(eventType,{type:eventType,id:'copyBehavior',action:'add'});
+
       var copyBehavior = new CopyBehavior();
       for (var i = 0; i < nodes.length; i++) {
         var node = nodes[i];
@@ -137,6 +142,8 @@ define([
     },
 
     addFollowPathBehavior: function(nodes, data) {
+      analytics.log(eventType,{type:eventType,id:'followPathBehavior',action:'add'});
+
       nodes[0].copyNum = 1;
       nodes[0].isFollowPath= true;
       nodes[0].nodeParent.instances[0].position = {
@@ -177,6 +184,8 @@ define([
     },
 
     addRadialBehavior: function(nodes, data) {
+      analytics.log(eventType,{type:eventType,id:'radialBehavior',action:'add'});
+
       var radialBehavior = new RadialDistributeBehavior();
       for (var i = 0; i < nodes.length; i++) {
         var node = nodes[i];
@@ -196,6 +205,8 @@ define([
     },
 
     addLinearBehavior: function(nodes, data) {
+      analytics.log(eventType,{type:eventType,id:'linearBehavior',action:'add'});
+
       var linearBehavior = new DistributeBehavior();
       for (var i = 0; i < nodes.length; i++) {
         var node = nodes[i];
@@ -217,6 +228,8 @@ define([
 
 
     addGaussianBehavior: function(nodes, data) {
+      analytics.log(eventType,{type:eventType,id:'gaussianBehavior',action:'add'});
+
       var gaussianBehavior = new GaussianBehavior();
       for (var i = 0; i < nodes.length; i++) {
         var node = nodes[i];
@@ -238,6 +251,8 @@ define([
 
 
     removeBehavior: function(s, behaviorName) {
+      analytics.log(eventType,{type:eventType,id:behaviorName,action:'remove'});
+
       s.removeAllAnchors();
       if (behaviorName == 'copy') {
         s.removeAllBehaviors();

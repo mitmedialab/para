@@ -6,9 +6,11 @@ define([
   'backbone',
   'models/tools/BaseToolModel',
   'models/data/PolygonNode',
-   'models/PaperManager'
+  'models/PaperManager',
+  'utils/analytics'
 
-], function(_, Backbone, BaseToolModel, PolygonNode, PaperManager) {
+
+], function(_, Backbone, BaseToolModel, PolygonNode, PaperManager, analytics) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -17,6 +19,8 @@ define([
   var sideNum = 6;
   var rotationAmt = 0;
   var scaleAmt = 0;
+  var eventType = 'shapeAdded';
+
 
 
   var PolyToolModel = BaseToolModel.extend({
@@ -49,6 +53,8 @@ define([
       }
         this.trigger('rootChange',false);
       this.trigger('rootRender');
+
+      analytics.log(eventType,{type:eventType,id:'polygon',action:'add'});
 
     },
 
