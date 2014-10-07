@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Source Sans Pro";
-  src: url('../fonts/SourceSansPro-Regular.otf.woff');
+  src: url('../fonts/SourceSans/SourceSansPro-Regular.ttf');
 }
 
 *:focus {
@@ -50,9 +50,8 @@ body {
     font-weight: 100;
     font-size: 12px;
     letter-spacing: 2px;
-    text-rendering: geometricPrecision;
-    margin:0;
-    background-color: #232323;
+   text-rendering: geometricPrecision;
+   margin:0;
 }
 
 body label {
@@ -61,17 +60,10 @@ body label {
    
 }
 
-input[type="text"] {
+input[type=text] {
     background: none;
     color: inherit;
-    border:0;
-   
-
-}
-input[type="text"].filename{
-     height:30px;
-    margin-top: 5px;
-    border:1px solid #aaa;
+    border: 0;
 }
 
 
@@ -111,30 +103,6 @@ input[type="range"]:focus::-moz-range-thumb,
 input[type="range"]:active::-webkit-slider-thumb {
     border-color: #fff;
 }
-
-#draw-container {
-    overflow: hidden;
-    min-height: 100%;
-    max-height: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-}
-
-.ui-container {
-    position: relative; 
-}
-
-.menubar-container, .toolbar-container, .properties-container {
-    overflow-x: hidden;
-    overflow-y: scroll;
-    max-height: 100%;
-    position: fixed;
-}
-
-
 
 .btn {
 display: inherit;
@@ -222,15 +190,30 @@ background-color: #cccccc;
 
 }
 
+/* Bar */
+::-webkit-scrollbar {
+    width: 4px;
+
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,1);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(255,0,0,0.8);
+}
+
+
 select{
 	min-width:200px;
 }
 .properties-container {
     right: 0px;
     top: 40px;
-    bottom: 0px;
-    width: 224px;
-    overflow-y: scroll;
+    bottom: 0;
+    width: 260px;
+    position: absolute;
 }
 #toolbar{
 	border-right: solid 1px #B2B2B2;
@@ -241,6 +224,7 @@ select{
     right:0px;
     width: 100%;
     height:40px;
+    position: absolute;
     border-bottom: solid 1px #B2B2B2;
 }
 input[type="button"]{
@@ -293,12 +277,13 @@ section {
     box-sizing: border-box;
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.95);
 }
-.toolbar-container {
-    top: 40px;
-    right: 224px;
+.toolbar-pop-over {
+    left: 0;
+    position: absolute;
     width: 36px;
     border-color: white ;
     box-sizing: border-box;
+    display: none;
 }
 .properties {
     right: 0;
@@ -309,6 +294,13 @@ section {
     position: absolute;
     color: #34332F;
 
+}
+
+
+
+header {
+    height: 26px;
+ 
 }
 
 
@@ -406,13 +398,13 @@ min-height: 200px;
 }
 
 #canvas-container{
- overflow-x: hidden;
+ overflow-x: hidden;   
 }
 #canvas-container:focus{
 	outline:none;
     border:none;
     box-shadow:none;
-   
+
 
 }
 
@@ -535,41 +527,12 @@ background-image: none;
 border: 1px solid #B2B2B2;
 -webkit-box-shadow: none;
 box-shadow:none;
-border-radius: 0px;
 -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
 
-/*file select styling*/
 
-.custom-file-input::-webkit-file-upload-button {
-  visibility: hidden;
-}
-.custom-file-input::before {
-  content: 'upload a file';
-  display: inline-block;
-  background: inherit;
-  border: 1px solid #B2B2B2;
-  border-radius: 1px;
-  padding: 3px 5px;
-  outline: none;
-  white-space: nowrap;
-  -webkit-user-select: none;
-  cursor: pointer;
-  text-shadow: none;
-   font-family: "Source Sans Pro";
-    font-weight: 100;
-    font-size: 12px;
-    text-rendering: geometricPrecision;
-    margin-top:5px;
-}
-.custom-file-input:hover::before {
-  border-color:  #B2B2B2;
-}
-.custom-file-input:active::before {
-  background: inherit;
-}
 
 
 /*------color picker styling----------*/
