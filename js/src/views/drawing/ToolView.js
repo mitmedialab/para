@@ -10,6 +10,7 @@ define([
 ], function($, _, Backbone, analytics){
 
   var lastSelected;
+  var eventType = 'toolChange';
   var ToolView = Backbone.View.extend({
     //
 
@@ -34,11 +35,13 @@ define([
 
       undoToolClick: function(){
         this.model.undo();
-        analytics.log('undo','undoClick');
+        analytics.log(eventType,{type:eventType,id:'undo',action:'undo'});
       },
 
       redoToolClick: function(){
         this.model.redo();
+        analytics.log(eventType,{type:eventType,id:'redo',action:'redo'});
+
       },
 
   	 selectToolClick: function(){
@@ -46,6 +49,8 @@ define([
   		$('#selectTool').addClass('active');
   		lastSelected = $('#selectTool');
       this.model.setState('selectTool');
+      analytics.log(eventType,{type:eventType,id:'selectTool',action:'toolSelected'});
+
 
   	},
 
@@ -54,6 +59,8 @@ define([
       $('#followPathTool').addClass('active');
       lastSelected = $('#followPathTool');
       this.model.setState('followPathTool');
+      analytics.log(eventType,{type:eventType,id:'followPathTool',action:'toolSelected'});
+
 
     },
 
@@ -62,6 +69,7 @@ define([
   		$('#penTool').addClass('active');
   		lastSelected = $('#penTool');
       this.model.setState('penTool');
+      analytics.log(eventType,{type:eventType,id:'penTool',action:'toolSelected'});
 
 
   	},
@@ -71,6 +79,8 @@ define([
   		$('#polyTool').addClass('active');
   		lastSelected = $('#polyTool');
       this.model.setState('polyTool');
+      analytics.log(eventType,{type:eventType,id:'polyTool',action:'toolSelected'});
+
 
   	},
 
@@ -79,6 +89,8 @@ define([
       $('#rotateTool').addClass('active');
       lastSelected = $('#rotateTool');
       this.model.setState('rotateTool');
+      analytics.log(eventType,{type:eventType,id:'rotateTool',action:'toolSelected'});
+
 
     },
 
