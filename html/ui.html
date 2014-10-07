@@ -9,7 +9,7 @@
 
 <div class="ui-container">
   <!--======================= CONTEXT MENU =======================-->
-  <div id="context-menu",class="floating-menu section_background">
+  <div id="context-menu",class="section_background">
     <div id = "main-menu">
       <script id="menu-template" type="text/x-handlebars-template">
       <div class="row" id="title-bar">
@@ -17,14 +17,8 @@
       <div id="close"><button id="close-btn">x</button></div>
       </div>
       <div class="row">
-      <div id="behavior-menu">behaviors</div>
       {{behavior-menu}}
       <div><a id="new-behavior-btn">new behavior +</a></div>
-      </div>
-      <div class="row">
-      <div id="cond-menu">conditionals</div>
-      {{cond-menu}}
-      <div><a id="new-cond-btn">new conditional +</a></div>
       </div>
       </script>
     </div>

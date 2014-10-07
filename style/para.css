@@ -420,9 +420,10 @@ min-height: 200px;
     position: absolute;
     visibility: hidden;
     z-index: 2;
-    background-color: #D1D9E0;
    	min-width:140px;
    	min-height:60px;
+      background: rgba(250,250,250,0.95)    
+
 }
 
 #color-chooser{
@@ -443,18 +444,19 @@ min-height: 200px;
 #context-menu div.row {
 	padding:6px;
 	min-height: 20px;
-	background-color: #EAF3FA;
+  background: rgba(250,250,250,0.95)    
 
 }
 
 #context-menu div.row#title-bar {
 	min-height: 30px;
-	background-color: #5CA2B5;
+	padding: 4%;
+    box-sizing: border-box;
+    background: rgba(238, 238, 238, 0.88);
 
 }
 #context-menu #name{
 	
-	color: #FFF;
 	width:100px;
 	float:left;
 }
@@ -462,7 +464,8 @@ min-height: 200px;
 #context-menu div#close{
 	float:right;
 	font-weight: bolder;
-	width: 30px;
+	width: 10px;
+    color:inherit;
 }
 
 #canvas{
