@@ -88,13 +88,8 @@ var CanvasView = Backbone.View.extend({
        c.attr('height', $(window).attr('innerHeight'));
 
   console.log("resize canvas",$(window).attr('innerWidth'));
-      /*    var htmlCanvas = this.$('canvas');
-      var parent = $('#canvas-container');
-     htmlCanvas.attr({ width: parent.width(), height: parent.height() });
-     // var newSize = new paper.Size(parent.width(),parent.height());*/
-     // paper.viewSize = newSize;
+     
       paper.view.draw();
-      //console.log(htmlCanvas.width(),htmlCanvas.height())  
 
     },
 

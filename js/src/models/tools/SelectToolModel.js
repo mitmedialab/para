@@ -86,7 +86,7 @@ define([
               this.currentPaths.push(path);
             }
             this.trigger('setSelection', path);
-
+            this.trigger('updateProperties');
             if (event.modifiers.option) {
               this.trigger('optionClick', this.selectedNodes[this.selectedNodes.length - 1]);
             }

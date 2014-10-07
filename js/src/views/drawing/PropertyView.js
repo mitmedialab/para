@@ -134,6 +134,7 @@ define([
     colorChange: function(event, ui) {
 
       var color = $('#color-window').iris('color');
+      console.log('color',color);
       if ($('#fillColorBlock').hasClass('color-block-selected')) {
           $('#fillColorBlock').removeClass('remove-color');
         $('#fillColorBlock').css('background-color', color);
@@ -151,26 +152,29 @@ define([
 
     },
 
-    pathSelected: function(path) {
+    pathSelected: function(node) {
+   
       //console.log("path selected");
-      this.currentPaths.push(path);
+      this.currentPaths.push(node);
+      console.log('node=',node);
+       console.log(node.getFirstSelectedInstance());
       //TODO: reference instance value not path value
-      var fill = this.currentPaths[0].fillColor;
-      var stroke = this.currentPaths[0].strokeColor;
-      var width = this.currentPaths[0].strokeWidth;
+      var fill = this.currentPaths[0].getFirstSelectedInstance().fillColor;
+      var stroke = this.currentPaths[0].getFirstSelectedInstance().strokeColor;
+      var width = this.currentPaths[0].getFirstSelectedInstance().strokeWidth;
 
       if (fill) {
-        $('#fillColorBlock').css('background-color', fill.toCSS(true));
-        $('#fill').val(fill.toCSS(true));
+        $('#fillColorBlock').css('background-color', fill);
+        $('#fill').val(fill);
         if ($('#fillColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', fill.toCSS(true));
+          $('#color-window').iris('color', fill);
         }
       }
       if (stroke) {
-        $('#strokeColorBlock').css('background-color', stroke.toCSS(true));
-        $('#stroke').val(stroke.toCSS(true));
+        $('#strokeColorBlock').css('background-color', stroke);
+        $('#stroke').val(stroke);
         if ($('#strokeColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', stroke.toCSS(true));
+          $('#color-window').iris('color', stroke);
         }
       }
       if (width) {

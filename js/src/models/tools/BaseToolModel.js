@@ -9,8 +9,8 @@ define([
   
 
   var BaseToolModel = Backbone.Model.extend({ 
-  style:{ fillColor: '#fff',
-    strokeColor: '#000',
+  style:{ fillColor: '#ffffff',
+    strokeColor: '#00000',
     strokeWidth: 1,},
  	defaults: {
   	},

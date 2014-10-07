@@ -81,6 +81,8 @@ define([
         this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
         this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
         this.listenTo(toolCollection, 'setSelection', this.setSelection);
+        this.listenTo(toolCollection, 'updateProperties', this.updateProperties);
+
         this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
         this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
         this.listenTo(toolCollection, 'moveDownNode', this.moveDownNode);
@@ -266,9 +268,18 @@ define([
 
       },
 
+      updateProperties: function(data){
+        console.log('updateProperties');
+        var selectedNodes = toolCollection.get(this.get('state')).selectedNodes;
+        this.trigger('pathSelected',selectedNodes[selectedNodes.length-1]);
+
+      },
+
+
       getSelection: function() {
 
         toolCollection.get(this.get('state')).selectedNodes = selectTool.selectedNodes;
+
 
       },
 
@@ -314,8 +325,7 @@ define([
       //callback triggered when select tool selects shape
       nodeSelected: function(selected) {
         this.determineSelectionPoint(selected);
-        this.trigger('pathSelected', selected);
-
+      
       },
 
       selectionReset: function() {

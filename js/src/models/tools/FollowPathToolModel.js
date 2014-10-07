@@ -37,7 +37,6 @@ define([
       if (!event.modifiers.shift) {
         if (this.currentNode) {
           this.currentNode.deselectAll();
-
         }
         this.currentPaths = [];
         this.currentNode = null;

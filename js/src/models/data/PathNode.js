@@ -116,8 +116,8 @@ define([
         width: width,
         height: height,
         strokeWidth: path.strokeWidth,
-        strokeColor: path.strokeColor,
-        fillColor: path.fillColor,
+        strokeColor: path.strokeColor.toCSS(true),
+        fillColor: path.fillColor.toCSS(true),
         closed: path.closed
       });
       path.position.x = 0;
