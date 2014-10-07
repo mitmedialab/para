@@ -50,8 +50,9 @@ body {
     font-weight: 100;
     font-size: 12px;
     letter-spacing: 2px;
-   text-rendering: geometricPrecision;
-   margin:0;
+    text-rendering: geometricPrecision;
+    margin:0;
+    background-color: #232323;
 }
 
 body label {
@@ -103,6 +104,30 @@ input[type="range"]:focus::-moz-range-thumb,
 input[type="range"]:active::-webkit-slider-thumb {
     border-color: #fff;
 }
+
+#draw-container {
+    overflow: hidden;
+    min-height: 100%;
+    max-height: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.ui-container {
+    position: relative; 
+}
+
+.menubar-container, .toolbar-container, .properties-container {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 100%;
+    position: fixed;
+}
+
+
 
 .btn {
 display: inherit;
@@ -190,21 +215,6 @@ background-color: #cccccc;
 
 }
 
-/* Bar */
-::-webkit-scrollbar {
-    width: 4px;
-
-}
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,1);
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
-}
-::-webkit-scrollbar-thumb:window-inactive {
-    background: rgba(255,0,0,0.8);
-}
-
-
 select{
 	min-width:200px;
 }
@@ -212,8 +222,9 @@ select{
     right: 0px;
     top: 40px;
     bottom: 0;
-    width: 260px;
-    position: absolute;
+    width: 224px;
+    height: 100%;
+    overflow-y: scroll;
 }
 #toolbar{
 	border-right: solid 1px #B2B2B2;
@@ -224,7 +235,6 @@ select{
     right:0px;
     width: 100%;
     height:40px;
-    position: absolute;
     border-bottom: solid 1px #B2B2B2;
 }
 input[type="button"]{
@@ -277,13 +287,12 @@ section {
     box-sizing: border-box;
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.95);
 }
-.toolbar-pop-over {
-    left: 0;
-    position: absolute;
+.toolbar-container {
+    top: 40px;
+    right: 224px;
     width: 36px;
     border-color: white ;
     box-sizing: border-box;
-    display: none;
 }
 .properties {
     right: 0;
