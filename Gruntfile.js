@@ -51,7 +51,7 @@ module.exports = function (grunt) {
                     baseUrl: "js/src/",
                     name: "uiloader",
                     out: "build/js/para.js",
-                    optimize: "none",
+                    // optimize: "none",
                     wrapShim: true,
                     useStrict: true
                 }

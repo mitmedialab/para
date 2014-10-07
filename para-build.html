@@ -1,18 +1,38 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <title>Para</title>
- 
-  <link href="style/para.css" rel="stylesheet">
+    <title>Para</title>
+
+    <link href="style/para.css" rel="stylesheet">
 </head>
 
 <body>
+<script>
+/* global alert */
+(function () {
+    "use strict";
+    var BROWSER_RE = /Chrome\/(\d+)\.(\d+)\.(\d+)\.(\d+)/,
+        MIN_CHROME_VESION = 37,
+        chromeVersion = BROWSER_RE.exec(window.navigator.userAgent);
+
+    if (chromeVersion && chromeVersion.length === 5) {
+        if (parseInt(chromeVersion[1], 10) < MIN_CHROME_VESION) {
+            alert("Para has only been tested on Google Chrome version " + MIN_CHROME_VESION + " and later. " +
+                "You are using version " + chromeVersion[1] + ".\n\n" +
+                "If you experience problems, please consider updating Google Chrome.");
+        }
+    } else {
+        alert("Para has only been tested on Google Chrome.\n\n" +
+            "If you experience problems, please consider trying Para again using Google Chrome.");
+    }
+}());
+</script>
 <script src="js/para.js"></script>
 </body>
 </html>
