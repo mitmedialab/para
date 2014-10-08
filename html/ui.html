@@ -1,61 +1,40 @@
 <!--======================= CANVAS =======================-->
-<!--draw container, contains canvas and object and property menus -->
-<div id = "draw-container"><!--draw container-->
-  <div id = "canvas-container"><!--canvas-container-->
-    <span><canvas id="canvas" resize='true'></canvas></span>
+<div class="canvas-wrapper"><!--draw container-->
+  <div id="canvas-container"><!--canvas-container-->
+    <span><canvas id="canvas" resize="true"></canvas></span>
   </div><!--/canvas-container-->
-</div>  <!--/draw container-->
+</div>  <!--/canvas-wrapper-->
 
-
-<div class="ui-container">
-  <!--======================= CONTEXT MENU =======================-->
-  <div id="context-menu",class="section_background">
-    <div id = "main-menu">
-      <script id="menu-template" type="text/x-handlebars-template">
-      <div class="row" id="title-bar">
-      <div id="name">{{name}}</div>
-      <div id="close"><button id="close-btn">x</button></div>
-      </div>
-      <div class="row">
-      {{behavior-menu}}
-      <div><a id="new-behavior-btn">new behavior +</a></div>
-      </div>
-      </script>
+<!--======================= CONTEXT MENU =======================-->
+<div id="context-menu",class="section_background">
+  <div id = "main-menu">
+    <script id="menu-template" type="text/x-handlebars-template">
+    <div class="row" id="title-bar">
+    <div id="name">{{name}}</div>
+    <div id="close"><button id="close-btn">x</button></div>
     </div>
-    <div id="behavior-types-menu">
-      <div class="row"><a id="copy">copy</a></div>  
-      <div class="row"><a id="linear">linear distribution</a></div> 
-      <div class="row"><a id="radial">radial distribution</a></div> 
-      <div class="row"><a id="gaussian">normal distribution</a></div> 
+    <div class="row">
+    {{behavior-menu}}
+    <div><a id="new-behavior-btn">new behavior +</a></div>
     </div>
+    </script>
   </div>
-
-  <!--======================= MENU BAR=======================-->
-  <div class ='menubar-container section-background'>
-  <div ></div>
+  <div id="behavior-types-menu">
+    <div class="row"><a id="copy">copy</a></div>  
+    <div class="row"><a id="linear">linear distribution</a></div> 
+    <div class="row"><a id="radial">radial distribution</a></div> 
+    <div class="row"><a id="gaussian">normal distribution</a></div> 
   </div>
+</div>
 
-  <div class="right-panel-container">
+<!--======================= MENU BAR =======================-->
+<div class="menubar-wrapper section-background">
+<div class="menubar-container"></div>
+</div>
 
-    <!--======================= TOOLBAR=======================-->
-    <div class="toolbar-container" style="display: block;">
-    <div id = "toolbar">
-      <button title="redo" class="btn btn-default btn-tool" id="redoTool"></button>
-      <button title="undo" class="btn btn-default btn-tool" id="undoTool"></button>
-      <!--<button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button>-->
-      <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"></button>
-      <button title="distribute" class="btn btn-default btn-tool" id="followPathTool"></button>
-      <button title="select" class="btn btn-default btn-tool" id="selectTool"><span></button>
-      <button title="pen" class="btn btn-default btn-tool" id="penTool"></button>
-      <button title="polygon" class="btn btn-default btn-tool" id="polyTool"></button>
-      <!--<button title="ellipse" class="btn btn-default btn-tool" id="ellipseTool"><span></button>
-      <button title="rectangle" class="btn btn-default btn-tool" id="rectangleTool"></button>
-      <button title="generate" class="btn btn-default btn-tool" id="generateTool"></button>-->
-    </div>
-    </div> <!-- /toolbar-->
-
-
-    <div class="properties-container" >
+<!--======================= PROPERTIES PANEL =======================-->
+<div class="properties-wrapper">
+    <div class="properties-container">
       <div id = 'prop-menu' class="properties">
 
           <!--======================= COLOR MENU =======================-->
@@ -104,8 +83,8 @@
 
       </div>
       <div class="form-group">
-        <!-- <label for="hidden-input">Scaffold</label>
-     <input type="checkbox" name="scaffold" value="scaffold">-->
+       <label for="hidden-input">Scaffold</label>
+       <input type="checkbox" name="scaffold" value="scaffold">
      </div>
     </div>
     </section><!--/colorMenu-->
@@ -194,6 +173,29 @@
           </div>
       </section> <!--/save-menu-->
     </div><!--/properties-->
-  </div><!--/right-panel-container-->
-</div><!--/uicontainer-->
-</div>
+  </div><!--/properties-container-->
+</div><!--/properties-wrapper-->
+
+<!--======================= TOOLBAR=======================-->
+<!--
+    NOTE: As tools are added to the toolbar, the min-height of the html
+    tag must be kept up to date in para.css. It should be 40px + n * 36px
+    where n is the number of tools
+-->
+<div class="toolbar-wrapper">
+  <div class="toolbar-container" style="display: block;">
+    <div id="toolbar">
+      <button title="redo" class="btn btn-default btn-tool" id="redoTool"></button>
+      <button title="undo" class="btn btn-default btn-tool" id="undoTool"></button>
+      <!-- <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button> -->
+      <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"></button>
+      <button title="distribute" class="btn btn-default btn-tool" id="followPathTool"></button>
+      <button title="select" class="btn btn-default btn-tool" id="selectTool"><span></button>
+      <button title="pen" class="btn btn-default btn-tool" id="penTool"></button>
+      <button title="polygon" class="btn btn-default btn-tool" id="polyTool"></button>
+      <!-- <button title="ellipse" class="btn btn-default btn-tool" id="ellipseTool"><span></button>
+      <button title="rectangle" class="btn btn-default btn-tool" id="rectangleTool"></button>
+      <button title="generate" class="btn btn-default btn-tool" id="generateTool"></button> -->
+    </div><!--/toolbar-->
+  </div><!--/toolbar-container-->
+</div><!--/toolbar-wrapper-->

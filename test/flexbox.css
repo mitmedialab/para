@@ -1,0 +1,70 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    height: 100%;
+    min-height: 100%;
+}
+
+div {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.canvas, .menubar, .toolbar, .propertybar {
+    opacity: .5;
+    border: thin solid black;
+    padding: 5px;
+}
+
+.canvas {
+    background-color: red;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+
+}
+
+.menubar {
+    background-color: green;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+    height: 40px;
+    overflow: auto;
+}
+
+.toolbar-wrapper, .propertybar-wrapper {
+    display: inline-flex;
+    vertical-align: top;
+    float: right;
+    position: relative;
+    max-height: 100%;
+    padding: 40px 0px 0px 0px;
+}
+
+.propertybar-wrapper {
+    min-height: 100%;
+    height: 100%;
+}
+
+.toolbar, .propertybar {
+    background-color: blue;
+    max-height: 100%;
+    overflow: auto;
+}
+
+.toolbar {
+    background-color: blue;
+}
+
+.propertybar {
+    background-color: orange;
+}
