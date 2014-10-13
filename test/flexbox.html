@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Para</title>
+
+    <link href="flexbox.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="canvas">canvas</div>
+
+<div class="menubar">menu</div>
+<div class="propertybar-wrapper">
+    <div class="propertybar">
+        <p>propertybar</p>
+        <ol>
+            <li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li>
+            <li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li>
+            <li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li>       
+        </ol>
+    </div>
+</div>
+<div class="toolbar-wrapper">
+    <div class="toolbar">
+        <p>toolbar</p>
+        <ol>
+            <li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li>
+            <li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li><li>p</li>    
+        </ol>
+    </div>
+</div>
+<script>
+var c = window.document.getElementsByClassName("canvas")[0];
+c.onclick = function () { console.log("clicked canvas", arguments); };
+</script>
+</body>
+
+</html>
