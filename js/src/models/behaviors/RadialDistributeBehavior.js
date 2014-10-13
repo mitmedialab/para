@@ -46,7 +46,7 @@ define([
         this.instances[this.middle].anchor = true;
         this.instances[num - 1].anchor = false;
         if (TrigFunc.equals(pointA, pointB)) {
-          this.instances[this.middle].delta.x -= 1;
+          this.instances[this.middle].delta.x -=100;
           pointB = this.instances[this.middle].delta;
         }
         var dist = TrigFunc.distance(pointA, pointB);
