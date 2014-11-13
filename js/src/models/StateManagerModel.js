@@ -258,8 +258,9 @@ define([
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = selectedShapes.length - 1; i >= 0; i--) {
           var instance = selectedShapes[i];
-          var clone = instance.cloneInstance();
 
+          var clone = instance.cloneInstance();
+          clone.set('rotation_delta',0);
           var edge = new Edge({
             x: instance,
             y: clone

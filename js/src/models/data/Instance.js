@@ -46,6 +46,9 @@ define([
 			reset: false,
 			geom: null,
 			bbox: null,
+			reset_matrix: true,
+
+			totalRotationDelta:0
 
 		},
 
@@ -58,8 +61,8 @@ define([
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
 			this.set('matrix', new paper.Matrix());
-			var bounds = new paper.Rectangle(0,0,1,1);
-			this.set('bbox',new paper.Path.Rectangle(bounds));
+			var bounds = new paper.Rectangle(0, 0, 1, 1);
+			this.set('bbox', new paper.Path.Rectangle(bounds));
 			SceneNode.prototype.initialize.apply(this, arguments);
 
 		},
@@ -90,24 +93,25 @@ define([
 			this.set(data);
 			//console.log("translation_delta",this.get('translation_delta'));
 
-			
 		},
+
+
 
 		incrementDelta: function(data) {
 			if (data.translation_delta) {
 				var translation_delta = this.get('translation_delta');
 				//console.log("translation_delta",this.get('translation_delta'));
 				translation_delta.add(data.translation_delta);
-				console.log("translation_delta",translation_delta);
+				console.log("translation_delta", translation_delta);
 
-				this.set('translation_delta',translation_delta);
+				this.set('translation_delta', translation_delta);
 			}
 			if (data.rotation_delta) {
 				var rotation_delta = this.get('rotation_delta');
-				rotation_delta+=data.rotation_delta;
-				this.set('rotation_delta',rotation_delta);
+				rotation_delta += data.rotation_delta;
+				this.set('rotation_delta', rotation_delta);
 			}
-			
+
 		},
 
 		getCenter: function() {
@@ -132,6 +136,23 @@ define([
 		},
 
 
+		concatMatrix: function(data) {
+			var matrix = this.get('matrix');
+			var reset_matrix = this.get('reset_matrix');
+
+			if (reset_matrix) {
+				this.set('reset_matrix', false);
+				this.set('totalRotationDelta',0);
+				matrix.reset();
+			}
+			if (data.rotation_delta) {
+				var crotation_delta = this.get('totalRotationDelta');
+				this.set('totalRotationDelta',crotation_delta+data.rotation_delta);
+
+			}
+			this.set('matrix',matrix);
+
+		},
 
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
@@ -141,12 +162,12 @@ define([
 			var selected = this.get('selected');
 			var translation_delta = this.get('translation_delta').toPaperPoint();
 			var rotation_origin = this.get('rotation_origin').toPaperPoint;
-			var rotation_delta = this.get('rotation_delta');
+			var rotation_delta = this.get('rotation_delta')+this.get('totalRotationDelta');
 			var scaling_origin = this.get('scaling_origin').toPaperPoint;
 			var scaling_delta = this.get('scaling_delta');
 
 			//console.log('translation_delta for render', translation_delta);
-			matrix.reset();
+
 			if (data) {
 
 				if (data.matrix) {
@@ -183,6 +204,7 @@ define([
 				//console.log('screen_position',this.get('screen_position'));
 				this.set('geom', path);
 			}
+			this.set('reset_matrix', true);
 		},
 
 		getLinkedDimensions: function(data) {
@@ -213,34 +235,34 @@ define([
 					bottomY: position.y + height,
 				};
 			}
-			console.log("dimensions",data.dimensions);
+			console.log("dimensions", data.dimensions);
 			console.log("getting dimensions for children", this.children.length);
-			data.top=false;
+			data.top = false;
 			for (var i = 0; i < this.children.length; i++) {
 
 				data = this.children[i].getLinkedDimensions(data);
 			}
-			console.log("post_dimensions",data.dimensions);
+			console.log("post_dimensions", data.dimensions);
 			//TODO: recycle bounding box rather than re-initializing it.
-			if(top){
+			if (top) {
 				var bx = data.dimensions.leftX;
 				var by = data.dimensions.topY;
-				var bwidth = data.dimensions.rightX-bx;
-				var bheight = data.dimensions.bottomY-by;
-				var rectangle = new paper.Rectangle(bx,by,bwidth,bheight);
+				var bwidth = data.dimensions.rightX - bx;
+				var bheight = data.dimensions.bottomY - by;
+				var rectangle = new paper.Rectangle(bx, by, bwidth, bheight);
 				data.bbox = this.get('bbox');
 
 				data.bbox.position = rectangle.center;
 
-				var scaleX = rectangle.width/data.bbox.bounds.width;
-				var scaleY = rectangle.height/data.bbox.bounds.height;
-				data.bbox.scale(scaleX,scaleY);
+				var scaleX = rectangle.width / data.bbox.bounds.width;
+				var scaleY = rectangle.height / data.bbox.bounds.height;
+				data.bbox.scale(scaleX, scaleY);
 
 				data.bbox.selectedColor = 'red';
 				data.bbox.visible = true;
-				data.bbox.selected = true;	
+				data.bbox.selected = true;
 				data.bbox.instance = this;
-				this.set('bbox',data.bbox);
+				this.set('bbox', data.bbox);
 			}
 
 			return data;
@@ -251,9 +273,9 @@ define([
 			clone.set('position', this.get('position').clone());
 			clone.set('translation_delta', this.get('translation_delta').clone());
 			clone.set('center', this.get('center').clone());
-			clone.set('scaling_origin',this.get('scaling_origin').clone());
+			clone.set('scaling_origin', this.get('scaling_origin').clone());
 			clone.set('rotation_origin', this.get('rotation_origin').clone());
-			clone.set('matrix',  this.get('matrix').clone());
+			clone.set('matrix', this.get('matrix').clone());
 			clone.set('bbox', this.get('bbox').clone());
 			return clone;
 		}

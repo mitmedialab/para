@@ -107,9 +107,8 @@ define([
 						data.translation = departureNode.getTranslation();
 					}*/
 					if (edge.contains('rotation')) {
-						data.rotation_delta = departureNode.get('rotation_delta');
-						console.log("updating_rotation_delta");
-					}
+						data.rotation_delta = departureNode.get('rotation_delta')+departureNode.get('totalRotationDelta');
+					}				
 				/*if (edge.contains('scaling')) {
 						data.translation = departureNode.getScaling();
 					}
@@ -123,8 +122,10 @@ define([
 						data.strokeWidth = departureNode.getStrokeWidth();
 					}*/
 
-					node.update(data);
+
+					node.concatMatrix(data);
 				}
+
 
 			}
 			var edgesRendered = node.edgesRendered();
