@@ -324,7 +324,6 @@ define([
       var s = selected[selected.length - 1];
       if(s){
       var userParams = s.userParams;
-      var behaviors = s.behaviors
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
 
@@ -340,13 +339,13 @@ define([
       }
       
 
-    for (var i = 0; i < behaviors.length; i++) {
+    /*for (var i = 0; i < behaviors.length; i++) {
 
           var data = {
             label: behaviors[i].behavior.name
           };
           behaviorParams.push(data);
-        }
+        }*/
      context = {
         paramName: propertyParams,
         behaviorName: behaviorParams

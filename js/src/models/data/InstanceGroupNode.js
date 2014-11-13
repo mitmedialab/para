@@ -1,4 +1,4 @@
-/*GroupNode.js
+/*InstanceGroupNode.js
  * class for geometric groupings of path objects
  * extends GeometryNode
  */
@@ -6,17 +6,17 @@
 define([
   'jquery',
   'underscore',
-  'models/data/GeometryNode'
+  'models/data/GroupNode'
 
-], function($,_, GeometryNode) {
+], function($,_, GroupNode) {
   //paperjs group object
  
-  var GroupNode = GeometryNode.extend({
-    name: 'group',
+  var InstanceGroupNode = GroupNode.extend({
+    name: 'instancegroup',
     type: 'geometry',
     constructor: function() {
 
-     GeometryNode.apply(this, arguments);
+     GroupNode.apply(this, arguments);
     },
 
   
@@ -26,7 +26,7 @@ define([
 
   });
 
-  return GroupNode;
+  return InstanceGroupNode;
 
 
 });

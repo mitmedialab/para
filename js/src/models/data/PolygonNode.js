@@ -14,11 +14,10 @@ define([
 
 ], function(_, PathNode, Instance, PaperManager) {
   //drawable paper.js path object that is stored in the pathnode
-  var paper = PaperManager.getPaperInstance();
   var PolygonNode = PathNode.extend({
 
-    type: 'polygon',
-    name: 'none',
+    type: 'geometry',
+    name: 'polygon',
 
      constructor: function() {
       this.userParams = [{label:'points',max:15,min:3,propertyName:'pointNum'}];

@@ -12,22 +12,97 @@ define([
 
 
     var SceneNode = Backbone.Model.extend({
+            defaults:{
+                visited:false,
+                rendered: false,
+                edges: null,
+            },
 
             constructor: function() {
+                //parent node
                 this.nodeParent = null;
+                //array to store children
                 this.children = [];
+                //array to store edges (for graph)
 
-                ////console.log("name="+name);
-
-                ////console.log("parent="+node.name);
-
+                //Global property that keeps track of total # of nodes
                 SceneNode.numNodeInstances++;
+             
+
                 Backbone.Model.apply(this, arguments);
-                ////console.log("number of nodes="+SceneNode.numNodeInstances);
             },
 
             initialize: function() {
+                this.set({edges:[]})
+            },
 
+            /*visit
+            * placeholder visit function for 
+            * external vistior tree traversal
+            */
+            visit: function(visitor,departureNode) {
+                visitor.visit(this,departureNode);   
+            },
+
+            /*getEdge
+            * searches edge array for matching x value 
+            * and returns relevant edge
+            */
+            getEdge: function(x){
+                var edges = this.get('edges');
+
+                for(var i=0;i<edges.length;i++){
+                    if(edges[i].get('x') ===x){
+                        return edges[i];
+                    }
+                }
+                return null;
+            },
+
+            /*edgesRendered
+            * checks to see if all x values of edges connected to this node 
+            * have been rendered
+            */
+            edgesRendered:function(){
+                var edges = this.get('edges');
+                //console.log("edges length",edges.length);
+                for(var i=0;i<edges.length;i++){
+                    if(!edges[i].get('x').get('rendered')){
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            /*addEdge
+            * checks to see if edge with x already exists
+            * in edge list. If not, adds a new edge
+            * otherwise, throws an error.
+            * TODO: merge/ overwrite conflicting edges
+            */
+            addEdge: function(edge,x){
+               // console.log("adding edge for",this.type,this.name);
+                 var edges = this.get('edges');
+                if(!this.getEdge(x)){                    
+                    edges.push(edge);
+                    this.set('edges',edges);
+                }
+                else{
+                    console.error("adding overriding edge");
+                }
+
+            },
+
+            /*reset
+            *resets visited value after graph traversal is complete
+            */
+            reset: function(){
+                this.vistied= false;
+            },
+
+            /*TODO: write export JSON function*/
+            exportJSON: function(data){
+                return {};
             },
             /*================ SceneNode method defintions ================*/
 
@@ -153,7 +228,7 @@ define([
             addChildNode: function(node) {
 
                 if (node !== null) {
-                    console.log("adding node",node.type);
+                    //console.log("adding node",this.name,node.name);
                     node.setParentNode(this);
                     this.children.push(node);
                     node.index = this.children.length-1;
@@ -188,7 +263,7 @@ define([
                 if (this.children[i] !==null) {
                             this.children[i].removeParentNode();
                            var child= this.children.splice(i, 1)[0];
-                            return child
+                            return child;
 
                 }
             },

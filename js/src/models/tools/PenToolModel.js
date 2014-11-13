@@ -5,12 +5,9 @@ define([
   'underscore',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PathNode',
-   'models/PaperManager',
-     'utils/analytics'
 
 
-], function(_, Backbone, BaseToolModel, PathNode, PaperManager,analytics) {
+], function(_, Backbone, BaseToolModel) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -22,11 +19,13 @@ define([
 
   var PenToolModel = BaseToolModel.extend({
   	  defaults:_.extend({},BaseToolModel.prototype.defaults,  {
-          }),
+      }),
 
    
   	initialize: function(){
-
+      BaseToolModel.prototype.initialize.apply(this, arguments);
+      var paper = this.get('paper');
+      this.reset();
   	},
 
     reset: function(){
@@ -52,7 +51,6 @@ define([
        
         this.trigger('rootChange',false);
       this.trigger('rootRender');
-      analytics.log(eventType,{type:eventType,id:'path',action:'add'});
 
 
     },
@@ -104,9 +102,7 @@ define([
           this.currentPath =  new paper.Path();
     
          this.currentPath.selected = true;
-     this.currentPath.strokeWidth = this.style.strokeWidth;
-         this.currentPath.strokeColor = this.style.strokeColor;
-         this.currentPath.fillColor = this.style.fillColor;
+    
          if(this.fillColor==-1){
           this.currentPath.style.fillColor = null;
 

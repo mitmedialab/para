@@ -1,63 +1,41 @@
 /*BaseToolModel.js
-*base model class for all direct manipulation tool models*/
+ *base model class for all direct manipulation tool models*/
 
 define([
   'underscore',
-  'backbone'
+  'backbone',
+  'models/PaperManager'
 
-], function(_, Backbone) {
-  
 
-  var BaseToolModel = Backbone.Model.extend({ 
-  style:{ fillColor: '#ffffff',
-    strokeColor: '#00000',
-    strokeWidth: 1,},
- 	defaults: {
-  	},
-  currentPath: null,
-  currentNode: null,
- 
+], function(_, Backbone, PaperManager) {
 
-  	constructor: function(){
-  		Backbone.Model.apply(this, arguments);
-     
-  	},
 
-  	reset: function(){
-      this.trigger('rootRender');
-  	},
+  var BaseToolModel = Backbone.Model.extend({
 
-  	//mousedown event
-	mouseDown : function(event) {
-  		
-       },
-     //mouse up event
-     mouseUp : function(event) {
-  		
-       },
+    defaults: {
+      fill_color: '#ffffff',
+      stroke_color: '#000000',
+      stroke_width: 1,
+      currentPaperObjects: null, //stores literal paperjs objects created / selected by tool
+      paper: PaperManager.getPaperInstance(),
+      matrix: null,
 
-     //mouse drag event
-     mouseDrag: function(event){
-
-     },
-
-     //mouse move event
-     mouseMove: function(event){
-
-     },
-
-     dblClick: function(event) {
-    
     },
 
-     //key down event
-     keyDown: function(event){
 
-     }
+    initialize: function() {
+      this.set('literals', []);
+      this.set('matrix', new paper.Matrix());
+
+    },
+
+    reset: function() {
+
+    }
 
 
   });
-  
+
 
   return BaseToolModel;
 

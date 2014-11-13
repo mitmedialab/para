@@ -15,7 +15,7 @@ define([
     //
 
     initialize: function(){
-      this.penToolClick();
+      this.polyToolClick();
     },
 
     render: function(){

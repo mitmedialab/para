@@ -41,7 +41,7 @@ define(["version", "jquery", "jquery-cookie"], function (version, $) {
         _userID = $.cookie(COOKIE_KEY) || _createID();
         _sessionID = _createID();
 
-        console.log("starting analytics for user %s with session ID %s", _userID, _sessionID);
+        /*console.log("starting analytics for user %s with session ID %s", _userID, _sessionID);
 
         // If we have pending submits left from last time, then they are probably failed.
         // So, we simply move them to failed to try again. Server will remove dupes.
@@ -65,7 +65,7 @@ define(["version", "jquery", "jquery-cookie"], function (version, $) {
 
         // Create a start event and immediately submit it (along with any prior failed submits)
         log("start", {"user-agent": window.navigator.userAgent, "version": version});
-        submit();
+        submit();*/
     };
 
     var log = function (name, data) {

@@ -1,133 +1,83 @@
-/*PenToolModel.js
-*base model class for all direct manipulation tool models*/
+/*PolyToolModel.js
+ *tool for drawing regular polygons
+ */
 
 define([
   'underscore',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PolygonNode',
-  'models/PaperManager',
-  'utils/analytics'
+], function(_, Backbone, BaseToolModel) {
 
-
-], function(_, Backbone, BaseToolModel, PolygonNode, PaperManager, analytics) {
-  
-  //types for bezier tool behavior
-  var types = ['point', 'handleIn', 'handleOut'];
   var nameVal = 0;
-  //segment being drawn, mode of current drawing, type
   var sideNum = 6;
   var rotationAmt = 0;
   var scaleAmt = 0;
-  var eventType = 'shapeAdded';
-
-
+  var polyPath = null;
 
   var PolyToolModel = BaseToolModel.extend({
-  	  defaults:_.extend({},BaseToolModel.prototype.defaults,  {
-          }),
+    defaults: _.extend({}, BaseToolModel.prototype.defaults, {
+    }),
 
-   
-  	initialize: function(){
+    initialize: function() {
+      BaseToolModel.prototype.initialize.apply(this, arguments);
+      var paper = this.get('paper');
+    },
 
-  	},
+    /*mousedown event- checks to see if current path has been initialized-
+     *if it has not, create a new one and trigger a shapeAdded event
+     */
+    mouseDown: function(event) {
+      var paper = this.get('paper');
+      polyPath = new paper.Path.RegularPolygon(event.point, sideNum, 1);
+      polyPath.selected = true;
+      polyPath.strokeWidth = this.get('stroke_width');
+      polyPath.strokeColor = this.get('stroke_color');
+      polyPath.fillColor = this.get('fill_color');
 
-    reset: function(){
-    
-      if(this.currentPath){
-          this.trigger('rootChange',true);
-      this.currentPath.selected = false;
-        
-        var pathNode  = new PolygonNode();
-          pathNode.name = "Path_"+nameVal;
-            nameVal++;
-       this.currentPath.rotate(-rotationAmt);
-           //console.log("rad=",this.currentPath.bounds.width/2);
-        var instance = pathNode.createInstanceFromPath(this.currentPath.clone());
-        instance.rotation.angle = rotationAmt;
-        this.trigger('nodeAdded',pathNode);
-         this.trigger('rootUpdate');
-        this.trigger('rootRender');  
-        this.currentPath.remove();
-        this.currentPath = null;
+      if (this.get('fill_color') === -1) {
+        polyPath.style.fillColor = null;
+
       }
-        this.trigger('rootChange',false);
-      this.trigger('rootRender');
+      if (this.get('stroke_color') === -1) {
+        polyPath.style.strokeColor = null;
 
-      analytics.log(eventType,{type:eventType,id:'polygon',action:'add'});
-
+      }
+      rotationAmt = 0;
     },
 
 
-      /*mousedown event- checks to see if current path has been initialized-
-      *if it has not, create a new one and trigger a shapeAdded event
-      */
 
-      mouseDown : function(event) {
-        //console.log("poly mouse down");
-          if (!this.currentPath) {
-         
-          
-                       
+    //mouse up event
+    mouseUp: function(event) {
+      if (polyPath) {
+        var matrix = this.get('matrix');
+        matrix.reset();
+        matrix.translate(polyPath.bounds.center.x, polyPath.bounds.center.y);
+        matrix.rotate(rotationAmt);
+        var paths = this.get('literals');
+       paths.push(polyPath);
+        this.set('literals', paths);
+        this.trigger('geometryAdded');
+      }
+    },
 
-          var paper = PaperManager.getPaperInstance();
-          this.currentPath =  new paper.Path.RegularPolygon(event.point,sideNum,1);
-       
-         this.currentPath.selected = true;
-         
-          rotationAmt=0;
+    //mouse drag event
+    mouseDrag: function(event) {
 
+      if (polyPath) {
+        var delta = polyPath.position.getDistance(event.point);
+        var angle = event.point.subtract(polyPath.position).angle;
+        var cAngle = polyPath.firstSegment.point.subtract(polyPath.position).angle;
+        var rad = polyPath.position.getDistance(polyPath.firstSegment.point);
+        var scale = delta / rad;
+        var rotate = angle - cAngle;
+        rotationAmt += rotate;
+        polyPath.scale(scale);
+        polyPath.rotate(rotate);
 
-        }
-      },
+      }
 
-      
-
-     //mouse up event
-     mouseUp : function(event) {
-      this.reset();
-      
-       },
-
-     //mouse drag event
-     mouseDrag: function(event){
-
-       if (this.currentPath) {
-        var delta = this.currentPath.position.getDistance(event.point);
-        var angle = event.point.subtract(this.currentPath.position).angle;
-        var cAngle =this.currentPath.firstSegment.point.subtract(this.currentPath.position).angle; 
-       
-        var rad = this.currentPath.position.getDistance(this.currentPath.firstSegment.point);
-        var scale = delta/rad;
-     
-        var rotate = angle-cAngle;
-       rotationAmt+=rotate;
-        //console.log("mouse angle="+angle);
-        //console.log("poly angle = "+cAngle);
-        //console.log("difference="+rotate);
-        this.currentPath.scale(scale);
-        this.currentPath.rotate(rotate);
-        this.currentPath.strokeWidth = this.style.strokeWidth;
-         this.currentPath.strokeColor = this.style.strokeColor;
-         this.currentPath.fillColor = this.style.fillColor;
-         if(this.fillColor==-1){
-          this.currentPath.style.fillColor = null;
-
-         }
-         if(this.strokeColor==-1){
-          this.currentPath.style.strokeColor = null;
-
-         }
-         // this.currentPath.rotate(angle);
-       }
-
-     },
-
-     //mouse move event
-     mouseMove: function(event){
-
-     }
-
+    },
 
 
 

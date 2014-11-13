@@ -6,374 +6,249 @@
 define([
 	'underscore',
 	'jquery',
-	'backbone',
-	'models/PaperManager'
-], function(_, $,Backbone, PaperManager) {
- var paper = PaperManager.getPaperInstance();
+	'models/data/SceneNode',
+	'models/PaperManager',
+	'utils/PPoint'
+], function(_, $, SceneNode, PaperManager, PPoint) {
+	var paper = PaperManager.getPaperInstance();
 
-	var Instance = Backbone.Model.extend({
+	var Instance = SceneNode.extend({
+		name: 'instance',
+		type: 'geometry',
 
-		 constructor: function() {
-			this.visible= true;
-			this.scale= 1;
-			this.closed = false;
-			this.width = 0;
-			this.height = 0;
-			this.reset = false;
-			this.order = 0;
-			this.position= {
-				x: 0,
-				y: 0
-			};
-			this.magnitude =0 ;
-			this.delta ={
-				x:0,
-				y:0
-			};
-			this.midpoint = {
-				x: 0,
-				y: 0
-			};
-			this.rotation = {
-				angle:0,x:0,y:0
-			};
-			this.anchor= false;
-			this.drawAnchor=false;
-			this.selected= false;
-			this.userSelected = null
-			this.copy= false;
-			this.strokeColor = null;
-			this.fillColor = null;
-			this.strokeWidth = 1;
-			//index of instance that was used to create this instance (for instances created upon render)
-			this.instanceParentIndex = 0;
-			this.index = null;
-			//array that contains the path of inheritance from a render;
-			this.renderSignature = [];
-			Backbone.Model.apply(this, arguments);
-			this.matrix = new paper.Matrix();
-					 },
-		reset: function() {
-			////console.log("reset instance");
-			this.visible= true;
-			this.scale= 1;
-			this.position= {
-				x: 0,
-				y: 0
-			};
-			this.rotation= {
-				angle:0,x:0,y:0
-			};
-			this.midpoint = {
-				x: 0,
-				y: 0
-			};
-			this.width = 0;
-			this.height = 0;
-			this.anchor= false;
-			this.selected= false;
-			this.closed = false;
-			this.instanceParentIndex = 0;
-			this.index = null;
+		defaults: {
+			visible: true,
+			selected: false,
+			closed: false,
+			width: 0,
+			height: 0,
+			order: 0,
 
-			
+			//point attributes
+			position: null,
+			translation_delta: null,
+			center: null,
+			scaling_origin: null,
+			scaling_delta: 1,
+			rotation_origin: null,
+			rotation_delta: 0,
+
+			//screen properies
+			screen_position: null,
+			screen_width: 0,
+			screen_height: 0,
+
+			stroke_color: null,
+			stroke_width: 1,
+			fill_color: 0,
+
+			matrix: null,
+			reset: false,
+			geom: null,
+			bbox: null,
+
 		},
 
-		exportJSON: function(){
-			//console.log(this.renderSignature);
-			this.set({
-				closed:this.closed,
-				position:{x:this.position.x,y:this.position.y},
-				delta: {x:this.delta.x,y:this.delta.y},
-				midpoint: this.midpoint,
-				width: this.width,
-				height: this.height,
-				anchor: this.anchor,
-				visible:this.visible,
-				scale:this.scale,
-				rotation: {angle:this.rotation.angle,x:this.rotation.x,y:this.rotation.y},
-				strokeWidth: this.strokeWidth,
-				fillColor: this.fillColor,
-				strokeColor: this.strokeColor,
-				magnitude: this.magnitude
 
-			});
+
+		initialize: function() {
+			this.set('position', new PPoint(0, 0));
+			this.set('translation_delta', new PPoint(0, 0));
+			this.set('center', new PPoint(0, 0));
+			this.set('scaling_origin', new PPoint(0, 0));
+			this.set('rotation_origin', new PPoint(0, 0));
+			this.set('matrix', new paper.Matrix());
+			var bounds = new paper.Rectangle(0,0,1,1);
+			this.set('bbox',new paper.Path.Rectangle(bounds));
+			SceneNode.prototype.initialize.apply(this, arguments);
+
+		},
+
+		reset: function() {
+			this.clear().set(this.defaults);
+			this.set('position', new PPoint(0, 0));
+			this.set('translation_delta', new PPoint(0, 0));
+			this.set('center', new PPoint(0, 0));
+			this.set('scaling_origin', new PPoint(0, 0));
+			this.set('rotation_origin', new PPoint(0, 0));
+			this.set('matrix', new paper.Matrix());
+		},
+
+		exportJSON: function() {
 			return this.toJSON();
 		},
 
-		parseJSON: function(data){
-			this.closed = data.closed;
-			this.position = data.position;
-			this.delta = data.delta;
-			this.midpoint = data.midpoint;
-			this.width = data.width;
-			this.height= data.height;
-			this.anchor =  data.anchor;
-			this.visible = data.visible;
-			this.scale = data.scale;
-			this.rotation = data.rotation;
-			this.strokeWidth = data.strokeWidth;
-			this.fillColor = data.fillColor;
-			this.strokeColor = data.strokeColor;
-			this.magnitude = data.magnitude;
+		parseJSON: function(data) {
+			this.set(data.toJSON);
 		},
 
 
 		//only called on a update function- 
 		//sets instances' properties to that of the data
-		update: function(data){
-			////console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
-			if(data.position){
-				////console.log('prior position =');
-				////console.log(this.position);
-				this.position.x=data.position.x;
-				this.position.y=data.position.y;
-				////console.log('updated position=');
-				////console.log(this.position);
-			}
+		update: function(data) {
+			//console.log('updating instance',data);
+			this.set(data);
+			//console.log("translation_delta",this.get('translation_delta'));
 
-			if(data.magnitude){
-				this.magnitude=data.magnitude;
-			}
-			if(data.delta){
-				////console.log('prior position =');
-				////console.log(this.position);
-			this.delta.x=data.delta.x;
-				this.delta.y=data.delta.y;
-
-				////console.log('updated position=');
-				////console.log(this.position);
-			}
-			if(data.width){
-				this.width=data.width;
-			}
-			if(data.height){
-				this.height = data.height;
-			}
-			if(data.scale){
-				this.scale=data.scale;
 			
+		},
+
+		incrementDelta: function(data) {
+			if (data.translation_delta) {
+				var translation_delta = this.get('translation_delta');
+				//console.log("translation_delta",this.get('translation_delta'));
+				translation_delta.add(data.translation_delta);
+				console.log("translation_delta",translation_delta);
+
+				this.set('translation_delta',translation_delta);
 			}
-			if(data.rotation){
-				////console.log("updating rotation");
-				this.rotation.angle=data.rotation.angle;
-				if(data.rotation.x){
-					this.rotation.x = data.rotation.x;
-				}
-				else{
-					this.rotation.x = this.midpoint.x;
-	
-				}
-				if(data.rotation.y){
-					this.rotation.y = data.rotation.y;
-				}
-				else{
-					this.rotation.y = this.midpoint.y;
-	
-				}
-			}
-			if(data.strokeWidth){
-				this.strokeWidth =data.strokeWidth;
-			}
-			if(data.strokeColor){
-				this.strokeColor= data.strokeColor;
-			}
-			if(data.fillColor){
-				this.fillColor = data.fillColor;
-			}
-			if(data.closed){
-				this.closed = data.closed;
-			}
-			this.midpoint.x = this.position.x+this.width/2;
-			this.midpoint.y = this.position.y+this.height/2;
 			
-
-
-
-
 		},
 
-		increment: function(data,relativePoint){
-			//console.log("calling update on instance: "+this.index+","+this.nodeParent.name);
-			
-			if(data.delta){
-				////console.log('prior position =');
-				////console.log(this.position);
-				var point  = new paper.Point(data.delta.x,data.delta.y);
-				/*//console.log("vector angle:"+point.angle);
-				var matrixRotation = this.matrix.rotation;
-				//console.log("matrix rotation:"+matrixRotation);
-				var matrixTranslation = this.matrix.translation
-				//console.log("matrix translation:"+matrixTranslation);
-				point.angle = point.angle-matrixRotation;
-				//console.log("vector angle:"+point.angle);*/
-				
-				this.delta.x+=point.x;
-				this.delta.y+=point.y;
-								////console.log('updated position=');
-				////console.log(this.position);
-			}
-			if(data.scale){
-				this.scale*=data.scale;
-			
-			}
-			if(data.rotation){
-				////console.log("updating rotation");
-				this.rotation+=data.rotation.angle;
-			}
-			if(data.strokeWidth){
-
-				this.strokeWidth =data.strokeWidth;
-			}
-			if(data.strokeColor){
-				if(data.strokeColor==-1){
-					this.strokeColor=null;
-				}
-				else{
-				this.strokeColor= data.strokeColor;
-				}
-				//console.log("setting stroke color to"+this.strokeColor);
-
-			}
-			if(data.fillColor){
-			if(data.fillColor==-1){
-					this.fillColor=null;
-				}
-				else{
-				this.fillColor = data.fillColor;
-				}
-			}
-			this.midpoint.x = this.position.x+this.width/2;
-			this.midpoint.y = this.position.y+this.height/2;
-
-
-
-
+		getCenter: function() {
+			return {
+				x: this.get('position').x + this.get('delta').x,
+				y: this.get('position').y + this.get('delta').y
+			};
 		},
 
-		getCenter: function(){
-			return {x:this.position.x+this.delta.x,y:this.position.y+this.delta.y};
+		getUpperLeft: function() {
+			return {
+				x: this.get('position').x + this.get('delta').x - this.get('width') / 2,
+				y: this.get('position').y + this.get('delta').y - this.get('height') / 2,
+			};
 		},
 
-		getUpperLeft: function(){
-			return {x:this.position.x+this.delta.x-this.width/2,y:this.position.y+this.delta.y-this.height/2};
-		},
-
-		getLowerRight: function(){
-			return {x:this.position.x+this.delta.x+this.width/2,y:this.position.y+this.delta.y+this.height/2};
+		getLowerRight: function() {
+			return {
+				x: this.get('position').x + this.get('delta').x + this.get('width') / 2,
+				y: this.get('position').y + this.get('delta').y + this.get('height') / 2,
+			};
 		},
 
 
-	
 
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 		render: function(data) {
-			//clo//console.log(data);
-			//if(this.nodeParent){
-				////console.log("calling render on instance: "+this.index+","+this.nodeParent.name);
-			//}
-			this.matrix.reset();
- 				
-			
-			if(data.matrix){
-				this.matrix.concatenate(data.matrix);			
+			//console.log("rendering instance");
+			var matrix = this.get('matrix');
+			var selected = this.get('selected');
+			var translation_delta = this.get('translation_delta').toPaperPoint();
+			var rotation_origin = this.get('rotation_origin').toPaperPoint;
+			var rotation_delta = this.get('rotation_delta');
+			var scaling_origin = this.get('scaling_origin').toPaperPoint;
+			var scaling_delta = this.get('scaling_delta');
+
+			//console.log('translation_delta for render', translation_delta);
+			matrix.reset();
+			if (data) {
+
+				if (data.matrix) {
+					matrix.concatenate(data.matrix);
 
 
+				}
+				if (data.selected) {
+					selected = data.selected;
+				}
 			}
-			/*if(data.position){
-				////console.log('prior position =');
-				////console.log(this.position);
 
-			
-				
-				this.matrix = this.matrix.translate(new paper.Point(this.position.x+data.position.x,this.position.y+data.position.y));
 
-				////console.log('updated position=');
-				////console.log(this.position);
+			matrix.translate(translation_delta);
+			matrix.rotate(rotation_delta, rotation_origin);
+			matrix.scale(scaling_delta, scaling_origin);
+
+			if (this.has('protoNode')) {
+				var proto = this.get('protoNode');
+				var geom = proto.run();
+				var path = geom.path;
+				path.data.instance = this;
+				path.transform(matrix);
+				var screen_bounds = path.bounds;
+				var bbox = this.get('bbox');
+				bbox.selected = selected;
+				path.selected = selected;
+				//screen_bounds.selected = selected;
+				this.set({
+					screen_position: screen_bounds.topLeft,
+					screen_width: screen_bounds.width,
+					screen_height: screen_bounds.height,
+				});
+				//console.log('screen_position',this.get('screen_position'));
+				this.set('geom', path);
 			}
-			else{*/
-				var delta = new paper.Point(this.delta.x,this.delta.y);
-				delta.length= delta.length+this.magnitude;
-				this.matrix = this.matrix.translate(delta);
-				this.matrix = this.matrix.scale(this.scale);
-
-				this.matrix = this.matrix.rotate(this.rotation.angle,this.position.x,this.position.y);
-				/*var uLP = new paper.Path.Circle(this.position.x,this.position.y,5);
-								 this.nodeParent.addScaffold(uLP);
-				var rectPos = new paper.Point(this.position.x-this.width/2,this.position.y-this.height/2);
-				var bb = new paper.Path.Rectangle(rectPos, new paper.Size(this.width,this.height));
-				this.nodeParent.addScaffold(bb);
-				bb.strokeColor='red';
-				bb.transform(this.matrix);
-
-			if(this.nodeParent.type!=='root'){
-				 uLP.fillColor = 'green';
-				 if(this.nodeParent.type==='behavior'){
-				 	 uLP.fillColor = 'red';
-				 }
-				 var size = new paper.Size(100, 100);
-
-				 var mP = new paper.Path.Circle(this.position.x+this.width/2,this.position.y+this.height/2,3);
-				var bb= new paper.Path.Rectangle(this.position.x,this.position.y,size);
-				this.nodeParent.addScaffold(bb);
-				bb.transform(this.matrix);
-				bb.strokeColor='red';
-				bb.strokeWidth=1;
-				 mP.fillColor='purple';
-				 this.nodeParent.addScaffold(mP);
-				uLP.transform(this.matrix);
-				mP.transform(this.matrix);
-			}*/
-				
-			//}
-
-			
-			
-			if(data.selected){
-				this.selected = data.selected;
-			}
-			/*if(data.strokeWidth){
-				this.strokeWidth =data.strokeWidth;
-			}
-			if(data.strokeColor){
-				this.strokeColor= data.strokeColor;
-			}
-			if(data.fillColor){
-				this.fillColor = data.fillColor;
-			}*/
-
-
-
 		},
 
-		clone: function(){
-			var newInstance = new Instance();
-			newInstance.position = {x:0,y:0};
-			newInstance.delta = {x:0,y:0};
-			newInstance.delta.x= this.delta.x;
-			newInstance.delta.y= this.delta.y;
-			newInstance.position.x = this.position.x;
-			newInstance.position.y = this.position.y;
-			newInstance.scale = this.scale;
-			newInstance.rotation.angle = this.rotation.angle;
-			newInstance.rotation.x = this.rotation.x;
-			newInstance.rotation.x = this.rotation.y;
-			newInstance.midpoint.x = this.midpoint.x;
-			newInstance.midpoint.y = this.midpoint.y;
-			newInstance.width = this.width;
-			newInstance.height = this.height;
-			newInstance.anchor = this.anchor;
-			newInstance.selected = this.selected;
-			newInstance.visible = true;
-			newInstance.magnitude=this.magnitude;
-			newInstance.nodeParent = this.nodeParent;
-			newInstance.strokeWidth = this.strokeWidth;
-			newInstance.strokeColor = this.strokeColor;
-			newInstance.fillColor = this.fillColor;
-			newInstance.matrix = this.matrix.clone();
-			return newInstance;
+		getLinkedDimensions: function(data) {
+			var dimensions = {};
+			var position = this.get('screen_position');
+			var width = this.get('screen_width');
+			var height = this.get('screen_height');
+			if (data.dimensions) {
+				var pdimensions = data.dimensions;
 
+				var leftX = position.x < pdimensions.leftX ? position.x : pdimensions.leftX;
+				var topY = position.y < pdimensions.topY ? position.y : pdimensions.topY;
+				var rightX = position.x + width > pdimensions.rightX ? position.x + width : pdimensions.rightX;
+				var bottomY = position.y + height > pdimensions.bottomY ? position.y + height : bottomY;
+
+				data.dimensions = {
+					leftX: leftX,
+					topY: topY,
+					rightX: rightX,
+					bottomY: bottomY,
+				};
+			} else {
+				data.dimensions = {
+					leftX: position.x,
+					topY: position.y,
+					rightX: position.x + width,
+					bottomY: position.y + height,
+				};
+			}
+
+
+			for (var i = 0; i < this.children; i++) {
+				data = this.children[i].getLinkedDimensions({
+					dimensions: dimensions
+				});
+			}
+			//TODO: recycle bounding box rather than re-initializing it.
+			if(data.top){
+				var bx = data.dimensions.leftX;
+				var by = data.dimensions.topY;
+				var bwidth = data.dimensions.rightX-bx;
+				var bheight = data.dimensions.bottomY-by;
+				var rectangle = new paper.Rectangle(bx,by,bwidth,bheight);
+				data.bbox = this.get('bbox');
+
+				data.bbox.position = rectangle.center;
+
+				var scaleX = rectangle.width/data.bbox.bounds.width;
+				var scaleY = rectangle.height/data.bbox.bounds.height;
+				data.bbox.scale(scaleX,scaleY);
+
+				data.bbox.selectedColor = 'red';
+				data.bbox.visible = true;
+				data.bbox.selected = true;	
+				data.bbox.instance = this;
+				this.set('bbox',data.bbox);
+			}
+
+			return data;
+		},
+
+		cloneInstance: function() {
+			var clone = this.clone();
+			clone.set('position', this.get('position').clone());
+			clone.set('translation_delta', this.get('translation_delta').clone());
+			clone.set('center', this.get('center').clone());
+			clone.set('scaling_origin',this.get('scaling_origin').clone());
+			clone.set('rotation_origin', this.get('rotation_origin').clone());
+			clone.set('matrix',  this.get('matrix').clone());
+			clone.set('bbox', this.get('bbox').clone());
+			return clone;
 		}
 	});
 

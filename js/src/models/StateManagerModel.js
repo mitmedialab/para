@@ -9,24 +9,28 @@ define([
     'models/data/GeometryNode',
     'models/data/PathNode',
     'models/data/PolygonNode',
+    'models/data/Instance',
     'models/tools/ToolCollection',
     'models/tools/PenToolModel',
     'models/tools/PolyToolModel',
     'models/tools/SelectToolModel',
     'models/tools/RotateToolModel',
     'models/tools/FollowPathToolModel',
-
-    'models/behaviors/BehaviorManagerModel',
-
     'models/PaperManager',
+    'filesaver',
+    'models/behaviors/actions/BlockNode',
+    'models/behaviors/actions/InitializeNode',
+    'models/behaviors/actions/TranslateNode',
+    'models/behaviors/actions/RotateNode',
+    'models/data/Visitor',
+    'models/data/Edge'
 
 
-
-    'filesaver'
   ],
 
-  function($, _, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode,ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, BehaviorManagerModel, PaperManager, FileSaver) {
+  function($, _, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, PaperManager, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge) {
     var rootNode,
+      visitor,
       currentNode,
       toolCollection,
       penTool,
@@ -45,16 +49,15 @@ define([
     var StateManagerModel = Backbone.Model.extend({
 
       defaults: {
-        'state': 'selectTool',
+        'state': 'polyTool',
       },
 
       initialize: function(event_bus) {
-        //clutch which controls 
-        clutch=0;
-        ////console.log(new FileSaver());
+        clutch = 0;
         paper = PaperManager.getPaperInstance();
-        //var background = new paper.Path();
-        //  background.importSVG('https://dl.dropboxusercontent.com/u/3699559/bg1.svg');
+        this.event_bus = event_bus;
+
+        //setup user tool managers
         penTool = new PenToolModel({
           id: 'penTool'
         });
@@ -70,15 +73,18 @@ define([
         });
         followPathTool = new FollowPathToolModel({
           id: 'followPathTool'
-          
+
         });
         followPathTool.event_bus = event_bus;
-        this.modified = false;
+        toolCollection = new ToolCollection([polyTool,penTool, selectTool, rotateTool, followPathTool]);
 
-        this.event_bus = event_bus;
-      
-        toolCollection = new ToolCollection([penTool, selectTool, polyTool, rotateTool, followPathTool]);
-        this.listenTo(toolCollection, 'nodeAdded', this.nodeAdded);
+
+        /* event listener registers */
+        this.listenTo(toolCollection,"geometryAdded",this.geometryAdded);
+        this.listenTo(toolCollection,"geometrySelected",this.geometrySelected);
+        this.listenTo(toolCollection,"geometryIncremented",this.geometryIncremented);
+        this.listenTo(toolCollection,"geometryCopied",this.geometryCopied);
+
         this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
         this.listenTo(toolCollection, 'setSelection', this.setSelection);
         this.listenTo(toolCollection, 'updateProperties', this.updateProperties);
@@ -89,38 +95,39 @@ define([
         this.listenTo(toolCollection, 'selectionReset', this.selectionReset);
 
         this.listenTo(toolCollection, 'optionClick', this.openMenu);
-        this.listenTo(toolCollection, 'rootRender', this.rootRender);
-        this.listenTo(toolCollection, 'rootChange', this.rootChange);
+        // this.listenTo(toolCollection, 'rootRender', this.rootRender);
+        //this.listenTo(toolCollection, 'rootChange', this.rootChange);
 
         this.listenTo(toolCollection, 'rootUpdate', this.rootUpdate);
         this.listenTo(toolCollection, 'getSelection', this.getSelection);
 
-
         this.listenTo(toolCollection, 'currentRender', this.currentRender);
         this.listenTo(toolCollection, 'setState', this.setState);
 
-
-        this.listenTo(event_bus, 'nodeAdded', this.nodeAdded);
-        this.listenTo(event_bus,  'rootUpdate', this.rootUpdate);
-
-        this.listenTo(event_bus, 'rootRender', this.rootRender);
-        //this.listenTo(event_bus, 'currentRender', this.currentRender);
-
-
+        // this.listenTo(event_bus, 'rootUpdate', this.rootUpdate);
+        //this.listenTo(event_bus, 'rootRender', this.rootRender);
         this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
         this.listenTo(event_bus, 'moveUpNode', this.moveUpNode);
 
 
-        rootNode = new GeometryNode();
+        //setup visitor
+        visitor = new Visitor();
+
+
+        //setup root node
+        rootNode = new Instance(null);
         rootNode.type = 'root';
         this.listenTo(rootNode, 'parseJSON', this.parseJSON);
-
         currentNode = rootNode;
-        this.rootRender();
 
+
+        //clear local storage
         localStorage.clear();
+        this.modified = false;
 
-      Backbone.UndoManager.removeUndoType("change");
+
+        //setup undo manager
+        Backbone.UndoManager.removeUndoType("change");
         var beforeCache;
         Backbone.UndoManager.addUndoType("change:isChanging", {
           "on": function(model, isChanging, options) {
@@ -140,68 +147,63 @@ define([
           "redo": function(model, before, after, options) {
             model.undoRedo(after);
           }
-
-          
         });
+
         undoManager = new Backbone.UndoManager({
-           track: true,
-        register: rootNode
-      });
- 
+          track: true,
+          register: rootNode
+        });
+
+
+        //setup default zeros for zoom and pan
         this.zeroedZoom = paper.view.zoom;
         this.zeroedPan = paper.view.center.clone();
 
       },
 
       undo: function() {
-        console.log("action is available",undoManager.isAvailable());
+        console.log("action is available", undoManager.isAvailable());
         undoManager.undo();
-        this.rootUpdate();
-        this.rootRender();
+        // this.rootUpdate();
+        //this.rootRender();
         paper.view.draw();
 
       },
 
       redo: function() {
         undoManager.redo();
-         this.rootUpdate();
-        this.rootRender();
+        //this.rootUpdate();
+        //this.rootRender();
         paper.view.draw();
 
 
       },
 
-      toggleClutch: function(){
-        switch(clutch){
+      toggleClutch: function() {
+        switch (clutch) {
           case 0:
-            clutch=1;
-          break;
+            clutch = 1;
+            break;
           case 1:
             clutch = 2;
             break;
           case 2:
-            clutch =0;
+            clutch = 0;
             break;
         }
-        this.rootRender();
+        //this.rootRender();
 
       },
-
-      rootChange: function(change){
-        rootNode.set("isChanging", change);
-
-      },
-
 
       setState: function(state) {
         toolCollection.get(this.get('state')).reset();
 
         this.set('state', state);
-        if(state==='penTool'|| state==='polyTool'){
-          console.log('move to root');  
+        if (state === 'penTool' || state === 'polyTool') {
+          console.log('move to root');
           this.moveToRoot();
 
-      }
+        }
 
       },
 
@@ -212,44 +214,124 @@ define([
 
       },
 
-      //callback triggered when tool adds new node
-      nodeAdded: function(node, noChangeTool) {
-        ////console.log('node added: '+ node.type);
-      //rootNode.set("isChanging", true);
-        currentNode.addChildNode(node);
-        if(!noChangeTool){
-          console.log("changing current node");
-          toolCollection.get(this.get('state')).currentNode = node;
+      /* geometryAdded
+       * callback that is triggered when a new geometry
+       * object is created by the user
+       * creates an init/translate procedure block based on the data
+       * of the geometry, adds the geometry node as a child of the
+       * procedure block and adds the procedure block to the scenegraph
+       */
+      geometryAdded: function(event) {
+        selectTool.deselectAll();
+        var currentTool = toolCollection.get(this.get('state'));
+        var paperObjects = currentTool.get('literals');
+        var matrix = currentTool.get('matrix');
+        for(var i=0;i<paperObjects.length;i++){
+          var pathNode = new PolygonNode();
+          var data = pathNode.normalizePath(paperObjects[i], matrix);
+          var instance = new Instance({
+            protoNode: pathNode,
+            selected: true
+        });
+        selectTool.addSelectedShape(instance);
+       instance.update(data);
+        var edge = new Edge({
+          x: currentNode,
+          y: instance
+        });
+        currentNode.addChildNode(instance);
+        instance.addEdge(edge);
+        visitor.addGeomFunction(pathNode);
         }
-          // rootNode.set("isChanging", false);
+      currentTool.set('literals',[]);
 
+        this.compile();
       },
 
-      moveUpNode: function() {
-        this.setCurrentNode(currentNode);
-        ////console.log('current node type='+currentNode.type);
-        this.rootRender();
-      },
+      geometryCopied: function(event){
+        console.log('geometryCopied');
+         var selectedShapes = selectTool.get('selected_shapes');
+        for(var i=selectedShapes.length-1;i>=0;i--){
+          var instance = selectedShapes[i];
+          var clone = instance.cloneInstance();
+          
+          var edge = new Edge({
+            x: currentNode,
+            y: instance
+          });
 
-      moveToRoot: function(){
-         if(currentNode!==rootNode){
-            this.setCurrentNode(rootNode.children[0]);
-          }
-          this.rootRender();
-      },
-      //moves down based on path
-      moveDownNode: function(path) {
-        var children = currentNode.children;
-        for (var i = 0; i < children.length; i++) {
-          if (children[i].containsPath(path) && children[i].type != 'path' && children[i].type != 'polygon') {
-            currentNode = children[i];
-            toolCollection.get(this.get('state')).currentNode = children[i];
-          }
+          edge.addAll();
+          instance.addChildNode(clone);
+          clone.addEdge(edge);
+          clone.set('selected',false);
+          instance.set('selected',false);
+          selectedShapes[i]=clone;
         }
-        ////console.log('current node type='+currentNode.type);
-        this.rootRender();
+        this.compile();
       },
 
+      /* geometrySelected
+       * callback that is triggered when a new geometry
+       * object is selected by the user
+       * creates an init/translate procedure block based on the data
+       * of the geometry, adds the geometry node as a child of the
+       * procedure block and adds the procedure block to the scenegraph
+       */
+      geometrySelected: function(event){
+        var currentTool = toolCollection.get(this.get('state'));
+        var paperObjects = currentTool.get('literals');
+         for(var i=0;i<paperObjects.length;i++){
+            var paperObject = paperObjects[i];
+            console.log(paperObject);
+            var instance = paperObject.data.instance;
+
+            instance.getLinkedDimensions({top:true});
+            selectTool.addSelectedShape(instance);
+         }
+
+         this.compile();
+      },
+
+      /* geometryIncremented
+       * callback that is triggered when a geometry is transformed
+       * by the user. Iterates through currently selected shapes
+       * and updates their deltas based on the transformation
+       * compiles graph and then iterates through a second time
+       * to display bounding boxes
+       * TODO: design so that only one iteration is neccesary?
+       */
+      geometryIncremented: function(data){
+        var selectedShapes = selectTool.get('selected_shapes');
+        for(var i=0;i<selectedShapes.length;i++){
+          console.log("incrementing instance at",i);
+          var instance = selectedShapes[i];
+          instance.incrementDelta(data);
+          
+        }
+        this.compile();
+
+        for(var j=0;j<selectedShapes.length;j++){
+          var inst = selectedShapes[j];
+          inst.getLinkedDimensions({top:true});
+        }
+      },
+
+      /* compile
+       * resets the geometry functions
+       * to remove all active instances and then
+       * visits the root node to
+       * begin the rendering process
+       */
+      compile: function() {
+        visitor.resetGeomFunctions();
+        visitor.visit(rootNode, null);
+        //debugging code to count # of paperjs objects
+      /*  var numChildren = paper.project.activeLayer.children.length;
+        console.log('total number of children='+numChildren);*/
+      },
+
+
+      //=======================BEGIN SELECTION METHODS=======================//
       /* sets correct selection based on currentNode
        * determines value by finding the hierarchical level of the current node
        * and using that level as an index to slice the render signature of the currently selected path
@@ -268,10 +350,10 @@ define([
 
       },
 
-      updateProperties: function(data){
+      updateProperties: function(data) {
         console.log('updateProperties');
         var selectedNodes = toolCollection.get(this.get('state')).selectedNodes;
-        this.trigger('pathSelected',selectedNodes[selectedNodes.length-1]);
+        this.trigger('pathSelected', selectedNodes[selectedNodes.length - 1]);
 
       },
 
@@ -283,31 +365,33 @@ define([
 
       },
 
-      rootRender: function() {
-        ////console.log('called root render');
+      //=======================END SELECTION METHODS=======================//
 
-        rootNode.resetObjects();
-        rootNode.render(null, currentNode, clutch);
-
-        // var numChildren = paper.project.activeLayer.children.length;
-        this.trigger('renderComplete');
-        // //console.log('total number of children='+numChildren);
-        // //console.log( paper.project.activeLayer.children);
+      moveUpNode: function() {
+        this.setCurrentNode(currentNode);
+        ////console.log('current node type='+currentNode.type);
+        //this.rootRender();
       },
 
-      rootUpdate: function() {
-        ////console.log('called root render');
-        this.modified = true;
-        this.trigger('disableSave', !this.modified);
-
-        rootNode.update([{}]);
-
+      moveToRoot: function() {
+        if (currentNode !== rootNode) {
+          this.setCurrentNode(rootNode.children[0]);
+        }
+        // this.rootRender();
       },
-      currentRender: function() {
-        ////console.log('called current render');
-        currentNode.clearObjects();
-        currentNode.render(null, currentNode);
+      //moves down based on path
+      moveDownNode: function(path) {
+        var children = currentNode.children;
+        for (var i = 0; i < children.length; i++) {
+          if (children[i].containsPath(path) && children[i].type != 'path' && children[i].type != 'polygon') {
+            currentNode = children[i];
+            toolCollection.get(this.get('state')).currentNode = children[i];
+          }
+        }
+        ////console.log('current node type='+currentNode.type);
+        //this.rootRender();
       },
+
       //callback triggered when tool navigates to specific node in tree;
       setCurrentNode: function(node) {
 
@@ -320,16 +404,6 @@ define([
 
 
         }
-      },
-
-      //callback triggered when select tool selects shape
-      nodeSelected: function(selected) {
-        this.determineSelectionPoint(selected);
-      
-      },
-
-      selectionReset: function() {
-        this.trigger('selectionReset');
       },
 
       /*recursively follows parent hierarchy upwards to find correct selection point 
@@ -405,10 +479,10 @@ define([
 
       canvasMouseDrag: function(delta, pan) {
         if (pan) {
-          console.log('paper start',paper.view.center);
+          console.log('paper start', paper.view.center);
           var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
           paper.view.scrollBy(inverseDelta);
-          console.log('paper end',paper.view.center);
+          console.log('paper end', paper.view.center);
 
           event.preventDefault();
         }
@@ -559,29 +633,29 @@ define([
         if (rootNode.children.length > 0) {
 
           this.setCurrentNode(rootNode.children[0]);
-          var currentZoom= paper.view.zoom;
+          var currentZoom = paper.view.zoom;
           var currentPan = paper.view.center.clone();
           paper.view.zoom = this.zeroedZoom;
           paper.view.center = this.zeroedPan.clone();
-
           this.listenToOnce(this, 'renderComplete', function() {
 
             var data = paper.project.exportSVG({
               asString: true
+
             });
 
             var blob = new Blob([data], {
               type: 'image/svg+xml'
             });
             var fileSaver = new FileSaver(blob, filename);
-          paper.view.zoom = currentZoom;
-          paper.view.center = currentPan;
+            paper.view.zoom = currentZoom;
+            paper.view.center = currentPan;
 
 
-          paper.view.draw();
+            paper.view.draw();
 
           });
-          this.rootRender();
+          // this.rootRender();
 
         }
 
@@ -597,7 +671,7 @@ define([
           this.setCurrentNode(rootNode.children[0]);
         }
         this.rootUpdate();
-        this.rootRender();
+        //this.rootRender();
         paper.view.draw();
         this.modified = false;
         this.trigger('disableSave', !this.modified);
@@ -620,7 +694,7 @@ define([
       },
 
       parseJSON: function(currentNode, data) {
-        console.log('parse json',currentNode,data);
+        console.log('parse json', currentNode, data);
         for (var i = 0; i < data.length; i++) {
           var type = data[i].type;
           var node;
@@ -628,7 +702,7 @@ define([
             case 'path':
               node = new PathNode(data[i]);
               break;
-               case 'polygon':
+            case 'polygon':
               node = new PolygonNode(data[i]);
               break;
             default:
@@ -650,9 +724,11 @@ define([
         }
       },
 
+
+
       updateStroke: function(width) {
-          var selectedTool = toolCollection.get(this.get('state'));
-          selectedTool.style.strokeWidth = width;
+        var selectedTool = toolCollection.get(this.get('state'));
+        selectedTool.style.strokeWidth = width;
         if (selectTool.selectedNodes.length > 0) {
           for (var i = 0; i < selectTool.selectedNodes.length; i++) {
             selectTool.selectedNodes[i].updateSelected([{
@@ -661,23 +737,23 @@ define([
           }
         }
         currentNode.update([{}]);
-        this.rootRender();
+        // this.rootRender();
         paper.view.draw();
       },
 
       updateColor: function(color, type) {
         console.log('color=', color);
         var selectedTool = toolCollection.get(this.get('state'));
-       
+
 
         var update;
         if (type == 'stroke') {
           update = [{
             strokeColor: color
           }];
-        
 
-         selectedTool.style.strokeColor = color;
+
+          selectedTool.style.strokeColor = color;
           console.log("set stroke color to:", color);
 
         } else {
@@ -695,7 +771,7 @@ define([
         }
 
         currentNode.update([{}]);
-        this.rootRender();
+        //this.rootRender();
         paper.view.draw();
       },
 
@@ -712,28 +788,28 @@ define([
 
         }
         currentNode.update([{}]);
-        this.rootRender();
+        // this.rootRender();
         paper.view.draw();
       },
 
-      removeBehavior: function(behaviorName){
-        var s = selectTool.selectedNodes[selectTool.selectedNodes.length-1];
-        if(s){
-        this.event_bus.trigger('removeBehavior',s,behaviorName);
-      
-      }
+      removeBehavior: function(behaviorName) {
+        var s = selectTool.selectedNodes[selectTool.selectedNodes.length - 1];
+        if (s) {
+          this.event_bus.trigger('removeBehavior', s, behaviorName);
+
+        }
       },
 
       deleteObject: function() {
         if (selectTool.selectedNodes.length > 0) {
           for (var i = 0; i < selectTool.selectedNodes.length; i++) {
-            if(!selectTool.selectedNodes[i].isFollowPath){
+            if (!selectTool.selectedNodes[i].isFollowPath) {
               selectTool.selectedNodes[i].deleteNode();
             }
           }
         }
         currentNode.update([{}]);
-        this.rootRender();
+        // this.rootRender();
         paper.view.draw();
       },
 

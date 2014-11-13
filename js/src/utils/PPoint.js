@@ -1,16 +1,17 @@
-/* TrigFunc.js
- * a collection of useful geometric, trig and other math functions
- */
+/*PPoint.js*
+* point class for para
+*/
 
 define([
 		'toolbox',
+			'models/PaperManager',
 
 
 	],
 
-	function(Toolbox) {
+	function(Toolbox, PaperManager) {
 
-		var Vec2D = Toolbox.Base.extend({
+		var PPoint = Toolbox.Base.extend({
 
 			constructor: function(x, y) {
 
@@ -19,20 +20,37 @@ define([
 
 			},
 
-			add: function(val) {
-				return new Vec2D(this.x + val.x, this.y + val.y);
+			set: function(point) {
+				this.x = point.x;
+				this.y = point.y;
 			},
 
-			sub: function(val) {
-				return new Vec2D(this.x - val.x, this.y - val.y);
+			setX: function(x){
+				this.x=x;
+			},
+
+			setY: function(y){
+				this.y=y;
+			},
+
+			add: function(point) {
+				this.x += point.x;
+				this.y += point.y;
+			},
+
+			sub: function(point) {
+				this.x -= point.x;
+				this.y -= point.y;
 			},
 
 			div: function(val) {
-				return new Vec2D(this.x / val, this.y / val);
+				this.x /= val;
+				this.y /= val;
 			},
 
 			mul: function(val) {
-				return new Vec2D(this.x * val, this.y * val);
+				this.x *= val;
+				this.y *= val;
 			},
 
 
@@ -69,12 +87,22 @@ define([
 				return v.mul(w.dot(v) / this.lengthSqrd(v));
 			},
 
+			clone: function(){
+				return new PPoint(this.x,this.y);
+			},
+
+			toPaperPoint: function(){
+				var paper = PaperManager.getPaperInstance();
+
+				return new paper.Point(this.x, this.y);
+			}
+
 		});
 
-		Vec2D.normalize = function(vec) {
+		PPoint.normalize = function(vec) {
 			//Returns a new vector that has the same direction as vec, but has a length of one.
 			if (vec.x === 0 && vec.y === 0) {
-				return new Vec2D(0, 0);
+				return new PPoint(0, 0);
 			}
 
 			return vec.div(vec.length());
@@ -82,5 +110,5 @@ define([
 
 
 
-		return Vec2D;
+		return PPoint;
 	});

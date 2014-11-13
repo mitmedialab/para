@@ -4,11 +4,11 @@
 
 define([
 		'toolbox',
-		'utils/Vec2D'
+		'utils/PPoint'
 
 	],
 
-	function(Toolbox, Vec2D) {
+	function(Toolbox, PPoint) {
 
 
 		var TrigFunc = Toolbox.Base.extend({
