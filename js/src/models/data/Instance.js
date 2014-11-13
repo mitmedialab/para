@@ -191,7 +191,7 @@ define([
 				var leftX = position.x < pdimensions.leftX ? position.x : pdimensions.leftX;
 				var topY = position.y < pdimensions.topY ? position.y : pdimensions.topY;
 				var rightX = position.x + width > pdimensions.rightX ? position.x + width : pdimensions.rightX;
-				var bottomY = position.y + height > pdimensions.bottomY ? position.y + height : bottomY;
+				var bottomY = position.y + height > pdimensions.bottomY ? position.y + height : pdimensions.bottomY;
 
 				data.dimensions = {
 					leftX: leftX,
@@ -207,13 +207,13 @@ define([
 					bottomY: position.y + height,
 				};
 			}
+			console.log("dimensions",data.dimensions);
+			console.log("getting dimensions for children", this.children.length);
+			for (var i = 0; i < this.children.length; i++) {
 
-
-			for (var i = 0; i < this.children; i++) {
-				data = this.children[i].getLinkedDimensions({
-					dimensions: dimensions
-				});
+				data = this.children[i].getLinkedDimensions(data);
 			}
+			console.log("post_dimensions",data.dimensions);
 			//TODO: recycle bounding box rather than re-initializing it.
 			if(data.top){
 				var bx = data.dimensions.leftX;
