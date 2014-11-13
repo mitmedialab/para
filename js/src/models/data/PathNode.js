@@ -18,22 +18,14 @@ define([
   var PathNode = GeometryNode.extend({
     name: 'path',
     type: 'geometry',
+    defaults: _.extend({}, GeometryNode.prototype.defaults, {
+      master_path: null
+    }),
 
-
-
-    constructor: function() {
-
-      GeometryNode.apply(this, arguments);
-      this.masterPath = null;
-
-
-    },
-
+   
 
     initialize: function(data) {
       GeometryNode.prototype.initialize.apply(this, arguments);
-
-
     },
 
     undoRedo: function(data) {
@@ -43,6 +35,10 @@ define([
 
     },
 
+    clone: function(){
+      var clone = GeometryNode.prototype.clone.apply(this,arguments);
+      clone.set('master_path',this.get('master_path').clone());
+    },
 
 
     exportJSON: function(data) {
@@ -75,7 +71,7 @@ define([
       data.rotation_origin = data.translation_delta;
       data.scaling_origin = data.translation_delta;
 
-      this.masterPath = path;
+      this.set('master_path', path);
       var imatrix = matrix.inverted();
       path.transform(imatrix);
       path.visible = false;
@@ -89,8 +85,11 @@ define([
      */
     run: function() {
 //console.log('run called on ', this.name);
-      var renderPath = this.masterPath.clone();
-      this.instances.push(renderPath);
+      var masterPath = this.get('master_path');
+      var renderPath = masterPath.clone();
+      var instances = this.get('instances');
+      instances.push(renderPath);
+      this.set('instances',instances);
       renderPath.visible = true;
       return {
         path: renderPath,
@@ -106,9 +105,11 @@ define([
      * them and only delete those which are not used by the user
      */
     reset: function() {
-      for (var i = 0; i < this.instances.length; i++) {
-        this.instances[i].remove();
+      var instances = this.get('instances');
+      for (var i = 0; i < instances.length; i++) {
+        instances[i].remove();
       }
+      this.set('instances',[]);
 
     },
 

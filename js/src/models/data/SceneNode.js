@@ -18,8 +18,10 @@ define([
                 edges: null,
             },
 
-            constructor: function() {
-                //parent node
+
+            initialize: function() {
+                this.set({edges:[]});
+                  //parent node
                 this.nodeParent = null;
                 //array to store children
                 this.children = [];
@@ -27,15 +29,12 @@ define([
 
                 //Global property that keeps track of total # of nodes
                 SceneNode.numNodeInstances++;
-             
-
-                Backbone.Model.apply(this, arguments);
             },
 
-            initialize: function() {
-                this.set({edges:[]})
-            },
 
+              clone: function(){
+                  return Backbone.Model.prototype.clone.apply(this,arguments);
+            },
             /*visit
             * placeholder visit function for 
             * external vistior tree traversal

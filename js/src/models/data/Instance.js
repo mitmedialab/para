@@ -102,6 +102,11 @@ define([
 
 				this.set('translation_delta',translation_delta);
 			}
+			if (data.rotation_delta) {
+				var rotation_delta = this.get('rotation_delta');
+				rotation_delta+=data.rotation_delta;
+				this.set('rotation_delta',rotation_delta);
+			}
 			
 		},
 
@@ -181,6 +186,7 @@ define([
 		},
 
 		getLinkedDimensions: function(data) {
+			var top = data.top;
 			var dimensions = {};
 			var position = this.get('screen_position');
 			var width = this.get('screen_width');
@@ -209,13 +215,14 @@ define([
 			}
 			console.log("dimensions",data.dimensions);
 			console.log("getting dimensions for children", this.children.length);
+			data.top=false;
 			for (var i = 0; i < this.children.length; i++) {
 
 				data = this.children[i].getLinkedDimensions(data);
 			}
 			console.log("post_dimensions",data.dimensions);
 			//TODO: recycle bounding box rather than re-initializing it.
-			if(data.top){
+			if(top){
 				var bx = data.dimensions.leftX;
 				var by = data.dimensions.topY;
 				var bwidth = data.dimensions.rightX-bx;

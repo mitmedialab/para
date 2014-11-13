@@ -76,14 +76,15 @@ define([
 
         });
         followPathTool.event_bus = event_bus;
-        toolCollection = new ToolCollection([polyTool,penTool, selectTool, rotateTool, followPathTool]);
+        toolCollection = new ToolCollection([polyTool, penTool, selectTool, rotateTool, followPathTool]);
 
 
         /* event listener registers */
-        this.listenTo(toolCollection,"geometryAdded",this.geometryAdded);
-        this.listenTo(toolCollection,"geometrySelected",this.geometrySelected);
-        this.listenTo(toolCollection,"geometryIncremented",this.geometryIncremented);
-        this.listenTo(toolCollection,"geometryCopied",this.geometryCopied);
+        this.listenTo(toolCollection, "geometryAdded", this.geometryAdded);
+        this.listenTo(toolCollection, "geometrySelected", this.geometrySelected);
+        this.listenTo(toolCollection, "geometryIncremented", this.geometryIncremented);
+        this.listenTo(toolCollection, "geometryCopied", this.geometryCopied);
+        this.listenTo(toolCollection, "geometryDeepCopied", this.geometryDeepCopied);
 
         this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
         this.listenTo(toolCollection, 'setSelection', this.setSelection);
@@ -195,10 +196,14 @@ define([
 
       },
 
-      setState: function(state) {
+      setState: function(state, mode) {
         toolCollection.get(this.get('state')).reset();
 
         this.set('state', state);
+        if (mode) {
+          var currentTool = toolCollection.get(this.get('state'));
+          currentTool.set('mode', mode);
+        }
         if (state === 'penTool' || state === 'polyTool') {
           console.log('move to root');
           this.moveToRoot();
@@ -226,46 +231,75 @@ define([
         var currentTool = toolCollection.get(this.get('state'));
         var paperObjects = currentTool.get('literals');
         var matrix = currentTool.get('matrix');
-        for(var i=0;i<paperObjects.length;i++){
+        for (var i = 0; i < paperObjects.length; i++) {
           var pathNode = new PolygonNode();
           var data = pathNode.normalizePath(paperObjects[i], matrix);
           var instance = new Instance({
             protoNode: pathNode,
             selected: true
-        });
-        selectTool.addSelectedShape(instance);
-       instance.update(data);
-        var edge = new Edge({
-          x: currentNode,
-          y: instance
-        });
-        currentNode.addChildNode(instance);
-        instance.addEdge(edge);
-        visitor.addGeomFunction(pathNode);
+          });
+          selectTool.addSelectedShape(instance);
+          instance.update(data);
+          var edge = new Edge({
+            x: currentNode,
+            y: instance
+          });
+          currentNode.addChildNode(instance);
+          instance.addEdge(edge);
+          visitor.addGeomFunction(pathNode);
         }
-      currentTool.set('literals',[]);
+        currentTool.set('literals', []);
 
         this.compile();
       },
 
-      geometryCopied: function(event){
-        console.log('geometryCopied');
-         var selectedShapes = selectTool.get('selected_shapes');
-        for(var i=selectedShapes.length-1;i>=0;i--){
+      geometryCopied: function(event) {
+        // console.log('geometryCopied');
+        var selectedShapes = selectTool.get('selected_shapes');
+        for (var i = selectedShapes.length - 1; i >= 0; i--) {
           var instance = selectedShapes[i];
           var clone = instance.cloneInstance();
-          
+
           var edge = new Edge({
-            x: currentNode,
-            y: instance
+            x: instance,
+            y: clone
           });
 
           edge.addAll();
           instance.addChildNode(clone);
           clone.addEdge(edge);
-          clone.set('selected',false);
-          instance.set('selected',false);
-          selectedShapes[i]=clone;
+          clone.set('selected', true);
+          instance.set('selected', false);
+          selectedShapes[i] = clone;
+        }
+        this.compile();
+      },
+
+      geometryDeepCopied: function(event) {
+        var selectedShapes = selectTool.get('selected_shapes');
+        console.log("selectedShapes=", selectedShapes.length);
+        for (var i = selectedShapes.length - 1; i >= 0; i--) {
+          console.log('geometryDeepCopied', i);
+
+          var instance = selectedShapes[i];
+          var clone = instance.cloneInstance();
+          var protoNode = instance.get('protoNode');
+          protoNode.clone();
+          clone.set('protoNode', protoNode);
+          console.log('protoNode=', protoNode);
+
+          visitor.addGeomFunction(protoNode);
+
+          var edge = new Edge({
+            x: currentNode,
+            y: clone
+          });
+
+          currentNode.addChildNode(clone);
+          clone.addEdge(edge);
+          clone.set('selected', true);
+          instance.set('selected', false);
+          selectedShapes[i] = clone;
         }
         this.compile();
       },
@@ -277,19 +311,20 @@ define([
        * of the geometry, adds the geometry node as a child of the
        * procedure block and adds the procedure block to the scenegraph
        */
-      geometrySelected: function(event){
+      geometrySelected: function(event) {
         var currentTool = toolCollection.get(this.get('state'));
         var paperObjects = currentTool.get('literals');
-         for(var i=0;i<paperObjects.length;i++){
-            var paperObject = paperObjects[i];
-            console.log(paperObject);
-            var instance = paperObject.data.instance;
+        for (var i = 0; i < paperObjects.length; i++) {
+          var paperObject = paperObjects[i];
+          var instance = paperObject.data.instance;
 
-            instance.getLinkedDimensions({top:true});
-            selectTool.addSelectedShape(instance);
-         }
+          instance.getLinkedDimensions({
+            top: true
+          });
+          selectTool.addSelectedShape(instance);
+        }
 
-         this.compile();
+        this.compile();
       },
 
       /* geometryIncremented
@@ -300,19 +335,20 @@ define([
        * to display bounding boxes
        * TODO: design so that only one iteration is neccesary?
        */
-      geometryIncremented: function(data){
+      geometryIncremented: function(data) {
         var selectedShapes = selectTool.get('selected_shapes');
-        for(var i=0;i<selectedShapes.length;i++){
-          console.log("incrementing instance at",i);
+        for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
           instance.incrementDelta(data);
-          
+
         }
         this.compile();
 
-        for(var j=0;j<selectedShapes.length;j++){
+        for (var j = 0; j < selectedShapes.length; j++) {
           var inst = selectedShapes[j];
-          inst.getLinkedDimensions({top:true});
+          inst.getLinkedDimensions({
+            top: true
+          });
         }
       },
 
@@ -326,8 +362,8 @@ define([
         visitor.resetGeomFunctions();
         visitor.visit(rootNode, null);
         //debugging code to count # of paperjs objects
-      /*  var numChildren = paper.project.activeLayer.children.length;
-        console.log('total number of children='+numChildren);*/
+        var numChildren = paper.project.activeLayer.children.length;
+        console.log('total number of children=' + numChildren);
       },
 
 

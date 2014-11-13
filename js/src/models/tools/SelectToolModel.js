@@ -9,12 +9,12 @@ define([
 
 
 
-
-], function(_, Backbone, BaseToolModel,PPoint) {
+], function(_, Backbone, BaseToolModel, PPoint) {
   var segment, handle;
   var moved = null;
   var segmentMod = false;
-  var copyReset= true;
+  var copyReset = true;
+  var angle = 0;
   var hitOptions = {
     segments: true,
     stroke: true,
@@ -25,13 +25,14 @@ define([
 
   var SelectToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
-      selected_shapes: null
+      selected_shapes: null,
+      mode: 'select'
     }),
 
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
       this.set('selected_shapes', []);
-      this.on('change:literals',this.triggerChange);
+      //this.on('change:literals',this.triggerChange);
 
     },
 
@@ -47,16 +48,22 @@ define([
 
     addSelectedShape: function(instance) {
       var selected_shapes = this.get('selected_shapes');
-      instance.set('selected', true);
-      selected_shapes.push(instance);
-      this.set('selected_shapes', selected_shapes);
+      if (!_.contains(selected_shapes, instance)) {
+        instance.set('selected', true);
+        selected_shapes.push(instance);
+        this.set('selected_shapes', selected_shapes);
+      }
     },
 
     /*mousedown event
      */
     mouseDown: function(event) {
       var paper = this.get('paper');
-
+      var posPoint = this.getRelativePoint();
+      if (posPoint) {
+        angle = event.point.subtract(posPoint).angle;
+        console.log('start angle=',angle);
+      }
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
         this.deselectAll();
@@ -84,30 +91,71 @@ define([
         literals.push(path);
         this.set('literals', literals);
 
-        this.trigger('geometrySelected');
       }
+
+      this.trigger('geometrySelected');
 
 
     },
 
-    triggerChange: function(){
+    triggerChange: function() {
       this.trigger('geometrySelected');
 
     },
 
-  
+
     //mouse drag event
     mouseDrag: function(event) {
-      if(event.modifiers.option && copyReset){
+      switch (this.get('mode')) {
+        case 'select':
+          this.selectDrag(event);
+          break;
+        case 'rotate':
+          this.rotateDrag(event);
+          break;
+      }
+    },
+
+    selectDrag: function(event) {
+      if (event.modifiers.option && copyReset) {
         copyReset = false;
 
         this.trigger('geometryCopied');
       }
 
-      var data = {};
-      data.translation_delta =  new PPoint(event.delta.x,event.delta.y);
-      this.trigger('geometryIncremented',data);
+      if (event.modifiers.shift && copyReset) {
+        copyReset = false;
 
+        this.trigger('geometryDeepCopied');
+      }
+
+      var data = {};
+      data.translation_delta = new PPoint(event.delta.x, event.delta.y);
+      this.trigger('geometryIncremented', data);
+
+    },
+
+    rotateDrag: function(event) {
+      var posPoint = this.getRelativePoint();
+      if (posPoint) {
+        var angle = event.lastPoint.subtract(posPoint).angle;
+        var dAngle = event.point.subtract(posPoint).angle;
+        var data = {};
+        data.rotation_delta = dAngle-angle
+        console.log('rotate_delta',data.rotation_delta);
+        this.trigger('geometryIncremented', data);
+
+      }
+
+    },
+
+    getRelativePoint: function() {
+      var literals = this.get('literals');
+      if (literals.length > 0) {
+        var firstLiteral = literals[0];
+        return firstLiteral.position;
+      }
+      return null;
     },
 
     dblClick: function(event) {
@@ -121,8 +169,8 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-     
-       copyReset = true;
+
+      copyReset = true;
 
     },
 

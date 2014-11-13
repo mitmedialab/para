@@ -101,14 +101,16 @@ define([
 
 				var edge = node.getEdge(departureNode);
 				if (edge) {
+					console.log("edge exists",edge.attributes);
 					var data = {};
-					if (edge.contains('translation')) {
+					/*if (edge.contains('translation')) {
 						data.translation = departureNode.getTranslation();
-					}
+					}*/
 					if (edge.contains('rotation')) {
-						data.translation = departureNode.getRotation();
+						data.rotation_delta = departureNode.get('rotation_delta');
+						console.log("updating_rotation_delta");
 					}
-					if (edge.contains('scaling')) {
+				/*if (edge.contains('scaling')) {
 						data.translation = departureNode.getScaling();
 					}
 					if (edge.contains('fillColor')) {
@@ -119,7 +121,7 @@ define([
 					}
 					if (edge.contains('strokeWidth')) {
 						data.strokeWidth = departureNode.getStrokeWidth();
-					}
+					}*/
 
 					node.update(data);
 				}

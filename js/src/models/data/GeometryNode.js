@@ -30,34 +30,27 @@ define([
     return temp;
   };
 
+
   var GeometryNode = SceneNode.extend({
     name: 'geometry',
     type: 'geometry',
 
-    defaults: function() {
+     defaults: _.extend({}, SceneNode.prototype.defaults, {
+      instances:null,
+    }),
 
-
-      return {
-        "isChanging": false
-      };
-    },
-
-    /* constructor 
-     * scaffolds: array for scaffold objects (helper information and paths)
-     * upperLeft: default origin of this, used for geometric transforms
-     */
-    constructor: function() {
-      this.instances = [];
-      SceneNode.apply(this, arguments);
-    },
-
-
+  
     /* initialization
      *
      */
     initialize: function(data) {
-    
+      this.set('instances',[]);
+      SceneNode.prototype.initialize.apply(this, arguments);
 
+    },
+
+    clone: function(){
+      return SceneNode.prototype.clone.apply(this,arguments);
     },
 
     /* run

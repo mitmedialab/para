@@ -48,7 +48,7 @@ define([
   		this.clearActive();
   		$('#selectTool').addClass('active');
   		lastSelected = $('#selectTool');
-      this.model.setState('selectTool');
+      this.model.setState('selectTool','select');
       analytics.log(eventType,{type:eventType,id:'selectTool',action:'toolSelected'});
 
 
@@ -88,7 +88,8 @@ define([
       this.clearActive();
       $('#rotateTool').addClass('active');
       lastSelected = $('#rotateTool');
-      this.model.setState('rotateTool');
+      this.model.setState('selectTool','rotate');
+      this.model.selectTool.
       analytics.log(eventType,{type:eventType,id:'rotateTool',action:'toolSelected'});
 
 
