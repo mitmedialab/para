@@ -38,6 +38,7 @@ define([
     clone: function(){
       var clone = GeometryNode.prototype.clone.apply(this,arguments);
       clone.set('master_path',this.get('master_path').clone());
+      return clone;
     },
 
 
@@ -77,6 +78,21 @@ define([
       path.visible = false;
       path.selected = false;
       return data;
+    },
+
+    updateMaster:function(segment_index,data, matrix){
+        var master_path = this.get('master_path');
+        if (data.translation_delta) {
+            master_path.transform(matrix);
+
+           console.log("path trigger segment",segment_index);
+          var delta = data.translation_delta.toPaperPoint();
+          master_path.segments[segment_index].point=  master_path.segments[segment_index].point.add(delta);
+          var inverted = matrix.inverted();
+          master_path.transform(inverted);
+        }
+        this.set('master_path',master_path);
+
     },
 
     /*run

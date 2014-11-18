@@ -19,6 +19,7 @@ var paper = PaperManager.getPaperInstance();
       this.selectedNodes = [];
       this.angle=0;
       this.startAngle=0;
+      var paper = this.get('paper');
       
     },
 

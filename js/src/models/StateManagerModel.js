@@ -231,6 +231,7 @@ define([
         var currentTool = toolCollection.get(this.get('state'));
         var paperObjects = currentTool.get('literals');
         var matrix = currentTool.get('matrix');
+        var instances =[];
         for (var i = 0; i < paperObjects.length; i++) {
           var pathNode = new PolygonNode();
           var data = pathNode.normalizePath(paperObjects[i], matrix);
@@ -247,10 +248,16 @@ define([
           currentNode.addChildNode(instance);
           instance.addEdge(edge);
           visitor.addGeomFunction(pathNode);
+         instances.push(instance);
+
         }
         currentTool.set('literals', []);
 
         this.compile();
+
+        for(var j=0;j<instances.length;j++){
+           this.trigger('prototypeCreated', instances[j]);
+        }
       },
 
       geometryCopied: function(event) {
@@ -260,7 +267,7 @@ define([
           var instance = selectedShapes[i];
 
           var clone = instance.cloneInstance();
-          clone.set('rotation_delta',0);
+          clone.set('rotation_delta', 0);
           var edge = new Edge({
             x: instance,
             y: clone
@@ -285,11 +292,11 @@ define([
           var instance = selectedShapes[i];
           var clone = instance.cloneInstance();
           var protoNode = instance.get('protoNode');
-          protoNode.clone();
-          clone.set('protoNode', protoNode);
-          console.log('protoNode=', protoNode);
+          var cloneProto = protoNode.clone();
+          clone.set('protoNode', cloneProto);
+          console.log('protoNode=', cloneProto);
 
-          visitor.addGeomFunction(protoNode);
+          visitor.addGeomFunction(cloneProto);
 
           var edge = new Edge({
             x: currentNode,
@@ -336,11 +343,20 @@ define([
        * to display bounding boxes
        * TODO: design so that only one iteration is neccesary?
        */
-      geometryIncremented: function(data) {
+      geometryIncremented: function(data,segment_index) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-          instance.incrementDelta(data);
+          if (segment_index != null) {
+            console.log("state trigger segment", segment_index);
+
+            var protoNode = instance.get('protoNode');
+            var matrix = instance.get('matrix')
+       
+            protoNode.updateMaster(segment_index, data, matrix);
+          } else {
+            instance.incrementDelta(data);
+          }
 
         }
         this.compile();

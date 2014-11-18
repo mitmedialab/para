@@ -14,7 +14,6 @@ define([
   var moved = null;
   var segmentMod = false;
   var copyReset = true;
-  var angle = 0;
   var hitOptions = {
     segments: true,
     stroke: true,
@@ -59,11 +58,7 @@ define([
      */
     mouseDown: function(event) {
       var paper = this.get('paper');
-      var posPoint = this.getRelativePoint();
-      if (posPoint) {
-        angle = event.point.subtract(posPoint).angle;
-        console.log('start angle=',angle);
-      }
+      segment = null;
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
         this.deselectAll();
@@ -80,6 +75,7 @@ define([
         var path = hitResult.item;
 
         if (hitResult.type == 'segment') {
+          console.log('hit segment');
           segment = hitResult.segment.index;
           segment.fullySelected = true;
         } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
@@ -106,6 +102,7 @@ define([
 
     //mouse drag event
     mouseDrag: function(event) {
+      console.log("segment=",segment);
       switch (this.get('mode')) {
         case 'select':
           this.selectDrag(event);
@@ -131,7 +128,13 @@ define([
 
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
-      this.trigger('geometryIncremented', data);
+      if(segment!=null){
+        console.log("trigger segment");
+        this.trigger('geometryIncremented', data, segment);
+      }
+      else{
+        this.trigger('geometryIncremented', data);
+      }
 
     },
 
@@ -141,7 +144,7 @@ define([
         var angle = event.lastPoint.subtract(posPoint).angle;
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
-        data.rotation_delta = dAngle-angle
+        data.rotation_delta = dAngle-angle;
         console.log('rotate_delta',data.rotation_delta);
         this.trigger('geometryIncremented', data);
 

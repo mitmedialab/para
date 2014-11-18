@@ -27,6 +27,29 @@
   </div>
 </div>
 
+<!--======================= PROTOTYPE MENU =======================-->
+
+<div class="proto-wrapper">
+    <div class="proto-container">
+      <div id="proto-menu" class="proto">
+       <script id="protoTemplate" type="text/x-handlebars-template">
+
+       {{#each proto}}
+
+       <div id = {{name}} class="proto-item">
+       <label id='protoName'>{{label}}</label>
+       <br>
+       <svg id ='snapshot' width ="100" height="75">
+       {{{svgsrc}}}
+       </svg>
+       </div>
+
+       {{/each}}
+       </script>
+
+</div>
+</div>
+</div>
 <!--======================= MENU BAR =======================-->
 <div class="menubar-wrapper section-background">
 <div class="menubar-container"></div>
