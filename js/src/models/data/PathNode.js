@@ -7,58 +7,36 @@
 
 define([
   'underscore',
-  'models/data/GeometryNode',
+  'models/data/Instance',
   'models/PaperManager',
   'utils/TrigFunc',
   'utils/PPoint'
 
-], function(_, GeometryNode, PaperManager, TrigFunc, PPoint) {
+], function(_, Instance, PaperManager, TrigFunc, PPoint) {
   //drawable paper.js path object that is stored in the pathnode
   var paper = PaperManager.getPaperInstance();
-  var PathNode = GeometryNode.extend({
+  var PathNode = Instance.extend({
     name: 'path',
     type: 'geometry',
-    defaults: _.extend({}, GeometryNode.prototype.defaults, {
-      master_path: null
+    defaults: _.extend({}, Instance.prototype.defaults, {
+      master_path: null,
+      geom_instances: null,
     }),
 
-   
 
     initialize: function(data) {
-      GeometryNode.prototype.initialize.apply(this, arguments);
+      Instance.prototype.initialize.apply(this, arguments);
+      this.set('geom_instances',[]);
     },
 
-    undoRedo: function(data) {
-      this.clearObjects();
-      GeometryNode.prototype.undoRedo.apply(this, arguments);
-      var path = new paper.Path();
-
-    },
-
+    
     clone: function(){
-      var clone = GeometryNode.prototype.clone.apply(this,arguments);
+      var clone = Instance.prototype.clone.apply(this,arguments);
       clone.set('master_path',this.get('master_path').clone());
       return clone;
     },
 
-
-    exportJSON: function(data) {
-      //console.log("path export json")
-      var jdata;
-      if (!data) {
-        this.set({
-          type: this.type,
-          name: this.name
-        });
-        jdata = this.toJSON();
-      } else {
-        jdata = data;
-      }
-
-      return GeometryNode.prototype.exportJSON.apply(this, [jdata]);
-    },
-
-
+    
     /*normalizePath
      * generates a set of transformation data based on the matrix
      * then inverts the matrix and normalizes the path based on these values
@@ -80,7 +58,7 @@ define([
       return data;
     },
 
-    updateMaster:function(segment_index,data, matrix){
+    updateGeom:function(segment_index,data, matrix){
         var master_path = this.get('master_path');
         if (data.translation_delta) {
             master_path.transform(matrix);
@@ -92,26 +70,21 @@ define([
           master_path.transform(inverted);
         }
         this.set('master_path',master_path);
-
     },
 
     /*run
      *creates a new path based on master path, stores it in the instances array
      * and returns it
      */
-    run: function() {
-//console.log('run called on ', this.name);
+     inheritGeom: function() {
+      console.log('path inherit geom called');
       var masterPath = this.get('master_path');
       var renderPath = masterPath.clone();
-      var instances = this.get('instances');
+      var instances = this.get('geom_instances');
       instances.push(renderPath);
-      this.set('instances',instances);
+      this.set('geom_instances',instances);
       renderPath.visible = true;
-      return {
-        path: renderPath,
-      };
-
-
+      return renderPath;
 
     },
 
@@ -121,50 +94,13 @@ define([
      * them and only delete those which are not used by the user
      */
     reset: function() {
-      var instances = this.get('instances');
+      var instances = this.get('geom_instances');
       for (var i = 0; i < instances.length; i++) {
         instances[i].remove();
       }
-      this.set('instances',[]);
+      this.set('geom_instances',[]);
 
     },
-
-    clearObjects: function() {
-
-    },
-
-
-
-    cloneLiteral: function(literal) {
-
-    },
-
-
-    //called when path points are modified 
-    updatePath: function(index, literalIndex, delta, handle) {
-
-    },
-
-    //checks to see if path exists in path_literals array
-    containsPath: function(path) {
-
-    },
-
-    //selects or deselects all path instances
-    selectAll: function() {
-
-    },
-
-    deselectAll: function() {
-
-
-    },
-
-    //checks for intersection and returns the first path found
-    checkIntersection: function() {
-
-      return null;
-    }
 
 
 

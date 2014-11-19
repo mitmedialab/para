@@ -235,20 +235,20 @@ define([
         for (var i = 0; i < paperObjects.length; i++) {
           var pathNode = new PolygonNode();
           var data = pathNode.normalizePath(paperObjects[i], matrix);
-          var instance = new Instance({
-            protoNode: pathNode,
+         /* var instance = new Instance({
+            proto_node: pathNode,
             selected: true
-          });
-          selectTool.addSelectedShape(instance);
-          instance.update(data);
+          });*/
+          selectTool.addSelectedShape(pathNode);
+          pathNode.update(data);
           var edge = new Edge({
             x: currentNode,
-            y: instance
+            y: pathNode
           });
-          currentNode.addChildNode(instance);
-          instance.addEdge(edge);
-          visitor.addGeomFunction(pathNode);
-         instances.push(instance);
+          currentNode.addChildNode(pathNode);
+          pathNode.addEdge(edge);
+          //visitor.addGeomFunction(pathNode);
+         instances.push(pathNode);
 
         }
         currentTool.set('literals', []);
@@ -261,27 +261,32 @@ define([
       },
 
       geometryCopied: function(event) {
-        // console.log('geometryCopied');
+        console.log('geometryCopied');
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = selectedShapes.length - 1; i >= 0; i--) {
           var instance = selectedShapes[i];
 
-          var clone = instance.cloneInstance();
-          clone.set('rotation_delta', 0);
+          var newInstance = this.create(instance);
+          newInstance.create(instance);
           var edge = new Edge({
             x: instance,
             y: clone
           });
 
           edge.addAll();
-          instance.addChildNode(clone);
-          clone.addEdge(edge);
-          clone.set('selected', true);
-          instance.set('selected', false);
-          selectedShapes[i] = clone;
+          newInstance.addChildNode(clone);
+          newInstance.addEdge(edge);
+          newInstance.set('selected', true);
+          newInstance.set('selected', false);
+          selectedShapes[i] = newInstance;
         }
         this.compile();
       },
+
+      create:function(parent){
+        var instance = new Instance();
+        instance.set('proto_node',parent);
+      }
 
       geometryDeepCopied: function(event) {
         var selectedShapes = selectTool.get('selected_shapes');
@@ -291,10 +296,10 @@ define([
 
           var instance = selectedShapes[i];
           var clone = instance.cloneInstance();
-          var protoNode = instance.get('protoNode');
-          var cloneProto = protoNode.clone();
-          clone.set('protoNode', cloneProto);
-          console.log('protoNode=', cloneProto);
+          var proto_node = instance.get('proto_node');
+          var cloneProto = proto_node.clone();
+          clone.set('proto_node', cloneProto);
+          console.log('proto_node=', cloneProto);
 
           visitor.addGeomFunction(cloneProto);
 
@@ -350,10 +355,9 @@ define([
           if (segment_index != null) {
             console.log("state trigger segment", segment_index);
 
-            var protoNode = instance.get('protoNode');
-            var matrix = instance.get('matrix')
+            var matrix = instance.get('matrix');
        
-            protoNode.updateMaster(segment_index, data, matrix);
+            instance.updateGeom(segment_index, data, matrix);
           } else {
             instance.incrementDelta(data);
           }

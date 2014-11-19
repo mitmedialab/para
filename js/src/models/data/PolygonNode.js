@@ -8,11 +8,10 @@
 define([
   'underscore',
   'models/data/PathNode',
-  'models/data/Instance',
   'models/PaperManager'
 
 
-], function(_, PathNode, Instance, PaperManager) {
+], function(_, PathNode, PaperManager) {
   //drawable paper.js path object that is stored in the pathnode
   var PolygonNode = PathNode.extend({
 
@@ -35,7 +34,7 @@ define([
 
    //called when path points are modified 
    updateParams: function(sideNum) {
-    console.log("update params to",sideNum);
+    /*console.log("update params to",sideNum);
       this.resetObjects();
       this.sideNum = sideNum;
       //update the path
@@ -55,11 +54,10 @@ define([
         newInstance.scale(scale);
         newInstance.reset= true;
          this.instance_literals[j] = newInstance;
-         
-      
+        
           
 
-      }
+      }*/
     }
 
    });

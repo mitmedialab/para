@@ -41,8 +41,7 @@ define([
         $(this).iris({
           palettes: ['#fff',
          '#000',
-          '#0E3D63',
-         
+          '#0E3D63', 
         '#16A2A6',
           '#C6E8ED',
           '#BC2028',

@@ -50,24 +50,10 @@ define([
 			});
 			//check to see if node is root (has no departure)
 
-			switch (node.name) {
-				case 'geometry':
-					this.visitGeometry(node, departureNode);
-					break;
-				case 'path':
-					this.visitPath(node, departureNode);
-					break;
-				case 'block':
-					this.visitBlock(node, departureNode);
-					break;
-				case 'instance':
-					this.visitInstance(node, departureNode);
-					break;
-				default:
-					//catch unsupported type
-					throw 'unsupported type in parse tree';
-			}
-
+			
+				
+			this.visitInstance(node, departureNode);
+			
 		},
 
 		visitChildren: function(node) {
@@ -95,7 +81,7 @@ define([
 		 * determines if node
 		 */
 		visitInstance: function(node, departureNode) {
-			//console.log("visit instance",node.type, node.name);
+			console.log("visit instance",node.type, node.name);
 			if (departureNode) {
 			//console.log("departure node exists");
 

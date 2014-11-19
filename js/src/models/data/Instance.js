@@ -48,7 +48,7 @@ define([
 			bbox: null,
 			reset_matrix: true,
 
-			totalRotationDelta:0
+			totalRotationDelta: 0
 
 		},
 
@@ -68,6 +68,10 @@ define([
 		},
 
 		reset: function() {
+
+		},
+
+		resetProperties: function() {
 			this.clear().set(this.defaults);
 			this.set('position', new PPoint(0, 0));
 			this.set('translation_delta', new PPoint(0, 0));
@@ -142,27 +146,52 @@ define([
 
 			if (reset_matrix) {
 				this.set('reset_matrix', false);
-				this.set('totalRotationDelta',0);
+				this.set('totalRotationDelta', 0);
 				matrix.reset();
 			}
 			if (data.rotation_delta) {
 				var crotation_delta = this.get('totalRotationDelta');
-				this.set('totalRotationDelta',crotation_delta+data.rotation_delta);
+				this.set('totalRotationDelta', crotation_delta + data.rotation_delta);
 
 			}
-			this.set('matrix',matrix);
+			this.set('matrix', matrix);
 
+		},
+
+		/*inheritGeom
+		 * moves up the prototype chain to find the
+		 * relevant geometry for this node and return it
+		 */
+		inheritGeom: function() {
+
+			if (this.has('protoNode')) {
+				var proto = this.get('protoNode');
+				return proto.inheritGeom();
+			}
+		},
+
+		/*updateGeom
+		 * moves up the prototype chain to find the
+		 * relevant geometry to increment points 
+		 * when user selects and moves points of an instance
+		 */
+		updateGeom: function(segment_index, data, matrix) {
+			if (this.has('protoNode')) {
+				var proto = this.get('protoNode');
+				proto.updateGeom(segment_index, data, matrix);
+			}
 		},
 
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
-		render: function(data) {
+			render: function(data) {
 			//console.log("rendering instance");
+			this.reset();
 			var matrix = this.get('matrix');
 			var selected = this.get('selected');
 			var translation_delta = this.get('translation_delta').toPaperPoint();
 			var rotation_origin = this.get('rotation_origin').toPaperPoint;
-			var rotation_delta = this.get('rotation_delta')+this.get('totalRotationDelta');
+			var rotation_delta = this.get('rotation_delta') + this.get('totalRotationDelta');
 			var scaling_origin = this.get('scaling_origin').toPaperPoint;
 			var scaling_delta = this.get('scaling_delta');
 
@@ -185,16 +214,15 @@ define([
 			matrix.rotate(rotation_delta, rotation_origin);
 			matrix.scale(scaling_delta, scaling_origin);
 
-			if (this.has('protoNode')) {
-				var proto = this.get('protoNode');
-				var geom = proto.run();
-				var path = geom.path;
-				path.data.instance = this;
-				path.transform(matrix);
-				var screen_bounds = path.bounds;
+
+			var geom = this.inheritGeom();
+			if (geom) {
+				geom.data.instance = this;
+				geom.transform(matrix);
+				var screen_bounds = geom.bounds;
 				var bbox = this.get('bbox');
 				bbox.selected = selected;
-				path.selected = selected;
+				geom.selected = selected;
 				//screen_bounds.selected = selected;
 				this.set({
 					screen_position: screen_bounds.topLeft,
@@ -202,7 +230,7 @@ define([
 					screen_height: screen_bounds.height,
 				});
 				//console.log('screen_position',this.get('screen_position'));
-				this.set('geom', path);
+				this.set('geom', geom);
 			}
 			this.set('reset_matrix', true);
 		},
