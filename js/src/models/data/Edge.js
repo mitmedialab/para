@@ -54,7 +54,6 @@ define([
 				this.set(transformation, false);
 			},
 
-
 			/*addAll
 			 * adds all transformations to edge
 			 */

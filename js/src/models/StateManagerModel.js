@@ -231,14 +231,14 @@ define([
         var currentTool = toolCollection.get(this.get('state'));
         var paperObjects = currentTool.get('literals');
         var matrix = currentTool.get('matrix');
-        var instances =[];
+        var instances = [];
         for (var i = 0; i < paperObjects.length; i++) {
           var pathNode = new PolygonNode();
           var data = pathNode.normalizePath(paperObjects[i], matrix);
-         /* var instance = new Instance({
-            proto_node: pathNode,
-            selected: true
-          });*/
+          /* var instance = new Instance({
+             proto_node: pathNode,
+             selected: true
+           });*/
           selectTool.addSelectedShape(pathNode);
           pathNode.update(data);
           var edge = new Edge({
@@ -248,22 +248,22 @@ define([
           currentNode.addChildNode(pathNode);
           pathNode.addEdge(edge);
           visitor.addGeomFunction(pathNode);
-         instances.push(pathNode);
+          instances.push(pathNode);
 
         }
         currentTool.set('literals', []);
 
         this.compile();
 
-        for(var j=0;j<instances.length;j++){
-           this.trigger('prototypeCreated', instances[j]);
+        for (var j = 0; j < instances.length; j++) {
+          this.trigger('prototypeCreated', instances[j]);
         }
       },
 
-       /* geometryCopied
+      /* geometryCopied
        * callback that is triggered when a geometry
        * object is shallow-copied
-       * creates an object which inherits from the copied 
+       * creates an object which inherits from the copied
        * object.
        */
       geometryCopied: function(event) {
@@ -273,13 +273,14 @@ define([
           var instance = selectedShapes[i];
 
           var newInstance = this.create(instance);
+          newInstance.set('translation_delta', instance.get('position').clone());
           var edge = new Edge({
             x: instance,
             y: newInstance,
           });
 
           edge.addAll();
-         
+
           newInstance.addEdge(edge);
           instance.set('selected', true);
           newInstance.set('selected', false);
@@ -289,44 +290,59 @@ define([
       },
 
       /* create
-      * Prototypal inheritance action:
-      * creates a new instance which inherits from
-      * the parent instance
-      */
-      create:function(parent){
+       * Prototypal inheritance action:
+       * creates a new instance which inherits from
+       * the parent instance
+       */
+      create: function(parent) {
         var instance = new Instance();
-        instance.set('proto_node',parent);
+        instance.set('proto_node', parent);
         parent.addChildNode(instance);
         return instance;
       },
 
+      /*geometryDeepCopied
+      * makes an independent clone of the object being copied and 
+      * transfers selection to that object
+      * TODO: deep copy all descendants of copy
+      * look into dynamically re-assigining prototype
+      */
       geometryDeepCopied: function(event) {
+        var instances = [];
         var selectedShapes = selectTool.get('selected_shapes');
-        console.log("selectedShapes=", selectedShapes.length);
+        console.log("deepcopy");
         for (var i = selectedShapes.length - 1; i >= 0; i--) {
           console.log('geometryDeepCopied', i);
 
           var instance = selectedShapes[i];
-          var clone = instance.cloneInstance();
-          var proto_node = instance.get('proto_node');
-          var cloneProto = proto_node.clone();
-          clone.set('proto_node', cloneProto);
-          console.log('proto_node=', cloneProto);
+          var newInstance = new PolygonNode();
+          instance.copyAttributes(newInstance);
+          var geom = instance.inheritGeom().clone();
+        
+          geom.fillColor = 'red';
+          newInstance.set('master_path', geom);
+          visitor.addGeomFunction(newInstance);
+         instances.push(newInstance);
 
-          visitor.addGeomFunction(cloneProto);
+        
 
+       
           var edge = new Edge({
             x: currentNode,
-            y: clone
+            y: newInstance
           });
 
-          currentNode.addChildNode(clone);
-          clone.addEdge(edge);
-          clone.set('selected', true);
+          currentNode.addChildNode(newInstance);
+          newInstance.addEdge(edge);
+          newInstance.set('selected', true);
           instance.set('selected', false);
-          selectedShapes[i] = clone;
+          selectedShapes[i] = newInstance;
         }
         this.compile();
+
+        for (var j = 0; j < instances.length; j++) {
+          this.trigger('prototypeCreated', instances[j]);
+        }
       },
 
       /* geometrySelected
@@ -360,7 +376,7 @@ define([
        * to display bounding boxes
        * TODO: design so that only one iteration is neccesary?
        */
-      geometryIncremented: function(data,segment_index) {
+      geometryIncremented: function(data, segment_index) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
@@ -371,7 +387,7 @@ define([
             var tmatrix = instance.get('tmatrix');
             var smatrix = instance.get('smatrix');
 
-            instance.updateGeom(segment_index, data, rmatrix, smatrix,tmatrix);
+            instance.updateGeom(segment_index, data, rmatrix, smatrix, tmatrix);
           } else {
             instance.incrementDelta(data);
           }

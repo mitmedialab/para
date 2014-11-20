@@ -16,11 +16,12 @@ define([
   //drawable paper.js path object that is stored in the pathnode
   var paper = PaperManager.getPaperInstance();
   var PathNode = Instance.extend({
-    name: 'path',
-    type: 'geometry',
+   
     defaults: _.extend({}, Instance.prototype.defaults, {
       master_path: null,
       geom_instances: null,
+       name: 'path',
+      type: 'geometry',
     }),
 
 
@@ -93,6 +94,8 @@ define([
       instances.push(renderPath);
       this.set('geom_instances',instances);
       renderPath.visible = true;
+      renderPath.data.nodetype = this.get('name');
+      console.log("nodetype-name",renderPath.data.nodetype);
       return renderPath;
 
     },

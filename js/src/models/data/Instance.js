@@ -102,16 +102,10 @@ define([
 			this.set(data.toJSON);
 		},
 
-
-		//only called on a update function- 
 		//sets instances' properties to that of the data
 		update: function(data) {
-			//console.log('updating instance',data);
 			this.set(data);
-			//console.log("translation_delta",this.get('translation_delta'));
-
 		},
-
 
 		incrementDelta: function(data) {
 			var matrix = this.get('matrix');
@@ -123,7 +117,7 @@ define([
 				//console.log('orig delta', translation_delta.x, ',', translation_delta.y);
 				translation_delta.add(data.translation_delta);
 				this.set('translation_delta', translation_delta);
-				
+
 			}
 			if (data.rotation_delta) {
 				var rotation_delta = this.get('rotation_delta');
@@ -164,36 +158,65 @@ define([
 				return proto.inheritGeom();
 			}
 		},
-
+		/*inheritRotation
+		 * checks first to see if there is a rotation prototype
+		 * moves up the prototype chain to find the
+		 * relevant rotation setting for this node and applies it to the matrix
+		 */
 		inheritRotation: function(rmatrix, target_rotation_origin) {
-			if (this.has('proto_node')) {
-				var protoNode = this.get('proto_node');
+			var protoNode;
+			if(this.has('rotation_node')){
+				protoNode = this.get('rotation_node');
+			}
+			else if (this.has('proto_node')) {
+				protoNode = this.get('proto_node');
+			}
+			if(protoNode){
 				rmatrix = protoNode.inheritRotation(rmatrix, target_rotation_origin);
 			}
-
-
-			
 			var rotation_delta = this.get('rotation_delta');
 			rmatrix.rotate(rotation_delta, target_rotation_origin);
 
 			return rmatrix;
 		},
 
+		/*inheritTranslation
+		 * checks first to see if there is a translation prototype
+		 * moves up the prototype chain to find the
+		 * relevant translation for this node and applies it to the matrix
+		 */
 		inheritTranslation: function(tmatrix, target_origin) {
-			if (this.has('proto_node')) {
-				var protoNode = this.get('proto_node');
+			var protoNode;
+			if(this.has('translation_node')){
+				protoNode = this.get('translation_node');
+			}
+			else if (this.has('proto_node')) {
+				protoNode = this.get('proto_node');
+			}
+			if(protoNode){
 				tmatrix = protoNode.inheritTranslation(tmatrix, target_origin);
 			}
-			
+
 			var translation_delta = this.get('translation_delta');
 			tmatrix.translate(translation_delta);
 
 			return tmatrix;
 		},
 
+		/*inheritScaling
+		 * checks first to see if there is a scaling prototype
+		 * moves up the prototype chain to find the
+		 * relevant scaling for this node and applies it to the matrix
+		 */
 		inheritScaling: function(smatrix, target_scaling_origin) {
-			if (this.has('proto_node')) {
-				var protoNode = this.get('proto_node');
+		var protoNode;
+			if(this.has('scaling_node')){
+				protoNode = this.get('scaling_node');
+			}
+			else if (this.has('proto_node')) {
+				protoNode = this.get('proto_node');
+			}
+			if(protoNode){
 				smatrix = protoNode.inheritScaling(smatrix, target_scaling_origin);
 			}
 
@@ -239,17 +262,36 @@ define([
 			rmatrix.rotate(rotation_delta, rotation_origin);
 			smatrix.scale(scaling_delta, scaling_origin);
 			tmatrix.translate(translation_delta);
-			
+
 			var protoNode = this.get('proto_node');
-			if (protoNode) {
-				console.log('inheriting transform for', this.name, this.type);
+			var translation_node = this.get('translation_node');
+			var rotation_node = this.get('rotation_node');
+			var scaling_node = this.get('scaling_node');
+			if (translation_node) {
+				tmatrix = translation_node.inheritTranslation(tmatrix, position);
+			}
+			else if(protoNode){
 				tmatrix = protoNode.inheritTranslation(tmatrix, position);
-				rmatrix = protoNode.inheritRotation(rmatrix, rotation_origin);
+			}
+
+			if (scaling_node) {
+				smatrix = scaling_node.inheritScaling(smatrix, scaling_origin);
+			}
+			else if(protoNode){
 				smatrix = protoNode.inheritScaling(smatrix, scaling_origin);
 			}
 
+			if (rotation_node) {
+				rmatrix = rotation_node.inheritRotation(rmatrix, rotation_origin);
+			}
+			else if(protoNode){
+				rmatrix = protoNode.inheritRotation(rmatrix, rotation_origin);
+			}
 
-			
+
+
+
+
 
 			var geom = this.inheritGeom();
 			if (geom) {
@@ -336,17 +378,34 @@ define([
 			return data;
 		},
 
-		cloneInstance: function() {
-			var clone = this.clone();
+		//TODO: implement deep copy and cloning correctly. right now it is effed
+
+		clone: function(){
+			var clone =  new Instance();//SceneNode.prototype.clone.apply(this, arguments);
+			this.copyAttributes(clone);
+			return clone;
+		},
+
+		copyAttributes: function(clone, deep) {
 			clone.set('position', this.get('position').clone());
 			clone.set('translation_delta', this.get('translation_delta').clone());
+			clone.set('rotation_delta', this.get('rotation_delta'));
+			clone.set('scaling_delta', this.get('scaling_delta').clone());
 			clone.set('center', this.get('center').clone());
 			clone.set('scaling_origin', this.get('scaling_origin').clone());
 			clone.set('rotation_origin', this.get('rotation_origin').clone());
-			clone.set('matrix', this.get('matrix').clone());
+			clone.set('rmatrix', this.get('rmatrix').clone());
+			clone.set('smatrix', this.get('smatrix').clone());
+			clone.set('tmatrix', this.get('tmatrix').clone());
 			clone.set('bbox', this.get('bbox').clone());
 			return clone;
+		},
+
+		removeProto: function() {
+			
+			
 		}
+
 	});
 
 	return Instance;

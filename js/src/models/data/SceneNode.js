@@ -33,7 +33,23 @@ define([
 
 
               clone: function(){
-                  return Backbone.Model.prototype.clone.apply(this,arguments);
+                 var clone= Backbone.Model.prototype.clone.apply(this,arguments);
+                var children = [];
+                var edges = [];
+                for(var i=0;i<this.children.length;i++){
+                        var cchild = this.children[i].clone();
+                        children.push(cchild);
+                }
+                var cedges = this.get('edges');
+                 for(var j=0;j<cedges.length;j++){
+                        var edge = cedges[j].clone();
+                        edge.set('y',this);
+                }
+                clone.children = children;
+                clone.set('edges',edges);
+                clone.nodeParent = this.nodeParent;
+                return clone; 
+
             },
             /*visit
             * placeholder visit function for 
