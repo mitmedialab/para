@@ -299,7 +299,13 @@ define([
       create: function(parent) {
         var instance = new Instance();
         instance.set('proto_node', parent);
+        instance.set('rotation_node', parent);
+        instance.set('scaling_node', parent);
+        instance.set('translation_node', parent);
         parent.addChildNode(instance);
+        var inheritors = parent.get('inheritors');
+        inheritors.push(instance);
+        parent.set('inheritors',inheritors);
         return instance;
       },
 
@@ -370,11 +376,13 @@ define([
       },
 
       modifyInheritance: function(event, type) {
-        console.log('modifyInheritance',type)
         var selectedShapes = selectTool.get('selected_shapes');
         var protoTarget = selectedShapes[selectedShapes.length - 1];
         var instance = selectedShapes[selectedShapes.length - 2];
         instance.set('rotation_node', protoTarget);
+        var inheritors= protoTarget.get('inheritors');
+        inheritors.push(instance);
+        protoTarget.set('inheritors',inheritors);
         var edge = new Edge({
             x: protoTarget,
             y: instance,
@@ -448,7 +456,8 @@ define([
         for (var j = 0; j < selectedShapes.length; j++) {
           var inst = selectedShapes[j];
           inst.getLinkedDimensions({
-            top: true
+            top: true,
+            mode: selectTool.get('mode')
           });
         }
       },

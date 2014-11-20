@@ -48,6 +48,7 @@ define([
 			reset: false,
 			geom: null,
 			bbox: null,
+			inheritors: null,
 
 		},
 
@@ -61,6 +62,7 @@ define([
 			this.set('rotation_origin', new PPoint(0, 0));
 			this.set('tmatrix', new paper.Matrix());
 			this.set('smatrix', new paper.Matrix());
+			this.set('inheritors',[]);
 			this.set('rmatrix', new paper.Matrix());
 			var bounds = new paper.Rectangle(0, 0, 1, 1);
 			this.set('bbox', new paper.Path.Rectangle(bounds));
@@ -179,6 +181,24 @@ define([
 			rmatrix.rotate(rotation_delta, target_rotation_origin);
 
 			return rmatrix;
+		},
+
+		/*getPrototypeFor
+		* check to see if object has a prototype attached to a specific property
+		*/
+		getPrototypeFor: function(type){
+			if(this.has(type)){
+				return(this.get(type));
+			}
+			else{
+				if(this.has('proto_node')){
+					var protoNode = this.get('proto_node');
+					return protoNode.getPrototypeFor(type);
+				}
+				else{
+					return null;
+				}
+			}
 		},
 
 		/*inheritTranslation
@@ -320,6 +340,7 @@ define([
 
 		getLinkedDimensions: function(data) {
 			var top = data.top;
+			var mode = data.mode;
 			var dimensions = {};
 			var position = this.get('screen_position');
 			var width = this.get('screen_width');
@@ -349,9 +370,11 @@ define([
 			console.log("dimensions", data.dimensions);
 			console.log("getting dimensions for children", this.children.length);
 			data.top = false;
-			for (var i = 0; i < this.children.length; i++) {
-
-				data = this.children[i].getLinkedDimensions(data);
+			var inheritors = this.get('inheritors');
+			for (var i = 0; i < inheritors.length; i++) {
+				if(inheritors[i].getPrototypeFor(mode)==this){
+					data = inheritors[i].getLinkedDimensions(data);
+				}
 			}
 			console.log("post_dimensions", data.dimensions);
 			//TODO: recycle bounding box rather than re-initializing it.

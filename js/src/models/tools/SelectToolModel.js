@@ -25,7 +25,7 @@ define([
   var SelectToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
       selected_shapes: null,
-      mode: 'select'
+      mode: 'proto_node'
     }),
 
     initialize: function() {
@@ -58,10 +58,10 @@ define([
      */
     mouseDown: function(event) {
       switch (this.get('mode')) {
-        case 'select':
+        case 'proto_node':
           this.selectDown(event);
           break;
-        case 'rotate':
+        case 'rotation_node':
           this.rotateDown(event);
           break;
       }
@@ -130,10 +130,10 @@ define([
     mouseDrag: function(event) {
       console.log("segment=", segment);
       switch (this.get('mode')) {
-        case 'select':
+        case 'proto_node':
           this.selectDrag(event);
           break;
-        case 'rotate':
+        case 'rotation_node':
           this.rotateDrag(event);
           break;
       }
