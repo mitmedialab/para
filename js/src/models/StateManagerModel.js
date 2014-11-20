@@ -247,7 +247,7 @@ define([
           });
           currentNode.addChildNode(pathNode);
           pathNode.addEdge(edge);
-          //visitor.addGeomFunction(pathNode);
+          visitor.addGeomFunction(pathNode);
          instances.push(pathNode);
 
         }
@@ -260,6 +260,12 @@ define([
         }
       },
 
+       /* geometryCopied
+       * callback that is triggered when a geometry
+       * object is shallow-copied
+       * creates an object which inherits from the copied 
+       * object.
+       */
       geometryCopied: function(event) {
         console.log('geometryCopied');
         var selectedShapes = selectTool.get('selected_shapes');
@@ -267,26 +273,32 @@ define([
           var instance = selectedShapes[i];
 
           var newInstance = this.create(instance);
-          newInstance.create(instance);
           var edge = new Edge({
             x: instance,
-            y: clone
+            y: newInstance,
           });
 
           edge.addAll();
-          newInstance.addChildNode(clone);
+         
           newInstance.addEdge(edge);
-          newInstance.set('selected', true);
+          instance.set('selected', true);
           newInstance.set('selected', false);
           selectedShapes[i] = newInstance;
         }
         this.compile();
       },
 
+      /* create
+      * Prototypal inheritance action:
+      * creates a new instance which inherits from
+      * the parent instance
+      */
       create:function(parent){
         var instance = new Instance();
         instance.set('proto_node',parent);
-      }
+        parent.addChildNode(instance);
+        return instance;
+      },
 
       geometryDeepCopied: function(event) {
         var selectedShapes = selectTool.get('selected_shapes');
@@ -355,9 +367,11 @@ define([
           if (segment_index != null) {
             console.log("state trigger segment", segment_index);
 
-            var matrix = instance.get('matrix');
-       
-            instance.updateGeom(segment_index, data, matrix);
+            var rmatrix = instance.get('rmatrix');
+            var tmatrix = instance.get('tmatrix');
+            var smatrix = instance.get('smatrix');
+
+            instance.updateGeom(segment_index, data, rmatrix, smatrix,tmatrix);
           } else {
             instance.incrementDelta(data);
           }

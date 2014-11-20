@@ -31,12 +31,20 @@ define([
 		},
 		/*resetGeomFunctions
 		* resets the instances stored by the 
-		* geom functions. Called before visiting the root node
+		* geom functions and recursively resets their children. 
+		* Called before visiting the root node
 		*/
-		resetGeomFunctions: function(){
-			var geomF = this.get('geomFunctions');
+		resetGeomFunctions: function(children){
+			var geomF;
+			if(!children){
+				geomF = this.get('geomFunctions');
+			}
+			else{
+				geomF = children;
+			}
 			for(var i=0;i<geomF.length;i++){
 				geomF[i].reset();
+				this.resetGeomFunctions(geomF[i].children);
 			}
 		},
 
@@ -82,43 +90,10 @@ define([
 		 */
 		visitInstance: function(node, departureNode) {
 			console.log("visit instance",node.type, node.name);
-			if (departureNode) {
-			//console.log("departure node exists");
-
-				var edge = node.getEdge(departureNode);
-				if (edge) {
-					console.log("edge exists",edge.attributes);
-					var data = {};
-					/*if (edge.contains('translation')) {
-						data.translation = departureNode.getTranslation();
-					}*/
-					if (edge.contains('rotation')) {
-						data.rotation_delta = departureNode.get('rotation_delta')+departureNode.get('totalRotationDelta');
-					}				
-				/*if (edge.contains('scaling')) {
-						data.translation = departureNode.getScaling();
-					}
-					if (edge.contains('fillColor')) {
-						data.fillColor = departureNode.getFillColor();
-					}
-					if (edge.contains('strokeColor')) {
-						data.strokeColor = departureNode.getStrokeColor();
-					}
-					if (edge.contains('strokeWidth')) {
-						data.strokeWidth = departureNode.getStrokeWidth();
-					}*/
-
-
-					node.concatMatrix(data);
-				}
-
-
-			}
+		
 			var edgesRendered = node.edgesRendered();
-			//console.log("edges Rendered=",edgesRendered);
 			if (edgesRendered) {
 				node.render();
-				node.set('rendered', true);
 			}
 
 			this.visitChildren(node);

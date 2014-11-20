@@ -42,13 +42,12 @@ define([
 			stroke_width: 1,
 			fill_color: 0,
 
-			matrix: null,
+			rmatrix: null,
+			tmatrix: null,
+			smatrix: null,
 			reset: false,
 			geom: null,
 			bbox: null,
-			reset_matrix: true,
-
-			totalRotationDelta: 0
 
 		},
 
@@ -60,7 +59,9 @@ define([
 			this.set('center', new PPoint(0, 0));
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
-			this.set('matrix', new paper.Matrix());
+			this.set('tmatrix', new paper.Matrix());
+			this.set('smatrix', new paper.Matrix());
+			this.set('rmatrix', new paper.Matrix());
 			var bounds = new paper.Rectangle(0, 0, 1, 1);
 			this.set('bbox', new paper.Path.Rectangle(bounds));
 			SceneNode.prototype.initialize.apply(this, arguments);
@@ -68,7 +69,19 @@ define([
 		},
 
 		reset: function() {
+			this.set('rendered', false);
+			this.set('visited', false);
+			var rmatrix = this.get('rmatrix');
+			var smatrix = this.get('smatrix');
+			var tmatrix = this.get('tmatrix');
 
+			rmatrix.reset();
+			smatrix.reset();
+			tmatrix.reset();
+
+			this.set('rmatrix', rmatrix);
+			this.set('smatrix', smatrix);
+			this.set('tmatrix', tmatrix);
 		},
 
 		resetProperties: function() {
@@ -100,15 +113,17 @@ define([
 		},
 
 
-
 		incrementDelta: function(data) {
+			var matrix = this.get('matrix');
+			var position = this.get('rotation_origin').toPaperPoint();
+			console.log('inc position', position.x, ',', position.y);
+
 			if (data.translation_delta) {
 				var translation_delta = this.get('translation_delta');
-				//console.log("translation_delta",this.get('translation_delta'));
+				//console.log('orig delta', translation_delta.x, ',', translation_delta.y);
 				translation_delta.add(data.translation_delta);
-				console.log("translation_delta", translation_delta);
-
 				this.set('translation_delta', translation_delta);
+				
 			}
 			if (data.rotation_delta) {
 				var rotation_delta = this.get('rotation_delta');
@@ -139,86 +154,111 @@ define([
 			};
 		},
 
-
-		concatMatrix: function(data) {
-			var matrix = this.get('matrix');
-			var reset_matrix = this.get('reset_matrix');
-
-			if (reset_matrix) {
-				this.set('reset_matrix', false);
-				this.set('totalRotationDelta', 0);
-				matrix.reset();
-			}
-			if (data.rotation_delta) {
-				var crotation_delta = this.get('totalRotationDelta');
-				this.set('totalRotationDelta', crotation_delta + data.rotation_delta);
-
-			}
-			this.set('matrix', matrix);
-
-		},
-
 		/*inheritGeom
 		 * moves up the prototype chain to find the
 		 * relevant geometry for this node and return it
 		 */
 		inheritGeom: function() {
-
-			if (this.has('protoNode')) {
-				var proto = this.get('protoNode');
+			if (this.has('proto_node')) {
+				var proto = this.get('proto_node');
 				return proto.inheritGeom();
 			}
 		},
 
+		inheritRotation: function(rmatrix, target_rotation_origin) {
+			if (this.has('proto_node')) {
+				var protoNode = this.get('proto_node');
+				rmatrix = protoNode.inheritRotation(rmatrix, target_rotation_origin);
+			}
+
+
+			
+			var rotation_delta = this.get('rotation_delta');
+			rmatrix.rotate(rotation_delta, target_rotation_origin);
+
+			return rmatrix;
+		},
+
+		inheritTranslation: function(tmatrix, target_origin) {
+			if (this.has('proto_node')) {
+				var protoNode = this.get('proto_node');
+				tmatrix = protoNode.inheritTranslation(tmatrix, target_origin);
+			}
+			
+			var translation_delta = this.get('translation_delta');
+			tmatrix.translate(translation_delta);
+
+			return tmatrix;
+		},
+
+		inheritScaling: function(smatrix, target_scaling_origin) {
+			if (this.has('proto_node')) {
+				var protoNode = this.get('proto_node');
+				smatrix = protoNode.inheritScaling(smatrix, target_scaling_origin);
+			}
+
+			var scaling_delta = this.get('scaling_delta');
+			smatrix.scale(scaling_delta, target_scaling_origin);
+
+			return smatrix;
+		},
+
+
+
 		/*updateGeom
 		 * moves up the prototype chain to find the
-		 * relevant geometry to increment points 
+		 * relevant geometry to increment points
 		 * when user selects and moves points of an instance
 		 */
-		updateGeom: function(segment_index, data, matrix) {
-			if (this.has('protoNode')) {
-				var proto = this.get('protoNode');
-				proto.updateGeom(segment_index, data, matrix);
+		updateGeom: function(segment_index, data, rmatrix, smatrix, tmatrix) {
+			if (this.has('proto_node')) {
+				var proto = this.get('proto_node');
+				proto.updateGeom(segment_index, data, rmatrix, smatrix, tmatrix);
 			}
 		},
 
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
-			render: function(data) {
+		render: function() {
 			//console.log("rendering instance");
-			this.reset();
-			var matrix = this.get('matrix');
+
+			var rmatrix = this.get('rmatrix');
+			var smatrix = this.get('smatrix');
+			var tmatrix = this.get('tmatrix');
 			var selected = this.get('selected');
+			var position = this.get('position').toPaperPoint();
 			var translation_delta = this.get('translation_delta').toPaperPoint();
-			var rotation_origin = this.get('rotation_origin').toPaperPoint;
-			var rotation_delta = this.get('rotation_delta') + this.get('totalRotationDelta');
-			var scaling_origin = this.get('scaling_origin').toPaperPoint;
+			var rotation_origin = this.get('rotation_origin').toPaperPoint();
+			console.log('rotation_origin', rotation_origin);
+			var rotation_delta = this.get('rotation_delta');
+			var scaling_origin = this.get('scaling_origin').toPaperPoint();
 			var scaling_delta = this.get('scaling_delta');
 
 			//console.log('translation_delta for render', translation_delta);
 
-			if (data) {
-
-				if (data.matrix) {
-					matrix.concatenate(data.matrix);
-
-
-				}
-				if (data.selected) {
-					selected = data.selected;
-				}
+			rmatrix.rotate(rotation_delta, rotation_origin);
+			smatrix.scale(scaling_delta, scaling_origin);
+			tmatrix.translate(translation_delta);
+			
+			var protoNode = this.get('proto_node');
+			if (protoNode) {
+				console.log('inheriting transform for', this.name, this.type);
+				tmatrix = protoNode.inheritTranslation(tmatrix, position);
+				rmatrix = protoNode.inheritRotation(rmatrix, rotation_origin);
+				smatrix = protoNode.inheritScaling(smatrix, scaling_origin);
 			}
 
 
-			matrix.translate(translation_delta);
-			matrix.rotate(rotation_delta, rotation_origin);
-			matrix.scale(scaling_delta, scaling_origin);
-
+			
 
 			var geom = this.inheritGeom();
 			if (geom) {
 				geom.data.instance = this;
-				geom.transform(matrix);
+				geom.position = position;
+				geom.transform(rmatrix);
+				geom.transform(smatrix);
+				geom.transform(tmatrix);
+				console.log('geom position', geom.position);
 				var screen_bounds = geom.bounds;
 				var bbox = this.get('bbox');
 				bbox.selected = selected;
@@ -232,7 +272,7 @@ define([
 				//console.log('screen_position',this.get('screen_position'));
 				this.set('geom', geom);
 			}
-			this.set('reset_matrix', true);
+			this.set('rendered', true);
 		},
 
 		getLinkedDimensions: function(data) {

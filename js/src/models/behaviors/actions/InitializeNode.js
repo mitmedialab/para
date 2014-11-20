@@ -22,12 +22,12 @@ define([
 			},
 
 			setPrototype: function(prototype){
-				this.protoNode = prototype;
+				this.proto_node = prototype;
 			},
 
 			evaluate: function(data){
-				if(data.protoNode){
-					var instance = data.protoNode.createInstance();
+				if(data.proto_node){
+					var instance = data.proto_node.createInstance();
 					if (this.next) {
 						this.next.evaluate({instance:instance});
 					return true;

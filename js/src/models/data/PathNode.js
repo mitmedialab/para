@@ -25,8 +25,9 @@ define([
 
 
     initialize: function(data) {
-      Instance.prototype.initialize.apply(this, arguments);
       this.set('geom_instances',[]);
+      Instance.prototype.initialize.apply(this, arguments);
+
     },
 
     
@@ -36,7 +37,7 @@ define([
       return clone;
     },
 
-    
+
     /*normalizePath
      * generates a set of transformation data based on the matrix
      * then inverts the matrix and normalizes the path based on these values
@@ -46,9 +47,10 @@ define([
       var data = {};
       data.rotation_delta = matrix.rotation;
       data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
-      data.translation_delta = new PPoint(matrix.translation.x, matrix.translation.y);
-      data.rotation_origin = data.translation_delta;
-      data.scaling_origin = data.translation_delta;
+      //data.translation_delta = new PPoint(matrix.translation.x, matrix.translation.y);
+      data.position = new PPoint(matrix.translation.x, matrix.translation.y);
+      data.rotation_origin =  new PPoint(matrix.translation.x, matrix.translation.y);
+      data.scaling_origin =  new PPoint(matrix.translation.x, matrix.translation.y);
 
       this.set('master_path', path);
       var imatrix = matrix.inverted();
@@ -58,16 +60,23 @@ define([
       return data;
     },
 
-    updateGeom:function(segment_index,data, matrix){
+    updateGeom:function(segment_index,data, rmatrix, smatrix, tmatrix){
         var master_path = this.get('master_path');
         if (data.translation_delta) {
-            master_path.transform(matrix);
+            master_path.transform(rmatrix);
+            master_path.transform(smatrix);
+            master_path.transform(tmatrix);
 
            console.log("path trigger segment",segment_index);
           var delta = data.translation_delta.toPaperPoint();
           master_path.segments[segment_index].point=  master_path.segments[segment_index].point.add(delta);
-          var inverted = matrix.inverted();
-          master_path.transform(inverted);
+          var rinverted = rmatrix.inverted();
+          var sinverted = smatrix.inverted();
+          var tinverted = tmatrix.inverted();
+
+          master_path.transform(tinverted);
+          master_path.transform(sinverted);
+          master_path.transform(rinverted);
         }
         this.set('master_path',master_path);
     },
@@ -99,6 +108,7 @@ define([
         instances[i].remove();
       }
       this.set('geom_instances',[]);
+      Instance.prototype.reset.apply(this,arguments);
 
     },
 
