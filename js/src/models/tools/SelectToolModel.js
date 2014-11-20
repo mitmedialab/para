@@ -57,11 +57,37 @@ define([
     /*mousedown event
      */
     mouseDown: function(event) {
+      switch (this.get('mode')) {
+        case 'select':
+          this.selectDown(event);
+          break;
+        case 'rotate':
+          this.rotateDown(event);
+          break;
+      }
+    },
+
+    rotateDown: function(event){
+       if(event.modifiers.option){
+        this.selectDown(event,true);
+     
+         this.trigger('modifyInheritance','rotation_node');
+      }
+      else{
+        this.selectDown(event);
+      }
+    },
+
+
+    selectDown: function(event, noDeselect) {
       var paper = this.get('paper');
       segment = null;
+      console.log("noDeselect=",noDeselect);
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
-        this.deselectAll();
+        if(!noDeselect){
+          this.deselectAll();
+        }
       }
 
       segment = null;
@@ -102,7 +128,7 @@ define([
 
     //mouse drag event
     mouseDrag: function(event) {
-      console.log("segment=",segment);
+      console.log("segment=", segment);
       switch (this.get('mode')) {
         case 'select':
           this.selectDrag(event);
@@ -128,11 +154,10 @@ define([
 
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
-      if(segment!=null){
+      if (segment != null) {
         console.log("trigger segment");
         this.trigger('geometryIncremented', data, segment);
-      }
-      else{
+      } else {
         this.trigger('geometryIncremented', data);
       }
 
@@ -144,8 +169,8 @@ define([
         var angle = event.lastPoint.subtract(posPoint).angle;
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
-        data.rotation_delta = dAngle-angle;
-        console.log('rotate_delta',data.rotation_delta);
+        data.rotation_delta = dAngle - angle;
+        console.log('rotate_delta', data.rotation_delta);
         this.trigger('geometryIncremented', data);
 
       }

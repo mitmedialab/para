@@ -189,14 +189,14 @@ define([
             },
 
             /*returns heierarchal level in tree*/
-            getLevelInTree: function(root,level){
-                if(this==root){
+            getLevelInTree: function(level){
+                if(this.get('name')=='root'){
                     return level;
                 }
                 else{
                     level++;
 
-                   return this.nodeParent.getLevelInTree(root,level);
+                   return this.nodeParent.getLevelInTree(level);
                 }
 
             },

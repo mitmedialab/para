@@ -85,6 +85,8 @@ define([
         this.listenTo(toolCollection, "geometryIncremented", this.geometryIncremented);
         this.listenTo(toolCollection, "geometryCopied", this.geometryCopied);
         this.listenTo(toolCollection, "geometryDeepCopied", this.geometryDeepCopied);
+        this.listenTo(toolCollection, "modifyInheritance", this.modifyInheritance);
+
 
         this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
         this.listenTo(toolCollection, 'setSelection', this.setSelection);
@@ -117,7 +119,7 @@ define([
 
         //setup root node
         rootNode = new Instance(null);
-        rootNode.type = 'root';
+        rootNode.set('name','root');
         this.listenTo(rootNode, 'parseJSON', this.parseJSON);
         currentNode = rootNode;
 
@@ -302,11 +304,11 @@ define([
       },
 
       /*geometryDeepCopied
-      * makes an independent clone of the object being copied and 
-      * transfers selection to that object
-      * TODO: deep copy all descendants of copy
-      * look into dynamically re-assigining prototype
-      */
+       * makes an independent clone of the object being copied and
+       * transfers selection to that object
+       * TODO: deep copy all descendants of copy
+       * look into dynamically re-assigining prototype
+       */
       geometryDeepCopied: function(event) {
         var instances = [];
         var selectedShapes = selectTool.get('selected_shapes');
@@ -318,15 +320,14 @@ define([
           var newInstance = new PolygonNode();
           instance.copyAttributes(newInstance);
           var geom = instance.inheritGeom().clone();
-        
+
           geom.fillColor = 'red';
           newInstance.set('master_path', geom);
           visitor.addGeomFunction(newInstance);
-         instances.push(newInstance);
+          instances.push(newInstance);
 
-        
 
-       
+
           var edge = new Edge({
             x: currentNode,
             y: newInstance
@@ -367,6 +368,55 @@ define([
 
         this.compile();
       },
+
+      modifyInheritance: function(event, type) {
+        console.log('modifyInheritance',type)
+        var selectedShapes = selectTool.get('selected_shapes');
+        var protoTarget = selectedShapes[selectedShapes.length - 1];
+        var instance = selectedShapes[selectedShapes.length - 2];
+        instance.set('rotation_node', protoTarget);
+        var edge = new Edge({
+            x: protoTarget,
+            y: instance,
+          });
+
+        if ((instance.has('rotation_node')) && (instance.has('proto_node'))) {
+          var rotationNode = instance.get('rotation_node');
+          var protoNode = instance.get('proto_node');
+          if (rotationNode != protoNode) {
+            var rLevel = rotationNode.getLevelInTree();
+            var pLevel = protoNode.getLevelInTree();
+            var rIndex = rotationNode.getIndex();
+            var pIndex = protoNode.getIndex();
+
+
+            if (rLevel > pLevel) {
+              var remove = protoNode.removeChildNode(instance);
+              if (remove) {
+                rotationNode.addChildNode(instance);
+              }
+            } else if (rLevel < pLevel) {
+              var remove = rotationNode.removeChildNode(instance);
+              if (remove) {
+                protoNode.addChildNode(instance);
+              }
+            } else {
+              if (rIndex > pIndex) {
+                var remove = protoNode.removeChildNode(instance);
+                if (remove) {
+                  rotationNode.addChildNode(instance);
+                }
+              } else if (rIndex < pLevel) {
+                var remove = rotationNode.removeChildNode(instance);
+                if (remove) {
+                  protoNode.addChildNode(instance);
+                }
+              }
+            }
+          }
+        }
+      },
+
 
       /* geometryIncremented
        * callback that is triggered when a geometry is transformed

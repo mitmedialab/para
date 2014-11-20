@@ -166,6 +166,7 @@ define([
 		inheritRotation: function(rmatrix, target_rotation_origin) {
 			var protoNode;
 			if(this.has('rotation_node')){
+				console.log('has rotation node');
 				protoNode = this.get('rotation_node');
 			}
 			else if (this.has('proto_node')) {
