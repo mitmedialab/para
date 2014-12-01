@@ -17,34 +17,42 @@ define([
 
 	var Visitor = Backbone.Model.extend({
 		defaults: {
-			geomFunctions: [],
+			prototypeRoot: null
 		},
-		/* addGeomFunction
-		*adds a new geomFunction
-		*/
-		addGeomFunction: function(geom) {
-			var geomF = this.get('geomFunctions');
-			geomF.push(geom);
-			this.set({
-				geomFunctions: geomF
-			});
+
+		initialize: function() {
+			var prototypeRoot = new Instance();
+			prototypeRoot.set('type', 'root');
+			this.set('prototypeRoot', prototypeRoot);
 		},
-		/*resetGeomFunctions
-		* resets the instances stored by the 
-		* geom functions and recursively resets their children. 
-		* Called before visiting the root node
-		*/
-		resetGeomFunctions: function(children){
-			var geomF;
-			if(!children){
-				geomF = this.get('geomFunctions');
+
+		/* addPrototype
+		 *adds a new prototype according to its parent
+		 */
+		addPrototype: function(prototype) {
+			var protoParent = prototype.get('proto_node');
+			if (protoParent) {
+				protoParent.addChildNode(prototype);
+			} else {
+				var root = this.get('prototypeRoot');
+				root.addChildNode(prototype);
 			}
-			else{
-				geomF = children;
+		},
+
+		/*resetPrototypes
+		 * resets the prototypes recursively.
+		 * Called before visiting the root node
+		 */
+		resetPrototypes: function(children) {
+			var prototypes;
+			if (!children) {
+				prototypes = this.get('prototypeRoot').children;
+			} else {
+				prototypes = children;
 			}
-			for(var i=0;i<geomF.length;i++){
-				geomF[i].reset();
-				this.resetGeomFunctions(geomF[i].children);
+			for (var i = 0; i < prototypes.length; i++) {
+				prototypes[i].reset();
+				this.resetPrototypes(prototypes[i].children);
 			}
 		},
 
@@ -58,10 +66,10 @@ define([
 			});
 			//check to see if node is root (has no departure)
 
-			
-				
+
+
 			this.visitInstance(node, departureNode);
-			
+
 		},
 
 		visitChildren: function(node) {
@@ -89,8 +97,8 @@ define([
 		 * determines if node
 		 */
 		visitInstance: function(node, departureNode) {
-			console.log("visit instance",node.type, node.name);
-		
+			console.log("visit instance", node.type, node.name);
+
 			var edgesRendered = node.edgesRendered();
 			if (edgesRendered) {
 				node.render();

@@ -39,7 +39,7 @@ define([
         model: stateManager
       }, event_bus);
       var protoView = new ProtoView({
-        el: '#proto-menu',
+        el: '.proto-container',
         model: stateManager
       });
       var toolView = new ToolView({

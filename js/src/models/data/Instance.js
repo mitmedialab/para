@@ -49,6 +49,7 @@ define([
 			geom: null,
 			bbox: null,
 			inheritors: null,
+			isProto: false
 
 		},
 
@@ -84,6 +85,7 @@ define([
 			this.set('rmatrix', rmatrix);
 			this.set('smatrix', smatrix);
 			this.set('tmatrix', tmatrix);
+			console.log("resetting ",this.get('name'),",",this.get('type'),",",this.get('isProto'));
 		},
 
 		resetProperties: function() {
@@ -156,10 +158,41 @@ define([
 		 */
 		inheritGeom: function() {
 			if (this.has('proto_node')) {
-				var proto = this.get('proto_node');
-				return proto.inheritGeom();
+				var protoNode = this.get('proto_node');
+				if(!protoNode.get('rendered')){
+					protoNode.render();
+				}
+				return protoNode.inheritGeom();
 			}
 		},
+		
+
+		/*inheritTranslation
+		 * checks first to see if there is a translation prototype
+		 * moves up the prototype chain to find the
+		 * relevant translation for this node and applies it to the matrix
+		 */
+		inheritTranslation: function(tmatrix, target_origin) {
+			var protoNode;
+			if(this.has('translation_node')){
+				protoNode = this.get('translation_node');
+			}
+			else if (this.has('proto_node')) {
+				protoNode = this.get('proto_node');
+			}
+			if(protoNode){
+				if(!protoNode.get('rendered')){
+					protoNode.render();
+				}
+				tmatrix = protoNode.inheritTranslation(tmatrix, target_origin);
+			}
+
+			var translation_delta = this.get('translation_delta');
+			tmatrix.translate(translation_delta);
+
+			return tmatrix;
+		},
+
 		/*inheritRotation
 		 * checks first to see if there is a rotation prototype
 		 * moves up the prototype chain to find the
@@ -175,12 +208,41 @@ define([
 				protoNode = this.get('proto_node');
 			}
 			if(protoNode){
+				if(!protoNode.get('rendered')){
+					protoNode.render();
+				}
 				rmatrix = protoNode.inheritRotation(rmatrix, target_rotation_origin);
 			}
 			var rotation_delta = this.get('rotation_delta');
 			rmatrix.rotate(rotation_delta, target_rotation_origin);
 
 			return rmatrix;
+		},
+
+		/*inheritScaling
+		 * checks first to see if there is a scaling prototype
+		 * moves up the prototype chain to find the
+		 * relevant scaling for this node and applies it to the matrix
+		 */
+		inheritScaling: function(smatrix, target_scaling_origin) {
+		var protoNode;
+			if(this.has('scaling_node')){
+				protoNode = this.get('scaling_node');
+			}
+			else if (this.has('proto_node')) {
+				protoNode = this.get('proto_node');
+			}
+			if(protoNode){
+				if(!protoNode.get('rendered')){
+					protoNode.render();
+				}
+				smatrix = protoNode.inheritScaling(smatrix, target_scaling_origin);
+			}
+
+			var scaling_delta = this.get('scaling_delta');
+			smatrix.scale(scaling_delta, target_scaling_origin);
+
+			return smatrix;
 		},
 
 		/*getPrototypeFor
@@ -200,54 +262,6 @@ define([
 				}
 			}
 		},
-
-		/*inheritTranslation
-		 * checks first to see if there is a translation prototype
-		 * moves up the prototype chain to find the
-		 * relevant translation for this node and applies it to the matrix
-		 */
-		inheritTranslation: function(tmatrix, target_origin) {
-			var protoNode;
-			if(this.has('translation_node')){
-				protoNode = this.get('translation_node');
-			}
-			else if (this.has('proto_node')) {
-				protoNode = this.get('proto_node');
-			}
-			if(protoNode){
-				tmatrix = protoNode.inheritTranslation(tmatrix, target_origin);
-			}
-
-			var translation_delta = this.get('translation_delta');
-			tmatrix.translate(translation_delta);
-
-			return tmatrix;
-		},
-
-		/*inheritScaling
-		 * checks first to see if there is a scaling prototype
-		 * moves up the prototype chain to find the
-		 * relevant scaling for this node and applies it to the matrix
-		 */
-		inheritScaling: function(smatrix, target_scaling_origin) {
-		var protoNode;
-			if(this.has('scaling_node')){
-				protoNode = this.get('scaling_node');
-			}
-			else if (this.has('proto_node')) {
-				protoNode = this.get('proto_node');
-			}
-			if(protoNode){
-				smatrix = protoNode.inheritScaling(smatrix, target_scaling_origin);
-			}
-
-			var scaling_delta = this.get('scaling_delta');
-			smatrix.scale(scaling_delta, target_scaling_origin);
-
-			return smatrix;
-		},
-
-
 
 		/*updateGeom
 		 * moves up the prototype chain to find the
@@ -312,8 +326,7 @@ define([
 
 
 
-
-
+			var isProto = this.get('isProto');
 			var geom = this.inheritGeom();
 			if (geom) {
 				geom.data.instance = this;
@@ -332,8 +345,13 @@ define([
 					screen_width: screen_bounds.width,
 					screen_height: screen_bounds.height,
 				});
-				//console.log('screen_position',this.get('screen_position'));
+				//if shape is prototype, do not render it on the screen
+				if(isProto){
+					geom.visible = false;
+				}
+
 				this.set('geom', geom);
+
 			}
 			this.set('rendered', true);
 		},

@@ -30,6 +30,7 @@ define([
 
   function($, _, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, PaperManager, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge) {
     var rootNode,
+      uninstantiated,
       visitor,
       currentNode,
       toolCollection,
@@ -119,10 +120,10 @@ define([
 
         //setup root node
         rootNode = new Instance(null);
-        rootNode.set('name','root');
+        rootNode.set('name', 'root');
         this.listenTo(rootNode, 'parseJSON', this.parseJSON);
         currentNode = rootNode;
-
+      
 
         //clear local storage
         localStorage.clear();
@@ -224,23 +225,17 @@ define([
       /* geometryAdded
        * callback that is triggered when a new geometry
        * object is created by the user
-       * creates an init/translate procedure block based on the data
-       * of the geometry, adds the geometry node as a child of the
-       * procedure block and adds the procedure block to the scenegraph
+       * creates a static object with no inheritance and adds it
+       * to the scene graph
        */
       geometryAdded: function(event) {
         selectTool.deselectAll();
         var currentTool = toolCollection.get(this.get('state'));
         var paperObjects = currentTool.get('literals');
         var matrix = currentTool.get('matrix');
-        var instances = [];
         for (var i = 0; i < paperObjects.length; i++) {
           var pathNode = new PolygonNode();
           var data = pathNode.normalizePath(paperObjects[i], matrix);
-          /* var instance = new Instance({
-             proto_node: pathNode,
-             selected: true
-           });*/
           selectTool.addSelectedShape(pathNode);
           pathNode.update(data);
           var edge = new Edge({
@@ -249,16 +244,50 @@ define([
           });
           currentNode.addChildNode(pathNode);
           pathNode.addEdge(edge);
-          visitor.addGeomFunction(pathNode);
-          instances.push(pathNode);
-
         }
         currentTool.set('literals', []);
-
         this.compile();
 
-        for (var j = 0; j < instances.length; j++) {
-          this.trigger('prototypeCreated', instances[j]);
+      },
+
+      /* addPrototype
+       * converts a static object to a prototype
+       * and adds one instance of the prototype to the scenegraph
+       * TODO: will be more complex when multiple objects are selected-
+       * behavior probably should be to create a prototype which encapsulates
+       * all those objects rather than one prototype per object
+       */
+
+      addPrototype: function() {
+        if (this.get('state') === 'selectTool') {
+          var selectedShapes = selectTool.get('selected_shapes');
+          if (selectedShapes.length == 1) {
+            var instance = selectedShapes[0];
+            var sceneParent = instance.nodeParent;
+            var newInstance = this.create(instance);
+            newInstance.set('translation_delta', instance.get('position').clone());
+            var edge = new Edge({
+              x: sceneParent,
+              y: newInstance,
+            });
+
+            edge.addAll();
+            sceneParent.removeChildNode(instance);
+            sceneParent.addChildNode(newInstance);
+            newInstance.addEdge(edge);
+            instance.set('selected', false);
+            newInstance.set('selected', true);
+
+            instance.set('isProto', true);
+            visitor.addPrototype(instance);
+            selectedShapes[0] = newInstance;
+
+            return instance;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
         }
       },
 
@@ -294,7 +323,8 @@ define([
       /* create
        * Prototypal inheritance action:
        * creates a new instance which inherits from
-       * the parent instance
+       * the parent instance.
+       * TODO: add in checks to prevent diamond inheritance
        */
       create: function(parent) {
         var instance = new Instance();
@@ -302,10 +332,9 @@ define([
         instance.set('rotation_node', parent);
         instance.set('scaling_node', parent);
         instance.set('translation_node', parent);
-        parent.addChildNode(instance);
         var inheritors = parent.get('inheritors');
         inheritors.push(instance);
-        parent.set('inheritors',inheritors);
+        parent.set('inheritors', inheritors);
         return instance;
       },
 
@@ -380,13 +409,13 @@ define([
         var protoTarget = selectedShapes[selectedShapes.length - 1];
         var instance = selectedShapes[selectedShapes.length - 2];
         instance.set('rotation_node', protoTarget);
-        var inheritors= protoTarget.get('inheritors');
+        var inheritors = protoTarget.get('inheritors');
         inheritors.push(instance);
-        protoTarget.set('inheritors',inheritors);
+        protoTarget.set('inheritors', inheritors);
         var edge = new Edge({
-            x: protoTarget,
-            y: instance,
-          });
+          x: protoTarget,
+          y: instance,
+        });
 
         if ((instance.has('rotation_node')) && (instance.has('proto_node'))) {
           var rotationNode = instance.get('rotation_node');
@@ -469,7 +498,8 @@ define([
        * begin the rendering process
        */
       compile: function() {
-        visitor.resetGeomFunctions();
+        visitor.resetPrototypes();
+        visitor.resetPrototypes(rootNode.children);
         visitor.visit(rootNode, null);
         //debugging code to count # of paperjs objects
         var numChildren = paper.project.activeLayer.children.length;
@@ -546,8 +576,6 @@ define([
           currentNode = node.getParentNode();
         } else {
           ////console.log('current node is set in state to:' +currentNode.type);
-
-
 
         }
       },
