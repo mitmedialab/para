@@ -9,76 +9,104 @@ define([
 	'handlebars'
 
 ], function($, _, Backbone, Handlebars) {
-	var template, source, prototypes;
-	var canvasDown=false;
+	var template, source, prototypes, currentId;
+	var canvasDown = false;
 	var ProtoView = Backbone.View.extend({
 		//
 		initialize: function() {
 			source = $('#protoTemplate').html();
 			template = Handlebars.default.compile(source);
-			//this.listenTo(this.model, 'prototypeCreated', this.addPrototype);
 			prototypes = [];
+			currentId = -1;
 			$("#canvas").bind('mousedown', function() {
-				canvasDown=true;
+				canvasDown = true;
 			});
-			$("#canvas").bind('mouseup', function() {
-				canvasDown=false;
-			});
+			$("#canvas").bind('mouseup', {
+				model: this.model
+			}, this.canvasMouseUp);
+			this.listenTo(this.model, "protoypeViewModified", this.addPrototype);
 
 		},
 
 		events: {
 			"mouseup": "checkAddPrototype",
-			"mousedown #canvas": "canvasMouseDown"
+			"mousedown #canvas": "canvasMouseDown",
+			"mousedown .proto-item": "assignId",
+			"mouseup .proto-item": "removeId",
+
+		},
+
+		assignId: function(event) {
+			var clickedEl = $(event.currentTarget);
+			currentId = clickedEl.attr("id");
+		},
+
+		removeId: function() {
+			currentId = -1;
 		},
 
 		checkAddPrototype: function() {
-			if(canvasDown){
+			if (canvasDown) {
 				var protoParams = this.model.addPrototype();
-				console.log('adding prototype',protoParams);
-				if(protoParams){
-					this.addPrototype(protoParams);
+				console.log('adding prototype', protoParams);
+				if (protoParams) {
+					this.addPrototype(protoParams.geom, protoParams.id);
 				}
 			}
 		},
 
-		canvasMouseDown: function() {
-			console.log('canvas mousedown');
+		canvasMouseUp: function(event) {
+			canvasDown = false;
+			if (currentId > -1) {
+				console.log("instantiatePrototype");
+				event.data.model.geometryInstantiated(currentId, event.offsetX, event.offsetY);
+				currentId = -1;
+			}
+
 		},
 
-		addPrototype: function(protoParams) {
 
-			console.log('adding prototype');
-			var p = protoParams.get('geom').clone();
-			var hScale = 75 / p.bounds.height;
+		addPrototype: function(geom, id, mod) {
+			console.log('triggering prototype', geom, id);
+			var hScale = 75 / geom.bounds.height;
 			console.log('hScale', hScale);
-			console.log('height', p.bounds.height);
-			p.scale(hScale);
-			console.log('height', p.bounds.height);
+			console.log('height', geom.bounds.height);
+			geom.scale(hScale);
+			console.log('height', geom.bounds.height);
 
-			p.position.x = 50;
-			p.position.y = 37;
+			geom.position.x = 50;
+			geom.position.y = 37;
 
-			p.data.instance = null;
-
-			console.log('p', p);
-			var psvg = p.exportSVG({
+			geom.data.instance = null;
+			geom.visible = true;
+			var psvg = geom.exportSVG({
 				asString: true
 			});
-			p.remove();
-
-
+			geom.remove();
+			console.log('id=', id);
 			var data = {
 				label: 'foo',
-				name: 'bar',
+				name: id,
 				svgsrc: psvg
 			};
-			prototypes.push(data);
+			if (mod) {
+				for (var i = 0; i < prototypes.length; i++) {
+					if (prototypes[i].name === id) {
+						prototypes.splice(i, 1, data);
+						console.log('index=', i);
+						break;
+					}
+
+				}
+			} else {
+				prototypes.push(data);
+			}
 			var html = template({
 				proto: prototypes
 			});
 			$('#proto-menu').html(html);
-		}
+		},
+
 
 
 	});

@@ -23,12 +23,13 @@ define([
     'models/behaviors/actions/TranslateNode',
     'models/behaviors/actions/RotateNode',
     'models/data/Visitor',
-    'models/data/Edge'
+    'models/data/Edge',
+    'utils/PPoint'
 
 
   ],
 
-  function($, _, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, PaperManager, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge) {
+  function($, _, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, PaperManager, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
     var rootNode,
       uninstantiated,
       visitor,
@@ -263,9 +264,14 @@ define([
           var selectedShapes = selectTool.get('selected_shapes');
           if (selectedShapes.length == 1) {
             var instance = selectedShapes[0];
+            instance.set('translation_delta',new PPoint(0,0));
+
             var sceneParent = instance.nodeParent;
             var newInstance = this.create(instance);
-            newInstance.set('translation_delta', instance.get('position').clone());
+            newInstance.set('position', instance.get('position').clone());
+            newInstance.set('rotation_origin', instance.get('position').clone());
+            newInstance.set('scaling_origin', instance.get('position').clone());
+
             var edge = new Edge({
               x: sceneParent,
               y: newInstance,
@@ -277,12 +283,15 @@ define([
             newInstance.addEdge(edge);
             instance.set('selected', false);
             newInstance.set('selected', true);
+            console.log("instantiated id=",newInstance.get('id'));
 
             instance.set('isProto', true);
             visitor.addPrototype(instance);
             selectedShapes[0] = newInstance;
-
-            return instance;
+            var id = instance.get('id');
+            var geom = instance.get('geom').clone();
+            this.compile();
+            return {geom:geom,id:id};
           } else {
             return false;
           }
@@ -291,33 +300,41 @@ define([
         }
       },
 
-      /* geometryCopied
+      /* geometryInstantiated
        * callback that is triggered when a geometry
-       * object is shallow-copied
-       * creates an object which inherits from the copied
-       * object.
+       * object is instantiated from a prototype
        */
-      geometryCopied: function(event) {
-        console.log('geometryCopied');
-        var selectedShapes = selectTool.get('selected_shapes');
-        for (var i = selectedShapes.length - 1; i >= 0; i--) {
-          var instance = selectedShapes[i];
+      geometryInstantiated: function(id,x,y) {
+        console.log('geometryInstantiated',x,y);
+          selectTool.deselectAll();
+          var prototype = visitor.getPrototypeById(id);
+          if(prototype){
+          var newInstance = this.create(prototype);
+          console.log("instantiated id=",newInstance.get('id'));
 
-          var newInstance = this.create(instance);
-          newInstance.set('translation_delta', instance.get('position').clone());
+          var screenpos = prototype.get('geom').position;
+          var protopos = prototype.get('position');
+          var td = new PPoint(x-screenpos.x+protopos.x,y-screenpos.y+protopos.y);
+
+          newInstance.set('position', td.clone());
+          newInstance.set('rotation_origin', td.clone());
+          newInstance.set('scaling_origin', td.clone());
+          console.log("coordinates",screenpos,protopos,td);
+
+          //var td = prototype.get('position').clone();
+          //newInstance.set('translation_delta', instance.get('position').clone());
           var edge = new Edge({
-            x: instance,
+            x: currentNode,
             y: newInstance,
           });
 
           edge.addAll();
-
           newInstance.addEdge(edge);
-          instance.set('selected', true);
-          newInstance.set('selected', false);
-          selectedShapes[i] = newInstance;
+          currentNode.addChildNode(newInstance);
+          newInstance.set('selected', true);
+          selectTool.addSelectedShape(newInstance);
+          this.compile();
         }
-        this.compile();
       },
 
       /* create
@@ -332,6 +349,7 @@ define([
         instance.set('rotation_node', parent);
         instance.set('scaling_node', parent);
         instance.set('translation_node', parent);
+
         var inheritors = parent.get('inheritors');
         inheritors.push(instance);
         parent.set('inheritors', inheritors);
@@ -361,8 +379,6 @@ define([
           visitor.addGeomFunction(newInstance);
           instances.push(newInstance);
 
-
-
           var edge = new Edge({
             x: currentNode,
             y: newInstance
@@ -384,9 +400,6 @@ define([
       /* geometrySelected
        * callback that is triggered when a new geometry
        * object is selected by the user
-       * creates an init/translate procedure block based on the data
-       * of the geometry, adds the geometry node as a child of the
-       * procedure block and adds the procedure block to the scenegraph
        */
       geometrySelected: function(event) {
         var currentTool = toolCollection.get(this.get('state'));
@@ -394,10 +407,10 @@ define([
         for (var i = 0; i < paperObjects.length; i++) {
           var paperObject = paperObjects[i];
           var instance = paperObject.data.instance;
-
-          instance.getLinkedDimensions({
+          /*instance.getLinkedDimensions({
             top: true
-          });
+          });*/
+          console.log("selected id=",instance.get('id'));
           selectTool.addSelectedShape(instance);
         }
 
@@ -463,7 +476,7 @@ define([
        * to display bounding boxes
        * TODO: design so that only one iteration is neccesary?
        */
-      geometryIncremented: function(data, segment_index) {
+      geometryIncremented: function(data, override, segment_index ) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
@@ -473,10 +486,23 @@ define([
             var rmatrix = instance.get('rmatrix');
             var tmatrix = instance.get('tmatrix');
             var smatrix = instance.get('smatrix');
-
+            console.log("inherited prototype",instance.__proto__);
             instance.updateGeom(segment_index, data, rmatrix, smatrix, tmatrix);
+
           } else {
-            instance.incrementDelta(data);
+            instance.incrementDelta(data, override);
+            //console.log("incremented id=",instance.get('id'));
+
+          }
+          if(override){
+            var prototypes = instance.getRelevantPrototypes(data);
+            for(var j=0;j<prototypes.length;j++){
+            var id =prototypes[j].get('id');
+            var geom = prototypes[j].get('geom').clone();
+            console.log('geom',geom,j);
+            console.log('triggering override',geom,id);
+              this.trigger('protoypeViewModified',geom,id,true)
+            }
           }
 
         }
@@ -484,10 +510,10 @@ define([
 
         for (var j = 0; j < selectedShapes.length; j++) {
           var inst = selectedShapes[j];
-          inst.getLinkedDimensions({
+          /*inst.getLinkedDimensions({
             top: true,
             mode: selectTool.get('mode')
-          });
+          });*/
         }
       },
 
@@ -504,6 +530,7 @@ define([
         //debugging code to count # of paperjs objects
         var numChildren = paper.project.activeLayer.children.length;
         console.log('total number of children=' + numChildren);
+        paper.view.draw();
       },
 
 
@@ -622,7 +649,7 @@ define([
 
       //triggered by paper tool on a mouse down event
       toolMouseDown: function(event, pan) {
-        if (!pan) {
+        if (!event.modifiers.space) {
           var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseDown(event);
           if (this.get('state') === 'penTool') {
@@ -635,7 +662,7 @@ define([
       },
 
       toolMouseUp: function(event, pan) {
-        if (!pan) {
+        if (!event.modifiers.space) {
           var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseUp(event);
         }
@@ -643,8 +670,8 @@ define([
       },
 
 
-      toolMouseDrag: function(event, pan) {
-        if (!pan) {
+      toolMouseDrag: function(event) {
+        if (!event.modifiers.space) {
           var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseDrag(event);
         }
@@ -685,8 +712,8 @@ define([
 
 
 
-      toolMouseMove: function(event, pan) {
-        if (!pan) {
+      toolMouseMove: function(event) {
+        if (!event.modifers.space) {
           var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseMove(event);
         }

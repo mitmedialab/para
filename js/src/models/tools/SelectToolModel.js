@@ -40,6 +40,7 @@ define([
       var selected_shapes = this.get('selected_shapes');
       for (var i = 0; i < selected_shapes.length; i++) {
         selected_shapes[i].set('selected', false);
+
       }
       this.set('selected_shapes', []);
       this.set('literals', []);
@@ -49,6 +50,7 @@ define([
       var selected_shapes = this.get('selected_shapes');
       if (!_.contains(selected_shapes, instance)) {
         instance.set('selected', true);
+        //instance.incrementDelta({},false, true);
         selected_shapes.push(instance);
         this.set('selected_shapes', selected_shapes);
       }
@@ -67,13 +69,12 @@ define([
       }
     },
 
-    rotateDown: function(event){
-       if(event.modifiers.option){
-        this.selectDown(event,true);
-     
-         this.trigger('modifyInheritance','rotation_node');
-      }
-      else{
+    rotateDown: function(event) {
+      if (event.modifiers.option) {
+        this.selectDown(event, true);
+
+        this.trigger('modifyInheritance', 'rotation_node');
+      } else {
         this.selectDown(event);
       }
     },
@@ -82,10 +83,10 @@ define([
     selectDown: function(event, noDeselect) {
       var paper = this.get('paper');
       segment = null;
-      console.log("noDeselect=",noDeselect);
+      console.log("noDeselect=", noDeselect);
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
-        if(!noDeselect){
+        if (!noDeselect) {
           this.deselectAll();
         }
       }
@@ -140,6 +141,7 @@ define([
     },
 
     selectDrag: function(event) {
+      console.log('event.modifiers',event.modifiers);
       if (event.modifiers.option && copyReset) {
         copyReset = false;
 
@@ -156,9 +158,9 @@ define([
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
       if (segment != null) {
         console.log("trigger segment");
-        this.trigger('geometryIncremented', data, segment);
+        this.trigger('geometryIncremented', data, event.modifiers.command, segment);
       } else {
-        this.trigger('geometryIncremented', data);
+        this.trigger('geometryIncremented', data, event.modifiers.command);
       }
 
     },
@@ -171,7 +173,7 @@ define([
         var data = {};
         data.rotation_delta = dAngle - angle;
         console.log('rotate_delta', data.rotation_delta);
-        this.trigger('geometryIncremented', data);
+        this.trigger('geometryIncremented', data, event.modifiers.command);
 
       }
 
@@ -197,7 +199,11 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
+      var selected_shapes = this.get('selected_shapes');
+      for (var i = 0; i < selected_shapes.length; i++) {
+        //selected_shapes[i].incrementDelta({}, false, true);
 
+      }
       copyReset = true;
 
     },

@@ -14,7 +14,7 @@ define([
  var mouseDown = false;
  var saveKey = 83;
  var loadKey = 76;
- var panKey = 91;
+ var panKey = 32;
  var rootKey = 82;
  var clutchKey = 72;
  var groupKey = 71;
@@ -75,7 +75,6 @@ var CanvasView = Backbone.View.extend({
     },
     setFocus: function(){
         pan = false;
-        panKey = false;
         altKey = false;
         
 
@@ -83,11 +82,10 @@ var CanvasView = Backbone.View.extend({
 
     resizeCanvas: function(){
       var c =  $('#canvas');
-      console.log('canvas',c);
        c.attr('width', $(window).attr('innerWidth'));
        c.attr('height', $(window).attr('innerHeight'));
+     
 
-  console.log("resize canvas",$(window).attr('innerWidth'));
      
       paper.view.draw();
 
@@ -123,14 +121,14 @@ var CanvasView = Backbone.View.extend({
   /* canvas event functions */
 
     canvasKeydown: function(event){
-      console.log(event.keyCode);
+      //console.log(event.keyCode);
       if(event.keyCode == saveKey){
         this.model.save();
       }
       if(event.keyCode === clearKey){
         this.model.deleteObject();
       }
-      if(event.metaKey){
+      if(event.keyCode === panKey){
         ////console.log("setting pan to true")
         pan = true;
       }
@@ -153,8 +151,7 @@ var CanvasView = Backbone.View.extend({
       //console.log(event.keyCode);
     
       
-        pan = false;
-      
+        pan = false; 
         altKey=false;
 
      

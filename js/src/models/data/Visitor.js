@@ -31,6 +31,7 @@ define([
 		 */
 		addPrototype: function(prototype) {
 			var protoParent = prototype.get('proto_node');
+			console.log("protoParent=", protoParent);
 			if (protoParent) {
 				protoParent.addChildNode(prototype);
 			} else {
@@ -56,11 +57,131 @@ define([
 			}
 		},
 
+		getPrototypeById: function(id) {
+			console.log('search id:', id);
+			var root = this.get('prototypeRoot');
+			var match = null;
+			this.visitBfs(root, function(node) {
+				if (node.get('type') === 'root') {
+					return; // do not process roots
+				}
+				var pId = node.get('id');
+				console.log('prototype id:', pId);
+				if (pId === id) {
+					console.log("found match");
+					match = node;
+					return node;
+				}
+			});
+			console.log("found match", match);
+			return match;
+		},
+
+		getInheritanceDimensions: function(root) {
+
+			this.visitDfs(root, function(node) {
+				if (node.get('type') === 'root') {
+					return; // do not process roots
+				}
+
+				var position = node.get('screen_position');
+				var width = node.get('screen_width');
+				var height = node.get('screen_height');
+
+			});
+
+		},
+
+		getSiblingDimensions: function(){
+
+		},
+
+		/*getLinkedDimensions: function(data) {
+			var top = data.top;
+			var mode = data.mode;
+			var dimensions = {};
+			var position = this.get('screen_position');
+			var width = this.get('screen_width');
+			var height = this.get('screen_height');
+			if (data.dimensions) {
+				var pdimensions = data.dimensions;
+
+				var leftX = position.x < pdimensions.leftX ? position.x : pdimensions.leftX;
+				var topY = position.y < pdimensions.topY ? position.y : pdimensions.topY;
+				var rightX = position.x + width > pdimensions.rightX ? position.x + width : pdimensions.rightX;
+				var bottomY = position.y + height > pdimensions.bottomY ? position.y + height : pdimensions.bottomY;
+
+				data.dimensions = {
+					leftX: leftX,
+					topY: topY,
+					rightX: rightX,
+					bottomY: bottomY,
+				};
+			} else {
+				data.dimensions = {
+					leftX: position.x,
+					topY: position.y,
+					rightX: position.x + width,
+					bottomY: position.y + height,
+				};
+			}
+
+
+			var dimensions = visitor.getLinkedDimensions(this);
+			
+			//TODO: recycle bounding box rather than re-initializing it.
+
+			var bx = data.dimensions.leftX;
+			var by = data.dimensions.topY;
+			var bwidth = data.dimensions.rightX - bx;
+			var bheight = data.dimensions.bottomY - by;
+			var rectangle = new paper.Rectangle(bx, by, bwidth, bheight);
+			data.bbox = this.get('bbox');
+
+			data.bbox.position = rectangle.center;
+
+			var scaleX = rectangle.width / data.bbox.bounds.width;
+			var scaleY = rectangle.height / data.bbox.bounds.height;
+			data.bbox.scale(scaleX, scaleY);
+
+			data.bbox.selectedColor = 'red';
+			data.bbox.visible = true;
+			data.bbox.selected = true;
+			data.bbox.instance = this;
+			this.set('bbox', data.bbox);
+
+
+			return data;
+		},*/
+
+		visitBfs: function(node, func) {
+			var q = [node];
+			while (q.length > 0) {
+				node = q.shift();
+				if (func) {
+					func(node);
+				}
+
+				_.each(node.children, function(child) {
+					q.push(child);
+				});
+			}
+		},
+
+		visitDfs: function(node, func) {
+			if (func) {
+				func(node);
+			}
+
+			_.each(node.children, function(child) {
+				this.visitDfs(child, func);
+			});
+		},
 
 		/*visit
 		 *
 		 */
-		visit: function(node, departureNode) {
+			visit: function(node, departureNode) {
 			node.set({
 				visited: true
 			});

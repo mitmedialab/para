@@ -95,6 +95,7 @@ define([
       this.set('geom_instances',instances);
       renderPath.visible = true;
       renderPath.data.nodetype = this.get('name');
+      renderPath.data.instance= null;
       console.log("nodetype-name",renderPath.data.nodetype);
       return renderPath;
 
