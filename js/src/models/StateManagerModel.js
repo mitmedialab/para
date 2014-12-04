@@ -33,6 +33,7 @@ define([
     var rootNode,
       uninstantiated,
       visitor,
+      shownPrototype,
       currentNode,
       toolCollection,
       penTool,
@@ -42,6 +43,7 @@ define([
       followPathTool,
       clutch;
 
+    var currentView;
     var undoManager;
 
     var undoLimit = 15;
@@ -65,7 +67,7 @@ define([
         var view_1 = paper.View._viewsById['canvas'];
         view_1._project.activate();
 
-
+        currentView = view_1;
         //setup user tool managers
         penTool = new PenToolModel({
           id: 'penTool'
@@ -310,6 +312,26 @@ define([
         }
       },
 
+      showPrototype: function(id) {
+        if (shownPrototype) {
+          shownPrototype.set('show', false);
+        }
+        shownPrototype = visitor.getPrototypeById(id);
+        shownPrototype.set('show', true);
+        console.log('show prototype', shownPrototype);
+        var view = paper.View._viewsById['sub-canvas'];
+
+        currentView = view;
+
+        this.compile();
+        view.center = shownPrototype.get('geom').position;
+        console.log("view center=",shownPrototype.get('geom').position);
+        view.draw();
+
+
+
+      },
+
       /* geometryInstantiated
        * callback that is triggered when a geometry
        * object is instantiated from a prototype
@@ -533,13 +555,24 @@ define([
        * begin the rendering process
        */
       compile: function() {
+        var view1 = paper.View._viewsById['sub-canvas'];
+
+        var view2 = paper.View._viewsById['canvas'];
+
+        view1._project.clear();
+        view2._project.clear();
+
         visitor.resetPrototypes();
         visitor.resetPrototypes(rootNode.children);
         visitor.visit(rootNode, null);
+      
+        currentView._project.activate();
         //debugging code to count # of paperjs objects
         var numChildren = paper.project.activeLayer.children.length;
-        console.log('total number of children=' + numChildren);
-        paper.view.draw();
+        console.log('total number of children in sub_view,main_view=' + view1._project.layers, view2._project.layers);
+        view1.draw();
+        view2.draw();
+
       },
 
 
@@ -761,8 +794,12 @@ define([
       },
 
       canvasDblclick: function(event) {
-        var selectedTool = toolCollection.get(this.get('state'));
-        selectedTool.dblClick(event);
+       // var selectedTool = toolCollection.get(this.get('state'));
+        //selectedTool.dblClick(event);
+          var view = paper.View._viewsById['canvas'];
+
+        currentView = view;
+
 
       },
 

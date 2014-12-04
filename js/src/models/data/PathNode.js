@@ -52,22 +52,27 @@ define([
       data.rotation_origin =  new PPoint(matrix.translation.x, matrix.translation.y);
       data.scaling_origin =  new PPoint(matrix.translation.x, matrix.translation.y);
 
-      this.set('master_path', path);
       var imatrix = matrix.inverted();
       path.transform(imatrix);
       path.visible = false;
-      path.selected = false;
+      path.selected = false;      
+      path.data.nodetype = this.get('name');
+      var pathJSON = path.toJSON();
+      this.set('master_path', pathJSON);
+      path.remove();
       return data;
     },
 
     updateGeom:function(segment_index,data, rmatrix, smatrix, tmatrix){
-        var master_path = this.get('master_path');
+        var master_pathJSON = this.get('master_path');
+        var master_path = new paper.Path();
+       master_path.importJSON(master_pathJSON);
         if (data.translation_delta) {
             master_path.transform(rmatrix);
             master_path.transform(smatrix);
             master_path.transform(tmatrix);
 
-           console.log("path trigger segment",segment_index);
+          console.log("path trigger segment",segment_index);
           var delta = data.translation_delta.toPaperPoint();
           master_path.segments[segment_index].point=  master_path.segments[segment_index].point.add(delta);
           var rinverted = rmatrix.inverted();
@@ -78,25 +83,16 @@ define([
           master_path.transform(sinverted);
           master_path.transform(rinverted);
         }
-        this.set('master_path',master_path);
+
+        this.set('master_path',master_path.toJSON());
+        master_path.remove();
     },
 
-    /*run
-     *creates a new path based on master path, stores it in the instances array
-     * and returns it
+    /*inheritGeom
+    * returns JSON object from master_path 
      */
      inheritGeom: function() {
-      console.log('path inherit geom called');
-      var masterPath = this.get('master_path');
-      var renderPath = masterPath.clone();
-      var instances = this.get('geom_instances');
-      instances.push(renderPath);
-      this.set('geom_instances',instances);
-      renderPath.visible = true;
-      renderPath.data.nodetype = this.get('name');
-      renderPath.data.instance= null;
-      console.log("nodetype-name",renderPath.data.nodetype);
-      return renderPath;
+      return this.get('master_path');
 
     },
 
@@ -106,11 +102,11 @@ define([
      * them and only delete those which are not used by the user
      */
     reset: function() {
-      var instances = this.get('geom_instances');
+      /*var instances = this.get('geom_instances');
       for (var i = 0; i < instances.length; i++) {
         instances[i].remove();
       }
-      this.set('geom_instances',[]);
+      this.set('geom_instances',[]);*/
       Instance.prototype.reset.apply(this,arguments);
 
     },

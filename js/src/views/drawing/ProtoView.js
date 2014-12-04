@@ -33,6 +33,7 @@ define([
 			"mousedown #canvas": "canvasMouseDown",
 			"mousedown .proto-item": "assignId",
 			"mouseup .proto-item": "removeId",
+			"dblclick .proto-item": 'selectPrototype'
 
 		},
 
@@ -45,8 +46,18 @@ define([
 			currentId = -1;
 		},
 
+		selectPrototype: function(event) {
+			var clickedEl = $(event.currentTarget);
+			currentId = clickedEl.attr("id");
+			this.model.showPrototype(currentId);
+			canvasDown=false;
+			currentId=-1;
+
+		},
+
 		checkAddPrototype: function() {
 			if (canvasDown) {
+				canvasDown = false;
 				var protoParams = this.model.addPrototype();
 				console.log('adding prototype', protoParams);
 				if (protoParams) {
@@ -57,6 +68,7 @@ define([
 
 		canvasMouseUp: function(event) {
 			canvasDown = false;
+
 			if (currentId > -1) {
 				console.log("instantiatePrototype");
 				event.data.model.geometryInstantiated(currentId, event.offsetX, event.offsetY);

@@ -50,6 +50,7 @@ define([
 			sibling_instances: null,
 			isProto: false,
 			id: null,
+			show: false,
 
 		},
 
@@ -353,9 +354,12 @@ define([
 			var view;
 			if(isProto){
 				view = paper.View._viewsById['sub-canvas'];
+				console.log("rendering a prototype");
         	}
         	else{
         		view = paper.View._viewsById['canvas'];
+        		console.log("rendering an instance");
+
         	}
         	view._project.activate();
         	
@@ -406,9 +410,13 @@ define([
 
 
 			
-			var geom = this.inheritGeom();
+			var geom = new paper.Path();
+			geom.importJSON(this.inheritGeom());
+			console.log("geom =",geom);
+			console.log("inherited geom",this.inheritGeom());
 			if (geom) {
 				geom.data.instance = this;
+				geom.visible = true;
 				geom.position = position;
 				geom.transform(rmatrix);
 				geom.transform(smatrix);
@@ -424,8 +432,13 @@ define([
 					screen_height: screen_bounds.height,
 				});
 				//if shape is prototype, do not render it on the screen
-				if (isProto) {
-					//geom.visible = false;
+				if (isProto && !this.get('show')) {
+					geom.visible = false;
+				console.log('hiding prototype',this.get('id'));
+
+				}
+				else if(isProto){
+					console.log('rendering prototype',this.get('id'));
 				}
 
 
