@@ -4,10 +4,12 @@ define([
     'models/behaviors/BaseBehavior',
     'models/PaperManager',
     'utils/TrigFunc',
+       'paper'
+
   ],
 
-  function(BaseBehavior, PaperManager, TrigFunc) {
-    var paper = PaperManager.getPaperInstance();
+  function(BaseBehavior, PaperManager, TrigFunc, paper) {
+  
     var DistributeBehavior = BaseBehavior.extend({
       name: 'linear',
       type: 'distribution',

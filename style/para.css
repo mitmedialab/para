@@ -124,7 +124,9 @@ input[type="range"]:active::-webkit-slider-thumb {
 .sub-canvas-container{
     width: 260px;
     height:300px;
-    border:1px solid #ff0000;
+    border:1px solid #B2B2B2;
+        overflow: hidden;
+
 }
 .menubar-wrapper {
     position: absolute;

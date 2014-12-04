@@ -4,10 +4,11 @@
 define([
   'underscore',
   'backbone',
+  'paper',
   'models/tools/BaseToolModel',
 
 
-], function(_, Backbone, BaseToolModel) {
+], function(_, Backbone, paper, BaseToolModel) {
   
   //types for bezier tool behavior
   var types = ['point', 'handleIn', 'handleOut'];
@@ -98,7 +99,6 @@ define([
           
                        
 
-         var paper = PaperManager.getPaperInstance();
           this.currentPath =  new paper.Path();
     
          this.currentPath.selected = true;

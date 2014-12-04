@@ -3,11 +3,11 @@
 
 define([
   'underscore',
+  'paper',
   'backbone',
-  'models/PaperManager'
 
 
-], function(_, Backbone, PaperManager) {
+], function(_, paper, Backbone) {
 
 
   var BaseToolModel = Backbone.Model.extend({
@@ -17,7 +17,6 @@ define([
       stroke_color: '#000000',
       stroke_width: 1,
       currentPaperObjects: null, //stores literal paperjs objects created / selected by tool
-      paper: PaperManager.getPaperInstance(),
       matrix: null,
 
     },

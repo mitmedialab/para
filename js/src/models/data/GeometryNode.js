@@ -7,15 +7,14 @@ define([
   'jquery',
   'underscore',
   'models/data/SceneNode',
-  'models/PaperManager',
   'models/data/Condition',
   'models/behaviors/CopyBehavior',
-  'utils/TrigFunc'
+  'utils/TrigFunc',
+  'paper'
 
 
 
-], function($, _, SceneNode, PaperManager, Condition, CopyBehavior, TrigFunc) {
-  var paper = PaperManager.getPaperInstance();
+], function($, _, SceneNode, Condition, CopyBehavior, TrigFunc, paper) {
 
   Function.prototype.clone = function() {
     var that = this;

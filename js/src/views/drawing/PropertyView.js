@@ -8,11 +8,11 @@ define([
   'backbone',
   'handlebars',
   'iris-color-picker',
-  'models/PaperManager'
-], function($, _, Backbone, Handlebars, IrisColorPicker, PaperManager) {
+  'models/PaperManager',
+  'paper'
+], function($, _, Backbone, Handlebars, IrisColorPicker, paper) {
 
   var template, source;
-  var paper = PaperManager.getPaperInstance();
   var PropertyView = Backbone.View.extend({
     //
     initialize: function() {

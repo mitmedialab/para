@@ -5,11 +5,10 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'models/PaperManager',
+  'paper',
 
-], function($, _, Backbone, PaperManager){
+], function($, _, Backbone, paper){
   
- var paper = PaperManager.getPaperInstance('canvas');
  var tool = new  paper.Tool();
  var mouseDown = false;
  var saveKey = 83;
@@ -84,8 +83,6 @@ var CanvasView = Backbone.View.extend({
       var c =  $('#canvas');
        c.attr('width', $(window).attr('innerWidth'));
        c.attr('height', $(window).attr('innerHeight'));
-     
-
      
       paper.view.draw();
 

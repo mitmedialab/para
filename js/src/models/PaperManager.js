@@ -20,7 +20,7 @@ define([
   
 // Static method
     PaperManager.getPaperInstance = function (type) {
-        // "instance" can be "this.instance" (static property) 
+     /*   // "instance" can be "this.instance" (static property) 
         // but it is better if it is private
        if(type==='sub-canvas'){
                if (!subPaperInstance) {
@@ -30,6 +30,8 @@ define([
              subPaperInstance = new paper.PaperScope();
              //paper.install($('canvas', window.parent.document));
              subPaperInstance.setup(subcanvas); 
+                paper.install(subPaperInstance);
+
              //console.log('setting up paperInstance for'+callerId);
 
         }
@@ -41,9 +43,10 @@ define([
              console.log('canvas=',canvas);
              paperInstance = new paper.PaperScope();
              paperInstance.setup(canvas); 
+              paper.install(paperInstance);
              //console.log('setting up paperInstance for'+callerId);
         }
-        return paperInstance;
+        return paperInstance;*/
     };
 
     return PaperManager;

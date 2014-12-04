@@ -4,12 +4,12 @@
 
 define([
 		'toolbox',
-			'models/PaperManager',
+		'paper',
 
 
 	],
 
-	function(Toolbox, PaperManager) {
+	function(Toolbox, paper) {
 
 		var PPoint = Toolbox.Base.extend({
 
@@ -92,7 +92,7 @@ define([
 			},
 
 			toPaperPoint: function(){
-				var paper = PaperManager.getPaperInstance();
+				
 
 				return new paper.Point(this.x, this.y);
 			}

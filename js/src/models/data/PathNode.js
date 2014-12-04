@@ -8,13 +8,12 @@
 define([
   'underscore',
   'models/data/Instance',
-  'models/PaperManager',
   'utils/TrigFunc',
-  'utils/PPoint'
+  'utils/PPoint',
+  'paper'
 
-], function(_, Instance, PaperManager, TrigFunc, PPoint) {
+], function(_, Instance,TrigFunc, PPoint, paper) {
   //drawable paper.js path object that is stored in the pathnode
-  var paper = PaperManager.getPaperInstance();
   var PathNode = Instance.extend({
    
     defaults: _.extend({}, Instance.prototype.defaults, {

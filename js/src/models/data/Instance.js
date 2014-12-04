@@ -6,12 +6,10 @@
 define([
 	'underscore',
 	'jquery',
+	'paper',
 	'models/data/SceneNode',
-	'models/PaperManager',
-	'utils/PPoint'
-], function(_, $, SceneNode, PaperManager, PPoint) {
-	var paper = PaperManager.getPaperInstance();
-	var subPaper = PaperManager.getPaperInstance('sub-canvas');
+	'utils/PPoint',
+], function(_, $,paper,SceneNode, PPoint) {
 	var Instance = SceneNode.extend({
 		name: 'instance',
 		type: 'geometry',
@@ -56,6 +54,9 @@ define([
 		},
 
 		initialize: function() {
+			console.log('instance paper',paper._id);
+
+			
 			this.set('position', new PPoint(0, 0));
 			this.set('translation_delta', new PPoint(0, 0));
 			this.set('center', new PPoint(0, 0));
@@ -71,6 +72,7 @@ define([
 			this.set('bbox', new paper.Path.Rectangle(bounds));
 			this.set('id', new Date().getTime().toString());
 			SceneNode.prototype.initialize.apply(this, arguments);
+			
 
 		},
 
@@ -347,6 +349,16 @@ define([
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 		render: function() {
+			var isProto = this.get('isProto');
+			var view;
+			if(isProto){
+				view = paper.View._viewsById['sub-canvas'];
+        	}
+        	else{
+        		view = paper.View._viewsById['canvas'];
+        	}
+        	view._project.activate();
+        	
 
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
@@ -393,7 +405,7 @@ define([
 
 
 
-			var isProto = this.get('isProto');
+			
 			var geom = this.inheritGeom();
 			if (geom) {
 				geom.data.instance = this;
@@ -413,8 +425,7 @@ define([
 				});
 				//if shape is prototype, do not render it on the screen
 				if (isProto) {
-					geom.visible = false;
-					var subPaper = 
+					//geom.visible = false;
 				}
 
 

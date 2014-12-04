@@ -3,13 +3,14 @@
 
 define([
   'underscore',
+  'paper',
   'backbone',
   'models/tools/BaseToolModel',
   'utils/PPoint'
 
 
 
-], function(_, Backbone, BaseToolModel, PPoint) {
+], function(_, paper, Backbone, BaseToolModel, PPoint) {
   var segment, handle;
   var moved = null;
   var segmentMod = false;
@@ -81,7 +82,6 @@ define([
 
 
     selectDown: function(event, noDeselect) {
-      var paper = this.get('paper');
       segment = null;
       console.log("noDeselect=", noDeselect);
       //automaticall deselect all on mousedown if shift modifier is not enabled

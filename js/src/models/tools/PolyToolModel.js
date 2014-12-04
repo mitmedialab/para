@@ -4,9 +4,10 @@
 
 define([
   'underscore',
+  'paper',
   'backbone',
   'models/tools/BaseToolModel',
-], function(_, Backbone, BaseToolModel) {
+], function(_, paper, Backbone, BaseToolModel) {
 
   var nameVal = 0;
   var sideNum = 6;
@@ -20,14 +21,13 @@ define([
 
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
-      var paper = this.get('paper');
+     
     },
 
     /*mousedown event- checks to see if current path has been initialized-
      *if it has not, create a new one and trigger a shapeAdded event
      */
     mouseDown: function(event) {
-      var paper = this.get('paper');
       polyPath = new paper.Path.RegularPolygon(event.point, sideNum, 1);
       polyPath.selected = true;
       polyPath.strokeWidth = this.get('stroke_width');
