@@ -7,11 +7,11 @@
 
 define([
   'underscore',
+  'paper',
   'models/data/PathNode',
-  'models/PaperManager'
 
 
-], function(_, PathNode, PaperManager) {
+], function(_, paper, PathNode) {
   //drawable paper.js path object that is stored in the pathnode
   var PolygonNode = PathNode.extend({
 

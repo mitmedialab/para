@@ -57,6 +57,14 @@ define([
       }
     },
 
+    getLastSelected: function(){
+        var selected_shapes = this.get('selected_shapes');
+        if(selected_shapes.length>0){
+          return selected_shapes[selected_shapes.length-1];
+        }
+        return null;
+    },
+
     /*mousedown event
      */
     mouseDown: function(event) {
@@ -83,7 +91,6 @@ define([
 
     selectDown: function(event, noDeselect) {
       segment = null;
-      console.log("noDeselect=", noDeselect);
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
         if (!noDeselect) {
@@ -102,7 +109,6 @@ define([
         var path = hitResult.item;
 
         if (hitResult.type == 'segment') {
-          console.log('hit segment');
           segment = hitResult.segment.index;
           segment.fullySelected = true;
         } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
@@ -129,7 +135,6 @@ define([
 
     //mouse drag event
     mouseDrag: function(event) {
-      console.log("segment=", segment);
       switch (this.get('mode')) {
         case 'proto_node':
           this.selectDrag(event);
@@ -141,7 +146,6 @@ define([
     },
 
     selectDrag: function(event) {
-      console.log('event.modifiers',event.modifiers);
       if (event.modifiers.option && copyReset) {
         copyReset = false;
 
@@ -157,7 +161,6 @@ define([
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
       if (segment != null) {
-        console.log("trigger segment");
         this.trigger('geometryIncremented', data, event.modifiers.command, segment);
       } else {
         this.trigger('geometryIncremented', data, event.modifiers.command);
@@ -172,7 +175,6 @@ define([
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
         data.rotation_delta = dAngle - angle;
-        console.log('rotate_delta', data.rotation_delta);
         this.trigger('geometryIncremented', data, event.modifiers.command);
 
       }

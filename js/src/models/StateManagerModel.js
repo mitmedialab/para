@@ -15,7 +15,6 @@ define([
     'models/tools/PenToolModel',
     'models/tools/PolyToolModel',
     'models/tools/SelectToolModel',
-    'models/tools/RotateToolModel',
     'models/tools/FollowPathToolModel',
     'filesaver',
     'models/behaviors/actions/BlockNode',
@@ -29,7 +28,7 @@ define([
 
   ],
 
-  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, RotateToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
+  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
     var rootNode,
       uninstantiated,
       visitor,
@@ -43,7 +42,7 @@ define([
       followPathTool,
       clutch;
 
-    var currentView;
+    var currentView, subView, mainView;
     var undoManager;
 
     var undoLimit = 15;
@@ -64,10 +63,12 @@ define([
         var subcanvas = $('canvas').get(1);
         paper.setup(canvas);
         paper.setup(subcanvas);
-        var view_1 = paper.View._viewsById['canvas'];
-        view_1._project.activate();
+        mainView = paper.View._viewsById['canvas'];
+        mainView._project.activate();
+        subView = paper.View._viewsById['sub-canvas'];
 
-        currentView = view_1;
+
+        currentView = mainView;
         //setup user tool managers
         penTool = new PenToolModel({
           id: 'penTool'
@@ -79,15 +80,12 @@ define([
         polyTool = new PolyToolModel({
           id: 'polyTool'
         });
-        rotateTool = new RotateToolModel({
-          id: 'rotateTool'
-        });
         followPathTool = new FollowPathToolModel({
           id: 'followPathTool'
 
         });
         followPathTool.event_bus = event_bus;
-        toolCollection = new ToolCollection([polyTool, penTool, selectTool, rotateTool, followPathTool]);
+        toolCollection = new ToolCollection([polyTool, penTool, selectTool, followPathTool]);
 
 
         /* event listener registers */
@@ -176,7 +174,6 @@ define([
       },
 
       undo: function() {
-        console.log("action is available", undoManager.isAvailable());
         undoManager.undo();
         // this.rootUpdate();
         //this.rootRender();
@@ -218,7 +215,6 @@ define([
           currentTool.set('mode', mode);
         }
         if (state === 'penTool' || state === 'polyTool') {
-          console.log('move to root');
           this.moveToRoot();
 
         }
@@ -292,14 +288,19 @@ define([
             newInstance.addEdge(edge);
             instance.set('selected', false);
             newInstance.set('selected', true);
-            console.log("instantiated id=", newInstance.get('id'));
 
             instance.set('isProto', true);
             visitor.addPrototype(instance);
             selectedShapes[0] = newInstance;
             var id = instance.get('id');
-            var geom = instance.get('geom').clone();
+            if (shownPrototype) {
+              shownPrototype.set('show', false);
+            }
+            shownPrototype = instance;
+            shownPrototype.set('show', true);
             this.compile();
+            var geom = instance.get('geom').clone();
+
             return {
               geom: geom,
               id: id
@@ -312,46 +313,41 @@ define([
         }
       },
 
-      showPrototype: function(id) {
+      /*showPrototype
+       * called to show a new prototype in the sub canvas
+       */
+      showPrototype: function(prototype) {
         if (shownPrototype) {
           shownPrototype.set('show', false);
         }
-        shownPrototype = visitor.getPrototypeById(id);
-        shownPrototype.set('show', true);
-        console.log('show prototype', shownPrototype);
-        var view = paper.View._viewsById['sub-canvas'];
-
-        currentView = view;
-
-        this.compile();
-        view.center = shownPrototype.get('geom').position;
-        console.log("view center=",shownPrototype.get('geom').position);
-        view.draw();
-
-
-
+        if (prototype) {
+          console.log("revealing prototype", prototype.get('geom').position);
+          shownPrototype = prototype;
+          shownPrototype.set('show', true);
+          this.compile();
+          this.trigger('centerGeom', prototype.get('geom').position);
+        } else {
+          shownPrototype = null;
+        }
       },
+
 
       /* geometryInstantiated
        * callback that is triggered when a geometry
        * object is instantiated from a prototype
        */
-      geometryInstantiated: function(id, x, y) {
-        console.log('geometryInstantiated', x, y);
-        selectTool.deselectAll();
-        var prototype = visitor.getPrototypeById(id);
-        if (prototype) {
-          var newInstance = this.create(prototype);
-          console.log("instantiated id=", newInstance.get('id'));
+      geometryInstantiated: function(x, y) {
+       
+        if (shownPrototype && currentView!= subView) {
+          var newInstance = this.create(shownPrototype);
 
-          var screenpos = prototype.get('geom').position;
-          var protopos = prototype.get('position');
+          var screenpos = shownPrototype.get('geom').position;
+          var protopos = shownPrototype.get('position');
           var td = new PPoint(x - screenpos.x + protopos.x, y - screenpos.y + protopos.y);
 
           newInstance.set('position', td.clone());
           newInstance.set('rotation_origin', td.clone());
           newInstance.set('scaling_origin', td.clone());
-          console.log("coordinates", screenpos, protopos, td);
 
           //var td = prototype.get('position').clone();
           //newInstance.set('translation_delta', instance.get('position').clone());
@@ -366,7 +362,9 @@ define([
           newInstance.set('selected', true);
           selectTool.addSelectedShape(newInstance);
           this.compile();
+          return true;
         }
+        return false;
       },
 
       /* create
@@ -397,9 +395,7 @@ define([
       geometryDeepCopied: function(event) {
         var instances = [];
         var selectedShapes = selectTool.get('selected_shapes');
-        console.log("deepcopy");
         for (var i = selectedShapes.length - 1; i >= 0; i--) {
-          console.log('geometryDeepCopied', i);
 
           var instance = selectedShapes[i];
           var newInstance = new PolygonNode();
@@ -442,8 +438,18 @@ define([
           /*instance.getLinkedDimensions({
             top: true
           });*/
-          console.log("selected id=", instance.get('id'));
           selectTool.addSelectedShape(instance);
+
+        }
+        //show prototype in sub view if selecting objects in the main view
+        if (currentView != subView) {
+          var lastSelected = selectTool.getLastSelected();
+          if (lastSelected) {
+            console.log("found last selected");
+            var proto = lastSelected.get('proto_node');
+            console.log("found prototype", proto);
+            this.showPrototype(proto);
+          }
         }
 
         this.compile();
@@ -457,6 +463,7 @@ define([
         var inheritors = protoTarget.get('inheritors');
         inheritors.push(instance);
         protoTarget.set('inheritors', inheritors);
+
         var edge = new Edge({
           x: protoTarget,
           y: instance,
@@ -513,7 +520,6 @@ define([
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
           if (segment_index != null) {
-            console.log("state trigger segment", segment_index);
 
             var rmatrix = instance.get('rmatrix');
             var tmatrix = instance.get('tmatrix');
@@ -530,8 +536,6 @@ define([
             for (var j = 0; j < prototypes.length; j++) {
               var id = prototypes[j].get('id');
               var geom = prototypes[j].get('geom').clone();
-              console.log('geom', geom, j);
-              console.log('triggering override', geom, id);
               this.trigger('protoypeViewModified', geom, id, true);
             }
           }
@@ -555,23 +559,18 @@ define([
        * begin the rendering process
        */
       compile: function() {
-        var view1 = paper.View._viewsById['sub-canvas'];
 
-        var view2 = paper.View._viewsById['canvas'];
-
-        view1._project.clear();
-        view2._project.clear();
+        mainView._project.clear();
+        subView._project.clear();
 
         visitor.resetPrototypes();
         visitor.resetPrototypes(rootNode.children);
         visitor.visit(rootNode, null);
-      
+
         currentView._project.activate();
-        //debugging code to count # of paperjs objects
-        var numChildren = paper.project.activeLayer.children.length;
-        console.log('total number of children in sub_view,main_view=' + view1._project.layers, view2._project.layers);
-        view1.draw();
-        view2.draw();
+
+        mainView.draw();
+        subView.draw();
 
       },
 
@@ -596,7 +595,6 @@ define([
       },
 
       updateProperties: function(data) {
-        console.log('updateProperties');
         var selectedNodes = toolCollection.get(this.get('state')).selectedNodes;
         this.trigger('pathSelected', selectedNodes[selectedNodes.length - 1]);
 
@@ -610,12 +608,32 @@ define([
 
       },
 
+      /*toggleView
+       * changes the currently active view
+       */
+      toggleView: function(main) {
+        selectTool.deselectAll();
+
+
+        if (main) {
+          currentView = mainView;
+          console.log("setting active to main");
+        } else {
+          currentView = subView;
+          console.log("setting active to sub");
+
+        }
+
+        this.compile();
+
+      },
+
+
       //=======================END SELECTION METHODS=======================//
 
       moveUpNode: function() {
         this.setCurrentNode(currentNode);
-        ////console.log('current node type='+currentNode.type);
-        //this.rootRender();
+
       },
 
       moveToRoot: function() {
@@ -633,18 +651,15 @@ define([
             toolCollection.get(this.get('state')).currentNode = children[i];
           }
         }
-        ////console.log('current node type='+currentNode.type);
-        //this.rootRender();
+
       },
 
       //callback triggered when tool navigates to specific node in tree;
       setCurrentNode: function(node) {
 
         if (node.getParentNode() !== null) {
-          ////console.log('current node is set in state to:' +node.getParentNode().type);
           currentNode = node.getParentNode();
         } else {
-          ////console.log('current node is set in state to:' +currentNode.type);
 
         }
       },
@@ -655,7 +670,6 @@ define([
        * TODO: make this assignment less janky.
        */
       determineSelectionPoint: function(selected) {
-        ////console.log('determining selection point');
         if (selected.nodeParent) {
           if (selected.nodeParent == currentNode) {
             toolCollection.get(this.get('state')).currentNode = currentNode;
@@ -722,10 +736,8 @@ define([
 
       canvasMouseDrag: function(delta, pan) {
         if (pan) {
-          console.log('paper start', paper.view.center);
           var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
           paper.view.scrollBy(inverseDelta);
-          console.log('paper end', paper.view.center);
 
           event.preventDefault();
         }
@@ -764,7 +776,6 @@ define([
       },
 
       canvasMouseWheel: function(event, pan, modify) {
-        //console.log(  event.originalEvent.wheelDelta);
         var delta = event.originalEvent.wheelDelta; //paper.view.center
 
         if (pan) {
@@ -794,11 +805,8 @@ define([
       },
 
       canvasDblclick: function(event) {
-       // var selectedTool = toolCollection.get(this.get('state'));
+        // var selectedTool = toolCollection.get(this.get('state'));
         //selectedTool.dblClick(event);
-          var view = paper.View._viewsById['canvas'];
-
-        currentView = view;
 
 
       },
@@ -809,12 +817,9 @@ define([
       },
 
       saveFile: function(id, filename) {
-        //console.log('id='+id);
         if (this.modified) {
           id = this.save(filename);
-          //console.log('id='+id);
         }
-        //console.log('id='+id);
         var data = localStorage[id];
         var blob = new Blob([data], {
           type: 'text/plain;charset=utf-8'
@@ -826,14 +831,11 @@ define([
       save: function() {
 
         var id = Date.now();
-        //console.log('saving with name:' + id);
         var data = JSON.stringify(rootNode.exportJSON());
 
         this.saveToLocal(id, data);
 
-        //console.log(localStorage[id]);
         this.trigger('localSaveComplete', id);
-        //console.log('completed saving');
         this.modified = false;
         this.trigger('disableSave', !this.modified);
         return id;
@@ -841,7 +843,6 @@ define([
 
       saveToLocal: function(id, data) {
         var saved = false;
-        //console.log(localStorage.length);
         while (localStorage.length > undoLimit - 1) {
           // try {
 
@@ -856,8 +857,7 @@ define([
           arr.sort(function(a, b) {
             return a.toLowerCase().localeCompare(b.toLowerCase());
           });
-          //console.log('array=');
-          //console.log(arr);
+
           this.trigger('removeItem', arr[0]);
           localStorage.removeItem(arr[0]);
 
@@ -869,10 +869,8 @@ define([
 
 
       loadLocal: function(filename) {
-        //console.log('loading with name:' + filename);
 
         var data = localStorage[filename];
-        //console.log(data);
         this.load(JSON.parse(data));
       },
 
@@ -910,7 +908,6 @@ define([
       },
 
       load: function(loadObj) {
-        //console.log(loadObj);
         rootNode.deleteChildren();
         var children = loadObj.children;
         this.parseJSON(rootNode, children);
@@ -941,7 +938,6 @@ define([
       },
 
       parseJSON: function(currentNode, data) {
-        console.log('parse json', currentNode, data);
         for (var i = 0; i < data.length; i++) {
           var type = data[i].type;
           var node;
@@ -989,7 +985,6 @@ define([
       },
 
       updateColor: function(color, type) {
-        console.log('color=', color);
         var selectedTool = toolCollection.get(this.get('state'));
 
 
@@ -1001,16 +996,13 @@ define([
 
 
           selectedTool.style.strokeColor = color;
-          console.log("set stroke color to:", color);
 
         } else {
           update = [{
             fillColor: color
           }];
           selectedTool.style.fillColor = color;
-          console.log("set fill color to", color);
         }
-        console.log(update);
 
         for (var i = 0; i < selectTool.selectedNodes.length; i++) {
 

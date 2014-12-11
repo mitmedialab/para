@@ -38,10 +38,7 @@ define([
         el: '#canvas-container',
         model: stateManager
       }, event_bus);
-      var protoView = new ProtoView({
-        el: '.proto-container',
-        model: stateManager
-      });
+     
       var toolView = new ToolView({
         el: '#toolbar',
         model: stateManager

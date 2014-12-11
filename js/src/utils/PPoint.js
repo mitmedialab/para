@@ -1,6 +1,6 @@
 /*PPoint.js*
-* point class for para
-*/
+ * point class for para
+ */
 
 define([
 		'toolbox',
@@ -25,32 +25,56 @@ define([
 				this.y = point.y;
 			},
 
-			setX: function(x){
-				this.x=x;
+			setX: function(x) {
+				this.x = x;
 			},
 
-			setY: function(y){
-				this.y=y;
+			setY: function(y) {
+				this.y = y;
 			},
 
-			add: function(point) {
-				this.x += point.x;
-				this.y += point.y;
+			add: function(point, newP) {
+				if (newP) {
+					var point2 = this.clone();
+					point2.add(point);
+					return point2;
+				} else {
+					this.x += point.x;
+					this.y += point.y;
+				}
 			},
 
-			sub: function(point) {
-				this.x -= point.x;
-				this.y -= point.y;
+			sub: function(point, newP) {
+				if (newP) {
+					var point2 = this.clone();
+					point2.sub(point);
+					return point2;
+				} else {
+					this.x -= point.x;
+					this.y -= point.y;
+				}
 			},
 
-			div: function(val) {
-				this.x /= val;
-				this.y /= val;
+			div: function(val, newP) {
+				if (newP) {
+					var point2 = this.clone();
+					point2.div(val);
+					return point2;
+				} else {
+					this.x /= val;
+					this.y /= val;
+				}
 			},
 
-			mul: function(val) {
-				this.x *= val;
-				this.y *= val;
+			mul: function(val, newP) {
+				if (newP) {
+					var point2 = this.clone();
+					point2.mul(val);
+					return point2;
+				} else {
+					this.x *= val;
+					this.y *= val;
+				}
 			},
 
 
@@ -87,12 +111,12 @@ define([
 				return v.mul(w.dot(v) / this.lengthSqrd(v));
 			},
 
-			clone: function(){
-				return new PPoint(this.x,this.y);
+			clone: function() {
+				return new PPoint(this.x, this.y);
 			},
 
-			toPaperPoint: function(){
-				
+			toPaperPoint: function() {
+
 
 				return new paper.Point(this.x, this.y);
 			}

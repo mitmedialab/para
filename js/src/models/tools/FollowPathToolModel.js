@@ -3,14 +3,13 @@
 
 define([
   'underscore',
+  'paper',
   'backbone',
   'models/tools/BaseToolModel',
   'models/data/PathNode',
-  'models/PaperManager'
 
-], function(_, Backbone, BaseToolModel, PathNode, PaperManager) {
+], function(_, paper, Backbone, BaseToolModel, PathNode) {
   var segment, instanceIndex, handle;
-  var paper = PaperManager.getPaperInstance();
 
 
   var hitOptions = {

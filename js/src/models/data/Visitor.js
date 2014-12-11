@@ -31,7 +31,6 @@ define([
 		 */
 		addPrototype: function(prototype) {
 			var protoParent = prototype.get('proto_node');
-			console.log("protoParent=", protoParent);
 			if (protoParent) {
 				protoParent.addChildNode(prototype);
 			} else {
@@ -58,7 +57,6 @@ define([
 		},
 
 		getPrototypeById: function(id) {
-			console.log('search id:', id);
 			var root = this.get('prototypeRoot');
 			var match = null;
 			this.visitBfs(root, function(node) {
@@ -66,14 +64,11 @@ define([
 					return; // do not process roots
 				}
 				var pId = node.get('id');
-				console.log('prototype id:', pId);
 				if (pId === id) {
-					console.log("found match");
 					match = node;
 					return node;
 				}
 			});
-			console.log("found match", match);
 			return match;
 		},
 
@@ -194,7 +189,6 @@ define([
 		},
 
 		visitChildren: function(node) {
-			//console.log("visiting node children for ", node.type);
 			var children = node.children;
 			for (var i = 0; i < children.length; i++) {
 				children[i].visit(this, node);
@@ -218,7 +212,6 @@ define([
 		 * determines if node
 		 */
 		visitInstance: function(node, departureNode) {
-			console.log("visit instance", node.type, node.name);
 
 			var edgesRendered = node.edgesRendered();
 			if (edgesRendered) {

@@ -6,16 +6,19 @@ define([
 	'jquery',
 	'underscore',
 	'backbone',
-	'handlebars'
+	'handlebars',
+	'jquery-ui'
 
 ], function($, _, Backbone, Handlebars) {
-	var template, source, prototypes, currentId;
+	var prototypes, currentId;
 	var canvasDown = false;
 	var ProtoView = Backbone.View.extend({
 		//
 		initialize: function() {
-			source = $('#protoTemplate').html();
-			template = Handlebars.default.compile(source);
+
+			$(".sub-canvas-container").resizable();
+
+
 			prototypes = [];
 			currentId = -1;
 			$("#canvas").bind('mousedown', function() {
@@ -31,29 +34,19 @@ define([
 		events: {
 			"mouseup": "checkAddPrototype",
 			"mousedown #canvas": "canvasMouseDown",
-			"mousedown .proto-item": "assignId",
+			"mousedown": "mouseDown",
 			"mouseup .proto-item": "removeId",
-			"dblclick .proto-item": 'selectPrototype'
 
 		},
 
-		assignId: function(event) {
-			var clickedEl = $(event.currentTarget);
-			currentId = clickedEl.attr("id");
+		mouseDown: function(event) {
+			console.log('mouseDown_canvas');
 		},
 
 		removeId: function() {
 			currentId = -1;
 		},
 
-		selectPrototype: function(event) {
-			var clickedEl = $(event.currentTarget);
-			currentId = clickedEl.attr("id");
-			this.model.showPrototype(currentId);
-			canvasDown=false;
-			currentId=-1;
-
-		},
 
 		checkAddPrototype: function() {
 			if (canvasDown) {
@@ -80,7 +73,7 @@ define([
 
 		addPrototype: function(geom, id, mod) {
 			console.log('triggering prototype', geom, id);
-			var hScale = 75 / geom.bounds.height;
+			/*var hScale = 75 / geom.bounds.height;
 			console.log('hScale', hScale);
 			console.log('height', geom.bounds.height);
 			geom.scale(hScale);
@@ -116,7 +109,7 @@ define([
 			var html = template({
 				proto: prototypes
 			});
-			$('#proto-menu').html(html);
+			$('#proto-menu').html(html);*/
 		},
 
 

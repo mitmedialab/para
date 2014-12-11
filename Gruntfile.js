@@ -29,7 +29,15 @@ module.exports = function (grunt) {
             html: { src: "para-build.html", dest: "build/para.html" },
             landing: { src: "index.html", dest: "build/index.html" },
             images: { expand: true, cwd: "images", src: "**", dest: "build/images/" },
-            fonts: { expand: true, cwd: "fonts", src: "**", dest: "build/fonts/" }
+            fonts: { expand: true, cwd: "fonts", src: "**", dest: "build/fonts/" },
+            ui:{
+                files: [{ 
+                    expand: true, 
+                    cwd: "bower_components/jqueryui/themes/base/images", 
+                    src: "**", 
+                    dest: "build/style/jqueryui/images/"
+                }]
+            }
         },
         cssmin: {
             all: {
@@ -38,6 +46,12 @@ module.exports = function (grunt) {
                     cwd: "style/",
                     src: ["*.css"],
                     dest: "build/style/"
+                },
+                {
+                    expand: true,
+                    cwd: "bower_components/jqueryui/themes/base/",
+                    src: ["*.css"],
+                    dest: "build/style/jqueryui"
                 }]
             }
         },

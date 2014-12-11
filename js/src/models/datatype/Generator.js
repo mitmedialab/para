@@ -12,7 +12,7 @@ define([
       
       constructor: function(action, condition) {
       	this.condition = condition;
-      	console.log(action);
+      	//console.log(action);
       	this.action = action; 
       	this.action.format(condition.range);
       },

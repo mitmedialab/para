@@ -68,7 +68,7 @@ define([
 			 * then calls update for each child
 			 */
 			update: function(data) {
-				console.log("updating:", this.name);
+				//console.log("updating:", this.name);
 				var geomDes = this.findGeometryDescendants();
 				for (var i = 0; i < geomDes.length; i++) {
 					this.evaluate({protoNode:geomDes[i]});
@@ -86,9 +86,9 @@ define([
 			 */
 			findGeometryDescendants: function() {
 				if (this.children.length > 0) {
-					console.log("for type", this.name,this.children);
+					//console.log("for type", this.name,this.children);
 					var currentChild = this.children[0];
-					console.log("currentChild.type=",currentChild.type);
+					//console.log("currentChild.type=",currentChild.type);
 					while (currentChild.type!=='geometry') {
 						currentChild = currentChild.children[0];
 					}

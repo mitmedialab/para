@@ -89,7 +89,7 @@ define([
         var diff = data.children.length-this.children.length;
 
         var missingChildren = data.children.slice(diff-1,data.children.length);
-        console.log('missingChildren',missingChildren); 
+        //console.log('missingChildren',missingChildren); 
         this.trigger('parseJSON',this, missingChildren);
         
 

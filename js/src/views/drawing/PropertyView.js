@@ -8,7 +8,6 @@ define([
   'backbone',
   'handlebars',
   'iris-color-picker',
-  'models/PaperManager',
   'paper'
 ], function($, _, Backbone, Handlebars, IrisColorPicker, paper) {
 

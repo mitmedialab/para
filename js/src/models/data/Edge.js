@@ -66,7 +66,6 @@ define([
 					strokeColor: true,
 					strokeWidth: true
 				});
-				console.log("set all",this.attributes);
 			}
 
 

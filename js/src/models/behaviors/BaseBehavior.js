@@ -92,8 +92,7 @@ define([
 			},
 
 			render: function() {
-				////console.log("behavior data="+ data);
-				////console.log("behavior node="+ currentNode);
+				
 				/* if (this.nodeParent == currentNode) {
 				 	for(var i=0;i<this.scaffolds.length;i++){
 				 		this.scaffolds[i].render(data[0]);

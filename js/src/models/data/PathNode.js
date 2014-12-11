@@ -72,7 +72,6 @@ define([
             master_path.transform(smatrix);
             master_path.transform(tmatrix);
 
-          console.log("path trigger segment",segment_index);
           var delta = data.translation_delta.toPaperPoint();
           master_path.segments[segment_index].point=  master_path.segments[segment_index].point.add(delta);
           var rinverted = rmatrix.inverted();

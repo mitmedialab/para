@@ -35,13 +35,13 @@ define([
 			 * (in effect adding the procedure to the end of the procedural chain) */
 			addChildNode: function(node) {
 				if (this.children.length === 0) {
-					console.log("no children, adding child");
+					//console.log("no children, adding child");
 					this.next = node;
 					node.prev = this;
 					var child = SceneNode.prototype.addChildNode.apply(this, arguments);
 					return child;
 				} else {
-					console.log("has child, getting next child");
+					//console.log("has child, getting next child");
 					this.getChildAt(0).addChildNode(node);
 				}
 			},
@@ -75,7 +75,7 @@ define([
 			 * calls subsequent procedure in block
 			 */
 			evaluate: function(data) {
-				console.log("evaluating:", this.name);
+				//console.log("evaluating:", this.name);
 				if (this.next) {
 					this.next.evaluate(data);
 					return true;

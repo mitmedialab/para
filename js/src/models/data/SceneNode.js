@@ -96,7 +96,6 @@ define([
             * TODO: merge/ overwrite conflicting edges
             */
             addEdge: function(edge,x){
-               // console.log("adding edge for",this.type,this.name);
                  var edges = this.get('edges');
                 if(!this.getEdge(x)){                    
                     edges.push(edge);
@@ -124,10 +123,8 @@ define([
             //destructor: clears all this.children and sets parent to null
             clear: function() {
 
-                ////console.log('clear called');
                 this.nodeParent = null;
                 for (var i = 0; i < this.children.length; i++) {
-                   // //console.log('clearning child of ' + this.name + 'at:' + i);
                     this.children[i].clear();
                     this.children[i] = null;
                 }
@@ -157,10 +154,8 @@ define([
                 var index = this.getIndex();
                 var siblings = this.nodeParent.getChildren();
                 var cut = siblings.splice(index,1);
-                ////console.log(cut);
-                ////console.log(siblings);
+              
                 if(cut == this){
-                    ////console.log('splice on siblings successfull');
                     return siblings;
                 }
                 

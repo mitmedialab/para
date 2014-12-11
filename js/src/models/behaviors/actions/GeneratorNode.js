@@ -25,7 +25,7 @@ define([
         var endCheck;
         if (this.next) {
           while (endCheck != this.end) {
-            console.log("=====generator_tick=======");
+            //console.log("=====generator_tick=======");
             endCheck = this.next.trigger();
           }
         }

@@ -1,13 +1,12 @@
 /*FollowPathBehavior.js
  */
 define([
+    'paper',
     'models/behaviors/BaseBehavior',
-    'models/PaperManager',
     'utils/TrigFunc'
   ],
 
-  function(BaseBehavior, PaperManager, TrigFunc) {
-    var paper = PaperManager.getPaperInstance();
+  function(paper, BaseBehavior, TrigFunc) {
     var FollowPathBehavior = BaseBehavior.extend({
       name: 'followpath',
       type: 'distribution',

@@ -2,13 +2,11 @@
  */
 define([
     'models/behaviors/BaseBehavior',
-    'models/PaperManager',
     'utils/TrigFunc',
-       'paper'
 
   ],
 
-  function(BaseBehavior, PaperManager, TrigFunc, paper) {
+  function(BaseBehavior,TrigFunc) {
   
     var DistributeBehavior = BaseBehavior.extend({
       name: 'linear',

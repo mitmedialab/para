@@ -14,14 +14,14 @@ define([
   var rotationAmt = 0;
   var scaleAmt = 0;
   var polyPath = null;
+  var drag = false;
 
   var PolyToolModel = BaseToolModel.extend({
-    defaults: _.extend({}, BaseToolModel.prototype.defaults, {
-    }),
+    defaults: _.extend({}, BaseToolModel.prototype.defaults, {}),
 
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
-     
+
     },
 
     /*mousedown event- checks to see if current path has been initialized-
@@ -50,21 +50,32 @@ define([
     //mouse up event
     mouseUp: function(event) {
       if (polyPath) {
-        var matrix = this.get('matrix');
-        matrix.reset();
-        matrix.translate(polyPath.bounds.center.x, polyPath.bounds.center.y);
-        matrix.rotate(rotationAmt);
-        var paths = this.get('literals');
-       paths.push(polyPath);
-        this.set('literals', paths);
-        this.trigger('geometryAdded');
+        if (drag) {
+          var matrix = this.get('matrix');
+          matrix.reset();
+          matrix.translate(polyPath.bounds.center.x, polyPath.bounds.center.y);
+          matrix.rotate(rotationAmt);
+          var paths = this.get('literals');
+          paths.push(polyPath);
+          this.set('literals', paths);
+          this.trigger('geometryAdded');
+
+        }
+        else{
+          polyPath.remove();
+        }
+        polyPath = null;
+
       }
+      drag = false;
+
     },
 
     //mouse drag event
     mouseDrag: function(event) {
 
       if (polyPath) {
+        drag = true;
         var delta = polyPath.position.getDistance(event.point);
         var angle = event.point.subtract(polyPath.position).angle;
         var cAngle = polyPath.firstSegment.point.subtract(polyPath.position).angle;

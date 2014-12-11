@@ -3,12 +3,10 @@
  */
 define([
     'models/behaviors/BaseBehavior',
-    'models/PaperManager',
     'utils/TrigFunc'
   ],
 
-  function(BaseBehavior, PaperManager, TrigFunc) {
-    var paper = PaperManager.getPaperInstance();
+  function(BaseBehavior, TrigFunc) {
     var RadialDistributeBehavior = BaseBehavior.extend({
       name: 'radial',
       type: 'distribution',

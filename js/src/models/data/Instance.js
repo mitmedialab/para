@@ -55,9 +55,6 @@ define([
 		},
 
 		initialize: function() {
-			console.log('instance paper',paper._id);
-
-			
 			this.set('position', new PPoint(0, 0));
 			this.set('translation_delta', new PPoint(0, 0));
 			this.set('center', new PPoint(0, 0));
@@ -126,7 +123,6 @@ define([
 			var position = this.get('rotation_origin').toPaperPoint();
 			var proto_incremented = false;
 			var protoNode;
-			console.log('override = ', override);
 			if (data.translation_delta) {
 				if (override) {
 					protoNode = this.get('translation_node');
@@ -354,11 +350,9 @@ define([
 			var view;
 			if(isProto){
 				view = paper.View._viewsById['sub-canvas'];
-				console.log("rendering a prototype");
         	}
         	else{
         		view = paper.View._viewsById['canvas'];
-        		console.log("rendering an instance");
 
         	}
         	view._project.activate();
@@ -386,12 +380,10 @@ define([
 			var scaling_node = this.get('scaling_node');
 			if (translation_node) {
 				tmatrix = translation_node.inheritTranslation(tmatrix, position);
-				console.log('this_translation_delta', translation_delta, 'proto_delta', translation_node.get('translation_delta'), 'pid', translation_node.get('id'));
 
 
 			} else if (protoNode) {
 				tmatrix = protoNode.inheritTranslation(tmatrix, position);
-				console.log('this_translation_delta', translation_delta, 'proto_delta', protoNode.get('translation_delta'), 'pid', protoNode.get('id'));
 			}
 
 
@@ -412,8 +404,7 @@ define([
 			
 			var geom = new paper.Path();
 			geom.importJSON(this.inheritGeom());
-			console.log("geom =",geom);
-			console.log("inherited geom",this.inheritGeom());
+			
 			if (geom) {
 				geom.data.instance = this;
 				geom.visible = true;
@@ -434,11 +425,9 @@ define([
 				//if shape is prototype, do not render it on the screen
 				if (isProto && !this.get('show')) {
 					geom.visible = false;
-				console.log('hiding prototype',this.get('id'));
 
 				}
 				else if(isProto){
-					console.log('rendering prototype',this.get('id'));
 				}
 
 
