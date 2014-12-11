@@ -9,7 +9,7 @@ define([
 	'paper',
 	'models/data/SceneNode',
 	'utils/PPoint',
-], function(_, $,paper,SceneNode, PPoint) {
+], function(_, $, paper, SceneNode, PPoint) {
 	var Instance = SceneNode.extend({
 		name: 'instance',
 		type: 'geometry',
@@ -70,7 +70,7 @@ define([
 			this.set('bbox', new paper.Path.Rectangle(bounds));
 			this.set('id', new Date().getTime().toString());
 			SceneNode.prototype.initialize.apply(this, arguments);
-			
+
 
 		},
 
@@ -100,7 +100,36 @@ define([
 			this.set('matrix', new paper.Matrix());
 		},
 
-		resetToLastDelta: function() {
+		resetToPrototype: function(data) {
+			console.log('reset to prototype');
+			var protoNode;
+			if (data.translation_delta) {
+
+				protoNode = this.get('translation_node');
+				if (!protoNode) {
+					protoNode = this.get('proto_node');
+				}
+				if (protoNode) {
+					this.set('position',protoNode.get('position').clone());
+					this.set('rotation_origin',protoNode.get('rotation_origin').clone());
+					this.set('scaling_origin',protoNode.get('scaling_origin').clone());
+					this.set('translation_delta',new PPoint(0,0));
+				}
+			}
+
+			if (data.rotation_delta) {
+
+				protoNode = this.get('rotation_node');
+				if (!protoNode) {
+					protoNode = this.get('proto_node');
+				}
+				if (protoNode) {
+					this.set('rotation_delta',0);
+				}
+			}
+		},
+
+			resetToLastDelta: function() {
 			this.set('translation_delta', this.get('translation_delta_last'));
 
 		},
@@ -185,41 +214,38 @@ define([
 		},
 
 		/*getRelevantPrototypes
-		* returns a list of relevant prototypes based on
-		* transformation properties
-		*/
-		getRelevantPrototypes: function(data){
+		 * returns a list of relevant prototypes based on
+		 * transformation properties
+		 */
+		getRelevantPrototypes: function(data) {
 			var prototypes = [];
 			var contains_proto = false;
-			if(data.rotation_delta){
-				if(this.get('rotation_node')){
+			if (data.rotation_delta) {
+				if (this.get('rotation_node')) {
 					prototypes.push(this.get('rotation_node'));
-				}
-				else if(this.get('proto_node')){
+				} else if (this.get('proto_node')) {
 					prototypes.push(this.get('proto_node'));
-					contains_proto=true;
+					contains_proto = true;
 				}
 			}
-			if(data.translation_delta){
-				if(this.get('translation_node')){
+			if (data.translation_delta) {
+				if (this.get('translation_node')) {
 					prototypes.push(this.get('translation_node'));
-				}
-				else if(this.get('proto_node')&&!contains_proto){
+				} else if (this.get('proto_node') && !contains_proto) {
 					prototypes.push(this.get('proto_node'));
-					contains_proto=true;
+					contains_proto = true;
 				}
 			}
-			if(data.rotation_delta){
-				if(this.get('scaling_node')){
+			if (data.rotation_delta) {
+				if (this.get('scaling_node')) {
 					prototypes.push(this.get('scaling_node'));
-				}
-				else if(this.get('proto_node')&&!contains_proto){
+				} else if (this.get('proto_node') && !contains_proto) {
 					prototypes.push(this.get('proto_node'));
-					contains_proto=true;
+					contains_proto = true;
 				}
 			}
 			return prototypes;
-			
+
 		},
 
 		/*inheritGeom
@@ -348,15 +374,14 @@ define([
 		render: function() {
 			var isProto = this.get('isProto');
 			var view;
-			if(isProto){
+			if (isProto) {
 				view = paper.View._viewsById['sub-canvas'];
-        	}
-        	else{
-        		view = paper.View._viewsById['canvas'];
+			} else {
+				view = paper.View._viewsById['canvas'];
 
-        	}
-        	view._project.activate();
-        	
+			}
+			view._project.activate();
+
 
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
@@ -401,10 +426,9 @@ define([
 
 
 
-			
 			var geom = new paper.Path();
 			geom.importJSON(this.inheritGeom());
-			
+
 			if (geom) {
 				geom.data.instance = this;
 				geom.visible = true;
@@ -426,9 +450,7 @@ define([
 				if (isProto && !this.get('show')) {
 					geom.visible = false;
 
-				}
-				else if(isProto){
-				}
+				} else if (isProto) {}
 
 
 

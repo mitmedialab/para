@@ -337,8 +337,8 @@ define([
        * object is instantiated from a prototype
        */
       geometryInstantiated: function(x, y) {
-       
-        if (shownPrototype && currentView!= subView) {
+
+        if (shownPrototype && currentView != subView) {
           var newInstance = this.create(shownPrototype);
 
           var screenpos = shownPrototype.get('geom').position;
@@ -524,22 +524,23 @@ define([
             var rmatrix = instance.get('rmatrix');
             var tmatrix = instance.get('tmatrix');
             var smatrix = instance.get('smatrix');
+
             instance.updateGeom(segment_index, data, rmatrix, smatrix, tmatrix);
 
           } else {
-            instance.incrementDelta(data, override);
-            //console.log("incremented id=",instance.get('id'));
+            if (currentView == mainView) {
+              instance.incrementDelta(data, override);
+            } else {
+              if (override) {
+                var inheritors = instance.get('inheritors');
+                for (var j = 0; j < inheritors.length; j++) {
+                  inheritors[j].resetToPrototype(data);
+                }
+              }
+              instance.incrementDelta(data);
 
-          }
-          if (override) {
-            var prototypes = instance.getRelevantPrototypes(data);
-            for (var j = 0; j < prototypes.length; j++) {
-              var id = prototypes[j].get('id');
-              var geom = prototypes[j].get('geom').clone();
-              this.trigger('protoypeViewModified', geom, id, true);
             }
           }
-
         }
         this.compile();
 
