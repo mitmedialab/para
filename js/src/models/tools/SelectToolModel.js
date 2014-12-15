@@ -11,14 +11,17 @@ define([
 
 
 ], function(_, paper, Backbone, BaseToolModel, PPoint) {
-  var segment, handle;
-  var moved = null;
+  var segment, literal, handle;
   var segmentMod = false;
   var copyReset = true;
-  var hitOptions = {
+  var dHitOptions = {
     segments: true,
-    stroke: true,
     handles: true,
+    tolerance: 2
+  };
+
+  var hitOptions = {
+    stroke: true,
     fill: true,
     tolerance: 2
   };
@@ -26,7 +29,7 @@ define([
   var SelectToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
       selected_shapes: null,
-      mode: 'proto_node'
+      mode: 'select'
     }),
 
     initialize: function() {
@@ -36,21 +39,24 @@ define([
 
     },
 
-
     deselectAll: function() {
       var selected_shapes = this.get('selected_shapes');
       for (var i = 0; i < selected_shapes.length; i++) {
         selected_shapes[i].set('selected', false);
+        selected_shapes[i].setSelectionForInheritors(false,true);
+        selected_shapes[i].set('selected_indexes', []);
 
       }
       this.set('selected_shapes', []);
-      this.set('literals', []);
     },
 
     addSelectedShape: function(instance) {
       var selected_shapes = this.get('selected_shapes');
       if (!_.contains(selected_shapes, instance)) {
         instance.set('selected', true);
+         if(instance.get('isProto')){
+            instance.setSelectionForInheritors(true,false);
+          }
         //instance.incrementDelta({},false, true);
         selected_shapes.push(instance);
         this.set('selected_shapes', selected_shapes);
@@ -69,10 +75,13 @@ define([
      */
     mouseDown: function(event) {
       switch (this.get('mode')) {
-        case 'proto_node':
+        case 'select':
           this.selectDown(event);
           break;
-        case 'rotation_node':
+        case 'dselect':
+          this.dSelectDown(event);
+          break;
+        case 'rotate':
           this.rotateDown(event);
           break;
       }
@@ -81,8 +90,6 @@ define([
     rotateDown: function(event) {
       if (event.modifiers.option) {
         this.selectDown(event, true);
-
-        this.trigger('modifyInheritance', 'rotation_node');
       } else {
         this.selectDown(event);
       }
@@ -90,69 +97,82 @@ define([
 
 
     selectDown: function(event, noDeselect) {
-      segment = null;
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
         if (!noDeselect) {
           this.deselectAll();
         }
       }
-
-      segment = null;
-      handle = null;
-      moved = null;
-
       var hitResult = paper.project.hitTest(event.point, hitOptions);
 
       if (hitResult) {
 
         var path = hitResult.item;
 
+        literal = path;
+
+      }
+        this.trigger('geometrySelected',literal);
+
+
+
+    },
+
+    dSelectDown: function(event, noDeselect) {
+      //automaticall deselect all on mousedown if shift modifier is not enabled
+            console.log('dselect down');
+
+      if (!event.modifiers.shift) {
+        if (!noDeselect) {
+          this.deselectAll();
+        }
+      }
+
+     
+      var hitResult = paper.project.hitTest(event.point, dHitOptions);
+
+      if (hitResult) {
+
         if (hitResult.type == 'segment') {
-          segment = hitResult.segment.index;
+          segment = hitResult.segment;
           segment.fullySelected = true;
         } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
           handle = hitResult.type;
           segment = hitResult.segment.index;
         }
+            console.log('hit segment',segment);
 
-        var literals = this.get('literals');
-        literals.push(path);
-        this.set('literals', literals);
 
       }
 
-      this.trigger('geometrySelected');
+      this.trigger('geometryDSelected',segment,handle);
 
 
     },
 
     triggerChange: function() {
-      this.trigger('geometrySelected');
-
+      this.trigger('geometrySelected',literal);
     },
 
 
     //mouse drag event
     mouseDrag: function(event) {
       switch (this.get('mode')) {
-        case 'proto_node':
+        case 'select':
           this.selectDrag(event);
           break;
-        case 'rotation_node':
+            case 'dselect':
+          this.dSelectDrag(event);
+          break;
+        case 'rotate':
           this.rotateDrag(event);
           break;
       }
     },
 
     selectDrag: function(event) {
+  
       if (event.modifiers.option && copyReset) {
-        copyReset = false;
-
-        this.trigger('geometryCopied');
-      }
-
-      if (event.modifiers.shift && copyReset) {
         copyReset = false;
 
         this.trigger('geometryDeepCopied');
@@ -160,11 +180,17 @@ define([
 
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
-      if (segment != null) {
-        this.trigger('geometryIncremented', data, event.modifiers.command, segment);
-      } else {
-        this.trigger('geometryIncremented', data, event.modifiers.command);
-      }
+      this.trigger('geometryIncremented', data, event.modifiers.command);
+      
+
+    },
+
+    dSelectDrag: function(event) {
+  
+      var data = {};
+      data.translation_delta = new PPoint(event.delta.x, event.delta.y);
+      this.trigger('geometrySegmentIncremented', data);
+      
 
     },
 
@@ -182,10 +208,10 @@ define([
     },
 
     getRelativePoint: function() {
-      var literals = this.get('literals');
-      if (literals.length > 0) {
-        var firstLiteral = literals[0];
-        return firstLiteral.position;
+   
+      if (literal) {
+       
+        return literal.position;
       }
       return null;
     },
@@ -203,9 +229,18 @@ define([
     mouseUp: function(event) {
       var selected_shapes = this.get('selected_shapes');
       for (var i = 0; i < selected_shapes.length; i++) {
-        //selected_shapes[i].incrementDelta({}, false, true);
+      
+         
+      selected_shapes[i].setSelectionForInheritors(true,false);
+          
+        //instance.incrementDelta({},false, true);
+       
+      
 
       }
+      literal = null;
+      segment = null;
+      handle= null;
       copyReset = true;
 
     },

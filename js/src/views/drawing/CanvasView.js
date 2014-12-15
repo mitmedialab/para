@@ -289,6 +289,7 @@ define([
       var diffCenter = c_center.sub(con_center, true);
       var diffTarget = new PPoint(targetPoint.x, targetPoint.y).sub(c_center, true);
       view.center = c_center.toPaperPoint();
+      view.zoom=1;
       view.scrollBy(diffCenter.add(diffTarget, true));
       view.draw();
     },
@@ -297,10 +298,6 @@ define([
     instantiatePrototype: function(event) {
       console.log("instantiatePrototype");
       var instantiated = this.model.geometryInstantiated(event.offsetX, event.offsetY);
-      if(instantiated){
-        this.canvasDblclick();
-      }
-
     }
 
 

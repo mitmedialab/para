@@ -215,7 +215,8 @@ define([
 
 			var edgesRendered = node.edgesRendered();
 			if (edgesRendered) {
-				node.render();
+		
+					node.render();
 			}
 
 			this.visitChildren(node);

@@ -23,7 +23,6 @@ define([
 
 
     initialize: function() {
-      this.set('literals', []);
       this.set('matrix', new paper.Matrix());
 
     },

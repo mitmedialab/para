@@ -91,6 +91,8 @@ define([
         /* event listener registers */
         this.listenTo(toolCollection, "geometryAdded", this.geometryAdded);
         this.listenTo(toolCollection, "geometrySelected", this.geometrySelected);
+        this.listenTo(toolCollection, "geometryDSelected", this.geometryDSelected);
+
         this.listenTo(toolCollection, "geometryIncremented", this.geometryIncremented);
         this.listenTo(toolCollection, "geometryCopied", this.geometryCopied);
         this.listenTo(toolCollection, "geometryDeepCopied", this.geometryDeepCopied);
@@ -234,23 +236,23 @@ define([
        * creates a static object with no inheritance and adds it
        * to the scene graph
        */
-      geometryAdded: function(event) {
+      geometryAdded: function(literal) {
         selectTool.deselectAll();
         var currentTool = toolCollection.get(this.get('state'));
-        var paperObjects = currentTool.get('literals');
+
         var matrix = currentTool.get('matrix');
-        for (var i = 0; i < paperObjects.length; i++) {
-          var pathNode = new PolygonNode();
-          var data = pathNode.normalizePath(paperObjects[i], matrix);
-          selectTool.addSelectedShape(pathNode);
-          pathNode.update(data);
-          var edge = new Edge({
-            x: currentNode,
-            y: pathNode
-          });
-          currentNode.addChildNode(pathNode);
-          pathNode.addEdge(edge);
-        }
+
+        var pathNode = new PolygonNode();
+        var data = pathNode.normalizePath(literal, matrix);
+        selectTool.addSelectedShape(pathNode);
+        pathNode.update(data);
+        var edge = new Edge({
+          x: currentNode,
+          y: pathNode
+        });
+        currentNode.addChildNode(pathNode);
+        pathNode.addEdge(edge);
+
         currentTool.set('literals', []);
         this.compile();
 
@@ -272,7 +274,7 @@ define([
             instance.set('translation_delta', new PPoint(0, 0));
 
             var sceneParent = instance.nodeParent;
-            var newInstance = this.create(instance);
+           var newInstance = this.create(instance);
             newInstance.set('position', instance.get('position').clone());
             newInstance.set('rotation_origin', instance.get('position').clone());
             newInstance.set('scaling_origin', instance.get('position').clone());
@@ -321,7 +323,6 @@ define([
           shownPrototype.set('show', false);
         }
         if (prototype) {
-          console.log("revealing prototype", prototype.get('geom').position);
           shownPrototype = prototype;
           shownPrototype.set('show', true);
           this.compile();
@@ -375,12 +376,13 @@ define([
        */
       create: function(parent) {
         var instance = new Instance();
+        var inheritors = parent.get('inheritors');
+        instance.set('master_path', parent.get('master_path'));
         instance.set('proto_node', parent);
         instance.set('rotation_node', parent);
         instance.set('scaling_node', parent);
         instance.set('translation_node', parent);
 
-        var inheritors = parent.get('inheritors');
         inheritors.push(instance);
         parent.set('inheritors', inheritors);
         return instance;
@@ -429,30 +431,47 @@ define([
        * callback that is triggered when a new geometry
        * object is selected by the user
        */
-      geometrySelected: function(event) {
-        var currentTool = toolCollection.get(this.get('state'));
-        var paperObjects = currentTool.get('literals');
-        for (var i = 0; i < paperObjects.length; i++) {
-          var paperObject = paperObjects[i];
-          var instance = paperObject.data.instance;
-          /*instance.getLinkedDimensions({
-            top: true
-          });*/
+      geometrySelected: function(literal) {
+
+        if (literal) {
+          var instance = literal.data.instance;
+          instance.set('selected_indexes', []);
+
           selectTool.addSelectedShape(instance);
 
-        }
-        //show prototype in sub view if selecting objects in the main view
-        if (currentView != subView) {
-          var lastSelected = selectTool.getLastSelected();
-          if (lastSelected) {
-            console.log("found last selected");
-            var proto = lastSelected.get('proto_node');
-            console.log("found prototype", proto);
-            this.showPrototype(proto);
+
+          //show prototype in sub view if selecting objects in the main view
+          if (currentView != subView) {
+            var lastSelected = selectTool.getLastSelected();
+            if (lastSelected) {
+              var proto = lastSelected.get('proto_node');
+              this.showPrototype(proto);
+            }
           }
         }
 
         this.compile();
+      },
+
+      geometryDirectSelected: function(segment) {
+          if(segment){
+          var path = segment.path;
+          var instance = path.data.instance;
+          selectTool.addSelectedShape(instance);
+          var selected_indexes = instance.get('selected_indexes');
+          selected_indexes.push(segment.index);
+           //show prototype in sub view if selecting objects in the main view
+          if (currentView != subView) {
+            var lastSelected = selectTool.getLastSelected();
+            if (lastSelected) {
+              var proto = lastSelected.get('proto_node');
+              this.showPrototype(proto);
+            }
+          }
+        }
+
+        this.compile();
+
       },
 
       modifyInheritance: function(event, type) {
@@ -520,12 +539,9 @@ define([
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
           if (segment_index != null) {
-
-            var rmatrix = instance.get('rmatrix');
-            var tmatrix = instance.get('tmatrix');
-            var smatrix = instance.get('smatrix');
-
-            instance.updateGeom(segment_index, data, rmatrix, smatrix, tmatrix);
+            if ((!instance.get('proto_node') && currentView == mainView) || (currentView == subView)) {
+              instance.updateGeom(segment_index, data);
+            }
 
           } else {
             if (currentView == mainView) {
@@ -618,10 +634,8 @@ define([
 
         if (main) {
           currentView = mainView;
-          console.log("setting active to main");
         } else {
           currentView = subView;
-          console.log("setting active to sub");
 
         }
 
@@ -723,6 +737,7 @@ define([
           var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseUp(event);
         }
+        this.compile();
 
       },
 
@@ -737,7 +752,7 @@ define([
 
       canvasMouseDrag: function(delta, pan) {
         if (pan) {
-          var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
+          var inverseDelta = new paper.Point(-delta.x / paper.view.zoom,-delta.y / paper.view.zoom);
           paper.view.scrollBy(inverseDelta);
 
           event.preventDefault();

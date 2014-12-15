@@ -24,6 +24,8 @@ define([
 
      events: {
     'click #selectTool': 'selectToolClick',
+        'click #dselectTool': 'dSelectToolClick',
+
     'click #penTool': 'penToolClick',
     'click #polyTool': 'polyToolClick',
     'click #rotateTool': 'rotateToolClick',
@@ -48,11 +50,19 @@ define([
   		this.clearActive();
   		$('#selectTool').addClass('active');
   		lastSelected = $('#selectTool');
-      this.model.setState('selectTool','proto_node');
+      this.model.setState('selectTool','select');
       analytics.log(eventType,{type:eventType,id:'selectTool',action:'toolSelected'});
 
 
   	},
+
+    dSelectToolClick: function(){
+      this.clearActive();
+      $('#dselectTool').addClass('active');
+      lastSelected = $('#dselectTool');
+      this.model.setState('selectTool','dselect');
+      analytics.log(eventType,{type:eventType,id:'dselectTool',action:'toolSelected'});
+    },
 
      followPathToolClick: function(){
       this.clearActive();
@@ -60,8 +70,6 @@ define([
       lastSelected = $('#followPathTool');
       this.model.setState('followPathTool');
       analytics.log(eventType,{type:eventType,id:'followPathTool',action:'toolSelected'});
-
-
     },
 
   	penToolClick: function(){
@@ -88,7 +96,7 @@ define([
       this.clearActive();
       $('#rotateTool').addClass('active');
       lastSelected = $('#rotateTool');
-      this.model.setState('selectTool','rotation_node');
+      this.model.setState('selectTool','rotate');
       this.model.selectTool.
       analytics.log(eventType,{type:eventType,id:'rotateTool',action:'toolSelected'});
 

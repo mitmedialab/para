@@ -10,17 +10,15 @@ define([
 	'jquery-ui'
 
 ], function($, _, Backbone, Handlebars) {
-	var prototypes, currentId;
+	
 	var canvasDown = false;
 	var ProtoView = Backbone.View.extend({
 		//
 		initialize: function() {
 
-			$(".sub-canvas-container").resizable();
 
 
-			prototypes = [];
-			currentId = -1;
+			
 			$("#canvas").bind('mousedown', function() {
 				canvasDown = true;
 			});

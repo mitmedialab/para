@@ -1,77 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generator: Adobe Illustrator 18.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-     viewBox="0 0 36 396" enable-background="new 0 0 36 396" xml:space="preserve">
+	 viewBox="0 0 36 432" enable-background="new 0 0 36 432" xml:space="preserve">
 <g id="select">
-    <g>
-        <polygon fill="#76787B" points="19,377 26,374 8,368 14,386 17,379 23,385 25,383         "/>
-    </g>
+	<g>
+		<polygon fill="#76787B" points="19,377 26,374 8,368 14,386 17,379 23,385 25,383 		"/>
+	</g>
 </g>
 <g id="poly">
-    <path fill="#76787B" d="M18,332.3l9,4.9v9.6l-9,4.9l-9-4.9v-9.6L18,332.3 M18,330l-11,6v12l11,6l11-6v-12L18,330L18,330z"/>
+	<path fill="#76787B" d="M18,332.3l9,4.9v9.6l-9,4.9l-9-4.9v-9.6L18,332.3 M18,330l-11,6v12l11,6l11-6v-12L18,330L18,330z"/>
 </g>
 <g id="pen_tool">
-    <polygon fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" points="8,296 12,311 20,312 22,310 24,308 23,300 
-            "/>
-    <line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" x1="8" y1="296" x2="17.5" y2="305.5"/>
-    <circle fill="#76787B" cx="17.5" cy="305.5" r="2.2"/>
-    
-        <rect x="16.6" y="309.6" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -213.1737 107.3533)" fill="#76787B" width="12.7" height="2.8"/>
+	<polygon fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" points="8,296 12,311 20,312 22,310 24,308 23,300 
+			"/>
+	<line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" x1="8" y1="296" x2="17.5" y2="305.5"/>
+	<circle fill="#76787B" cx="17.5" cy="305.5" r="2.2"/>
+	
+		<rect x="16.6" y="309.6" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -213.1737 107.3533)" fill="#76787B" width="12.7" height="2.8"/>
 </g>
 <g id="rotate">
-    <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M16.8,259c6,0,10.8,4.8,10.8,10.8
-        c0,2.6-0.9,5-2.4,6.8"/>
-    <g>
-        <g>
-            <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M8,276.1c-0.3-0.4-0.6-0.8-0.8-1.3"/>
-            <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="2.9543,2.9543" d="M6.2,272
-                c-0.2-0.7-0.2-1.5-0.2-2.2c0-4.9,3.3-9.1,7.9-10.4"/>
-            <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M15.3,259.1c0.5-0.1,1-0.1,1.5-0.1"/>
-        </g>
-    </g>
-    <polygon fill="#76787B" points="30.6,277.5 21.6,281.5 22.6,271.5    "/>
+	<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M16.8,259c6,0,10.8,4.8,10.8,10.8
+		c0,2.6-0.9,5-2.4,6.8"/>
+	<g>
+		<g>
+			<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M8,276.1c-0.3-0.4-0.6-0.8-0.8-1.3"/>
+			<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="2.9543,2.9543" d="M6.2,272
+				c-0.2-0.7-0.2-1.5-0.2-2.2c0-4.9,3.3-9.1,7.9-10.4"/>
+			<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M15.3,259.1c0.5-0.1,1-0.1,1.5-0.1"/>
+		</g>
+	</g>
+	<polygon fill="#76787B" points="30.6,277.5 21.6,281.5 22.6,271.5 	"/>
 </g>
 <g id="generate">
-    <polygon fill="#76787B" points="28,235 31,247 19,244    "/>
-    
-        <line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="3" x1="20" y1="236" x2="6" y2="222"/>
-    <line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" x1="29" y1="245" x2="20" y2="236"/>
+	<polygon fill="#76787B" points="28,235 31,247 19,244 	"/>
+	
+		<line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" stroke-dasharray="3" x1="20" y1="236" x2="6" y2="222"/>
+	<line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" x1="29" y1="245" x2="20" y2="236"/>
 </g>
 <g id="follow_x5F_path">
-    <g>
-        <g>
-            <polygon fill="#76787B" points="27,204 31,202 19.5,198.5 23,210 25,206 29.5,210 31,208.5            "/>
-        </g>
-    </g>
-    <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M21.3,195.2C26.9,192.6,27,185,27,185"/>
-    <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M6.5,209c0,0,0.9-6.3,4.6-10.1"/>
-    <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M16.5,200h-2c-2.5,0-4.5-2-4.5-4.5V193
-        c0-2.4,2.1-4.5,4.5-4.5h2c2.5,0,4.5,2.2,4.5,4.7v2.3C21,198,19,200,16.5,200z"/>
+	<g>
+		<g>
+			<polygon fill="#76787B" points="27,204 31,202 19.5,198.5 23,210 25,206 29.5,210 31,208.5 			"/>
+		</g>
+	</g>
+	<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M21.3,195.2C26.9,192.6,27,185,27,185"/>
+	<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M6.5,209c0,0,0.9-6.3,4.6-10.1"/>
+	<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M16.5,200h-2c-2.5,0-4.5-2-4.5-4.5V193
+		c0-2.4,2.1-4.5,4.5-4.5h2c2.5,0,4.5,2.2,4.5,4.7v2.3C21,198,19,200,16.5,200z"/>
 </g>
 <g id="scale">
-    <polygon fill="#76787B" points="20,157 28,154 25,162    "/>
-    <g>
-        <path fill="#76787B" d="M29,153v13H16v-13H29 M31,151H14v17h17V151L31,151z"/>
-    </g>
-    <g>
-        <path fill="#76787B" d="M14,162v4v2h2h2l0,3H9v-9H14 M16,160H7v13h13l0-7h-4V160L16,160z"/>
-    </g>
-    <line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" x1="15" y1="167" x2="24" y2="158"/>
+	<polygon fill="#76787B" points="20,157 28,154 25,162 	"/>
+	<g>
+		<path fill="#76787B" d="M29,153v13H16v-13H29 M31,151H14v17h17V151L31,151z"/>
+	</g>
+	<g>
+		<path fill="#76787B" d="M14,162v4v2h2h2l0,3H9v-9H14 M16,160H7v13h13l0-7h-4V160L16,160z"/>
+	</g>
+	<line fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" x1="15" y1="167" x2="24" y2="158"/>
 </g>
 <g id="undo_1_">
-    <polygon fill="#76787B" points="21,114 31,120 21,126    "/>
-    <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M6,137v-10c0-4.2,2.9-7,7-7h10"/>
+	<polygon fill="#76787B" points="21,114 31,120 21,126 	"/>
+	<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M6,137v-10c0-4.2,2.9-7,7-7h10"/>
 </g>
 <g id="redo">
-    <polygon fill="#76787B" points="15,78 5,84 15,90    "/>
-    <path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M30,101V91c0-4.2-2.9-7-7-7H13"/>
+	<polygon fill="#76787B" points="15,78 5,84 15,90 	"/>
+	<path fill="none" stroke="#76787B" stroke-width="2" stroke-miterlimit="10" d="M30,101V91c0-4.2-2.9-7-7-7H13"/>
 </g>
 <g id="rect_x5F_tool">
-    <path fill="#76787B" d="M28,46v16H8V46H28 M30,44H6v20h24V44L30,44z"/>
+	<path fill="#76787B" d="M28,46v16H8V46H28 M30,44H6v20h24V44L30,44z"/>
 </g>
 <g id="ellipse_x5F_tool">
-    <path fill="#76787B" d="M18,10c6.1,0,11,3.6,11,8s-4.9,8-11,8S7,22.4,7,18S11.9,10,18,10 M18,8C10.8,8,5,12.5,5,18s5.8,10,13,10
-        s13-4.5,13-10S25.2,8,18,8L18,8z"/>
+	<path fill="#76787B" d="M18,10c6.1,0,11,3.6,11,8s-4.9,8-11,8S7,22.4,7,18S11.9,10,18,10 M18,8C10.8,8,5,12.5,5,18s5.8,10,13,10
+		s13-4.5,13-10S25.2,8,18,8L18,8z"/>
+</g>
+<g id="select_1_">
+	<g>
+		<polygon fill="none" stroke="#76787B" stroke-width="1.5" stroke-miterlimit="10" points="19.5,413 26.5,410 8.5,404 14.5,422 
+			17.5,415 23.5,421 25.5,419 		"/>
+	</g>
 </g>
 </svg>
