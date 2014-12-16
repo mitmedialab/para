@@ -20,9 +20,9 @@ define([
       this.listenTo(this.model, 'removeItem', this.removeItem);
       this.listenTo(this.model, 'disableSave', this.disableSave);
 
-      this.listenTo(this.model, 'pathSelected', this.pathSelected);
+      this.listenTo(this.model, 'geometrySelected', this.geometrySelected);
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
-      this.currentPaths = [];
+      this.curresntPaths = [];
       source = $('#parameterTemplate').html();
       template = Handlebars.default.compile(source);
 
@@ -152,37 +152,28 @@ define([
 
     },
 
-    pathSelected: function(node) {
-   
-      //console.log("path selected");
-      this.currentPaths.push(node);
-      console.log('node=',node);
-       console.log(node.getFirstSelectedInstance());
-      //TODO: reference instance value not path value
-      var fill = this.currentPaths[0].getFirstSelectedInstance().fillColor;
-      var stroke = this.currentPaths[0].getFirstSelectedInstance().strokeColor;
-      var width = this.currentPaths[0].getFirstSelectedInstance().strokeWidth;
+    geometrySelected: function(data) {
 
-      if (fill) {
-        $('#fillColorBlock').css('background-color', fill);
-        $('#fill').val(fill);
+      if (data.fill_color) {
+        $('#fillColorBlock').css('background-color', data.fill_color);
+        $('#fill').val(data.fill_color);
         if ($('#fillColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', fill);
+          $('#color-window').iris('color', data.fill_color);
         }
       }
-      if (stroke) {
-        $('#strokeColorBlock').css('background-color', stroke);
-        $('#stroke').val(stroke);
+      if (data.stroke_color) {
+        $('#strokeColorBlock').css('background-color', data.stroke_color);
+        $('#stroke').val(data.stroke_color);
         if ($('#strokeColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', stroke);
+          $('#color-window').iris('color', data.stroke_color);
         }
       }
-      if (width) {
+      if (data.stroke_width) {
         //console.log("setting slider");
-        $('#strokeSlider').val(width);
+        $('#strokeSlider').val(data.stroke_width);
       }
 
-      this.setParams();
+      //this.setParams();
     },
 
 

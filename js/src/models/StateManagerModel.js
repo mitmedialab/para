@@ -438,7 +438,9 @@ define([
           instance.set('selected_indexes', []);
 
           selectTool.addSelectedShape(instance);
-
+          var data = {fill_color: literal.fillColor.toCSS(true),stroke_color:literal.strokeColor.toCSS(true), stroke_width:literal.strokeWidth};
+          this.styleModified(data,true);
+          this.trigger('geometrySelected',data);
 
           //show prototype in sub view if selecting objects in the main view
           if (currentView != subView) {
@@ -555,7 +557,7 @@ define([
       },
 
 
-      styleModified: function(data) {
+      styleModified: function(data, noUpdate) {
         var selectedTool = toolCollection.get(this.get('state'));
         var style = selectedTool.get('style');
          if(data.stroke_color){
@@ -568,6 +570,7 @@ define([
          style.stroke_width = data.stroke_width;
         }
         selectedTool.set('style',style);
+        if(!noUpdate){
         var selectedShapes = selectTool.get('selected_shapes');
 
         for (var i = 0; i < selectedShapes.length; i++) {
@@ -575,6 +578,7 @@ define([
             instance.modifyStyle(data); 
         }
         this.compile();
+        }
       },
 
     
