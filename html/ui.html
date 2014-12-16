@@ -112,12 +112,23 @@
       <div id = "parameters" class="section-background">
        <script id="parameterTemplate" type="text/x-handlebars-template">
 
-       {{#each paramName}}
+       {{#each paramSlider}}
 
        <div class="form-group">
        <label id='parameterName'>{{label}}</label>
        <br>
-       <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" propertyName={{propertyName}}>
+       <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" property_name={{property_name}} inst_id={{id}}>
+       </div>
+
+
+       {{/each}}
+
+      {{#each paramText}}
+
+       <div class="form-group">
+       <label id='parameterName'>{{label}}</label>
+       <br>
+       <input id = "parameterText" type="text" value={{val}} property_name={{property_name}} inst_id={{id}}>
        </div>
 
 

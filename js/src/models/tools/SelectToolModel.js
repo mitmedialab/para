@@ -14,7 +14,7 @@ define([
   var segment, literal, handle;
   var segmentMod = false;
   var copyReset = true;
-  var startDist,startWidth,startHeight = null;
+  var startPoint, startDist,startWidth,startHeight = null;
   var dHitOptions = {
     segments: true,
     handles: true,
@@ -83,8 +83,9 @@ define([
           break;
         case 'rotate':
         case 'scale':
-          startDist = event.point.subtract(this.getRelativePoint());
           this.rotateDown(event);
+         startDist = event.point.subtract(literal.position);
+
           startWidth = literal.bounds.width;
           startHeight = literal.bounds.height;
 
@@ -218,15 +219,23 @@ define([
      scaleDrag: function(event) {
       var posPoint = this.getRelativePoint();
       if (posPoint) {
-        var diff = event.point.subtract(posPoint);
-        var objWidth = startWidth/2;
-        var objHeight = startHeight/2;
-        var scaleX = Math.abs(diff.x/objWidth);
-        var scaleY = Math.abs(diff.y/objHeight);
+        var d1 = startDist;
+        var d2x = startWidth/2-startDist.x;
+        var d2y = startWidth/2-startDist.x;
+
+        var d3 = event.point.subtract(posPoint);
+
+        var rscaleX = d3.x/d1.x;
+        var rscaleY = d3.y/d1.y;
+
+        var tScaleX = ((startWidth/2)*rscaleX)/((d3.x+d2x)/rscaleX);
+        var tScaleY = ((startHeight/2)*rscaleY)/((d3.y+d2y)/rscaleY);
+        tScaleX = (tScaleX===0)? 1: tScaleX;
+        tScaleY = (tScaleY===0)? 1: tScaleY;
+
         var data = {};
         data.set = true;
-        data.scaling_delta = new PPoint(scaleX,scaleY);
-        console.log("scale delta",diff, objWidth,objHeight,scaleX,scaleY);
+        data.scaling_delta = new PPoint(tScaleX,tScaleY);
         this.trigger('geometryModified', data, event.modifiers.command);
 
       }

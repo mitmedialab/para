@@ -10,6 +10,8 @@ define([
     'models/data/GeometryNode',
     'models/data/PathNode',
     'models/data/PolygonNode',
+    'models/data/RectNode',
+    'models/data/EllipseNode',
     'models/data/Instance',
     'models/tools/ToolCollection',
     'models/tools/PenToolModel',
@@ -28,7 +30,7 @@ define([
 
   ],
 
-  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
+  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
     var rootNode,
       uninstantiated,
       visitor,
@@ -241,8 +243,23 @@ define([
         var currentTool = toolCollection.get(this.get('state'));
 
         var matrix = currentTool.get('matrix');
+        
+        var pathNode;
+        switch( currentTool.get('mode')){
+          case 'poly':
+            pathNode = new PolygonNode();
+          break;
+          case 'ellipse':
+            pathNode = new EllipseNode();
+            break;
+          case 'rect':
+            pathNode = new RectNode();
+            break;
+          case 'path':
+              pathNode = new PathNode();
+            break;
 
-        var pathNode = new PolygonNode();
+        }
         var data = pathNode.normalizePath(literal, matrix);
         selectTool.addSelectedShape(pathNode);
         pathNode.set(data);
@@ -274,7 +291,7 @@ define([
             instance.set('translation_delta', new PPoint(0, 0));
 
             var sceneParent = instance.nodeParent;
-           var newInstance = this.create(instance);
+           var newInstance = instance.create();
             newInstance.set('position', instance.get('position').clone());
             newInstance.set('rotation_origin', instance.get('position').clone());
             newInstance.set('scaling_origin', instance.get('position').clone());
@@ -340,7 +357,7 @@ define([
       geometryInstantiated: function(x, y) {
 
         if (shownPrototype && currentView != subView) {
-          var newInstance = this.create(shownPrototype);
+          var newInstance = shownPrototype.create();
 
           var screenpos = shownPrototype.get('geom').position;
           var protopos = shownPrototype.get('position');
@@ -368,26 +385,7 @@ define([
         return false;
       },
 
-      /* create
-       * Prototypal inheritance action:
-       * creates a new instance which inherits from
-       * the parent instance.
-       * TODO: add in checks to prevent diamond inheritance
-       */
-      create: function(parent) {
-        var instance = new Instance();
-        var inheritors = parent.get('inheritors');
-        instance.set('master_path', parent.get('master_path'));
-        instance.set('proto_node', parent);
-        instance.set('rotation_node', parent);
-        instance.set('scaling_node', parent);
-        instance.set('translation_node', parent);
-
-        inheritors.push(instance);
-        parent.set('inheritors', inheritors);
-        return instance;
-      },
-
+      
       /*geometryDeepCopied
        * makes an independent clone of the object being copied and
        * transfers selection to that object
@@ -438,7 +436,10 @@ define([
           instance.set('selected_indexes', []);
 
           selectTool.addSelectedShape(instance);
-          var data = {fill_color: literal.fillColor.toCSS(true),stroke_color:literal.strokeColor.toCSS(true), stroke_width:literal.strokeWidth};
+          var data = {id:instance.get('id'),fill_color: literal.fillColor.toCSS(true),stroke_color:literal.strokeColor.toCSS(true), stroke_width:literal.strokeWidth};
+          if(selectTool.get('selected_shapes').length===1){
+            data.params = instance.get('userParams');
+          }
           this.styleModified(data,true);
           this.trigger('geometrySelected',data);
 
@@ -474,6 +475,14 @@ define([
 
         this.compile();
 
+      },
+
+      geometryParamsModified: function(data){
+        var selectedShapes = selectTool.get('selected_shapes');
+        for(var i=0;i<selectedShapes.length;i++){
+         selectedShapes[i].updateParams(data);
+        }
+        this.compile();
       },
 
       modifyInheritance: function(event, type) {
@@ -546,7 +555,8 @@ define([
               if (override) {
                 var inheritors = instance.get('inheritors');
                 for (var j = 0; j < inheritors.length; j++) {
-                  inheritors[j].resetDeltaToPrototype(data);
+                  console.log(inheritors[j].resetDeltaToPrototype);
+                  inheritors[j].resetDeltasToPrototype(data);
                 }
               }
               instance.modifyDelta(data);

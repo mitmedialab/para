@@ -28,30 +28,6 @@ define([
 
     },
 
-    
-    clone: function(){
-      var clone = Instance.prototype.clone.apply(this,arguments);
-      clone.set('master_path',this.get('master_path').clone());
-      return clone;
-    },
-
-
-
-    /*reset
-     *removes all rendered instances, eventually change to reset
-     * them and only delete those which are not used by the user
-     */
-    reset: function() {
-      /*var instances = this.get('geom_instances');
-      for (var i = 0; i < instances.length; i++) {
-        instances[i].remove();
-      }
-      this.set('geom_instances',[]);*/
-      Instance.prototype.reset.apply(this,arguments);
-
-    },
-
-
 
   });
 

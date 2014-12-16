@@ -9,59 +9,54 @@ define([
   'underscore',
   'paper',
   'models/data/PathNode',
+  'models/data/Instance',
 
 
-], function(_, paper, PathNode) {
+], function(_, paper, PathNode, Instance) {
   //drawable paper.js path object that is stored in the pathnode
   var PolygonNode = PathNode.extend({
 
-  defaults: _.extend({}, PathNode.prototype.defaults, {
-       name: 'polygon',
-    
+    defaults: _.extend({}, PathNode.prototype.defaults, {
+      name: 'polygon',
+      userParams: null
     }),
-     constructor: function() {
-      this.userParams = [{label:'points',max:15,min:3,propertyName:'pointNum'}];
-      this.pointNum = 6;
-      PathNode.apply(this, arguments);
-
-    },
 
     initialize: function(data) {
-        PathNode.prototype.initialize.apply(this, arguments);
-      },
+      PathNode.prototype.initialize.apply(this, arguments);
+      this.set('userParams',[{
+        label: 'points',
+        max: 15,
+        min: 3,
+        val: 6,
+        property_name: 'point_num'
+      }]);
+    },
 
+    normalizePath: function(path, matrix) {
+      var userParams = this.get('userParams');
+      userParams[0].val = path.segments.length;
+      this.set('userParams',userParams);
+      var data = Instance.prototype.normalizePath.apply(this,arguments);  
+      return data;
+    },
 
-    
+    //called when path points are modified 
+    updateParams: function(data) {
+      if(data.property_name=='point_num'){
+         var userParams = this.get('userParams');
+          userParams[0].val = data.value;
+          this.set('userParams',userParams);
 
-   //called when path points are modified 
-   updateParams: function(sideNum) {
-    /*console.log("update params to",sideNum);
-      this.resetObjects();
-      this.sideNum = sideNum;
-      //update the path
-      for(var j=0;j<this.instance_literals.length;j++){
-         var instance = this.instance_literals[j];
-          var rad = instance.bounds.width/2;
-          var matrix = instance.data.tmatrix;
-
-          var center = new paper.Point(0,0);
-          console.log("center",center);
-          console.log("rad",rad);
-          var width = instance.bounds.width;
-        instance.remove();
-        instance = null;
-        var newInstance = new paper.Path.RegularPolygon(center,sideNum,1);
-        var scale = width/newInstance.bounds.width;
-        newInstance.scale(scale);
-        newInstance.reset= true;
-         this.instance_literals[j] = newInstance;
-        
-          
-
-      }*/
+          var radius = this.get('width')/2;
+          var new_master =new paper.Path.RegularPolygon(new paper.Point(0,0), data.value, radius);
+          new_master.visible = false;
+          this.set('master_path',new_master.exportJSON());
+          new_master.remove();
+          console.log('reset path to ',data.value);
+      }
     }
 
-   });
+  });
 
   return PolygonNode;
 });

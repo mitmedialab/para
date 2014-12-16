@@ -32,7 +32,7 @@ define([
             },
 
 
-              clone: function(){
+           /* clone: function(){
                  var clone= Backbone.Model.prototype.clone.apply(this,arguments);
                 var children = [];
                 var edges = [];
@@ -50,7 +50,7 @@ define([
                 clone.nodeParent = this.nodeParent;
                 return clone; 
 
-            },
+            },*/
             /*visit
             * placeholder visit function for 
             * external vistior tree traversal

@@ -39,15 +39,16 @@ define([
       $('#color-window').each(function() {
         $(this).iris({
           palettes: ['#fff',
-         '#000',
-          '#0E3D63', 
-        '#16A2A6',
-          '#C6E8ED',
-          '#BC2028',
-         '#F0576D',
-          '#F2682A',
-          '#F1A54D',
-         '#FEE4BF'],
+            '#000',
+            '#0E3D63',
+            '#16A2A6',
+            '#C6E8ED',
+            '#BC2028',
+            '#F0576D',
+            '#F2682A',
+            '#F1A54D',
+            '#FEE4BF'
+          ],
           hide: false,
           color: '#fff',
           change: function(event, ui) {
@@ -90,21 +91,25 @@ define([
         */
     },
 
-    removeBehavior:function(event){
-     var name = $(event.target).attr('id');
+    removeBehavior: function(event) {
+      var name = $(event.target).attr('id');
       this.model.removeBehavior(name);
     },
 
-    clearColor:function(event){
-       if ($('#fillColorBlock').hasClass('color-block-selected')) {
+    clearColor: function(event) {
+      if ($('#fillColorBlock').hasClass('color-block-selected')) {
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
-        this.model.styleModified({fill_color:null});
+        this.model.styleModified({
+          fill_color: null
+        });
 
       } else {
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
-        this.model.styleModified({stroke_color:null});
+        this.model.styleModified({
+          stroke_color: null
+        });
       }
     },
 
@@ -125,7 +130,7 @@ define([
         }
       }
       var data = {};
-      data[(id+"_color")]=color;
+      data[(id + "_color")] = color;
       this.model.styleModified(data);
 
     },
@@ -133,19 +138,23 @@ define([
     colorChange: function(event, ui) {
 
       var color = $('#color-window').iris('color');
-      console.log('color',color);
+      console.log('color', color);
       if ($('#fillColorBlock').hasClass('color-block-selected')) {
-          $('#fillColorBlock').removeClass('remove-color');
+        $('#fillColorBlock').removeClass('remove-color');
         $('#fillColorBlock').css('background-color', color);
         $('#fill').val(color);
-        this.model.styleModified({fill_color:color});
+        this.model.styleModified({
+          fill_color: color
+        });
 
 
       } else {
-           $('#strokeColorBlock').removeClass('remove-color');
+        $('#strokeColorBlock').removeClass('remove-color');
         $('#strokeColorBlock').css('background-color', color);
         $('#stroke').val(color);
-        this.model.styleModified({stroke_color:color});
+        this.model.styleModified({
+          stroke_color: color
+        });
 
       }
 
@@ -173,7 +182,7 @@ define([
         $('#strokeSlider').val(data.stroke_width);
       }
 
-      //this.setParams();
+      this.setParams(data.params,data.id);
     },
 
 
@@ -182,13 +191,13 @@ define([
       if (id == 'fillColorBlock') {
         $('#strokeColorBlock').removeClass('color-block-selected');
         $('#fillColorBlock').addClass('color-block-selected');
-         if( !$('#fillColorBlock').hasClass('remove-color')){
-            $('#color-window').iris('color', $('#fillColorBlock').css('background-color'));
-          }
+        if (!$('#fillColorBlock').hasClass('remove-color')) {
+          $('#color-window').iris('color', $('#fillColorBlock').css('background-color'));
+        }
       } else {
         $('#strokeColorBlock').addClass('color-block-selected');
         $('#fillColorBlock').removeClass('color-block-selected');
-        if( !$('#strokeColorBlock').hasClass('remove-color')){
+        if (!$('#strokeColorBlock').hasClass('remove-color')) {
           $('#color-window').iris('color', $('#strokeColorBlock').css('background-color'));
         }
       }
@@ -196,22 +205,25 @@ define([
 
     strokeChange: function(event) {
       var value = parseInt($(event.target).val(), 10);
-      this.model.styleModified({stroke_width:value});
+      this.model.styleModified({
+        stroke_width: value
+      });
     },
 
     paramChange: function(event) {
-      var value = parseInt($(event.target).val(), 10);
-
-      //console.log('value=',value);
-      var selected = this.model.getSelected();
-
-      var s = selected[selected.length - 1];
-      if (s) {
-        s.updateParams(value);
+      var element = $(event.target);
+      var value = +element.val();
+      if(!isNaN(value)){
+        var id = element.attr('inst_id');
+        var property_name = element.attr('property_name');
+        var data = {
+          value: value,
+          id: id,
+          property_name: property_name
+        };
+        console.log('param change', data);
+        this.model.geometryParamsModified(data);
       }
-      this.model.rootUpdate();
-      this.model.rootRender();
-      paper.view.draw();
 
     },
 
@@ -305,51 +317,49 @@ define([
 
 
     //triggered when StateManager finds selection point
-    setParams: function() {
+    setParams: function(userParams,id) {
 
-      var propertyParams = [];
+      var paramSliders = [];
+      var paramTexts = [];
       var behaviorParams = [];
       var context = {};
-      var selected = this.model.getSelected();
+      console.log('userParams', userParams);
 
-      var s = selected[selected.length - 1];
-      if(s){
-      var userParams = s.userParams;
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
-
-          var data = {
-            label: userParams[i].label,
-            max: userParams[i].max,
-            min: userParams[i].min,
-            val: s[userParams[i].propertyName],
-            propertyName: userParams[i].propertyName
-          };
-          propertyParams.push(data);
+            userParams[i].id = id;
+          if (userParams[i].type === 'text_box') {
+            paramTexts.push(userParams[i]);
+          } else {
+            console.log('slider val',userParams[i].val);
+            paramSliders.push(userParams[i]);
+          }
         }
+
+
+        context = {
+          paramSlider: paramSliders,
+          paramText: paramTexts
+        };
       }
-      
 
-    /*for (var i = 0; i < behaviors.length; i++) {
-
-          var data = {
-            label: behaviors[i].behavior.name
-          };
-          behaviorParams.push(data);
-        }*/
-     context = {
-        paramName: propertyParams,
-        behaviorName: behaviorParams
-      };
-    }
-      //console.log("context", context);
       var html = template(context);
       $('#parameters').html(html);
       $('#parameterSlider').each(function() {
         var slider = $(this);
-
+        console.log('actual slider val',slider.val());
         slider.on('input', function(slideEvt) {
           slider.trigger('param-change');
+        });
+      });
+      $('#parameterText').each(function() {
+        var text = $(this);
+
+        text.keyup(function(e) {
+          if (e.keyCode === 13) {
+            text.trigger('param-change');
+          }
+
         });
       });
 

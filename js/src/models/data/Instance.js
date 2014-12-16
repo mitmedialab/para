@@ -45,7 +45,7 @@ define([
 
 			stroke_color: null,
 			stroke_width: null,
-			fill_color:null,
+			fill_color: null,
 
 			rmatrix: null,
 			tmatrix: null,
@@ -87,9 +87,26 @@ define([
 			});
 			this.set('id', new Date().getTime().toString());
 			SceneNode.prototype.initialize.apply(this, arguments);
+		},
 
-
-
+		/* create
+		 * Prototypal inheritance action:
+		 * creates a new instance which inherits from
+		 * the parent instance.
+		 * TODO: add in checks to prevent diamond inheritance
+		 */
+		create: function() {
+			var instance = new this.constructor();
+			console.log('instance',instance);
+			var inheritors = this.get('inheritors');
+			instance.set('master_path', this.get('master_path'));
+			instance.set('proto_node', this);
+			instance.set('rotation_node', this);
+			instance.set('scaling_node', this);
+			instance.set('translation_node', this);
+			inheritors.push(instance);
+			this.set('inheritors', inheritors);
+			return instance;
 		},
 
 		reset: function() {
@@ -256,6 +273,8 @@ define([
 			data.fill_color = path.fillColor;
 			data.stroke_color = path.strokeColor;
 			data.stroke_width = path.strokeWidth;
+			data.width = path.bounds.width;
+			data.height = path.bounds.height;
 			var imatrix = matrix.inverted();
 			path.transform(imatrix);
 			path.visible = false;
@@ -780,15 +799,6 @@ define([
 				}
 			}
 			this.set('rendered', true);
-		},
-
-
-
-		//TODO: implement deep copy and cloning correctly. right now it is effed
-		clone: function() {
-			var clone = new Instance(); //SceneNode.prototype.clone.apply(this, arguments);
-			this.copyAttributes(clone);
-			return clone;
 		},
 
 		copyAttributes: function(clone, deep) {
