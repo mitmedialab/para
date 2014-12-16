@@ -99,13 +99,12 @@ define([
        if ($('#fillColorBlock').hasClass('color-block-selected')) {
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
-        this.model.updateColor(-1, 'fill');
+        this.model.styleModified({fill_color:null});
 
       } else {
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
-        this.model.updateColor(-1, 'stroke');
-
+        this.model.styleModified({stroke_color:null});
       }
     },
 
@@ -125,7 +124,9 @@ define([
           $('#color-window').iris('color', color);
         }
       }
-      this.model.updateColor(color, id);
+      var data = {};
+      data[(id+"_color")]=color;
+      this.model.styleModified(data);
 
     },
 
@@ -137,13 +138,14 @@ define([
           $('#fillColorBlock').removeClass('remove-color');
         $('#fillColorBlock').css('background-color', color);
         $('#fill').val(color);
-        this.model.updateColor(color, 'fill');
+        this.model.styleModified({fill_color:color});
+
 
       } else {
            $('#strokeColorBlock').removeClass('remove-color');
         $('#strokeColorBlock').css('background-color', color);
         $('#stroke').val(color);
-        this.model.updateColor(color, 'stroke');
+        this.model.styleModified({stroke_color:color});
 
       }
 
@@ -203,7 +205,7 @@ define([
 
     strokeChange: function(event) {
       var value = parseInt($(event.target).val(), 10);
-      this.model.updateStroke(value);
+      this.model.styleModified({stroke_width:value});
     },
 
     paramChange: function(event) {

@@ -230,8 +230,10 @@ define([
     subCanvasMouseUp: function(event) {
       if (main.down) {
         var data = event.data.parent.model.addPrototype();
-        var targetPosition = data.geom.position;
-        event.data.parent.centerGeom(targetPosition);
+        if(data){
+          var targetPosition = data.geom.position;
+          event.data.parent.centerGeom(targetPosition);
+        }
       }
       sub.down = false;
       main.down = false;

@@ -14,6 +14,7 @@ define([
   var segment, literal, handle;
   var segmentMod = false;
   var copyReset = true;
+  var startDist,startWidth,startHeight = null;
   var dHitOptions = {
     segments: true,
     handles: true,
@@ -57,7 +58,6 @@ define([
          if(instance.get('isProto')){
             instance.setSelectionForInheritors(true,false);
           }
-        //instance.incrementDelta({},false, true);
         selected_shapes.push(instance);
         this.set('selected_shapes', selected_shapes);
       }
@@ -82,9 +82,14 @@ define([
           this.dSelectDown(event);
           break;
         case 'rotate':
+        case 'scale':
+          startDist = event.point.subtract(this.getRelativePoint());
           this.rotateDown(event);
+          startWidth = literal.bounds.width;
+          startHeight = literal.bounds.height;
+
           break;
-      }
+        }
     },
 
     rotateDown: function(event) {
@@ -167,6 +172,9 @@ define([
         case 'rotate':
           this.rotateDrag(event);
           break;
+         case 'scale':
+          this.scaleDrag(event);
+          break;
       }
     },
 
@@ -180,7 +188,7 @@ define([
 
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
-      this.trigger('geometryIncremented', data, event.modifiers.command);
+      this.trigger('geometryModified', data, event.modifiers.command);
       
 
     },
@@ -201,7 +209,25 @@ define([
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
         data.rotation_delta = dAngle - angle;
-        this.trigger('geometryIncremented', data, event.modifiers.command);
+        this.trigger('geometryModified', data, event.modifiers.command);
+
+      }
+
+    },
+
+     scaleDrag: function(event) {
+      var posPoint = this.getRelativePoint();
+      if (posPoint) {
+        var diff = event.point.subtract(posPoint);
+        var objWidth = startWidth/2;
+        var objHeight = startHeight/2;
+        var scaleX = Math.abs(diff.x/objWidth);
+        var scaleY = Math.abs(diff.y/objHeight);
+        var data = {};
+        data.set = true;
+        data.scaling_delta = new PPoint(scaleX,scaleY);
+        console.log("scale delta",diff, objWidth,objHeight,scaleX,scaleY);
+        this.trigger('geometryModified', data, event.modifiers.command);
 
       }
 
@@ -233,7 +259,6 @@ define([
          
       selected_shapes[i].setSelectionForInheritors(true,false);
           
-        //instance.incrementDelta({},false, true);
        
       
 

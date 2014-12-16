@@ -30,6 +30,8 @@ define([
       'click #rectangleTool': 'rectToolClick',
       'click #ellipseTool': 'ellipseToolClick',
       'click #rotateTool': 'rotateToolClick',
+      'click #scaleTool': 'scaleToolClick',
+
       'click #followPathTool': 'followPathToolClick',
       'click #undoTool': 'undoToolClick',
       'click #redoTool': 'redoToolClick'
@@ -156,6 +158,19 @@ define([
       analytics.log(eventType, {
         type: eventType,
         id: 'rotateTool',
+        action: 'toolSelected'
+      });
+    },
+
+    scaleToolClick: function() {
+      this.clearActive();
+      $('#scaleTool').addClass('active');
+      lastSelected = $('#scaleTool');
+      this.model.setState('selectTool', 'scale');
+      this.model.selectTool.
+      analytics.log(eventType, {
+        type: eventType,
+        id: 'scaleTool',
         action: 'toolSelected'
       });
     },

@@ -93,7 +93,7 @@ define([
         this.listenTo(toolCollection, "geometrySelected", this.geometrySelected);
         this.listenTo(toolCollection, "geometryDSelected", this.geometryDSelected);
 
-        this.listenTo(toolCollection, "geometryIncremented", this.geometryIncremented);
+        this.listenTo(toolCollection, "geometryModified", this.geometryModified);
         this.listenTo(toolCollection, "geometryCopied", this.geometryCopied);
         this.listenTo(toolCollection, "geometryDeepCopied", this.geometryDeepCopied);
         this.listenTo(toolCollection, "modifyInheritance", this.modifyInheritance);
@@ -245,7 +245,7 @@ define([
         var pathNode = new PolygonNode();
         var data = pathNode.normalizePath(literal, matrix);
         selectTool.addSelectedShape(pathNode);
-        pathNode.update(data);
+        pathNode.set(data);
         var edge = new Edge({
           x: currentNode,
           y: pathNode
@@ -267,7 +267,7 @@ define([
        */
 
       addPrototype: function() {
-        if (this.get('state') === 'selectTool') {
+        if (this.get('state') === 'selectTool' && currentView ===mainView) {
           var selectedShapes = selectTool.get('selected_shapes');
           if (selectedShapes.length == 1) {
             var instance = selectedShapes[0];
@@ -534,41 +534,50 @@ define([
        * to display bounding boxes
        * TODO: design so that only one iteration is neccesary?
        */
-      geometryIncremented: function(data, override, segment_index) {
+      geometryModified: function(data, override) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-          if (segment_index != null) {
-            if ((!instance.get('proto_node') && currentView == mainView) || (currentView == subView)) {
-              instance.updateGeom(segment_index, data);
-            }
-
-          } else {
             if (currentView == mainView) {
-              instance.incrementDelta(data, override);
+              instance.modifyDelta(data, override);
             } else {
               if (override) {
                 var inheritors = instance.get('inheritors');
                 for (var j = 0; j < inheritors.length; j++) {
-                  inheritors[j].resetToPrototype(data);
+                  inheritors[j].resetDeltaToPrototype(data);
                 }
               }
-              instance.incrementDelta(data);
+              instance.modifyDelta(data);
 
             }
-          }
         }
         this.compile();
-
-        for (var k = 0; k < selectedShapes.length; k++) {
-          var inst = selectedShapes[k];
-          /*inst.getLinkedDimensions({
-            top: true,
-            mode: selectTool.get('mode')
-          });*/
-        }
       },
 
+
+      styleModified: function(data) {
+        var selectedTool = toolCollection.get(this.get('state'));
+        var style = selectedTool.get('style');
+         if(data.stroke_color){
+          style.stroke_color = data.stroke_color;
+        }
+        if(data.fill_color){
+          style.fill_color = data.fill_color;
+        }
+        if(data.stroke_width){
+         style.stroke_width = data.stroke_width;
+        }
+        selectedTool.set('style',style);
+        var selectedShapes = selectTool.get('selected_shapes');
+
+        for (var i = 0; i < selectedShapes.length; i++) {
+           var instance = selectedShapes[i]; 
+            instance.modifyStyle(data); 
+        }
+        this.compile();
+      },
+
+    
       /* compile
        * resets the geometry functions
        * to remove all active instances and then
@@ -591,40 +600,6 @@ define([
 
       },
 
-
-      //=======================BEGIN SELECTION METHODS=======================//
-      /* sets correct selection based on currentNode
-       * determines value by finding the hierarchical level of the current node
-       * and using that level as an index to slice the render signature of the currently selected path
-       * sends this as the starting value for selecting other relevant paths based on the current node
-       */
-      setSelection: function(path) {
-
-        var index = currentNode.getLevelInTree(rootNode, 0);
-        if (path.data.renderSignature[index] !== null) {
-          var value = path.data.renderSignature.slice(0, index + 1);
-          value = value.join();
-
-          currentNode.selectByValue(index, value, path, currentNode);
-
-        }
-
-      },
-
-      updateProperties: function(data) {
-        var selectedNodes = toolCollection.get(this.get('state')).selectedNodes;
-        this.trigger('pathSelected', selectedNodes[selectedNodes.length - 1]);
-
-      },
-
-
-      getSelection: function() {
-
-        toolCollection.get(this.get('state')).selectedNodes = selectTool.selectedNodes;
-
-
-      },
-
       /*toggleView
        * changes the currently active view
        */
@@ -643,8 +618,6 @@ define([
 
       },
 
-
-      //=======================END SELECTION METHODS=======================//
 
       moveUpNode: function() {
         this.setCurrentNode(currentNode);
@@ -985,50 +958,6 @@ define([
 
 
 
-      updateStroke: function(width) {
-        var selectedTool = toolCollection.get(this.get('state'));
-        selectedTool.style.strokeWidth = width;
-        if (selectTool.selectedNodes.length > 0) {
-          for (var i = 0; i < selectTool.selectedNodes.length; i++) {
-            selectTool.selectedNodes[i].updateSelected([{
-              strokeWidth: Number(width)
-            }]);
-          }
-        }
-        currentNode.update([{}]);
-        // this.rootRender();
-        paper.view.draw();
-      },
-
-      updateColor: function(color, type) {
-        var selectedTool = toolCollection.get(this.get('state'));
-
-
-        var update;
-        if (type == 'stroke') {
-          update = [{
-            strokeColor: color
-          }];
-
-
-          selectedTool.style.strokeColor = color;
-
-        } else {
-          update = [{
-            fillColor: color
-          }];
-          selectedTool.style.fillColor = color;
-        }
-
-        for (var i = 0; i < selectTool.selectedNodes.length; i++) {
-
-          selectTool.selectedNodes[i].updateSelected(update);
-        }
-
-        currentNode.update([{}]);
-        //this.rootRender();
-        paper.view.draw();
-      },
 
       updateCopyNum: function(number) {
         if (selectTool.selectedNodes.length > 0) {

@@ -34,7 +34,7 @@ define([
 			translation_delta: null,
 			center: null,
 			scaling_origin: null,
-			scaling_delta: 1,
+			scaling_delta: null,
 			rotation_origin: null,
 			rotation_delta: 0,
 
@@ -44,8 +44,8 @@ define([
 			screen_height: 0,
 
 			stroke_color: null,
-			stroke_width: 1,
-			fill_color: 0,
+			stroke_width: null,
+			fill_color:null,
 
 			rmatrix: null,
 			tmatrix: null,
@@ -67,6 +67,8 @@ define([
 		initialize: function() {
 			this.set('position', new PPoint(0, 0));
 			this.set('translation_delta', new PPoint(0, 0));
+			this.set('scaling_delta', new PPoint(1, 1));
+
 			this.set('center', new PPoint(0, 0));
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
@@ -116,7 +118,28 @@ define([
 			this.set('matrix', new paper.Matrix());
 		},
 
-		resetToPrototype: function(data) {
+
+		resetStylesToPrototype: function(data, recurse) {
+
+			if (data.fill_color) {
+				this.set('fill_color', null);
+			}
+
+			if (data.stroke_color) {
+				this.set('stroke_color', null);
+			}
+
+			if (data.stroke_width) {
+				this.set('stroke_width', null);
+			}
+			if (recurse) {
+				var inheritors = this.get('inheritors');
+				for (var i = 0; i < inheritors.length; i++) {
+					inheritors[i].resetStylesToPrototype(data, recurse);
+				}
+			}
+		},
+		resetDeltasToPrototype: function(data) {
 			var protoNode;
 			if (data.translation_delta) {
 
@@ -140,6 +163,16 @@ define([
 				}
 				if (protoNode) {
 					this.set('rotation_delta', 0);
+				}
+			}
+			if (data.scaling_delta) {
+
+				protoNode = this.get('scaling_node');
+				if (!protoNode) {
+					protoNode = this.get('scaling_node');
+				}
+				if (protoNode) {
+					this.set('scaling_delta', new PPoint(1, 1));
 				}
 			}
 		},
@@ -169,15 +202,12 @@ define([
 			this.set(data.toJSON);
 		},
 
-		//sets instances' properties to that of the data
-		update: function(data) {
-			this.set(data);
-		},
 
-		/* updateGeom
+
+		/* modifyPoints
 		 * called when segment in geometry is modified
 		 */
-		updateGeom: function(segment_index, data) {
+		modifyPoints: function(segment_index, data) {
 			var master_pathJSON = this.get('master_path');
 			var master_path = new paper.Path();
 			master_path.importJSON(master_pathJSON);
@@ -223,7 +253,9 @@ define([
 			data.position = new PPoint(matrix.translation.x, matrix.translation.y);
 			data.rotation_origin = new PPoint(matrix.translation.x, matrix.translation.y);
 			data.scaling_origin = new PPoint(matrix.translation.x, matrix.translation.y);
-
+			data.fill_color = path.fillColor;
+			data.stroke_color = path.strokeColor;
+			data.stroke_width = path.strokeWidth;
 			var imatrix = matrix.inverted();
 			path.transform(imatrix);
 			path.visible = false;
@@ -241,7 +273,35 @@ define([
 		},
 
 
-		incrementDelta: function(data, override) {
+		modifyStyle: function(data, override) {
+
+			if (override) {
+				var proto_node = this.get('proto_node');
+				proto_node.modifyStyle(data);
+			}
+
+			if (data.fill_color) {
+				this.set('fill_color', data.fill_color);
+
+			}
+
+			if (data.stroke_color) {
+				this.set('stroke_color', data.stroke_color);
+			}
+
+			if (data.stroke_width) {
+				this.set('stroke_width', data.stroke_width);
+			}
+
+			var inheritors = this.get('inheritors');
+
+			for (var i = 0; i < inheritors.length; i++) {
+				inheritors[i].resetStylesToPrototype(data, true);
+
+			}
+		},
+
+		modifyDelta: function(data, override) {
 			var matrix = this.get('matrix');
 			var position = this.get('rotation_origin').toPaperPoint();
 			var proto_incremented = false;
@@ -253,14 +313,18 @@ define([
 						protoNode = this.get('proto_node');
 					}
 					if (protoNode) {
-						protoNode.incrementDelta(data);
+						protoNode.modifyDelta(data);
 						proto_incremented = true;
 
 					}
 
 				} else {
 					var translation_delta = this.get('translation_delta');
-					translation_delta.add(data.translation_delta);
+					if (data.set) {
+						translation_delta = data.translation_delta;
+					} else {
+						translation_delta.add(data.translation_delta);
+					}
 					this.set('translation_delta', translation_delta);
 				}
 			}
@@ -272,15 +336,42 @@ define([
 						protoNode = this.get('proto_node');
 					}
 					if (protoNode) {
-						protoNode.incrementDelta(data);
+						protoNode.modifyDelta(data);
 						proto_incremented = true;
 					}
 
 
 				} else {
 					var rotation_delta = this.get('rotation_delta');
-					rotation_delta += data.rotation_delta;
+					if (data.set) {
+						rotation_delta = data.rotation_delta;
+					} else {
+						rotation_delta += data.rotation_delta;
+					}
 					this.set('rotation_delta', rotation_delta);
+				}
+			}
+
+			if (data.scaling_delta) {
+				if (override) {
+					protoNode = this.get('scaling_node');
+					if (!protoNode) {
+						protoNode = this.get('proto_node');
+					}
+					if (protoNode) {
+						protoNode.modifyDelta(data);
+						proto_incremented = true;
+					}
+
+
+				} else {
+					var scaling_delta = this.get('scaling_delta');
+					if (data.set) {
+						scaling_delta = data.scaling_delta;
+					} else {
+						scaling_delta.add(data.scaling_delta);
+					}
+					this.set('scaling_delta', scaling_delta);
 				}
 			}
 
@@ -447,6 +538,36 @@ define([
 			return smatrix;
 		},
 
+		inheritFill: function() {
+			if (this.get('fill_color')) {
+				return this.get('fill_color');
+			} else {
+				if (this.has('proto_node')) {
+					return this.get('proto_node').inheritFill();
+				}
+			}
+		},
+
+		inheritStroke: function() {
+			if (this.get('stroke_color')) {
+				return this.get('stroke_color');
+			} else {
+				if (this.has('proto_node')) {
+					return this.get('proto_node').inheritStroke();
+				}
+			}
+		},
+
+		inheritWidth: function() {
+			if (this.get('stroke_width')) {
+				return this.get('stroke_width');
+			} else {
+				if (this.has('proto_node')) {
+					return this.get('proto_node').inheritWidth();
+				}
+			}
+		},
+
 
 		/*getPrototypeFor
 		 * check to see if object has a prototype attached to a specific property
@@ -478,7 +599,6 @@ define([
 			for (var i = 0; i < inheritors.length; i++) {
 				inheritors[i].set('proto_selected', select);
 				if (select) {
-					console.log('update bounding box at',i);
 					this.updateBoundingBox(inheritors[i]);
 				}
 				if (ancestors) {
@@ -505,9 +625,8 @@ define([
 					i_bbox.topLeft.y = i_topLeft.y;
 				}
 			}
-			
+
 			if (!i_bbox.bottomRight) {
-				console.log('setting i_bbox bottom right');
 				i_bbox.bottomRight = i_bottomRight;
 			} else {
 				if (i_bottomRight.x > i_bbox.bottomRight.x) {
@@ -539,6 +658,10 @@ define([
 				var proto_selected = this.get('proto_selected');
 				var inheritor_selected = this.get('inheritor_selected');
 
+				var fill_color = this.inheritFill();
+				var stroke_color = this.inheritStroke();
+				var stroke_width = this.inheritWidth();
+
 				var rmatrix = this.get('rmatrix');
 				var smatrix = this.get('smatrix');
 				var tmatrix = this.get('tmatrix');
@@ -553,7 +676,7 @@ define([
 
 
 				rmatrix.rotate(rotation_delta, rotation_origin);
-				smatrix.scale(scaling_delta, scaling_origin);
+				smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
 				tmatrix.translate(translation_delta);
 
 				var protoNode = this.get('proto_node');
@@ -596,6 +719,9 @@ define([
 				}
 				if (geom) {
 					geom.data.instance = this;
+					geom.fillColor = fill_color;
+					geom.strokeColor = stroke_color;
+					geom.strokeWidth = stroke_width;
 					geom.visible = true;
 					geom.position = position;
 					geom.transform(rmatrix);
@@ -613,17 +739,16 @@ define([
 							g_bbox.data.instance = this;
 							g_bbox.selectedColor = '#16BDE7';
 							g_bbox.selected = true;
-							
+
 							var i_bbox = this.get('i_bbox');
 							//draw in bounding box for inheritors
 							if (i_bbox.bottomRight) {
 								paper.View._viewsById['canvas']._project.activate();
-								var width= i_bbox.bottomRight.x-i_bbox.topLeft.x;
-								var height = i_bbox.bottomRight.y-i_bbox.topLeft.y;
-								var gi_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width,height));
+								var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
+								var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
+								var gi_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
 								gi_bbox.selectedColor = '#83CC27';
 								gi_bbox.selected = true;
-								console.log('gi_bbox', i_bbox);
 								view._project.activate();
 
 							}
