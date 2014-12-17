@@ -9,16 +9,16 @@ define([
   'models/tools/BaseToolModel',
 ], function(_, paper, Backbone, BaseToolModel) {
 
-  var nameVal = 0;
   var sideNum = 6;
   var rotationAmt = 0;
   var startPosition = null;
-  var scaleAmt = 0;
   var polyPath = null;
   var drag = false;
   var literal = null;
-  var lastDeltaX;
-  var lastDeltaY;
+  var segment, mode, type = null;
+  var types = ['point', 'handleIn', 'handleOut'];
+
+
   var PolyToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
       mode: 'poly'
@@ -37,6 +37,9 @@ define([
         case 'poly':
           polyPath = new paper.Path.RegularPolygon(event.point, sideNum, 1);
           break;
+        case 'pen':
+          this.penMouseDown(event);
+          break;
         default:
           var rectangle = new paper.Rectangle(event.point, new paper.Size(1, 1));
           switch (this.get('mode')) {
@@ -49,34 +52,90 @@ define([
           }
           break;
       }
-      polyPath.selected = true;
-      polyPath.strokeWidth = this.get('style').stroke_width;
-      polyPath.strokeColor = this.get('style').stroke_color;
-      polyPath.fillColor = this.get('style').fill_color;
+      if (polyPath) {
+        if (this.get('mode') !== 'pen') {
+          polyPath.selected = true;
+        }
+        polyPath.strokeWidth = this.get('style').stroke_width;
+        polyPath.strokeColor = this.get('style').stroke_color;
+        polyPath.fillColor = this.get('style').fill_color;
 
-      if (this.get('style').fillColor === -1) {
-        polyPath.style.fillColor = null;
+        if (this.get('style').fillColor === -1) {
+          polyPath.style.fillColor = null;
 
-      }
-      if (this.get('style').stroke_color === -1) {
-        polyPath.style.strokeColor = null;
+        }
+        if (this.get('style').stroke_color === -1) {
+          polyPath.style.strokeColor = null;
 
+        }
       }
       rotationAmt = 0;
     },
 
+    penMouseDown: function(event) {
+      if (segment) {
+        segment.selected = false;
+      }
+      mode = type = segment = null;
+
+      if (!polyPath) {
+        polyPath = new paper.Path();
+      }
+
+      var result = this.findHandle(event.point);
+      if (result) {
+        segment = result.segment;
+        type = result.type;
+        if (polyPath.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
+          mode = 'close';
+          polyPath.closed = true;
+          this.reset();
+        }
+      }
+
+      if (mode != 'close') {
+        mode = segment ? 'move' : 'add';
+        if (!segment) {
+          segment = polyPath.add(event.point);
+        }
+        segment.selected = true;
+      }
+
+    },
+
+
+
+    reset: function() {
+      segment = null;
+      if (polyPath) {
+        if (polyPath.segments.length > 1) {
+          var matrix = this.get('matrix');
+          matrix.reset();
+          matrix.translate(polyPath.bounds.center.x, polyPath.bounds.center.y);
+          matrix.rotate(rotationAmt);
+          this.trigger('geometryAdded', polyPath);
+        } else {
+          polyPath.remove();
+        }
+
+      }
+
+      polyPath = null;
+
+
+    },
+
     //mouse up event
     mouseUp: function(event) {
-      if (polyPath) {
+      if (polyPath && (this.get('mode') !== 'pen')) {
         if (drag) {
           var matrix = this.get('matrix');
           matrix.reset();
           matrix.translate(polyPath.bounds.center.x, polyPath.bounds.center.y);
           matrix.rotate(rotationAmt);
 
-          literal = polyPath;
 
-          this.trigger('geometryAdded', literal);
+          this.trigger('geometryAdded', polyPath);
 
         } else {
           polyPath.remove();
@@ -93,6 +152,9 @@ define([
       switch (this.get('mode')) {
         case 'poly':
           this.polyMouseDrag(event);
+          break;
+        case 'pen':
+          this.penMouseDrag(event);
           break;
         default:
           this.regularMouseDrag(event);
@@ -117,6 +179,23 @@ define([
       }
 
     },
+
+    //mouse drag event - brokem
+    penMouseDrag: function(event) {
+
+      if (mode == 'move' && type == 'point') {
+        segment.point = event.point;
+      } else if (mode != 'close') {
+        var delta = event.delta.clone();
+        if (type == 'handleOut' || mode == 'add') {
+          delta = delta.negate();
+        }
+        segment.handleIn = segment.handleIn.add(delta);
+        segment.handleOut = segment.handleOut.subtract(delta);
+      }
+
+
+    },
     //mouse drag event
     regularMouseDrag: function(event) {
       if (polyPath) {
@@ -126,31 +205,56 @@ define([
         var deltaY = event.point.y - startPosition.y;
 
         polyPath.remove();
-        var rectangle = new paper.Rectangle( startPosition, new paper.Size(deltaX, deltaY));
-        if(this.get('mode')==='rect'){    
+        var rectangle = new paper.Rectangle(startPosition, new paper.Size(deltaX, deltaY));
+        if (this.get('mode') === 'rect') {
           polyPath = new paper.Path.Rectangle(rectangle);
-        }
-        else{
+        } else {
           polyPath = new paper.Path.Ellipse(rectangle);
         }
 
-         polyPath.selected = true;
-      polyPath.strokeWidth = this.get('style').stroke_width;
-      polyPath.strokeColor = this.get('style').stroke_color;
-      polyPath.fillColor = this.get('style').fill_color;
+        polyPath.selected = true;
+        polyPath.strokeWidth = this.get('style').stroke_width;
+        polyPath.strokeColor = this.get('style').stroke_color;
+        polyPath.fillColor = this.get('style').fill_color;
 
-      if (this.get('style').fillColor === -1) {
-        polyPath.style.fillColor = null;
+        if (this.get('style').fillColor === -1) {
+          polyPath.style.fillColor = null;
+
+        }
+        if (this.get('style').stroke_color === -1) {
+          polyPath.style.strokeColor = null;
+
+        }
 
       }
-      if (this.get('style').stroke_color === -1) {
-        polyPath.style.strokeColor = null;
 
+    },
+
+
+    //method to determine location of handle for current segment for pen tool
+    findHandle: function(point) {
+      for (var i = 0, l = polyPath.segments.length; i < l; i++) {
+        for (var j = 0; j < 3; j++) {
+          var _type = types[j];
+          var sub_segment = polyPath.segments[i];
+          var segmentPoint;
+          if (type == 'point') {
+            segmentPoint = sub_segment.point;
+          } else {
+            segmentPoint = sub_segment.point.add(sub_segment[type]);
+
+          }
+
+          var distance = (point.subtract(segmentPoint)).length;
+          if (distance < 3) {
+            return {
+              type: _type,
+              segment: sub_segment
+            };
+          }
+        }
       }
-        console.log("path data", polyPath.bounds,deltaX,deltaY);
-
-      }
-
+      return null;
     },
 
 

@@ -11,19 +11,24 @@ define([
 
 
 ], function(_, paper, Backbone, BaseToolModel, PPoint) {
-  var segment, literal, handle;
+  var segments = [];
+  var literal;
+  var handle;
   var segmentMod = false;
   var copyReset = true;
   var startPoint, startDist,startWidth,startHeight = null;
   var dHitOptions = {
     segments: true,
+    curves: true,
     handles: true,
-    tolerance: 2
+    tolerance: 5,
   };
 
   var hitOptions = {
     stroke: true,
     fill: true,
+    bounds: true,
+    center: true,
     tolerance: 2
   };
 
@@ -140,18 +145,22 @@ define([
       if (hitResult) {
 
         if (hitResult.type == 'segment') {
-          segment = hitResult.segment;
-          segment.fullySelected = true;
+          hitResult.segment.fullySelected = true; 
+          segments.push(hitResult.segment);
         } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
           handle = hitResult.type;
-          segment = hitResult.segment.index;
+          segments.push(hitResult.segment);
         }
-            console.log('hit segment',segment);
+        else if(hitResult.type=='curve'){
+          console.log('hit result',hitResult.location);
+          segments.push(hitResult.location._segment1);
+          segments.push(hitResult.location._segment2);
+        }
 
 
       }
 
-      this.trigger('geometryDSelected',segment,handle);
+      this.trigger('geometryDSelected',segments,event.modifiers.command);
 
 
     },
@@ -195,10 +204,9 @@ define([
     },
 
     dSelectDrag: function(event) {
-  
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
-      this.trigger('geometrySegmentIncremented', data);
+      this.trigger('geometrySegmentModified', data, handle,event.modifiers.command);
       
 
     },
@@ -273,7 +281,7 @@ define([
 
       }
       literal = null;
-      segment = null;
+      segments = [];
       handle= null;
       copyReset = true;
 

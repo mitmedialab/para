@@ -54,7 +54,7 @@ define([
 			geom: null,
 			inheritors: null,
 			sibling_instances: null,
-			isProto: false,
+			is_proto: false,
 			id: null,
 			show: false,
 
@@ -97,7 +97,7 @@ define([
 		 */
 		create: function() {
 			var instance = new this.constructor();
-			console.log('instance',instance);
+			console.log('instance', instance);
 			var inheritors = this.get('inheritors');
 			instance.set('master_path', this.get('master_path'));
 			instance.set('proto_node', this);
@@ -224,7 +224,12 @@ define([
 		/* modifyPoints
 		 * called when segment in geometry is modified
 		 */
-		modifyPoints: function(segment_index, data) {
+		modifyPoints: function(segment_index, data, handle, override) {
+			var proto_node = this.get('proto_node');
+			if(override && proto_node){
+				proto_node.modifyPoints(segment_index, data, handle, override);
+			}
+
 			var master_pathJSON = this.get('master_path');
 			var master_path = new paper.Path();
 			master_path.importJSON(master_pathJSON);
@@ -237,8 +242,19 @@ define([
 				master_path.transform(smatrix);
 				master_path.transform(tmatrix);
 				var delta = data.translation_delta.toPaperPoint();
-				master_path.segments[segment_index].point = master_path.segments[segment_index].point.add(delta);
+				if (!handle) {
+					master_path.segments[segment_index].point = master_path.segments[segment_index].point.add(delta);
+				} else {
+					if (handle === 'handle-in') {
+						master_path.segments[segment_index].handleIn = master_path.segments[segment_index].handleIn.add(delta);
+						master_path.segments[segment_index].handleOut = master_path.segments[segment_index].handleOut.subtract(delta);
 
+					} else {
+						master_path.segments[segment_index].handleOut = master_path.segments[segment_index].handleOut.add(delta);
+						master_path.segments[segment_index].handleIn = master_path.segments[segment_index].handleIn.subtract(delta);
+
+					}
+				}
 				var rinverted = rmatrix.inverted();
 				var sinverted = smatrix.inverted();
 				var tinverted = tmatrix.inverted();
@@ -246,11 +262,11 @@ define([
 				master_path.transform(tinverted);
 				master_path.transform(sinverted);
 				master_path.transform(rinverted);
-				var newPoint = master_path.segments[segment_index].point.clone();
+				/*var newPoint = master_path.segments[segment_index].point.clone();
 				var diff = newPoint.subtract(origPoint);
 				var path_deltas = this.get('path_deltas');
 				path_deltas[segment_index].add(new PPoint(diff.x, diff.y));
-				this.set('path_deltas', path_deltas);
+				this.set('path_deltas', path_deltas);*/
 			}
 
 			this.set('master_path', master_path.toJSON());
@@ -662,9 +678,9 @@ define([
 		propagates the instances' properties with that of the data*/
 		render: function() {
 			if (this.get('name') != 'root') {
-				var isProto = this.get('isProto');
+				var is_proto = this.get('is_proto');
 				var view;
-				if (isProto) {
+				if (is_proto) {
 					view = paper.View._viewsById['sub-canvas'];
 				} else {
 					view = paper.View._viewsById['canvas'];
@@ -791,7 +807,7 @@ define([
 						screen_height: screen_bounds.height,
 					});
 					//if shape is prototype, do not render it on the screen
-					if (isProto && !this.get('show')) {
+					if (is_proto && !this.get('show')) {
 						geom.visible = false;
 
 					}

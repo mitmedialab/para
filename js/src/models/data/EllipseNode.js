@@ -21,11 +21,6 @@ define([
       RectNode.prototype.initialize.apply(this, arguments);
     },
 
-    //called when path points are modified 
-    updateParams: function(data) {
-
-    }
-
   });
 
   return EllipseNode;

@@ -99,7 +99,7 @@ define([
       this.clearActive();
       $('#penTool').addClass('active');
       lastSelected = $('#penTool');
-      this.model.setState('penTool');
+      this.model.setState('polyTool','pen');
       analytics.log(eventType, {
         type: eventType,
         id: 'penTool',

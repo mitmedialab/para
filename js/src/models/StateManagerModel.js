@@ -96,6 +96,8 @@ define([
         this.listenTo(toolCollection, "geometryDSelected", this.geometryDSelected);
 
         this.listenTo(toolCollection, "geometryModified", this.geometryModified);
+        this.listenTo(toolCollection, "geometrySegmentModified", this.geometrySegmentModified);
+
         this.listenTo(toolCollection, "geometryCopied", this.geometryCopied);
         this.listenTo(toolCollection, "geometryDeepCopied", this.geometryDeepCopied);
         this.listenTo(toolCollection, "modifyInheritance", this.modifyInheritance);
@@ -243,20 +245,20 @@ define([
         var currentTool = toolCollection.get(this.get('state'));
 
         var matrix = currentTool.get('matrix');
-        
+
         var pathNode;
-        switch( currentTool.get('mode')){
+        switch (currentTool.get('mode')) {
           case 'poly':
             pathNode = new PolygonNode();
-          break;
+            break;
           case 'ellipse':
             pathNode = new EllipseNode();
             break;
           case 'rect':
             pathNode = new RectNode();
             break;
-          case 'path':
-              pathNode = new PathNode();
+          case 'pen':
+            pathNode = new PathNode();
             break;
 
         }
@@ -284,14 +286,14 @@ define([
        */
 
       addPrototype: function() {
-        if (this.get('state') === 'selectTool' && currentView ===mainView) {
+        if (this.get('state') === 'selectTool' && currentView === mainView) {
           var selectedShapes = selectTool.get('selected_shapes');
           if (selectedShapes.length == 1) {
             var instance = selectedShapes[0];
             instance.set('translation_delta', new PPoint(0, 0));
 
             var sceneParent = instance.nodeParent;
-           var newInstance = instance.create();
+            var newInstance = instance.create();
             newInstance.set('position', instance.get('position').clone());
             newInstance.set('rotation_origin', instance.get('position').clone());
             newInstance.set('scaling_origin', instance.get('position').clone());
@@ -308,7 +310,7 @@ define([
             instance.set('selected', false);
             newInstance.set('selected', true);
 
-            instance.set('isProto', true);
+            instance.set('is_proto', true);
             visitor.addPrototype(instance);
             selectedShapes[0] = newInstance;
             var id = instance.get('id');
@@ -385,7 +387,7 @@ define([
         return false;
       },
 
-      
+
       /*geometryDeepCopied
        * makes an independent clone of the object being copied and
        * transfers selection to that object
@@ -436,12 +438,17 @@ define([
           instance.set('selected_indexes', []);
 
           selectTool.addSelectedShape(instance);
-          var data = {id:instance.get('id'),fill_color: literal.fillColor.toCSS(true),stroke_color:literal.strokeColor.toCSS(true), stroke_width:literal.strokeWidth};
-          if(selectTool.get('selected_shapes').length===1){
+          var data = {
+            id: instance.get('id'),
+            fill_color: literal.fillColor.toCSS(true),
+            stroke_color: literal.strokeColor.toCSS(true),
+            stroke_width: literal.strokeWidth
+          };
+          if (selectTool.get('selected_shapes').length === 1) {
             data.params = instance.get('userParams');
           }
-          this.styleModified(data,true);
-          this.trigger('geometrySelected',data);
+          this.styleModified(data, true);
+          this.trigger('geometrySelected', data);
 
           //show prototype in sub view if selecting objects in the main view
           if (currentView != subView) {
@@ -456,14 +463,20 @@ define([
         this.compile();
       },
 
-      geometryDirectSelected: function(segment) {
-          if(segment){
-          var path = segment.path;
+      geometryDSelected: function(segments, override) {
+        if (segments.length > 0) {
+          var path = segments[0].path;
+
           var instance = path.data.instance;
-          selectTool.addSelectedShape(instance);
-          var selected_indexes = instance.get('selected_indexes');
-          selected_indexes.push(segment.index);
-           //show prototype in sub view if selecting objects in the main view
+          console.log('dselected',override);
+          if (!instance.get('proto_node') || override) {
+            selectTool.addSelectedShape(instance);
+            var selected_indexes = instance.get('selected_indexes');
+            for (var i = 0; i < segments.length; i++) {
+              selected_indexes.push(segments[i].index);
+            }
+          }
+          //show prototype in sub view if selecting objects in the main view
           if (currentView != subView) {
             var lastSelected = selectTool.getLastSelected();
             if (lastSelected) {
@@ -477,10 +490,10 @@ define([
 
       },
 
-      geometryParamsModified: function(data){
+      geometryParamsModified: function(data) {
         var selectedShapes = selectTool.get('selected_shapes');
-        for(var i=0;i<selectedShapes.length;i++){
-         selectedShapes[i].updateParams(data);
+        for (var i = 0; i < selectedShapes.length; i++) {
+          selectedShapes[i].updateParams(data);
         }
         this.compile();
       },
@@ -549,49 +562,66 @@ define([
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-            if (currentView == mainView) {
-              instance.modifyDelta(data, override);
-            } else {
-              if (override) {
-                var inheritors = instance.get('inheritors');
-                for (var j = 0; j < inheritors.length; j++) {
-                  console.log(inheritors[j].resetDeltaToPrototype);
-                  inheritors[j].resetDeltasToPrototype(data);
-                }
+          if (currentView == mainView) {
+            instance.modifyDelta(data, override);
+          } else {
+            if (override) {
+              var inheritors = instance.get('inheritors');
+              for (var j = 0; j < inheritors.length; j++) {
+                console.log(inheritors[j].resetDeltaToPrototype);
+                inheritors[j].resetDeltasToPrototype(data);
               }
-              instance.modifyDelta(data);
-
             }
+            instance.modifyDelta(data);
+
+          }
         }
         this.compile();
+      },
+
+      geometrySegmentModified: function(data, handle, override) {
+        console.log("segment modified");
+        var selectedShapes = selectTool.get('selected_shapes');
+        for (var i = 0; i < selectedShapes.length; i++) {
+          var instance = selectedShapes[i];
+          if (!instance.get('proto_node') || override) {
+          var selected_indexes = instance.get('selected_indexes');
+          for (var j = 0; j < selected_indexes.length; j++) {
+            instance.modifyPoints(selected_indexes[j], data, handle,override);
+          }
+        }
+
+        }
+        this.compile();
+
       },
 
 
       styleModified: function(data, noUpdate) {
         var selectedTool = toolCollection.get(this.get('state'));
         var style = selectedTool.get('style');
-         if(data.stroke_color){
+        if (data.stroke_color) {
           style.stroke_color = data.stroke_color;
         }
-        if(data.fill_color){
+        if (data.fill_color) {
           style.fill_color = data.fill_color;
         }
-        if(data.stroke_width){
-         style.stroke_width = data.stroke_width;
+        if (data.stroke_width) {
+          style.stroke_width = data.stroke_width;
         }
-        selectedTool.set('style',style);
-        if(!noUpdate){
-        var selectedShapes = selectTool.get('selected_shapes');
+        selectedTool.set('style', style);
+        if (!noUpdate) {
+          var selectedShapes = selectTool.get('selected_shapes');
 
-        for (var i = 0; i < selectedShapes.length; i++) {
-           var instance = selectedShapes[i]; 
-            instance.modifyStyle(data); 
-        }
-        this.compile();
+          for (var i = 0; i < selectedShapes.length; i++) {
+            var instance = selectedShapes[i];
+            instance.modifyStyle(data);
+          }
+          this.compile();
         }
       },
 
-    
+
       /* compile
        * resets the geometry functions
        * to remove all active instances and then
@@ -710,21 +740,24 @@ define([
         if (!event.modifiers.space) {
           var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseDown(event);
-          if (this.get('state') === 'penTool') {
+          /*if (this.get('state') === 'penTool') {
             this.modified = true;
             this.trigger('disableSave', !this.modified);
-          }
+          }*/
         }
 
 
       },
 
       toolMouseUp: function(event, pan) {
+        var selectedTool = toolCollection.get(this.get('state'));
+
         if (!event.modifiers.space) {
-          var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseUp(event);
         }
-        this.compile();
+        if (selectedTool.get('mode') !== 'pen') {
+          this.compile();
+        }
 
       },
 
@@ -739,7 +772,7 @@ define([
 
       canvasMouseDrag: function(delta, pan) {
         if (pan) {
-          var inverseDelta = new paper.Point(-delta.x / paper.view.zoom,-delta.y / paper.view.zoom);
+          var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
           paper.view.scrollBy(inverseDelta);
 
           event.preventDefault();
@@ -969,7 +1002,6 @@ define([
 
         }
       },
-
 
 
 

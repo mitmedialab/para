@@ -114,7 +114,7 @@
 
        {{#each paramSlider}}
 
-       <div class="form-group">
+       <div id="parameterSliders" class="form-group">
        <label id='parameterName'>{{label}}</label>
        <br>
        <input id = "parameterSlider" type="range" class="span2" value="" min={{min}} max={{max}} data-slider-value={{val}} data-slider-orientation="horizontal" data-slider-selection="after" property_name={{property_name}} inst_id={{id}}>
@@ -125,7 +125,7 @@
 
       {{#each paramText}}
 
-       <div class="form-group">
+       <div id="parameterTexts" class="form-group">
        <label id='parameterName'>{{label}}</label>
        <br>
        <input id = "parameterText" type="text" value={{val}} property_name={{property_name}} inst_id={{id}}>

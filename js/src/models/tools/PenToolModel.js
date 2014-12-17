@@ -95,8 +95,6 @@ define([
           
 
           if (!this.currentPath) {
-         
-          
                        
 
           this.currentPath =  new paper.Path();

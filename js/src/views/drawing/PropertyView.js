@@ -114,6 +114,8 @@ define([
     },
 
     colorInputChange: function(event) {
+            console.log('color change');
+
       var color = $(event.target).val();
       var id = $(event.target).attr('id');
       if (id == 'fill') {
@@ -136,7 +138,7 @@ define([
     },
 
     colorChange: function(event, ui) {
-
+      console.log('color change');
       var color = $('#color-window').iris('color');
       console.log('color', color);
       if ($('#fillColorBlock').hasClass('color-block-selected')) {
@@ -162,7 +164,7 @@ define([
     },
 
     geometrySelected: function(data) {
-
+      this.undelegateEvents();
       if (data.fill_color) {
         $('#fillColorBlock').css('background-color', data.fill_color);
         $('#fill').val(data.fill_color);
@@ -183,6 +185,7 @@ define([
       }
 
       this.setParams(data.params,data.id);
+      this.delegateEvents();
     },
 
 
@@ -344,17 +347,23 @@ define([
       }
 
       var html = template(context);
+      var count = 0;
       $('#parameters').html(html);
-      $('#parameterSlider').each(function() {
+      $('#parameterSliders input').each(function() {
         var slider = $(this);
+
+        if(userParams){
+          slider.val(userParams[count].val);
+        }
+        count++;
         console.log('actual slider val',slider.val());
         slider.on('input', function(slideEvt) {
           slider.trigger('param-change');
         });
       });
-      $('#parameterText').each(function() {
+      $('#parameterTexts input').each(function() {
         var text = $(this);
-
+        console.log("adding keyboard listener to",text);
         text.keyup(function(e) {
           if (e.keyCode === 13) {
             text.trigger('param-change');

@@ -44,9 +44,30 @@ define([
       return data;
     },
 
-    //called when path points are modified 
+     //called when path points are modified 
     updateParams: function(data) {
+      if(data.property_name=='width'||data.property_name=='height'){
+         var userParams = this.get('userParams');
+          if(data.property_name ==='width'){
+            userParams[0].val = data.value;
+          }
+          else{
+            userParams[1].val = data.value;
+          }
+          this.set('userParams',userParams);
 
+          var new_master;
+          if(this.get('name')==='rectangle'){
+            new_master = new paper.Path.Rectangle(new paper.Point(0,0), userParams[0].val, userParams[1].val);
+          } 
+          else{
+           new_master =new paper.Path.Ellipse(new paper.Point(0,0), userParams[0].val, userParams[1].val);
+          }
+          new_master.visible = false;
+          this.set('master_path',new_master.exportJSON());
+          new_master.remove();
+          console.log('reset path to ',data.value);
+      }
     }
 
   });
