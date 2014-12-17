@@ -114,7 +114,6 @@ define([
     },
 
     colorInputChange: function(event) {
-            console.log('color change');
 
       var color = $(event.target).val();
       var id = $(event.target).attr('id');
@@ -138,9 +137,7 @@ define([
     },
 
     colorChange: function(event, ui) {
-      console.log('color change');
       var color = $('#color-window').iris('color');
-      console.log('color', color);
       if ($('#fillColorBlock').hasClass('color-block-selected')) {
         $('#fillColorBlock').removeClass('remove-color');
         $('#fillColorBlock').css('background-color', color);
@@ -180,12 +177,11 @@ define([
         }
       }
       if (data.stroke_width) {
-        //console.log("setting slider");
         $('#strokeSlider').val(data.stroke_width);
       }
 
       this.setParams(data.params,data.id);
-      this.delegateEvents();
+      this.delegateEvents();  
     },
 
 
@@ -224,7 +220,6 @@ define([
           id: id,
           property_name: property_name
         };
-        console.log('param change', data);
         this.model.geometryParamsModified(data);
       }
 
@@ -326,7 +321,6 @@ define([
       var paramTexts = [];
       var behaviorParams = [];
       var context = {};
-      console.log('userParams', userParams);
 
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
@@ -334,7 +328,6 @@ define([
           if (userParams[i].type === 'text_box') {
             paramTexts.push(userParams[i]);
           } else {
-            console.log('slider val',userParams[i].val);
             paramSliders.push(userParams[i]);
           }
         }
@@ -356,14 +349,12 @@ define([
           slider.val(userParams[count].val);
         }
         count++;
-        console.log('actual slider val',slider.val());
         slider.on('input', function(slideEvt) {
           slider.trigger('param-change');
         });
       });
       $('#parameterTexts input').each(function() {
         var text = $(this);
-        console.log("adding keyboard listener to",text);
         text.keyup(function(e) {
           if (e.keyCode === 13) {
             text.trigger('param-change');

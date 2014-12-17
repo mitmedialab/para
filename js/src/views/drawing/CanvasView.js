@@ -280,7 +280,6 @@ define([
 
     /*centers the sub-view on a specific point */
     centerGeom: function(targetPoint) {
-      console.log('target Point', targetPoint);
       var view = paper.View._viewsById['sub-canvas'];
       var subCanvas = $('#sub-canvas');
       var subCanvasCon = $('.sub-canvas-container');
@@ -298,7 +297,6 @@ define([
 
     /*attempts to create a new instance of the current prototype*/
     instantiatePrototype: function(event) {
-      console.log("instantiatePrototype");
       var instantiated = this.model.geometryInstantiated(event.offsetX, event.offsetY);
     }
 

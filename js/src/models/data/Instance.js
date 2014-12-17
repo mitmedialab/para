@@ -226,7 +226,7 @@ define([
 		 */
 		modifyPoints: function(segment_index, data, handle, override) {
 			var proto_node = this.get('proto_node');
-			if(override && proto_node){
+			if (override && proto_node) {
 				proto_node.modifyPoints(segment_index, data, handle, override);
 			}
 
@@ -477,7 +477,7 @@ define([
 			if (this.has('proto_node')) {
 
 				var protoNode = this.get('proto_node');
-				if (!protoNode.get('r~endered')) {
+				if (!protoNode.get('rendered')) {
 					protoNode.render();
 				}
 				return protoNode.inheritGeom();
@@ -488,7 +488,7 @@ define([
 			/*var path_deltas = this.get('path_deltas');
 			for (var i = 0; i < path_deltas.length; i++) {
 				if (path.segments.length > i) {
-					console.log("adding",i, path_deltas[i].x,path_deltas[i].y );
+					'console'.log("adding",i, path_deltas[i].x,path_deltas[i].y );
 					path.segments[i].point.x = path.segments[i].point.x + path_deltas[i].x;
 					path.segments[i].point.y = path.segments[i].point.y + path_deltas[i].y;
 
@@ -677,144 +677,149 @@ define([
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 		render: function() {
-			if (this.get('name') != 'root') {
-				var is_proto = this.get('is_proto');
-				var view;
-				if (is_proto) {
-					view = paper.View._viewsById['sub-canvas'];
-				} else {
-					view = paper.View._viewsById['canvas'];
-
-				}
-				view._project.activate();
-
-				var selected = this.get('selected');
-				var selected_indexes = this.get('selected_indexes');
-				var proto_selected = this.get('proto_selected');
-				var inheritor_selected = this.get('inheritor_selected');
-
-				var fill_color = this.inheritFill();
-				var stroke_color = this.inheritStroke();
-				var stroke_width = this.inheritWidth();
-
-				var rmatrix = this.get('rmatrix');
-				var smatrix = this.get('smatrix');
-				var tmatrix = this.get('tmatrix');
-
-
-				var position = this.get('position').toPaperPoint();
-				var translation_delta = this.get('translation_delta').toPaperPoint();
-				var rotation_origin = this.get('rotation_origin').toPaperPoint();
-				var rotation_delta = this.get('rotation_delta');
-				var scaling_origin = this.get('scaling_origin').toPaperPoint();
-				var scaling_delta = this.get('scaling_delta');
-
-
-				rmatrix.rotate(rotation_delta, rotation_origin);
-				smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
-				tmatrix.translate(translation_delta);
-
-				var protoNode = this.get('proto_node');
-				var translation_node = this.get('translation_node');
-				var rotation_node = this.get('rotation_node');
-				var scaling_node = this.get('scaling_node');
-				if (translation_node) {
-					tmatrix = translation_node.inheritTranslation(tmatrix, position);
-
-
-				} else if (protoNode) {
-					tmatrix = protoNode.inheritTranslation(tmatrix, position);
-				}
-
-
-				if (scaling_node) {
-					smatrix = scaling_node.inheritScaling(smatrix, scaling_origin);
-				} else if (protoNode) {
-					smatrix = protoNode.inheritScaling(smatrix, scaling_origin);
-				}
-
-				if (rotation_node) {
-					rmatrix = rotation_node.inheritRotation(rmatrix, rotation_origin);
-				} else if (protoNode) {
-					rmatrix = protoNode.inheritRotation(rmatrix, rotation_origin);
-				}
-
-
-				var geom = new paper.Path();
-
-				if (protoNode) {
-					if (!protoNode.get('rendered')) {
-						protoNode.render();
-					}
-					geom.importJSON(protoNode.inheritGeom());
-				} else {
-
-					geom.importJSON(this.get('master_path'));
-
-				}
-				if (geom) {
-					geom.data.instance = this;
-					geom.fillColor = fill_color;
-					geom.strokeColor = stroke_color;
-					geom.strokeWidth = stroke_width;
-					geom.visible = true;
-					geom.position = position;
-					geom.transform(rmatrix);
-					geom.transform(smatrix);
-					geom.transform(tmatrix);
-					var screen_bounds = geom.bounds;
-
-					if (selected_indexes.length === 0) {
-
-						if (selected) {
-							geom.selectedColor = '#16BDE7';
-							geom.selected = selected;
-							view._project.activate();
-							var g_bbox = new paper.Path.Rectangle(geom.bounds.topLeft, new paper.Size(geom.bounds.width, geom.bounds.height));
-							g_bbox.data.instance = this;
-							g_bbox.selectedColor = '#16BDE7';
-							g_bbox.selected = true;
-
-							var i_bbox = this.get('i_bbox');
-							//draw in bounding box for inheritors
-							if (i_bbox.bottomRight) {
-								paper.View._viewsById['canvas']._project.activate();
-								var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
-								var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
-								var gi_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
-								gi_bbox.selectedColor = '#83CC27';
-								gi_bbox.selected = true;
-								view._project.activate();
-
-							}
-
-						} else if (proto_selected) {
-							geom.selectedColor = '#83CC27';
-							geom.selected = proto_selected;
-						} else if (inheritor_selected) {
-							geom.selectedColor = '#FF175D';
-							geom.selected = inheritor_selected;
-						}
+			if (!this.get('rendered')) {
+				if (this.get('name') != 'root') {
+					var is_proto = this.get('is_proto');
+					var view;
+					if (is_proto && this.get('show')) {
+						view = paper.View._viewsById['sub-canvas'];
 					} else {
-						for (var i = 0; i < selected_indexes.length; i++) {
-							geom.segments[selected_indexes[i]].selected = true;
-						}
-					}
-					//screen_bounds.selected = selected;
-					this.set({
-						screen_position: screen_bounds.topLeft,
-						screen_width: screen_bounds.width,
-						screen_height: screen_bounds.height,
-					});
-					//if shape is prototype, do not render it on the screen
-					if (is_proto && !this.get('show')) {
-						geom.visible = false;
+						view = paper.View._viewsById['canvas'];
 
 					}
-					this.set('geom', geom);
+					view._project.activate();
+
+					var selected = this.get('selected');
+					var selected_indexes = this.get('selected_indexes');
+					var proto_selected = this.get('proto_selected');
+					var inheritor_selected = this.get('inheritor_selected');
+
+					var fill_color = this.inheritFill();
+					var stroke_color = this.inheritStroke();
+					var stroke_width = this.inheritWidth();
+
+					var rmatrix = this.get('rmatrix');
+					var smatrix = this.get('smatrix');
+					var tmatrix = this.get('tmatrix');
+
+
+					var position = this.get('position').toPaperPoint();
+					var translation_delta = this.get('translation_delta').toPaperPoint();
+					var rotation_origin = this.get('rotation_origin').toPaperPoint();
+					var rotation_delta = this.get('rotation_delta');
+					var scaling_origin = this.get('scaling_origin').toPaperPoint();
+					var scaling_delta = this.get('scaling_delta');
+
+
+					rmatrix.rotate(rotation_delta, rotation_origin);
+					smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
+					tmatrix.translate(translation_delta);
+
+					var protoNode = this.get('proto_node');
+					var translation_node = this.get('translation_node');
+					var rotation_node = this.get('rotation_node');
+					var scaling_node = this.get('scaling_node');
+					if (translation_node) {
+						tmatrix = translation_node.inheritTranslation(tmatrix, position);
+
+
+					} else if (protoNode) {
+						tmatrix = protoNode.inheritTranslation(tmatrix, position);
+					}
+
+
+					if (scaling_node) {
+						smatrix = scaling_node.inheritScaling(smatrix, scaling_origin);
+					} else if (protoNode) {
+						smatrix = protoNode.inheritScaling(smatrix, scaling_origin);
+					}
+
+					if (rotation_node) {
+						rmatrix = rotation_node.inheritRotation(rmatrix, rotation_origin);
+					} else if (protoNode) {
+						rmatrix = protoNode.inheritRotation(rmatrix, rotation_origin);
+					}
+
+
+					var geom = new paper.Path();
+
+					if (protoNode) {
+						if (!protoNode.get('rendered')) {
+							protoNode.render();
+						}
+						geom.importJSON(protoNode.inheritGeom());
+					} else {
+
+						geom.importJSON(this.get('master_path'));
+
+					}
+					if (geom) {
+						geom.data.instance = this;
+						geom.fillColor = fill_color;
+						geom.strokeColor = stroke_color;
+						geom.strokeWidth = stroke_width;
+						geom.visible = true;
+						geom.position = position;
+						geom.transform(rmatrix);
+						geom.transform(smatrix);
+						geom.transform(tmatrix);
+						var screen_bounds = geom.bounds;
+
+						if (selected_indexes.length === 0) {
+
+							if (selected) {
+								geom.selectedColor = '#16BDE7';
+								geom.selected = selected;
+								view._project.activate();
+								var g_bbox = new paper.Path.Rectangle(geom.bounds.topLeft, new paper.Size(geom.bounds.width, geom.bounds.height));
+								g_bbox.data.instance = this;
+								g_bbox.selectedColor = '#16BDE7';
+								g_bbox.selected = true;
+
+								var i_bbox = this.get('i_bbox');
+								//draw in bounding box for inheritors
+								if (i_bbox.bottomRight) {
+									paper.View._viewsById['canvas']._project.activate();
+									var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
+									var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
+									var gi_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
+									gi_bbox.selectedColor = '#83CC27';
+									gi_bbox.selected = true;
+									view._project.activate();
+
+								}
+
+							} else if (proto_selected) {
+								geom.selectedColor = '#83CC27';
+								geom.selected = proto_selected;
+							} else if (inheritor_selected) {
+								geom.selectedColor = '#FF175D';
+								geom.selected = inheritor_selected;
+							}
+						} else {
+							for (var i = 0; i < selected_indexes.length; i++) {
+								geom.segments[selected_indexes[i]].selected = true;
+							}
+						}
+						//screen_bounds.selected = selected;
+						this.set({
+							screen_position: screen_bounds.topLeft,
+							screen_width: screen_bounds.width,
+							screen_height: screen_bounds.height,
+						});
+						//if shape is prototype, do not render it on the screen
+						if (is_proto && !this.get('show')) {
+							geom.visible = false;
+
+						} else if (is_proto) {
+							console.log('showing prototype', this.get('id'));
+
+						}
+						this.set('geom', geom);
+					}
 				}
+				this.set('rendered', true);
 			}
-			this.set('rendered', true);
 		},
 
 		copyAttributes: function(clone, deep) {
