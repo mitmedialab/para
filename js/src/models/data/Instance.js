@@ -36,7 +36,7 @@ define([
 			scaling_origin: null,
 			scaling_delta: null,
 			rotation_origin: null,
-			rotation_delta: 0,
+			rotation_delta: null,
 
 			//screen properies
 			screen_position: null,
@@ -66,8 +66,6 @@ define([
 
 		initialize: function() {
 			this.set('position', new PPoint(0, 0));
-			this.set('translation_delta', new PPoint(0, 0));
-			this.set('scaling_delta', new PPoint(1, 1));
 
 			this.set('center', new PPoint(0, 0));
 			this.set('scaling_origin', new PPoint(0, 0));
@@ -97,13 +95,11 @@ define([
 		 */
 		create: function() {
 			var instance = new this.constructor();
+			this.set('is_proto', true);
+
 			console.log('instance', instance);
 			var inheritors = this.get('inheritors');
-			instance.set('master_path', this.get('master_path'));
 			instance.set('proto_node', this);
-			instance.set('rotation_node', this);
-			instance.set('scaling_node', this);
-			instance.set('translation_node', this);
 			inheritors.push(instance);
 			this.set('inheritors', inheritors);
 			return instance;
@@ -157,40 +153,25 @@ define([
 			}
 		},
 		resetDeltasToPrototype: function(data) {
-			var protoNode;
+			console.log('reset deltas to prototype', this.get('id'));
 			if (data.translation_delta) {
 
-				protoNode = this.get('translation_node');
-				if (!protoNode) {
-					protoNode = this.get('proto_node');
-				}
+				var protoNode = this.get('proto_node');
+
 				if (protoNode) {
 					this.set('position', protoNode.get('position').clone());
 					this.set('rotation_origin', protoNode.get('rotation_origin').clone());
 					this.set('scaling_origin', protoNode.get('scaling_origin').clone());
-					this.set('translation_delta', new PPoint(0, 0));
+					this.set('translation_delta', null);
 				}
 			}
 
 			if (data.rotation_delta) {
+				this.set('rotation_delta', null);
 
-				protoNode = this.get('rotation_node');
-				if (!protoNode) {
-					protoNode = this.get('proto_node');
-				}
-				if (protoNode) {
-					this.set('rotation_delta', 0);
-				}
 			}
 			if (data.scaling_delta) {
-
-				protoNode = this.get('scaling_node');
-				if (!protoNode) {
-					protoNode = this.get('scaling_node');
-				}
-				if (protoNode) {
-					this.set('scaling_delta', new PPoint(1, 1));
-				}
+				this.set('scaling_delta', null);
 			}
 		},
 
@@ -224,17 +205,16 @@ define([
 		/* modifyPoints
 		 * called when segment in geometry is modified
 		 */
-		modifyPoints: function(segment_index, data, handle, override) {
+		modifyPoints: function(segment_index, data, handle, mode) {
 			var proto_node = this.get('proto_node');
-			if (override && proto_node) {
-				proto_node.modifyPoints(segment_index, data, handle, override);
+			if (mode ==='proxy' && proto_node) {
+				proto_node.modifyPoints(segment_index, data, handle, 'none');
 			}
 
-			var master_pathJSON = this.get('master_path');
+			var master_pathJSON = this.inheritProperty('master_path');
 			var master_path = new paper.Path();
 			master_path.importJSON(master_pathJSON);
 			if (data.translation_delta) {
-				var origPoint = master_path.segments[segment_index].point.clone();
 				var tmatrix = this.get('tmatrix');
 				var rmatrix = this.get('rmatrix');
 				var smatrix = this.get('smatrix');
@@ -308,13 +288,23 @@ define([
 		},
 
 
-		modifyStyle: function(data, override) {
+		modifyStyle: function(data, mode) {
+			var inheritors = this.get('inheritors');
 
-			if (override) {
+			if (mode === 'proxy') {
 				var proto_node = this.get('proto_node');
-				proto_node.modifyStyle(data);
-			}
+				proto_node.modifyStyle(data, 'none');
+			} else if (mode === 'match') {
+				for (var j = 0; j < inheritors.length; j++) {
+					inheritors[i].resetStylesToPrototype(data, true);
 
+				}
+			} else if (mode === 'relative') {
+				for (var i = 0; i < inheritors.length; i++) {
+					inheritors[i].modifyStyle(data, 'none');
+				}
+			}
+if (mode !== 'proxy') {
 			if (data.fill_color) {
 				this.set('fill_color', data.fill_color);
 
@@ -327,80 +317,71 @@ define([
 			if (data.stroke_width) {
 				this.set('stroke_width', data.stroke_width);
 			}
-
-			var inheritors = this.get('inheritors');
-
-			for (var i = 0; i < inheritors.length; i++) {
-				inheritors[i].resetStylesToPrototype(data, true);
-
-			}
+		}
 		},
 
-		modifyDelta: function(data, override) {
+		modifyDelta: function(data, mode) {
 			var matrix = this.get('matrix');
 			var position = this.get('rotation_origin').toPaperPoint();
 			var proto_incremented = false;
-			var protoNode;
-			if (data.translation_delta) {
-				if (override) {
-					protoNode = this.get('translation_node');
-					if (!protoNode) {
-						protoNode = this.get('proto_node');
-					}
-					if (protoNode) {
-						protoNode.modifyDelta(data);
-						proto_incremented = true;
+			var protoNode = this.get('proto_node');
+			var inheritors = this.get('inheritors');
 
-					}
+			if (mode === 'proxy') {
+				if (protoNode) {
+					protoNode.modifyDelta(data);
+					proto_incremented = true;
+				}
 
-				} else {
+			} else if (mode === 'match') {
+				for (var j = 0; j < inheritors.length; j++) {
+					inheritors[j].resetDeltasToPrototype(data);
+				}
+			}
+
+			if (mode === 'relative') {
+				for (var i = 0; i < inheritors.length; i++) {
+					inheritors[i].modifyDelta(data, 'none');
+				}
+
+			}
+
+			if (mode !== 'proxy') {
+				if (data.translation_delta) {
+
 					var translation_delta = this.get('translation_delta');
+					if (!translation_delta) {
+						translation_delta = new PPoint(0, 0);
+					}
 					if (data.set) {
 						translation_delta = data.translation_delta;
 					} else {
 						translation_delta.add(data.translation_delta);
 					}
 					this.set('translation_delta', translation_delta);
+
 				}
-			}
 
-			if (data.rotation_delta) {
-				if (override) {
-					protoNode = this.get('rotation_node');
-					if (!protoNode) {
-						protoNode = this.get('proto_node');
-					}
-					if (protoNode) {
-						protoNode.modifyDelta(data);
-						proto_incremented = true;
-					}
-
-
-				} else {
+				if (data.rotation_delta) {
 					var rotation_delta = this.get('rotation_delta');
+					if (!rotation_delta) {
+						rotation_delta = 0;
+					}
 					if (data.set) {
 						rotation_delta = data.rotation_delta;
 					} else {
 						rotation_delta += data.rotation_delta;
 					}
 					this.set('rotation_delta', rotation_delta);
+
 				}
-			}
 
-			if (data.scaling_delta) {
-				if (override) {
-					protoNode = this.get('scaling_node');
-					if (!protoNode) {
-						protoNode = this.get('proto_node');
-					}
-					if (protoNode) {
-						protoNode.modifyDelta(data);
-						proto_incremented = true;
-					}
+				if (data.scaling_delta) {
 
-
-				} else {
 					var scaling_delta = this.get('scaling_delta');
+					if (!scaling_delta) {
+						scaling_delta = 0;
+					}
 					if (data.set) {
 						scaling_delta = data.scaling_delta;
 					} else {
@@ -409,6 +390,8 @@ define([
 					this.set('scaling_delta', scaling_delta);
 				}
 			}
+
+
 
 		},
 
@@ -431,97 +414,6 @@ define([
 				x: this.get('position').x + this.get('delta').x + this.get('width') / 2,
 				y: this.get('position').y + this.get('delta').y + this.get('height') / 2,
 			};
-		},
-
-		/*getRelevantPrototypes
-		 * returns a list of relevant prototypes based on
-		 * transformation properties
-		 */
-		getRelevantPrototypes: function(data) {
-			var prototypes = [];
-			var contains_proto = false;
-			if (data.rotation_delta) {
-				if (this.get('rotation_node')) {
-					prototypes.push(this.get('rotation_node'));
-				} else if (this.get('proto_node')) {
-					prototypes.push(this.get('proto_node'));
-					contains_proto = true;
-				}
-			}
-			if (data.translation_delta) {
-				if (this.get('translation_node')) {
-					prototypes.push(this.get('translation_node'));
-				} else if (this.get('proto_node') && !contains_proto) {
-					prototypes.push(this.get('proto_node'));
-					contains_proto = true;
-				}
-			}
-			if (data.rotation_delta) {
-				if (this.get('scaling_node')) {
-					prototypes.push(this.get('scaling_node'));
-				} else if (this.get('proto_node') && !contains_proto) {
-					prototypes.push(this.get('proto_node'));
-					contains_proto = true;
-				}
-			}
-			return prototypes;
-
-		},
-
-		/*inheritGeom
-		 * moves up the prototype chain to find the
-		 * relevant geometry for this node and return it
-		 */
-		inheritGeom: function() {
-
-			if (this.has('proto_node')) {
-
-				var protoNode = this.get('proto_node');
-				if (!protoNode.get('rendered')) {
-					protoNode.render();
-				}
-				return protoNode.inheritGeom();
-			} else {
-				return this.get('master_path');
-			}
-
-			/*var path_deltas = this.get('path_deltas');
-			for (var i = 0; i < path_deltas.length; i++) {
-				if (path.segments.length > i) {
-					'console'.log("adding",i, path_deltas[i].x,path_deltas[i].y );
-					path.segments[i].point.x = path.segments[i].point.x + path_deltas[i].x;
-					path.segments[i].point.y = path.segments[i].point.y + path_deltas[i].y;
-
-				}
-			}*/
-
-		},
-
-
-		/*inheritTranslation
-		 * checks first to see if there is a translation prototype
-		 * moves up the prototype chain to find the
-		 * relevant translation for this node and applies it to the matrix
-		 */
-		inheritTranslation: function(tmatrix, target_origin) {
-			var protoNode;
-			if (this.has('translation_node')) {
-				protoNode = this.get('translation_node');
-
-			} else if (this.has('proto_node')) {
-				protoNode = this.get('proto_node');
-			}
-			if (protoNode) {
-				if (!protoNode.get('rendered')) {
-					protoNode.render();
-				}
-				tmatrix = protoNode.inheritTranslation(tmatrix, target_origin);
-
-			}
-			var translation_delta = this.get('translation_delta');
-			tmatrix.translate(translation_delta);
-
-			return tmatrix;
 		},
 
 		/*inheritRotation
@@ -548,77 +440,21 @@ define([
 			return rmatrix;
 		},
 
-		/*inheritScaling
+		/*inheritProperty
 		 * checks first to see if there is a scaling prototype
 		 * moves up the prototype chain to find the
 		 * relevant scaling for this node and applies it to the matrix
 		 */
-		inheritScaling: function(smatrix, target_scaling_origin) {
-			var protoNode;
-			if (this.has('scaling_node')) {
-				protoNode = this.get('scaling_node');
-			} else if (this.has('proto_node')) {
-				protoNode = this.get('proto_node');
-			}
-			if (protoNode) {
-				if (!protoNode.get('rendered')) {
-					protoNode.render();
-				}
-				smatrix = protoNode.inheritScaling(smatrix, target_scaling_origin);
-			}
-
-			var scaling_delta = this.get('scaling_delta');
-			smatrix.scale(scaling_delta, target_scaling_origin);
-
-			return smatrix;
-		},
-
-		inheritFill: function() {
-			if (this.get('fill_color')) {
-				return this.get('fill_color');
+		inheritProperty: function(property) {
+			if (this.get(property)) {
+				return this.get(property);
 			} else {
 				if (this.has('proto_node')) {
-					return this.get('proto_node').inheritFill();
+					return this.get('proto_node').inheritProperty(property);
 				}
 			}
 		},
 
-		inheritStroke: function() {
-			if (this.get('stroke_color')) {
-				return this.get('stroke_color');
-			} else {
-				if (this.has('proto_node')) {
-					return this.get('proto_node').inheritStroke();
-				}
-			}
-		},
-
-		inheritWidth: function() {
-			if (this.get('stroke_width')) {
-				return this.get('stroke_width');
-			} else {
-				if (this.has('proto_node')) {
-					return this.get('proto_node').inheritWidth();
-				}
-			}
-		},
-
-
-		/*getPrototypeFor
-		 * check to see if object has a prototype attached to a specific property
-		 */
-		getPrototypeFor: function(type) {
-			if (this.has(type)) {
-				return (this.get(type));
-			} else {
-				if (this.has('proto_node')) {
-					var protoNode = this.get('proto_node');
-					return protoNode.getPrototypeFor(type);
-				} else {
-					return null;
-				}
-			}
-		},
 
 		/* setSelectionForInheritors
 		 * toggles selection mode for objects which inherit
@@ -680,79 +516,44 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var is_proto = this.get('is_proto');
-					var view;
-					if (is_proto && this.get('show')) {
-						view = paper.View._viewsById['sub-canvas'];
-					} else {
-						view = paper.View._viewsById['canvas'];
-
-					}
-					view._project.activate();
 
 					var selected = this.get('selected');
 					var selected_indexes = this.get('selected_indexes');
 					var proto_selected = this.get('proto_selected');
 					var inheritor_selected = this.get('inheritor_selected');
 
-					var fill_color = this.inheritFill();
-					var stroke_color = this.inheritStroke();
-					var stroke_width = this.inheritWidth();
+					var fill_color = this.inheritProperty('fill_color');
+					var stroke_color = this.inheritProperty('stroke_color');
+					var stroke_width = this.inheritProperty('stroke_width');
+					var protoNode = this.get('proto_node');
 
 					var rmatrix = this.get('rmatrix');
 					var smatrix = this.get('smatrix');
 					var tmatrix = this.get('tmatrix');
 
-
 					var position = this.get('position').toPaperPoint();
-					var translation_delta = this.get('translation_delta').toPaperPoint();
 					var rotation_origin = this.get('rotation_origin').toPaperPoint();
-					var rotation_delta = this.get('rotation_delta');
 					var scaling_origin = this.get('scaling_origin').toPaperPoint();
-					var scaling_delta = this.get('scaling_delta');
 
 
-					rmatrix.rotate(rotation_delta, rotation_origin);
-					smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
-					tmatrix.translate(translation_delta);
-
-					var protoNode = this.get('proto_node');
-					var translation_node = this.get('translation_node');
-					var rotation_node = this.get('rotation_node');
-					var scaling_node = this.get('scaling_node');
-					if (translation_node) {
-						tmatrix = translation_node.inheritTranslation(tmatrix, position);
-
-
-					} else if (protoNode) {
-						tmatrix = protoNode.inheritTranslation(tmatrix, position);
+					var scaling_delta = this.inheritProperty('scaling_delta');
+					var rotation_delta = this.inheritProperty('rotation_delta');
+					var translation_delta = this.inheritProperty('translation_delta');
+					if (scaling_delta) {
+						smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
 					}
-
-
-					if (scaling_node) {
-						smatrix = scaling_node.inheritScaling(smatrix, scaling_origin);
-					} else if (protoNode) {
-						smatrix = protoNode.inheritScaling(smatrix, scaling_origin);
+					if (rotation_delta) {
+						rmatrix.rotate(rotation_delta, rotation_origin);
 					}
-
-					if (rotation_node) {
-						rmatrix = rotation_node.inheritRotation(rmatrix, rotation_origin);
-					} else if (protoNode) {
-						rmatrix = protoNode.inheritRotation(rmatrix, rotation_origin);
+					if (translation_delta) {
+						tmatrix.translate(translation_delta.toPaperPoint());
 					}
-
 
 					var geom = new paper.Path();
 
-					if (protoNode) {
-						if (!protoNode.get('rendered')) {
-							protoNode.render();
-						}
-						geom.importJSON(protoNode.inheritGeom());
-					} else {
+					geom.importJSON(this.inheritProperty('master_path'));
 
-						geom.importJSON(this.get('master_path'));
 
-					}
 					if (geom) {
 						geom.data.instance = this;
 						geom.fillColor = fill_color;
@@ -770,7 +571,6 @@ define([
 							if (selected) {
 								geom.selectedColor = '#16BDE7';
 								geom.selected = selected;
-								view._project.activate();
 								var g_bbox = new paper.Path.Rectangle(geom.bounds.topLeft, new paper.Size(geom.bounds.width, geom.bounds.height));
 								g_bbox.data.instance = this;
 								g_bbox.selectedColor = '#16BDE7';
@@ -785,8 +585,6 @@ define([
 									var gi_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
 									gi_bbox.selectedColor = '#83CC27';
 									gi_bbox.selected = true;
-									view._project.activate();
-
 								}
 
 							} else if (proto_selected) {
@@ -807,14 +605,7 @@ define([
 							screen_width: screen_bounds.width,
 							screen_height: screen_bounds.height,
 						});
-						//if shape is prototype, do not render it on the screen
-						if (is_proto && !this.get('show')) {
-							geom.visible = false;
 
-						} else if (is_proto) {
-							console.log('showing prototype', this.get('id'));
-
-						}
 						this.set('geom', geom);
 					}
 				}

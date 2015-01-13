@@ -34,7 +34,6 @@ define([
     var rootNode,
       uninstantiated,
       visitor,
-      shownPrototype,
       currentNode,
       toolCollection,
       penTool,
@@ -98,8 +97,8 @@ define([
         this.listenTo(toolCollection, "geometryModified", this.geometryModified);
         this.listenTo(toolCollection, "geometrySegmentModified", this.geometrySegmentModified);
 
-        this.listenTo(toolCollection, "geometryCopied", this.geometryCopied);
-        this.listenTo(toolCollection, "geometryDeepCopied", this.geometryDeepCopied);
+        this.listenTo(toolCollection, "addPrototype", this.addPrototype);
+
         this.listenTo(toolCollection, "modifyInheritance", this.modifyInheritance);
 
 
@@ -113,8 +112,6 @@ define([
         this.listenTo(toolCollection, 'selectionReset', this.selectionReset);
 
         this.listenTo(toolCollection, 'optionClick', this.openMenu);
-        // this.listenTo(toolCollection, 'rootRender', this.rootRender);
-        //this.listenTo(toolCollection, 'rootChange', this.rootChange);
 
         this.listenTo(toolCollection, 'rootUpdate', this.rootUpdate);
         this.listenTo(toolCollection, 'getSelection', this.getSelection);
@@ -122,8 +119,7 @@ define([
         this.listenTo(toolCollection, 'currentRender', this.currentRender);
         this.listenTo(toolCollection, 'setState', this.setState);
 
-        // this.listenTo(event_bus, 'rootUpdate', this.rootUpdate);
-        //this.listenTo(event_bus, 'rootRender', this.rootRender);
+
         this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
         this.listenTo(event_bus, 'moveUpNode', this.moveUpNode);
 
@@ -278,47 +274,32 @@ define([
       },
 
       /* addPrototype
-       * converts a static object to a prototype
-       * and adds one instance of the prototype to the scenegraph
+       * adds one instance of the prototype to the scenegraph
        * TODO: will be more complex when multiple objects are selected-
        * behavior probably should be to create a prototype which encapsulates
        * all those objects rather than one prototype per object
        */
 
       addPrototype: function() {
-        if (this.get('state') === 'selectTool' && currentView === mainView) {
+        console.log('add prototype');
+        if (this.get('state') === 'selectTool') {
           var selectedShapes = selectTool.get('selected_shapes');
           if (selectedShapes.length == 1) {
             var instance = selectedShapes[0];
-            instance.set('translation_delta', new PPoint(0, 0));
+            //instance.set('translation_delta', new PPoint(0, 0));
 
-            var sceneParent = instance.nodeParent;
+          
             var newInstance = instance.create();
             newInstance.set('position', instance.get('position').clone());
             newInstance.set('rotation_origin', instance.get('position').clone());
             newInstance.set('scaling_origin', instance.get('position').clone());
 
-            var edge = new Edge({
-              x: sceneParent,
-              y: newInstance,
-            });
-
-            edge.addAll();
-            sceneParent.removeChildNode(instance);
-            sceneParent.addChildNode(newInstance);
-            newInstance.addEdge(edge);
+            currentNode.addChildNode(newInstance);
             instance.set('selected', false);
             newInstance.set('selected', true);
 
-            instance.set('is_proto', true);
-            visitor.addPrototype(instance);
             selectedShapes[0] = newInstance;
             var id = instance.get('id');
-            if (shownPrototype) {
-              shownPrototype.set('show', false);
-            }
-            shownPrototype = instance;
-            shownPrototype.set('show', true);
             this.compile();
             var geom = instance.get('geom').clone();
 
@@ -327,6 +308,7 @@ define([
               id: id
             };
           } else {
+            //this case should check for grouping of objects as prototypes (if such a prototype does not already exist, it must be created?)
             return false;
           }
         } else {
@@ -334,61 +316,8 @@ define([
         }
       },
 
-      /*showPrototype
-       * called to show a new prototype in the sub canvas
-       */
-      showPrototype: function(prototype) {
-        if (shownPrototype) {
-          shownPrototype.set('show', false);
-        }
-        if (prototype) {
-          shownPrototype = prototype;
-          shownPrototype.set('show', true);
-          this.compile();
-          this.trigger('centerGeom', prototype.get('geom').position);
-        } else {
-          shownPrototype = null;
-        }
-      },
 
-
-      /* geometryInstantiated
-       * callback that is triggered when a geometry
-       * object is instantiated from a prototype
-       */
-      geometryInstantiated: function(x, y) {
-
-        if (shownPrototype && currentView != subView) {
-          var newInstance = shownPrototype.create();
-
-          var screenpos = shownPrototype.get('geom').position;
-          var protopos = shownPrototype.get('position');
-          var td = new PPoint(x - screenpos.x + protopos.x, y - screenpos.y + protopos.y);
-
-          newInstance.set('position', td.clone());
-          newInstance.set('rotation_origin', td.clone());
-          newInstance.set('scaling_origin', td.clone());
-
-          //var td = prototype.get('position').clone();
-          //newInstance.set('translation_delta', instance.get('position').clone());
-          var edge = new Edge({
-            x: currentNode,
-            y: newInstance,
-          });
-
-          edge.addAll();
-          newInstance.addEdge(edge);
-          currentNode.addChildNode(newInstance);
-          newInstance.set('selected', true);
-          selectTool.addSelectedShape(newInstance);
-          this.compile();
-          return true;
-        }
-        return false;
-      },
-
-
-      /*geometryDeepCopied
+     /*geometryDeepCopied
        * makes an independent clone of the object being copied and
        * transfers selection to that object
        * TODO: deep copy all descendants of copy
@@ -449,15 +378,6 @@ define([
           }
           this.styleModified(data, true);
           this.trigger('geometrySelected', data);
-
-          //show prototype in sub view if selecting objects in the main view
-          if (currentView != subView) {
-            var lastSelected = selectTool.getLastSelected();
-            if (lastSelected) {
-              var proto = lastSelected.get('proto_node');
-              this.showPrototype(proto);
-            }
-          }
         }
 
         this.compile();
@@ -474,14 +394,6 @@ define([
             var selected_indexes = instance.get('selected_indexes');
             for (var i = 0; i < segments.length; i++) {
               selected_indexes.push(segments[i].index);
-            }
-          }
-          //show prototype in sub view if selecting objects in the main view
-          if (currentView != subView) {
-            var lastSelected = selectTool.getLastSelected();
-            if (lastSelected) {
-              var proto = lastSelected.get('proto_node');
-              this.showPrototype(proto);
             }
           }
         }
@@ -558,36 +470,27 @@ define([
        * to display bounding boxes
        * TODO: design so that only one iteration is neccesary?
        */
-      geometryModified: function(data, override) {
+      geometryModified: function(data, modifiers) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-          if (currentView == mainView) {
-            instance.modifyDelta(data, override);
-          } else {
-            if (override) {
-              var inheritors = instance.get('inheritors');
-              for (var j = 0; j < inheritors.length; j++) {
-                console.log(inheritors[j].resetDeltaToPrototype);
-                inheritors[j].resetDeltasToPrototype(data);
-              }
-            }
-            instance.modifyDelta(data);
+            
+              
+            instance.modifyDelta(data,modifiers);
 
           }
-        }
+        
         this.compile();
       },
 
-      geometrySegmentModified: function(data, handle, override) {
-        console.log("segment modified");
+      geometrySegmentModified: function(data, handle, modifiers) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
           if (!instance.get('proto_node') || override) {
           var selected_indexes = instance.get('selected_indexes');
           for (var j = 0; j < selected_indexes.length; j++) {
-            instance.modifyPoints(selected_indexes[j], data, handle,override);
+            instance.modifyPoints(selected_indexes[j], data, handle,modifiers);
           }
         }
 
@@ -633,11 +536,11 @@ define([
         mainView._project.clear();
         subView._project.clear();
 
-        visitor.resetPrototypes();
         visitor.resetPrototypes(rootNode.children);
         visitor.visit(rootNode, null);
 
-        currentView._project.activate();
+        //used to switch canvas, not currently being used
+        //currentView._project.activate();
 
         mainView.draw();
         subView.draw();
@@ -646,6 +549,7 @@ define([
 
       /*toggleView
        * changes the currently active view
+       * not currently in use
        */
       toggleView: function(main) {
         selectTool.deselectAll();

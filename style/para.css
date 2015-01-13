@@ -122,6 +122,7 @@ input[type="range"]:active::-webkit-slider-thumb {
     left: 0px;
 }
 .sub-canvas-container{
+     display: none;
     width: 260px;
     height:300px;
     border:1px solid #000;

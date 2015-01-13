@@ -61,8 +61,6 @@ define([
 			canvasDown = false;
 
 			if (currentId > -1) {
-				console.log("instantiatePrototype");
-				event.data.model.geometryInstantiated(currentId, event.offsetX, event.offsetY);
 				currentId = -1;
 			}
 

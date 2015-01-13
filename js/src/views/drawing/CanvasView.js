@@ -229,7 +229,6 @@ define([
 
     subCanvasMouseUp: function(event) {
       if (main.down) {
-        var data = event.data.parent.model.addPrototype();
         if(data){
           var targetPosition = data.geom.position;
           event.data.parent.centerGeom(targetPosition);
@@ -262,20 +261,17 @@ define([
     },
 
     canvasDblclick: function(event) {
-      this.setMainActive();
-
+      /*this.setMainActive();
       this.model.toggleView(true);
       $('#sub-canvas').css('background-color', '#232323');
-      $('#canvas').css('background-color', '#5B5B5B');
+      $('#canvas').css('background-color', '#5B5B5B');*/
     },
 
     subDblclick: function(event) {
-      event.data.parent.setSubActive();
+     /* event.data.parent.setSubActive();
       event.data.parent.model.toggleView(false);
       $('#sub-canvas').css('background-color', '#5B5B5B');
-      $('#canvas').css('background-color', '#232323');
-
-
+      $('#canvas').css('background-color', '#232323');*/
     },
 
     /*centers the sub-view on a specific point */

@@ -17,47 +17,24 @@ define([
 
 	var Visitor = Backbone.Model.extend({
 		defaults: {
-			prototypeRoot: null
 		},
 
 		initialize: function() {
-			var prototypeRoot = new Instance();
-			prototypeRoot.set('type', 'root');
-			this.set('prototypeRoot', prototypeRoot);
 		},
 
-		/* addPrototype
-		 *adds a new prototype according to its parent
-		 */
-		addPrototype: function(prototype) {
-			var protoParent = prototype.get('proto_node');
-			if (protoParent) {
-				protoParent.addChildNode(prototype);
-			} else {
-				var root = this.get('prototypeRoot');
-				root.addChildNode(prototype);
-			}
-		},
 
 		/*resetPrototypes
 		 * resets the prototypes recursively.
 		 * Called before visiting the root node
 		 */
-		resetPrototypes: function(children) {
-			var prototypes;
-			if (!children) {
-				prototypes = this.get('prototypeRoot').children;
-			} else {
-				prototypes = children;
-			}
+		resetPrototypes: function(prototypes) {
 			for (var i = 0; i < prototypes.length; i++) {
 				prototypes[i].reset();
 				this.resetPrototypes(prototypes[i].children);
 			}
 		},
 
-		getPrototypeById: function(id) {
-			var root = this.get('prototypeRoot');
+		getPrototypeById: function(root, id) {
 			var match = null;
 			this.visitBfs(root, function(node) {
 				if (node.get('type') === 'root') {
@@ -215,7 +192,6 @@ define([
 
 			var edgesRendered = node.edgesRendered();
 			if (edgesRendered) {
-		
 					node.render();
 			}
 

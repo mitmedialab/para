@@ -193,12 +193,12 @@ define([
       if (event.modifiers.option && copyReset) {
         copyReset = false;
 
-        this.trigger('geometryDeepCopied');
+        this.trigger('addPrototype');
       }
 
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
-      this.trigger('geometryModified', data, event.modifiers.command);
+      this.trigger('geometryModified', data, event.modifiers);
       
 
     },
@@ -206,7 +206,7 @@ define([
     dSelectDrag: function(event) {
       var data = {};
       data.translation_delta = new PPoint(event.delta.x, event.delta.y);
-      this.trigger('geometrySegmentModified', data, handle,event.modifiers.command);
+      this.trigger('geometrySegmentModified', data, handle,event.modifiers);
       
 
     },
@@ -218,7 +218,7 @@ define([
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
         data.rotation_delta = dAngle - angle;
-        this.trigger('geometryModified', data, event.modifiers.command);
+        this.trigger('geometryModified', data, event.modifiers);
 
       }
 
@@ -244,7 +244,7 @@ define([
         var data = {};
         data.set = true;
         data.scaling_delta = new PPoint(tScaleX,tScaleY);
-        this.trigger('geometryModified', data, event.modifiers.command);
+        this.trigger('geometryModified', data, event.modifiers);
 
       }
 
