@@ -53,6 +53,8 @@ define([
 
       defaults: {
         'state': 'polyTool',
+        'tool-mode': 'standard',
+        'tool-modifier': 'none'
       },
 
       initialize: function(event_bus) {
@@ -288,7 +290,7 @@ define([
             var instance = selectedShapes[0];
             //instance.set('translation_delta', new PPoint(0, 0));
 
-          
+
             var newInstance = instance.create();
             newInstance.set('position', instance.get('position').clone());
             newInstance.set('rotation_origin', instance.get('position').clone());
@@ -317,7 +319,7 @@ define([
       },
 
 
-     /*geometryDeepCopied
+      /*geometryDeepCopied
        * makes an independent clone of the object being copied and
        * transfers selection to that object
        * TODO: deep copy all descendants of copy
@@ -388,7 +390,7 @@ define([
           var path = segments[0].path;
 
           var instance = path.data.instance;
-          console.log('dselected',override);
+          console.log('dselected', override);
           if (!instance.get('proto_node') || override) {
             selectTool.addSelectedShape(instance);
             var selected_indexes = instance.get('selected_indexes');
@@ -474,12 +476,12 @@ define([
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-            
-              
-            instance.modifyDelta(data,modifiers);
 
-          }
-        
+
+          instance.modifyDelta(data, this.get('tool-mode'), this.get('tool-modifier'));
+
+        }
+
         this.compile();
       },
 
@@ -487,13 +489,10 @@ define([
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-          if (!instance.get('proto_node') || override) {
           var selected_indexes = instance.get('selected_indexes');
           for (var j = 0; j < selected_indexes.length; j++) {
-            instance.modifyPoints(selected_indexes[j], data, handle,modifiers);
+            instance.modifyPoints(selected_indexes[j], data, handle, this.get('tool-mode'), this.get('tool-modifier'));
           }
-        }
-
         }
         this.compile();
 
@@ -518,7 +517,7 @@ define([
 
           for (var i = 0; i < selectedShapes.length; i++) {
             var instance = selectedShapes[i];
-            instance.modifyStyle(data);
+            instance.modifyStyle(data, this.get('tool-mode'), this.get('tool-modifier'));
           }
           this.compile();
         }

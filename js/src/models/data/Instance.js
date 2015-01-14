@@ -152,8 +152,33 @@ define([
 				}
 			}
 		},
+
+
+		/*setDeltasToInstance
+		 * sets delta to match properties of a given instance, depending on the properties of the
+		 * data that is passed in
+		 */
+		setDeltasToInstance: function(data, instance) {
+			if (data.translation_delta) {
+				this.set('translation_delta', instance.get('translation_delta'));
+			}
+
+			if (data.rotation_delta) {
+				this.set('rotation_delta', instance.get('rotation_delta'));
+
+			}
+			if (data.scaling_delta) {
+				this.set('scaling_delta', instance.get('scaling_delta'));
+
+			}
+		},
+
+
+		/*resetDeltasToPrototype
+		 * removes property of instance so that it is overriden by prototype,
+		 * if property exists in the data
+		 */
 		resetDeltasToPrototype: function(data) {
-			console.log('reset deltas to prototype', this.get('id'));
 			if (data.translation_delta) {
 
 				var protoNode = this.get('proto_node');
@@ -175,10 +200,6 @@ define([
 			}
 		},
 
-		resetToLastDelta: function() {
-			this.set('translation_delta', this.get('translation_delta_last'));
-
-		},
 
 		resetPathDeltas: function() {
 			var geom = new paper.Path();
@@ -205,9 +226,9 @@ define([
 		/* modifyPoints
 		 * called when segment in geometry is modified
 		 */
-		modifyPoints: function(segment_index, data, handle, mode) {
+		modifyPoints: function(segment_index, data, handle, mode, modifier) {
 			var proto_node = this.get('proto_node');
-			if (mode ==='proxy' && proto_node) {
+			if (mode === 'proxy' && proto_node) {
 				proto_node.modifyPoints(segment_index, data, handle, 'none');
 			}
 
@@ -288,7 +309,7 @@ define([
 		},
 
 
-		modifyStyle: function(data, mode) {
+		modifyStyle: function(data, mode, modifier) {
 			var inheritors = this.get('inheritors');
 
 			if (mode === 'proxy') {
@@ -304,94 +325,91 @@ define([
 					inheritors[i].modifyStyle(data, 'none');
 				}
 			}
-if (mode !== 'proxy') {
-			if (data.fill_color) {
-				this.set('fill_color', data.fill_color);
+			if (mode !== 'proxy') {
+				if (data.fill_color) {
+					this.set('fill_color', data.fill_color);
 
-			}
+				}
 
-			if (data.stroke_color) {
-				this.set('stroke_color', data.stroke_color);
-			}
+				if (data.stroke_color) {
+					this.set('stroke_color', data.stroke_color);
+				}
 
-			if (data.stroke_width) {
-				this.set('stroke_width', data.stroke_width);
+				if (data.stroke_width) {
+					this.set('stroke_width', data.stroke_width);
+				}
 			}
-		}
 		},
 
-		modifyDelta: function(data, mode) {
+		modifyDelta: function(data, mode, modifier) {
 			var matrix = this.get('matrix');
 			var position = this.get('rotation_origin').toPaperPoint();
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
-
+			console.log('mode', mode, 'modifier', modifier);
 			if (mode === 'proxy') {
 				if (protoNode) {
-					protoNode.modifyDelta(data);
+					if (modifier === 'override') {
+						protoNode.setDeltasToInstance(data, this);
+					}
+					protoNode.modifyDelta(data, 'standard', 'none');
 					proto_incremented = true;
 				}
+			} else if (mode === 'standard') {
+				if (modifier === 'override') {
+					for (var j = 0; j < inheritors.length; j++) {
+						inheritors[j].resetDeltasToPrototype(data);
+					}
+				} else if (modifier === 'relative') {
+					for (var i = 0; i < inheritors.length; i++) {
+						inheritors[i].modifyDelta(data, 'standard', 'none');
+					}
 
-			} else if (mode === 'match') {
-				for (var j = 0; j < inheritors.length; j++) {
-					inheritors[j].resetDeltasToPrototype(data);
 				}
 			}
+			if (data.translation_delta) {
 
-			if (mode === 'relative') {
-				for (var i = 0; i < inheritors.length; i++) {
-					inheritors[i].modifyDelta(data, 'none');
+				var translation_delta = this.get('translation_delta');
+				if (!translation_delta) {
+					translation_delta = new PPoint(0, 0);
 				}
+				if (data.set) {
+					translation_delta = data.translation_delta;
+				} else {
+					translation_delta.add(data.translation_delta);
+				}
+				this.set('translation_delta', translation_delta);
 
 			}
 
-			if (mode !== 'proxy') {
-				if (data.translation_delta) {
-
-					var translation_delta = this.get('translation_delta');
-					if (!translation_delta) {
-						translation_delta = new PPoint(0, 0);
-					}
-					if (data.set) {
-						translation_delta = data.translation_delta;
-					} else {
-						translation_delta.add(data.translation_delta);
-					}
-					this.set('translation_delta', translation_delta);
-
+			if (data.rotation_delta) {
+				var rotation_delta = this.get('rotation_delta');
+				if (!rotation_delta) {
+					rotation_delta = 0;
 				}
-
-				if (data.rotation_delta) {
-					var rotation_delta = this.get('rotation_delta');
-					if (!rotation_delta) {
-						rotation_delta = 0;
-					}
-					if (data.set) {
-						rotation_delta = data.rotation_delta;
-					} else {
-						rotation_delta += data.rotation_delta;
-					}
-					this.set('rotation_delta', rotation_delta);
-
+				if (data.set) {
+					rotation_delta = data.rotation_delta;
+				} else {
+					rotation_delta += data.rotation_delta;
 				}
+				this.set('rotation_delta', rotation_delta);
 
-				if (data.scaling_delta) {
-
-					var scaling_delta = this.get('scaling_delta');
-					if (!scaling_delta) {
-						scaling_delta = 0;
-					}
-					if (data.set) {
-						scaling_delta = data.scaling_delta;
-					} else {
-						scaling_delta.add(data.scaling_delta);
-					}
-					this.set('scaling_delta', scaling_delta);
-				}
 			}
 
+			if (data.scaling_delta) {
 
+				var scaling_delta = this.get('scaling_delta');
+				if (!scaling_delta) {
+					scaling_delta = 0;
+				}
+				if (data.set) {
+					scaling_delta = data.scaling_delta;
+				} else {
+					scaling_delta.add(data.scaling_delta);
+				}
+				this.set('scaling_delta', scaling_delta);
+			}
 
 		},
 

@@ -40,7 +40,7 @@ define([
       }, event_bus);
      
       var toolView = new ToolView({
-        el: '#toolbar',
+        el: '#tool-elements',
         model: stateManager
       });
       var propertyView = new PropertyView({

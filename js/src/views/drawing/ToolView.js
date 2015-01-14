@@ -16,6 +16,7 @@ define([
 
     initialize: function() {
       this.polyToolClick();
+      this.modeStandardClick();
     },
 
     render: function() {
@@ -31,11 +32,13 @@ define([
       'click #ellipseTool': 'ellipseToolClick',
       'click #rotateTool': 'rotateToolClick',
       'click #scaleTool': 'scaleToolClick',
-
       'click #followPathTool': 'followPathToolClick',
       'click #undoTool': 'undoToolClick',
-      'click #redoTool': 'redoToolClick'
-
+      'click #redoTool': 'redoToolClick',
+      'click #modeProxy': 'modeProxyClick',
+      'click #modeStandard': 'modeStandardClick',
+      'click #modRelative': 'modRelativeClick',
+      'click #modOverride': 'modOverrideClick'
     },
 
     undoToolClick: function() {
@@ -99,7 +102,7 @@ define([
       this.clearActive();
       $('#penTool').addClass('active');
       lastSelected = $('#penTool');
-      this.model.setState('polyTool','pen');
+      this.model.setState('polyTool', 'pen');
       analytics.log(eventType, {
         type: eventType,
         id: 'penTool',
@@ -154,7 +157,6 @@ define([
       $('#rotateTool').addClass('active');
       lastSelected = $('#rotateTool');
       this.model.setState('selectTool', 'rotate');
-      this.model.selectTool.
       analytics.log(eventType, {
         type: eventType,
         id: 'rotateTool',
@@ -167,12 +169,55 @@ define([
       $('#scaleTool').addClass('active');
       lastSelected = $('#scaleTool');
       this.model.setState('selectTool', 'scale');
-      this.model.selectTool.
       analytics.log(eventType, {
         type: eventType,
         id: 'scaleTool',
         action: 'toolSelected'
       });
+    },
+
+
+    modeProxyClick: function() {
+      $('#modeStandard').removeClass('active');
+      $('#modeProxy').addClass('active');
+      this.model.set('tool-mode','proxy');
+
+    },
+
+    modeStandardClick: function() {
+      $('#modeStandard').addClass('active');
+      $('#modeProxy').removeClass('active');
+      this.model.set('tool-mode','standard');
+    },
+
+    modRelativeClick: function() {
+      var button = $('#modRelative');
+      if(button.hasClass('active')){
+        button.removeClass('active');
+        this.model.set('tool-modifier','none');
+
+      }
+      else{
+        button.addClass('active');
+        $('#modOverride').removeClass('active');
+        this.model.set('tool-modifier','relative');
+
+
+      }
+    },
+
+    modOverrideClick: function() {
+    var button = $('#modOverride');
+      if(button.hasClass('active')){
+        button.removeClass('active');
+         this.model.set('tool-modifier','none');
+      }
+      else{
+        button.addClass('active');
+        $('#modRelative').removeClass('active');
+         this.model.set('tool-modifier','override');
+
+      }
     },
 
     clearActive: function() {

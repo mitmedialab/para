@@ -135,10 +135,12 @@ input[type="range"]:active::-webkit-slider-thumb {
     top: 0px;
     right: 0px;
     left: 0px;
-    height: 40px;
+    height: 36px;
     overflow: hidden;
     border-bottom: solid 1px #B2B2B2;
     background: rgba(250,250,250,0.95);
+}
+.menubar-container{
 }
 
 .toolbar-wrapper, .properties-wrapper, .proto-wrapper {
@@ -147,13 +149,13 @@ input[type="range"]:active::-webkit-slider-thumb {
     float: right;
     position: relative;
     max-height: 100%;
-    padding: 40px 0px 0px 0px;
+    padding: 36px 0px 0px 0px;
     z-index:100;
 }
 
 .proto-wrapper, .sub-canvas-wrapper{
     float: left;
-   padding: 40px 0px 0px 0px;
+   padding: 36px 0px 0px 0px;
 
 }
 
@@ -184,6 +186,8 @@ input[type="range"]:active::-webkit-slider-thumb {
     border: none;
     white-space: nowrap;
 }
+.horz-btn{
+}
 
 .btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
     color: #333;
@@ -197,10 +201,19 @@ input[type="range"]:active::-webkit-slider-thumb {
     border-radius:0;
     border-bottom: solid 1px #B2B2B2;
     background-image: url(../images/icons.svg);
-    background-size: 36px 432px;
+    background-size: 36px 522px;
     background-repeat: no-repeat;
     background-position-x: 0px;
     background-position-y: 0px;
+}
+
+.btn-tool-horz{
+    float:left;
+    border-bottom: none;
+    border-left: solid 1px #B2B2B2;
+}
+.btn-tool-horz-last{
+    border-right:solid 1px #B2B2B2;
 }
 .btn-tool.active{
     background-color: rgba(200, 200, 200, 0.88);
@@ -242,6 +255,27 @@ input[type="range"]:active::-webkit-slider-thumb {
 #generateTool {
     background-position-y: -216px;
 }
+#modeStandard{
+ background-position-y: -432px;
+}
+#modeProxy{
+ background-position-y: -468px;
+}
+#modRelative{
+ background-position-y: -504px;
+ background-position-x: -18px;
+ width:20px;
+ height:20px;
+ border: solid 1px #B2B2B2;
+ border-right:none;
+
+}
+#modOverride{
+background-position-y: -504px;
+width:20px;
+height:20px;
+border: solid 1px #B2B2B2;
+}
 
 #rangechaser {
     position: absolute;
@@ -263,6 +297,17 @@ select{
 
 #toolbar{
     border-right: solid 1px #B2B2B2;
+}
+#modToolbar{
+    height:20px;
+    float:left;
+    margin: 7px 0 0 0;
+}
+#horz-toolbar{
+  }
+#horz-toolbar span{
+    float:left;
+    margin:10px 10px;
 }
 
 input[type="button"]{
@@ -350,12 +395,18 @@ header button, .sub-header button {
     width: 16px;
 }
 
-.properties header {
+.properties header{
     padding: 4%;
     box-sizing: border-box;
     line-height: 10pt;
     background-color: rgba(200, 200, 200, 0.88);
 }
+#horz-toolbar header {
+        background-color: rgba(200, 200, 200, 0.88);
+        width:20px;
+        height:36px;
+        float: left;
+    }
 
 .clearfix {
     clear: both;
