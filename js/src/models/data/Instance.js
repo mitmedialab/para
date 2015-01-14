@@ -60,13 +60,14 @@ define([
 
 			//path properties
 			master_path: null,
+			alpha: 1,
+			mod: -0.01,
 			//path_deltas: null,
 
 		},
 
 		initialize: function() {
 			this.set('position', new PPoint(0, 0));
-
 			this.set('center', new PPoint(0, 0));
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
@@ -184,9 +185,9 @@ define([
 				var protoNode = this.get('proto_node');
 
 				if (protoNode) {
-					this.set('position', protoNode.get('position').clone());
-					this.set('rotation_origin', protoNode.get('rotation_origin').clone());
-					this.set('scaling_origin', protoNode.get('scaling_origin').clone());
+					//this.set('position', protoNode.get('position').clone());
+					//this.set('rotation_origin', protoNode.get('rotation_origin').clone());
+					//this.set('scaling_origin', protoNode.get('scaling_origin').clone());
 					this.set('translation_delta', null);
 				}
 			}
@@ -347,7 +348,6 @@ define([
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
-			console.log('mode', mode, 'modifier', modifier);
 			if (mode === 'proxy') {
 				if (protoNode) {
 					if (modifier === 'override') {
@@ -649,6 +649,27 @@ define([
 		removeProto: function() {
 
 
+		},
+
+		animateAlpha: function(levels, property) {
+			var inheritors = this.get('inheritors');
+			var alpha = this.get('alpha');
+				var mod = this.get('mod');
+				if (alpha < 0.65) {
+					mod = 0.01;
+				} else if (alpha >= 1) {
+					mod = -0.01;
+				}
+				alpha += mod;
+			for (var i = 0; i < inheritors.length; i++) {
+				var inheritor = inheritors[i];	
+				if(!inheritor.get(property)){
+					inheritor.set('alpha', alpha);
+					inheritor.get('geom').fillColor.alpha = alpha;
+				}
+			}
+			this.set('mod', mod);
+				this.set('alpha', alpha);
 		}
 
 	});

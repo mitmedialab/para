@@ -99,7 +99,9 @@ define([
         this.listenTo(toolCollection, "geometryModified", this.geometryModified);
         this.listenTo(toolCollection, "geometrySegmentModified", this.geometrySegmentModified);
 
-        this.listenTo(toolCollection, "addPrototype", this.addPrototype);
+        this.listenTo(toolCollection, "addInstance", this.addInstance);
+        this.listenTo(toolCollection, "setPositionForIntialized", this.setPositionForInitialized);
+
 
         this.listenTo(toolCollection, "modifyInheritance", this.modifyInheritance);
 
@@ -275,15 +277,14 @@ define([
 
       },
 
-      /* addPrototype
-       * adds one instance of the prototype to the scenegraph
+      /* addInstance
+       * adds one instance of the prototype selected to the scenegraph
        * TODO: will be more complex when multiple objects are selected-
        * behavior probably should be to create a prototype which encapsulates
        * all those objects rather than one prototype per object
        */
 
-      addPrototype: function() {
-        console.log('add prototype');
+      addInstance: function() {
         if (this.get('state') === 'selectTool') {
           var selectedShapes = selectTool.get('selected_shapes');
           if (selectedShapes.length == 1) {
@@ -316,6 +317,44 @@ define([
         } else {
           return false;
         }
+      },
+
+      setPositionForInitialized: function(position){
+        console.log('set position for intitialized');
+         var selectedShapes = selectTool.get('selected_shapes');
+          if (selectedShapes.length == 1) {
+            var instance = selectedShapes[0];
+             instance.set('position', new PPoint(position.x,position.y));
+            instance.set('rotation_origin', new PPoint(position.x,position.y));
+            instance.set('scaling_origin',new PPoint(position.x,position.y));
+            instance.set('transformation_delta',new PPoint(0,0));
+
+          }
+      },
+
+      animate:function(){
+
+        var selectedShapes = selectTool.get('selected_shapes');
+        var property;
+        var levels= 1;
+        switch(selectTool.get('mode')){
+          case 'select':
+          property='translation_delta';
+          break;
+          case 'rotate':
+           property='rotation_delta';
+          break;
+          case 'scale':
+           property='scaling_delta';
+          break;
+        }
+        for(var i=0;i<selectedShapes.length;i++){
+         selectedShapes[i].animateAlpha(levels,property);
+
+
+        }
+        paper.view.draw();
+
       },
 
 
@@ -542,7 +581,6 @@ define([
         //currentView._project.activate();
 
         mainView.draw();
-        subView.draw();
 
       },
 

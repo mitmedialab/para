@@ -16,6 +16,8 @@ define([
   var handle;
   var segmentMod = false;
   var copyReset = true;
+  //keeps track of when a copy was released to set correct position data for the new instance
+  var copyInitialized= false;
   var startPoint, startDist,startWidth,startHeight = null;
   var dHitOptions = {
     segments: true,
@@ -192,8 +194,8 @@ define([
   
       if (event.modifiers.option && copyReset) {
         copyReset = false;
-
-        this.trigger('addPrototype');
+        copyInitialized = true;
+        this.trigger('addInstance');
       }
 
       var data = {};
@@ -273,7 +275,11 @@ define([
       var selected_shapes = this.get('selected_shapes');
       for (var i = 0; i < selected_shapes.length; i++) {
       
-         
+      if(copyInitialized){
+        copyInitialized=false;
+        console.log("setting position");
+        this.trigger('setPositionForIntialized',event.point)
+      }
       selected_shapes[i].setSelectionForInheritors(true,false);
           
        

@@ -80,9 +80,10 @@ define([
       tool.attach('mousedown', this.toolMouseDown);
       tool.attach('mousedrag', this.toolMouseDrag);
       tool.attach('mouseup', this.toolMouseUp);
-
       this.listenTo(this.model, 'centerGeom', this.centerGeom);
 
+      paper.view.parent = this;
+      paper.view.on('frame', this.animate);
 
     },
 
@@ -153,6 +154,9 @@ define([
       this.parent.model.toolMouseMove(event);
     },
 
+    animate: function(event){
+      this.parent.model.animate();
+    },
 
     /* canvas event functions */
     canvasKeydown: function(event) {
@@ -217,7 +221,6 @@ define([
 
     canvasMouseUp: function(event) {
       if (sub.down) {
-        this.instantiatePrototype(event);
       }
       main.down = false;
       sub.down = false;
@@ -229,10 +232,7 @@ define([
 
     subCanvasMouseUp: function(event) {
       if (main.down) {
-        if(data){
-          var targetPosition = data.geom.position;
-          event.data.parent.centerGeom(targetPosition);
-        }
+       
       }
       sub.down = false;
       main.down = false;
@@ -291,10 +291,7 @@ define([
       view.draw();
     },
 
-    /*attempts to create a new instance of the current prototype*/
-    instantiatePrototype: function(event) {
-      var instantiated = this.model.geometryInstantiated(event.offsetX, event.offsetY);
-    }
+   
 
 
 
