@@ -340,6 +340,16 @@ section {
     position: relative;
 }
 
+#constraint-wheel {
+    width: 100%;
+    height: 100%;
+}
+
+.cinner:hover {
+    stroke: #d00000;
+    fill: #d00000;
+}
+
 .section-background {
     padding: 10px;
 }

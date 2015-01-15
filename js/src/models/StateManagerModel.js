@@ -18,6 +18,7 @@ define([
     'models/tools/PolyToolModel',
     'models/tools/SelectToolModel',
     'models/tools/FollowPathToolModel',
+    'models/tools/ConstraintToolModel',
     'filesaver',
     'models/behaviors/actions/BlockNode',
     'models/behaviors/actions/InitializeNode',
@@ -30,7 +31,7 @@ define([
 
   ],
 
-  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
+  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
     var rootNode,
       uninstantiated,
       visitor,
@@ -87,7 +88,12 @@ define([
           id: 'followPathTool'
 
         });
+        constraintTool = new ConstraintToolModel({
+          id: 'constraintTool'
+        });
         followPathTool.event_bus = event_bus;
+        // TODO: check is event bus makes sense
+        // constraintTool.event_bus = c_event_bus;
         toolCollection = new ToolCollection([polyTool, penTool, selectTool, followPathTool]);
 
 
@@ -396,6 +402,11 @@ define([
         for (var j = 0; j < instances.length; j++) {
           this.trigger('prototypeCreated', instances[j]);
         }
+      },
+
+      // TESTING
+      constraintSelected: function(data) {
+        constraintTool.selectConstraint(data);    
       },
 
       /* geometrySelected

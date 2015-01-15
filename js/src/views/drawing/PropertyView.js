@@ -12,6 +12,13 @@ define([
 ], function($, _, Backbone, Handlebars, IrisColorPicker, paper) {
 
   var template, source;
+  var constraintPropMap = {};
+    constraintPropMap['couter'] = 'strokeWeight';
+    constraintPropMap['cinner'] = 'fill';
+    constraintPropMap['csize']  = 'scale';
+    constraintPropMap['cposition'] = 'position';
+    constraintPropMap['corient1'] = 'orientation'; // TODO: should be made into one item
+    constraintPropMap['corient2'] = 'orientation'; // TODO: should be combined with previous
   var PropertyView = Backbone.View.extend({
     //
     initialize: function() {
@@ -74,8 +81,9 @@ define([
       'change #fill': 'colorInputChange',
       'change #stroke': 'colorInputChange',
       'click #no-color': 'clearColor',
-      'click .behaviorRemove': 'removeBehavior'
-
+      'click .behaviorRemove': 'removeBehavior',
+      // testing
+      'click #constraint-wheel': 'constraintChange'
 
     },
 
@@ -209,6 +217,14 @@ define([
       });
     },
 
+    // TESTING
+    constraintChange: function(event) {
+      var element = $(event.target);
+      var elementId = element.attr('class');
+
+      this.model.constraintSelected(constraintPropMap[elementId]);
+    },
+
     paramChange: function(event) {
       var element = $(event.target);
       var value = +element.val();
@@ -271,7 +287,6 @@ define([
         alert('please enter a name for your file');
       }
     },
-
 
     removeItem: function(id) {
       ////console.log('removing:'+id);
