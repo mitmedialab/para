@@ -326,7 +326,7 @@ define([
         if (selectedShapes.length == 1) {
           var instance = selectedShapes[0];
           instance.set('position', new PPoint(position.x, position.y));
-          instance.set('rotation_origin', new PPoint(position.x, position.y));
+          instance.set('rotation_origin', new PointPoint(position.x, position.y));
           instance.set('scaling_origin', new PPoint(position.x, position.y));
           instance.set('transformation_delta', new PPoint(0, 0));
 

@@ -724,7 +724,7 @@ define([
 			} else {
 				for (var i = 0; i < inheritors.length; i++) {
 					var inheritor = inheritors[i];
-					if (!inheritor.get(property) || modifier=='override') {
+					if (!inheritor.get(property) || modifier!='none') {
 						inheritor.set('alpha', alpha);
 						inheritor.get('geom').fillColor.alpha = alpha;
 						inheritor.animateAlpha(levels,property,mode,modifier, curlevel+1);
