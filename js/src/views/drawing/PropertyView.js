@@ -22,7 +22,7 @@ define([
 
       this.listenTo(this.model, 'geometrySelected', this.geometrySelected);
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
-      this.curresntPaths = [];
+      this.currentPaths = [];
       source = $('#parameterTemplate').html();
       template = Handlebars.default.compile(source);
 

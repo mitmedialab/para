@@ -10,6 +10,8 @@ define([
 	'models/data/SceneNode',
 	'utils/PPoint',
 ], function(_, $, paper, SceneNode, PPoint) {
+
+
 	var Instance = SceneNode.extend({
 		name: 'instance',
 		type: 'geometry',
@@ -62,7 +64,10 @@ define([
 			master_path: null,
 			alpha: 1,
 			mod: -0.01,
-			//path_deltas: null,
+			inheritance_selection_color: '#0D7C1F',
+			proxy_selection_color: '#10B0FF',
+			primary_selection_color: '#A5FF00'
+				//path_deltas: null,
 
 		},
 
@@ -109,6 +114,11 @@ define([
 		reset: function() {
 			this.set('rendered', false);
 			this.set('visited', false);
+
+			this.set('i_bbox', {
+				topLeft: null,
+				bottomRight: null,
+			});
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');
@@ -161,7 +171,7 @@ define([
 		 */
 		setDeltasToInstance: function(data, instance) {
 			if (data.translation_delta) {
-				this.set('translation_delta', instance.get('translation_delta'));
+				this.set('translation_delta', instance.get('translation_delta').clone());
 			}
 
 			if (data.rotation_delta) {
@@ -315,7 +325,9 @@ define([
 
 			if (mode === 'proxy') {
 				var proto_node = this.get('proto_node');
-				proto_node.modifyStyle(data, 'none');
+				if (proto_node) {
+					proto_node.modifyStyle(data, 'none');
+				}
 			} else if (mode === 'match') {
 				for (var j = 0; j < inheritors.length; j++) {
 					inheritors[i].resetStylesToPrototype(data, true);
@@ -479,50 +491,70 @@ define([
 		 * from this. Optionally also toggles selection for all
 		 * ancestors.
 		 */
-		setSelectionForInheritors: function(select, ancestors) {
-			this.set('i_bbox', {
-				topLeft: null,
-				bottomRight: null,
-			});
+		setSelectionForInheritors: function(select, mode, modifer,recurse) {
 			var inheritors = this.get('inheritors');
+			
+			var proto = this.get('proto_node');
+			if (proto) {
+				if (!select) {
+					proto.set('inheritor_selected', false);
+					proto.setSelectionForInheritors(false);
+				} else {
+					if(recurse>0){
+					if (mode === 'proxy') {
+						proto.set('inheritor_selected', 'proxy');
+						console.log('set inheritor selected to proxy');
+
+					} else {
+						proto.set('inheritor_selected', 'standard');
+						proto.set('alpha', 1);
+						console.log('set alpha to 1 for proto');
+					}
+					}
+					else{
+						proto.set('inheritor_selected', false);
+						proto.set('alpha', 1);
+					}
+					proto.setSelectionForInheritors(select, 'standard', 'none',0);
+				}
+
+				}
+			
 			for (var i = 0; i < inheritors.length; i++) {
 				inheritors[i].set('proto_selected', select);
-				if (select) {
-					this.updateBoundingBox(inheritors[i]);
-				}
-				if (ancestors) {
-					inheritors[i].setSelectionForInheritors(select, ancestors);
-				}
+				inheritors[i].set('alpha', 1);
 			}
 		},
 
 		updateBoundingBox: function(instance) {
 			var i_bbox = this.get('i_bbox');
 			var i_geom = instance.get('geom');
-			var i_topLeft = i_geom.bounds.topLeft;
-			var i_width = i_geom.bounds.width;
-			var i_height = i_geom.bounds.height;
-			var i_bottomRight = i_geom.bounds.bottomRight;
+			if (i_geom) {
+				var i_topLeft = i_geom.bounds.topLeft;
+				var i_width = i_geom.bounds.width;
+				var i_height = i_geom.bounds.height;
+				var i_bottomRight = i_geom.bounds.bottomRight;
 
-			if (!i_bbox.topLeft) {
-				i_bbox.topLeft = i_topLeft;
-			} else {
-				if (i_topLeft.x < i_bbox.topLeft.x) {
-					i_bbox.topLeft.x = i_topLeft.x;
+				if (!i_bbox.topLeft) {
+					i_bbox.topLeft = i_topLeft;
+				} else {
+					if (i_topLeft.x < i_bbox.topLeft.x) {
+						i_bbox.topLeft.x = i_topLeft.x;
+					}
+					if (i_topLeft.y < i_bbox.topLeft.y) {
+						i_bbox.topLeft.y = i_topLeft.y;
+					}
 				}
-				if (i_topLeft.y < i_bbox.topLeft.y) {
-					i_bbox.topLeft.y = i_topLeft.y;
-				}
-			}
 
-			if (!i_bbox.bottomRight) {
-				i_bbox.bottomRight = i_bottomRight;
-			} else {
-				if (i_bottomRight.x > i_bbox.bottomRight.x) {
-					i_bbox.bottomRight.x = i_bottomRight.x;
-				}
-				if (i_bottomRight.y > i_bbox.bottomRight.y) {
-					i_bbox.bottomRight.y = i_bottomRight.y;
+				if (!i_bbox.bottomRight) {
+					i_bbox.bottomRight = i_bottomRight;
+				} else {
+					if (i_bottomRight.x > i_bbox.bottomRight.x) {
+						i_bbox.bottomRight.x = i_bottomRight.x;
+					}
+					if (i_bottomRight.y > i_bbox.bottomRight.y) {
+						i_bbox.bottomRight.y = i_bottomRight.y;
+					}
 				}
 			}
 		},
@@ -583,34 +615,56 @@ define([
 						geom.transform(smatrix);
 						geom.transform(tmatrix);
 						var screen_bounds = geom.bounds;
-
 						if (selected_indexes.length === 0) {
+							var g_bbox = new paper.Path.Rectangle(geom.bounds.topLeft, new paper.Size(geom.bounds.width, geom.bounds.height));
+							g_bbox.data.instance = this;
+							var inheritors = this.get('inheritors');
+							for (var k = 0; k < inheritors.length; k++) {
+								this.updateBoundingBox(inheritors[k]);
+							}
+							var i_bbox = this.get('i_bbox');
+							var gi_bbox;
+							if (i_bbox.bottomRight) {
+								var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
+								var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
+								gi_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
+							}
+
+
 
 							if (selected) {
-								geom.selectedColor = '#16BDE7';
-								geom.selected = selected;
-								var g_bbox = new paper.Path.Rectangle(geom.bounds.topLeft, new paper.Size(geom.bounds.width, geom.bounds.height));
-								g_bbox.data.instance = this;
-								g_bbox.selectedColor = '#16BDE7';
-								g_bbox.selected = true;
 
-								var i_bbox = this.get('i_bbox');
+
+
+								geom.selectedColor = this.get('primary_selection_color');
+								geom.selected = selected;
+
+								g_bbox.selectedColor = this.get('primary_selection_color');
+								g_bbox.selected = true;
 								//draw in bounding box for inheritors
-								if (i_bbox.bottomRight) {
-									paper.View._viewsById['canvas']._project.activate();
-									var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
-									var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
-									var gi_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
-									gi_bbox.selectedColor = '#83CC27';
+								if (gi_bbox) {
+									gi_bbox.selectedColor = this.get('inheritance_selection_color');
 									gi_bbox.selected = true;
 								}
 
 							} else if (proto_selected) {
-								geom.selectedColor = '#83CC27';
+								geom.selectedColor = this.get('inheritance_selection_color');
 								geom.selected = proto_selected;
-							} else if (inheritor_selected) {
-								geom.selectedColor = '#FF175D';
+							}
+							if (inheritor_selected) {
+								geom.selectedColor = this.get('proxy_selection_color');
 								geom.selected = inheritor_selected;
+								g_bbox.selectedColor = this.get('proxy_selection_color');
+								g_bbox.selected = true;
+								console.log('inheritor_selected for',this.get('id'));
+								if (inheritor_selected === 'proxy') {
+									console.log('inheritor proxy');
+									if (gi_bbox) {
+										gi_bbox.selectedColor = this.get('inheritance_selection_color');
+										gi_bbox.selected = true;
+									}
+								}
+
 							}
 						} else {
 							for (var i = 0; i < selected_indexes.length; i++) {
@@ -651,25 +705,34 @@ define([
 
 		},
 
-		animateAlpha: function(levels, property) {
+		animateAlpha: function(levels, property, mode, modifier, curlevel) {
 			var inheritors = this.get('inheritors');
 			var alpha = this.get('alpha');
-				var mod = this.get('mod');
-				if (alpha < 0.65) {
-					mod = 0.01;
-				} else if (alpha >= 1) {
-					mod = -0.01;
+			var mod = this.get('mod');
+			if (alpha < 0.65) {
+				mod = 0.01;
+			} else if (alpha >= 1) {
+				mod = -0.01;
+			}
+			alpha += mod;
+			if (mode === 'proxy') {
+				var proto = this.get('proto_node');
+				if (proto) {
+					proto.set('alpha', alpha);
+					proto.get('geom').fillColor.alpha = alpha;
 				}
-				alpha += mod;
-			for (var i = 0; i < inheritors.length; i++) {
-				var inheritor = inheritors[i];	
-				if(!inheritor.get(property)){
-					inheritor.set('alpha', alpha);
-					inheritor.get('geom').fillColor.alpha = alpha;
+			} else {
+				for (var i = 0; i < inheritors.length; i++) {
+					var inheritor = inheritors[i];
+					if (!inheritor.get(property) || modifier=='override') {
+						inheritor.set('alpha', alpha);
+						inheritor.get('geom').fillColor.alpha = alpha;
+						inheritor.animateAlpha(levels,property,mode,modifier, curlevel+1);
+					}
 				}
 			}
 			this.set('mod', mod);
-				this.set('alpha', alpha);
+			this.set('alpha', alpha);
 		}
 
 	});

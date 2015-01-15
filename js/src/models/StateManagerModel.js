@@ -104,8 +104,8 @@ define([
 
 
         this.listenTo(toolCollection, "modifyInheritance", this.modifyInheritance);
-
-
+        this.on('change:tool-mode', this.modeChanged);
+        this.on('change:tool-modifier', this.modeChanged);
         this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
         this.listenTo(toolCollection, 'setSelection', this.setSelection);
         this.listenTo(toolCollection, 'updateProperties', this.updateProperties);
@@ -296,6 +296,7 @@ define([
             newInstance.set('position', instance.get('position').clone());
             newInstance.set('rotation_origin', instance.get('position').clone());
             newInstance.set('scaling_origin', instance.get('position').clone());
+            instance.set('transformation_delta', new PPoint(0, 0));
 
             currentNode.addChildNode(newInstance);
             instance.set('selected', false);
@@ -321,35 +322,35 @@ define([
 
       setPositionForInitialized: function(position){
         console.log('set position for intitialized');
-         var selectedShapes = selectTool.get('selected_shapes');
-          if (selectedShapes.length == 1) {
-            var instance = selectedShapes[0];
-             instance.set('position', new PPoint(position.x,position.y));
-            instance.set('rotation_origin', new PPoint(position.x,position.y));
-            instance.set('scaling_origin',new PPoint(position.x,position.y));
-            instance.set('transformation_delta',new PPoint(0,0));
+        var selectedShapes = selectTool.get('selected_shapes');
+        if (selectedShapes.length == 1) {
+          var instance = selectedShapes[0];
+          instance.set('position', new PPoint(position.x, position.y));
+          instance.set('rotation_origin', new PPoint(position.x, position.y));
+          instance.set('scaling_origin', new PPoint(position.x, position.y));
+          instance.set('transformation_delta', new PPoint(0, 0));
 
-          }
+        }
       },
 
-      animate:function(){
+      animate: function() {
 
         var selectedShapes = selectTool.get('selected_shapes');
         var property;
-        var levels= 1;
-        switch(selectTool.get('mode')){
+        var levels = 1;
+        switch (selectTool.get('mode')) {
           case 'select':
-          property='translation_delta';
-          break;
+            property = 'translation_delta';
+            break;
           case 'rotate':
-           property='rotation_delta';
-          break;
+            property = 'rotation_delta';
+            break;
           case 'scale':
-           property='scaling_delta';
-          break;
+            property = 'scaling_delta';
+            break;
         }
-        for(var i=0;i<selectedShapes.length;i++){
-         selectedShapes[i].animateAlpha(levels,property);
+        for (var i = 0; i < selectedShapes.length; i++) {
+          selectedShapes[i].animateAlpha(levels, property, this.get('tool-mode'), this.get('tool-modifier'),0);
 
 
         }
@@ -406,8 +407,8 @@ define([
         if (literal) {
           var instance = literal.data.instance;
           instance.set('selected_indexes', []);
-
           selectTool.addSelectedShape(instance);
+          instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
           var data = {
             id: instance.get('id'),
             fill_color: literal.fillColor.toCSS(true),
@@ -424,6 +425,16 @@ define([
         this.compile();
       },
 
+      modeChanged: function() {
+        console.log('mode changed');
+        var selectedShapes = selectTool.get('selected_shapes');
+        for (var i = 0; i < selectedShapes.length; i++) {
+
+          selectedShapes[i].setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
+        }
+        this.compile();
+      },
+
       geometryDSelected: function(segments, override) {
         if (segments.length > 0) {
           var path = segments[0].path;
@@ -432,6 +443,8 @@ define([
           console.log('dselected', override);
           if (!instance.get('proto_node') || override) {
             selectTool.addSelectedShape(instance);
+            instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
+
             var selected_indexes = instance.get('selected_indexes');
             for (var i = 0; i < segments.length; i++) {
               selected_indexes.push(segments[i].index);

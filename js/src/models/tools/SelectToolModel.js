@@ -51,7 +51,7 @@ define([
       var selected_shapes = this.get('selected_shapes');
       for (var i = 0; i < selected_shapes.length; i++) {
         selected_shapes[i].set('selected', false);
-        selected_shapes[i].setSelectionForInheritors(false,true);
+        selected_shapes[i].setSelectionForInheritors(false);
         selected_shapes[i].set('selected_indexes', []);
 
       }
@@ -62,9 +62,6 @@ define([
       var selected_shapes = this.get('selected_shapes');
       if (!_.contains(selected_shapes, instance)) {
         instance.set('selected', true);
-         if(instance.get('isProto')){
-            instance.setSelectionForInheritors(true,false);
-          }
         selected_shapes.push(instance);
         this.set('selected_shapes', selected_shapes);
       }
@@ -278,9 +275,9 @@ define([
       if(copyInitialized){
         copyInitialized=false;
         console.log("setting position");
-        this.trigger('setPositionForIntialized',event.point)
+        //this.trigger('setPositionForIntialized',event.point);
       }
-      selected_shapes[i].setSelectionForInheritors(true,false);
+     // selected_shapes[i].setSelectionForInheritors(true,false);
           
        
       
