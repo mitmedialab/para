@@ -9,7 +9,8 @@ define([
 	'paper',
 	'models/data/SceneNode',
 	'utils/PPoint',
-], function(_, $, paper, SceneNode, PPoint) {
+	'cjs'
+], function(_, $, paper, SceneNode, PPoint, cjs) {
 
 
 	var Instance = SceneNode.extend({
@@ -33,10 +34,12 @@ define([
 
 			//point attributes
 			position: null,
-			translation_delta: null,
+			translation_deltaX: null,
+			translation_deltaY: null,
 			center: null,
 			scaling_origin: null,
-			scaling_delta: null,
+			scaling_deltaX: null,
+			scaling_deltaY: null,
 			rotation_origin: null,
 			rotation_delta: null,
 
@@ -45,9 +48,15 @@ define([
 			screen_width: 0,
 			screen_height: 0,
 
-			stroke_color: null,
+			stroke_colorR: null,
+			stroke_colorG: null,
+			stroke_colorB: null,
+			stroke_colorA: null,
+			fill_colorR: null,
+			fill_colorG: null,
+			fill_colorB: null,
+			fill_colorA: null,
 			stroke_width: null,
-			fill_color: null,
 
 			rmatrix: null,
 			tmatrix: null,
@@ -103,11 +112,34 @@ define([
 			var instance = new this.constructor();
 			this.set('is_proto', true);
 
-			console.log('instance', instance);
 			var inheritors = this.get('inheritors');
 			instance.set('proto_node', this);
 			inheritors.push(instance);
 			this.set('inheritors', inheritors);
+			 instance.set('position', {
+              operator: 'set',
+              val: this.get('position').val.clone()
+            });
+            instance.set('rotation_origin', {
+              operator: 'set',
+              val: this.get('position').val.clone()
+            });
+            instance.set('scaling_origin', {
+              operator: 'set',
+              val: this.get('position').val.clone()
+            });
+            instance.set('translation_deltaX', {
+              operator: 'add',
+              val: cjs({
+                _var: 0
+              })
+            });
+            instance.set('translation_deltaY', {
+              operator: 'add',
+              val: cjs({
+                _var: 0
+              })
+            });
 			return instance;
 		},
 
@@ -130,6 +162,23 @@ define([
 			this.set('rmatrix', rmatrix);
 			this.set('smatrix', smatrix);
 			this.set('tmatrix', tmatrix);
+		},
+
+		setConstraint: function(property_name, func) {
+			/*	var property = this.get(property_name);
+
+				var rot_var = instance.get('rotation_constraint');
+				if (!rot_var) {
+					rot_var = cjs(instance.get('rotation_delta').get());
+				} //cjs(instance.get('rotation_delta').get());
+				var rotation_delta = cjs(function() {
+					return rot_var.get();
+				});
+				this.set('rotation_delta', rotation_delta);
+				this.set('rotation_constraint', rot_var);
+				instance.set('rotation_constraint', rot_var);
+				instance.set('rotation_delta', rotation_delta);*/
+
 		},
 
 		resetProperties: function() {
@@ -169,7 +218,7 @@ define([
 		 * sets delta to match properties of a given instance, depending on the properties of the
 		 * data that is passed in
 		 */
-		setDeltasToInstance: function(data, instance) {
+		_setPropertiesToInstance: function(data, instance) {
 			if (data.translation_delta) {
 				this.set('translation_delta', instance.get('translation_delta').clone());
 			}
@@ -189,7 +238,7 @@ define([
 		 * removes property of instance so that it is overriden by prototype,
 		 * if property exists in the data
 		 */
-		resetDeltasToPrototype: function(data) {
+		_setPropertiesToPrototype: function(data) {
 			if (data.translation_delta) {
 
 				var protoNode = this.get('proto_node');
@@ -292,24 +341,93 @@ define([
 		 */
 		normalizePath: function(path, matrix) {
 			var data = {};
-			data.rotation_delta = matrix.rotation;
-			data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
+			data.rotation_delta = {
+				operator: 'add',
+				val: cjs({_var:matrix.rotation})
+			};
+			data.scaling_deltaX = {
+				operator: 'add',
+				val: cjs({_var:matrix.scaling.x})
+			};
+			data.scaling_deltaY = {
+				operator: 'add',
+				val: cjs({_var:matrix.scaling.y})
+			};
+			data.translation_deltaX = {
+				operator: 'add',
+				val: cjs({_var:0})
+			};
+			data.translation_deltaY = {
+				operator: 'add',
+				val: cjs({_var:0})
+			};
 			//data.translation_delta = new PPoint(matrix.translation.x, matrix.translation.y);
-			data.position = new PPoint(matrix.translation.x, matrix.translation.y);
-			data.rotation_origin = new PPoint(matrix.translation.x, matrix.translation.y);
-			data.scaling_origin = new PPoint(matrix.translation.x, matrix.translation.y);
-			data.fill_color = path.fillColor;
-			data.stroke_color = path.strokeColor;
-			data.stroke_width = path.strokeWidth;
-			data.width = path.bounds.width;
-			data.height = path.bounds.height;
+			data.position = {
+				operator: 'set',
+				val: new PPoint(matrix.translation.x, matrix.translation.y)
+			};
+			data.rotation_origin = {
+				operator: 'set',
+				val: new PPoint(matrix.translation.x, matrix.translation.y)
+			};
+			data.scaling_origin = {
+				operator: 'set',
+				val: new PPoint(matrix.translation.x, matrix.translation.y)
+			};
+			data.fill_colorR = {
+				operator: 'set',
+				val: cjs({_var:path.fillColor.red})
+			};
+			data.fill_colorG = {
+				operator: 'set',
+				val: cjs({_var:path.fillColor.green})
+			};
+			data.fill_colorB = {
+				operator: 'set',
+				val: cjs({_var:path.fillColor.blue})
+			};
+			data.fill_colorA = {
+				operator: 'set',
+				val: cjs({_var:path.fillColor.alpha})
+			};
+			data.stroke_colorR = {
+				operator: 'set',
+				val: cjs({_var:path.strokeColor.red})
+			};
+			data.stroke_colorG = {
+				operator: 'set',
+				val: cjs({_var:path.strokeColor.green})
+			};
+			data.stroke_colorB = {
+				operator: 'set',
+				val: cjs({_var:path.strokeColor.blue})
+			};
+			data.stroke_colorA = {
+				operator: 'set',
+				val: cjs({_var:path.strokeColor.alpha})
+			};
+			data.stroke_width = {
+				operator: 'set',
+				val: cjs({_var:path.strokeWidth})
+			};
+			data.width = {
+				operator: 'add',
+				val: cjs({_var:path.bounds.width})
+			};
+			data.height = {
+				operator: 'add',
+				val: cjs({_var:path.bounds.height})
+			};
 			var imatrix = matrix.inverted();
 			path.transform(imatrix);
 			path.visible = false;
 			path.selected = false;
 			path.data.nodetype = this.get('name');
 			var pathJSON = path.toJSON();
-			this.set('master_path', pathJSON);
+			this.set('master_path', {
+				operator: 'add',
+				val: pathJSON
+			});
 			var path_deltas = [];
 			for (var i = 0; i < path.segments.length; i++) {
 				path_deltas.push(new PPoint(0, 0));
@@ -320,110 +438,83 @@ define([
 		},
 
 
-		modifyStyle: function(data, mode, modifier) {
-			var inheritors = this.get('inheritors');
-
-			if (mode === 'proxy') {
-				var proto_node = this.get('proto_node');
-				if (proto_node) {
-					proto_node.modifyStyle(data, 'none');
-				}
-			} else if (mode === 'match') {
-				for (var j = 0; j < inheritors.length; j++) {
-					inheritors[i].resetStylesToPrototype(data, true);
-
-				}
-			} else if (mode === 'relative') {
-				for (var i = 0; i < inheritors.length; i++) {
-					inheritors[i].modifyStyle(data, 'none');
-				}
-			}
-			if (mode !== 'proxy') {
-				if (data.fill_color) {
-					this.set('fill_color', data.fill_color);
-
-				}
-
-				if (data.stroke_color) {
-					this.set('stroke_color', data.stroke_color);
-				}
-
-				if (data.stroke_width) {
-					this.set('stroke_width', data.stroke_width);
-				}
-			}
-		},
-
-		modifyDelta: function(data, mode, modifier) {
+		modifyProperty: function(data, mode, modifier) {
 			var matrix = this.get('matrix');
-			var position = this.get('rotation_origin').toPaperPoint();
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
 			if (mode === 'proxy') {
 				if (protoNode) {
 					if (modifier === 'override') {
-						protoNode.setDeltasToInstance(data, this);
+						protoNode._setPropertiesToInstance(data, this);
 					}
-					protoNode.modifyDelta(data, 'standard', 'none');
+					protoNode.modifyProperty(data, 'standard', 'none');
 					proto_incremented = true;
 				}
 			} else if (mode === 'standard') {
 				if (modifier === 'override') {
 					for (var j = 0; j < inheritors.length; j++) {
-						inheritors[j].resetDeltasToPrototype(data);
+						inheritors[j]._setPropertiesToPrototype(data);
 					}
 				} else if (modifier === 'relative') {
 					for (var i = 0; i < inheritors.length; i++) {
-						inheritors[i].modifyDelta(data, 'standard', 'none');
+						inheritors[i].modifyProperty(data, 'standard', 'none');
 					}
 
 				}
 			}
-			if (data.translation_delta) {
-
-				var translation_delta = this.get('translation_delta');
-				if (!translation_delta) {
-					translation_delta = new PPoint(0, 0);
+			for (var p in data) {
+				if (data.hasOwnProperty(p)) {
+					var data_property = data[p];
+					var property;
+					if (this.has(p)) {
+						property = this.get(p);
+					} else {
+						property = {
+							val: cjs({
+								'_var': 0
+							}),
+							operator: data_property.operator
+						};
+					}
+					if (data_property.operator === 'set') {
+						property.val.put('_var' , data_property.val);
+					} else if (data_property.operator === 'add') {
+						var cValue = property.val.get('_var');
+						property.val.put('_var', cValue + data_property.val);
+					}
+					this.set(p,property);
 				}
-				if (data.set) {
-					translation_delta = data.translation_delta;
-				} else {
-					translation_delta.add(data.translation_delta);
-				}
-				this.set('translation_delta', translation_delta);
-
-			}
-
-			if (data.rotation_delta) {
-				var rotation_delta = this.get('rotation_delta');
-				if (!rotation_delta) {
-					rotation_delta = 0;
-				}
-				if (data.set) {
-					rotation_delta = data.rotation_delta;
-				} else {
-					rotation_delta += data.rotation_delta;
-				}
-				this.set('rotation_delta', rotation_delta);
 
 			}
 
-			if (data.scaling_delta) {
-
-				var scaling_delta = this.get('scaling_delta');
-				if (!scaling_delta) {
-					scaling_delta = 0;
-				}
-				if (data.set) {
-					scaling_delta = data.scaling_delta;
-				} else {
-					scaling_delta.add(data.scaling_delta);
-				}
-				this.set('scaling_delta', scaling_delta);
-			}
 
 		},
+
+		/*inheritProperty
+		 * checks first to see if there is a scaling prototype
+		 * moves up the prototype chain to find the
+		 * relevant scaling for this node and applies it to the matrix
+		 */
+		inheritProperty: function(property) {
+			if (this.get(property)) {
+				var property_constraint = this.get(property).val;
+				if (!property_constraint.get) {
+					return property_constraint;
+				} else {
+					if (property_constraint.get('_constraint')) {
+						return property_constraint.get('_constraint');
+					} else {
+						return property_constraint.get('_var');
+					}
+				}
+			} else {
+				if (this.has('proto_node')) {
+					return this.get('proto_node').inheritProperty(property);
+				}
+			}
+		},
+
 
 		getCenter: function() {
 			return {
@@ -446,44 +537,6 @@ define([
 			};
 		},
 
-		/*inheritRotation
-		 * checks first to see if there is a rotation prototype
-		 * moves up the prototype chain to find the
-		 * relevant rotation setting for this node and applies it to the matrix
-		 */
-		inheritRotation: function(rmatrix, target_rotation_origin) {
-			var protoNode;
-			if (this.has('rotation_node')) {
-				protoNode = this.get('rotation_node');
-			} else if (this.has('proto_node')) {
-				protoNode = this.get('proto_node');
-			}
-			if (protoNode) {
-				if (!protoNode.get('rendered')) {
-					protoNode.render();
-				}
-				rmatrix = protoNode.inheritRotation(rmatrix, target_rotation_origin);
-			}
-			var rotation_delta = this.get('rotation_delta');
-			rmatrix.rotate(rotation_delta, target_rotation_origin);
-
-			return rmatrix;
-		},
-
-		/*inheritProperty
-		 * checks first to see if there is a scaling prototype
-		 * moves up the prototype chain to find the
-		 * relevant scaling for this node and applies it to the matrix
-		 */
-		inheritProperty: function(property) {
-			if (this.get(property)) {
-				return this.get(property);
-			} else {
-				if (this.has('proto_node')) {
-					return this.get('proto_node').inheritProperty(property);
-				}
-			}
-		},
 
 
 		/* setSelectionForInheritors
@@ -491,35 +544,34 @@ define([
 		 * from this. Optionally also toggles selection for all
 		 * ancestors.
 		 */
-		setSelectionForInheritors: function(select, mode, modifer,recurse) {
+		setSelectionForInheritors: function(select, mode, modifer, recurse) {
 			var inheritors = this.get('inheritors');
-			
+
 			var proto = this.get('proto_node');
 			if (proto) {
 				if (!select) {
 					proto.set('inheritor_selected', false);
 					proto.setSelectionForInheritors(false);
 				} else {
-					if(recurse>0){
-					if (mode === 'proxy') {
-						proto.set('inheritor_selected', 'proxy');
-						console.log('set inheritor selected to proxy');
+					if (recurse > 0) {
+						if (mode === 'proxy') {
+							proto.set('inheritor_selected', 'proxy');
+							console.log('set inheritor selected to proxy');
 
+						} else {
+							proto.set('inheritor_selected', 'standard');
+							proto.set('alpha', 1);
+							console.log('set alpha to 1 for proto');
+						}
 					} else {
-						proto.set('inheritor_selected', 'standard');
-						proto.set('alpha', 1);
-						console.log('set alpha to 1 for proto');
-					}
-					}
-					else{
 						proto.set('inheritor_selected', false);
 						proto.set('alpha', 1);
 					}
-					proto.setSelectionForInheritors(select, 'standard', 'none',0);
+					proto.setSelectionForInheritors(select, 'standard', 'none', 0);
 				}
 
-				}
-			
+			}
+
 			for (var i = 0; i < inheritors.length; i++) {
 				inheritors[i].set('proto_selected', select);
 				inheritors[i].set('alpha', 1);
@@ -572,8 +624,8 @@ define([
 					var proto_selected = this.get('proto_selected');
 					var inheritor_selected = this.get('inheritor_selected');
 
-					var fill_color = this.inheritProperty('fill_color');
-					var stroke_color = this.inheritProperty('stroke_color');
+					var fill_color = new paper.Color(this.inheritProperty('fill_colorR'), this.inheritProperty('fill_colorG'), this.inheritProperty('fill_colorB'));
+					var stroke_color = new paper.Color(this.inheritProperty('stroke_colorR'), this.inheritProperty('stroke_colorG'), this.inheritProperty('stroke_colorB'));
 					var stroke_width = this.inheritProperty('stroke_width');
 					var protoNode = this.get('proto_node');
 
@@ -581,22 +633,26 @@ define([
 					var smatrix = this.get('smatrix');
 					var tmatrix = this.get('tmatrix');
 
-					var position = this.get('position').toPaperPoint();
-					var rotation_origin = this.get('rotation_origin').toPaperPoint();
-					var scaling_origin = this.get('scaling_origin').toPaperPoint();
+					var position = this.get('position').val.toPaperPoint();
+					var rotation_origin = this.get('rotation_origin').val.toPaperPoint();
+					var scaling_origin = this.get('scaling_origin').val.toPaperPoint();
 
 
-					var scaling_delta = this.inheritProperty('scaling_delta');
+					var scaling_deltaX = this.inheritProperty('scaling_deltaX');
+					var scaling_deltaY = this.inheritProperty('scaling_deltaY');
 					var rotation_delta = this.inheritProperty('rotation_delta');
-					var translation_delta = this.inheritProperty('translation_delta');
-					if (scaling_delta) {
-						smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
-					}
+					var translation_deltaX = this.inheritProperty('translation_deltaX');
+					var translation_deltaY = this.inheritProperty('translation_deltaY');
+
+
 					if (rotation_delta) {
 						rmatrix.rotate(rotation_delta, rotation_origin);
 					}
-					if (translation_delta) {
-						tmatrix.translate(translation_delta.toPaperPoint());
+					if (scaling_deltaX) {
+						smatrix.scale(scaling_deltaX, scaling_deltaY, scaling_origin);
+					}
+					if (translation_deltaX) {
+						tmatrix.translate(new paper.Point(translation_deltaX, translation_deltaY));
 					}
 
 					var geom = new paper.Path();
@@ -611,8 +667,8 @@ define([
 						geom.strokeWidth = stroke_width;
 						geom.visible = true;
 						geom.position = position;
-						geom.transform(rmatrix);
 						geom.transform(smatrix);
+						geom.transform(rmatrix);
 						geom.transform(tmatrix);
 						var screen_bounds = geom.bounds;
 						if (selected_indexes.length === 0) {
@@ -656,9 +712,7 @@ define([
 								geom.selected = inheritor_selected;
 								g_bbox.selectedColor = this.get('proxy_selection_color');
 								g_bbox.selected = true;
-								console.log('inheritor_selected for',this.get('id'));
 								if (inheritor_selected === 'proxy') {
-									console.log('inheritor proxy');
 									if (gi_bbox) {
 										gi_bbox.selectedColor = this.get('inheritance_selection_color');
 										gi_bbox.selected = true;
@@ -724,10 +778,10 @@ define([
 			} else {
 				for (var i = 0; i < inheritors.length; i++) {
 					var inheritor = inheritors[i];
-					if (!inheritor.get(property) || modifier!='none') {
+					if (!inheritor.get(property) || modifier != 'none') {
 						inheritor.set('alpha', alpha);
 						inheritor.get('geom').fillColor.alpha = alpha;
-						inheritor.animateAlpha(levels,property,mode,modifier, curlevel+1);
+						inheritor.animateAlpha(levels, property, mode, modifier, curlevel + 1);
 					}
 				}
 			}

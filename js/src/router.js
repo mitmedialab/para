@@ -21,7 +21,6 @@ define([
   });
 
   var initialize = function() {
-
     var app_router = new AppRouter();
 
 
