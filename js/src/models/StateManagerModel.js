@@ -15,7 +15,6 @@ define([
     'models/data/EllipseNode',
     'models/data/Instance',
     'models/tools/ToolCollection',
-    'models/tools/PenToolModel',
     'models/tools/PolyToolModel',
     'models/tools/SelectToolModel',
     'models/tools/FollowPathToolModel',
@@ -32,13 +31,12 @@ define([
 
   ],
 
-  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint, ColorUtils) {
+  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint, ColorUtils) {
     var rootNode,
       uninstantiated,
       visitor,
       currentNode,
       toolCollection,
-      penTool,
       polyTool,
       selectTool,
       rotateTool,
@@ -56,13 +54,12 @@ define([
       defaults: {
         'state': 'polyTool',
         'tool-mode': 'standard',
-        'tool-modifier': 'none'
+        'tool-modifier': 'none',
+        'tool': null
       },
 
-      initialize: function(event_bus) {
+      initialize: function(attributes,options) {
         clutch = 0;
-        this.event_bus = event_bus;
-
         //setup paperscopes
         var canvas = $('canvas').get(0);
         var subcanvas = $('canvas').get(1);
@@ -71,17 +68,12 @@ define([
         mainView = paper.View._viewsById['canvas'];
         mainView._project.activate();
         subView = paper.View._viewsById['sub-canvas'];
-
-
         currentView = mainView;
         //setup user tool managers
-        penTool = new PenToolModel({
-          id: 'penTool'
-        });
+       
         selectTool = new SelectToolModel({
           id: 'selectTool'
         });
-        selectTool.event_bus = event_bus;
         polyTool = new PolyToolModel({
           id: 'polyTool'
         });
@@ -89,9 +81,7 @@ define([
           id: 'followPathTool'
 
         });
-        followPathTool.event_bus = event_bus;
-        toolCollection = new ToolCollection([polyTool, penTool, selectTool, followPathTool]);
-
+        toolCollection = new ToolCollection([polyTool,selectTool, followPathTool]);
 
         /* event listener registers */
         this.listenTo(toolCollection, "geometryAdded", this.geometryAdded);
@@ -181,7 +171,7 @@ define([
           var currentTool = toolCollection.get(this.get('state'));
           currentTool.set('mode', mode);
         }
-        if (state === 'penTool' || state === 'polyTool') {
+        if (state === 'polyTool') {
           this.moveToRoot();
 
         }
@@ -365,7 +355,9 @@ define([
           if (constrain) {
             var ss = selectTool.get('selected_shapes');
             var lastInstance = ss[ss.length - 1];
-            lastInstance.setConstraint(instance);
+          // lastInstance.setRelativeConstraint(lastInstance,instance,'rotation_delta',45);
+          //  lastInstance.setConditionalConstraint(lastInstance,instance,'translation_deltaX');
+          lastInstance.setEqualityConstraint(lastInstance,instance,'rotation_delta');
           }
 
           instance.set('selected_indexes', []);
@@ -852,10 +844,7 @@ define([
           node.type = type;
           node.name = data[i].name;
           currentNode.addChildNode(node);
-          for (var j = 0; j < data[i].behaviors.length; j++) {
-            var behavior = data[i].behaviors[j];
-            this.event_bus.trigger('newBehavior', [node], behavior.name, behavior);
-          }
+         
 
           if (data[i].children.length > 0) {
             this.parseJSON(node, data[i].children);
@@ -883,13 +872,7 @@ define([
         paper.view.draw();
       },
 
-      removeBehavior: function(behaviorName) {
-        var s = selectTool.selectedNodes[selectTool.selectedNodes.length - 1];
-        if (s) {
-          this.event_bus.trigger('removeBehavior', s, behaviorName);
-
-        }
-      },
+      
 
       deleteObject: function() {
         if (selectTool.selectedNodes.length > 0) {

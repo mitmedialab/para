@@ -11,8 +11,9 @@ define([
   'views/drawing/ProtoView',
   'models/StateManagerModel',
   'models/behaviors/BehaviorManagerModel',
+  'models/tools/SelectToolModel'
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, StateManagerModel, BehaviorManagerModel) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, StateManagerModel, BehaviorManagerModel,SelectToolModel) {
 
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
@@ -28,9 +29,8 @@ define([
 
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
-      var behaviorManagerModel = new BehaviorManagerModel(event_bus);
-      var stateManager = new StateManagerModel(event_bus);
-
+      
+      var stateManager = new StateManagerModel();
 
       //setup the canvas view
       var canvasView = new CanvasView({
@@ -47,8 +47,7 @@ define([
         model: stateManager
       });
       var contextView = new ContextView({
-        el: '#context-menu',
-        model: behaviorManagerModel
+        el: '#context-menu'
       }, event_bus);
       propertyView.render();
 

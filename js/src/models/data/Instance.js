@@ -116,30 +116,31 @@ define([
 			instance.set('proto_node', this);
 			inheritors.push(instance);
 			this.set('inheritors', inheritors);
-			 instance.set('position', {
-              operator: 'set',
-              val: this.get('position').val.clone()
-            });
-            instance.set('rotation_origin', {
-              operator: 'set',
-              val: this.get('position').val.clone()
-            });
-            instance.set('scaling_origin', {
-              operator: 'set',
-              val: this.get('position').val.clone()
-            });
-            instance.set('translation_deltaX', {
-              operator: 'add',
-              val: cjs({
-                _var: 0
-              })
-            });
-            instance.set('translation_deltaY', {
-              operator: 'add',
-              val: cjs({
-                _var: 0
-              })
-            });
+			instance.set('position', {
+				operator: 'set',
+				val: this.get('position').val.clone()
+			});
+			instance.set('rotation_origin', {
+				operator: 'set',
+				val: this.get('position').val.clone()
+			});
+			instance.set('scaling_origin', {
+				operator: 'set',
+				val: this.get('position').val.clone()
+			});
+			instance.set('translation_deltaX', {
+				operator: 'add',
+				val: {
+					_var: cjs(0)
+				}
+
+			});
+			instance.set('translation_deltaY', {
+				operator: 'add',
+				val: {
+					_var: cjs(0)
+				}
+			});
 			return instance;
 		},
 
@@ -164,22 +165,70 @@ define([
 			this.set('tmatrix', tmatrix);
 		},
 
-		setConstraint: function(property_name, func) {
-			/*	var property = this.get(property_name);
+		/*setEqualityConstraint: function(ref, rel, property_name) {
+			var relProp = rel.inheritConstraint(property_name);
+			var refProp = ref.inheritConstraint(property_name);
 
-				var rot_var = instance.get('rotation_constraint');
-				if (!rot_var) {
-					rot_var = cjs(instance.get('rotation_delta').get());
-				} //cjs(instance.get('rotation_delta').get());
-				var rotation_delta = cjs(function() {
-					return rot_var.get();
-				});
-				this.set('rotation_delta', rotation_delta);
-				this.set('rotation_constraint', rot_var);
-				instance.set('rotation_constraint', rot_var);
-				instance.set('rotation_delta', rotation_delta);*/
+			var f = function() {
+				return refProp.get();
+			};
+			if (relProp._constraint) {
+				relProp._constraint.set(f);
+			} else {
+				relProp._constraint = cjs(f);
+			}
+			if (refProp._constraint) {
+				refProp._constraint.set(f);
+			} else {
+				refProp._constraint = cjs(f);
+			}
+		},*/
 
+		setRelativeConstraint: function(ref, rel, property_name, offset) {
+			var relProp = rel.inheritProperty(property_name);
+			var refProp = ref.inheritProperty(property_name);
+			if (!refProp._constraint) {
+				refProp._constraint = cjs(refProp._var);
+			}
+			var refVar = refProp._constraint;
+			var f = function() {
+				return refVar.get() + offset;
+			};
+			if (relProp._constraint) {
+				relProp._constraint.set(f);
+			} else {
+				relProp._constraint = cjs(f);
+			}
 		},
+
+		removeConstraint: function(instance, property_name) {
+				var property = instance.inheritProperty(property_name);
+				if(property._constraint){
+					var cval = property._constraint.get();
+					property._var.set(cval);
+					delete property._constraint;
+				}
+		},
+
+		setConditionalConstraint: function(ref, rel, property_name) {
+			var relVar = rel.inheritConstraint(property_name);
+			var refVar = ref.inheritConstraint(property_name);
+			var relProp = rel.inheritProperty(property_name);
+			var c = function() {
+				if (relVar.get() < refVar.get()) {
+					return relVar.get();
+				} else {
+					relVar.set(refVar.get());
+					return refVar.get();
+				}
+			};
+			if (relProp._constraint) {
+				relProp._constraint.set(c);
+			} else {
+				relProp._constraint = cjs(c);
+			}
+		},
+
 
 		resetProperties: function() {
 			this.clear().set(this.defaults);
@@ -292,7 +341,7 @@ define([
 				proto_node.modifyPoints(segment_index, data, handle, 'none');
 			}
 
-			var master_pathJSON = this.inheritProperty('master_path');
+			var master_pathJSON = this.accessProperty('master_path');
 			var master_path = new paper.Path();
 			master_path.importJSON(master_pathJSON);
 			if (data.translation_delta) {
@@ -343,23 +392,33 @@ define([
 			var data = {};
 			data.rotation_delta = {
 				operator: 'add',
-				val: cjs({_var:matrix.rotation})
+				val: {
+					_var: cjs(matrix.rotation)
+				}
 			};
 			data.scaling_deltaX = {
 				operator: 'add',
-				val: cjs({_var:matrix.scaling.x})
+				val: {
+					_var: cjs(matrix.scaling.x)
+				}
 			};
 			data.scaling_deltaY = {
 				operator: 'add',
-				val: cjs({_var:matrix.scaling.y})
+				val: {
+					_var: cjs(matrix.scaling.y)
+				}
 			};
 			data.translation_deltaX = {
 				operator: 'add',
-				val: cjs({_var:0})
+				val: {
+					_var: cjs(0)
+				}
 			};
 			data.translation_deltaY = {
 				operator: 'add',
-				val: cjs({_var:0})
+				val: {
+					_var: cjs(0)
+				}
 			};
 			//data.translation_delta = new PPoint(matrix.translation.x, matrix.translation.y);
 			data.position = {
@@ -376,47 +435,70 @@ define([
 			};
 			data.fill_colorR = {
 				operator: 'set',
-				val: cjs({_var:path.fillColor.red})
+				val: {
+					_var: cjs(path.fillColor.red)
+				}
 			};
 			data.fill_colorG = {
 				operator: 'set',
-				val: cjs({_var:path.fillColor.green})
+				val: {
+					_var: cjs(path.fillColor.green)
+				}
 			};
 			data.fill_colorB = {
 				operator: 'set',
-				val: cjs({_var:path.fillColor.blue})
+				val: {
+					_var: cjs(path.fillColor.blue)
+				}
 			};
 			data.fill_colorA = {
 				operator: 'set',
-				val: cjs({_var:path.fillColor.alpha})
+				val: {
+					_var: cjs(path.fillColor.alpha)
+				}
 			};
 			data.stroke_colorR = {
 				operator: 'set',
-				val: cjs({_var:path.strokeColor.red})
+				val: {
+					_var: cjs(path.strokeColor.red)
+				}
 			};
 			data.stroke_colorG = {
 				operator: 'set',
-				val: cjs({_var:path.strokeColor.green})
+				val: {
+					_var: cjs(path.strokeColor.green)
+				}
 			};
 			data.stroke_colorB = {
 				operator: 'set',
-				val: cjs({_var:path.strokeColor.blue})
+				val: {
+					_var: cjs(path.strokeColor.blue)
+				}
 			};
 			data.stroke_colorA = {
 				operator: 'set',
-				val: cjs({_var:path.strokeColor.alpha})
+				val: {
+					_var: cjs(path.strokeColor.alpha)
+				}
 			};
 			data.stroke_width = {
 				operator: 'set',
-				val: cjs({_var:path.strokeWidth})
+				val: {
+					_var: cjs(path.strokeWidth)
+				}
 			};
 			data.width = {
 				operator: 'add',
-				val: cjs({_var:path.bounds.width})
+				val: {
+					_var: cjs(path.bounds.width)
+				}
+
 			};
 			data.height = {
 				operator: 'add',
-				val: cjs({_var:path.bounds.height})
+				val: {
+					_var: cjs(path.bounds.height)
+				}
 			};
 			var imatrix = matrix.inverted();
 			path.transform(imatrix);
@@ -471,19 +553,19 @@ define([
 						property = this.get(p);
 					} else {
 						property = {
-							val: cjs({
-								'_var': 0
-							}),
+							val: {
+								_var: cjs(0)
+							},
 							operator: data_property.operator
 						};
 					}
 					if (data_property.operator === 'set') {
-						property.val.put('_var' , data_property.val);
+						property.val._var.set(data_property.val);
 					} else if (data_property.operator === 'add') {
-						var cValue = property.val.get('_var');
-						property.val.put('_var', cValue + data_property.val);
+						var cValue = property.val._var.get();
+						property.val._var.set(cValue + data_property.val);
 					}
-					this.set(p,property);
+					this.set(p, property);
 				}
 
 			}
@@ -492,26 +574,58 @@ define([
 		},
 
 		/*inheritProperty
-		 * checks first to see if there is a scaling prototype
 		 * moves up the prototype chain to find the
-		 * relevant scaling for this node and applies it to the matrix
+		 * appropriate property reference and returns it
+		 * note: returns a reference, not ACTUAL VALUE.
+		 * To access property value call accessProperty (below)
 		 */
-		inheritProperty: function(property) {
-			if (this.get(property)) {
-				var property_constraint = this.get(property).val;
-				if (!property_constraint.get) {
-					return property_constraint;
-				} else {
-					if (property_constraint.get('_constraint')) {
-						return property_constraint.get('_constraint');
-					} else {
-						return property_constraint.get('_var');
-					}
-				}
+
+		inheritProperty: function(property_name) {
+			if (this.get(property_name)) {
+				var property = this.get(property_name).val;
+				return property;
 			} else {
 				if (this.has('proto_node')) {
-					return this.get('proto_node').inheritProperty(property);
+					return this.get('proto_node').inheritProperty(property_name);
 				}
+			}
+		},
+
+		/*inheritConstraint
+		 * returns the correct reference to the object's
+		 * property, based on the constraint.
+		 */
+
+		inheritConstraint: function(property_name) {
+			var property = this.inheritProperty(property_name);
+			if (!property._var) {
+				return property;
+			} else {
+				if (property._constraint) {
+					//console.log('returning constraint reference');
+					return property._constraint;
+				} else {
+					//console.log('returning var reference');
+					return property._var;
+				}
+			}
+		},
+
+
+
+		/* accessProperty
+		 * returns the actual value for a given property by first
+		 *finding it in the inheritance chain and then checking the constraint
+		 * to return the appropriate value
+		 */
+		accessProperty: function(property_name) {
+			var property = this.inheritConstraint(property_name);
+			if (!property.get) {
+				return property;
+			} else {
+
+				return property.get();
+
 			}
 		},
 
@@ -624,9 +738,9 @@ define([
 					var proto_selected = this.get('proto_selected');
 					var inheritor_selected = this.get('inheritor_selected');
 
-					var fill_color = new paper.Color(this.inheritProperty('fill_colorR'), this.inheritProperty('fill_colorG'), this.inheritProperty('fill_colorB'));
-					var stroke_color = new paper.Color(this.inheritProperty('stroke_colorR'), this.inheritProperty('stroke_colorG'), this.inheritProperty('stroke_colorB'));
-					var stroke_width = this.inheritProperty('stroke_width');
+					var fill_color = new paper.Color(this.accessProperty('fill_colorR'), this.accessProperty('fill_colorG'), this.accessProperty('fill_colorB'));
+					var stroke_color = new paper.Color(this.accessProperty('stroke_colorR'), this.accessProperty('stroke_colorG'), this.accessProperty('stroke_colorB'));
+					var stroke_width = this.accessProperty('stroke_width');
 					var protoNode = this.get('proto_node');
 
 					var rmatrix = this.get('rmatrix');
@@ -638,11 +752,11 @@ define([
 					var scaling_origin = this.get('scaling_origin').val.toPaperPoint();
 
 
-					var scaling_deltaX = this.inheritProperty('scaling_deltaX');
-					var scaling_deltaY = this.inheritProperty('scaling_deltaY');
-					var rotation_delta = this.inheritProperty('rotation_delta');
-					var translation_deltaX = this.inheritProperty('translation_deltaX');
-					var translation_deltaY = this.inheritProperty('translation_deltaY');
+					var scaling_deltaX = this.accessProperty('scaling_deltaX');
+					var scaling_deltaY = this.accessProperty('scaling_deltaY');
+					var rotation_delta = this.accessProperty('rotation_delta');
+					var translation_deltaX = this.accessProperty('translation_deltaX');
+					var translation_deltaY = this.accessProperty('translation_deltaY');
 
 
 					if (rotation_delta) {
@@ -657,7 +771,7 @@ define([
 
 					var geom = new paper.Path();
 
-					geom.importJSON(this.inheritProperty('master_path'));
+					geom.importJSON(this.accessProperty('master_path'));
 
 
 					if (geom) {
