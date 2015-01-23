@@ -48,9 +48,10 @@ define([
     var undoManager;
 
     var undoLimit = 15;
-
+    var toolNameMap;
 
     var StateManagerModel = Backbone.Model.extend({
+
 
       defaults: {
         'state': 'polyTool',
@@ -58,10 +59,10 @@ define([
         'tool-modifier': 'none'
       },
 
-      initialize: function(event_bus) {
+      initialize: function(event_bus, options) {
         clutch = 0;
         this.event_bus = event_bus;
-
+          
         //setup paperscopes
         var canvas = $('canvas').get(0);
         var subcanvas = $('canvas').get(1);
@@ -86,15 +87,16 @@ define([
         });
         followPathTool = new FollowPathToolModel({
           id: 'followPathTool'
-
         });
-        constraintTool = new ConstraintToolModel({
-          id: 'constraintTool'
-        });
+        constraintTool = options.constrainer;
+        console.log(constraintTool);
+        constraintTool.set('sm', this); 
         followPathTool.event_bus = event_bus;
         // TODO: check is event bus makes sense
         // constraintTool.event_bus = c_event_bus;
-        toolCollection = new ToolCollection([polyTool, penTool, selectTool, followPathTool]);
+        toolCollection = new ToolCollection([polyTool, penTool, selectTool, followPathTool, constraintTool]);
+
+        toolNameMap = {'pen': penTool, 'select': selectTool, 'poly': polyTool, 'path': followPathTool, 'constraint': constraintTool};
 
 
         /* event listener registers */
@@ -133,6 +135,9 @@ define([
         this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
         this.listenTo(event_bus, 'moveUpNode', this.moveUpNode);
 
+
+        // EXPERIMENTAL: Tool Function-call delegation, should be for each tool
+        this.listenTo( constraintTool, 'delegateMethod', this.delegateMethod );
 
         //setup visitor
         visitor = new Visitor();
@@ -233,12 +238,34 @@ define([
 
       },
 
-
+      /*
+       * Tell the tool to advance its state.
+       */
+      advanceTool: function() {
+        var tool = toolCollection.get(this.get('state'));
+        tool.advance();
+      },
 
       resetTools: function() {
         toolCollection.get(this.get('state')).reset();
 
       },
+
+      getToolByName: function( toolName ) {
+        return toolNameMap[toolName];
+      },
+
+      /*
+       * Requests a particular tool to call a named method. The results are passed back to the source of the delegation. 
+       */
+      delegateMethod: function( toolName, methodName ) {
+        console.log('Delegating method: ' + methodName + ' to tool: ' + toolName); 
+        var args = Array.prototype.slice.call( arguments, 2 ); // extract the method arguments
+        var tool = this.getToolByName( toolName );
+        var method = tool[methodName];
+        var result = tool[methodName].apply(tool, args);
+        return result;
+      }, 
 
       /* geometryAdded
        * callback that is triggered when a new geometry
@@ -291,6 +318,7 @@ define([
        */
 
       addInstance: function() {
+        console.log('here');
         if (this.get('state') === 'selectTool') {
           var selectedShapes = selectTool.get('selected_shapes');
           if (selectedShapes.length == 1) {
@@ -405,21 +433,38 @@ define([
       },
 
       // TESTING
-      constraintSelected: function(data) {
-        constraintTool.selectConstraint(data);    
+      setConstraintProperty: function(data) {
+        var result = constraintTool.setConstraintProperty(data);   
+        this.trigger('toolViewUpdate', 'constraint', result); 
       },
+
+      setConstraintType: function(data) {
+        var result = constraintTool.setConstraintType(data);
+        this.trigger('toolViewUpdate', 'constraint', result);
+      },
+
+      setConstraintExpression: function(data) {
+        var result = constraintTool.setConstraintExpression(data);
+        this.trigger('toolViewUpdate', 'constraint', result);
+      },
+
+      toolViewUpdate: function(view, data) {
+
+      },
+      // END TESTING
 
       /* geometrySelected
        * callback that is triggered when a new geometry
        * object is selected by the user
        */
-      geometrySelected: function(literal) {
+      geometrySelected: function(literal, clear) {
 
         if (literal) {
           var instance = literal.data.instance;
           instance.set('selected_indexes', []);
           selectTool.addSelectedShape(instance);
           instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
+           
           var data = {
             id: instance.get('id'),
             fill_color: literal.fillColor.toCSS(true),
@@ -429,6 +474,7 @@ define([
           if (selectTool.get('selected_shapes').length === 1) {
             data.params = instance.get('userParams');
           }
+          
           this.styleModified(data, true);
           this.trigger('geometrySelected', data);
         }
@@ -447,6 +493,7 @@ define([
       },
 
       geometryDSelected: function(segments, override) {
+        console.log('triggered');
         if (segments.length > 0) {
           var path = segments[0].path;
 

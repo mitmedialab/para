@@ -23,6 +23,7 @@ define([
   var groupKey = 71;
   var altKey = false;
   var clearKey = 67;
+  var advanceKey = 78; // EXPERIMENTAL
   var pan = false;
   var last = {
     x: 0,
@@ -181,7 +182,10 @@ define([
       if (event.keyCode === clutchKey) {
         this.model.toggleClutch();
       }
-
+      // EXPERIMENTAL
+      if (event.keyCode === advanceKey) {
+        this.model.advanceTool();
+      }
     },
 
     canvasKeyup: function(event) {

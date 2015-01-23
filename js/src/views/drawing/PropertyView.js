@@ -12,13 +12,14 @@ define([
 ], function($, _, Backbone, Handlebars, IrisColorPicker, paper) {
 
   var template, source;
-  var constraintPropMap = {};
-    constraintPropMap['couter'] = 'strokeWeight';
-    constraintPropMap['cinner'] = 'fill';
-    constraintPropMap['csize']  = 'scale';
-    constraintPropMap['cposition'] = 'position';
-    constraintPropMap['corient1'] = 'orientation'; // TODO: should be made into one item
-    constraintPropMap['corient2'] = 'orientation'; // TODO: should be combined with previous
+  var constraintTypeMap = {};
+    constraintTypeMap['more-box'] = 'more';
+    constraintTypeMap['more'] = 'more';
+    constraintTypeMap['less-box'] = 'less';
+    constraintTypeMap['less'] = 'less';
+    constraintTypeMap['equal-box'] = 'equal';
+    constraintTypeMap['equal-bottom'] = 'equal';
+    constraintTypeMap['equal-top'] = 'equal';
   var PropertyView = Backbone.View.extend({
     //
     initialize: function() {
@@ -29,10 +30,11 @@ define([
 
       this.listenTo(this.model, 'geometrySelected', this.geometrySelected);
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
+
+      this.listenTo(this.model, 'toolViewUpdate', this.update);
       this.currentPaths = [];
       source = $('#parameterTemplate').html();
       template = Handlebars.default.compile(source);
-
 
       $('#fillColorBlock').addClass('color-block-selected');
       $('#fillColorBlock').css('background-color', 'white');
@@ -83,13 +85,11 @@ define([
       'click #no-color': 'clearColor',
       'click .behaviorRemove': 'removeBehavior',
       // testing
-      'click #constraint-wheel': 'constraintChange'
-
     },
 
     render: function() {
       // ////console.log('property view rendering');back
-      // ////console.log('source='+$('#property-list-template').html());
+      // ///console.log('source='+$('#property-list-template').html());
       /* var source = $('#property-list-template').html();
         var template = Handlebars.compile(source);
         var properties = this.model.getSelected();
@@ -168,6 +168,42 @@ define([
 
     },
 
+    update: function( view, data ) {
+      console.log('Updating view: ' + view + ' with data: ' + data);
+      if ( view == "constraint" ) {
+        this.updateConstraintMenu( data );
+      } 
+    },
+
+    updateConstraintMenu: function( data ) {
+      for ( var param in data ) {
+        console.log('[INFO] Updating... Parameter: ' + param + ', Value: ' + data[param]);
+        if ( param == "property" ) {
+          var properties = $('.constraint-prop:not(#' + data[param] + ')');
+          properties.attr('class', 'constraint-prop');
+          var prop = $('#' + data[param] + '.constraint-prop');
+          prop.attr('class', 'constraint-prop focus'); 
+        }
+        if ( param == "type" ) {
+          var types = $('.constraint-type:not(#' + data[param] + '-container)');
+          types.attr('class', 'constraint-type');
+          $('#' + data[param] + '.constraint-type').attr('class', 'constraint-type focus');
+        }
+        if ( param == "expression" ) {
+          var result = data[param];
+          if (result == "true") {
+            $('#expression').removeClass('invalid');
+            $('#expression').addClass('valid');
+          } else if (result == "false") {
+            $('#expression').removeClass('valid');
+            $('#expression').addClass('invalid');
+          } else {
+            $('#expression').attr('class', 'form-control expression');
+          }
+        }
+      }
+    },
+
     geometrySelected: function(data) {
       this.undelegateEvents();
       if (data.fill_color) {
@@ -218,12 +254,30 @@ define([
     },
 
     // TESTING
-    constraintChange: function(event) {
+    setConstraintProperty: function(event) {
       var element = $(event.target);
-      var elementId = element.attr('class');
-
-      this.model.constraintSelected(constraintPropMap[elementId]);
+      var elementId = element.attr('id');
+      console.log('Registered click from: ' + elementId);
+      this.model.setConstraintProperty(constraintPropMap[elementId]);
     },
+
+    setConstraintType: function(event) {
+      var element = $(event.target);
+      var elementId = element.attr('id');
+      console.log('Registered click from: ' + elementId);
+      this.model.setConstraintType(constraintTypeMap[elementId]);
+      // this.model.passEvent(tool, 'setConstraintType');
+    },
+
+    setConstraintExpression: function(event) {
+      var element = $(event.target);
+      var elementText = element.val();
+      console.log('Registered expression input change: ' + elementText);
+      this.model.setConstraintExpression(elementText);
+      // this.model.passEvent(tool, 'setConstraintExpression');
+    },
+    // END TESTING
+    
 
     paramChange: function(event) {
       var element = $(event.target);

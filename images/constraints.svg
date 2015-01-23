@@ -1,0 +1,73 @@
+<svg
+   version="1.1"
+   viewbox="0 0 150 150"
+   id="constraint-wheel-box">
+  <g
+     transform="translate(0,-902.36218)"
+     id="constraint-wheel">
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(2.0759837,0,0,2.0759837,-69.69715,831.60712)"
+       id="path2985"
+       fill="#000000"
+       fill-opacity="0.06947285"
+       stroke="#000000"
+       stroke-opacity="1" />
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(2.0166584,0,0,2.0166584,-65.562149,835.77162)"
+       id="path2985-6"
+       fill="#000000"
+       fill-opacity="0.06947285"
+       stroke="#cccccc"
+       stroke-opacity="1" />
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(1.7991328,0,0,1.7991328,-50.400494,851.04148)"
+       id="path2985-7"
+       fill="#000000"
+       fill-opacity="0.06947285"
+       stroke="#000000"
+       stroke-opacity="1" />
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(1.7200326,0,0,1.7200326,-44.887172,856.59416)"
+       id="path2985-7-7"
+       style="fill:#000000;fill-opacity:0.06947285;stroke:#b3b3b3;stroke-opacity:1" />
+    <path
+       d="m 71.139552,1027.072 -3.758424,-17.5321 15.237744,17.4412 -14.2755,16.3396 z"
+       id="path3039"
+       fill="#808080"
+       stroke="#000000"
+       stroke-width="0.91121644px"
+       stroke-linecap="butt"
+       stroke-linejoin="miter"
+       stroke-opacity="1" />
+    <path
+       d="m 78.860448,927.90477 3.758424,17.5321 -15.237744,-17.44117 14.2755,-16.33947 z"
+       id="path3039-0"
+       fill="#808080"
+       stroke="#000000"
+       stroke-width="0.91121644px"
+       stroke-linecap="butt"
+       stroke-linejoin="miter"
+       stroke-opacity="1" />
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(0.20724067,0,0,0.20724067,60.555217,962.78904)"
+       id="path2985-7-7-5"
+       fill="#000000"
+       fill-opacity="0.06947285"
+       stroke="#000000"
+       stroke-opacity="1" />
+    <path
+       d="m 22.442435,1030.0255 105.115125,-105.11501 -0.26212,-0.26213 0,0 0,0 0,0"
+       id="path3077"
+       fill="none"
+       stroke="#000000"
+       stroke-width="2.07598352px"
+       stroke-linecap="butt"
+       stroke-linejoin="miter"
+       stroke-opacity="1" />
+  </g>
+</svg>
