@@ -195,7 +195,7 @@ define([
 
     strokeChange: function(event) {
       var value = parseInt($(event.target).val(), 10);
-      var data = {stroke_width: value};
+      var data = {stroke_width: {val:value, operator:'set'}};
       this.model.styleModified(data);
       this.model.setToolStyle(data);
     },

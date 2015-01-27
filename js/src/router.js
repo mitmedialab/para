@@ -29,7 +29,7 @@ define([
 
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
-      
+
       var stateManager = new StateManagerModel();
 
       //setup the canvas view
@@ -50,8 +50,6 @@ define([
         el: '#context-menu'
       }, event_bus);
       propertyView.render();
-
-
 
     });
 

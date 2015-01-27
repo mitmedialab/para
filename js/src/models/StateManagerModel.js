@@ -19,10 +19,6 @@ define([
     'models/tools/SelectToolModel',
     'models/tools/FollowPathToolModel',
     'filesaver',
-    'models/behaviors/actions/BlockNode',
-    'models/behaviors/actions/InitializeNode',
-    'models/behaviors/actions/TranslateNode',
-    'models/behaviors/actions/RotateNode',
     'models/data/Visitor',
     'models/data/Edge',
     'utils/PPoint',
@@ -30,8 +26,7 @@ define([
 
 
   ],
-
-  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint, ColorUtils) {
+  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, Visitor, Edge, PPoint, ColorUtils) {
     var rootNode,
       uninstantiated,
       visitor,
@@ -59,6 +54,8 @@ define([
       },
 
       initialize: function(attributes,options) {
+        var testP = new PPoint(100,20);
+       
         clutch = 0;
         //setup paperscopes
         var canvas = $('canvas').get(0);
@@ -212,9 +209,8 @@ define([
             break;
 
         }
-        var data = pathNode.normalizePath(literal, matrix);
-        selectTool.addSelectedShape(pathNode);
-        pathNode.set(data);
+       pathNode.normalizePath(literal, matrix);
+      selectTool.addSelectedShape(pathNode);
         var edge = new Edge({
           x: currentNode,
           y: pathNode
@@ -354,10 +350,12 @@ define([
           var instance = literal.data.instance;
           if (constrain) {
             var ss = selectTool.get('selected_shapes');
-            var lastInstance = ss[ss.length - 1];
-          // lastInstance.setRelativeConstraint(lastInstance,instance,'rotation_delta',45);
-          //  lastInstance.setConditionalConstraint(lastInstance,instance,'translation_deltaX');
-          lastInstance.setEqualityConstraint(lastInstance,instance,'rotation_delta');
+            var  lastInstance = ss[ss.length - 1];
+          //lastInstance.setRelativeConstraint(lastInstance,instance,'rotation_delta',45);
+//lastInstance.setEqualConstraint(lastInstance,instance,'rotation_delta');
+          
+        lastInstance.setConditionalConstraint(lastInstance,instance,'rotation_delta', "<");
+          //lastInstance.setEqualityConstraint(lastInstance,instance,'rotation_delta');
           }
 
           instance.set('selected_indexes', []);
@@ -477,10 +475,9 @@ define([
           style.fill_color = data.fill_color;
         }
         if (data.stroke_width) {
-          style.stroke_width = data.stroke_width;
+          style.stroke_width = data.stroke_width.val;
         }
         selectedTool.set('style', style);
-        console.log('selected tool style =',selectedTool.get('style'));
       },
 
       /*styleModified
@@ -489,44 +486,10 @@ define([
        */
       styleModified: function(style_data) {
         var selectedShapes = selectTool.get('selected_shapes');
-        var data = {};
-        if (style_data.fill_color) {
-          data.fill_colorR = {
-            operator: 'set',
-            val: ColorUtils.hexToR(style_data.fill_color)
-          };
-           data.fill_colorG = {
-            operator: 'set',
-            val: ColorUtils.hexToG(style_data.fill_color)
-          };
-           data.fill_colorB = {
-            operator: 'set',
-            val: ColorUtils.hexToB(style_data.fill_color)
-          };
-        }
-        if (style_data.stroke_color) {
-          data.stroke_colorR = {
-            operator: 'set',
-            val: ColorUtils.hexToR(style_data.stroke_color)
-          };
-           data.stroke_colorG = {
-            operator: 'set',
-            val: ColorUtils.hexToG(style_data.stroke_color)
-          };
-           data.stroke_colorB = {
-            operator: 'set',
-            val: ColorUtils.hexToB(style_data.stroke_color)
-          };
-        }
-          if (style_data.stroke_width) {
-          data.stroke_width = {
-            operator: 'set',
-            val: style_data.stroke_width
-          };
-        }
+        
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-          instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+          instance.modifyProperty(style_data, this.get('tool-mode'), this.get('tool-modifier'));
         }
         this.compile();
 

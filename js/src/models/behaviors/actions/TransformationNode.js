@@ -46,14 +46,14 @@ define([
 			/* setDelta
 			* sets delta to new values
 			*/
-			setDelta: function(point){
+			setDelta: function(x,y){
 				this.delta.set(x,y);
 			},
 
 			/* incrementDelta
 			* increments delta value
 			*/
-			incrementDelta: function(point){
+			incrementDelta: function(x,y){
 				this.delta.add(x,y);
 			},
 

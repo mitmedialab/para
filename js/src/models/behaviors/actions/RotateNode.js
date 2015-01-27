@@ -29,7 +29,7 @@ define([
                          this.linkedOrigin = false;
                     }
                     else{
-                         this.origin.set(x,y);
+                         this.origin.setValue({x,y});
                          this.relativeOrigin = false;
                     }
                },
@@ -39,7 +39,7 @@ define([
                */
                incrementOrigin: function(x,y){
                     if(!this.linkedOrigin){
-                         this.origin.add(x,y);
+                         this.origin.add({x,y});
                          this.relativeOrigin = false;
                     }
                     else{

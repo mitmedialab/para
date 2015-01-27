@@ -3,56 +3,85 @@
  */
 
 define([
-		'toolbox',
+
 		'paper',
-		'cjs'
+		'cjs',
+		'utils/PProperty',
+		'utils/PConstraint'
 
 
 	],
 
-	function(Toolbox, paper, cjs) {
+	function(paper, cjs, PProperty, PConstraint) {
 
-		var PPoint = Toolbox.Base.extend({
+		var PPoint = PConstraint.extend({
 
-			constructor: function(x, y) {
+			constructor: function(x, y, operator) {
 
-				this.x = x;
-				this.y = y;
-
+				this.x = new PProperty(x);
+				this.y = new PProperty(y);
+				PConstraint.apply(this, arguments);
+				if(operator){
+					this.set('operator',operator);
+				}
+				this.setNull(false);
 			},
 
-			set: function(point) {
-				this.x = point.x;
-				this.y = point.y;
-			},
-
-			setX: function(x) {
-				this.x = x;
-			},
-
-			setY: function(y) {
-				this.y = y;
-			},
-
-			add: function(point, newP) {
-				if (newP) {
-					var point2 = this.clone();
-					point2.add(point);
-					return point2;
+			setValue: function(point) {
+				if (point.x.get) {
+					this.x.setValue(point.x.get());
+					this.y.setValue(point.y.get());
 				} else {
-					this.x += point.x;
-					this.y += point.y;
+					this.x.setValue(point.x);
+					this.y.setValue(point.y);
 				}
 			},
 
-			sub: function(point, newP) {
+			getValue: function() {
+				return {
+					x: this.x.getValue(),
+					y: this.y.getValue()
+				};
+			},
+
+			getX: function() {
+				return this.x.getValue();
+			},
+
+			getY: function() {
+				return this.y.getValue();
+			},
+
+			setX: function(x) {
+				this.x.setValue(x);
+				this.setNull(false);
+			},
+
+			setY: function(y) {
+				this.y.setValue(y);
+				this.setNull(false);
+			},
+
+			add: function(data, newP) {
 				if (newP) {
 					var point2 = this.clone();
-					point2.sub(point);
+					point2.add(data);
 					return point2;
 				} else {
-					this.x -= point.x;
-					this.y -= point.y;
+					this.setX(this.getX() + data.x);
+					this.setY(this.getY() + data.y);
+				}
+			},
+
+			sub: function(data, newP) {
+				if (newP) {
+					var point2 = this.clone();
+					point2.sub(data);
+					return point2;
+				} else {
+					this.setX(this.getX() - data.x);
+					this.setY(this.getY() - data.y);
+
 				}
 			},
 
@@ -62,8 +91,8 @@ define([
 					point2.div(val);
 					return point2;
 				} else {
-					this.x /= val;
-					this.y /= val;
+					this.setX(this.getX() / val);
+					this.setY(this.getY() / val);
 				}
 			},
 
@@ -73,8 +102,8 @@ define([
 					point2.mul(val);
 					return point2;
 				} else {
-					this.x *= val;
-					this.y *= val;
+					this.setX(this.x.get() * val);
+					this.setY(this.y.get() * val);
 				}
 			},
 
@@ -112,20 +141,17 @@ define([
 				return v.mul(w.dot(v) / this.lengthSqrd(v));
 			},
 
+			/*clone
+			 * returns a static clone based on the current values of the point
+			 * does not clone the constraints of the original
+			 */
 			clone: function() {
-				return new PPoint(this.x, this.y);
+				return new PPoint(this.getX(), this.getY());
 			},
 
 			toPaperPoint: function() {
-
-
-				return new paper.Point(this.x, this.y);
+				return new paper.Point(this.x.getValue(), this.y.getValue());
 			},
-
-			toConstraint: function(){
-				var f = function() { return this;};
-				return cjs(f);
-			}
 
 		});
 
