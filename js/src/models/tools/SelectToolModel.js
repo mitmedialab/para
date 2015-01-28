@@ -85,14 +85,14 @@ define([
     },
 
     resetSelections: function() {
-      deselectAll();
+      this.deselectAll();
       var selections = this.get('selections');
       for (var i = 0; i < selections.length; i++) {
         this.set('selected_shapes', selections[i]);
-        deselectAll();
+        this.deselectAll();
       }
       this.set('selections', []);
-      current_sel_index = 0;
+      this.set('current_sel_index', 0);
     },
 
     getCurrentSelection: function() {

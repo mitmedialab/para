@@ -175,6 +175,7 @@ define([
 
 
       setState: function(state, mode) {
+        this.clearIrrelevantState();
         toolCollection.get(this.get('state')).reset();
 
         this.set('state', state);
@@ -186,6 +187,19 @@ define([
           this.moveToRoot();
 
         }
+      },
+
+      clearIrrelevantState: function() {
+        var state = this.get('state');
+        switch (state) {
+          case 'constraintTool':
+            console.log('here');
+            constraintTool.clearState();
+            console.log(selectTool.get('selected_shapes'));
+            break;
+          default:
+        }
+        this.compile();
       },
 
       /*

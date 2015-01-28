@@ -56,6 +56,10 @@ var template,source, model, view, menuX, menuY, currentNode;
 
     render: function() {
       switch (this.model.get('mode')) {
+        case 'references':
+          this.hideWheel();
+          this.hideExpEditor();
+          break;
         case 'property':
           this.showWheel();
           break;
@@ -163,7 +167,8 @@ var template,source, model, view, menuX, menuY, currentNode;
     },
 
     hideWheel: function() {
-      this.$('#constraint-wheel').css({
+      this.$('#constraint-wheel').attr('class', '');
+      this.$('#constraint-wheel-box').css({
         visibility: 'hidden'
       });
       this.wheelVisible = false;
@@ -173,11 +178,12 @@ var template,source, model, view, menuX, menuY, currentNode;
       $('#expInput').css({
         display: 'inherit'
       });
+      this.editorVisible = true;
     },
 
     hideExpEditor: function() {
-      this.$('#exp-editor').css({
-        visibility: 'hidden'
+      this.$('#expInput').css({
+        display: 'none'
       });
       this.editorVisible = false;
     },

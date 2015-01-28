@@ -294,6 +294,20 @@ define([
 
     mouseUp: function(event) {
       
+    },
+
+    clearState: function() {
+      this.get('sm').delegateMethod('select', 'resetSelections');
+      this.set('references', []);
+      this.set('relatives', []);
+      this.set('type', 'equal');
+      this.set('expression', '');
+      this.set('props_selected', []);
+      this.set('mode', 'references');
+      this.set('maxDelimiter', 0);
+      this.set('minDeliiter', 0);
+      this.set('avgDelimiter', 0);
+      this.set('delimited', false);
     } 
   });
 
