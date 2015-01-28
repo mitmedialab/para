@@ -413,22 +413,22 @@ define([
             * will likely need a constraint manager to handle equality constraints in the 
             * future
             */
-            /*var equalFRef = function(){
-              var ref = refInstance.inheritProperty(propertyName);
-              var rel = relInstance.inheritProperty(propertyName);
+           /* var equalFRef = function(){
+              var ref = refInstance.inheritProperty('rotation_delta');
+              var rel = relInstance.inheritProperty('rotation_delta');
               rel.setValue(ref.val.getValue());
               return  ref.val.getValue();
             };
 
              var equalFRel = function(){
-              var ref = refInstance.inheritProperty(propertyName);
-              var rel = relInstance.inheritProperty(propertyName);
+              var ref = refInstance.inheritProperty('rotation_delta');
+              var rel = relInstance.inheritProperty('rotation_delta');
              ref.setValue(rel.val.getValue());
               return  rel.val.getValue();
             };
 
-            refInstance.inheritProperty(propertyName).setConstraint(equalFRef);
-            relInstance.inheritProperty(propertyName).setConstraint(equalFRel);*/
+            refInstance.inheritProperty('rotation_delta').setConstraint(equalFRef);
+            relInstance.inheritProperty('rotation_delta').setConstraint(equalFRel);*/
             
       },
 
