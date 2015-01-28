@@ -348,14 +348,15 @@ define([
             stroke_width: literal.strokeWidth, 
           };
           var instance = literal.data.instance;
+          //placeholder functionality for setting constraints
           if (constrain) {
             var ss = selectTool.get('selected_shapes');
-            var  lastInstance = ss[ss.length - 1];
-          //lastInstance.setRelativeConstraint(lastInstance,instance,'rotation_delta',45);
-//lastInstance.setEqualConstraint(lastInstance,instance,'rotation_delta');
+            var relInstance = ss[ss.length - 1];
+            var refInstance = instance;
+            this.constrain(relInstance,refInstance);
+
+
           
-        lastInstance.setConditionalConstraint(lastInstance,instance,'rotation_delta', "<");
-          //lastInstance.setEqualityConstraint(lastInstance,instance,'rotation_delta');
           }
 
           instance.set('selected_indexes', []);
@@ -374,6 +375,61 @@ define([
         }
 
         this.compile();
+      },
+
+      /*constrain
+      * placeholder function for setting constraints
+      * between instances
+      */
+
+      constrain: function(relInstance,refInstance){
+        /*example which sets one-way offset constraint on x coordinate of translation delta*/
+            
+            var offset = 100;
+            /*constraint function
+            * IMPORTANT: for each constraint function to work correctly
+            * you must both set the value of the constrained property
+            and return the new value (even though this seems redundant) */
+            var relativeF = function(){
+              //access translation delta properties for both relative and reference objects
+              var ref = refInstance.inheritProperty('translation_delta');
+              var rel = relInstance.inheritProperty('translation_delta');
+              //set the x value of the reference property to the x value of the relative property + the offset
+              ref.setX(rel.getX()+offset);
+              //return the offset x value of the relative property
+              return rel.getX()+offset;
+            };
+
+            //set the constraint on the x property of the ref translation 
+            refInstance.inheritProperty('translation_delta').x.setConstraint(relativeF);
+
+
+
+          /*example which sets two-way equality constraint on rotation_delta*/
+            /* constraint function
+            * requires two, one for both relative and reference properties
+            * will not work correctly if other objects are also set to have 
+            * equal constraints with objects that are pre-constrained
+            * will likely need a constraint manager to handle equality constraints in the 
+            * future
+            */
+            /*var equalFRef = function(){
+              var ref = refInstance.inheritProperty(propertyName);
+              var rel = relInstance.inheritProperty(propertyName);
+              rel.setValue(ref.val.getValue());
+              return  ref.val.getValue();
+            };
+
+             var equalFRel = function(){
+              var ref = refInstance.inheritProperty(propertyName);
+              var rel = relInstance.inheritProperty(propertyName);
+             ref.setValue(rel.val.getValue());
+              return  rel.val.getValue();
+            };
+
+            refInstance.inheritProperty(propertyName).setConstraint(equalFRef);
+            relInstance.inheritProperty(propertyName).setConstraint(equalFRel);*/
+            
       },
 
       /* geometryDSelected

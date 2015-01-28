@@ -6,7 +6,7 @@ define([
 
 		'paper',
 		'cjs',
-		'utils/PProperty',
+		'utils/PFloat',
 		'utils/PConstraint',
 		'utils/ColorUtils'
 
@@ -14,16 +14,16 @@ define([
 
 	],
 
-	function(paper, cjs, PProperty, PConstraint, ColorUtils) {
+	function(paper, cjs, PFloat, PConstraint, ColorUtils) {
 
 		var PColor = PConstraint.extend({
 
 			constructor: function(r, g, b, a, operator) {
 
-				this.r = new PProperty(r);
-				this.g = new PProperty(g);
-				this.b = new PProperty(b);
-				this.a = new PProperty(a);
+				this.r = new PFloat(r);
+				this.g = new PFloat(g);
+				this.b = new PFloat(b);
+				this.a = new PFloat(a);
 				PConstraint.apply(this, arguments);
 
 				if (operator) {

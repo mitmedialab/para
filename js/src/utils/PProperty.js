@@ -1,6 +1,6 @@
 /*PProperty.js
- * object that represents a constrainable
- * property for an instance in Para
+ * constrainable value in para
+ * essentially a wrapper class for cjs functionality
  *
  */
 
@@ -28,9 +28,7 @@ define([
 
 		setValue: function(val) {
 			this._val.set(val);
-		},
-
-		
+		},		
 
 	});
 

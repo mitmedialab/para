@@ -1,5 +1,5 @@
 	/*PConstraint.js
-	 * base constraint class in para
+	 * base class for all constrainable properties in para
 	 *
 	 */
 
@@ -7,8 +7,8 @@
 		'underscore',
 		'jquery',
 		'backbone',
-		'cjs'
-	], function(_, $, Backbone, cjs) {
+		'utils/PProperty'
+	], function(_, $, Backbone, PProperty) {
 
 		var PConstraint = Backbone.Model.extend({
 
@@ -22,30 +22,61 @@
 
 			},
 
+			/* setNull
+			*  sets property default isNull to true
+			* used for prototpical inheritance functionality
+			*/
 			setNull: function(val) {
 				this.set('isNull', val);
 			},
 
+			/* checks to see if property is null
+			* used for prototpical inheritance functionality
+			*/
 			isNull: function() {
 				return this.get('isNull');
 			},
 
+			/*setConstraint
+			* sets constraint object if it exists 
+			* or initializes a new one if it does not exist
+			* expects paramter to be a function
+			*/
+			setConstraint: function(func){
+				if (!this.isConstrained()) {
+					this.constraint = new PProperty(func);
+				}
+				else{
+					this.constraint.setValue(func);
+				}
+			},
+
+			/*getConstraint
+			* returns the constraint of this property
+			* if it exists.
+			*/
 			getConstraint: function() {
 				if (this.constraint) {
 					return this.constraint;
-				} else {
-					return this.val;
-				}
+
+				} 
 			},
 
-			removeConstraint: function() {
+			/* removeConstraint
+			* removes the constraint of this property
+			*/
+			removeConstraint: function(axis) {
 				if (this.isConstrained()) {
-					this.val.setValue(this.getConstraint().getValue());
-					this.constraint.set(null);
-					delete this.constraint;
-				}
+						this.constraint.setValue(null);
+						delete this.constraint;
+					}
+				
 			},
 
+			/* isConstrained
+			* returns true if constraint exists
+			* false if not
+			*/
 			isConstrained: function() {
 
 				if (this.constraint) {
@@ -55,6 +86,12 @@
 				}
 			},
 
+			/* modify
+			* update the value of the property
+			* based on a data argument. This is called
+			* when shapes are transformed by the user to
+			* update their properties
+			*/
 			modify: function(data) {
 				for (var p in data) {
 					if (data.hasOwnProperty(p)) {
@@ -70,22 +107,6 @@
 					}
 				}
 			},
-
-			setRelativeConstraint: function(refProp, offset){
-				//right now assumes that object can only have one constraint at a time
-				refProp.removeConstraint();
-				this.removeConstraint();
-
-			},
-
-			setEqualConstraint: function(refProp){
-				//right now assumes that object can only have one constraint at a time
-				refProp.removeConstraint();
-				this.removeConstraint();
-
-			}
-
-
 
 		});
 		return PConstraint;

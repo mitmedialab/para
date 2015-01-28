@@ -1,5 +1,7 @@
-/*PPoint.js*
- * point class for para
+/*PFloat.js*
+ * constrainable float class 
+ * for para instance properties
+ * x: PProperty object for storing float value
  */
 
 define([
@@ -8,16 +10,18 @@ define([
 		'cjs',
 		'utils/PProperty',
 		'utils/PConstraint'
-
-
 	],
 
 	function(paper, cjs, PProperty, PConstraint) {
 
 		var PFloat = PConstraint.extend({
 
+			/* constructor
+			* val: initial value of the float
+			* operator: optional argument to specify the 
+			* operation performed when property is modified
+			*/
 			constructor: function(val, operator) {
-
 				this.val = new PProperty(val);
 				PConstraint.apply(this, arguments);
 				if (operator) {
@@ -26,50 +30,24 @@ define([
 				this.setNull(false);
 			},
 
+			/* setValue
+			* sets the value of the property
+			*/
 			setValue: function(val) {
 				this.val.setValue(val);
 			},
 
+			/* getValue
+			* checks to see if val is constrained
+			* and if so, returns the constraint value
+			* otherwise just returns the current value of val.
+			*/
 			getValue: function() {
-				return this.getConstraint().getValue();
-			},
-
-			add: function(val, newP) {
-				if (newP) {
-					var float2 = this.clone();
-					float2.add(val);
-					return float2;
-				} else {
-					this.setValue(this.getValue() + val);
+				if(!this.isConstrained()){
+					return this.val.getValue();
 				}
-			},
-
-			sub: function(val, newP) {
-				if (newP) {
-					var float2 = this.clone();
-					float2.sub(val);
-					return float2;
-				} else {
-					this.setValue(this.getValue() - val);
-				}
-			},
-			div: function(val, newP) {
-				if (newP) {
-					var float2 = this.clone();
-					float2.div(val);
-					return float2;
-				} else {
-					this.setValue(this.getValue() / val);
-				}
-			},
-
-			mul: function(val, newP) {
-				if (newP) {
-					var float2 = this.clone();
-					float2.mul(val);
-					return float2;
-				} else {
-					this.setValue(this.getValue() * val);
+				else{
+					return this.getConstraint().getValue();
 				}
 			},
 
@@ -81,55 +59,47 @@ define([
 				return new PFloat(this.getValue());
 			},
 
-			setRelativeConstraint: function(refProp, offset) {
-				PConstraint.prototype.setRelativeConstraint.call(this, refProp, offset);
-				var f = function() {
-					return refProp.getValue() + offset;
-				};
-				if (this.constraint) {
-					this.constraint.setValue(f);
+			/* basic math operations */
+			add: function(val, newP) {
+				if (newP) {
+					var float2 = this.clone();
+					float2.add(val);
+					return float2;
 				} else {
-					this.constraint = new PProperty(f);
+					this.setValue(this.val.getValue() + val);
 				}
 			},
 
-			/* removes prior equality constraints
-			 * will need a constraints manager to effectively set
-			 * and maintain equality constraints accross multiple objects
-			 */
-			setEqualConstraint: function(refProp) {
-				PConstraint.prototype.setEqualConstraint.call(this, refProp);
-				var f = function() {
-					return refProp.val.getValue();
-				};
-
-				this.constraint = new PProperty(f);
-				this.val = refProp.val;
-				refProp.constraint = new PProperty(f);
+			sub: function(val, newP) {
+				if (newP) {
+					var float2 = this.clone();
+					float2.sub(val);
+					return float2;
+				} else {
+					this.setValue(this.val.getValue() - val);
+				}
+			},
+			div: function(val, newP) {
+				if (newP) {
+					var float2 = this.clone();
+					float2.div(val);
+					return float2;
+				} else {
+					this.setValue(this.val.getValue() / val);
+				}
 			},
 
-			setConditionalConstraint: function(refProp, operator) {
-				var relVal = this.getConstraint();
-				var refVal = refProp.getConstraint();
-				var statement = "relVal.getValue() "+operator+" refVal.getValue()";
-		
-				var f = function() {
-					if (eval(statement)) {
-						return relVal.getValue();
-					} else {
-						relVal.setValue(refVal.getValue());
-						return refVal.getValue();
-					}
-				};
-
-				this.constraint = new PProperty(f);
+			mul: function(val, newP) {
+				if (newP) {
+					var float2 = this.clone();
+					float2.mul(val);
+					return float2;
+				} else {
+					this.setValue(this.val.getValue() * val);
+				}
 			}
 
-
-
 		});
-
-
 
 		return PFloat;
 	});

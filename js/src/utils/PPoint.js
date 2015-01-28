@@ -1,51 +1,58 @@
 /*PPoint.js*
- * point class for para
+ * constrainable point class
+ * for para instance properties
+ * x: PFloat object for storing x coordinate
+ * y: PFloat object storing y coordinate
  */
 
 define([
 
 		'paper',
 		'cjs',
-		'utils/PProperty',
+		'utils/PFloat',
 		'utils/PConstraint'
-
-
 	],
 
-	function(paper, cjs, PProperty, PConstraint) {
+	function(paper, cjs, PFloat, PConstraint) {
 
 		var PPoint = PConstraint.extend({
-
+			/* constructor
+			 * x, y: initial x and y coordinates
+			 * operator: optional argument to specify the
+			 * operation performed when property is modified
+			 */
 			constructor: function(x, y, operator) {
-
-				this.x = new PProperty(x);
-				this.y = new PProperty(y);
+				this.x = new PFloat(x);
+				this.y = new PFloat(y);
 				PConstraint.apply(this, arguments);
-				if(operator){
-					this.set('operator',operator);
+				if (operator) {
+					this.set('operator', operator);
 				}
 				this.setNull(false);
 			},
 
+			/* setValue
+			 * accepts an object with x,y properties as an argument
+			 */
 			setValue: function(point) {
-				if (point.x.get) {
-					this.x.setValue(point.x.get());
-					this.y.setValue(point.y.get());
-				} else {
-					this.x.setValue(point.x);
-					this.y.setValue(point.y);
-				}
+				this.setX(point.x);
+				this.setY(point.y);
 			},
 
+			/* getValue
+			 * returns an object with current x and y values as properties
+			 */
 			getValue: function() {
 				return {
-					x: this.x.getValue(),
-					y: this.y.getValue()
+					x: this.getX(),
+					y: this.getY()
 				};
 			},
 
+			/*get and set funcitons for x and y*/
 			getX: function() {
 				return this.x.getValue();
+
 			},
 
 			getY: function() {
@@ -62,6 +69,23 @@ define([
 				this.setNull(false);
 			},
 
+			/*clone
+			 * returns a static clone based on the current values of the point
+			 * does not clone the constraints of the original
+			 */
+			clone: function() {
+				return new PPoint(this.getX(), this.getY());
+			},
+
+			/*toPaperPoint
+			* returns a paper.js point object based on the current 
+			* values of this object
+			*/
+			toPaperPoint: function() {
+				return new paper.Point(this.getX(), this.getY());
+			},
+
+			/* basic math operations */
 			add: function(data, newP) {
 				if (newP) {
 					var point2 = this.clone();
@@ -107,7 +131,6 @@ define([
 				}
 			},
 
-
 			distanceSqrd: function(vec1, vec2) {
 				return (Math.pow(vec1.x - vec2.x, 2) + Math.pow(vec1.y - vec2.y, 2));
 			},
@@ -129,7 +152,6 @@ define([
 			},
 
 
-
 			dot: function(b) {
 				//Computes the dot product of a and b'
 				return (this.x * b.x) + (this.y * b.y);
@@ -141,17 +163,8 @@ define([
 				return v.mul(w.dot(v) / this.lengthSqrd(v));
 			},
 
-			/*clone
-			 * returns a static clone based on the current values of the point
-			 * does not clone the constraints of the original
-			 */
-			clone: function() {
-				return new PPoint(this.getX(), this.getY());
-			},
+			
 
-			toPaperPoint: function() {
-				return new paper.Point(this.x.getValue(), this.y.getValue());
-			},
 
 		});
 

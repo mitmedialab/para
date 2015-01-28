@@ -168,31 +168,6 @@ define([
 			this.set('tmatrix', tmatrix);
 		},
 
-		setEqualConstraint: function(ref, rel, property_name) {
-			var relProp = rel.inheritProperty(property_name);
-			var refProp = ref.inheritProperty(property_name);
-			relProp.setEqualConstraint(refProp);
-		},
-
-		setRelativeConstraint: function(ref, rel, property_name, offset) {
-			var relProp = rel.inheritProperty(property_name);
-			var refProp = ref.inheritProperty(property_name);
-			relProp.setRelativeConstraint(refProp, offset);
-
-		},
-
-
-		setConditionalConstraint: function(ref, rel, property_name, operator) {
-			var relProp = rel.inheritProperty(property_name);
-			var refProp = ref.inheritProperty(property_name);
-			relProp.setConditionalConstraint(refProp, operator);
-		},
-
-		removeConstraint: function(property_name) {
-			var property = this.inheritProperty(property_name);
-			property.removeConstraint();
-		},
-
 
 		resetProperties: function() {
 			this.clear().set(this.defaults);
