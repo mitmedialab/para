@@ -7,6 +7,7 @@ define([
     'paper',
     'backbone',
     'backbone.undo',
+    'cjs',
     'models/data/GeometryNode',
     'models/data/PathNode',
     'models/data/PolygonNode',
@@ -14,7 +15,6 @@ define([
     'models/data/EllipseNode',
     'models/data/Instance',
     'models/tools/ToolCollection',
-    'models/tools/PenToolModel',
     'models/tools/PolyToolModel',
     'models/tools/SelectToolModel',
     'models/tools/FollowPathToolModel',
@@ -26,18 +26,18 @@ define([
     'models/behaviors/actions/RotateNode',
     'models/data/Visitor',
     'models/data/Edge',
-    'utils/PPoint'
+    'utils/PPoint',
+    'utils/ColorUtils'
 
 
   ],
 
-  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PenToolModel, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint) {
+  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint, ColorUtils) {
     var rootNode,
       uninstantiated,
       visitor,
       currentNode,
       toolCollection,
-      penTool,
       polyTool,
       selectTool,
       rotateTool,
@@ -56,13 +56,12 @@ define([
       defaults: {
         'state': 'polyTool',
         'tool-mode': 'standard',
-        'tool-modifier': 'none'
+        'tool-modifier': 'none',
+        'tool': null
       },
 
-      initialize: function(event_bus, options) {
+      initialize: function(attributes,options) {
         clutch = 0;
-        this.event_bus = event_bus;
-          
         //setup paperscopes
         var canvas = $('canvas').get(0);
         var subcanvas = $('canvas').get(1);
@@ -71,17 +70,12 @@ define([
         mainView = paper.View._viewsById['canvas'];
         mainView._project.activate();
         subView = paper.View._viewsById['sub-canvas'];
-
-
         currentView = mainView;
         //setup user tool managers
-        penTool = new PenToolModel({
-          id: 'penTool'
-        });
+       
         selectTool = new SelectToolModel({
           id: 'selectTool'
         });
-        selectTool.event_bus = event_bus;
         polyTool = new PolyToolModel({
           id: 'polyTool'
         });
@@ -91,10 +85,8 @@ define([
         constraintTool = options.constrainer;
         console.log(constraintTool);
         constraintTool.set('sm', this); 
-        followPathTool.event_bus = event_bus;
-        // TODO: check is event bus makes sense
-        // constraintTool.event_bus = c_event_bus;
-        toolCollection = new ToolCollection([polyTool, penTool, selectTool, followPathTool, constraintTool]);
+        //followPathTool.event_bus = event_bus;
+        toolCollection = new ToolCollection([polyTool, selectTool, followPathTool, constraintTool]);
 
         toolNameMap = {'pen': penTool, 'select': selectTool, 'poly': polyTool, 'path': followPathTool, 'constraint': constraintTool};
 
@@ -103,38 +95,14 @@ define([
         this.listenTo(toolCollection, "geometryAdded", this.geometryAdded);
         this.listenTo(toolCollection, "geometrySelected", this.geometrySelected);
         this.listenTo(toolCollection, "geometryDSelected", this.geometryDSelected);
-
         this.listenTo(toolCollection, "geometryModified", this.geometryModified);
         this.listenTo(toolCollection, "geometrySegmentModified", this.geometrySegmentModified);
-
+        this.listenTo(toolCollection, 'updateProperties', this.updateProperties);
         this.listenTo(toolCollection, "addInstance", this.addInstance);
         this.listenTo(toolCollection, "setPositionForIntialized", this.setPositionForInitialized);
-
-
-        this.listenTo(toolCollection, "modifyInheritance", this.modifyInheritance);
+        this.listenTo(toolCollection, 'setState', this.setState);
         this.on('change:tool-mode', this.modeChanged);
         this.on('change:tool-modifier', this.modeChanged);
-        this.listenTo(toolCollection, 'nodeSelected', this.nodeSelected);
-        this.listenTo(toolCollection, 'setSelection', this.setSelection);
-        this.listenTo(toolCollection, 'updateProperties', this.updateProperties);
-
-        this.listenTo(toolCollection, 'setCurrentNode', this.setCurrentNode);
-        this.listenTo(toolCollection, 'moveUpNode', this.moveUpNode);
-        this.listenTo(toolCollection, 'moveDownNode', this.moveDownNode);
-        this.listenTo(toolCollection, 'selectionReset', this.selectionReset);
-
-        this.listenTo(toolCollection, 'optionClick', this.openMenu);
-
-        this.listenTo(toolCollection, 'rootUpdate', this.rootUpdate);
-        this.listenTo(toolCollection, 'getSelection', this.getSelection);
-
-        this.listenTo(toolCollection, 'currentRender', this.currentRender);
-        this.listenTo(toolCollection, 'setState', this.setState);
-
-
-        this.listenTo(event_bus, 'moveDownNode', this.moveDownNode);
-        this.listenTo(event_bus, 'moveUpNode', this.moveUpNode);
-
 
         // EXPERIMENTAL: Tool Function-call delegation, should be for each tool
         this.listenTo( constraintTool, 'delegateMethod', this.delegateMethod );
@@ -142,18 +110,15 @@ define([
         //setup visitor
         visitor = new Visitor();
 
-
         //setup root node
         rootNode = new Instance(null);
         rootNode.set('name', 'root');
         this.listenTo(rootNode, 'parseJSON', this.parseJSON);
         currentNode = rootNode;
 
-
         //clear local storage
         localStorage.clear();
         this.modified = false;
-
 
         //setup undo manager
         Backbone.UndoManager.removeUndoType("change");
@@ -207,21 +172,7 @@ define([
 
       },
 
-      toggleClutch: function() {
-        switch (clutch) {
-          case 0:
-            clutch = 1;
-            break;
-          case 1:
-            clutch = 2;
-            break;
-          case 2:
-            clutch = 0;
-            break;
-        }
-        //this.rootRender();
 
-      },
 
       setState: function(state, mode) {
         toolCollection.get(this.get('state')).reset();
@@ -231,11 +182,10 @@ define([
           var currentTool = toolCollection.get(this.get('state'));
           currentTool.set('mode', mode);
         }
-        if (state === 'penTool' || state === 'polyTool') {
+        if (state === 'polyTool') {
           this.moveToRoot();
 
         }
-
       },
 
       /*
@@ -316,22 +266,14 @@ define([
        * behavior probably should be to create a prototype which encapsulates
        * all those objects rather than one prototype per object
        */
-
       addInstance: function() {
-        console.log('here');
         if (this.get('state') === 'selectTool') {
           var selectedShapes = selectTool.get('selected_shapes');
           if (selectedShapes.length == 1) {
             var instance = selectedShapes[0];
             //instance.set('translation_delta', new PPoint(0, 0));
 
-
             var newInstance = instance.create();
-            newInstance.set('position', instance.get('position').clone());
-            newInstance.set('rotation_origin', instance.get('position').clone());
-            newInstance.set('scaling_origin', instance.get('position').clone());
-            instance.set('transformation_delta', new PPoint(0, 0));
-
             currentNode.addChildNode(newInstance);
             instance.set('selected', false);
             newInstance.set('selected', true);
@@ -354,8 +296,7 @@ define([
         }
       },
 
-      setPositionForInitialized: function(position){
-        console.log('set position for intitialized');
+      setPositionForInitialized: function(position) {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length == 1) {
           var instance = selectedShapes[0];
@@ -368,7 +309,6 @@ define([
       },
 
       animate: function() {
-
         var selectedShapes = selectTool.get('selected_shapes');
         var property;
         var levels = 1;
@@ -384,14 +324,13 @@ define([
             break;
         }
         for (var i = 0; i < selectedShapes.length; i++) {
-          selectedShapes[i].animateAlpha(levels, property, this.get('tool-mode'), this.get('tool-modifier'),0);
+          selectedShapes[i].animateAlpha(levels, property, this.get('tool-mode'), this.get('tool-modifier'), 0);
 
 
         }
         paper.view.draw();
 
       },
-
 
       /*geometryDeepCopied
        * makes an independent clone of the object being copied and
@@ -457,41 +396,44 @@ define([
        * callback that is triggered when a new geometry
        * object is selected by the user
        */
-      geometrySelected: function(literal, clear) {
+      geometrySelected: function(literal, constrain) {
 
         if (literal) {
+           var styledata = {
+            fill_color:  literal.fillColor.toCSS(true),
+            stroke_color:literal.strokeColor.toCSS(true),
+            stroke_width: literal.strokeWidth, 
+          };
           var instance = literal.data.instance;
+          if (constrain) {
+            var ss = selectTool.get('selected_shapes');
+            var lastInstance = ss[ss.length - 1];
+          // lastInstance.setRelativeConstraint(lastInstance,instance,'rotation_delta',45);
+          //  lastInstance.setConditionalConstraint(lastInstance,instance,'translation_deltaX');
+          lastInstance.setEqualityConstraint(lastInstance,instance,'rotation_delta');
+          }
+
           instance.set('selected_indexes', []);
           selectTool.addSelectedShape(instance);
           instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-           
-          var data = {
-            id: instance.get('id'),
-            fill_color: literal.fillColor.toCSS(true),
-            stroke_color: literal.strokeColor.toCSS(true),
-            stroke_width: literal.strokeWidth
-          };
+          this.setToolStyle(styledata);
+
           if (selectTool.get('selected_shapes').length === 1) {
-            data.params = instance.get('userParams');
+            var params = instance.get('userParams');
+
+            var id = instance.get('id');
+            this.trigger('geometrySelected', styledata, params, id);
           }
-          
-          this.styleModified(data, true);
-          this.trigger('geometrySelected', data);
+
         }
 
         this.compile();
       },
 
-      modeChanged: function() {
-        console.log('mode changed');
-        var selectedShapes = selectTool.get('selected_shapes');
-        for (var i = 0; i < selectedShapes.length; i++) {
-
-          selectedShapes[i].setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-        }
-        this.compile();
-      },
-
+      /* geometryDSelected
+       * callback that is triggered when a new geometry
+       * object is direct-selected by the user
+       */
       geometryDSelected: function(segments, override) {
         console.log('triggered');
         if (segments.length > 0) {
@@ -514,6 +456,26 @@ define([
 
       },
 
+      /*modeChanged
+       * event callback triggered when tool mode is altered
+       * to update the selection visiualizaitons for the selected shapes to
+       * correspond with the new tool mode
+       */
+      modeChanged: function() {
+        console.log('mode changed');
+        var selectedShapes = selectTool.get('selected_shapes');
+        for (var i = 0; i < selectedShapes.length; i++) {
+
+          selectedShapes[i].setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
+        }
+        this.compile();
+      },
+
+
+      /* geometryParamsModified
+       * callback that is triggered when exposed parameters of geometry are
+       * modified by the user
+       */
       geometryParamsModified: function(data) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
@@ -522,79 +484,25 @@ define([
         this.compile();
       },
 
-      modifyInheritance: function(event, type) {
-        var selectedShapes = selectTool.get('selected_shapes');
-        var protoTarget = selectedShapes[selectedShapes.length - 1];
-        var instance = selectedShapes[selectedShapes.length - 2];
-        instance.set('rotation_node', protoTarget);
-        var inheritors = protoTarget.get('inheritors');
-        inheritors.push(instance);
-        protoTarget.set('inheritors', inheritors);
 
-        var edge = new Edge({
-          x: protoTarget,
-          y: instance,
-        });
-
-        if ((instance.has('rotation_node')) && (instance.has('proto_node'))) {
-          var rotationNode = instance.get('rotation_node');
-          var protoNode = instance.get('proto_node');
-          if (rotationNode != protoNode) {
-            var rLevel = rotationNode.getLevelInTree();
-            var pLevel = protoNode.getLevelInTree();
-            var rIndex = rotationNode.getIndex();
-            var pIndex = protoNode.getIndex();
-
-
-            if (rLevel > pLevel) {
-              var remove = protoNode.removeChildNode(instance);
-              if (remove) {
-                rotationNode.addChildNode(instance);
-              }
-            } else if (rLevel < pLevel) {
-              var remove = rotationNode.removeChildNode(instance);
-              if (remove) {
-                protoNode.addChildNode(instance);
-              }
-            } else {
-              if (rIndex > pIndex) {
-                var remove = protoNode.removeChildNode(instance);
-                if (remove) {
-                  rotationNode.addChildNode(instance);
-                }
-              } else if (rIndex < pLevel) {
-                var remove = rotationNode.removeChildNode(instance);
-                if (remove) {
-                  protoNode.addChildNode(instance);
-                }
-              }
-            }
-          }
-        }
-      },
-
-
-      /* geometryIncremented
+      /* geometryModified
        * callback that is triggered when a geometry is transformed
-       * by the user. Iterates through currently selected shapes
-       * and updates their deltas based on the transformation
-       * compiles graph and then iterates through a second time
-       * to display bounding boxes
-       * TODO: design so that only one iteration is neccesary?
+       * by the user.
        */
       geometryModified: function(data, modifiers) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-
-
-          instance.modifyDelta(data, this.get('tool-mode'), this.get('tool-modifier'));
-
+          instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
         }
-
         this.compile();
       },
 
+
+      /* geometrySegmentModified
+       * callback that is triggered when a geometry segment is transformed
+       * by the user
+       */
       geometrySegmentModified: function(data, handle, modifiers) {
         var selectedShapes = selectTool.get('selected_shapes');
         for (var i = 0; i < selectedShapes.length; i++) {
@@ -608,10 +516,13 @@ define([
 
       },
 
-
-      styleModified: function(data, noUpdate) {
+      /*setToolStyle
+       * called to update the style settings for the currently selected tool
+       */
+      setToolStyle: function(data) {
         var selectedTool = toolCollection.get(this.get('state'));
         var style = selectedTool.get('style');
+
         if (data.stroke_color) {
           style.stroke_color = data.stroke_color;
         }
@@ -622,17 +533,57 @@ define([
           style.stroke_width = data.stroke_width;
         }
         selectedTool.set('style', style);
-        if (!noUpdate) {
-          var selectedShapes = selectTool.get('selected_shapes');
-
-          for (var i = 0; i < selectedShapes.length; i++) {
-            var instance = selectedShapes[i];
-            instance.modifyStyle(data, this.get('tool-mode'), this.get('tool-modifier'));
-          }
-          this.compile();
-        }
+        console.log('selected tool style =',selectedTool.get('style'));
       },
 
+      /*styleModified
+       * triggered when style properties are modified in the property bar
+       * updates the color/ fill/ stroke weight of selected shapes
+       */
+      styleModified: function(style_data) {
+        var selectedShapes = selectTool.get('selected_shapes');
+        var data = {};
+        if (style_data.fill_color) {
+          data.fill_colorR = {
+            operator: 'set',
+            val: ColorUtils.hexToR(style_data.fill_color)
+          };
+           data.fill_colorG = {
+            operator: 'set',
+            val: ColorUtils.hexToG(style_data.fill_color)
+          };
+           data.fill_colorB = {
+            operator: 'set',
+            val: ColorUtils.hexToB(style_data.fill_color)
+          };
+        }
+        if (style_data.stroke_color) {
+          data.stroke_colorR = {
+            operator: 'set',
+            val: ColorUtils.hexToR(style_data.stroke_color)
+          };
+           data.stroke_colorG = {
+            operator: 'set',
+            val: ColorUtils.hexToG(style_data.stroke_color)
+          };
+           data.stroke_colorB = {
+            operator: 'set',
+            val: ColorUtils.hexToB(style_data.stroke_color)
+          };
+        }
+          if (style_data.stroke_width) {
+          data.stroke_width = {
+            operator: 'set',
+            val: style_data.stroke_width
+          };
+        }
+        for (var i = 0; i < selectedShapes.length; i++) {
+          var instance = selectedShapes[i];
+          instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+        }
+        this.compile();
+
+      },
 
       /* compile
        * resets the geometry functions
@@ -674,12 +625,6 @@ define([
 
       },
 
-
-      moveUpNode: function() {
-        this.setCurrentNode(currentNode);
-
-      },
-
       moveToRoot: function() {
         if (currentNode !== rootNode) {
           this.setCurrentNode(rootNode.children[0]);
@@ -698,64 +643,13 @@ define([
 
       },
 
-      //callback triggered when tool navigates to specific node in tree;
-      setCurrentNode: function(node) {
 
-        if (node.getParentNode() !== null) {
-          currentNode = node.getParentNode();
-        } else {
-
-        }
-      },
-
-      /*recursively follows parent hierarchy upwards to find correct selection point 
-       * when selected node is found, it is assigned as the currently selected
-       * node in the selected tool.
-       * TODO: make this assignment less janky.
-       */
-      determineSelectionPoint: function(selected) {
-        if (selected.nodeParent) {
-          if (selected.nodeParent == currentNode) {
-            toolCollection.get(this.get('state')).currentNode = currentNode;
-            if (toolCollection.get(this.get('state')).selectedNodes.indexOf(selected) == -1) {
-              toolCollection.get(this.get('state')).selectedNodes.push(selected);
-              this.event_bus.trigger('nodeSelected', selected);
-
-
-            }
-            return;
-          }
-          if (selected == rootNode) {
-            return;
-          } else {
-            this.determineSelectionPoint(selected.nodeParent);
-          }
-        }
-      },
-
-      /*returns currently selected shapes*/
-
-      getSelected: function() {
-        return toolCollection.get(this.get('state')).selectedNodes;
-      },
-
-
-      /* Called by select tool on Shift-click
-       * pulls up the properties menu for the selected node
-       */
-      openMenu: function(node) {
-        this.event_bus.trigger('openMenu', node);
-      },
 
       //triggered by paper tool on a mouse down event
       toolMouseDown: function(event, pan) {
         if (!event.modifiers.space) {
           var selectedTool = toolCollection.get(this.get('state'));
           selectedTool.mouseDown(event);
-          /*if (this.get('state') === 'penTool') {
-            this.modified = true;
-            this.trigger('disableSave', !this.modified);
-          }*/
         }
 
 
@@ -1003,10 +897,7 @@ define([
           node.type = type;
           node.name = data[i].name;
           currentNode.addChildNode(node);
-          for (var j = 0; j < data[i].behaviors.length; j++) {
-            var behavior = data[i].behaviors[j];
-            this.event_bus.trigger('newBehavior', [node], behavior.name, behavior);
-          }
+         
 
           if (data[i].children.length > 0) {
             this.parseJSON(node, data[i].children);
@@ -1034,13 +925,7 @@ define([
         paper.view.draw();
       },
 
-      removeBehavior: function(behaviorName) {
-        var s = selectTool.selectedNodes[selectTool.selectedNodes.length - 1];
-        if (s) {
-          this.event_bus.trigger('removeBehavior', s, behaviorName);
-
-        }
-      },
+      
 
       deleteObject: function() {
         if (selectTool.selectedNodes.length > 0) {

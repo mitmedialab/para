@@ -15,11 +15,18 @@ require.config({
         "iris-color-picker": "../../bower_components/iris-color-picker/dist/iris",
         "jquery-cookie" : "../../bower_components/jquery-cookie/jquery.cookie",
         "html": "../../html",
+        "cjs": "../../bower_components/constraintjs/build/cjs.min"        
     },
   
     shim: {       
         "toolbox": {
             exports: "Toolbox"
+        },
+        "cjs":{
+            exports: "cjs",
+            init: function(){
+                return cjs.noConflict();
+            }
         },
         "backbone.undo": {
             deps: ["backbone"]

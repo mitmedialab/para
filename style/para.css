@@ -201,7 +201,7 @@ input[type="range"]:active::-webkit-slider-thumb {
     border-radius:0;
     border-bottom: solid 1px #B2B2B2;
     background-image: url(../images/icons2.svg);
-    background-size: 36px 629px;
+    background-size: 36px 665px;
     background-repeat: no-repeat;
     background-position-x: 0px;
     background-position-y: 0px;
@@ -348,72 +348,61 @@ section {
 }
 
 #expInput {
-  border: 1px solid #a1a1a1;
-  padding: 5px 5px;
-  background: #ffffff;
-  width: 200px;
-  height: 30px;
-  border-radius: 5px;
+  display: none;
 }
 
-#expRelation {
+#relationIndicator {
   float: left;
-  height: 100%;
-  width: 20px;
-  border: 1px solid #a1a1a1;
-  background-image: url(../images/icons2.svg);
-  background-size: 36px 629px;
-  background-repeat: no-repeat;
-  background-position-x: 0px;
-  background-position-y: 557px;
+  width: 36px;
+  height: 36px;
+  border: 1px #aaa solid;
+  background-position-y: -628px;
 }
 
-#expType {
-  position: absolute;
-  top: 150px;
-  left: -20px;
-  height: 24px;
-  width: 75px;
-  border: 1px solid #a1a1a1;
-  background: #fff;
+input[type=text]#expression {
+  border: #aaa 1px solid;
+  margin-top: 5px;
+  height: 36px;
 }
+
+#relationSelector {
+  position: absolute;
+  visibility: hidden;
+  top: 100px;
+  left: -26px;
+  height: 36px;
+  width: 108px;  
+} 
 
 .btn-relation {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  padding: 0px;
-  border-radius: 0px;
+  height: 36px;
+  width: 36px;
   background-image: url(../images/icons2.svg);
-  background-size: 24px 420px;
+  background-size: 36px 665px;
   background-repeat: no-repeat;
   background-position-x: 0px;
   background-position-y: 0px;
+  border: 1px #aaa solid;
 }
 
 #less {
+  float: left;
   top: 0px;
   left: 0px;
-  background-position-y: -396px;
+  background-position-y: -557px;
 }
 
 #equal {
+  float: left;
   top: 0px;
-  left: 25px;
-  background-position-y: -420px;
+  left: 36px;
+  background-position-y: -629px;
 }
 
 #more {
   top: 0px;
-  left: 50px;
-  background-position-y: -372px;
-}
-
-#expression {
-  float: right;
-  height: 18px;
-  width: 160px;
-  border: 1px solid #aaa;
+  left: 72px;
+  background-position-y: -593px;
 }
 
 #position:hover {

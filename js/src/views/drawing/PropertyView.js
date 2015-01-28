@@ -24,7 +24,6 @@ define([
     //
     initialize: function() {
       //listen to update view statements from model to re-render view
-      this.listenTo(this.model, 'updateView', this.render);
       this.listenTo(this.model, 'removeItem', this.removeItem);
       this.listenTo(this.model, 'disableSave', this.disableSave);
 
@@ -87,37 +86,26 @@ define([
       // testing
     },
 
-    render: function() {
-      // ////console.log('property view rendering');back
-      // ///console.log('source='+$('#property-list-template').html());
-      /* var source = $('#property-list-template').html();
-        var template = Handlebars.compile(source);
-        var properties = this.model.getSelected();
-       // ////console.log(properties);
-        var html = template(properties);
-        this.$el.html(html);
-        */
-    },
-
     removeBehavior: function(event) {
       var name = $(event.target).attr('id');
       this.model.removeBehavior(name);
     },
 
     clearColor: function(event) {
+      var data;
       if ($('#fillColorBlock').hasClass('color-block-selected')) {
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
-        this.model.styleModified({
-          fill_color: null
-        });
+        data = { fill_color: -1};
+        this.model.styleModified(data);
+        this.model.setToolStyle(data);
 
       } else {
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
-        this.model.styleModified({
-          stroke_color: null
-        });
+        data = { stroke_color: -1};
+        this.model.styleModified(data);
+        this.model.setToolStyle(data);
       }
     },
 
@@ -141,27 +129,30 @@ define([
       var data = {};
       data[(id + "_color")] = color;
       this.model.styleModified(data);
+      this.model.setToolStyle(data);
 
     },
 
     colorChange: function(event, ui) {
       var color = $('#color-window').iris('color');
+      var data;
       if ($('#fillColorBlock').hasClass('color-block-selected')) {
         $('#fillColorBlock').removeClass('remove-color');
         $('#fillColorBlock').css('background-color', color);
         $('#fill').val(color);
-        this.model.styleModified({
-          fill_color: color
-        });
+        data = { fill_color: color};
+        this.model.styleModified(data);
+        this.model.setToolStyle(data);
+
 
 
       } else {
         $('#strokeColorBlock').removeClass('remove-color');
         $('#strokeColorBlock').css('background-color', color);
         $('#stroke').val(color);
-        this.model.styleModified({
-          stroke_color: color
-        });
+        data = {stroke_color: color};
+        this.model.styleModified(data);
+         this.model.setToolStyle(data);
 
       }
 
@@ -204,7 +195,7 @@ define([
       }
     },
 
-    geometrySelected: function(data) {
+    geometrySelected: function(data,params,id) {
       this.undelegateEvents();
       if (data.fill_color) {
         $('#fillColorBlock').css('background-color', data.fill_color);
@@ -224,7 +215,7 @@ define([
         $('#strokeSlider').val(data.stroke_width);
       }
 
-      this.setParams(data.params,data.id);
+      this.setParams(params,id);
       this.delegateEvents();  
     },
 
@@ -248,9 +239,9 @@ define([
 
     strokeChange: function(event) {
       var value = parseInt($(event.target).val(), 10);
-      this.model.styleModified({
-        stroke_width: value
-      });
+      var data = {stroke_width: value};
+      this.model.styleModified(data);
+      this.model.setToolStyle(data);
     },
 
     // TESTING
@@ -436,7 +427,7 @@ define([
 
     },
 
-    selectionReset: function() {
+    clearParameters: function() {
       this.currentPaths = [];
       $('#parameters').empty();
 

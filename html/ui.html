@@ -99,16 +99,6 @@
     </g>
     </svg>
 
-    <div id="expInput">
-      <div id="expRelation">
-      </div>
-      <input type="text" class="expression" id="expression">
-      <div id="expType">
-        <button title="less" class="btn btn-default btn-relation" id="less"></button>
-        <button title="equal" class="btn btn-default btn-relation" id="equal"></button>
-        <button title="more" class="btn btn-default btn-relation" id="more"></button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -287,9 +277,6 @@
                  style="fill:#b3b3b3;stroke:#b3b3b3;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
             </g>
           </svg>
-          <div class="form-group">
-            <label> Expression <input class="form-control expression" type="text" id="constraint-exp"></label>
-          </div>
         </div>
       </section>
 -->
@@ -303,7 +290,8 @@
      </h2>
      <div class="clearfix"></div>
    </header>
-   <div id = "parameters" class="section-background">
+   <div id = "parameterMenu" class="section-background">
+     <div id = "parameters">
      <script id="parameterTemplate" type="text/x-handlebars-template">
 
      {{#each paramSlider}}
@@ -339,8 +327,26 @@
 
      {{/each}}
 
-
      </script>
+     </div>
+      <div id="expInput">
+        <!-- <div id="relationIndicator">
+        </div>
+        <div id="relationPicker">
+        </div> -->
+        <div class="form-group">
+          <label> expression </label>
+          <div id="expHolder">
+            <button class="btn btn-default btn-relation" id="relationIndicator"> </button>
+            <div id="relationSelector">
+              <button class="btn btn-default btn-relation" id="less"> </button>
+              <button class="btn btn-default btn-relation" id="equal"> </button>
+              <button class="btn btn-default btn-relation" id="more"> </button>
+            </div>
+            <input class="form-control expression" type="text" id="expression">
+          </div>
+        </div>
+      </div>
    </div>
  </section><!--parameterSlider-->
 

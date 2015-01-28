@@ -5,11 +5,12 @@
 define([
 		'toolbox',
 		'paper',
+		'cjs'
 
 
 	],
 
-	function(Toolbox, paper) {
+	function(Toolbox, paper, cjs) {
 
 		var PPoint = Toolbox.Base.extend({
 
@@ -119,6 +120,11 @@ define([
 
 
 				return new paper.Point(this.x, this.y);
+			},
+
+			toConstraint: function(){
+				var f = function() { return this;};
+				return cjs(f);
 			}
 
 		});

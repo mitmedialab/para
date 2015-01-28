@@ -31,7 +31,8 @@
     "iris-color-picker": "git://github.com/Automattic/Iris.git",
     "jqueryui": "git://github.com/components/jqueryui.git",
     "jquery-cookie": "~1.4.1",
-    "requirejs-text": "~2.0.12"
+    "requirejs-text": "~2.0.12",
+    "constraintjs" : "git://github.com/soney/constraintjs.git"
   },
   "resolutions": {
     "backbone": "1.1.2",

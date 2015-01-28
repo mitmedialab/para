@@ -157,7 +157,8 @@ define([
         literal = path;
 
       }
-        this.trigger('geometrySelected',literal);
+      var constrain = event.modifiers.command;
+        this.trigger('geometrySelected',literal,constrain);
 
 
 
@@ -231,7 +232,8 @@ define([
       }
 
       var data = {};
-      data.translation_delta = new PPoint(event.delta.x, event.delta.y);
+      data.translation_deltaX = {operator:'add',val:event.delta.x};
+      data.translation_deltaY = {operator:'add',val:event.delta.y};
       this.trigger('geometryModified', data, event.modifiers);
       
 
@@ -239,7 +241,8 @@ define([
 
     dSelectDrag: function(event) {
       var data = {};
-      data.translation_delta = new PPoint(event.delta.x, event.delta.y);
+       data.translation_deltaX = {operator:'add',val:event.delta.x};
+      data.translation_deltaY = {operator:'add',val:event.delta.y};
       this.trigger('geometrySegmentModified', data, handle,event.modifiers);
       
 
@@ -251,7 +254,7 @@ define([
         var angle = event.lastPoint.subtract(posPoint).angle;
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
-        data.rotation_delta = dAngle - angle;
+        data.rotation_delta = {operator:'add',val:dAngle - angle};
         this.trigger('geometryModified', data, event.modifiers);
 
       }
@@ -277,7 +280,8 @@ define([
 
         var data = {};
         data.set = true;
-        data.scaling_delta = new PPoint(tScaleX,tScaleY);
+        data.scaling_deltaX = {operator:'add',val:tScaleX};
+        data.scaling_deltaY = {operator:'add',val:tScaleY};
         this.trigger('geometryModified', data, event.modifiers);
 
       }

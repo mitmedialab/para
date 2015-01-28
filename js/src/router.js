@@ -22,7 +22,6 @@ define([
   });
 
   var initialize = function() {
-
     var app_router = new AppRouter();
 
 
@@ -30,10 +29,8 @@ define([
 
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
-      var behaviorManagerModel = new BehaviorManagerModel(event_bus);
       var constraintToolModel = new ConstraintToolModel({id: 'constraintTool'});
-      var stateManager = new StateManagerModel(event_bus, {constrainer: constraintToolModel});
-
+      var stateManager = new StateManagerModel({}, {constrainer: constraintToolModel});
 
       //setup the canvas view
       var canvasView = new CanvasView({
@@ -54,8 +51,6 @@ define([
         model: constraintToolModel, 
       });
       propertyView.render();
-
-
 
     });
 

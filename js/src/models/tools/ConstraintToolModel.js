@@ -7,10 +7,17 @@ define([
     'paper',
     'backbone',
     'models/tools/BaseToolModel',
-], function(_, paper, Backbone, BaseToolModel) {
+    'utils/PPoint',
+], function(_, paper, Backbone, BaseToolModel, PPoint) {
 
-  // convenience definitions
   
+  // convenience definitions
+  Math.avg = function( valArray ) {
+    var sum = valArray.reduce( function(a, b) { return a + b });
+    var avg = sum / valArray.length;
+    return avg;
+  }
+
   // model definition
   var ConstraintToolModel = BaseToolModel.extend({
   
@@ -21,7 +28,11 @@ define([
       expression: '',
       props_selected: null,
       props: ['position', 'scale', 'orientation', 'strokeWeight', 'stroke', 'fill'],
-      mode: 'references'
+      mode: 'references',
+      maxDelimiter: 0,
+      minDelimiter: 0,
+      avgDelimiter: 0,
+      delimited: false
     }),
 
     initialize: function() {
@@ -56,6 +67,34 @@ define([
     deselectRelatives: function() {
       // relatives = []
       // clear expression 
+    },
+
+    drawDelimiters: function() {
+      
+    },
+
+    drawPositionDelimiters: function() {
+
+    },
+
+    drawScaleDelimiters: function() {
+
+    },
+
+    drawStrokeWeightDelimiters: function() {
+
+    },
+
+    drawOrientationDelimiters: function() {
+
+    },
+
+    drawStrokeDelimiters: function() {
+
+    },
+
+    drawFillDelimiters: function() {
+
     },
 
     /*
@@ -177,6 +216,48 @@ define([
       }
     },
 
+    computeConstraintDelimiters: function() {
+      var relatives = this.get( 'relatives' );
+      var property = this.get( 'props_selected' )[0];
+      console.log('Got property name: ' + property);
+      var propValues = relatives.map( function( instance ) {
+        return instance.get(property);
+      });
+      this.computeRepProperties( relatives, property );
+      this.set('delimited', true);
+      console.log('MaxDelimiter set to: ' + this.get('maxDelimiter').x);
+      console.log('MinDelimiter set to: ' + this.get('minDelimiter').y);
+      console.log('AvgDelimiter set to: ' + this.get('avgDelimiter').x); 
+    },
+
+    computeRepProperties: function( instanceList, property ) {
+      switch (property) {
+        case 'position':
+          console.log(instanceList[0]);
+          var positionsX = instanceList.map( function( instance ) {
+            return instance.accessProperty('position').x;
+          });
+          console.log('PositionsX: ' + positionsX[0]);
+          var positionsY = instanceList.map( function( instance ) {
+            return instance.accessProperty('position').y;
+          });
+          this.set('maxDelimiter', new PPoint(Math.max( positionsX ), Math.max( positionsY )));
+          this.set('minDelimiter', new PPoint(Math.min( positionsX ), Math.min( positionsY )));
+          this.set('avgDelimiter', new PPoint(Math.avg( positionsX ), Math.avg( positionsY )));
+          break;
+        case 'orientation':
+          break;
+        case 'scale':
+          break;
+        case 'strokeWeight':
+          break;
+        case 'stroke':
+          break;
+        case 'fill':
+          break;
+      }
+    },
+
     mouseDown: function(event) {
       var state = this.get('mode');
       switch ( state ) {
@@ -191,6 +272,7 @@ define([
           this.get('sm').delegateMethod('select', 'mouseDown', event);
           var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');
           this.relativesSelection( relatives );
+          this.computeConstraintDelimiters();
           break;
         case 'type':
           // TODO: check if type button has been clicked

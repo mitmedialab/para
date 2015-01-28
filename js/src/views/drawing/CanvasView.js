@@ -19,7 +19,6 @@ define([
   var loadKey = 76;
   var panKey = 32;
   var rootKey = 82;
-  var clutchKey = 72;
   var groupKey = 71;
   var altKey = false;
   var clearKey = 67;
@@ -178,9 +177,6 @@ define([
       }
       if (event.keyCode === groupKey) {
         this.model.group();
-      }
-      if (event.keyCode === clutchKey) {
-        this.model.toggleClutch();
       }
       // EXPERIMENTAL
       if (event.keyCode === advanceKey) {
