@@ -116,6 +116,21 @@ define([
 			 */
 			toPaperColor: function() {
 				return new paper.Color(this.getR(), this.getG(), this.getB(), this.getA());
+			},
+
+			/* modify
+			* converts hex values to color values
+			* calls super modify following this conversion
+			*/ 
+			modify: function(style_data) {
+				var data = {
+					operator: 'set',
+					r: ColorUtils.hexToR(style_data),
+					g: ColorUtils.hexToG(style_data),
+					b: ColorUtils.hexToB(style_data)
+				};
+				console.log('color data', data);
+				PConstraint.prototype.modify.call(this, data);
 			}
 
 		});
