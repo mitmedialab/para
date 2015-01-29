@@ -44,6 +44,7 @@
 			*/
 			setConstraint: function(func){
 				if (!this.isConstrained()) {
+					
 					this.constraint = new PProperty(func);
 				}
 				else{
