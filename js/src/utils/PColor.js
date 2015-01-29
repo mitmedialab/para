@@ -57,29 +57,49 @@ define([
 			 * returns an object with current rgba values as properties
 			 */
 			getValue: function() {
-				return {
-					r: this.getR(),
-					g: this.getG(),
-					b: this.getB(),
-					a: this.getA()
-				};
+				if (!this.isConstrained()) {
+					return {
+						r: this.getR(),
+						g: this.getG(),
+						b: this.getB(),
+						a: this.getA()
+					};
+				} else {
+					return this.getConstraint().getValue();
+				}
 			},
 
 			/*get and set funcitons for rgba*/
 			getR: function() {
-				return this.r.getValue();
+				if (this.isConstrained()) {
+					return this.getConstraint().getValue().r;
+				} else {
+					return this.r.getValue();
+				}
 			},
 
 			getG: function() {
-				return this.g.getValue();
+				if (this.isConstrained()) {
+					return this.getConstraint().getValue().g;
+				} else {
+					return this.g.getValue();
+				}
 			},
 
 			getB: function() {
-				return this.b.getValue();
+				if (this.isConstrained()) {
+					return this.getConstraint().getValue().b;
+				} else {
+					return this.b.getValue();
+				}
 			},
 
 			getA: function() {
-				return this.a.getValue();
+				if (this.isConstrained()) {
+					return this.getConstraint().getValue().a;
+				} else {
+					return this.a.getValue();
+				}
 			},
 
 			setR: function(r) {
@@ -115,13 +135,14 @@ define([
 			 * values of this object
 			 */
 			toPaperColor: function() {
+				
 				return new paper.Color(this.getR(), this.getG(), this.getB(), this.getA());
 			},
 
 			/* modify
-			* converts hex values to color values
-			* calls super modify following this conversion
-			*/ 
+			 * converts hex values to color values
+			 * calls super modify following this conversion
+			 */
 			modify: function(style_data) {
 				var data = {
 					operator: 'set',
@@ -129,7 +150,6 @@ define([
 					g: ColorUtils.hexToG(style_data),
 					b: ColorUtils.hexToB(style_data)
 				};
-				console.log('color data', data);
 				PConstraint.prototype.modify.call(this, data);
 			}
 

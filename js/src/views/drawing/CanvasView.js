@@ -20,9 +20,8 @@ define([
   var panKey = 32;
   var rootKey = 82;
   var groupKey = 71;
-  var altKey = false;
   var clearKey = 67;
-  var pan = false;
+  var pan, alt, cmd = false;
   var last = {
     x: 0,
     y: 0
@@ -99,7 +98,7 @@ define([
 
     setFocus: function() {
       pan = false;
-      altKey = false;
+      alt = false;
     },
 
     /* sets main canvas as active 
@@ -169,19 +168,24 @@ define([
         pan = true;
       }
       if (event.altKey) {
-        altKey = true;
+        alt = true;
+      }
+      if(event.cmdKey){
+        cmd = true;
       }
       if (event.keyCode === rootKey) {
         this.model.moveToRoot();
       }
       if (event.keyCode === groupKey) {
-        this.model.group();
+          this.model.groupInstance();
+        
       }
     },
 
     canvasKeyup: function(event) {
       pan = false;
-      altKey = false;
+      alt = false;
+      cmd = false;
     },
 
     //enter and leave functions manage keyboard events by focusing the canvas elemennt
@@ -251,7 +255,7 @@ define([
     },
 
     canvasMousewheel: function(event) {
-      this.model.canvasMouseWheel(event, pan, altKey);
+      this.model.canvasMouseWheel(event, pan, alt);
 
     },
 

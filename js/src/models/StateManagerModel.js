@@ -7,12 +7,12 @@ define([
     'paper',
     'backbone',
     'backbone.undo',
-    'cjs',
     'models/data/GeometryNode',
     'models/data/PathNode',
     'models/data/PolygonNode',
     'models/data/RectNode',
     'models/data/EllipseNode',
+    'models/data/ListNode',
     'models/data/Instance',
     'models/tools/ToolCollection',
     'models/tools/PolyToolModel',
@@ -20,13 +20,11 @@ define([
     'models/tools/FollowPathToolModel',
     'filesaver',
     'models/data/Visitor',
-    'models/data/Edge',
     'utils/PPoint',
-    'utils/ColorUtils'
 
 
   ],
-  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, Visitor, Edge, PPoint, ColorUtils) {
+  function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, FileSaver, Visitor, PPoint) {
     var rootNode,
       uninstantiated,
       visitor,
@@ -53,9 +51,9 @@ define([
         'tool': null
       },
 
-      initialize: function(attributes,options) {
-        var testP = new PPoint(100,20);
-       
+      initialize: function(attributes, options) {
+        var testP = new PPoint(100, 20);
+
         clutch = 0;
         //setup paperscopes
         var canvas = $('canvas').get(0);
@@ -67,7 +65,7 @@ define([
         subView = paper.View._viewsById['sub-canvas'];
         currentView = mainView;
         //setup user tool managers
-       
+
         selectTool = new SelectToolModel({
           id: 'selectTool'
         });
@@ -78,7 +76,7 @@ define([
           id: 'followPathTool'
 
         });
-        toolCollection = new ToolCollection([polyTool,selectTool, followPathTool]);
+        toolCollection = new ToolCollection([polyTool, selectTool, followPathTool]);
 
         /* event listener registers */
         this.listenTo(toolCollection, "geometryAdded", this.geometryAdded);
@@ -209,14 +207,10 @@ define([
             break;
 
         }
-       pathNode.normalizePath(literal, matrix);
-      selectTool.addSelectedShape(pathNode);
-        var edge = new Edge({
-          x: currentNode,
-          y: pathNode
-        });
+        pathNode.normalizePath(literal, matrix);
+        selectTool.addSelectedShape(pathNode);
+      
         currentNode.addChildNode(pathNode);
-        pathNode.addEdge(edge);
 
         currentTool.set('literals', []);
         this.compile();
@@ -257,6 +251,22 @@ define([
         } else {
           return false;
         }
+      },
+
+      /*groupInstance
+      * creates list from currently selected instances
+      */
+      groupInstance: function(){
+        console.log("grouping instances");
+        if (this.get('state') === 'selectTool') {
+          var selectedShapes = selectTool.get('selected_shapes');
+          if(selectedShapes.length>0){
+            var list = new ListNode();
+            list.add(selectedShapes);
+            currentNode.addChildNode(list);
+          }
+        }
+        this.compile();
       },
 
       setPositionForInitialized: function(position) {
@@ -317,13 +327,7 @@ define([
           visitor.addGeomFunction(newInstance);
           instances.push(newInstance);
 
-          var edge = new Edge({
-            x: currentNode,
-            y: newInstance
-          });
-
           currentNode.addChildNode(newInstance);
-          newInstance.addEdge(edge);
           newInstance.set('selected', true);
           instance.set('selected', false);
           selectedShapes[i] = newInstance;
@@ -342,10 +346,10 @@ define([
       geometrySelected: function(literal, constrain) {
 
         if (literal) {
-           var styledata = {
-            fill_color:  literal.fillColor.toCSS(true),
-            stroke_color:literal.strokeColor.toCSS(true),
-            stroke_width: literal.strokeWidth, 
+          var styledata = {
+            fill_color: literal.fillColor.toCSS(true),
+            stroke_color: literal.strokeColor.toCSS(true),
+            stroke_width: literal.strokeWidth,
           };
           var instance = literal.data.instance;
           //placeholder functionality for setting constraints
@@ -353,16 +357,16 @@ define([
             var ss = selectTool.get('selected_shapes');
             var relInstance = ss[ss.length - 1];
             var refInstance = instance;
-            this.constrain(relInstance,refInstance);
+            this.constrain(relInstance, refInstance);
 
 
-          
+
           }
 
           instance.set('selected_indexes', []);
           selectTool.addSelectedShape(instance);
           instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-         
+
           this.setToolStyle(styledata);
 
           if (selectTool.get('selected_shapes').length === 1) {
@@ -378,58 +382,81 @@ define([
       },
 
       /*constrain
-      * placeholder function for setting constraints
-      * between instances
-      */
+       * placeholder function for setting constraints
+       * between instances
+       */
 
-      constrain: function(relInstance,refInstance){
+      constrain: function(relInstance, refInstance) {
         /*example which sets one-way offset constraint on x coordinate of translation delta*/
-            
-            var offset = 100;
-            /*constraint function
-            * IMPORTANT: for each constraint function to work correctly
-            * you must both set the value of the constrained property
-            and return the new value (even though this seems redundant) */
-            var relativeF = function(){
-              //access translation delta properties for both relative and reference objects
-              var ref = refInstance.inheritProperty('translation_delta');
-              var rel = relInstance.inheritProperty('translation_delta');
-              //set the x value of the reference property to the x value of the relative property + the offset
-              ref.setX(rel.getX()+offset);
-              //return the offset x value of the relative property
-              return rel.getX()+offset;
-            };
 
-            //set the constraint on the x property of the ref translation 
-            refInstance.inheritProperty('translation_delta').x.setConstraint(relativeF);
+        var offset = 0.5;
+        /*constraint function
+        * IMPORTANT: for each constraint function to work correctly
+        * you must both set the value of the constrained property
+        and return the new value (even though this seems redundant) */
+        refInstance.set('fill_color',relInstance.inheritProperty('fill_color').clone());
+       var relativeF = function() {
+          //access translation delta properties for both relative and reference objects
+          var ref = refInstance.inheritProperty('fill_color');
+          var rel = relInstance.inheritProperty('fill_color');
+          //set the x value of the reference property to the x value of the relative property + the offset
+          ref.setR(rel.getR() + 0.2);
+          ref.setG(rel.getG() + 0.2);
+          ref.setB(rel.getB() + 0.2);
+          //return the offset x value of the relative property
+          return {
+            r: rel.getR() + 0.2,
+            b: rel.getG() + 0.2,
+            c: rel.getB() + 0.2,
+            a: 1
+          };
+        };
+
+        //set the constraint on the x property of the ref translation 
+        refInstance.inheritProperty('fill_color').setConstraint(relativeF);
+
+          /*var relativeF = function(){
+             //access translation delta properties for both relative and reference objects
+             var ref = refInstance.inheritProperty('translation_delta');
+             var rel = relInstance.inheritProperty('translation_delta');
+             //set the x value of the reference property to the x value of the relative property + the offset
+             ref.setX(rel.getX()+100);
+             ref.setX(rel.getY()+100);
+             //return the offset x value of the relative property
+             return {x:rel.getX()+100,
+                    y: rel.getY()+100};
+           };*/
+
+           //set the constraint on the x property of the ref translation 
+         //refInstance.inheritProperty('translation_delta').setConstraint(relativeF);
 
 
 
-          /*example which sets two-way equality constraint on rotation_delta*/
-            /* constraint function
-            * requires two, one for both relative and reference properties
-            * will not work correctly if other objects are also set to have 
-            * equal constraints with objects that are pre-constrained
-            * will likely need a constraint manager to handle equality constraints in the 
-            * future
-            */
-           /* var equalFRef = function(){
-              var ref = refInstance.inheritProperty('rotation_delta');
-              var rel = relInstance.inheritProperty('rotation_delta');
-              rel.setValue(ref.val.getValue());
-              return  ref.val.getValue();
-            };
+        /*example which sets two-way equality constraint on rotation_delta*/
+        /* constraint function
+         * requires two, one for both relative and reference properties
+         * will not work correctly if other objects are also set to have
+         * equal constraints with objects that are pre-constrained
+         * will likely need a constraint manager to handle equality constraints in the
+         * future
+         */
+        /* var equalFRef = function(){
+           var ref = refInstance.inheritProperty('rotation_delta');
+           var rel = relInstance.inheritProperty('rotation_delta');
+           rel.setValue(ref.val.getValue());
+           return  ref.val.getValue();
+         };
 
-             var equalFRel = function(){
-              var ref = refInstance.inheritProperty('rotation_delta');
-              var rel = relInstance.inheritProperty('rotation_delta');
-             ref.setValue(rel.val.getValue());
-              return  rel.val.getValue();
-            };
+          var equalFRel = function(){
+           var ref = refInstance.inheritProperty('rotation_delta');
+           var rel = relInstance.inheritProperty('rotation_delta');
+          ref.setValue(rel.val.getValue());
+           return  rel.val.getValue();
+         };
 
-            refInstance.inheritProperty('rotation_delta').setConstraint(equalFRef);
-            relInstance.inheritProperty('rotation_delta').setConstraint(equalFRel);*/
-            
+         refInstance.inheritProperty('rotation_delta').setConstraint(equalFRef);
+         relInstance.inheritProperty('rotation_delta').setConstraint(equalFRel);*/
+
       },
 
       /* geometryDSelected
@@ -542,7 +569,7 @@ define([
        */
       styleModified: function(style_data) {
         var selectedShapes = selectTool.get('selected_shapes');
-        
+
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
           instance.modifyProperty(style_data, this.get('tool-mode'), this.get('tool-modifier'));
@@ -863,7 +890,7 @@ define([
           node.type = type;
           node.name = data[i].name;
           currentNode.addChildNode(node);
-         
+
 
           if (data[i].children.length > 0) {
             this.parseJSON(node, data[i].children);
@@ -891,7 +918,7 @@ define([
         paper.view.draw();
       },
 
-      
+
 
       deleteObject: function() {
         if (selectTool.selectedNodes.length > 0) {

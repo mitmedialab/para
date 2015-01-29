@@ -43,20 +43,32 @@ define([
 			 * returns an object with current x and y values as properties
 			 */
 			getValue: function() {
-				return {
-					x: this.getX(),
-					y: this.getY()
-				};
+				if (!this.isConstrained()) {
+					return {
+						x: this.getX(),
+						y: this.getY(),
+					};
+				} else {
+					return this.getConstraint().getValue();
+				}
 			},
 
 			/*get and set funcitons for x and y*/
 			getX: function() {
+				if (this.isConstrained()) {
+					return this.getConstraint().getValue().x;
+				} else {
 				return this.x.getValue();
+			}
 
 			},
 
 			getY: function() {
-				return this.y.getValue();
+				if (this.isConstrained()) {
+					return this.getConstraint().getValue().y;
+				} else {
+					return this.y.getValue();
+				}
 			},
 
 			setX: function(x) {
@@ -78,9 +90,9 @@ define([
 			},
 
 			/*toPaperPoint
-			* returns a paper.js point object based on the current 
-			* values of this object
-			*/
+			 * returns a paper.js point object based on the current
+			 * values of this object
+			 */
 			toPaperPoint: function() {
 				return new paper.Point(this.getX(), this.getY());
 			},
@@ -163,7 +175,6 @@ define([
 				return v.mul(w.dot(v) / this.lengthSqrd(v));
 			},
 
-			
 
 
 		});
