@@ -20,19 +20,14 @@ define([
     'models/tools/FollowPathToolModel',
     'models/tools/ConstraintToolModel',
     'filesaver',
-    'models/behaviors/actions/BlockNode',
-    'models/behaviors/actions/InitializeNode',
-    'models/behaviors/actions/TranslateNode',
-    'models/behaviors/actions/RotateNode',
     'models/data/Visitor',
     'models/data/Edge',
     'utils/PPoint',
-    'utils/ColorUtils'
-
+    'utils/ColorUtils',
+    'utils/PaperUI'
 
   ],
-
-  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, BlockNode, InitializeNode, TranslateNode, RotateNode, Visitor, Edge, PPoint, ColorUtils) {
+  function($, _, paper, Backbone, UndoManager, cjs, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, Edge, PPoint, ColorUtils, PaperUI) {
     var rootNode,
       uninstantiated,
       visitor,
@@ -61,6 +56,8 @@ define([
       },
 
       initialize: function(attributes,options) {
+        var testP = new PPoint(100,20);
+       
         clutch = 0;
         //setup paperscopes
         var canvas = $('canvas').get(0);
@@ -193,9 +190,7 @@ define([
         var state = this.get('state');
         switch (state) {
           case 'constraintTool':
-            console.log('here');
             constraintTool.clearState();
-            console.log(selectTool.get('selected_shapes'));
             break;
           default:
         }
@@ -259,9 +254,8 @@ define([
             break;
 
         }
-        var data = pathNode.normalizePath(literal, matrix);
-        selectTool.addSelectedShape(pathNode);
-        pathNode.set(data);
+       pathNode.normalizePath(literal, matrix);
+      selectTool.addSelectedShape(pathNode);
         var edge = new Edge({
           x: currentNode,
           y: pathNode
@@ -419,12 +413,15 @@ define([
             stroke_width: literal.strokeWidth, 
           };
           var instance = literal.data.instance;
+          //placeholder functionality for setting constraints
           if (constrain) {
             var ss = selectTool.get('selected_shapes');
-            var lastInstance = ss[ss.length - 1];
-          // lastInstance.setRelativeConstraint(lastInstance,instance,'rotation_delta',45);
-          //  lastInstance.setConditionalConstraint(lastInstance,instance,'translation_deltaX');
-          lastInstance.setEqualityConstraint(lastInstance,instance,'rotation_delta');
+            var relInstance = ss[ss.length - 1];
+            var refInstance = instance;
+            this.constrain(relInstance,refInstance);
+
+
+          
           }
 
           instance.set('selected_indexes', []);
@@ -442,6 +439,62 @@ define([
         }
 
         this.compile();
+      },
+
+      /*constrain
+      * placeholder function for setting constraints
+      * between instances
+      */
+
+      constrain: function(relInstance,refInstance){
+        /*example which sets one-way offset constraint on x coordinate of translation delta*/
+            
+            var offset = 100;
+            /*constraint function
+            * IMPORTANT: for each constraint function to work correctly
+            * you must both set the value of the constrained property
+            and return the new value (even though this seems redundant) */
+            var relativeF = function(){
+              //access translation delta properties for both relative and reference objects
+              var ref = refInstance.inheritProperty('translation_delta');
+              var rel = relInstance.inheritProperty('translation_delta');
+              //set the x value of the reference property to the x value of the relative property + the offset
+              ref.setX(rel.getX()+offset);
+              console.log('Constrained value: ', rel.getX() + offset);
+              //return the offset x value of the relative property
+              return rel.getX()+offset;
+            };
+
+            //set the constraint on the x property of the ref translation 
+            refInstance.inheritProperty('translation_delta').x.setConstraint(relativeF);
+
+
+
+          /*example which sets two-way equality constraint on rotation_delta*/
+            /* constraint function
+            * requires two, one for both relative and reference properties
+            * will not work correctly if other objects are also set to have 
+            * equal constraints with objects that are pre-constrained
+            * will likely need a constraint manager to handle equality constraints in the 
+            * future
+            */
+           /* var equalFRef = function(){
+              var ref = refInstance.inheritProperty('rotation_delta');
+              var rel = relInstance.inheritProperty('rotation_delta');
+              rel.setValue(ref.val.getValue());
+              return  ref.val.getValue();
+            };
+
+             var equalFRel = function(){
+              var ref = refInstance.inheritProperty('rotation_delta');
+              var rel = relInstance.inheritProperty('rotation_delta');
+             ref.setValue(rel.val.getValue());
+              return  rel.val.getValue();
+            };
+
+            refInstance.inheritProperty('rotation_delta').setConstraint(equalFRef);
+            relInstance.inheritProperty('rotation_delta').setConstraint(equalFRel);*/
+            
       },
 
       /* geometryDSelected
@@ -544,10 +597,9 @@ define([
           style.fill_color = data.fill_color;
         }
         if (data.stroke_width) {
-          style.stroke_width = data.stroke_width;
+          style.stroke_width = data.stroke_width.val;
         }
         selectedTool.set('style', style);
-        console.log('selected tool style =',selectedTool.get('style'));
       },
 
       /*styleModified
@@ -556,44 +608,10 @@ define([
        */
       styleModified: function(style_data) {
         var selectedShapes = selectTool.get('selected_shapes');
-        var data = {};
-        if (style_data.fill_color) {
-          data.fill_colorR = {
-            operator: 'set',
-            val: ColorUtils.hexToR(style_data.fill_color)
-          };
-           data.fill_colorG = {
-            operator: 'set',
-            val: ColorUtils.hexToG(style_data.fill_color)
-          };
-           data.fill_colorB = {
-            operator: 'set',
-            val: ColorUtils.hexToB(style_data.fill_color)
-          };
-        }
-        if (style_data.stroke_color) {
-          data.stroke_colorR = {
-            operator: 'set',
-            val: ColorUtils.hexToR(style_data.stroke_color)
-          };
-           data.stroke_colorG = {
-            operator: 'set',
-            val: ColorUtils.hexToG(style_data.stroke_color)
-          };
-           data.stroke_colorB = {
-            operator: 'set',
-            val: ColorUtils.hexToB(style_data.stroke_color)
-          };
-        }
-          if (style_data.stroke_width) {
-          data.stroke_width = {
-            operator: 'set',
-            val: style_data.stroke_width
-          };
-        }
+        
         for (var i = 0; i < selectedShapes.length; i++) {
           var instance = selectedShapes[i];
-          instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+          instance.modifyProperty(style_data, this.get('tool-mode'), this.get('tool-modifier'));
         }
         this.compile();
 
@@ -612,6 +630,8 @@ define([
 
         visitor.resetPrototypes(rootNode.children);
         visitor.visit(rootNode, null);
+
+        PaperUI.redraw();
 
         //used to switch canvas, not currently being used
         //currentView._project.activate();

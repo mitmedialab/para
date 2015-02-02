@@ -9,8 +9,10 @@ define([
 	'paper',
 	'models/data/SceneNode',
 	'utils/PPoint',
-	'cjs'
-], function(_, $, paper, SceneNode, PPoint, cjs) {
+	'utils/PFloat',
+	'utils/PColor',
+	'utils/TrigFunc'
+], function(_, $, paper, SceneNode, PPoint, PFloat, PColor, TrigFunc) {
 
 
 	var Instance = SceneNode.extend({
@@ -28,36 +30,29 @@ define([
 			i_bbox: null,
 			inheritorbbox: null,
 			closed: false,
-			width: 0,
-			height: 0,
-			order: 0,
-
-			//point attributes
-			position: null,
-			translation_deltaX: null,
-			translation_deltaY: null,
-			center: null,
-			scaling_origin: null,
-			scaling_deltaX: null,
-			scaling_deltaY: null,
-			rotation_origin: null,
-			rotation_delta: null,
 
 			//screen properies
 			screen_position: null,
 			screen_width: 0,
 			screen_height: 0,
+			order: 0,
 
-			stroke_colorR: null,
-			stroke_colorG: null,
-			stroke_colorB: null,
-			stroke_colorA: null,
-			fill_colorR: null,
-			fill_colorG: null,
-			fill_colorB: null,
-			fill_colorA: null,
+			/*constrainable properties*/
+			position: null,
+			translation_delta: null,
+			scaling_origin: null,
+			scaling_delta: null,
+			rotation_origin: null,
+			rotation_delta: null,
+			stroke_color: null,
+			fill_color: null,
 			stroke_width: null,
+			width: 0,
+			height: 0,
+			master_path: null,
 
+
+			center: null,
 			rmatrix: null,
 			tmatrix: null,
 			smatrix: null,
@@ -70,13 +65,10 @@ define([
 			show: false,
 
 			//path properties
-			master_path: null,
-			alpha: 1,
 			mod: -0.01,
 			inheritance_selection_color: '#0D7C1F',
 			proxy_selection_color: '#10B0FF',
 			primary_selection_color: '#A5FF00',
-				//path_deltas: null,
 
 
                         // EXPERIMENTAL
@@ -85,10 +77,41 @@ define([
 		},
 
 		initialize: function() {
+
 			this.set('position', new PPoint(0, 0));
 			this.set('center', new PPoint(0, 0));
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
+			this.set('alpha', new PFloat(1));
+
+			var translation_delta = new PPoint(0, 0);
+			translation_delta.setNull(true);
+			this.set('translation_delta', translation_delta);
+
+			var scaling_delta = new PPoint(0, 0);
+			scaling_delta.setNull(true);
+			this.set('scaling_delta', scaling_delta);
+
+			var rotation_delta = new PFloat(0);
+			rotation_delta.setNull(true);
+			this.set('rotation_delta', rotation_delta);
+
+			var stroke_color = new PColor(0, 0, 0);
+			stroke_color.setNull(true);
+			this.set('stroke_color', stroke_color);
+
+			var fill_color = new PColor(0, 0, 0);
+			fill_color.setNull(true);
+			this.set('fill_color', fill_color);
+
+			var stroke_width = new PFloat(0);
+			stroke_width.setNull(true);
+			this.set('stroke_width', stroke_width);
+
+			var master_path = new PFloat(0);
+			master_path.setNull(true);
+			this.set('master_path', master_path);
+
 			this.set('tmatrix', new paper.Matrix());
 			this.set('smatrix', new paper.Matrix());
 			this.set('inheritors', []);
@@ -120,31 +143,11 @@ define([
 			instance.set('proto_node', this);
 			inheritors.push(instance);
 			this.set('inheritors', inheritors);
-			instance.set('position', {
-				operator: 'set',
-				val: this.get('position').val.clone()
-			});
-			instance.set('rotation_origin', {
-				operator: 'set',
-				val: this.get('position').val.clone()
-			});
-			instance.set('scaling_origin', {
-				operator: 'set',
-				val: this.get('position').val.clone()
-			});
-			instance.set('translation_deltaX', {
-				operator: 'add',
-				val: {
-					_var: cjs(0)
-				}
-
-			});
-			instance.set('translation_deltaY', {
-				operator: 'add',
-				val: {
-					_var: cjs(0)
-				}
-			});
+			var position = this.get('position');
+			instance.set('position', position.clone());
+			instance.set('rotation_origin', position.clone());
+			instance.set('scaling_origin', position.clone());
+			instance.set('translation_delta', position.clone());
 			return instance;
 		},
 
@@ -169,70 +172,6 @@ define([
 			this.set('tmatrix', tmatrix);
 		},
 
-		/*setEqualityConstraint: function(ref, rel, property_name) {
-			var relProp = rel.inheritConstraint(property_name);
-			var refProp = ref.inheritConstraint(property_name);
-
-			var f = function() {
-				return refProp.get();
-			};
-			if (relProp._constraint) {
-				relProp._constraint.set(f);
-			} else {
-				relProp._constraint = cjs(f);
-			}
-			if (refProp._constraint) {
-				refProp._constraint.set(f);
-			} else {
-				refProp._constraint = cjs(f);
-			}
-		},*/
-
-		setRelativeConstraint: function(ref, rel, property_name, offset) {
-			var relProp = rel.inheritProperty(property_name);
-			var refProp = ref.inheritProperty(property_name);
-			if (!refProp._constraint) {
-				refProp._constraint = cjs(refProp._var);
-			}
-			var refVar = refProp._constraint;
-			var f = function() {
-				return refVar.get() + offset;
-			};
-			if (relProp._constraint) {
-				relProp._constraint.set(f);
-			} else {
-				relProp._constraint = cjs(f);
-			}
-		},
-
-		removeConstraint: function(instance, property_name) {
-				var property = instance.inheritProperty(property_name);
-				if(property._constraint){
-					var cval = property._constraint.get();
-					property._var.set(cval);
-					delete property._constraint;
-				}
-		},
-
-		setConditionalConstraint: function(ref, rel, property_name) {
-			var relVar = rel.inheritConstraint(property_name);
-			var refVar = ref.inheritConstraint(property_name);
-			var relProp = rel.inheritProperty(property_name);
-			var c = function() {
-				if (relVar.get() < refVar.get()) {
-					return relVar.get();
-				} else {
-					relVar.set(refVar.get());
-					return refVar.get();
-				}
-			};
-			if (relProp._constraint) {
-				relProp._constraint.set(c);
-			} else {
-				relProp._constraint = cjs(c);
-			}
-		},
-
 
 		resetProperties: function() {
 			this.clear().set(this.defaults);
@@ -248,15 +187,15 @@ define([
 		resetStylesToPrototype: function(data, recurse) {
 
 			if (data.fill_color) {
-				this.set('fill_color', null);
+				this.get('fill_color').setNull(true);
 			}
 
 			if (data.stroke_color) {
-				this.set('stroke_color', null);
+				this.get('stroke_color').setNull(true);
 			}
 
 			if (data.stroke_width) {
-				this.set('stroke_width', null);
+				this.get('stroke_width').setNull(true);
 			}
 			if (recurse) {
 				var inheritors = this.get('inheritors');
@@ -267,7 +206,7 @@ define([
 		},
 
 
-		/*setDeltasToInstance
+		/*setPropertiesToInstance
 		 * sets delta to match properties of a given instance, depending on the properties of the
 		 * data that is passed in
 		 */
@@ -287,7 +226,7 @@ define([
 		},
 
 
-		/*resetDeltasToPrototype
+		/*rsetPropertiesToPrototype
 		 * removes property of instance so that it is overriden by prototype,
 		 * if property exists in the data
 		 */
@@ -300,16 +239,15 @@ define([
 					//this.set('position', protoNode.get('position').clone());
 					//this.set('rotation_origin', protoNode.get('rotation_origin').clone());
 					//this.set('scaling_origin', protoNode.get('scaling_origin').clone());
-					this.set('translation_delta', null);
+					this.get('translation_delta').setNull(true);
 				}
 			}
 
 			if (data.rotation_delta) {
-				this.set('rotation_delta', null);
-
+				this.get('rotation_delta').setNull(true);
 			}
 			if (data.scaling_delta) {
-				this.set('scaling_delta', null);
+				this.get('scaling_delta').setNull(true);
 			}
 		},
 
@@ -355,7 +293,7 @@ define([
 				master_path.transform(rmatrix);
 				master_path.transform(smatrix);
 				master_path.transform(tmatrix);
-				var delta = data.translation_delta.toPaperPoint();
+				var delta = new paper.Point(data.translation_delta.x, data.translation_delta.y);
 				if (!handle) {
 					master_path.segments[segment_index].point = master_path.segments[segment_index].point.add(delta);
 				} else {
@@ -383,7 +321,9 @@ define([
 				this.set('path_deltas', path_deltas);*/
 			}
 
-			this.set('master_path', master_path.toJSON());
+			this.set('master_path', new PFloat(master_path.exportJSON({
+				asString: true
+			})));
 			master_path.remove();
 		},
 
@@ -394,132 +334,42 @@ define([
 		 */
 		normalizePath: function(path, matrix) {
 			var data = {};
-			data.rotation_delta = {
-				operator: 'add',
-				val: {
-					_var: cjs(matrix.rotation)
-				}
-			};
-			data.scaling_deltaX = {
-				operator: 'add',
-				val: {
-					_var: cjs(matrix.scaling.x)
-				}
-			};
-			data.scaling_deltaY = {
-				operator: 'add',
-				val: {
-					_var: cjs(matrix.scaling.y)
-				}
-			};
-			data.translation_deltaX = {
-				operator: 'add',
-				val: {
-					_var: cjs(0)
-				}
-			};
-			data.translation_deltaY = {
-				operator: 'add',
-				val: {
-					_var: cjs(0)
-				}
-			};
-			//data.translation_delta = new PPoint(matrix.translation.x, matrix.translation.y);
-			data.position = {
-				operator: 'set',
-				val: new PPoint(matrix.translation.x, matrix.translation.y)
-			};
-			data.rotation_origin = {
-				operator: 'set',
-				val: new PPoint(matrix.translation.x, matrix.translation.y)
-			};
-			data.scaling_origin = {
-				operator: 'set',
-				val: new PPoint(matrix.translation.x, matrix.translation.y)
-			};
-			data.fill_colorR = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.fillColor.red)
-				}
-			};
-			data.fill_colorG = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.fillColor.green)
-				}
-			};
-			data.fill_colorB = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.fillColor.blue)
-				}
-			};
-			data.fill_colorA = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.fillColor.alpha)
-				}
-			};
-			data.stroke_colorR = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.strokeColor.red)
-				}
-			};
-			data.stroke_colorG = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.strokeColor.green)
-				}
-			};
-			data.stroke_colorB = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.strokeColor.blue)
-				}
-			};
-			data.stroke_colorA = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.strokeColor.alpha)
-				}
-			};
-			data.stroke_width = {
-				operator: 'set',
-				val: {
-					_var: cjs(path.strokeWidth)
-				}
-			};
-			data.width = {
-				operator: 'add',
-				val: {
-					_var: cjs(path.bounds.width)
-				}
+			data.rotation_delta = new PFloat(matrix.rotation);
+			if (data.rotation_delta > 360 || data.rotation_delta < 0) {
+				data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
+			}
+			data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
 
-			};
-			data.height = {
-				operator: 'add',
-				val: {
-					_var: cjs(path.bounds.height)
-				}
-			};
+			data.translation_delta = new PPoint(0, 0, 'add');
+			data.position = new PPoint(matrix.translation.x, matrix.translation.y, 'set');
+			data.rotation_origin = new PPoint(matrix.translation.x, matrix.translation.y, 'set');
+
+			data.scaling_origin = new PPoint(matrix.translation.x, matrix.translation.y, 'set');
+
+			data.fill_color = new PColor(path.fillColor.red, path.fillColor.green, path.fillColor.blue, path.fillColor.alpha);
+			data.stroke_color = new PColor(path.strokeColor.red, path.strokeColor.green, path.strokeColor.blue, path.strokeColor.alpha);
+
+			data.stroke_width = new PFloat(path.strokeWidth);
+			data.width = new PFloat(path.bounds.width);
+			data.height = new PFloat(path.bounds.height);
+
+
 			var imatrix = matrix.inverted();
 			path.transform(imatrix);
 			path.visible = false;
 			path.selected = false;
 			path.data.nodetype = this.get('name');
-			var pathJSON = path.toJSON();
-			this.set('master_path', {
-				operator: 'add',
-				val: pathJSON
+			var pathJSON = path.exportJSON({
+				asString: true
 			});
+			this.set('master_path', new PFloat(pathJSON));
 			var path_deltas = [];
 			for (var i = 0; i < path.segments.length; i++) {
 				path_deltas.push(new PPoint(0, 0));
 			}
 			this.set('path_deltas', path_deltas);
 			path.remove();
+			this.set(data);
 			return data;
 		},
 
@@ -552,29 +402,22 @@ define([
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
-					var property;
+
 					if (this.has(p)) {
-						property = this.get(p);
-					} else {
-						property = {
-							val: {
-								_var: cjs(0)
-							},
-							operator: data_property.operator
-						};
+						var property = this.get(p);
+						property.modify(data_property);
+						//check to make sure rotation is between 0 and 360
+						if (p == 'rotation_delta') {
+							if (property.getValue() > 360 || property.getValue() < 0) {
+								property.setValue(TrigFunc.wrap(property.getValue(), 0, 360));
+							}
+						}
+						this.set(p, property);
 					}
-					if (data_property.operator === 'set') {
-						property.val._var.set(data_property.val);
-					} else if (data_property.operator === 'add') {
-						var cValue = property.val._var.get();
-						property.val._var.set(cValue + data_property.val);
-					}
-					this.set(p, property);
+
 				}
 
 			}
-
-
 		},
 
 		/*inheritProperty
@@ -585,8 +428,9 @@ define([
 		 */
 
 		inheritProperty: function(property_name) {
-			if (this.get(property_name)) {
-				var property = this.get(property_name).val;
+
+			if (!this.get(property_name).isNull()) {
+				var property = this.get(property_name);
 				return property;
 			} else {
 				if (this.has('proto_node')) {
@@ -595,27 +439,6 @@ define([
 			}
 		},
 
-		/*inheritConstraint
-		 * returns the correct reference to the object's
-		 * property, based on the constraint.
-		 */
-
-		inheritConstraint: function(property_name) {
-			var property = this.inheritProperty(property_name);
-			if (!property._var) {
-				return property;
-			} else {
-				if (property._constraint) {
-					//console.log('returning constraint reference');
-					return property._constraint;
-				} else {
-					//console.log('returning var reference');
-					return property._var;
-				}
-			}
-		},
-
-
 
 		/* accessProperty
 		 * returns the actual value for a given property by first
@@ -623,14 +446,8 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
-			var property = this.inheritConstraint(property_name);
-			if (!property.get) {
-				return property;
-			} else {
+			return this.inheritProperty(property_name).getValue();
 
-				return property.get();
-
-			}
 		},
 
 
@@ -664,7 +481,7 @@ define([
 		 */
 		setSelectionForInheritors: function(select, mode, modifer, recurse) {
 			var inheritors = this.get('inheritors');
-
+			var alpha;
 			var proto = this.get('proto_node');
 			if (proto) {
 				if (!select) {
@@ -674,16 +491,20 @@ define([
 					if (recurse > 0) {
 						if (mode === 'proxy') {
 							proto.set('inheritor_selected', 'proxy');
-							console.log('set inheritor selected to proxy');
+							//console.log('set inheritor selected to proxy');
 
 						} else {
 							proto.set('inheritor_selected', 'standard');
-							proto.set('alpha', 1);
-							console.log('set alpha to 1 for proto');
+							alpha = proto.get('alpha');
+							alpha.setValue(1);
+							proto.set('alpha', alpha);
+							//console.log('set alpha to 1 for proto');
 						}
 					} else {
 						proto.set('inheritor_selected', false);
-						proto.set('alpha', 1);
+						alpha = proto.get('alpha');
+						alpha.setValue(1);
+						proto.set('alpha', alpha);
 					}
 					proto.setSelectionForInheritors(select, 'standard', 'none', 0);
 				}
@@ -692,7 +513,9 @@ define([
 
 			for (var i = 0; i < inheritors.length; i++) {
 				inheritors[i].set('proto_selected', select);
-				inheritors[i].set('alpha', 1);
+				alpha = inheritors[i].get('alpha');
+				alpha.setValue(1);
+				inheritors[i].set('alpha', alpha);
 			}
 		},
 
@@ -747,8 +570,8 @@ define([
 					var proto_selected = this.get('proto_selected');
 					var inheritor_selected = this.get('inheritor_selected');
 
-					var fill_color = new paper.Color(this.accessProperty('fill_colorR'), this.accessProperty('fill_colorG'), this.accessProperty('fill_colorB'));
-					var stroke_color = new paper.Color(this.accessProperty('stroke_colorR'), this.accessProperty('stroke_colorG'), this.accessProperty('stroke_colorB'));
+					var fill_color = this.inheritProperty('fill_color').toPaperColor();
+					var stroke_color = this.inheritProperty('stroke_color').toPaperColor();
 					var stroke_width = this.accessProperty('stroke_width');
 					var protoNode = this.get('proto_node');
 
@@ -756,26 +579,24 @@ define([
 					var smatrix = this.get('smatrix');
 					var tmatrix = this.get('tmatrix');
 
-					var position = this.get('position').val.toPaperPoint();
-					var rotation_origin = this.get('rotation_origin').val.toPaperPoint();
-					var scaling_origin = this.get('scaling_origin').val.toPaperPoint();
+					var position = this.get('position').toPaperPoint();
+					var rotation_origin = this.get('rotation_origin').toPaperPoint();
+					var scaling_origin = this.get('scaling_origin').toPaperPoint();
 
 
-					var scaling_deltaX = this.accessProperty('scaling_deltaX');
-					var scaling_deltaY = this.accessProperty('scaling_deltaY');
+					var scaling_delta = this.accessProperty('scaling_delta');
 					var rotation_delta = this.accessProperty('rotation_delta');
-					var translation_deltaX = this.accessProperty('translation_deltaX');
-					var translation_deltaY = this.accessProperty('translation_deltaY');
+					var translation_delta = this.inheritProperty('translation_delta').toPaperPoint();
 
 
 					if (rotation_delta) {
 						rmatrix.rotate(rotation_delta, rotation_origin);
 					}
-					if (scaling_deltaX) {
-						smatrix.scale(scaling_deltaX, scaling_deltaY, scaling_origin);
+					if (scaling_delta) {
+						smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
 					}
-					if (translation_deltaX) {
-						tmatrix.translate(new paper.Point(translation_deltaX, translation_deltaY));
+					if (translation_delta) {
+						tmatrix.translate(translation_delta);
 					}
 
 					var geom = new paper.Path();
@@ -888,24 +709,26 @@ define([
 			var inheritors = this.get('inheritors');
 			var alpha = this.get('alpha');
 			var mod = this.get('mod');
-			if (alpha < 0.65) {
+			if (alpha.getValue() < 0.65) {
 				mod = 0.01;
-			} else if (alpha >= 1) {
+			} else if (alpha.getValue() >= 1) {
 				mod = -0.01;
 			}
-			alpha += mod;
+
+			alpha.add(mod);
+
 			if (mode === 'proxy') {
 				var proto = this.get('proto_node');
 				if (proto) {
-					proto.set('alpha', alpha);
-					proto.get('geom').fillColor.alpha = alpha;
+					proto.set('alpha', alpha.clone());
+					proto.get('geom').fillColor.alpha = alpha.getValue();
 				}
 			} else {
 				for (var i = 0; i < inheritors.length; i++) {
 					var inheritor = inheritors[i];
-					if (!inheritor.get(property) || modifier != 'none') {
-						inheritor.set('alpha', alpha);
-						inheritor.get('geom').fillColor.alpha = alpha;
+					if (inheritor.get(property).isNull() || modifier != 'none') {
+						inheritor.set('alpha', alpha.clone());
+						inheritor.get('geom').fillColor.alpha = alpha.getValue();
 						inheritor.animateAlpha(levels, property, mode, modifier, curlevel + 1);
 					}
 				}

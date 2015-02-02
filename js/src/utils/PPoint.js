@@ -1,58 +1,111 @@
 /*PPoint.js*
- * point class for para
+ * constrainable point class
+ * for para instance properties
+ * x: PFloat object for storing x coordinate
+ * y: PFloat object storing y coordinate
  */
 
 define([
-		'toolbox',
+
 		'paper',
-		'cjs'
-
-
+		'cjs',
+		'utils/PFloat',
+		'utils/PConstraint'
 	],
 
-	function(Toolbox, paper, cjs) {
+	function(paper, cjs, PFloat, PConstraint) {
 
-		var PPoint = Toolbox.Base.extend({
+		var PPoint = PConstraint.extend({
+			/* constructor
+			 * x, y: initial x and y coordinates
+			 * operator: optional argument to specify the
+			 * operation performed when property is modified
+			 */
+			constructor: function(x, y, operator) {
+				this.x = new PFloat(x);
+				this.y = new PFloat(y);
+				PConstraint.apply(this, arguments);
+				if (operator) {
+					this.set('operator', operator);
+				}
+				this.setNull(false);
+			},
 
-			constructor: function(x, y) {
+			/* setValue
+			 * accepts an object with x,y properties as an argument
+			 */
+			setValue: function(point) {
+				this.setX(point.x);
+				this.setY(point.y);
+			},
 
-				this.x = x;
-				this.y = y;
+			/* getValue
+			 * returns an object with current x and y values as properties
+			 */
+			getValue: function() {
+				return {
+					x: this.getX(),
+					y: this.getY()
+				};
+			},
+
+			/*get and set funcitons for x and y*/
+			getX: function() {
+				return this.x.getValue();
 
 			},
 
-			set: function(point) {
-				this.x = point.x;
-				this.y = point.y;
+			getY: function() {
+				return this.y.getValue();
 			},
 
 			setX: function(x) {
-				this.x = x;
+				this.x.setValue(x);
+				this.setNull(false);
 			},
 
 			setY: function(y) {
-				this.y = y;
+				this.y.setValue(y);
+				this.setNull(false);
 			},
 
-			add: function(point, newP) {
+			/*clone
+			 * returns a static clone based on the current values of the point
+			 * does not clone the constraints of the original
+			 */
+			clone: function() {
+				return new PPoint(this.getX(), this.getY());
+			},
+
+			/*toPaperPoint
+			* returns a paper.js point object based on the current 
+			* values of this object
+			*/
+			toPaperPoint: function() {
+				return new paper.Point(this.getX(), this.getY());
+			},
+
+			/* basic math operations */
+			add: function(data, newP) {
 				if (newP) {
 					var point2 = this.clone();
-					point2.add(point);
+					point2.add(data);
 					return point2;
 				} else {
-					this.x += point.x;
-					this.y += point.y;
+					this.setX(this.getX() + data.x);
+					this.setY(this.getY() + data.y);
 				}
 			},
 
-			sub: function(point, newP) {
+			sub: function(data, newP) {
 				if (newP) {
 					var point2 = this.clone();
-					point2.sub(point);
+					point2.sub(data);
 					return point2;
 				} else {
-					this.x -= point.x;
-					this.y -= point.y;
+					this.setX(this.getX() - data.x);
+					this.setY(this.getY() - data.y);
+
 				}
 			},
 
@@ -62,8 +115,8 @@ define([
 					point2.div(val);
 					return point2;
 				} else {
-					this.x /= val;
-					this.y /= val;
+					this.setX(this.getX() / val);
+					this.setY(this.getY() / val);
 				}
 			},
 
@@ -73,11 +126,10 @@ define([
 					point2.mul(val);
 					return point2;
 				} else {
-					this.x *= val;
-					this.y *= val;
+					this.setX(this.x.get() * val);
+					this.setY(this.y.get() * val);
 				}
 			},
-
 
 			distanceSqrd: function(vec1, vec2) {
 				return (Math.pow(vec1.x - vec2.x, 2) + Math.pow(vec1.y - vec2.y, 2));
@@ -100,7 +152,6 @@ define([
 			},
 
 
-
 			dot: function(b) {
 				//Computes the dot product of a and b'
 				return (this.x * b.x) + (this.y * b.y);
@@ -112,20 +163,8 @@ define([
 				return v.mul(w.dot(v) / this.lengthSqrd(v));
 			},
 
-			clone: function() {
-				return new PPoint(this.x, this.y);
-			},
+			
 
-			toPaperPoint: function() {
-
-
-				return new paper.Point(this.x, this.y);
-			},
-
-			toConstraint: function(){
-				var f = function() { return this;};
-				return cjs(f);
-			}
 
 		});
 

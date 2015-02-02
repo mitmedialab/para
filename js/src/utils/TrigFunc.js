@@ -17,22 +17,22 @@ define([
 		});
 
 		TrigFunc.equals = function(p1, p2) {
-			if (p1.x === p2.x && p1.y === p2.y) {
+			if (p1.getX() === p2.getX() && p1.getY() === p2.getY()) {
 				return true;
 			}
 			return false;
 		};
 
 		TrigFunc.map = function(value, istart, istop, ostart, ostop) {
-	    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
-	  }
+			return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+		};
 
 		TrigFunc.cartToPolar = function(p1, p2) {
 
 			var r = 0;
 			var theta = 0;
-			var x = p2.x - p1.x;
-			var y = p2.y - p1.y;
+			var x = p2.getX() - p1.getX();
+			var y = p2.getY() - p1.getY();
 			r = Math.sqrt((x * x) + (y * y));
 
 			var type = 0;
@@ -100,16 +100,16 @@ define([
 
 		TrigFunc.subtract = function(p1, p2) {
 			return {
-				x: p1.x - p2.x,
-				y: p1.y - p2.y
+				x: p1.getX() - p2.getX(),
+				y: p1.getY() - p2.getY()
 			};
 		};
 
 
 		TrigFunc.add = function(p1, p2) {
 			return {
-				x: p1.x + p2.x,
-				y: p1.y + p2.y
+				x: p1.getX() + p2.getX(),
+				y: p1.getY() + p2.getY()
 			};
 		};
 
@@ -121,10 +121,10 @@ define([
 			} else {
 				var average = points[0];
 				for (var i = 1; i < points.length; i++) {
-					average = this.add(average,points[i]);
+					average = this.add(average, points[i]);
 				}
-				var x = average.x / points.length;
-				var y = average.y / points.length;
+				var x = average.getX() / points.length;
+				var y = average.getY() / points.length;
 				return {
 					x: x,
 					y: y
@@ -136,15 +136,15 @@ define([
 		TrigFunc.distance = function(p1, p2) {
 			////console.log("p1="+p1);
 			////console.log("p2="+p2);
-			var distance = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+			var distance = Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
 			return distance;
 		};
 
 		TrigFunc.midpoint = function(p1, p2) {
 			//console.log(p1);
 			//console.log(p2);
-			var x = (p1.x + p2.x) / 2;
-			var y = (p1.y + p2.y) / 2;
+			var x = (p1.getX() + p2.getX()) / 2;
+			var y = (p1.getY() + p2.getY()) / 2;
 
 			return {
 				x: x,
@@ -155,7 +155,7 @@ define([
 		//determines if point is on left or right of line
 		TrigFunc.side = function(pA, pB, pM) {
 
-			var position = (pB.x - pA.x) * (pM.y - pA.y) - (pB.y - pA.y) * (pM.x - pA.x);
+			var position = (pB.getX() - pA.getX()) * (pM.getY() - pA.getY()) - (pB.getY() - pA.getY()) * (pM.getX() - pA.getX());
 			////console.log("position=");
 			////console.log(position);
 			if (position > 0) {
@@ -167,6 +167,20 @@ define([
 
 			return 0;
 		};
+
+		TrigFunc.wrap = function(value, lower, upper) {
+
+			if (lower >= upper) {
+				throw ("Rotary bounds are of negative or zero size");
+			}
+
+			var distance = upper - lower;
+			var times = (value - lower) / distance;
+
+			return value - (times * distance);
+		};
+
+
 
 		return TrigFunc;
 	});
