@@ -66,7 +66,7 @@ var template,source, model, view, menuX, menuY, currentNode;
         case 'relatives':
           this.unfocusWheel();
           break;
-        case 'type':
+        case 'expression':
           this.showExpEditor();
           break;
       }
@@ -208,8 +208,7 @@ var template,source, model, view, menuX, menuY, currentNode;
       var element = $(event.target);
       var elementText = element.val();
       console.log('Registered expression input change: ' + elementText);
-      this.model.setConstraintExpression(elementText);
-      // this.model.passEvent(tool, 'setConstraintExpression');
+      model.setConstraintExpression(elementText);
     },
 
   });

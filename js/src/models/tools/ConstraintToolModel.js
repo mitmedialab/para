@@ -8,15 +8,21 @@ define([
     'backbone',
     'models/tools/BaseToolModel',
     'utils/PPoint',
-], function(_, paper, Backbone, BaseToolModel, PPoint) {
+    'utils/PaperUI',
+    'utils/PaperUIEvents',
+    'utils/Utils'
+], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIEvents, Utils) {
 
-  
-  // convenience definitions
-  Math.avg = function( valArray ) {
-    var sum = valArray.reduce( function(a, b) { return a + b });
-    var avg = sum / valArray.length;
-    return avg;
-  }
+  var hitOptions = {
+    stroke: true,
+    bounds: true,
+    center: true,
+    tolerance: 3
+  };
+
+  var propToConstraintMap = {
+    'position': 'translation_delta'
+  };
 
   // model definition
   var ConstraintToolModel = BaseToolModel.extend({
@@ -32,6 +38,7 @@ define([
       maxDelimiter: 0,
       minDelimiter: 0,
       avgDelimiter: 0,
+      constrainToVal: 0,
       delimited: false
     }),
 
@@ -42,71 +49,14 @@ define([
     },
 
     /*
-     * Adds a constraint to the selected set and makes sure that it is accounted for in the UI throughout constraint creation. This includes visualizing alignment lines for position constraints, scale ellipses for scale constraints, etc.
-     */
-    
-    selectConstraint: function( property ) {
-    },
-
-    
-    /*
-     * Clears the UI and current constraint state, setting up for a completely new constraint. Note that this does not change the constraint property; that must be selected on the sidebar.
-     */
-    
-    cancelConstraint: function() {
-      // trigger deselection of objects
-      // do not change sidebar constraint selections 
-      //    possibly remove expression
-      //    possibly set type back to equality
-    },
-
-    /*
-     * Partial undo of constraint process after relative objects have been deselected. It can only occur after relative objects have been selected, and sets the state back as if the reference object had just been selected.
-     */
-    
-    deselectRelatives: function() {
-      // relatives = []
-      // clear expression 
-    },
-
-    drawDelimiters: function() {
-      
-    },
-
-    drawPositionDelimiters: function() {
-
-    },
-
-    drawScaleDelimiters: function() {
-
-    },
-
-    drawStrokeWeightDelimiters: function() {
-
-    },
-
-    drawOrientationDelimiters: function() {
-
-    },
-
-    drawStrokeDelimiters: function() {
-
-    },
-
-    drawFillDelimiters: function() {
-
-    },
-
-    /*
      * Changes the constraint in state to reflect the selected comparator (<, =, >).
      */
     setConstraintType: function(type) {
       this.set('type', type);
       var result = {};
       result['type'] = type;
-      console.log('Selected Constraint Type: ' + type);
+      //console.log('Selected Constraint Type: ' + type);
       return type;
-      // TODO: trigger statemanagermodel update view  
     },
 
     /*
@@ -124,7 +74,6 @@ define([
         console.log('[INFO] Invalid Expression Entered: ' + exp);
       }
       return result;
-      // TODO: trigger statemanagermodel update view, should be highlighting error
     },
 
     validate: function(exp) {
@@ -142,36 +91,6 @@ define([
       this.set('props_selected', selected_props);
       console.log('Selected Constraint Property: ' + property);
       return result;
-      // TODO: trigger statemanagermodel update view
-    },
-
-    /*
-     *
-     *
-     */
-    handleSelection: function( instanceList ) {
-        // TODO: trigger statemanagermodel update view, special box highlighting for ref shape
-        // TODO: trigger statemanagermodel update view, special box highlighting for rel shapes
-      if (this.get('references').length == 0) {
-        this.set('references', instanceList);
-      } else {
-        this.set('relatives', instanceList);
-      }
-      // if numObjects = 1 and no reference
-      //  set reference to instanceList
-      //  set special highlighting for reference
-      //  return
-      // elif reference
-      //  set relatives to instanceList
-      //  set special highlighting for relatives
-      //  recompute min, max, avg constraints
-      //  trigger display min, max, avg constraints
-    },
-
-    referencesSelection: function( instanceList ) {
-      if ( instanceList.length > 0 ) {
-        this.set('references', instanceList);
-      }
     },
 
     /*
@@ -194,19 +113,23 @@ define([
           console.log('Advanced constraint tool mode to relatives');
           break;
         case 'relatives':
-          this.set('mode', 'type');
-          console.log('Advanced constraint tool mode to type');
+          this.set('mode', 'value');
+          console.log('Advanced constraint tool mode to value');
           break;
-        case 'type':
+        case 'value':
           this.set('mode', 'expression');
+          console.log('Advanced constraint tool mode to expression');
           break;
         case 'expression':
-          var result = this.createConstraint();
-          if ( result ) {
-            this.get('sm').delegateMethod('select', 'resetSelections');
-            this.set('mode', 'references');
-          }
+          this.createConstraint();
+          this.clearState();
           break; 
+      }
+    },
+
+    referencesSelection: function( instanceList ) {
+      if ( instanceList.length > 0 ) {
+        this.set('references', instanceList);
       }
     },
 
@@ -215,46 +138,35 @@ define([
         this.set('relatives', instanceList);
       }
     },
+    
+    createConstraint: function() {
+      var constrainToVal = this.get('constrainToVal');
+      var references = this.get('references');
+      var relatives = this.get('relatives');
+      var expression = this.get('expression');
 
-    computeConstraintDelimiters: function() {
-      var relatives = this.get( 'relatives' );
-      var property = this.get( 'props_selected' )[0];
-      console.log('Got property name: ' + property);
-      var propValues = relatives.map( function( instance ) {
-        return instance.get(property);
-      });
-      this.computeRepProperties( relatives, property );
-      this.set('delimited', true);
-      console.log('MaxDelimiter set to: ' + this.get('maxDelimiter').x);
-      console.log('MinDelimiter set to: ' + this.get('minDelimiter').y);
-      console.log('AvgDelimiter set to: ' + this.get('avgDelimiter').x); 
+      var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );
+      var refProp = refPropList[0];
+      console.log('Ref prop: ', refProp);
+      var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); 
+
+      var relativeF = function() {
+        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue() }));
+        var evaluation = eval( expression );
+        console.log('constrained value: ', evaluation);
+        refProp.setValue( evaluation );
+        return evaluation;  
+      };
+
+      refProp.setConstraint( relativeF );
     },
 
-    computeRepProperties: function( instanceList, property ) {
-      switch (property) {
-        case 'position':
-          console.log(instanceList[0]);
-          var positionsX = instanceList.map( function( instance ) {
-            return instance.accessProperty('position').x;
-          });
-          console.log('PositionsX: ' + positionsX[0]);
-          var positionsY = instanceList.map( function( instance ) {
-            return instance.accessProperty('position').y;
-          });
-          this.set('maxDelimiter', new PPoint(Math.max( positionsX ), Math.max( positionsY )));
-          this.set('minDelimiter', new PPoint(Math.min( positionsX ), Math.min( positionsY )));
-          this.set('avgDelimiter', new PPoint(Math.avg( positionsX ), Math.avg( positionsY )));
-          break;
-        case 'orientation':
-          break;
-        case 'scale':
-          break;
-        case 'strokeWeight':
-          break;
-        case 'stroke':
-          break;
-        case 'fill':
-          break;
+    rewordConstraint: function() {
+      var constrainToVal = this.get('constrainToVal');
+      for (var i = 0; i < constrainToVal.length; i++) {
+        if (constrainToVal[i] in propToConstraintMap) {
+          constrainToVal[i] = propToConstraintMap[constrainToVal[i]];
+        }
       }
     },
 
@@ -270,12 +182,23 @@ define([
           break;
         case 'relatives':
           this.get('sm').delegateMethod('select', 'mouseDown', event);
+          var references = this.get('references'); 
           var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');
           this.relativesSelection( relatives );
-          this.computeConstraintDelimiters();
+          //this.get('sm').constrain( references[0], relatives[0] );
+          PaperUI.drawPositionDelimiters( references, relatives, {'max-position-x': true, 'max-position-y': true, 'avg-position-x': true, 'avg-position-y': true, 'min-position-x': true, 'min-position-y': true});
           break;
-        case 'type':
-          // TODO: check if type button has been clicked
+        case 'value':
+          var hitResult = paper.project.hitTest(event.point, hitOptions);
+          if ( hitResult ) {
+            var path = hitResult.item;
+            if ( path.name.indexOf( 'delimit' ) == 0 ) {
+              var propSplit = path.name.split('-');
+              propSplit = propSplit.slice( 1, propSplit.length );
+              this.set( 'constrainToVal', propSplit );
+              this.rewordConstraint();
+            }
+          }
           break;
         case 'expression':
           // TODO: check if expression has been submitted?
@@ -296,6 +219,10 @@ define([
       
     },
 
+    mouseMove: function(event) {
+
+    },
+
     clearState: function() {
       this.get('sm').delegateMethod('select', 'resetSelections');
       this.set('references', []);
@@ -308,8 +235,37 @@ define([
       this.set('minDeliiter', 0);
       this.set('avgDelimiter', 0);
       this.set('delimited', false);
-    } 
+      PaperUI.clear();
+    }, 
+  
+    /*
+     *  Constraint Tool UI Listeners, passed to Para UI
+     */
+
+
+    /*
+     *
+     */
+    delimiterHighlight: function( event ) {
+      var path = event.target;
+      // TODO: be pickier about these style changes 
+      path.strokeColor = 'red'; 
+      path.strokeWidth = 1.3*path.strokeWidth;  
+    },
+
+    delimiterSelect: function( event ) {
+      var path = event.target;
+      // TODO: be pickier about these style changes
+      path.strokeColor = 'blue';
+      path.strokeWidth = 1.3*path.strokeWidth;
+      this.set('constrainToVal', path.getName()); // TODO: implement path.getName, prob by extending Paper path 
+    }
+  
   });
+
+  
+
+
 
   return ConstraintToolModel;
 
