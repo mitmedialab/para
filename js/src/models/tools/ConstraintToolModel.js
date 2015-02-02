@@ -13,6 +13,7 @@ define([
     'utils/Utils'
 ], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIEvents, Utils) {
 
+  // hit testing for clicking Paper UI elements
   var hitOptions = {
     stroke: true,
     bounds: true,
@@ -20,28 +21,41 @@ define([
     tolerance: 3
   };
 
+  // map property names for UI to instance properties to constrain
+  //
+  // NOTE: ideally this would be 1-1; i.e. constraining translation_delta
+  // would actually constrain position. In reality, an instance's position
+  // is based on both an original position AND a translation_delta. Thus
+  // making a position constraint really only constrains a delta for now.
+  // 
+  // UPSHOT: there should be properties on the instance which directly 
+  // relate to the properties to be constrained
   var propToConstraintMap = {
-    'position': 'translation_delta'
+    'position': 'translation_delta',
+    'scale': 'scaling_delta',
+    'orientation': 'rotation_delta'
   };
 
   // model definition
   var ConstraintToolModel = BaseToolModel.extend({
-  
+ 
+    /*
+     * Creates attributes on the model for keeping track of the model's
+     * state.
+     */
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
-      references: null,
-      relatives: null,
-      type: 'equal',
-      expression: '',
-      props_selected: null,
-      props: ['position', 'scale', 'orientation', 'strokeWeight', 'stroke', 'fill'],
-      mode: 'references',
-      maxDelimiter: 0,
-      minDelimiter: 0,
-      avgDelimiter: 0,
-      constrainToVal: 0,
-      delimited: false
+      references: null,       // list of reference instances
+      relatives: null,        // list of relative instances
+      type: 'equal',          // relation for constraint
+      expression: '',         // the entered constraint expression
+      props_selected: null,   // a list of properties to be constrained
+      mode: 'references',     // indicator for current state
+      constrainToVal: [],     // array for specifying value constrained to
     }),
 
+    /*
+     * Sets up the model.
+     */
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
       this.set('references', []);
@@ -49,21 +63,28 @@ define([
     },
 
     /*
-     * Changes the constraint in state to reflect the selected comparator (<, =, >).
+     * Changes the constraint in state to reflect the selected relation (<, =, >).
+     * Currently only these three relations are supported, with names:
+     * 'less', 'equal', 'more'
+     * For convenience, they correspond to ids of UI elements.
+     *
+     * @param type - string for relation name
      */
     setConstraintType: function(type) {
       this.set('type', type);
       var result = {};
       result['type'] = type;
-      //console.log('Selected Constraint Type: ' + type);
+      console.log('[INFO] Selected Constraint Type: ' + type);
       return type;
     },
 
     /*
-     * Changes the constraint in state to reflect comparison with the given expression.
+     * Changes the constraint in state to reflect comparison with the given expression. 
+     * The expression is first validated and then set.
+     * 
+     * @param exp - a string for the expression
      */
     setConstraintExpression: function(exp) {
-      // TODO: make expression validation
       var result = {};
       if (this.validate(exp)) {
         this.set('expression', exp);
@@ -76,12 +97,25 @@ define([
       return result;
     },
 
+    /*
+     * Validates the expression passed so that a constraint can be made.
+     * Validation should ensure that no injections are being made,
+     * since eval is used to evaluate the expression; it should also
+     * ensure that the expression is mathematically valid.
+     *
+     * @param exp - a string for the expression to validate
+     *
+     * TODO: IMPLEMENT THIS FUNCTION   
+     */
     validate: function(exp) {
       return true;
     },
 
     /*
-     * Chooses the property that will be constrained. Note that these are only fundamental properties, such as position and scale.
+     * Sets the property that will be constrained in state. Note that 
+     * these are only fundamental properties, such as position and scale.
+     *
+     * @param property - string for the name of the property to constrain
      */
     setConstraintProperty: function(property) {
       // TODO: change this to adding to current set to allow for more than one selected constraint
@@ -94,51 +128,78 @@ define([
     },
 
     /*
-     * Make sure the tool has a state which is workable. That is, relatives should not exist without references, etc.
+     * Make sure the tool has a state which is workable. That is, relatives 
+     * should not exist without references, etc.
+     *
+     * TODO: IMPLEMENT THIS FUNCTION
      */
     validateState: function() {
 
     },
 
+    /*
+     * Move the state of the tool forward to allow for the next stage
+     * in constraint creation. Ensures that the current state's info
+     * is saved into state so that the next stage is meaningful.
+     *
+     */
     advance: function() {
       var state = this.get('mode');
       switch ( state ) {
         case 'references':
           this.get('sm').delegateMethod('select', 'saveSelection');
           this.set('mode', 'property');
-          console.log('Advanced constraint tool mode to property');
+          console.log('[INFO] Advanced constraint tool mode to property');
           break;
         case 'property':
           this.set('mode', 'relatives');
-          console.log('Advanced constraint tool mode to relatives');
+          console.log('[INFO] Advanced constraint tool mode to relatives');
           break;
         case 'relatives':
           this.set('mode', 'value');
-          console.log('Advanced constraint tool mode to value');
+          console.log('[INFO] Advanced constraint tool mode to value');
           break;
         case 'value':
           this.set('mode', 'expression');
-          console.log('Advanced constraint tool mode to expression');
+          console.log('[INFO] Advanced constraint tool mode to expression');
           break;
         case 'expression':
           this.createConstraint();
           this.clearState();
+          console.log('[INFO] Reset constraint tool state');
           break; 
       }
     },
 
+    /*
+     * Takes a list of instances, checks their validity, and sets them 
+     * in the constraint tool reference state.
+     *
+     * @param instanceList - a list of instances
+     */
     referencesSelection: function( instanceList ) {
       if ( instanceList.length > 0 ) {
         this.set('references', instanceList);
       }
     },
 
+    /*
+     * Takes a list of instances, checks their validity, and sets them 
+     * in the constraint tool relatives state.
+     *
+     * @param instanceList - a list of instances
+     */
     relativesSelection: function( instanceList ) {
       if ( instanceList.length > 0 ) {
         this.set('relatives', instanceList);
       }
     },
     
+    /*
+     * Uses the constraint tool state which has been specified through
+     * the stages of interaction to construct the constraint on the 
+     * references and relatives as desired. 
+     */
     createConstraint: function() {
       var constrainToVal = this.get('constrainToVal');
       var references = this.get('references');
@@ -147,20 +208,37 @@ define([
 
       var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );
       var refProp = refPropList[0];
-      console.log('Ref prop: ', refProp);
       var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); 
+
 
       var relativeF = function() {
         var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue() }));
         var evaluation = eval( expression );
-        console.log('constrained value: ', evaluation);
         refProp.setValue( evaluation );
         return evaluation;  
       };
 
       refProp.setConstraint( relativeF );
+     
+      /* 
+      var relDeltaList = Utils.getPropConstraintFromList( relatives, rewordToVal.slice(1, rewordToVal.length) );
+      var relativeDeltaF = function() {
+        var x = Utils[rewordToVal[0]]( relDeltaList.map( function( prop ) { return prop.getValue() }));
+        var evaluation = eval( expression );
+        refDelta.setValue( evaluation );
+        return evaluation; 
+      };
+
+      refDelta.setConstraint( relativeF );*/
     },
 
+    /*
+     * Rewords the specified value to be constrained to (a property list)
+     * so that the terms used in the UI (scale, position) map to instance
+     * properties.
+     *
+     * NOTE: Ideally, this should never have to be used.  
+     */
     rewordConstraint: function() {
       var constrainToVal = this.get('constrainToVal');
       for (var i = 0; i < constrainToVal.length; i++) {
@@ -170,6 +248,24 @@ define([
       }
     },
 
+    /*
+     * Handles mouseDown events on the canvas when the constraint tool is
+     * being used. For each different state of the tool, the event is 
+     * handled appropriately.
+     *
+     * state 'references': delegate mouseDown events to the selection tool
+     *                     for selection of reference instances
+     *
+     * state 'property':   do nothing
+     *
+     * state 'relatives':  delegate mouseDown events to the selection tool
+     *                     for selection of relative instances
+     * 
+     * state 'value':      test for hits on UI elements that specify value
+     *                     to constrain to
+     *
+     * state 'expression': do nothing
+     */
     mouseDown: function(event) {
       var state = this.get('mode');
       switch ( state ) {
@@ -223,6 +319,11 @@ define([
 
     },
 
+    /*
+     * Resets the state of the constraint tool so that it is as if it has
+     * just been selected, or is not selected at all, and removes all UI 
+     * elements associated with it. 
+     */
     clearState: function() {
       this.get('sm').delegateMethod('select', 'resetSelections');
       this.set('references', []);
@@ -231,17 +332,14 @@ define([
       this.set('expression', '');
       this.set('props_selected', []);
       this.set('mode', 'references');
-      this.set('maxDelimiter', 0);
-      this.set('minDeliiter', 0);
-      this.set('avgDelimiter', 0);
-      this.set('delimited', false);
       PaperUI.clear();
     }, 
-  
+ 
+
+
     /*
      *  Constraint Tool UI Listeners, passed to Para UI
      */
-
 
     /*
      *
@@ -252,7 +350,10 @@ define([
       path.strokeColor = 'red'; 
       path.strokeWidth = 1.3*path.strokeWidth;  
     },
-
+    
+    /*
+     *
+     */
     delimiterSelect: function( event ) {
       var path = event.target;
       // TODO: be pickier about these style changes
