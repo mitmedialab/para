@@ -103,22 +103,58 @@ define([
       paper.view.draw();
     },
 
+    /*
+     * Draw dashed boxes made of pairs of lines for maximum, minimum, and 
+     * average x- and y- scales for a set of instances, and give them 
+     * names for reference
+     *
+     * Name format: delimit-(func)-scale-(x|y)
+     *
+     * @param references - Not actually used...@TODO take out
+     * @param relatives  - The instances to compute properties from
+     * @param delimiters - An object containing desired delimiters
+     */
     drawScaleDelimiters: function( references, relatives, delimiters ) {
-      // draw dashed boxes (made of pairs of lines) for each scale
     },
 
+    /*
+     * Draw dashed circles with pairs of orientation-indicating arrows
+     * for maximum, minimum, and average orientations for a set of 
+     * instances, and give them names for reference
+     *
+     * Name format: delimit-(func)-orientation-(x|y)
+     *
+     * @param references - Not actually used...@TODO take out
+     * @param relatives  - The instances to compute properties from
+     * @param delimiters - An object containing desired delimiters
+     */
     drawOrientationDelimiters: function( references, relatives, delimiters ) {
       // draw dashed circle with arrows for each orientation
     },
 
+    /*
+     * Draw rectangles expanded around a reference edge representing 
+     * the reference edge weight with as well as minimum, maximum, 
+     * and average edge weights for a set of relative instances. The 
+     * rectangles should be easily distinguishable from each other.
+     * 
+     *
+     * Name format: delimit-(func)-orientation-(x|y)
+     *
+     * @param references - reference instances to draw on 
+     * @param relatives  - instances to compute properties from
+     * @param delimiters - An object containing desired delimiters
+     */
     drawWeightDelimiters: function( references, relatives, delimiters ) {
       // draw shapes of delimiter-levels of thickness, different colors around references
     },
 
+    // TODO: figure out how to do this...
     drawStrokeDelimiters: function( references, relatives, delimiters ) {
 
     },
 
+    // TODO: figure out how to do this...
     drawFillDelimiters: function( references, relatives, delimiters ) {
 
     },

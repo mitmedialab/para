@@ -1,5 +1,35 @@
 /* ConstraintToolModel.js
  * Model class for the constraint tools, which allows for the creation of basic constraints.
+ * 
+ * The constraint tool works by allowing the user to construct a constraint through interaction
+ * with the UI in stages, captured in this tool's code as states. The user can move through
+ * the process by satisfying the requirements for a stage and then making a definitive indication
+ * to the model to move to the next state ( currently, through an 'n' keypress ). Similarly,
+ * they can move backwards through a 'b' keypress, or even return the state to the initial
+ * by switching off the constraint tool. The stages of interaction are indicated below:
+ *
+ * 1) 'references': The user, just like with the selection tool, selects a set of instances
+ *                  to have their properties constrained.
+ *
+ * 2) 'property':   Handles show up on a representative of the references selected representing
+ *                  each primitive property of instances. The user can select a property 
+ *                  by clicking on it; this is the property of the references to constrain.
+ *
+ * 3) 'relatives':  The user, just like with the selection tool, selects a set of instances
+ *                  to have their properties constrained to.
+ *
+ * 4) 'value':      The exact property to be constrained to for the relatives, based on a function
+ *                  operating on a list of their properties, is specified. The exact UI
+ *                  corresponding to the property as well as the means of selection vary between 
+ *                  properties; using position as an example, the UI elements are dashed horizontal
+ *                  and vertical lines at the max, min, and avg x- and y-positions of the relatives.
+ *                  Selection is done by clicking on one of the lines.
+ *
+ * 5) 'expression': The user types in an expression and chooses a relation in the UI elements that
+ *                  appear in the Parameters menu. This expression then relates the reference 
+ *                  properties to the relative value specified. 
+ *
+ *
  */
 
 define([
