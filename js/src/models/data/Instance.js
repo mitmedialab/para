@@ -68,8 +68,12 @@ define([
 			mod: -0.01,
 			inheritance_selection_color: '#0D7C1F',
 			proxy_selection_color: '#10B0FF',
-			primary_selection_color: '#A5FF00'
+			primary_selection_color: '#A5FF00',
 
+
+                        // EXPERIMENTAL
+                        selection_palette: ['#0D7C1F', '#FF4D4D', '#33D6FF', '#E698D2'],
+                        sel_palette_index: 0
 		},
 
 		initialize: function() {
@@ -548,6 +552,11 @@ define([
 			}
 		},
 
+                getSelectionColor: function() {
+                  var color_palette = this.get('selection_palette');
+                  var color_ind = this.get('sel_palette_index');
+                  return color_palette[color_ind];
+                },
 
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
@@ -626,12 +635,14 @@ define([
 							if (selected) {
 
 
+                                                                // EXPERIMENTAL
+								// geom.selectedColor = this.get('primary_selection_color');
+								geom.selectedColor = this.getSelectionColor();
+                                                                geom.selected = selected;
 
-								geom.selectedColor = this.get('primary_selection_color');
-								geom.selected = selected;
-
-								g_bbox.selectedColor = this.get('primary_selection_color');
-								g_bbox.selected = true;
+								// g_bbox.selectedColor = this.get('primary_selection_color');
+								g_bbox.selectedColor = this.getSelectionColor();
+                                                                g_bbox.selected = true;
 								//draw in bounding box for inheritors
 								if (gi_bbox) {
 									gi_bbox.selectedColor = this.get('inheritance_selection_color');

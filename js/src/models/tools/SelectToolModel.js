@@ -37,17 +37,22 @@ define([
   var SelectToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
       selected_shapes: null,
+      selections: null,
+      current_sel_index: 0,
       mode: 'select'
     }),
 
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
       this.set('selected_shapes', []);
+      this.set('selections', []);
       //this.on('change:literals',this.triggerChange);
 
     },
 
     deselectAll: function() {
+      // TODO: do this across all selections
+
       var selected_shapes = this.get('selected_shapes');
       for (var i = 0; i < selected_shapes.length; i++) {
         selected_shapes[i].set('selected', false);
@@ -62,10 +67,40 @@ define([
       var selected_shapes = this.get('selected_shapes');
       if (!_.contains(selected_shapes, instance)) {
         instance.set('selected', true);
+        instance.set('sel_palette_index', this.get('current_sel_index'));
         selected_shapes.push(instance);
         this.set('selected_shapes', selected_shapes);
       }
     },
+
+    // EXPERIMENTAL
+    saveSelection: function() {
+      var selections = this.get('selections');
+      selections.push(this.get('selected_shapes'));
+      this.set('selected_shapes', []);
+      this.set('selections', selections);
+      var current_sel_index = this.get('current_sel_index');
+      current_sel_index += 1;
+      this.set('current_sel_index', current_sel_index);
+    },
+
+    resetSelections: function() {
+      this.deselectAll();
+      var selections = this.get('selections');
+      for (var i = 0; i < selections.length; i++) {
+        this.set('selected_shapes', selections[i]);
+        this.deselectAll();
+      }
+      this.set('selections', []);
+      this.set('current_sel_index', 0);
+    },
+
+    getCurrentSelection: function() {
+      var selections = this.get('selected_shapes');
+      return selections; 
+    },
+    // END EXPERIMENTAL
+
 
     getLastSelected: function(){
         var selected_shapes = this.get('selected_shapes');

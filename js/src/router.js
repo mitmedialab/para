@@ -11,9 +11,9 @@ define([
   'views/drawing/ProtoView',
   'models/StateManagerModel',
   'models/behaviors/BehaviorManagerModel',
-  'models/tools/SelectToolModel'
+  'models/tools/ConstraintToolModel',
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, StateManagerModel, BehaviorManagerModel,SelectToolModel) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, StateManagerModel, BehaviorManagerModel, ConstraintToolModel) {
 
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
@@ -29,15 +29,19 @@ define([
 
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
-
-      var stateManager = new StateManagerModel();
+      var constraintToolModel = new ConstraintToolModel({
+        id: 'constraintTool'
+      });
+      var stateManager = new StateManagerModel({}, {
+        constrainer: constraintToolModel
+      });
 
       //setup the canvas view
       var canvasView = new CanvasView({
         el: '#canvas-container',
         model: stateManager
       }, event_bus);
-     
+
       var toolView = new ToolView({
         el: '#tool-elements',
         model: stateManager
@@ -47,8 +51,9 @@ define([
         model: stateManager
       });
       var contextView = new ContextView({
-        el: '#context-menu'
-      }, event_bus);
+        el: '#context-menu',
+        model: constraintToolModel,
+      });
       propertyView.render();
 
     });

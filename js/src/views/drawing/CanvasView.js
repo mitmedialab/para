@@ -21,7 +21,9 @@ define([
   var rootKey = 82;
   var groupKey = 71;
   var clearKey = 67;
+
   var pan, alt, cmd = false;
+  var advanceKey = 78; // EXPERIMENTAL
   var last = {
     x: 0,
     y: 0
@@ -179,6 +181,10 @@ define([
       if (event.keyCode === groupKey) {
           this.model.groupInstance();
         
+      }
+      // EXPERIMENTAL
+      if (event.keyCode === advanceKey) {
+        this.model.advanceTool();
       }
     },
 

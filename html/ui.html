@@ -8,23 +8,97 @@
 
 <!--======================= CONTEXT MENU =======================-->
 <div id="context-menu",class="section_background">
-  <div id = "main-menu">
-    <script id="menu-template" type="text/x-handlebars-template">
-    <div class="row" id="title-bar">
-    <div id="name">{{name}}</div>
-    <div id="close"><button id="close-btn">x</button></div>
-    </div>
-    <div class="row">
-    {{behavior-menu}}
-    <div><a id="new-behavior-btn">new behavior +</a></div>
-    </div>
-    </script>
-  </div>
-  <div id="behavior-types-menu">
-    <div class="row"><a id="copy">copy</a></div>  
-    <div class="row"><a id="linear">linear distribution</a></div> 
-    <div class="row"><a id="radial">radial distribution</a></div> 
-    <div class="row"><a id="gaussian">normal distribution</a></div> 
+  <div id = "constraint-menu">
+    <svg
+       version="1.1"
+       viewbox="0 0 150 150"
+       id="constraint-wheel-box">
+    <g
+       transform="translate(0,-902.36218)"
+       id="constraint-wheel">
+       <g id="stroke">
+        <path
+           d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+           transform="matrix(2.0759837,0,0,2.0759837,-69.69715,831.60712)"
+           id="stroke-outer"
+           class="constraint-prop"
+           fill="#000000"
+           fill-opacity="0.06947285"
+           stroke="#000000"
+           stroke-opacity="1" />
+        <path
+           d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+           transform="matrix(1.7991328,0,0,1.7991328,-50.400494,851.04148)"
+           id="stroke-inner"
+           class="constraint-prop"
+           fill="#000000"
+           fill-opacity="0.06947285"
+           stroke="#000000"
+           stroke-opacity="1" />
+        </g>
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(2.0166584,0,0,2.0166584,-65.562149,835.77162)"
+       id="weight"
+       class="constraint-prop focus"
+       fill="#000000"
+       fill-opacity="0.06947285"
+       stroke="#cccccc"
+       stroke-opacity="1" />
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(1.7200326,0,0,1.7200326,-44.887172,856.59416)"
+       id="fill"
+       class="constraint-prop"
+       fill="#000000"
+       fill-opacity="0.06947285"
+       stroke="#b3b3b3"
+       stroke-opacity="1" />
+    <g
+    id="orient-arrows">
+       <path
+          d="m 71.139552,1027.072 -3.758424,-17.5321 15.237744,17.4412 -14.2755,16.3396 z"
+          id="orient1"
+          class="constraint-prop"
+          fill="#808080"
+          stroke="#000000"
+          stroke-width="0.91121644px"
+          stroke-linecap="butt"
+          stroke-linejoin="miter"
+          stroke-opacity="1" />
+       <path
+          d="m 78.860448,927.90477 3.758424,17.5321 -15.237744,-17.44117 14.2755,-16.33947 z"
+          id="orient2"
+          class="constraint-prop"
+          fill="#808080"
+          stroke="#000000"
+          stroke-width="0.91121644px"
+          stroke-linecap="butt"
+          stroke-linejoin="miter"
+          stroke-opacity="1" />
+    </g>
+    <path
+       d="m 22.442435,1030.0255 105.115125,-105.11501 -0.26212,-0.26213 0,0 0,0 0,0"
+       id="scale"
+       class="constraint-prop"
+       fill="none"
+       stroke="#000000"
+       stroke-width="2.07598352px"
+       stroke-linecap="butt"
+       stroke-linejoin="miter"
+       stroke-opacity="1" />
+    <path
+       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
+       transform="matrix(0.20724067,0,0,0.20724067,60.555217,962.78904)"
+       id="position"
+       class="constraint-prop focus"
+       fill="#000000"
+       fill-opacity="0.06947285"
+       stroke="#000000"
+       stroke-opacity="1" />
+    </g>
+    </svg>
+
   </div>
 </div>
 
@@ -94,7 +168,118 @@
      </div>
    </section><!--/colorMenu-->
 
+      <!--====================== EXPERIMENTAL CONSTRAINT MENU ====================-->
+     <!--
+       <section id="constraint-menu">   
+        <header>
+          <h2> Constraint </h2>
+          <div class="clearfix"></div>
+        </header>
 
+        <div id="constraint-props" class="section-background">
+
+
+          <svg
+             version="1.1"
+             viewbox="0 0 450 150"
+             id="constraint-type-box">
+            <g
+               transform="translate(0,-902.36218)"
+               id="constraint-type">
+              <g id="more-container"
+                class="constraint-type">
+                <path
+                   d="M 37.142857,925.41616 127.7571,977.73231 38.425033,1029.3082"
+                   id="more"
+                   fill="none"
+                   stroke="#999999"
+                   stroke-width="7"
+                   stroke-linecap="butt"
+                   stroke-linejoin="miter"
+                   stroke-miterlimit="4"
+                   stroke-opacity="1"
+                   stroke-dasharray="none" />
+                <rect
+                   width="122.72665"
+                   height="130.58379"
+                   x="19.350962"
+                   y="912.42743"
+                   id="more-box"
+                   fill="#000000"
+                   fill-opacity="0"
+                   stroke="none" />
+              </g> 
+              <g id="less-container"
+                class="constraint-type">
+                <path
+                   d="M 403.16427,1029.3082 312.55003,976.9921 401.8821,925.41616"
+                   id="less"
+                   fill="none"
+                   stroke="#999999"
+                   stroke-width="7"
+                   stroke-linecap="butt"
+                   stroke-linejoin="miter"
+                   stroke-miterlimit="4"
+                   stroke-opacity="1"
+                   stroke-dasharray="none" />
+                <rect
+                   width="122.74514"
+                   height="129.888"
+                   x="297.19885"
+                   y="913.13239"
+                   id="less-box"
+                   fill="#000000"
+                   fill-opacity="0"
+                   stroke="none" />
+              </g>
+              <g id="equal-container"
+                class="constraint-type focus">
+                <path
+                   d="m 162.64286,948.79075 107.85714,0 -1.42857,0.71429"
+                   id="equal-top"
+                   fill="none"
+                   stroke="#999999"
+                   stroke-width="7"
+                   stroke-linecap="butt"
+                   stroke-linejoin="miter"
+                   stroke-miterlimit="4"
+                   stroke-opacity="1"
+                   stroke-dasharray="none" />
+                <path
+                   d="m 162.64286,1006.2907 107.85714,0 -1.42857,0.7143"
+                   id="equal-bottom"
+                   fill="none"
+                   stroke="#999999"
+                   stroke-width="7"
+                   stroke-linecap="butt"
+                   stroke-linejoin="miter"
+                   stroke-miterlimit="4"
+                   stroke-opacity="1"
+                   stroke-dasharray="none" />
+                <rect
+                   width="135.93463"
+                   height="130.22035"
+                   x="151.67552"
+                   y="912.60913"
+                   id="equal-box"
+                   fill="#000000"
+                   fill-opacity="0"
+                   stroke="none" />
+              </g>
+              <path
+                 d="m 147.14286,10.714286 0,130.714284"
+                 transform="translate(0,902.36218)"
+                 id="sep1"
+                 style="fill:none;stroke:#b3b3b3;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+              <path
+                 d="m 292.85715,914.14788 0,130.71432"
+                 id="sep2"
+                 style="fill:#b3b3b3;stroke:#b3b3b3;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            </g>
+          </svg>
+        </div>
+      </section>
+-->
    <!--======================= PARAMETER MENU =======================-->
 
    <section> 
@@ -105,7 +290,8 @@
      </h2>
      <div class="clearfix"></div>
    </header>
-   <div id = "parameters" class="section-background">
+   <div id = "parameterMenu" class="section-background">
+     <div id = "parameters">
      <script id="parameterTemplate" type="text/x-handlebars-template">
 
      {{#each paramSlider}}
@@ -141,8 +327,26 @@
 
      {{/each}}
 
-
      </script>
+     </div>
+      <div id="expInput">
+        <!-- <div id="relationIndicator">
+        </div>
+        <div id="relationPicker">
+        </div> -->
+        <div class="form-group">
+          <label> expression </label>
+          <div id="expHolder">
+            <button class="btn btn-default btn-relation" id="relationIndicator"> </button>
+            <div id="relationSelector">
+              <button class="btn btn-default btn-relation" id="less"> </button>
+              <button class="btn btn-default btn-relation" id="equal"> </button>
+              <button class="btn btn-default btn-relation" id="more"> </button>
+            </div>
+            <input class="form-control expression" type="text" id="expression">
+          </div>
+        </div>
+      </div>
    </div>
  </section><!--parameterSlider-->
 
@@ -204,7 +408,10 @@
       <div id="toolbar">
        <button title="select" class="btn btn-default btn-tool" id="selectTool"><span></button>
        <button title="dselect" class="btn btn-default btn-tool" id="dselectTool"><span></button>
-       <!-- <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button> -->
+       <!-- EXPERIMENTAL -->
+       <button title="constrain" class="btn btn-default btn-tool" id="constraintTool"></button>
+       <!-- END EXPERIMENTAL --> 
+      <!-- <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button> -->
        <button title="rotate" class="btn btn-default btn-tool" id="rotateTool"></button>
        <button title="scale" class="btn btn-default btn-tool" id="scaleTool"></button>
 

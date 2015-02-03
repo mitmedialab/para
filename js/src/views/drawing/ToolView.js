@@ -26,6 +26,7 @@ define([
     events: {
       'click #selectTool': 'selectToolClick',
       'click #dselectTool': 'dSelectToolClick',
+      'click #constraintTool': 'constraintToolClick',
       'click #penTool': 'penToolClick',
       'click #polyTool': 'polyToolClick',
       'click #rectangleTool': 'rectToolClick',
@@ -172,6 +173,18 @@ define([
       analytics.log(eventType, {
         type: eventType,
         id: 'scaleTool',
+        action: 'toolSelected'
+      });
+    },
+
+    constraintToolClick: function() {
+      this.clearActive();
+      $('#constraintTool').addClass('active');
+      lastSelected = $('#constraintTool');
+      this.model.setState('constraintTool');
+      analytics.log(eventType, {
+        type: eventType,
+        id: 'constraintTool',
         action: 'toolSelected'
       });
     },
