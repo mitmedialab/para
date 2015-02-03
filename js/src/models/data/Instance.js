@@ -560,7 +560,7 @@ define([
 
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
-		render: function() {
+		render: function(data) {
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var is_proto = this.get('is_proto');
@@ -681,7 +681,9 @@ define([
 						this.set('geom', geom);
 					}
 				}
+				
 				this.set('rendered', true);
+				return this.get('geom');
 			}
 		},
 

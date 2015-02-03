@@ -167,9 +167,11 @@ define([
 
 		visitChildren: function(node) {
 			var children = node.children;
+			var data = [];
 			for (var i = 0; i < children.length; i++) {
-				children[i].visit(this, node);
+				data.push(children[i].visit(this, node));
 			}
+			return data;
 		},
 
 		visitGeometry: function(node) {
@@ -189,13 +191,9 @@ define([
 		 * determines if node
 		 */
 		visitInstance: function(node, departureNode) {
-
-			var edgesRendered = node.edgesRendered();
-			if (edgesRendered) {
-					node.render();
-			}
-
-			this.visitChildren(node);
+			var data = this.visitChildren(node);
+			var ndata = node.render(data);
+			return ndata;
 		}
 
 	});
