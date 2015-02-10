@@ -292,23 +292,50 @@ define(['jquery',
     openSelectedGroups: function() {
       console.log('opening groups');
       var selectedShapes = selectTool.get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
+      var members = [];
+      var forRemoval = [];
+      for (var i = selectedShapes.length - 1; i >= 0; i--) {
         var shape = selectedShapes[i];
         if (shape.get('type') === 'list') {
           shape.set('open', true);
+          forRemoval = forRemoval.concat(shape);
+          members = members.concat(shape.members);
         }
       }
+      selectTool.removeSelectedShape(forRemoval);
+      selectTool.addSelectedShape(members);
+      this.compile();
     },
 
     closeSelectedGroups: function() {
       console.log('closing groups');
-       var selectedShapes = selectTool.get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
-        var shape = selectedShapes[i];
-        if (shape.get('type') === 'list') {
-          shape.set('open', false);
+      var selectedShapes = selectTool.get('selected_shapes');
+      var lists = currentNode.get('lists');
+      console.log('lists',lists);
+      var members = [];
+      var forRemoval = [];
+      for (var j = 0; j < lists.length; j++) {
+        for (var i = 0; i < selectedShapes.length; i++) {
+          var shape = selectedShapes[i];
+          var containsList = lists[j].getListMember(shape);
+          console.log("containsList =", containsList.get('id'), "shape=",shape.get('i'));
+          if (containsList) {
+            containsList.set('open', false);
+            members = members.concat(containsList);
+            forRemoval = forRemoval.concat(containsList.members);
+          }
         }
       }
+      console.log('for removal', forRemoval.map(function(item) {
+        return item.get('type')+item.get('id');
+      }));
+      console.log('for adding', members.map(function(item) {
+        return item.get('type')+item.get('id');
+      }));
+      selectTool.removeSelectedShape(forRemoval);
+      selectTool.addSelectedShape(members);
+
+      this.compile();
     },
 
     setPositionForInitialized: function(position) {

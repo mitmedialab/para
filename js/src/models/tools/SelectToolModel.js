@@ -62,7 +62,17 @@ define([
       this.set('selected_shapes', []);
     },
 
-    addSelectedShape: function(instance) {
+    addSelectedShape: function(data) {
+      if (data instanceof Array) {
+        for (var i = 0; i < data.length; i++) {
+          this.addSingleShape(data[i]);
+        }
+      } else {
+        this.addSingleShape(data);
+      }
+    },
+
+    addSingleShape: function(instance) {
       var selected_shapes = this.get('selected_shapes');
       if (!_.contains(selected_shapes, instance)) {
         instance.set('selected', true);
@@ -72,7 +82,17 @@ define([
       }
     },
 
-    removeSelectedShape: function(shape) {
+    removeSelectedShape: function(data) {
+      if (data instanceof Array) {
+        for (var i = 0; i < data.length; i++) {
+          this.removeSingleShape(data[i]);
+        }
+      } else {
+        this.removeSingleShape(data);
+      }
+    },
+
+    removeSingleShape: function(shape) {
       shape.set('selected', false);
       shape.setSelectionForInheritors(false);
       var selected_shapes = this.get('selected_shapes');

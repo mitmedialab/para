@@ -56,7 +56,7 @@ define([
             * external vistior tree traversal
             */
             visit: function(visitor,departureNode) {
-                return visitor.visit(this,departureNode);   
+                return  visitor.visit(this,departureNode);   
             },
 
             /*getEdge

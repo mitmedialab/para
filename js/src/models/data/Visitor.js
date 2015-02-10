@@ -49,25 +49,8 @@ define([
 			return match;
 		},
 
-		getInheritanceDimensions: function(root) {
-
-			this.visitDfs(root, function(node) {
-				if (node.get('type') === 'root') {
-					return; // do not process roots
-				}
-
-				var position = node.get('screen_position');
-				var width = node.get('screen_width');
-				var height = node.get('screen_height');
-
-			});
-
-		},
-
-		getSiblingDimensions: function(){
-
-		},
-
+		
+		
 		/*getLinkedDimensions: function(data) {
 			var top = data.top;
 			var mode = data.mode;

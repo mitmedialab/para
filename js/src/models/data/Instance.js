@@ -197,6 +197,10 @@ define([
 			return null;
 		},
 
+		getListMember: function(member) {
+			return this.getMember(member);
+		},
+
 
 
 		/* create

@@ -75,15 +75,32 @@ define([
           }
         }
       }
-      return false;
+      return null;
+    },
+
+    getListMember: function(member) {
+      for (var i = 0; i < this.members.length; i++) {
+        var m = this.members[i].getListMember(member);
+        if (m) {
+          if (m.get('open') && m.get('type') === 'list') {
+            console.log('returning list member');
+            return m;
+          } else {
+            console.log('returning self');
+            return this;
+          }
+        }
+      }
+      console.log('returning nothing');
+      return null;
     },
 
     render: function(data) {
       var bbox = this.renderBoundingBox(data);
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
-      if(this.get('open')){
-        bbox.strokeColor = new paper.Color(255,0,0,0.5);
+      if (this.get('open')) {
+        bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
         bbox.strokeWidth = 1;
       }
 
@@ -106,7 +123,7 @@ define([
         var bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
         this.set('bbox', bbox);
 
-        var screen_bounds = bbox.bounds;  
+        var screen_bounds = bbox.bounds;
         this.set({
           screen_top_left: screen_bounds.topLeft,
           screen_top_right: screen_bounds.topRight,
@@ -116,7 +133,7 @@ define([
           left_center: screen_bounds.leftCenter,
           right_center: screen_bounds.rightCenter,
           bottom_center: screen_bounds.bottomCenter,
-          top_center:screen_bounds.topCenter,
+          top_center: screen_bounds.topCenter,
           area: screen_bounds.area,
           screen_width: screen_bounds.width,
           screen_height: screen_bounds.height,
