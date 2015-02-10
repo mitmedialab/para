@@ -9,10 +9,9 @@ define([
   'underscore',
   'paper',
   'models/data/PathNode',
-  'models/data/Instance',
 
 
-], function(_, paper, PathNode, Instance) {
+], function(_, paper, PathNode) {
   //drawable paper.js path object that is stored in the pathnode
   var PolygonNode = PathNode.extend({
 
@@ -32,11 +31,11 @@ define([
       }]);
     },
 
-    normalizePath: function(path, matrix) {
+    normalizeGeometry: function(path, matrix) {
       var userParams = this.get('userParams');
       userParams[0].val = path.segments.length;
       this.set('userParams',userParams);
-      var data = Instance.prototype.normalizePath.apply(this,arguments);  
+      var data = PathNode.prototype.normalizeGeometry.apply(this,arguments);  
       return data;
     },
 

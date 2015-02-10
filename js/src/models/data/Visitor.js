@@ -31,7 +31,7 @@ define([
 			for (var i = 0; i < prototypes.length; i++) {
 				prototypes[i].reset();
 				this.resetPrototypes(prototypes[i].children);
-			}
+			}	
 		},
 
 		getPrototypeById: function(root, id) {
@@ -161,7 +161,7 @@ define([
 
 
 
-			this.visitInstance(node, departureNode);
+			return this.visitInstance(node, departureNode);
 
 		},
 

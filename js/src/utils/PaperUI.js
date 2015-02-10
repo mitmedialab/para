@@ -35,8 +35,8 @@ define([
      * @param relatives  - a list of relative instances
      */
     drawConstraintArrow: function( references, relatives ) {
-      var ref_positions = getPropFromList( references, 'position' );
-      var rel_positions = getPropFromList( relatives, 'position' );
+      var ref_positions = getPropFromList( references, 'translation_delta' );
+      var rel_positions = getPropFromList( relatives, 'translation_delta' );
       var ref_centroid = getCentroid( ref_positions );
       var rel_centroid = getCentroid( rel_positions );
       var arrowPath = new paper.Path();
@@ -67,7 +67,7 @@ define([
      */
     drawPositionDelimiters: function( references, relatives, delimiters ) {
       // delimiters to check for in the delimiter object
-      var propArray = ['max-position-x', 'max-position-y', 'avg-position-x', 'avg-position-y', 'min-position-x', 'min-position-y'];
+      var propArray = ['max-translation_delta-x', 'max-translation_delta-y', 'avg-translation_delta-x', 'avg-translation_delta-y', 'min-translation_delta-x', 'min-translation_delta-y'];
 
       // go through each position delimiter and draw a line if the
       // delimiter is in the delimiters object
@@ -164,7 +164,9 @@ define([
      * tracking.
      */
     clear: function() {
+      console.log('calling paper UI clear');
       for (var i = 0; i < this.pathReferences.length; i++) {
+        console.log('removing reference at',i);
         this.pathReferences[i].remove();
       }
       this.pathReferences = [];

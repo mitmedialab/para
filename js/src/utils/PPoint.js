@@ -58,8 +58,8 @@ define([
 				if (this.isConstrained()) {
 					return this.getConstraint().getValue().x;
 				} else {
-				return this.x.getValue();
-			}
+					return this.x.getValue();
+				}
 
 			},
 

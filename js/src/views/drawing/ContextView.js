@@ -145,7 +145,7 @@ var template,source, model, view, menuX, menuY, currentNode;
     showWheel: function() {
       // get position for handle from initial reference
       var ref_instance = this.model.get('references')[0];
-      var ref_position = ref_instance.get('screen_position');
+      var ref_position = ref_instance.get('screen_top_left');
       var ref_width = ref_instance.get('screen_width');
       var ref_height = ref_instance.get('screen_height');
 

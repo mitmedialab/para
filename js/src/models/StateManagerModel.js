@@ -18,7 +18,7 @@ define(['jquery',
   'models/tools/SelectToolModel',
   'models/tools/FollowPathToolModel',
   'models/tools/ConstraintToolModel',
-  'filesaver', 
+  'filesaver',
   'models/data/Visitor',
   'utils/PPoint',
   'utils/ColorUtils',
@@ -68,9 +68,8 @@ define(['jquery',
       });
 
       constraintTool = options.constrainer;
-      console.log("constraint tool = ", constraintTool);
       constraintTool.set('sm', this);
-     
+
       toolCollection = new ToolCollection([polyTool, selectTool, followPathTool, constraintTool]);
 
       toolNameMap = {
@@ -146,22 +145,16 @@ define(['jquery',
 
     undo: function() {
       undoManager.undo();
-      // this.rootUpdate();
-      //this.rootRender();
       paper.view.draw();
 
     },
 
     redo: function() {
       undoManager.redo();
-      //this.rootUpdate();
-      //this.rootRender();
       paper.view.draw();
 
 
     },
-
-
 
     setState: function(state, mode) {
       this.clearIrrelevantState();
@@ -246,7 +239,7 @@ define(['jquery',
           break;
 
       }
-      pathNode.normalizePath(literal, matrix);
+      pathNode.normalizeGeometry(literal, matrix);
       selectTool.addSelectedShape(pathNode);
 
       currentNode.addChildNode(pathNode);
@@ -267,28 +260,14 @@ define(['jquery',
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length == 1) {
           var instance = selectedShapes[0];
-          //instance.set('translation_delta', new PPoint(0, 0));
-
           var newInstance = instance.create();
           currentNode.addChildNode(newInstance);
           instance.set('selected', false);
           newInstance.set('selected', true);
-
           selectedShapes[0] = newInstance;
           var id = instance.get('id');
           this.compile();
-          var geom = instance.get('geom').clone();
-
-          return {
-            geom: geom,
-            id: id
-          };
-        } else {
-          //this case should check for grouping of objects as prototypes (if such a prototype does not already exist, it must be created?)
-          return false;
         }
-      } else {
-        return false;
       }
     },
 
@@ -296,16 +275,40 @@ define(['jquery',
      * creates list from currently selected instances
      */
     groupInstance: function() {
-      console.log("grouping instances");
+      // console.log("grouping instances");
       if (this.get('state') === 'selectTool') {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length > 0) {
           var list = new ListNode();
-          list.add(selectedShapes);
-          currentNode.addChildNode(list);
+          list.addMember(selectedShapes);
+          selectTool.deselectAll();
+          currentNode.addChildNode(list, selectedShapes);
+          selectTool.addSelectedShape(list);
         }
       }
       this.compile();
+    },
+
+    openSelectedGroups: function() {
+      console.log('opening groups');
+      var selectedShapes = selectTool.get('selected_shapes');
+      for (var i = 0; i < selectedShapes.length; i++) {
+        var shape = selectedShapes[i];
+        if (shape.get('type') === 'list') {
+          shape.set('open', true);
+        }
+      }
+    },
+
+    closeSelectedGroups: function() {
+      console.log('closing groups');
+       var selectedShapes = selectTool.get('selected_shapes');
+      for (var i = 0; i < selectedShapes.length; i++) {
+        var shape = selectedShapes[i];
+        if (shape.get('type') === 'list') {
+          shape.set('open', false);
+        }
+      }
     },
 
     setPositionForInitialized: function(position) {
@@ -403,38 +406,43 @@ define(['jquery',
      * object is selected by the user
      */
     geometrySelected: function(literal, constrain) {
-
       if (literal) {
         var styledata = {
-          fill_color: literal.fillColor.toCSS(true),
-          stroke_color: literal.strokeColor.toCSS(true),
-          stroke_width: literal.strokeWidth,
+          fill_color: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
+          stroke_color: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
+          stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
         };
-        var instance = literal.data.instance;
-        //placeholder functionality for setting constraints
-        if (constrain) {
-          var ss = selectTool.get('selected_shapes');
-          var relInstance = ss[ss.length - 1];
-          var refInstance = instance;
-          this.constrain(relInstance, refInstance);
 
+        //temporary array for storing selected objects
+        var sInstances = [];
+        var linstance = literal.data.instance;
+        var currentLists = currentNode.get('lists');
 
+        for (var i = 0; i < currentLists.length; i++) {
+          console.log("checking for group at", i);
+          var item = currentLists[i].getMember(linstance);
+          if (item) {
+            sInstances.push(item);
+          }
+        }
+        //add in originally selected index if no lists have been added
+        if (sInstances.length < 1) {
+          sInstances.push(linstance);
+        }
+        for (var j = 0; j < sInstances.length; j++) {
+          var instance = sInstances[j];
+          selectTool.addSelectedShape(instance);
+          instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
+
+          this.setToolStyle(styledata);
+
+          if (selectTool.get('selected_shapes').length === 1) {
+            var params = instance.get('userParams');
+            var id = instance.get('id');
+            this.trigger('geometrySelected', styledata, params, id);
+          }
 
         }
-
-        instance.set('selected_indexes', []);
-        selectTool.addSelectedShape(instance);
-        instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-
-        this.setToolStyle(styledata);
-
-        if (selectTool.get('selected_shapes').length === 1) {
-          var params = instance.get('userParams');
-
-          var id = instance.get('id');
-          this.trigger('geometrySelected', styledata, params, id);
-        }
-
       }
 
       this.compile();
@@ -459,7 +467,7 @@ define(['jquery',
         var rel = relInstance.inheritProperty('translation_delta');
         //set the x value of the reference property to the x value of the relative property + the offset
         ref.setX(rel.getX() + offset);
-        console.log('Constrained value: ', rel.getX() + offset);
+        //console.log('Constrained value: ', rel.getX() + offset);
         //return the offset x value of the relative property
         return rel.getX() + offset;
       };
@@ -540,12 +548,12 @@ define(['jquery',
      * object is direct-selected by the user
      */
     geometryDSelected: function(segments, override) {
-      console.log('triggered');
+      //console.log('triggered');
       if (segments.length > 0) {
         var path = segments[0].path;
 
         var instance = path.data.instance;
-        console.log('dselected', override);
+        //console.log('dselected', override);
         if (!instance.get('proto_node') || override) {
           selectTool.addSelectedShape(instance);
           instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
@@ -567,7 +575,7 @@ define(['jquery',
      * correspond with the new tool mode
      */
     modeChanged: function() {
-      console.log('mode changed');
+      //console.log('mode changed');
       var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
 
@@ -640,6 +648,7 @@ define(['jquery',
       selectedTool.set('style', style);
     },
 
+
     /*styleModified
      * triggered when style properties are modified in the property bar
      * updates the color/ fill/ stroke weight of selected shapes
@@ -663,17 +672,16 @@ define(['jquery',
      */
     compile: function() {
 
-      mainView._project.clear();
-      subView._project.clear();
-
+      //mainView._project.clear();
+      // subView._project.clear();
       visitor.resetPrototypes(rootNode.children);
-      visitor.visit(rootNode, null);
 
+      visitor.visit(rootNode, null);
       PaperUI.redraw();
 
       //used to switch canvas, not currently being used
       //currentView._project.activate();
-
+      //console.log('paper shapes',mainView._project.activeLayer.children.length);
       mainView.draw();
 
     },
@@ -715,16 +723,12 @@ define(['jquery',
 
     },
 
-
-
     //triggered by paper tool on a mouse down event
     toolMouseDown: function(event, pan) {
       if (!event.modifiers.space) {
         var selectedTool = toolCollection.get(this.get('state'));
         selectedTool.mouseDown(event);
       }
-
-
     },
 
     toolMouseUp: function(event, pan) {
@@ -736,7 +740,6 @@ define(['jquery',
       if (selectedTool.get('mode') !== 'pen') {
         this.compile();
       }
-
     },
 
 
@@ -795,7 +798,6 @@ define(['jquery',
       if (pan) {
 
         var mousePos = new paper.Point(event.offsetX, event.offsetY);
-
         var viewPosition = paper.view.viewToProject(mousePos);
         var data = this.changeZoom(paper.view.zoom, delta, paper.view.center, viewPosition);
         paper.view.zoom = data.z;

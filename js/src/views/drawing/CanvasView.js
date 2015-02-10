@@ -21,8 +21,11 @@ define([
   var rootKey = 82;
   var groupKey = 71;
   var clearKey = 67;
-
-  var pan, alt, cmd = false;
+  var upArrow = 38;
+  var downArrow = 40;
+  var rightArrow = 39;
+  var leftArrow = 37;
+  var pan, alt, cmd, shift = false;
   var advanceKey = 78; // EXPERIMENTAL
   var last = {
     x: 0,
@@ -154,14 +157,22 @@ define([
       this.parent.model.toolMouseMove(event);
     },
 
-    animate: function(event){
+    animate: function(event) {
       this.parent.model.animate();
     },
 
     /* canvas event functions */
     canvasKeydown: function(event) {
+    //  console.log(event.keyCode);
       if (event.keyCode == saveKey) {
         this.model.save();
+      }
+      if (shift) {
+        if (event.keyCode == upArrow) {
+            this.model.closeSelectedGroups();
+        } else if (event.keyCode == downArrow) {
+            this.model.openSelectedGroups();
+        }
       }
       if (event.keyCode === clearKey) {
         this.model.deleteObject();
@@ -172,15 +183,18 @@ define([
       if (event.altKey) {
         alt = true;
       }
-      if(event.cmdKey){
+      if (event.cmdKey) {
         cmd = true;
+      }
+      if (event.shiftKey) {
+        shift = true;
       }
       if (event.keyCode === rootKey) {
         this.model.moveToRoot();
       }
       if (event.keyCode === groupKey) {
-          this.model.groupInstance();
-        
+        this.model.groupInstance();
+
       }
       // EXPERIMENTAL
       if (event.keyCode === advanceKey) {
@@ -189,9 +203,15 @@ define([
     },
 
     canvasKeyup: function(event) {
+
+
+      if (!event.shiftKey) {
+        shift =false;
+      }
       pan = false;
       alt = false;
       cmd = false;
+
     },
 
     //enter and leave functions manage keyboard events by focusing the canvas elemennt
@@ -225,8 +245,7 @@ define([
     },
 
     canvasMouseUp: function(event) {
-      if (sub.down) {
-      }
+      if (sub.down) {}
       main.down = false;
       sub.down = false;
     },
@@ -237,7 +256,7 @@ define([
 
     subCanvasMouseUp: function(event) {
       if (main.down) {
-       
+
       }
       sub.down = false;
       main.down = false;
@@ -273,10 +292,10 @@ define([
     },
 
     subDblclick: function(event) {
-     /* event.data.parent.setSubActive();
-      event.data.parent.model.toggleView(false);
-      $('#sub-canvas').css('background-color', '#5B5B5B');
-      $('#canvas').css('background-color', '#232323');*/
+      /* event.data.parent.setSubActive();
+       event.data.parent.model.toggleView(false);
+       $('#sub-canvas').css('background-color', '#5B5B5B');
+       $('#canvas').css('background-color', '#232323');*/
     },
 
     /*centers the sub-view on a specific point */
@@ -291,12 +310,10 @@ define([
       var diffCenter = c_center.sub(con_center, true);
       var diffTarget = new PPoint(targetPoint.x, targetPoint.y).sub(c_center, true);
       view.center = c_center.toPaperPoint();
-      view.zoom=1;
+      view.zoom = 1;
       view.scrollBy(diffCenter.add(diffTarget, true));
       view.draw();
     },
-
-   
 
 
 

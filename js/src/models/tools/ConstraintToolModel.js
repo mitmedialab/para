@@ -239,10 +239,10 @@ define([
       var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );
       var refProp = refPropList[0];
       var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); 
-
+      console.log("relList",relPropList,"refProp",refProp);
 
       var relativeF = function() {
-        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue() }));
+        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));
         var evaluation = eval( expression );
         refProp.setValue( evaluation );
         return evaluation;  
@@ -312,13 +312,13 @@ define([
           var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');
           this.relativesSelection( relatives );
           //this.get('sm').constrain( references[0], relatives[0] );
-          PaperUI.drawPositionDelimiters( references, relatives, {'max-position-x': true, 'max-position-y': true, 'avg-position-x': true, 'avg-position-y': true, 'min-position-x': true, 'min-position-y': true});
+          PaperUI.drawPositionDelimiters( references, relatives, {'max-translation_delta-x': true, 'max-translation_delta-y': true, 'avg-translation_delta-x': true, 'avg-translation_delta-y': true, 'min-translation_delta-x': true, 'min-translation_delta-y': true});
           break;
         case 'value':
           var hitResult = paper.project.hitTest(event.point, hitOptions);
           if ( hitResult ) {
             var path = hitResult.item;
-            if ( path.name.indexOf( 'delimit' ) == 0 ) {
+            if ( path.name.indexOf( 'delimit' ) === 0 ) {
               var propSplit = path.name.split('-');
               propSplit = propSplit.slice( 1, propSplit.length );
               this.set( 'constrainToVal', propSplit );
