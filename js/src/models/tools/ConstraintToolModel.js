@@ -248,8 +248,9 @@ define([
         return evaluation;  
       };
 
-      refProp.setConstraint( relativeF );
-     
+      refProp.setConstraint(relativeF);
+
+
       /* 
       var relDeltaList = Utils.getPropConstraintFromList( relatives, rewordToVal.slice(1, rewordToVal.length) );
       var relativeDeltaF = function() {

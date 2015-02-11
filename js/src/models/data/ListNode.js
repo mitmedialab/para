@@ -23,7 +23,6 @@ define([
 
     },
 
-
     /* addMember, removeMember
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
@@ -38,24 +37,44 @@ define([
     },
 
     removeMember: function(data) {
-      var index;
-      if (data instanceof Array) {
-        for (var i = 0; i < data.length; i++) {
-          index = $.inArray(data[i], this.embers);
-          this.members.splice(index, 1);
-        }
+      var index = $.inArray(data, this.members);
+      if (index === -1) {
+        return false;
       } else {
-        index = $.inArray(data, this.members);
         this.members.splice(index, 1);
+        return true;
       }
     },
 
+    /*recRemoveMember
+     * attempts to remove an item recursively
+     * returns true if item is removed,
+     * false if item is not found
+     */
+    recRemoveMember: function(data) {
+      if (this.removeMember(data)) {
+        return true;
+      } else {
+        for (var i = 0; i < this.members.length; i++) {
+          var removed = this.members[i].recRemoveMember(data);
+          if (removed) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
 
     /* hasMember, getMember
      * recursive methods for checking if instance exists in
      * list or sublist and accessing said parent list */
 
-    hasMember: function(member) {
+    hasMember: function(member, top) {
+      if (!top) {
+        if (this === member) {
+          return true;
+        }
+      }
       for (var i = 0; i < this.members.length; i++) {
         if (this.members[i].hasMember(member)) {
           return true;
@@ -65,6 +84,7 @@ define([
     },
 
     getMember: function(member) {
+
       for (var i = 0; i < this.members.length; i++) {
         var m = this.members[i].getMember(member);
         if (m) {
@@ -78,21 +98,17 @@ define([
       return null;
     },
 
-    getListMember: function(member) {
+    /*closeMembers
+     * recursively closes all members
+     *of this list
+     */
+    closeMembers: function() {
       for (var i = 0; i < this.members.length; i++) {
-        var m = this.members[i].getListMember(member);
-        if (m) {
-          if (m.get('open') && m.get('type') === 'list') {
-            console.log('returning list member');
-            return m;
-          } else {
-            console.log('returning self');
-            return this;
-          }
+        if (this.members[i].get('type') === 'list') {
+          this.members[i].closeMembers();
+          this.members[i].set('open', false);
         }
       }
-      console.log('returning nothing');
-      return null;
     },
 
     render: function(data) {

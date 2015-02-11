@@ -18,7 +18,7 @@ define([
    
     defaults: _.extend({}, Instance.prototype.defaults, {
      
-       name: 'point',
+      name: 'point',
       type: 'geometry',
     }),
 

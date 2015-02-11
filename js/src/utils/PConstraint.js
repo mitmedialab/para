@@ -49,6 +49,7 @@
 				else{
 					this.constraint.setValue(func);
 				}
+				this.trigger('constraint_set');
 			},
 
 			/*getConstraint

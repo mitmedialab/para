@@ -275,12 +275,12 @@ define(['jquery',
      * creates list from currently selected instances
      */
     groupInstance: function() {
-      // console.log("grouping instances");
       if (this.get('state') === 'selectTool') {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length > 0) {
           var list = new ListNode();
           list.addMember(selectedShapes);
+          visitor.addList(list);
           selectTool.deselectAll();
           currentNode.addChildNode(list, selectedShapes);
           selectTool.addSelectedShape(list);
@@ -289,17 +289,19 @@ define(['jquery',
       this.compile();
     },
 
+    /*openSelectedGroups
+    * attempts to open selected items, if they are lists 
+    * and updates selection accordingly
+    */
     openSelectedGroups: function() {
-      console.log('opening groups');
       var selectedShapes = selectTool.get('selected_shapes');
       var members = [];
       var forRemoval = [];
-      for (var i = selectedShapes.length - 1; i >= 0; i--) {
-        var shape = selectedShapes[i];
-        if (shape.get('type') === 'list') {
-          shape.set('open', true);
-          forRemoval = forRemoval.concat(shape);
-          members = members.concat(shape.members);
+      for(var i=0;i<selectedShapes.length;i++){
+        var l = visitor.openList(selectedShapes[i]);
+        if(l){
+          forRemoval.push(l);
+          members = members.concat(l.members);
         }
       }
       selectTool.removeSelectedShape(forRemoval);
@@ -307,34 +309,23 @@ define(['jquery',
       this.compile();
     },
 
+    /*closeSelectedGroups
+    * attempts to close selected items, if they are lists 
+    * and updates selection accordingly
+    */
     closeSelectedGroups: function() {
-      console.log('closing groups');
       var selectedShapes = selectTool.get('selected_shapes');
-      var lists = currentNode.get('lists');
-      console.log('lists',lists);
-      var members = [];
+        var members = [];
       var forRemoval = [];
-      for (var j = 0; j < lists.length; j++) {
-        for (var i = 0; i < selectedShapes.length; i++) {
-          var shape = selectedShapes[i];
-          var containsList = lists[j].getListMember(shape);
-          console.log("containsList =", containsList.get('id'), "shape=",shape.get('i'));
-          if (containsList) {
-            containsList.set('open', false);
-            members = members.concat(containsList);
-            forRemoval = forRemoval.concat(containsList.members);
-          }
+      for (var i = 0; i < selectedShapes.length; i++) {
+        var l = visitor.closeParentList(selectedShapes[i]);
+        if(l){
+          forRemoval.push(selectedShapes[i]);
+          members = members.concat(l);
         }
       }
-      console.log('for removal', forRemoval.map(function(item) {
-        return item.get('type')+item.get('id');
-      }));
-      console.log('for adding', members.map(function(item) {
-        return item.get('type')+item.get('id');
-      }));
       selectTool.removeSelectedShape(forRemoval);
       selectTool.addSelectedShape(members);
-
       this.compile();
     },
 
@@ -440,22 +431,8 @@ define(['jquery',
           stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
         };
 
-        //temporary array for storing selected objects
-        var sInstances = [];
         var linstance = literal.data.instance;
-        var currentLists = currentNode.get('lists');
-
-        for (var i = 0; i < currentLists.length; i++) {
-          console.log("checking for group at", i);
-          var item = currentLists[i].getMember(linstance);
-          if (item) {
-            sInstances.push(item);
-          }
-        }
-        //add in originally selected index if no lists have been added
-        if (sInstances.length < 1) {
-          sInstances.push(linstance);
-        }
+        var sInstances = visitor.filterSelection(linstance);
         for (var j = 0; j < sInstances.length; j++) {
           var instance = sInstances[j];
           selectTool.addSelectedShape(instance);

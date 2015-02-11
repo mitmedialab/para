@@ -25,6 +25,7 @@ define([
 					this.set('operator', operator);
 				}
 				this.setNull(false);
+				this.on('constrained',this.messageConstraint);
 			},
 
 			/* setValue
@@ -32,6 +33,10 @@ define([
 			*/
 			setValue: function(val) {
 				this.val.setValue(val);
+			},
+
+			messageConstraint: function(val){
+				console.log('=========a float was constrained!=========');
 			},
 
 			/* getValue

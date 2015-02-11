@@ -141,8 +141,8 @@ define([
 
 
 		/* Overriding methods for add and remove child node*/
-		addChildNode: function(child, selectedInstances) {
-			if (selectedInstances) {
+		addChildNode: function(child) {
+			/*if (selectedInstances) {
 				console.log('selected instances',selectedInstances);
 				for (var i = 0; i < selectedInstances.length; i++) {
 					if (selectedInstances[i].get('type') === 'list') {
@@ -156,15 +156,15 @@ define([
 				lists.push(child);
 				console.log('adding list to node');
 			}
-			this.set('lists', lists);
+			this.set('lists', lists);*/
 			SceneNode.prototype.addChildNode.call(this, child);
 		},
 
 
 		removeChildNode: function(child) {
-			if (child.get('type') === 'list') {
+		/*	if (child.get('type') === 'list') {
 				this.removeListsItem(child);
-			}
+			}*/
 			SceneNode.prototype.removeChildNode.call(this, child);
 		},
 
@@ -196,12 +196,6 @@ define([
 			}
 			return null;
 		},
-
-		getListMember: function(member) {
-			return this.getMember(member);
-		},
-
-
 
 		/* create
 		 * Prototypal inheritance action:
