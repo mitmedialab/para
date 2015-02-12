@@ -87,7 +87,7 @@ define([
 		},
 
 		render: function(root) {
-			for(var i=0;i<renderQueue.length;i++){
+			for (var i = 0; i < renderQueue.length; i++) {
 				renderQueue[i].render();
 			}
 		},
@@ -110,10 +110,10 @@ define([
 					this.visitInstance(node, departureNode, state_data);
 					break;
 			}
-			
+
 		},
 
-		/*visitList
+		/*visitList- THIS IS SLOW- SPEED IT UP
 		 * visitor method for computing lists
 		 * if render then computes the list's dimensions based on its members
 		 * and draws it on the screen.
@@ -124,13 +124,13 @@ define([
 			var member;
 			var state = state_data.list;
 			if (state === store) {
-				
+
 				listsToCompile = listsToCompile.filter(function(item) {
 					return !node.hasMember(item, true);
 				});
 				listsToCompile.push(node);
 				for (var k = 0; k < node.children.length; k++) {
-						node.children[k].visit(this, node, state_data);
+					node.children[k].visit(this, node, state_data);
 				}
 			} else if (state === compile) {
 				node.compile();
@@ -165,7 +165,7 @@ define([
 					break;
 			}
 
-			
+
 		},
 
 
@@ -186,14 +186,30 @@ define([
 			closedLists.push(list);
 		},
 
+		/* addToOpenLists
+		* attempts to add a newly created instance to any open lists
+		*/
+		addToOpenLists: function(instance) {
+			for (var i = 0; i < closedLists.length; i++) {
+				var list = closedLists[i];
+				for (var j = openLists.length-1; j >= 0; j--) {
+					if(openLists[j].hasMember(list)){
+						openLists[j].addMember(instance);
+						break;
+					}
+				}
+			}
+		},
+
 
 
 		/*removeList
 		 *removes list item recursively checking sublists
 		 */
-		removeList: function(list) {
+			removeList: function(list) {
 			for (var i = 0; i < closedLists.length; i++) {
 				closedLists[i].recRemoveMember(list);
+
 			}
 		},
 

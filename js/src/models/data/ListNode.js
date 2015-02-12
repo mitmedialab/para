@@ -20,6 +20,7 @@ define([
     initialize: function() {
       Instance.prototype.initialize.apply(this, arguments);
       this.members = [];
+      this.get('translation_delta').setNull(false);
 
     },
 
@@ -112,17 +113,27 @@ define([
     },
 
     compile: function() {
-      this.compileTransforms();
       this.compileMembers();
     },
 
    compileMembers: function() {
       //console.log('num members = ', this.members.length, 'num geom =', geomList.length);
+      console.log('tdelta',this.accessProperty('translation_delta'));
+      console.log('l-matrix',this.get('tmatrix'));
       for (var i = 0; i < this.members.length; i++) {
+        this.compileTransforms();
         var member = this.members[i];
         var m_tmatrix = member.get('tmatrix');
-        m_tmatrix.translate(this.get('tmatrix'));
+        m_tmatrix.concatenate(this.get('tmatrix'));
       }
+    },
+
+    compileTransforms: function(){
+     this.get('rmatrix').reset();
+     this.get('smatrix').reset();
+     this.get('tmatrix').reset();
+      Instance.prototype.compileTransforms.call(this,arguments);
+
     },
 
     render:function(){

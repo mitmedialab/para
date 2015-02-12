@@ -243,7 +243,7 @@ define(['jquery',
       selectTool.addSelectedShape(pathNode);
 
       currentNode.addChildNode(pathNode);
-
+      visitor.addToOpenLists(pathNode);
       currentTool.set('literals', []);
       this.compile();
 
@@ -262,6 +262,7 @@ define(['jquery',
           var instance = selectedShapes[0];
           var newInstance = instance.create();
           currentNode.addChildNode(newInstance);
+          visitor.addToOpenLists(newInstance);
           instance.set('selected', false);
           newInstance.set('selected', true);
           selectedShapes[0] = newInstance;
