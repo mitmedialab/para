@@ -34,9 +34,12 @@ define([
 		 * Called before visiting the root node
 		 */
 		resetPrototypes: function(prototypes) {
-			for (var i = 0; i < prototypes.length; i++) {
+			/*for (var i = 0; i < prototypes.length; i++) {
 				prototypes[i].reset();
 				this.resetPrototypes(prototypes[i].children);
+			}*/
+			for (var i = 0; i <renderQueue.length; i++) {
+				renderQueue[i].reset();
 			}
 			listsToCompile = [];
 			renderQueue = [];
@@ -88,7 +91,9 @@ define([
 
 		render: function(root) {
 			for (var i = 0; i < renderQueue.length; i++) {
-				renderQueue[i].render();
+				if(renderQueue[i].get('type')!=='generator'){
+					renderQueue[i].render();
+				}
 			}
 		},
 

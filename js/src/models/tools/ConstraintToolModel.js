@@ -235,7 +235,8 @@ define([
       var references = this.get('references');
       var relatives = this.get('relatives');
       var expression = this.get('expression');
-
+      var generator = references[0].getGenerator();
+      
       var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );
       var refProp = refPropList[0];
       var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); 
@@ -243,6 +244,10 @@ define([
 
       var relativeF = function() {
         var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));
+        if(generator){
+          var i = generator.getValue();
+          console.log('constraint value of i:',i);
+        }
         var evaluation = eval( expression );
         refProp.setValue( evaluation );
         return evaluation;  
@@ -262,6 +267,30 @@ define([
 
       refDelta.setConstraint( relativeF );*/
     },
+
+   /* createListConstraint: function(){
+  
+      var constrainToVal = this.get('constrainToVal');
+      var references = this.get('references');
+      var relatives = this.get('relatives');
+      var expression = this.get('expression');
+      var generator = references[0].getGenerator();
+
+      var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );
+      var refProp = refPropList[0];
+      var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); 
+      console.log("relList",relPropList,"refProp",refProp);
+
+      var relativeF = function() {
+        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));
+        var i = generator.getValue();
+        var evaluation = eval( expression );
+        refProp.setValue( evaluation );
+        return evaluation;  
+      };
+
+      refProp.setConstraint(relativeF);
+    },*/
 
     /*
      * Rewords the specified value to be constrained to (a property list)

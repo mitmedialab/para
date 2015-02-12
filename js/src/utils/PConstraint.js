@@ -99,8 +99,10 @@
 						if (this.hasOwnProperty(p) && !this.isNull()) {
 							
 							if (data.operator === 'set') {
+								//console.log('modifying via set');
 								this[p].setValue(data_property);
 							} else {
+								//console.log('modifying via add');
 								this[p].setValue(this[p].getValue() + data_property);
 							}
 						}

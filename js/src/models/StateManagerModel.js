@@ -13,6 +13,7 @@ define(['jquery',
   'models/data/EllipseNode',
   'models/data/ListNode',
   'models/data/Instance',
+  'models/data/Generator',
   'models/tools/ToolCollection',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
@@ -23,7 +24,7 @@ define(['jquery',
   'utils/PPoint',
   'utils/ColorUtils',
   'utils/PaperUI',
-], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, PaperUI) {
+], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, Generator, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, PaperUI) {
 
   var rootNode, uninstantiated, visitor, currentNode, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
 
@@ -279,11 +280,17 @@ define(['jquery',
       if (this.get('state') === 'selectTool') {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length > 0) {
+
           var list = new ListNode();
           list.addMember(selectedShapes);
+
+          var generator = new Generator();
+          generator.addChildNode(list);
+          generator.setRange(0, selectedShapes.length);
+          list.setGenerator(generator);
           visitor.addList(list);
           selectTool.deselectAll();
-          currentNode.addChildNode(list, selectedShapes);
+          currentNode.addChildNode(generator);
           selectTool.addSelectedShape(list);
         }
       }
@@ -291,16 +298,16 @@ define(['jquery',
     },
 
     /*openSelectedGroups
-    * attempts to open selected items, if they are lists 
-    * and updates selection accordingly
-    */
+     * attempts to open selected items, if they are lists
+     * and updates selection accordingly
+     */
     openSelectedGroups: function() {
       var selectedShapes = selectTool.get('selected_shapes');
       var members = [];
       var forRemoval = [];
-      for(var i=0;i<selectedShapes.length;i++){
+      for (var i = 0; i < selectedShapes.length; i++) {
         var l = visitor.openList(selectedShapes[i]);
-        if(l){
+        if (l) {
           forRemoval.push(l);
           members = members.concat(l.members);
         }
@@ -311,16 +318,16 @@ define(['jquery',
     },
 
     /*closeSelectedGroups
-    * attempts to close selected items, if they are lists 
-    * and updates selection accordingly
-    */
+     * attempts to close selected items, if they are lists
+     * and updates selection accordingly
+     */
     closeSelectedGroups: function() {
       var selectedShapes = selectTool.get('selected_shapes');
-        var members = [];
+      var members = [];
       var forRemoval = [];
       for (var i = 0; i < selectedShapes.length; i++) {
         var l = visitor.closeParentList(selectedShapes[i]);
-        if(l){
+        if (l) {
           forRemoval.push(selectedShapes[i]);
           members = members.concat(l);
         }

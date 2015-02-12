@@ -18,7 +18,7 @@ define([
 
 	var Instance = SceneNode.extend({
 		name: 'instance',
-		type: 'geometry',
+		type: 'instance',
 
 		defaults: {
 			visible: true,
@@ -195,6 +195,20 @@ define([
 				return this;
 			}
 			return null;
+		},
+
+		/* setGenerator, getGenerator
+		 * sets and gets the generator for this list
+		 * which can be used to define iterative constraints
+		 */
+		setGenerator: function(generator) {
+			this.generator = generator;
+		},
+
+		getGenerator: function(generator) {
+			if (this.generator) {
+				return this.generator;
+			}
 		},
 
 		/* create
@@ -430,7 +444,7 @@ define([
 		 */
 
 		inheritProperty: function(property_name) {
-
+			//console.log('inheriting at',property_name,this.get('type'));
 			if (!this.get(property_name).isNull()) {
 				var property = this.get(property_name);
 				return property;
@@ -597,7 +611,7 @@ define([
 			if (translation_delta) {
 				tmatrix.translate(translation_delta.toPaperPoint());
 			}
-			
+
 		},
 
 
@@ -708,7 +722,7 @@ define([
 
 		},
 
-		
+
 		renderGeom: function() {
 			var geom = this.get('geom');
 			var rmatrix = this.get('rmatrix');

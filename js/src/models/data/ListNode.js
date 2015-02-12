@@ -21,7 +21,6 @@ define([
       Instance.prototype.initialize.apply(this, arguments);
       this.members = [];
       this.get('translation_delta').setNull(false);
-
     },
 
     /* addMember, removeMember
@@ -116,27 +115,44 @@ define([
       this.compileMembers();
     },
 
-   compileMembers: function() {
+    compileMembers: function() {
       //console.log('num members = ', this.members.length, 'num geom =', geomList.length);
-      console.log('tdelta',this.accessProperty('translation_delta'));
-      console.log('l-matrix',this.get('tmatrix'));
+      // console.log('tdelta',this.accessProperty('translation_delta'));
+      //console.log('l-matrix',this.get('tmatrix'));
+      var translation_delta = this.get('translation_delta');
       for (var i = 0; i < this.members.length; i++) {
+        if (this.generator) {
+          this.generator.increment();
+        }
         this.compileTransforms();
+        console.log('l-matrix', this.get('tmatrix'));
         var member = this.members[i];
         var m_tmatrix = member.get('tmatrix');
-        m_tmatrix.concatenate(this.get('tmatrix'));
+        var l_matrix = this.get('tmatrix');
+       var xC = translation_delta.x.isConstrained();
+         var yC = translation_delta.y.isConstrained();
+         if(xC){
+           m_tmatrix.tx = 0;
+         }
+         if(yC){
+           m_tmatrix.tx = 0;
+         }
+        m_tmatrix.concatenate(l_matrix);
+
+      
       }
     },
 
-    compileTransforms: function(){
-     this.get('rmatrix').reset();
-     this.get('smatrix').reset();
-     this.get('tmatrix').reset();
-      Instance.prototype.compileTransforms.call(this,arguments);
+    compileTransforms: function() {
+      this.get('rmatrix').reset();
+      this.get('smatrix').reset();
+      this.get('tmatrix').reset();
+
+      Instance.prototype.compileTransforms.call(this, arguments);
 
     },
 
-    render:function(){
+    render: function() {
       var bbox = this.renderBoundingBox();
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');

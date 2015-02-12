@@ -15,71 +15,78 @@ define([
         name: 'generator',
         type: 'generator',
         value: null,
-        start: null,
-        end: null,
+        start_val: null,
+        end_val: null,
         loop: null,
       }),
 
-      intialize: function() {
-        Instance.prototype.initialize.apply(this, arguments);
-        this.set('start', new PFloat(0));
-        this.set('end', new PFloat(0));
-        this.set('value', new PFloat(0));
+      initialize: function() {
+       
+        this.set('start_val', new PFloat(0,'set'));
+        this.set('end_val', new PFloat(0,'set'));
+        this.set('value', new PFloat(0,'set'));
         this.set('loop', new PBool(false));
+        Instance.prototype.initialize.apply(this, arguments);
       },
 
       reset: function() {
         Instance.prototype.reset.call(this, arguments);
-        this.setValue(this.accessProperty('start'));
+        var start = this.accessProperty('start_val');
+        this.setValue(start);
       },
 
       setRange: function(start, end, loop) {
+        console.log('end',end);
         this.setStart(start);
         this.setEnd(end);
         if (loop) {
           this.setLoop(loop);
         }
+        
       },
 
       setValue: function(value) {
-        this.modifyProperty({
-          value: value
-        }, 'standard', 'none');
+        this.modifyProperty({value:  {val:value,operator:'set'}});
       },
 
+      getValue: function(){
+        return this.accessProperty('value');
+      },
+
+
       setStart: function(value) {
-        this.modifyProperty({
-          start: value
-        }, 'standard', 'none');
+        this.modifyProperty({start_val:  {val:value,operator:'set'}});
       },
 
       setEnd: function(value) {
-        this.modifyProperty({
-          end: value
-        }, 'standard', 'none');
+        this.modifyProperty({end_val: {val:value,operator:'set'}});
       },
 
       setLoop: function(value) {
-        this.modifyProperty({
-          loop: value
-        }, 'standard', 'none');
+        this.modifyProperty({loop: {val:value,operator:'set'}});
       },
 
       increment: function() {
-        var start = this.accessProperty('start');
-        var end = this.accessProperty('end');
+        var start = this.accessProperty('start_val');
+        var end = this.accessProperty('end_val');
         var value = this.accessProperty('value');
         var loop = this.accessProperty('loop');
         if (value < end) {
-          this.setValue(value++);
+          var newVal = value+1;
+          this.setValue(newVal);
         } else {
           if (loop) {
             this.setValue(start);
           }
         }
-      }
+        console.log('incrementing generator to:',this.accessProperty('value'));
+      },
 
-      
+      render: function(){
+        console.log('generator is being rendered? This is not supposed to happen');
+      },
+
+
     });
 
     return Generator;
