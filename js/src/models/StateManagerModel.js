@@ -679,8 +679,8 @@ define(['jquery',
       //mainView._project.clear();
       // subView._project.clear();
       visitor.resetPrototypes(rootNode.children);
-
       visitor.visit(rootNode, null);
+      visitor.computeLists();
       PaperUI.redraw();
 
       //used to switch canvas, not currently being used
