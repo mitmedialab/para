@@ -114,7 +114,6 @@ define([
     compile: function() {
       this.compileTransforms();
       this.compileMembers();
-      return [];
     },
 
    compileMembers: function() {
@@ -126,8 +125,8 @@ define([
       }
     },
 
-    render:function(data){
-      var bbox = this.renderBoundingBox(data);
+    render:function(){
+      var bbox = this.renderBoundingBox();
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
       if (this.get('open')) {
@@ -137,7 +136,7 @@ define([
 
     },
 
-    renderBoundingBox: function(geomList) {
+    renderBoundingBox: function() {
       if (this.get('bbox')) {
         this.get('bbox').remove();
       }

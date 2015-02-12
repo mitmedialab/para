@@ -571,7 +571,7 @@ define([
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 
-		compile: function(data) {
+		compile: function() {
 			this.compileTransforms();
 		},
 

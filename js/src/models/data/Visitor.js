@@ -17,7 +17,8 @@ define([
 	//stores para lists
 	var closedLists = [];
 	var openLists = [];
-	var listsToRender = [];
+	var listsToCompile = [];
+	var renderQueue = [];
 	var store = 0;
 	var compile = 1;
 	var render = 2;
@@ -37,7 +38,8 @@ define([
 				prototypes[i].reset();
 				this.resetPrototypes(prototypes[i].children);
 			}
-			listsToRender = [];
+			listsToCompile = [];
+			renderQueue = [];
 		},
 
 		/* getPrototypeById 
@@ -61,7 +63,7 @@ define([
 		/* computeLists
 		 * method to begin rendering process of lists
 		 * following rendering of all non-list items in the tree
-		 * (calls visit on each member of listsToRender array with render argument set
+		 * (calls visit on each member of listsToCompile array with render argument set
 		 * to true
 		 */
 
@@ -69,8 +71,8 @@ define([
 			var state_data = {
 				list: compile
 			};
-			for (var i = 0; i < listsToRender.length; i++) {
-				this.visit(listsToRender[i], null, state_data);
+			for (var i = 0; i < listsToCompile.length; i++) {
+				this.visit(listsToCompile[i], null, state_data);
 			}
 		},
 
@@ -85,11 +87,9 @@ define([
 		},
 
 		render: function(root) {
-			var state_data = {
-				list: render,
-				instance: render
-			};
-			this.visit(root, null, state_data);
+			for(var i=0;i<renderQueue.length;i++){
+				renderQueue[i].render();
+			}
 		},
 
 		/*visit
@@ -102,16 +102,15 @@ define([
 			node.set({
 				visited: true
 			});
-			var rval;
 			switch (node.get('type')) {
 				case 'list':
-					rval = this.visitList(node, departureNode, state_data);
+					this.visitList(node, departureNode, state_data);
 					break;
 				default:
-					rval = this.visitInstance(node, departureNode, state_data);
+					this.visitInstance(node, departureNode, state_data);
 					break;
 			}
-			return rval;
+			
 		},
 
 		/*visitList
@@ -122,19 +121,20 @@ define([
 		 * filters the array to ensure that it only contains lists with no parent list
 		 */
 		visitList: function(node, departureNode, state_data) {
-			var data, member, ndata;
+			var member;
 			var state = state_data.list;
 			if (state === store) {
 				
-				listsToRender = listsToRender.filter(function(item) {
+				listsToCompile = listsToCompile.filter(function(item) {
 					return !node.hasMember(item, true);
 				});
-				listsToRender.push(node);
+				listsToCompile.push(node);
 				for (var k = 0; k < node.children.length; k++) {
 						node.children[k].visit(this, node, state_data);
 				}
 			} else if (state === compile) {
-				node.compile(data);
+				node.compile();
+				renderQueue.push(node);
 				for (var i = 0; i < node.members.length; i++) {
 					member = node.members[i];
 					if (member.get('type') === 'list') {
@@ -142,20 +142,6 @@ define([
 					}
 				}
 				return;
-			} else if (state === render) {
-				data = [];
-				for (var j = 0; j < node.members.length; j++) {
-					var d;
-					member = node.members[j];
-					if (member.get('type') === 'list') {
-						d = member.visit(this, node, state_data);
-					} else {
-						d = member.get('geom');
-					}
-					data.push(d);
-				}
-				ndata = node.render(data);
-				return ndata;
 			}
 		},
 
@@ -166,27 +152,20 @@ define([
 		visitInstance: function(node, departureNode, state_data) {
 			//console.log('state_data_ visit',state_data);
 
-			var data = [];
-			var ndata;
 			var state = state_data.instance;
 			var children = node.children;
 
 			switch (state) {
 				case compile:
 					node.compile();
+					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {
 						children[i].visit(this, node, state_data);
 					}
 					break;
-				case render:
-					for (var j = 0; j < children.length; j++) {
-						data.push(children[j].visit(this, node, state_data));
-					}
-					ndata = node.render(data);
-					break;
 			}
 
-			return ndata;
+			
 		},
 
 
