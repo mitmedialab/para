@@ -121,24 +121,24 @@ define([
       //console.log('l-matrix',this.get('tmatrix'));
       var translation_delta = this.get('translation_delta');
       for (var i = 0; i < this.members.length; i++) {
-        if (this.generator) {
-          this.generator.increment();
-        }
+      
         this.compileTransforms();
         console.log('l-matrix', this.get('tmatrix'));
         var member = this.members[i];
         var m_tmatrix = member.get('tmatrix');
         var l_matrix = this.get('tmatrix');
        var xC = translation_delta.x.isConstrained();
-         var yC = translation_delta.y.isConstrained();
+        var yC = translation_delta.y.isConstrained();
          if(xC){
            m_tmatrix.tx = 0;
          }
          if(yC){
-           m_tmatrix.tx = 0;
+           m_tmatrix.ty = 0;
          }
         m_tmatrix.concatenate(l_matrix);
-
+       if (this.generator) {
+          this.generator.increment();
+        }
       
       }
     },
