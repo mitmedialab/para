@@ -111,7 +111,22 @@ define([
       }
     },
 
-    render: function(data) {
+    compile: function() {
+      this.compileTransforms();
+      this.compileMembers();
+      return [];
+    },
+
+   compileMembers: function() {
+      //console.log('num members = ', this.members.length, 'num geom =', geomList.length);
+      for (var i = 0; i < this.members.length; i++) {
+        var member = this.members[i];
+        var m_tmatrix = member.get('tmatrix');
+        m_tmatrix.translate(this.get('tmatrix'));
+      }
+    },
+
+    render:function(data){
       var bbox = this.renderBoundingBox(data);
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
@@ -120,7 +135,6 @@ define([
         bbox.strokeWidth = 1;
       }
 
-      return [];
     },
 
     renderBoundingBox: function(geomList) {

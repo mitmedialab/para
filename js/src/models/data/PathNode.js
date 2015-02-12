@@ -51,7 +51,6 @@ define([
       data.position = position;
 
       data.rotation_origin = new PPoint(0, 0, 'set');
-
       data.scaling_origin = new PPoint(0, 0, 'set');
 
       data.fill_color = new PColor(path.fillColor.red, path.fillColor.green, path.fillColor.blue, path.fillColor.alpha);
@@ -73,7 +72,6 @@ define([
         var pointNode = new PointNode();
         pointNode.normalizeGeometry(segments[j]);
         this.addChildNode(pointNode);
-        console.log('adding point at', j);
       }
       var pathJSON = path.exportJSON({
         asString: true
@@ -81,10 +79,18 @@ define([
       this.set('master_path', new PFloat(pathJSON));
      
       path.remove();
+      for (var property in data) {
+        if (data.hasOwnProperty(property)) {
+          
+          data[property].setNull(false);
+        }
+      }
       this.set(data);
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
       this.setPathAltered();
+      
+
       return data;
     },
 

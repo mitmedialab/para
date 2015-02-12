@@ -96,8 +96,8 @@
 				for (var p in data) {
 					if (data.hasOwnProperty(p)) {
 						var data_property = data[p];
-						if (this.hasOwnProperty(p)) {
-							this.setNull(false);
+						if (this.hasOwnProperty(p) && !this.isNull()) {
+							
 							if (data.operator === 'set') {
 								this[p].setValue(data_property);
 							} else {

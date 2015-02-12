@@ -162,9 +162,9 @@ define([
 
 
 		removeChildNode: function(child) {
-		/*	if (child.get('type') === 'list') {
-				this.removeListsItem(child);
-			}*/
+			/*	if (child.get('type') === 'list') {
+					this.removeListsItem(child);
+				}*/
 			SceneNode.prototype.removeChildNode.call(this, child);
 		},
 
@@ -442,6 +442,8 @@ define([
 					return this.get('proto_node').inheritProperty(property_name);
 				}
 			}
+			//console.log('property is null');
+			return null;
 		},
 
 
@@ -451,7 +453,12 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
-			return this.inheritProperty(property_name).getValue();
+			var property = this.inheritProperty(property_name);
+			if (property) {
+				return property.getValue();
+			} else {
+				return null;
+			}
 
 		},
 
@@ -564,18 +571,47 @@ define([
 		/*only called on a render function-
 		propagates the instances' properties with that of the data*/
 
-		render: function(data) {
+		compile: function(data) {
+			this.compileTransforms();
+		},
+
+		compileTransforms: function() {
+			var rmatrix = this.get('rmatrix');
+			var smatrix = this.get('smatrix');
+			var tmatrix = this.get('tmatrix');
+
+			var rotation_origin = this.get('rotation_origin').toPaperPoint();
+			var scaling_origin = this.get('scaling_origin').toPaperPoint();
+
+
+			var scaling_delta = this.accessProperty('scaling_delta');
+			var rotation_delta = this.accessProperty('rotation_delta');
+			var translation_delta = this.inheritProperty('translation_delta');
+
+			if (rotation_delta) {
+				rmatrix.rotate(rotation_delta, rotation_origin);
+			}
+			if (scaling_delta) {
+				smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
+			}
+			if (translation_delta) {
+				tmatrix.translate(translation_delta.toPaperPoint());
+			}
+			
+		},
+
+
+		render: function() {
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.renderGeom();
-					this.renderTransforms(geom);
 					this.renderStyle(geom);
 					this.renderSelection(geom);
 					this.set('rendered', true);
 					return geom;
 				}
+				return 'root';
 			}
-			return 'root';
 		},
 
 
@@ -672,29 +708,29 @@ define([
 
 		},
 
-		renderTransforms: function(geom) {
+		
+		renderGeom: function() {
+			var geom = this.get('geom');
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');
+
+			var path_altered = this.get('path_altered').getValue();
+			if (!path_altered && geom) {
+				geom.transform(this.get('ti_matrix'));
+				geom.transform(this.get('ri_matrix'));
+				geom.transform(this.get('si_matrix'));
+				geom.selected = false;
+			} else {
+				if (!geom) {
+					console.log("creating new geom");
+					geom = new paper.Path();
+				}
+				geom.importJSON(this.accessProperty('master_path'));
+			}
+			geom.data.instance = this;
+
 			var position = this.get('position').toPaperPoint();
-			var rotation_origin = this.get('rotation_origin').toPaperPoint();
-			var scaling_origin = this.get('scaling_origin').toPaperPoint();
-
-
-			var scaling_delta = this.accessProperty('scaling_delta');
-			var rotation_delta = this.accessProperty('rotation_delta');
-			var translation_delta = this.inheritProperty('translation_delta').toPaperPoint();
-
-			if (rotation_delta) {
-				rmatrix.rotate(rotation_delta, rotation_origin);
-			}
-			if (scaling_delta) {
-				smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
-			}
-			if (translation_delta) {
-				tmatrix.translate(translation_delta);
-			}
-
 			geom.position = position;
 			geom.transform(smatrix);
 			geom.transform(rmatrix);
@@ -717,27 +753,7 @@ define([
 				screen_height: screen_bounds.height,
 			});
 
-
-		},
-
-		renderGeom: function() {
-			var geom = this.get('geom');
-			var path_altered = this.get('path_altered').getValue();
-			if (!path_altered && geom) {
-				geom.transform(this.get('ti_matrix'));
-				geom.transform(this.get('ri_matrix'));
-				geom.transform(this.get('si_matrix'));
-				geom.selected = false;
-			} else {
-				if (!geom) {
-					console.log("creating new geom");
-					geom = new paper.Path();
-				}
-				geom.importJSON(this.accessProperty('master_path'));
-			}
-			geom.data.instance = this;
 			this.set('geom', geom);
-
 			var p_altered = this.get('path_altered');
 			p_altered.setValue(false);
 			this.set('path_altered', p_altered);

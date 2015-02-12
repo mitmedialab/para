@@ -18,6 +18,9 @@ define([
 	var closedLists = [];
 	var openLists = [];
 	var listsToRender = [];
+	var store = 0;
+	var compile = 1;
+	var render = 2;
 
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
@@ -38,8 +41,8 @@ define([
 		},
 
 		/* getPrototypeById 
-		* returns prototype by id 
-		*/
+		 * returns prototype by id
+		 */
 		getPrototypeById: function(root, id) {
 			var match = null;
 			this.visitBfs(root, function(node) {
@@ -56,66 +59,102 @@ define([
 		},
 
 		/* computeLists
-		* method to begin rendering process of lists
-		* following rendering of all non-list items in the tree 
-		* (calls visit on each member of listsToRender array with render argument set
-		* to true 
-		*/
+		 * method to begin rendering process of lists
+		 * following rendering of all non-list items in the tree
+		 * (calls visit on each member of listsToRender array with render argument set
+		 * to true
+		 */
 
-		computeLists: function() {
+		compileLists: function() {
+			var state_data = {
+				list: compile
+			};
 			for (var i = 0; i < listsToRender.length; i++) {
-				this.visit(listsToRender[i], null, true);
+				this.visit(listsToRender[i], null, state_data);
 			}
+		},
+
+		compileInstances: function(root) {
+			var state_data = {
+				list: store,
+				instance: compile
+			};
+			//console.log('state_data_ compile instances',state_data);
+
+			this.visit(root, null, state_data);
+		},
+
+		render: function(root) {
+			var state_data = {
+				list: render,
+				instance: render
+			};
+			this.visit(root, null, state_data);
 		},
 
 		/*visit
 		 * visitor method to walk the tree and compute and render each
 		 * node on the screen according to type;
 		 */
-		visit: function(node, departureNode, render) {
+		visit: function(node, departureNode, state_data) {
+			//console.log('state_data_ visit',state_data);
+
 			node.set({
 				visited: true
 			});
 			var rval;
 			switch (node.get('type')) {
 				case 'list':
-					rval = this.visitList(node, departureNode, render);
+					rval = this.visitList(node, departureNode, state_data);
 					break;
 				default:
-					rval = this.visitInstance(node, departureNode, true);
+					rval = this.visitInstance(node, departureNode, state_data);
 					break;
 			}
 			return rval;
 		},
 
 		/*visitList
-		* visitor method for computing lists
-		* if render then computes the list's dimensions based on its members
-		* and draws it on the screen.
-		* otherwise, stashes the list in an array for rendering on a second pass.
-		* filters the array to ensure that it only contains lists with no parent list
-		*/
-		visitList: function(node, render) {
-			var data;
-			if (!render) {
-				data = this.visitChildren(node);
+		 * visitor method for computing lists
+		 * if render then computes the list's dimensions based on its members
+		 * and draws it on the screen.
+		 * otherwise, stashes the list in an array for rendering on a second pass.
+		 * filters the array to ensure that it only contains lists with no parent list
+		 */
+		visitList: function(node, departureNode, state_data) {
+			var data, member, ndata;
+			var state = state_data.list;
+			if (state === store) {
+				
 				listsToRender = listsToRender.filter(function(item) {
 					return !node.hasMember(item, true);
 				});
 				listsToRender.push(node);
-				return data;
-			} else {
-				data = [];
+				for (var k = 0; k < node.children.length; k++) {
+						node.children[k].visit(this, node, state_data);
+				}
+			} else if (state === compile) {
+				node.compile(data);
 				for (var i = 0; i < node.members.length; i++) {
+					member = node.members[i];
+					if (member.get('type') === 'list') {
+						member.visit(this, node, state_data);
+					}
+				}
+				return;
+			} else if (state === render) {
+				data = [];
+				for (var j = 0; j < node.members.length; j++) {
 					var d;
-					if (node.get('type') === 'list') {
-						d = node.members[i].visit(this, node, true);
+					member = node.members[j];
+					if (member.get('type') === 'list') {
+						d = member.visit(this, node, state_data);
 					} else {
-						d = node.members[i].get('geom');
+						d = member.get('geom');
 					}
 					data.push(d);
 				}
-				var ndata = node.render(data);
+				ndata = node.render(data);
 				return ndata;
 			}
 		},
@@ -124,17 +163,33 @@ define([
 		 * called for visit to instance node
 		 * determines if node
 		 */
-		visitInstance: function(node, departureNode) {
+		visitInstance: function(node, departureNode, state_data) {
+			//console.log('state_data_ visit',state_data);
+
 			var data = [];
+			var ndata;
+			var state = state_data.instance;
 			var children = node.children;
-			for (var i = 0; i < children.length; i++) {
-				data.push(children[i].visit(this, node));
+
+			switch (state) {
+				case compile:
+					node.compile();
+					for (var i = 0; i < children.length; i++) {
+						children[i].visit(this, node, state_data);
+					}
+					break;
+				case render:
+					for (var j = 0; j < children.length; j++) {
+						data.push(children[j].visit(this, node, state_data));
+					}
+					ndata = node.render(data);
+					break;
 			}
-			var ndata = node.render(data);
+
 			return ndata;
 		},
 
-		
+
 		//=======list heirarchy managment methods==========//
 
 		/*addList
