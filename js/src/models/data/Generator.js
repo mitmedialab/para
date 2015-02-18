@@ -36,7 +36,7 @@ define([
       },
 
       setRange: function(start, end, loop) {
-        console.log('end',end);
+        //console.log('end',end);
         this.setStart(start);
         this.setEnd(end);
         if (loop) {
@@ -79,7 +79,7 @@ define([
             this.setValue(start);
           }
         }
-        console.log('incrementing generator to:',this.accessProperty('value'));
+       // console.log('incrementing generator to:',this.accessProperty('value'));
       },
 
       render: function(){

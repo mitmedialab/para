@@ -246,7 +246,9 @@ define([
         var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));
         if(generator){
           var i = generator.getValue();
+          
           console.log('constraint value of i:',i);
+
         }
         var evaluation = eval( expression );
         refProp.setValue( evaluation );

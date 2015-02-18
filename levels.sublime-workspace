@@ -4,508 +4,550 @@
 		"selected_items":
 		[
 			[
-				"followPath",
-				"followPathBehavior"
+				"t",
+				"tmatrix"
 			],
 			[
-				"get",
-				"getLeft"
+				"ne",
+				"newVal"
 			],
 			[
-				"tra",
-				"transform"
+				"ger",
+				"generator"
 			],
 			[
-				"insta",
-				"instance_literals"
+				"ge",
+				"generator"
 			],
 			[
-				"to",
-				"toJSON"
-			],
-			[
-				"rotation",
-				"rotationOrigin"
-			],
-			[
-				"node",
-				"nodeParent"
-			],
-			[
-				"co",
-				"concatenate"
-			],
-			[
-				"mid",
-				"midpoint"
-			],
-			[
-				"follow",
-				"FollowPathBehavior"
-			],
-			[
-				"instan",
-				"instanceParentIndex"
-			],
-			[
-				"instanc",
-				"instance_literals"
-			],
-			[
-				"instances",
-				"instances"
-			],
-			[
-				"instance",
-				"instanceParentIndex"
-			],
-			[
-				"inst",
-				"instanceParentIndex"
-			],
-			[
-				"beh",
-				"behaviorNode"
-			],
-			[
-				"method",
-				"methodName"
-			],
-			[
-				"clear",
-				"clearScaffolds"
-			],
-			[
-				"pap",
-				"PaperManager"
-			],
-			[
-				"strok",
-				"strokeColor"
-			],
-			[
-				"key",
-				"keyCode"
-			],
-			[
-				"curre",
-				"currentNode"
-			],
-			[
-				"pare",
-				"instanceParentIndex"
-			],
-			[
-				"event",
-				"event_bus"
-			],
-			[
-				"inter",
-				"intersections"
-			],
-			[
-				"act",
-				"activeLayer"
-			],
-			[
-				"ex",
-				"excludeIndex"
-			],
-			[
-				"remo",
-				"removeInstanceAt"
-			],
-			[
-				"Path",
-				"pathChild"
-			],
-			[
-				"le",
-				"length-1"
-			],
-			[
-				"scaff",
-				"scaffoldLine"
-			],
-			[
-				"Vec",
-				"Vec2"
-			],
-			[
-				"de",
-				"deps"
-			],
-			[
-				"con",
-				"conditional_line"
-			],
-			[
-				"even",
-				"event_bus"
-			],
-			[
-				"tar",
-				"targetVal"
-			],
-			[
-				"num",
-				"numInstances"
-			],
-			[
-				"curren",
-				"currentNode"
-			],
-			[
-				"cop",
-				"copyBehavior"
-			],
-			[
-				"be",
-				"behaviorNode"
-			],
-			[
-				"poi",
-				"pointBC"
-			],
-			[
-				"Poi",
-				"pointAC"
-			],
-			[
-				"sca",
-				"scaffold"
-			],
-			[
-				"a",
-				"anchor"
-			],
-			[
-				"hide",
-				"hideMenu"
-			],
-			[
-				"root",
-				"rootRender"
-			],
-			[
-				"Beh",
-				"behaviorManagerModel"
-			],
-			[
-				"contains",
-				"containsPath"
-			],
-			[
-				"conta",
-				"containsPath"
-			],
-			[
-				"render",
-				"renderSignature"
-			],
-			[
-				"curr",
-				"currentNode"
-			],
-			[
-				"fu",
-				"function"
-			],
-			[
-				"name",
-				"nameVal"
-			],
-			[
-				"symbo",
-				"symbol_literal"
-			],
-			[
-				"current",
-				"currentPathNode"
-			],
-			[
-				"path",
-				"path_literal"
-			],
-			[
-				"canvas",
-				"canvasDblclick"
-			],
-			[
-				"dis",
-				"distributeBehavior"
-			],
-			[
-				"cav",
-				"canvasMousewheel"
-			],
-			[
-				"meth",
-				"methodName"
+				"comp",
+				"compileTransforms"
 			],
 			[
 				"pro",
 				"prototype"
 			],
 			[
-				"intersection",
-				"intersectionFound"
+				"com",
+				"compileTransforms"
 			],
 			[
-				"interse",
-				"intersectionFound"
+				"render",
+				"renderQueue"
 			],
 			[
-				"up",
-				"updateInstances"
+				"data",
+				"data"
 			],
 			[
-				"create",
-				"createInstances"
+				"lists",
+				"listsToRender"
 			],
 			[
-				"paren",
-				"nodeParent"
+				"closed",
+				"closedLists"
 			],
 			[
-				"update",
-				"updateMembers"
+				"sele",
+				"selectedInstances"
 			],
 			[
-				"che",
-				"checkIntersections"
+				"selected",
+				"selectedShapes"
 			],
 			[
-				"currently",
-				"currentlySelected"
+				"fun",
+				"function"
 			],
 			[
-				"mousedown",
-				"mousedown"
+				"sel",
+				"selectedShapes"
 			],
 			[
-				"pad",
-				"padding-right"
+				"shif",
+				"shiftKey"
 			],
 			[
-				"mar",
-				"margin-right"
+				"select",
+				"selectTool"
 			],
 			[
-				"margin",
-				"margin-left"
+				"se",
+				"selectedShapes"
+			],
+			[
+				"j",
+				"jquery"
+			],
+			[
+				"curr",
+				"currentNode"
 			],
 			[
 				"add",
 				"addChildNode"
 			],
 			[
+				"scre",
+				"screen_bounds"
+			],
+			[
+				"abs",
+				"absolute_position"
+			],
+			[
+				"scree",
+				"screen_height"
+			],
+			[
+				"renderS",
+				"renderSelection"
+			],
+			[
+				"inh",
+				"inheritor_bbox"
+			],
+			[
+				"renderG",
+				"renderInheritorBoundingBox"
+			],
+			[
+				"rend",
+				"renderTransforms"
+			],
+			[
+				"proto",
+				"proto_node"
+			],
+			[
+				"propert",
+				"property_name"
+			],
+			[
+				"insta",
+				"instance_bbox"
+			],
+			[
+				"instan",
+				"instances"
+			],
+			[
+				"ti",
+				"ti_matrix"
+			],
+			[
+				"path",
+				"path_altered"
+			],
+			[
+				"handle",
+				"handleIn"
+			],
+			[
+				"poin",
+				"pointNode"
+			],
+			[
+				"selec",
+				"selectedShapes"
+			],
+			[
+				"ref",
+				"reference"
+			],
+			[
+				"property",
+				"propertyName"
+			],
+			[
+				"get",
+				"getValue"
+			],
+			[
+				"inheri",
+				"inheritProperty"
+			],
+			[
+				"set",
+				"setNull"
+			],
+			[
+				"proper",
+				"property"
+			],
+			[
+				"prop",
+				"property"
+			],
+			[
+				"remove",
+				"removeConstraint"
+			],
+			[
+				"PCo",
+				"PConstraint"
+			],
+			[
+				"fi",
+				"fill_color"
+			],
+			[
+				"prope",
+				"property_name"
+			],
+			[
 				"str",
-				"strokeColor"
+				"stroke_width"
 			],
 			[
-				"Pa",
-				"PaperManager"
+				"c",
+				"constraint"
 			],
 			[
-				"Pp",
-				"paper"
+				"P",
+				"PProperty"
 			],
 			[
-				"paper",
-				"PaperMananger"
+				"const",
+				"constraint"
 			],
 			[
-				"GE",
-				"GeometryNode"
+				"acces",
+				"accessProperty"
 			],
 			[
-				"di",
-				"display"
+				"in",
+				"inherit"
 			],
 			[
-				"marg",
-				"margin-bottom"
+				"pr",
+				"property"
+			],
+			[
+				"stroke",
+				"stroke_weight"
+			],
+			[
+				"stle",
+				"style_data"
+			],
+			[
+				"sty",
+				"style_data"
+			],
+			[
+				"dat",
+				"data_property"
+			],
+			[
+				"fill",
+				"fill_color"
 			],
 			[
 				"p",
-				"padding"
+				"property"
 			],
 			[
-				"bac",
-				"background-color"
+				"has",
+				"hasOwnProperty"
 			],
 			[
-				"margi",
-				"margin-top"
+				"co",
+				"command"
 			],
 			[
-				"ba",
-				"background-color"
+				"rot",
+				"rotation_delta"
 			],
 			[
-				"list",
-				"list-style-type"
+				"rota",
+				"rotation_constraint"
 			],
 			[
-				"i",
-				"inline"
+				"ro",
+				"rotation_delta"
 			],
 			[
-				"Geom",
-				"GeometryNode"
+				"rotat",
+				"rotation_delta"
+			],
+			[
+				"rotation",
+				"rotation_delta"
+			],
+			[
+				"a",
+				"alpha"
+			],
+			[
+				"tool",
+				"tool-mode"
+			],
+			[
+				"mode",
+				"modeChanged"
+			],
+			[
+				"too",
+				"tool-modifier"
+			],
+			[
+				"inheritance",
+				"inheritance_selection_color"
+			],
+			[
+				"selecte",
+				"selectedShapes"
+			],
+			[
+				"transfo",
+				"transformation"
+			],
+			[
+				"copy",
+				"copyInitialized"
+			],
+			[
+				"tool-",
+				"tool-modifier"
+			],
+			[
+				"fu",
+				"function"
+			],
+			[
+				"modm",
+				"modMatchClick"
+			],
+			[
+				"modeStandar",
+				"modeStandardClick"
+			],
+			[
+				"border",
+				"border-bottom"
+			],
+			[
+				"marg",
+				"margin-left"
+			],
+			[
+				"inher",
+				"inherit"
+			],
+			[
+				"rotatio",
+				"rotation_delta"
+			],
+			[
+				"fil",
+				"fill_color"
+			],
+			[
+				"o",
+				"override"
+			],
+			[
+				"mod",
+				"modifyPoints"
+			],
+			[
+				"prot",
+				"proto_node"
+			],
+			[
+				"hand",
+				"handleIn"
+			],
+			[
+				"h",
+				"handle-in"
+			],
+			[
+				"seg",
+				"segments"
+			],
+			[
+				"hit",
+				"hitResult"
+			],
+			[
+				"pol",
+				"polyPath"
+			],
+			[
+				"pe",
+				"penMouseDrag"
+			],
+			[
+				"new",
+				"new_master"
+			],
+			[
+				"poi",
+				"point_num"
+			],
+			[
+				"PO",
+				"PolygonNode"
+			],
+			[
+				"geo",
+				"geometrySelected"
+			],
+			[
+				"strok",
+				"stroke_color"
+			],
+			[
+				"stro",
+				"stroke_color"
+			],
+			[
+				"inhe",
+				"inherit"
+			],
+			[
+				"reset",
+				"resetStylesToPrototype"
+			],
+			[
+				"sca",
+				"scaling_delta"
+			],
+			[
+				"tra",
+				"translation_delta"
+			],
+			[
+				"poly",
+				"polyPath"
+			],
+			[
+				"rec",
+				"rectangle"
+			],
+			[
+				"reg",
+				"regularMouseDrag"
+			],
+			[
+				"el",
+				"ellipse"
+			],
+			[
+				"to",
+				"topLeft"
+			],
+			[
+				"i_",
+				"i_bottomRight"
+			],
+			[
+				"Pap",
+				"toPaperPoint"
+			],
+			[
+				"top",
+				"topLeft"
+			],
+			[
+				"geome",
+				"geometrySelected"
+			],
+			[
+				"current",
+				"currentView"
+			],
+			[
+				"mast",
+				"master_path"
+			],
+			[
+				"trans",
+				"translation_delta"
+			],
+			[
+				"main",
+				"mainView"
+			],
+			[
+				"can",
+				"canvasDblclick"
+			],
+			[
+				"sub",
+				"subView"
+			],
+			[
+				"target",
+				"targetPoint"
+			],
+			[
+				"center",
+				"centerGeom"
+			],
+			[
+				"diff",
+				"diffTarget"
+			],
+			[
+				"con",
+				"con_center"
+			],
+			[
+				"caN",
+				"canvasDown"
+			],
+			[
+				"show",
+				"shownPrototype"
+			],
+			[
+				"getP",
+				"getPrototypeById"
+			],
+			[
+				"master",
+				"master_path"
+			],
+			[
+				"is",
+				"isProto"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"contents": "/*Condition.js\n * used to store condition logic\n *\n */\n\ndefine([\n	'underscore',\n	'backbone',\n], function(_, Backbone) {\n\n	var Condition = Backbone.Model.extend({\n\n		 constructor: function() {\n		 	//used to evaluate relationship between propA and propB\n			this.operator = null;\n			//first part of conditional\n			this.propA = null;\n			//second part of conditional\n			this.propB = null;\n			this.target = null;\n		\n			Backbone.Model.apply(this, arguments);\n		 },\n\n		 initialize: function(propA,operator,targetB,propB){\n		 	this.operator = operator;\n			//first part of conditional\n			this.propA = propA;\n			//second part of conditional\n			this.propB = propB;\n			this.target = targetB;\n		\n		 },\n		\n\n		evaluate: function(instance){\n			var instanceVal = eval('instance.'+this.propA);\n			/*if(!this.propB){\n				return instanceVal;\n\n			}*/\n\n		\n				var targetVal;\n				if(this.propB){\n					targetVal = eval('target.'+this.propB);\n				}\n				else{\n					targetVal = this.target;\n				}\n				var result = false;\n				switch (this.operator){\n\n					case '=':\n						result = instanceVal===targetVal;\n					break;\n					case '<':\n						result =instanceVal<targetVal;\n					break;\n					case '<=':\n						result =instanceVal<=targetVal;\n					break;\n					case '>':\n						result =instanceVal>targetVal;\n					break;\n					case '>=':\n						result =instanceVal>=targetVal;\n					break;\n					case '!=':\n						result =instanceVal!=targetVal;\n					break;\n					case 'leftOf':\n						result = targetVal.instanceSide(instance)===1;\n					break;\n					case 'rightOf':\n						result = targetVal.instanceSide(instance)===-1;\n					break;\n					\n					case 'color':\n						console.log(instance);\n						console.log(targetVal.type);\n						var color = targetVal.instances[0].strokeColor;\n						if(color === '#000000'){\n							result = true;\n						}\n						else{\n						var r= this.hexToR(color);\n						var g = this.hexToG(color);\n						if(r>g){\n							result = targetVal.instanceSide(instance)===1;	\n						}\n						else{\n							result = targetVal.instanceSide(instance)===-1;\n\n						}\n					}\n\n				}\n\n				return result;\n			\n\n		},\n\n		hexToR: function (h) {return parseInt((this.cutHex(h)).substring(0,2),16);},\n		hexToG: function (h) {return parseInt((this.cutHex(h)).substring(2,4),16);},\n		hexToB: function (h) {return parseInt((this.cutHex(h)).substring(4,6),16);},\n\n		cutHex:function (h) {return (h.charAt(0)=='#') ? h.substring(1,7):h;}\n	});\n\n	return Condition;\n\n\n\n});",
-			"file": "js/src/models/data/Condition.js",
-			"file_size": 2404,
-			"file_write_time": 1406746672000000,
-			"settings":
-			{
-				"buffer_size": 2410,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "js/src/models/StateManagerModel.js",
 			"settings":
 			{
-				"buffer_size": 9414,
+				"buffer_size": 31058,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/views/drawing/ToolView.js",
+			"file": "js/src/models/data/PointNode.js",
 			"settings":
 			{
-				"buffer_size": 1109,
+				"buffer_size": 1206,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/tools/BaseToolModel.js",
+			"file": "js/src/models/data/PathNode.js",
 			"settings":
 			{
-				"buffer_size": 739,
+				"buffer_size": 5322,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/tools/PolyToolModel.js",
+			"file": "js/src/models/data/ListNode.js",
 			"settings":
 			{
-				"buffer_size": 1135,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/data/SceneNode.js",
-			"settings":
-			{
-				"buffer_size": 6768,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/router.js",
-			"settings":
-			{
-				"buffer_size": 1809,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/behaviors/ScaleBehavior.js",
-			"settings":
-			{
-				"buffer_size": 1887,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/tools/PenToolModel.js",
-			"settings":
-			{
-				"buffer_size": 3927,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/behaviors/scaffold.js",
-			"settings":
-			{
-				"buffer_size": 1424,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/tools/SelectToolModel.js",
-			"settings":
-			{
-				"buffer_size": 4141,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "/*FillBehavior.js\n */\ndefine([\n    'models/behaviors/BaseBehavior',\n    'models/PaperManager',\n    'utils/TrigFunc',\n    'models/behaviors/Scaffold'\n  ],\n\n  function(BaseBehavior, PaperManager, TrigFunc, Scaffold) {\n    var paper = PaperManager.getPaperInstance();\n    var FollowPathBehavior = BaseBehavior.extend({\n\n      constructor: function(pathChild,rotate) {\n       \n\n      },\n\n\n\n\n      update: function(data) {\n        for(var i=0;i<this.children)\n      }\n\n    });\n  });\n",
-			"file": "js/src/models/behaviors/FillBehavior",
-			"file_size": 440,
-			"file_write_time": 1407791930000000,
-			"settings":
-			{
-				"buffer_size": 478,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/data/GroupNode.js",
-			"settings":
-			{
-				"buffer_size": 434,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/behaviors/RadialDistributeBehavior.js",
-			"settings":
-			{
-				"buffer_size": 5162,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/behaviors/BaseBehavior.js",
-			"settings":
-			{
-				"buffer_size": 2779,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/behaviors/FollowPathBehavior.js",
-			"settings":
-			{
-				"buffer_size": 4068,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/behaviors/BehaviorManagerModel.js",
-			"settings":
-			{
-				"buffer_size": 5031,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/utils/TrigFunc.js",
-			"settings":
-			{
-				"buffer_size": 2900,
+				"buffer_size": 5545,
 				"line_ending": "Unix"
 			}
 		},
@@ -513,65 +555,92 @@
 			"file": "js/src/models/data/Instance.js",
 			"settings":
 			{
-				"buffer_size": 7346,
+				"buffer_size": 22133,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/behaviors/CopyBehavior.js",
+			"file": "js/src/utils/PFloat.js",
 			"settings":
 			{
-				"buffer_size": 3656,
+				"buffer_size": 2261,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/views/drawing/PropertyView.js",
+			"file": "js/src/utils/PPoint.js",
 			"settings":
 			{
-				"buffer_size": 1654,
+				"buffer_size": 4083,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/behaviors/DistributeBehavior.js",
+			"file": "js/src/models/data/Generator.js",
 			"settings":
 			{
-				"buffer_size": 3788,
+				"buffer_size": 2336,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/data/BehaviorNode.js",
+			"contents": "Searching 71 files for \"setRange\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Generator.js:\n   36        },\n   37  \n   38:       setRange: function(start, end, loop) {\n   39          this.setStart(start);\n   40          this.setEnd(end);\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js:\n  287            var generator = new Generator();\n  288            generator.addChildNode(list);\n  289:           generator.setRange(0, selectedShapes.length);\n  290  \n  291            visitor.addList(list);\n\n2 matches across 2 files\n",
 			"settings":
 			{
-				"buffer_size": 765,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "Searching 35 files for \".clear\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js:\n   17        update: function() {\n   18          // console.log(\"distribution update\");\n   19:         this.clearScaffolds();\n   20          this.setVisible(true);\n   21          this.distribute();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   23        update: function(data) {\n   24          //console.log('follow path update: '+ this.type);\n   25:         this.clearScaffolds();\n   26        \n   27            var zeroedPath = this.pathChild.getLiteral().clone();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/RadialDistributeBehavior.js:\n   20  \n   21        update: function() {\n   22:         this.clearScaffolds();\n   23          this.distribute();\n   24  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/GeometryNode.js:\n  396      clearObjects: function() {\n  397        this.instance_literals = [];\n  398:       this.clearScaffolds();\n  399  \n  400        for (var i = 0; i < this.children.length; i++) {\n  401:         this.children[i].clear();\n  402        }\n  403  \n  ...\n  474      deleteNode: function() {\n  475        for (var i = this.children.length - 1; i > -1; i--) {\n  476:         this.children[i].clearObjects();\n  477          this.children[i].deleteNode();\n  478        }\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js:\n  103        this.instance_literals = [];\n  104        console.log(this.scaffolds.length);\n  105:       GeometryNode.prototype.clearObjects.apply(this, arguments);\n  106        console.log(this.scaffolds.length);\n  107      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/SceneNode.js:\n   39                  for (var i = 0; i < this.children.length; i++) {\n   40                     // console.log('clearning child of ' + this.name + 'at:' + i);\n   41:                     this.children[i].clear();\n   42                      this.children[i] = null;\n   43                  }\n   44  \n   45:                 //this.children.clear();\n   46                  return true;\n   47  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/StateManagerModel.js:\n  170       //console.log('called root render');\n  171      \n  172:       rootNode.clear();\n  173        rootNode.render(null,currentNode);\n  174      },\n  ...\n  182      currentRender: function(){\n  183        //console.log('called current render');\n  184:       currentNode.clear();\n  185        currentNode.render(null,currentNode);\n  186      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js:\n   28  \n   29    	 selectToolClick: function(){\n   30:   		this.clearActive();\n   31    		$('#selectTool').addClass('active');\n   32    		lastSelected = $('#selectTool');\n   ..\n   36  \n   37    	penToolClick: function(){\n   38:   		this.clearActive();\n   39    		$('#penTool').addClass('active');\n   40    		lastSelected = $('#penTool');\n   ..\n   45  \n   46    	polyToolClick: function(){\n   47:   		this.clearActive();\n   48    		$('#polyTool').addClass('active');\n   49    		lastSelected = $('#polyTool');\n\n14 matches across 8 files\n\n\nSearching 35 files for \"clear\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js:\n   17        update: function() {\n   18          // console.log(\"distribution update\");\n   19:         this.clearScaffolds();\n   20          this.setVisible(true);\n   21          this.distribute();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   23        update: function(data) {\n   24          //console.log('follow path update: '+ this.type);\n   25:         this.clearScaffolds();\n   26        \n   27            var zeroedPath = this.pathChild.getLiteral().clone();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/RadialDistributeBehavior.js:\n   20  \n   21        update: function() {\n   22:         this.clearScaffolds();\n   23          this.distribute();\n   24  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/scaffold.js:\n   43  		},\n   44  \n   45: 		clear: function(data){\n   46  			\n   47  			this.instance_literal.remove();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/GeometryNode.js:\n  394  \n  395  \n  396:     clearObjects: function() {\n  397        this.instance_literals = [];\n  398:       this.clearScaffolds();\n  399  \n  400        for (var i = 0; i < this.children.length; i++) {\n  401:         this.children[i].clear();\n  402        }\n  403  \n  ...\n  474      deleteNode: function() {\n  475        for (var i = this.children.length - 1; i > -1; i--) {\n  476:         this.children[i].clearObjects();\n  477          this.children[i].deleteNode();\n  478        }\n  ...\n  610      },\n  611  \n  612:     clearScaffolds: function() {\n  613:       console.log(\"called clear scaffolds for \"+this.type);\n  614        for (var j = 0; j < this.scaffolds.length; j++) {\n  615          this.scaffolds[j].remove();\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js:\n   93      },\n   94  \n   95:     /*clears out all but first of literal paths*/\n   96:     clearObjects: function() {\n   97:       console.log(\"called clear for path node\");\n   98  \n   99        for (var j = 0; j < this.instance_literals.length; j++) {\n  ...\n  103        this.instance_literals = [];\n  104        console.log(this.scaffolds.length);\n  105:       GeometryNode.prototype.clearObjects.apply(this, arguments);\n  106        console.log(this.scaffolds.length);\n  107      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/SceneNode.js:\n   32              /*================ SceneNode method defintions ================*/\n   33  \n   34:             //destructor: clears all this.children and sets parent to null\n   35:             clear: function() {\n   36  \n   37:                 //console.log('clear called');\n   38                  this.nodeParent = null;\n   39                  for (var i = 0; i < this.children.length; i++) {\n   40:                    // console.log('clearning child of ' + this.name + 'at:' + i);\n   41:                     this.children[i].clear();\n   42                      this.children[i] = null;\n   43                  }\n   44  \n   45:                 //this.children.clear();\n   46                  return true;\n   47  \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/StateManagerModel.js:\n  170       //console.log('called root render');\n  171      \n  172:       rootNode.clear();\n  173        rootNode.render(null,currentNode);\n  174      },\n  ...\n  182      currentRender: function(){\n  183        //console.log('called current render');\n  184:       currentNode.clear();\n  185        currentNode.render(null,currentNode);\n  186      },\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js:\n   28  \n   29    	 selectToolClick: function(){\n   30:   		this.clearActive();\n   31    		$('#selectTool').addClass('active');\n   32    		lastSelected = $('#selectTool');\n   ..\n   36  \n   37    	penToolClick: function(){\n   38:   		this.clearActive();\n   39    		$('#penTool').addClass('active');\n   40    		lastSelected = $('#penTool');\n   ..\n   45  \n   46    	polyToolClick: function(){\n   47:   		this.clearActive();\n   48    		$('#polyTool').addClass('active');\n   49    		lastSelected = $('#polyTool');\n   ..\n   52    	},\n   53  \n   54:   	clearActive: function(){\n   55    		if(lastSelected){\n   56    			lastSelected.removeClass('active');\n\n26 matches across 9 files\n\n\nSearching 35 files for \"toggleRotat\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   14        constructor: function(pathChild,rotate) {\n   15          this.pathChild = pathChild;\n   16:         this.toggleRotate=rotate; \n   17  \n   18        },\n   ..\n  118  \n  119                  });\n  120:                 if(this.toggleRotate){\n  121                    console.log(\"rotation is active\");\n  122                     instance.update({\n  ...\n  130                  location = location_n;\n  131                }\n  132:                if(this.toggleRotate){\n  133                var startDelta = finalPath.segments[1].point.subtract(finalPath.segments[0].point);\n  134                this.instances[0].update({\n\n3 matches in 1 file\n\n\nSearching 35 files for \"checkDistanceIncrement\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior.js:\n   77  		},\n   78  \n   79: 		checkDistanceIncrement: function(start,selected,tDist){\n   80  \n   81            var dist = TrigFunc.distance(start.position,selected.position);\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js:\n   72                /*if (selected) {\n   73                  if (selected.index === 1) {\n   74:                   this.checkDistanceIncrement(child.instances[0], selected.instance, dist, child);\n   75                  } else if (selected.index == child.instances.length - 2) {\n   76                    this.checkDistanceDecrement(child.instances[0], selected.instance, dist, child);\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   92               if (selected) {\n   93                  if (selected.index === 1) {\n   94:                   this.nodeParent.checkDistanceIncrement(this.instances[0], selected.instance, maxDist, this.nodeParent);\n   95                  } else if (selected.index == this.instances.length - 2) {\n   96                    this.nodeParent.checkDistanceDecrement(this.instances[0], selected.instance, maxDist, this.nodeParent);\n\n3 matches across 3 files\n\n\nSearching 35 files for \".follow\"\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BehaviorManagerModel.js:\n  128          }\n  129          nodes[1].extendBehaviorFirst(followPathBehavior, ['update']);\n  130:         nodes[0].follow=true;\n  131        }\n  132      }\n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js:\n   28            zeroedPath.position.x =0+zeroedPath.bounds.width/2;\n   29            zeroedPath.position.y=0+zeroedPath.bounds.height/2;\n   30:           this.followPath(zeroedPath);\n   31           \n   32          \n\n/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js:\n  198              instance_literal.visible = this.instances[k].visible;\n  199  \n  200:            /* if (this.nodeParent != currentNode && this.follow) {\n  201                instance_literal.visible=false;\n  202              }*/\n\n3 matches across 3 files\n",
-			"settings":
-			{
-				"buffer_size": 10876,
+				"buffer_size": 587,
 				"line_ending": "Unix",
 				"name": "Find Results",
 				"scratch": true
 			}
 		},
 		{
-			"file": "js/src/models/data/PathNode.js",
+			"file": "js/src/utils/PConstraint.js",
 			"settings":
 			{
-				"buffer_size": 10792,
+				"buffer_size": 2359,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/data/GeometryNode.js",
+			"file": "js/src/models/data/Visitor.js",
 			"settings":
 			{
-				"buffer_size": 19031,
+				"buffer_size": 7923,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/tools/SelectToolModel.js",
+			"settings":
+			{
+				"buffer_size": 9347,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/views/drawing/CanvasView.js",
+			"settings":
+			{
+				"buffer_size": 7637,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/SceneNode.js",
+			"settings":
+			{
+				"buffer_size": 9954,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "/* ConstraintToolModel.js\n * Model class for the constraint tools, which allows for the creation of basic constraints.\n * \n * The constraint tool works by allowing the user to construct a constraint through interaction\n * with the UI in stages, captured in this tool's code as states. The user can move through\n * the process by satisfying the requirements for a stage and then making a definitive indication\n * to the model to move to the next state ( currently, through an 'n' keypress ). Similarly,\n * they can move backwards through a 'b' keypress, or even return the state to the initial\n * by switching off the constraint tool. The stages of interaction are indicated below:\n *\n * 1) 'references': The user, just like with the selection tool, selects a set of instances\n *                  to have their properties constrained.\n *\n * 2) 'property':   Handles show up on a representative of the references selected representing\n *                  each primitive property of instances. The user can select a property \n *                  by clicking on it; this is the property of the references to constrain.\n *\n * 3) 'relatives':  The user, just like with the selection tool, selects a set of instances\n *                  to have their properties constrained to.\n *\n * 4) 'value':      The exact property to be constrained to for the relatives, based on a function\n *                  operating on a list of their properties, is specified. The exact UI\n *                  corresponding to the property as well as the means of selection vary between \n *                  properties; using position as an example, the UI elements are dashed horizontal\n *                  and vertical lines at the max, min, and avg x- and y-positions of the relatives.\n *                  Selection is done by clicking on one of the lines.\n *\n * 5) 'expression': The user types in an expression and chooses a relation in the UI elements that\n *                  appear in the Parameters menu. This expression then relates the reference \n *                  properties to the relative value specified. \n *\n *\n */\n\ndefine([\n    'underscore',\n    'paper',\n    'backbone',\n    'models/tools/BaseToolModel',\n    'utils/PPoint',\n    'utils/PaperUI',\n    'utils/PaperUIEvents',\n    'utils/Utils'\n], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIEvents, Utils) {\n\n  // hit testing for clicking Paper UI elements\n  var hitOptions = {\n    stroke: true,\n    bounds: true,\n    center: true,\n    tolerance: 3\n  };\n\n  // map property names for UI to instance properties to constrain\n  //\n  // NOTE: ideally this would be 1-1; i.e. constraining translation_delta\n  // would actually constrain position. In reality, an instance's position\n  // is based on both an original position AND a translation_delta. Thus\n  // making a position constraint really only constrains a delta for now.\n  // \n  // UPSHOT: there should be properties on the instance which directly \n  // relate to the properties to be constrained\n  var propToConstraintMap = {\n    'position': 'translation_delta',\n    'scale': 'scaling_delta',\n    'orientation': 'rotation_delta'\n  };\n\n  // model definition\n  var ConstraintToolModel = BaseToolModel.extend({\n \n    /*\n     * Creates attributes on the model for keeping track of the model's\n     * state.\n     */\n    defaults: _.extend({}, BaseToolModel.prototype.defaults, {\n      references: null,       // list of reference instances\n      relatives: null,        // list of relative instances\n      type: 'equal',          // relation for constraint\n      expression: '',         // the entered constraint expression\n      props_selected: null,   // a list of properties to be constrained\n      mode: 'references',     // indicator for current state\n      constrainToVal: [],     // array for specifying value constrained to\n    }),\n\n    /*\n     * Sets up the model.\n     */\n    initialize: function() {\n      BaseToolModel.prototype.initialize.apply(this, arguments);\n      this.set('references', []);\n      this.set('relatives', []);\n    },\n\n    /*\n     * Changes the constraint in state to reflect the selected relation (<, =, >).\n     * Currently only these three relations are supported, with names:\n     * 'less', 'equal', 'more'\n     * For convenience, they correspond to ids of UI elements.\n     *\n     * @param type - string for relation name\n     */\n    setConstraintType: function(type) {\n      this.set('type', type);\n      var result = {};\n      result['type'] = type;\n      console.log('[INFO] Selected Constraint Type: ' + type);\n      return type;\n    },\n\n    /*\n     * Changes the constraint in state to reflect comparison with the given expression. \n     * The expression is first validated and then set.\n     * \n     * @param exp - a string for the expression\n     */\n    setConstraintExpression: function(exp) {\n      var result = {};\n      if (this.validate(exp)) {\n        this.set('expression', exp);\n        result['expression'] = 'true';\n        console.log('[INFO] Valid Expression Entered: ' + exp);\n      } else {\n        result['expression'] = 'false';\n        console.log('[INFO] Invalid Expression Entered: ' + exp);\n      }\n      return result;\n    },\n\n    /*\n     * Validates the expression passed so that a constraint can be made.\n     * Validation should ensure that no injections are being made,\n     * since eval is used to evaluate the expression; it should also\n     * ensure that the expression is mathematically valid.\n     *\n     * @param exp - a string for the expression to validate\n     *\n     * TODO: IMPLEMENT THIS FUNCTION   \n     */\n    validate: function(exp) {\n      return true;\n    },\n\n    /*\n     * Sets the property that will be constrained in state. Note that \n     * these are only fundamental properties, such as position and scale.\n     *\n     * @param property - string for the name of the property to constrain\n     */\n    setConstraintProperty: function(property) {\n      // TODO: change this to adding to current set to allow for more than one selected constraint\n      var selected_props = [property];\n      var result = {};\n      result['property'] = property;\n      this.set('props_selected', selected_props);\n      console.log('Selected Constraint Property: ' + property);\n      return result;\n    },\n\n    /*\n     * Make sure the tool has a state which is workable. That is, relatives \n     * should not exist without references, etc.\n     *\n     * TODO: IMPLEMENT THIS FUNCTION\n     */\n    validateState: function() {\n\n    },\n\n    /*\n     * Move the state of the tool forward to allow for the next stage\n     * in constraint creation. Ensures that the current state's info\n     * is saved into state so that the next stage is meaningful.\n     *\n     */\n    advance: function() {\n      var state = this.get('mode');\n      switch ( state ) {\n        case 'references':\n          this.get('sm').delegateMethod('select', 'saveSelection');\n          this.set('mode', 'property');\n          console.log('[INFO] Advanced constraint tool mode to property');\n          break;\n        case 'property':\n          this.set('mode', 'relatives');\n          console.log('[INFO] Advanced constraint tool mode to relatives');\n          break;\n        case 'relatives':\n          this.set('mode', 'value');\n          console.log('[INFO] Advanced constraint tool mode to value');\n          break;\n        case 'value':\n          this.set('mode', 'expression');\n          console.log('[INFO] Advanced constraint tool mode to expression');\n          break;\n        case 'expression':\n          this.createConstraint();\n          this.clearState();\n          console.log('[INFO] Reset constraint tool state');\n          break; \n      }\n    },\n\n    /*\n     * Takes a list of instances, checks their validity, and sets them \n     * in the constraint tool reference state.\n     *\n     * @param instanceList - a list of instances\n     */\n    referencesSelection: function( instanceList ) {\n      if ( instanceList.length > 0 ) {\n        this.set('references', instanceList);\n      }\n    },\n\n    /*\n     * Takes a list of instances, checks their validity, and sets them \n     * in the constraint tool relatives state.\n     *\n     * @param instanceList - a list of instances\n     */\n    relativesSelection: function( instanceList ) {\n      if ( instanceList.length > 0 ) {\n        this.set('relatives', instanceList);\n      }\n    },\n    \n    /*\n     * Uses the constraint tool state which has been specified through\n     * the stages of interaction to construct the constraint on the \n     * references and relatives as desired. \n     */\n    createConstraint: function() {\n      var constrainToVal = this.get('constrainToVal');\n      var references = this.get('references');\n      var relatives = this.get('relatives');\n      var expression = this.get('expression');\n      var generator = references[0].getGenerator();\n      \n      var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );\n      var refProp = refPropList[0];\n      var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); \n      console.log(\"relList\",relPropList,\"refProp\",refProp);\n\n      var relativeF = function() {\n        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));\n        if(generator){\n          var i = generator.getValue();\n          \n          console.log('constraint value of i:',i);\n\n        }\n        var evaluation = eval( expression );\n        refProp.setValue( evaluation );\n        return evaluation;  \n      };\n\n      refProp.setConstraint(relativeF);\n\n\n      /* \n      var relDeltaList = Utils.getPropConstraintFromList( relatives, rewordToVal.slice(1, rewordToVal.length) );\n      var relativeDeltaF = function() {\n        var x = Utils[rewordToVal[0]]( relDeltaList.map( function( prop ) { return prop.getValue() }));\n        var evaluation = eval( expression );\n        refDelta.setValue( evaluation );\n        return evaluation; \n      };\n\n      refDelta.setConstraint( relativeF );*/\n    },\n\n   /* createListConstraint: function(){\n  \n      var constrainToVal = this.get('constrainToVal');\n      var references = this.get('references');\n      var relatives = this.get('relatives');\n      var expression = this.get('expression');\n      var generator = references[0].getGenerator();\n\n      var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );\n      var refProp = refPropList[0];\n      var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); \n      console.log(\"relList\",relPropList,\"refProp\",refProp);\n\n      var relativeF = function() {\n        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));\n        var i = generator.getValue();\n        var evaluation = eval( expression );\n        refProp.setValue( evaluation );\n        return evaluation;  \n      };\n\n      refProp.setConstraint(relativeF);\n    },*/\n\n    /*\n     * Rewords the specified value to be constrained to (a property list)\n     * so that the terms used in the UI (scale, position) map to instance\n     * properties.\n     *\n     * NOTE: Ideally, this should never have to be used.  \n     */\n    rewordConstraint: function() {\n      var constrainToVal = this.get('constrainToVal');\n      for (var i = 0; i < constrainToVal.length; i++) {\n        if (constrainToVal[i] in propToConstraintMap) {\n          constrainToVal[i] = propToConstraintMap[constrainToVal[i]];\n        }\n      }\n    },\n\n    /*\n     * Handles mouseDown events on the canvas when the constraint tool is\n     * being used. For each different state of the tool, the event is \n     * handled appropriately.\n     *\n     * state 'references': delegate mouseDown events to the selection tool\n     *                     for selection of reference instances\n     *\n     * state 'property':   do nothing\n     *\n     * state 'relatives':  delegate mouseDown events to the selection tool\n     *                     for selection of relative instances\n     * \n     * state 'value':      test for hits on UI elements that specify value\n     *                     to constrain to\n     *\n     * state 'expression': do nothing\n     */\n    mouseDown: function(event) {\n      var state = this.get('mode');\n      switch ( state ) {\n        case 'references':\n          // TODO: check if selection already exists, set to references if so, OR clear selections when constraint tool selected\n          var sm = this.get('sm');\n          this.get('sm').delegateMethod('select', 'mouseDown', event);\n          var references = this.get('sm').delegateMethod('select', 'getCurrentSelection');\n          this.referencesSelection( references );\n          break;\n        case 'relatives':\n          this.get('sm').delegateMethod('select', 'mouseDown', event);\n          var references = this.get('references'); \n          var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');\n          this.relativesSelection( relatives );\n          //this.get('sm').constrain( references[0], relatives[0] );\n          PaperUI.drawPositionDelimiters( references, relatives, {'max-translation_delta-x': true, 'max-translation_delta-y': true, 'avg-translation_delta-x': true, 'avg-translation_delta-y': true, 'min-translation_delta-x': true, 'min-translation_delta-y': true});\n          break;\n        case 'value':\n          var hitResult = paper.project.hitTest(event.point, hitOptions);\n          if ( hitResult ) {\n            var path = hitResult.item;\n            if ( path.name.indexOf( 'delimit' ) === 0 ) {\n              var propSplit = path.name.split('-');\n              propSplit = propSplit.slice( 1, propSplit.length );\n              this.set( 'constrainToVal', propSplit );\n              this.rewordConstraint();\n            }\n          }\n          break;\n        case 'expression':\n          // TODO: check if expression has been submitted?\n          break; \n      } \n    \n    },\n\n    mouseDrag: function(event) {\n            \n    },\n\n    dblClick: function(event) {\n      \n    },\n\n    mouseUp: function(event) {\n      \n    },\n\n    mouseMove: function(event) {\n\n    },\n\n    /*\n     * Resets the state of the constraint tool so that it is as if it has\n     * just been selected, or is not selected at all, and removes all UI \n     * elements associated with it. \n     */\n    clearState: function() {\n      this.get('sm').delegateMethod('select', 'resetSelections');\n      this.set('references', []);\n      this.set('relatives', []);\n      this.set('type', 'equal');\n      this.set('expression', '');\n      this.set('props_selected', []);\n      this.set('mode', 'references');\n      PaperUI.clear();\n    }, \n \n\n\n    /*\n     *  Constraint Tool UI Listeners, passed to Para UI\n     */\n\n    /*\n     *\n     */\n    delimiterHighlight: function( event ) {\n      var path = event.target;\n      // TODO: be pickier about these style changes \n      path.strokeColor = 'red'; \n      path.strokeWidth = 1.3*path.strokeWidth;  \n    },\n    \n    /*\n     *\n     */\n    delimiterSelect: function( event ) {\n      var path = event.target;\n      // TODO: be pickier about these style changes\n      path.strokeColor = 'blue';\n      path.strokeWidth = 1.3*path.strokeWidth;\n      this.set('constrainToVal', path.getName()); // TODO: implement path.getName, prob by extending Paper path \n    }\n  \n  });\n\n  \n\n\n\n  return ConstraintToolModel;\n\n});  \n\n    \n",
+			"file": "js/src/models/tools/ConstraintToolModel.js",
+			"file_size": 15519,
+			"file_write_time": 1423774754000000,
+			"settings":
+			{
+				"buffer_size": 15531,
 				"line_ending": "Unix"
 			}
 		}
@@ -579,9 +648,21 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 287.0,
+		"height": 87.0,
 		"selected_items":
 		[
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
 			[
 				"Package Control: ",
 				"Package Control: Install Package"
@@ -612,6 +693,100 @@
 	},
 	"file_history":
 	[
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/datatype/Generator.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PPoint.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/SelectToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PointNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/RectNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/SceneNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/PropertyView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PColor.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PFloat.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ContextView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/Utils.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PaperUI.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/router.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/ColorUtils.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PBool.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/datatype/:*Function Node",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Instance.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/ConstraintToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PathNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PolygonNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PConstraint.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/EllipseNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ShapeNode.js",
+		"/Users/jennifermaryjacobs/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/TrigFunc.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PProperty.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/TransformationNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/PenToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/BaseToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/style/para.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ToolView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower.json",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/Gruntfile.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/RotateNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PConstraint.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/html/ui.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/para-build.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/para.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/build/para.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/constraintjs/test/resources/qunit-1.12.0.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PProperty.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/config.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Condition.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/CanvasView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/.jscsrc",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/uiloader.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/app.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ProtoView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/GeometryNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/PolyToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Visitor.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/texput.log",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/EllipseNode",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/GroupNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/InitializeNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Edge.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/ToolCollection.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/jqueryui/themes/base/resizable.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/DistributeBehavior.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/GaussianBehavior.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/RadialDistributeBehavior.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/FollowPathBehavior.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/ShapeGenerator.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/FollowPathToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/ImportToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/PaperManager.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/RotateToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/ScaleNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/build/style/para.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/BaseBehavior.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/GeneratorNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/BlockNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/BaseNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/build/style/jqueryui/images/ui-icons_cd0a0a_256x240.png",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/jqueryui/themes/base/theme.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/README.md",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/levels.sublime-workspace",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/index.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/RootManager.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/fonts/SourceSansPro-ExtraLight.otf.woff",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/InstanceGroupNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/analytics.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/BehaviorManagerModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/TranslateNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ProcedureEditor.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/CopyNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/BlockNode.js\nBlockNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/Generator.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/CopyBehavior.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/FillBehavior",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/scaffold.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/ScaleBehavior.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/BehaviorNode.js",
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js",
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/RootManager.js",
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/CanvasView.js",
@@ -645,36 +820,25 @@
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior",
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Utils.js",
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Actions/ParentBehavior.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/PathEditing.html",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Actions/FollowPathAction",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/app.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/BezierTool.html",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/index2.html",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ShapeToolModel.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PaperManager",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/canvas.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/PathTool.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/SceneNode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PathNode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/GeometryNode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ShapeToolModel",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ObjectsView",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/.jshintrc",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/README.md",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/DrawingView.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/mygenerator.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/snode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/pathsketch.html"
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/PathEditing.html"
 	],
 	"find":
 	{
-		"height": 74.0
+		"height": 123.0
 	},
 	"find_in_files":
 	{
-		"height": 93.0,
+		"height": 0.0,
 		"where_history":
 		[
+			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src",
+			"/Users/jennifermaryjacobs/Documents/work/code/para/",
+			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src",
+			"/Users/jennifermaryjacobs/Documents/work/code/para/",
+			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src",
+			"<open files>,/Users/jennifermaryjacobs/Documents/work/code/para/js/src",
+			"<open files>",
+			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src",
 			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
 			"",
 			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
@@ -686,134 +850,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"updateOrigin",
-			"console.l",
-			"console.log",
-			";\n",
-			"\n        ",
-			"console.log",
-			"setOrigin",
-			"updateOrigin",
-			"\"",
-			".follow",
-			"follow",
-			"checkDistanceIncrement",
-			"toggleRotat",
-			"c",
-			"clear",
-			".clear",
-			"clearScaffolds",
-			"position",
-			".position",
-			"update",
-			"createInstanceFromPath: function(path)",
-			"createInstanceAt",
-			".update",
-			".matrix",
-			"update",
-			".position",
-			"increment",
-			"console",
-			"this.midpoint",
-			"intersection",
-			"\"",
-			"console.log",
-			"u_data",
-			"\"",
-			"instance_literal",
-			"\"",
-			"path_literal",
-			"instance_literal",
-			"getLiteral",
-			"\"",
-			"= 1",
-			"=1",
-			"containsPath",
-			".selected =",
-			"masterPath",
-			"visible = false",
-			"- 1",
-			"-1",
-			".anchor=true",
-			"/* ",
-			"rotation:",
-			"delta",
-			"updat",
-			"clear",
-			"setSelection",
-			"              this.trigger('rootUpdate');\n",
-			"checkDistanceIncrement",
-			"render",
-			"getLeft",
-			"extendBehavior",
-			"\"",
-			"this.children",
-			"checkIntersection",
-			"check",
-			"\"",
-			"render",
-			".anchors",
-			"removeAnchors",
-			"this.anchors ",
-			"project.active",
-			"prokect.active",
-			"\"",
-			"exclude",
-			"\"",
-			"intersec",
-			"instance_literals.",
-			", ",
-			"'update'",
-			"clearScaffolds",
-			"clearScaffods",
-			"clear",
-			"drawAnchor",
-			"console.log",
-			"Vec2d",
-			"\"",
-			"event_bus",
-			"eventBus",
-			"'+",
-			"BehaviorManagerModel",
-			"\"",
-			"boolB",
-			"boolA",
-			"PathNode",
-			"TrigFunc",
-			"createInstance",
-			";\n",
-			"push",
-			"currentRender",
-			"'currentRender'",
-			"shiftClick",
-			"0.75",
+			"\n      ",
+			"'end'",
+			"'end",
+			"'start'",
+			"setRange",
+			"proto_node",
+			"accessProperty",
+			"start",
+			"grop",
+			"modify",
+			"modifyProp",
+			"modifyPropert",
+			"modifyProperty",
+			"accessValue",
+			"listsToRender",
+			"visitList",
+			") ",
+			"rootNode",
+			"render:",
+			"isNull",
 			"console.log(",
+			"'constrained",
+			"'constraint_set'",
+			"setConstraint:",
+			"getListMember",
+			"splice",
+			"map",
+			"get('lists')",
+			"closeSelectedGroups",
+			"group",
+			"screen_top_left",
+			"'screen_top_left'",
+			"this.set('scre",
+			"this.get('top_left",
+			"color_ind",
+			"getSelectionColor",
 			"console.log",
-			"\"",
-			"currentRender",
-			".render(",
-			"\"",
-			"DistributeBehavior",
-			".proto",
-			".prototye",
-			"menuY",
-			"open",
-			"openMenu",
-			"behaviorManage",
-			"//selects or deselects all path instances\n    selectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = true;\n      }\n\n    },\n\n    deselectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = false;\n      }\n        for (var i = 0; i < this.instances_.length; i++) {\n        this.instances[i].selected = false;\n      }\n\n    },",
-			"deselectAll",
-			".selected=",
-			".setSelection",
-			"\"",
+			"hasMember",
+			"'selected_indexes",
+			"render",
+			"geometrySel",
+			"groupKey",
+			"groupKey\\",
 			".clear",
-			"clear called",
-			"   \n",
-			"instanceParent",
-			"pathrender",
-			".selected",
-			"\"",
-			"currentNode",
-			"\""
+			"pathReferences",
+			"drawPositionDelimiters",
+			"Utils",
+			"setConstraintExpression",
+			"this.set('expression",
+			"this.set('references",
+			"references",
+			"showWheel",
+			"sel_palette_index",
+			"'inheritor_bbox",
+			"instance_",
+			"updateBoundingBox",
+			"compile:",
+			"compile",
+			"primary_selection_color",
+			"this.get('bbox",
+			"compile:",
+			"createInstance",
+			"PaperUI",
+			"new paper.",
+			" new paper.",
+			"compile",
+			"complie",
+			"addInstance",
+			"selected",
+			"set('i_",
+			"console.l",
+			"compile",
+			"normalizePath",
+			"modifyPoints",
+			"normalizePath",
+			"constraintTool",
+			"group",
+			"grou",
+			"edge",
+			"visit",
+			"PPoint",
+			"Instance",
+			"PathNode",
+			"GeometryNode",
+			"cmdKeu",
+			"altKey",
+			"getR",
+			".val",
+			"getValue",
+			"removeConstraint",
+			"getConstraint",
+			"inheritPr",
+			"console.log",
+			"modify",
+			"accessProperty",
+			"inheritProperty",
+			"inheritConstraint",
+			"inheritProperty",
+			"inheritConstraint",
+			".call",
+			"prototype.call",
+			"'alpha",
+			"set('alpha'",
+			".set('alpha",
+			".set('alpha'",
+			"animateALpha",
+			"console.log",
+			"console.olg",
+			"setNull",
+			"isNull",
+			"modifyProperty",
+			"modify",
+			"exportJSOn",
+			"setToolStyle",
+			"stroke_wei",
+			"styleModified",
+			"console.log('selected tool style =',selectedTool.get('style'));",
+			"console.log(\"selected",
+			"console.log(selected",
+			".prototype.",
+			"accessProperty",
+			"PProperty",
+			"console.log",
+			".val",
+			"fill_colorR",
+			" fill_colorR",
+			"fillColorR",
+			"inheritProperty"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -821,6 +985,35 @@
 		"regex": false,
 		"replace_history":
 		[
+			"'end_val'",
+			"'start_val'",
+			"listsToCompile",
+			"normalizeGeometry",
+			".getY()",
+			".getX()",
+			"operator",
+			"inheritance_selection_color",
+			"'translation'",
+			"Override",
+			"is_proto",
+			"geometrySelected",
+			"modifyDelta",
+			"geometryModified",
+			"'rotate'",
+			"'select'",
+			".inside",
+			"'rotation_node'",
+			"'proto_node'",
+			"'rotation_node'",
+			"'rotate_node'",
+			"'proto_node'",
+			"proto_node",
+			"reset_matrix",
+			"literals",
+			"stroke_color",
+			"",
+			"scaling",
+			"PPoint",
 			"'",
 			"delta",
 			".delta",
@@ -859,23 +1052,140 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "js/src/models/data/Condition.js",
+					"file": "js/src/models/StateManagerModel.js",
 					"settings":
 					{
-						"buffer_size": 2410,
+						"buffer_size": 31058,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1647,
-								1656
+								8744,
+								8744
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true,
+							"word_wrap": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4652.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "js/src/models/data/PointNode.js",
+					"settings":
+					{
+						"buffer_size": 1206,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								464,
+								464
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 17.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/src/models/data/PathNode.js",
+					"settings":
+					{
+						"buffer_size": 5322,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3386,
+								3396
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1470.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/src/models/data/ListNode.js",
+					"settings":
+					{
+						"buffer_size": 5545,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3550,
+								3550
+							],
+							[
+								3602,
+								3602
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1866.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "js/src/models/data/Instance.js",
+					"settings":
+					{
+						"buffer_size": 22133,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9898,
+								9898
 							]
 						],
 						"settings":
@@ -883,176 +1193,62 @@
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
-						"translation.x": 29.0,
-						"translation.y": 202.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "js/src/models/StateManagerModel.js",
-					"settings":
-					{
-						"buffer_size": 9414,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8197,
-								8197
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
 						"translation.x": 0.0,
-						"translation.y": 3879.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "js/src/views/drawing/ToolView.js",
-					"settings":
-					{
-						"buffer_size": 1109,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "js/src/models/tools/BaseToolModel.js",
-					"settings":
-					{
-						"buffer_size": 739,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								361,
-								361
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "js/src/models/tools/PolyToolModel.js",
-					"settings":
-					{
-						"buffer_size": 1135,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1030,
-								1030
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2591.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 5,
-					"file": "js/src/models/data/SceneNode.js",
+					"file": "js/src/utils/PFloat.js",
 					"settings":
 					{
-						"buffer_size": 6768,
+						"buffer_size": 2261,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								75,
-								104
+								795,
+								795
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 110.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 6,
-					"file": "js/src/router.js",
+					"file": "js/src/utils/PPoint.js",
 					"settings":
 					{
-						"buffer_size": 1809,
+						"buffer_size": 4083,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1582,
+								1582
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 430.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1060,23 +1256,23 @@
 			]
 		},
 		{
-			"selected": 6,
+			"selected": 7,
 			"sheets":
 			[
 				{
 					"buffer": 7,
-					"file": "js/src/models/behaviors/ScaleBehavior.js",
+					"file": "js/src/models/data/Generator.js",
 					"settings":
 					{
-						"buffer_size": 1887,
+						"buffer_size": 2336,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								921,
-								921
+								568,
+								568
 							]
 						],
 						"settings":
@@ -1093,406 +1289,27 @@
 				},
 				{
 					"buffer": 8,
-					"file": "js/src/models/tools/PenToolModel.js",
 					"settings":
 					{
-						"buffer_size": 3927,
+						"buffer_size": 587,
 						"regions":
 						{
-						},
-						"selection":
-						[
-							[
-								1052,
-								1052
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "js/src/models/behaviors/scaffold.js",
-					"settings":
-					{
-						"buffer_size": 1424,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1419,
-								1419
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "js/src/models/tools/SelectToolModel.js",
-					"settings":
-					{
-						"buffer_size": 4141,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1794,
-								1797
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1195.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "js/src/models/behaviors/FillBehavior",
-					"settings":
-					{
-						"buffer_size": 478,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								478,
-								478
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "js/src/models/data/GroupNode.js",
-					"settings":
-					{
-						"buffer_size": 434,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								394,
-								394
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "js/src/models/behaviors/RadialDistributeBehavior.js",
-					"settings":
-					{
-						"buffer_size": 5162,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								547,
-								547
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "js/src/models/behaviors/BaseBehavior.js",
-					"settings":
-					{
-						"buffer_size": 2779,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								83,
-								83
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "js/src/models/behaviors/FollowPathBehavior.js",
-					"settings":
-					{
-						"buffer_size": 4068,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2845,
-								2845
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 565.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 16,
-					"file": "js/src/models/behaviors/BehaviorManagerModel.js",
-					"settings":
-					{
-						"buffer_size": 5031,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3322,
-								3322
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 944.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 17,
-					"file": "js/src/utils/TrigFunc.js",
-					"settings":
-					{
-						"buffer_size": 2900,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2598,
-								2602
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 40.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 18,
-					"file": "js/src/models/data/Instance.js",
-					"settings":
-					{
-						"buffer_size": 7346,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5989,
-								5989
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 3243.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 19,
-					"file": "js/src/models/behaviors/CopyBehavior.js",
-					"settings":
-					{
-						"buffer_size": 3656,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3133,
-								3133
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 20,
-					"file": "js/src/views/drawing/PropertyView.js",
-					"settings":
-					{
-						"buffer_size": 1654,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1440,
-								1440
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 4,
-			"sheets":
-			[
-				{
-					"buffer": 21,
-					"file": "js/src/models/behaviors/DistributeBehavior.js",
-					"settings":
-					{
-						"buffer_size": 3788,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3002,
-								3002
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 475.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 22,
-					"file": "js/src/models/data/BehaviorNode.js",
-					"settings":
-					{
-						"buffer_size": 765,
-						"regions":
-						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										156,
+										164
+									],
+									[
+										477,
+										485
+									]
+								],
+								"scope": ""
+							}
 						},
 						"selection":
 						[
@@ -1503,8 +1320,13 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"detect_indentation": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1513,254 +1335,73 @@
 					"type": "text"
 				},
 				{
-					"buffer": 23,
+					"buffer": 9,
+					"file": "js/src/utils/PConstraint.js",
 					"settings":
 					{
-						"buffer_size": 10876,
+						"buffer_size": 2359,
 						"regions":
 						{
-							"match":
-							{
-								"flags": 112,
-								"regions":
-								[
-									[
-										240,
-										246
-									],
-									[
-										554,
-										560
-									],
-									[
-										826,
-										832
-									],
-									[
-										1074,
-										1080
-									],
-									[
-										1194,
-										1200
-									],
-									[
-										1367,
-										1373
-									],
-									[
-										1657,
-										1663
-									],
-									[
-										2049,
-										2055
-									],
-									[
-										2182,
-										2188
-									],
-									[
-										2408,
-										2414
-									],
-									[
-										2601,
-										2607
-									],
-									[
-										2827,
-										2833
-									],
-									[
-										3000,
-										3006
-									],
-									[
-										3168,
-										3174
-									],
-									[
-										3541,
-										3546
-									],
-									[
-										3855,
-										3860
-									],
-									[
-										4127,
-										4132
-									],
-									[
-										4307,
-										4312
-									],
-									[
-										4500,
-										4505
-									],
-									[
-										4587,
-										4592
-									],
-									[
-										4707,
-										4712
-									],
-									[
-										4880,
-										4885
-									],
-									[
-										4996,
-										5001
-									],
-									[
-										5058,
-										5063
-									],
-									[
-										5319,
-										5324
-									],
-									[
-										5374,
-										5379
-									],
-									[
-										5434,
-										5439
-									],
-									[
-										5669,
-										5674
-									],
-									[
-										5982,
-										5987
-									],
-									[
-										6050,
-										6055
-									],
-									[
-										6116,
-										6121
-									],
-									[
-										6293,
-										6298
-									],
-									[
-										6384,
-										6389
-									],
-									[
-										6517,
-										6522
-									],
-									[
-										6743,
-										6748
-									],
-									[
-										6936,
-										6941
-									],
-									[
-										7162,
-										7167
-									],
-									[
-										7335,
-										7340
-									],
-									[
-										7503,
-										7508
-									],
-									[
-										7643,
-										7648
-									],
-									[
-										8030,
-										8041
-									],
-									[
-										8148,
-										8159
-									],
-									[
-										8372,
-										8383
-									],
-									[
-										8735,
-										8757
-									],
-									[
-										9101,
-										9123
-									],
-									[
-										9594,
-										9616
-									],
-									[
-										10173,
-										10180
-									],
-									[
-										10475,
-										10482
-									],
-									[
-										10763,
-										10770
-									]
-								],
-								"scope": ""
-							}
 						},
 						"selection":
 						[
 							[
-								9920,
-								9920
+								2092,
+								2092
 							]
 						],
 						"settings":
 						{
-							"detect_indentation": false,
-							"output_tag": 5,
-							"result_base_dir": "",
-							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
-							"result_line_regex": "^ +([0-9]+):",
-							"scroll_past_end": true,
-							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 4080.0,
+						"translation.y": 1087.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 24,
-					"file": "js/src/models/data/PathNode.js",
+					"buffer": 10,
+					"file": "js/src/models/data/Visitor.js",
 					"settings":
 					{
-						"buffer_size": 10792,
+						"buffer_size": 7923,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1112,
-								1118
+								2155,
+								2155
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2698.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "js/src/models/tools/SelectToolModel.js",
+					"settings":
+					{
+						"buffer_size": 9347,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1098,
+								1098
 							]
 						],
 						"settings":
@@ -1770,25 +1411,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 875.0,
+						"translation.y": 4045.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 25,
-					"file": "js/src/models/data/GeometryNode.js",
+					"buffer": 12,
+					"file": "js/src/views/drawing/CanvasView.js",
 					"settings":
 					{
-						"buffer_size": 19031,
+						"buffer_size": 7637,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2472,
-								2484
+								4316,
+								4316
 							]
 						],
 						"settings":
@@ -1798,7 +1439,63 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3462.0,
+						"translation.y": 1252.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "js/src/models/data/SceneNode.js",
+					"settings":
+					{
+						"buffer_size": 9954,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7162,
+								7170
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4538.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "js/src/models/tools/ConstraintToolModel.js",
+					"settings":
+					{
+						"buffer_size": 15531,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14790,
+								14795
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6298.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1812,7 +1509,7 @@
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 31.0
 	},
 	"layout":
 	{
@@ -1829,19 +1526,12 @@
 				0,
 				2,
 				1
-			],
-			[
-				2,
-				0,
-				3,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.24562350217,
-			0.493907582292,
+			0.485593075286,
 			1.0
 		],
 		"rows":
@@ -1853,7 +1543,7 @@
 	"menu_visible": true,
 	"replace":
 	{
-		"height": 64.0
+		"height": 108.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1862,8 +1552,12 @@
 		"selected_items":
 		[
 			[
+				"polygon",
+				"js/src/models/data/PolygonNode.js"
+			],
+			[
 				"",
-				"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js"
+				"js/src/views/drawing/ToolView.js"
 			]
 		],
 		"width": 0.0
@@ -1880,6 +1574,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 272.0,
+	"side_bar_width": 331.0,
 	"status_bar_visible": true
 }

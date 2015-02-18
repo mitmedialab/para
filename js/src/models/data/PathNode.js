@@ -42,7 +42,6 @@ define([
         data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
       }
       data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
-      console.log("scaling=",matrix.scaling.x,matrix.scaling.y);
       
       var translation_delta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
       var position = new PPoint(0,0 ,'set');

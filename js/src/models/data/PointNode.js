@@ -44,6 +44,10 @@ define([
 
     render: function(){
       return 'point';
+    },
+
+    compile: function(){
+
     }
 
 

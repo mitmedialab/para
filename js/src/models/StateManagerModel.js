@@ -304,15 +304,13 @@ define(['jquery',
     openSelectedGroups: function() {
       var selectedShapes = selectTool.get('selected_shapes');
       var members = [];
-      var forRemoval = [];
-      for (var i = 0; i < selectedShapes.length; i++) {
-        var l = visitor.openList(selectedShapes[i]);
-        if (l) {
-          forRemoval.push(l);
-          members = members.concat(l.members);
-        }
+    
+        var openedLists = visitor.toggleOpen(selectedShapes);
+        for(var i=0;i<openedLists.length;i++){
+          members = members.concat(openedLists[i].members);
+        
       }
-      selectTool.removeSelectedShape(forRemoval);
+      selectTool.removeSelectedShape(openedLists);
       selectTool.addSelectedShape(members);
       this.compile();
     },
@@ -323,17 +321,9 @@ define(['jquery',
      */
     closeSelectedGroups: function() {
       var selectedShapes = selectTool.get('selected_shapes');
-      var members = [];
-      var forRemoval = [];
-      for (var i = 0; i < selectedShapes.length; i++) {
-        var l = visitor.closeParentList(selectedShapes[i]);
-        if (l) {
-          forRemoval.push(selectedShapes[i]);
-          members = members.concat(l);
-        }
-      }
-      selectTool.removeSelectedShape(forRemoval);
-      selectTool.addSelectedShape(members);
+      var toggledLists = visitor.toggleClosed(selectedShapes);
+      selectTool.removeSelectedShape(selectedShapes);
+      selectTool.addSelectedShape(toggledLists);
       this.compile();
     },
 

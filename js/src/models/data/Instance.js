@@ -197,6 +197,19 @@ define([
 			return null;
 		},
 
+		toggleOpen: function(item) {
+			return null;
+		},
+
+		toggleClosed: function(item) {
+			return null;
+		},
+
+		addMemberToOpen: function(data, added_bool) {
+			console.log('checking instance');
+			return [];
+		},
+
 		/* setGenerator, getGenerator
 		 * sets and gets the generator for this list
 		 * which can be used to define iterative constraints
@@ -546,30 +559,32 @@ define([
 		},
 
 		updateBoundingBox: function(instance) {
-			var i_bbox = this.get('i_bbox');
-			var i_topLeft = instance.get('screen_top_left').clone();
-			var i_bottomRight = instance.get('screen_bottom_right').clone();
+			if (instance.get('screen_top_left') && instance.get('screen_bottom_right')) {
+				var i_bbox = this.get('i_bbox');
+				var i_topLeft = instance.get('screen_top_left').clone();
+				var i_bottomRight = instance.get('screen_bottom_right').clone();
 
 
-			if (!i_bbox.topLeft) {
-				i_bbox.topLeft = i_topLeft;
-			} else {
-				if (i_topLeft.x < i_bbox.topLeft.x) {
-					i_bbox.topLeft.x = i_topLeft.x;
+				if (!i_bbox.topLeft) {
+					i_bbox.topLeft = i_topLeft;
+				} else {
+					if (i_topLeft.x < i_bbox.topLeft.x) {
+						i_bbox.topLeft.x = i_topLeft.x;
+					}
+					if (i_topLeft.y < i_bbox.topLeft.y) {
+						i_bbox.topLeft.y = i_topLeft.y;
+					}
 				}
-				if (i_topLeft.y < i_bbox.topLeft.y) {
-					i_bbox.topLeft.y = i_topLeft.y;
-				}
-			}
 
-			if (!i_bbox.bottomRight) {
-				i_bbox.bottomRight = i_bottomRight;
-			} else {
-				if (i_bottomRight.x > i_bbox.bottomRight.x) {
-					i_bbox.bottomRight.x = i_bottomRight.x;
-				}
-				if (i_bottomRight.y > i_bbox.bottomRight.y) {
-					i_bbox.bottomRight.y = i_bottomRight.y;
+				if (!i_bbox.bottomRight) {
+					i_bbox.bottomRight = i_bottomRight;
+				} else {
+					if (i_bottomRight.x > i_bbox.bottomRight.x) {
+						i_bbox.bottomRight.x = i_bottomRight.x;
+					}
+					if (i_bottomRight.y > i_bbox.bottomRight.y) {
+						i_bbox.bottomRight.y = i_bottomRight.y;
+					}
 				}
 			}
 
@@ -590,6 +605,8 @@ define([
 		},
 
 		compileTransforms: function() {
+			  //console.log('compiling t', this.get('id'), 'instance');
+
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');

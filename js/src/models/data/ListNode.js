@@ -23,17 +23,72 @@ define([
       this.get('translation_delta').setNull(false);
     },
 
+    printMembers:function(){
+   
+      var ids = [];
+      for (var i=0;i<this.members.length;i++){
+        
+        if(this.members[i].get('type')==='list'){
+           this.members[i].printMembers();
+         }
+         ids = ids.concat(this.members[i].get('id'));
+      }
+      console.log('total members for',this.get('id'),ids.length,ids);
+    },
+
     /* addMember, removeMember
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
     addMember: function(data) {
+      var translation_delta = this.accessProperty('translation_delta');
+      var neg_delta = {
+        x: -translation_delta.x,
+        y: -translation_delta.y
+      };
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
+          //console.log(i);
+          //console.log("t-delta prior", data[i].accessProperty('translation_delta'));
+          data[i].modifyProperty({
+            'translation_delta': neg_delta
+          });
+          // console.log("t-delta after", data[i].accessProperty('translation_delta'));
           this.members.push(data[i]);
         }
       } else {
+        // console.log("t-delta prior", data.accessProperty('translation_delta'));
+        data.modifyProperty({
+          'translation_delta': neg_delta
+        });
+        // console.log("t-delta after", data.accessProperty('translation_delta'));
         this.members.push(data);
       }
+    },
+
+    addMemberToOpen: function(data) {
+      if (this.get('open')) {
+        var addedToList = false;
+        for (var i = 0; i < this.members.length; i++) {
+          addedToList = addedToList ? true : this.members[i].addMemberToOpen(data);
+        }
+        if (addedToList) {
+          console.log('adding to list', this.get('id'));
+          if (data.get('type') === 'list') {
+            for (var j = 0; j < data.members.length; j++) {
+              var removed = this.removeMember(data.members[j]);
+              console.log('removing data member at ', j, removed);
+            }
+          }
+          this.addMember(data);
+          return true;
+        } else {
+          console.log('already added');
+          return true;
+        }
+      } else {
+        console.log('list not open');
+      }
+      return false;
     },
 
     removeMember: function(data) {
@@ -41,7 +96,10 @@ define([
       if (index === -1) {
         return false;
       } else {
-        this.members.splice(index, 1);
+        var member = this.members.splice(index, 1)[0];
+        member.modifyProperty({
+           'translation_delta': this.accessProperty('translation_delta')
+         });
         return true;
       }
     },
@@ -102,13 +160,53 @@ define([
      * recursively closes all members
      *of this list
      */
-    closeMembers: function() {
+    closeAllMembers: function() {
       for (var i = 0; i < this.members.length; i++) {
         if (this.members[i].get('type') === 'list') {
-          this.members[i].closeMembers();
+          this.members[i].closeAllMembers();
           this.members[i].set('open', false);
         }
       }
+    },
+
+    toggleOpen: function(item) {
+      if (this.hasMember(item)) {
+        if (!this.get('open')) {
+          this.set('open', true);
+          return [this];
+        } else {
+          var toggledLists = [];
+          for (var i = 0; i < this.members.length; i++) {
+            var toggled = this.members[i].toggleOpen(item);
+            if (toggled) {
+              toggledLists = toggledLists.concat(toggled);
+            }
+          }
+          return toggledLists;
+        }
+      }
+      return null;
+    },
+
+    toggleClosed: function(item) {
+      if (this.hasMember(item)) {
+        var toggledLists = [];
+        for (var i = 0; i < this.members.length; i++) {
+          var toggled = this.members[i].toggleClosed(item);
+          if (toggled) {
+            toggledLists = toggledLists.concat(toggled);
+          }
+        }
+        if (toggledLists.length > 0) {
+          return toggledLists;
+        } else {
+          if (this.get('open')) {
+            this.set('open', false);
+            return [this];
+          }
+        }
+      }
+      return null;
     },
 
     compile: function() {
@@ -116,41 +214,73 @@ define([
     },
 
     compileMembers: function() {
+     // console.log('compiling list', this.get('id'), this.accessProperty('translation_delta'), this.get('tmatrix'));
       //console.log('num members = ', this.members.length, 'num geom =', geomList.length);
       // console.log('tdelta',this.accessProperty('translation_delta'));
       //console.log('l-matrix',this.get('tmatrix'));
       var translation_delta = this.get('translation_delta');
       for (var i = 0; i < this.members.length; i++) {
-      
-        this.compileTransforms();
-        console.log('l-matrix', this.get('tmatrix'));
+
+        var i_matricies = this.compileTransforms();
+        //  console.log('l-matrix', this.get('tmatrix'));
         var member = this.members[i];
+        var mtd = member.get('translation_delta');
         var m_tmatrix = member.get('tmatrix');
-        var l_matrix = this.get('tmatrix');
-       var xC = translation_delta.x.isConstrained();
+        var l_matrix = i_matricies.tmatrix;
+        var xC = translation_delta.x.isConstrained();
         var yC = translation_delta.y.isConstrained();
-         if(xC){
-           m_tmatrix.tx = 0;
-         }
-         if(yC){
-           m_tmatrix.ty = 0;
-         }
+        var mxC = mtd.x.isConstrained();
+        var myC = mtd.y.isConstrained();
+        if (xC && !mxC) {
+          m_tmatrix.tx = 0;
+        }
+        if (yC && !myC) {
+          m_tmatrix.ty = 0;
+        }
+        if (mxC) {
+          l_matrix.tx = 0;
+        }
+        if (myC) {
+          l_matrix.ty = 0;
+        }
         m_tmatrix.concatenate(l_matrix);
-       if (this.generator) {
+        if (this.generator) {
           this.generator.increment();
         }
-      
       }
     },
 
     compileTransforms: function() {
-      this.get('rmatrix').reset();
-      this.get('smatrix').reset();
-      this.get('tmatrix').reset();
+      //console.log('compiling t', this.get('id'), 'list');
+      var rmatrix = this.get('rmatrix').clone();
+      var smatrix = this.get('smatrix').clone();
+      var tmatrix = this.get('tmatrix').clone();
 
-      Instance.prototype.compileTransforms.call(this, arguments);
+      var rotation_origin = this.get('rotation_origin').toPaperPoint();
+      var scaling_origin = this.get('scaling_origin').toPaperPoint();
 
+
+      var scaling_delta = this.accessProperty('scaling_delta');
+      var rotation_delta = this.accessProperty('rotation_delta');
+      var translation_delta = this.inheritProperty('translation_delta');
+
+      if (rotation_delta) {
+        rmatrix.rotate(rotation_delta, rotation_origin);
+      }
+      if (scaling_delta) {
+        smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
+      }
+      if (translation_delta) {
+        tmatrix.translate(translation_delta.toPaperPoint());
+      }
+      return {
+        tmatrix: tmatrix,
+        rmatrix: rmatrix,
+        smatrix: smatrix
+      };
     },
+
+
 
     render: function() {
       var bbox = this.renderBoundingBox();
@@ -169,6 +299,7 @@ define([
       }
 
       for (var k = 0; k < this.members.length; k++) {
+
         this.updateBoundingBox(this.members[k]);
       }
 
