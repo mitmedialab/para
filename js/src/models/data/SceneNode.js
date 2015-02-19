@@ -55,9 +55,10 @@ define([
             * placeholder visit function for 
             * external vistior tree traversal
             */
-            visit: function(visitor,departureNode,state_data) {
-              visitor.visit(this,departureNode,state_data);   
+            visit: function(visitor,visitFunction,departureNode,state_data) {
+              visitor[visitFunction](this,departureNode,state_data);   
             },
+
 
             /*getEdge
             * searches edge array for matching x value 

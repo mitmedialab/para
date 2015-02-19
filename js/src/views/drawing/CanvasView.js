@@ -20,7 +20,7 @@ define([
   var panKey = 32;
   var rootKey = 82;
   var groupKey = 71;
-  var clearKey = 67;
+  var deleteKey = 67;
   var upArrow = 38;
   var downArrow = 40;
   var rightArrow = 39;
@@ -174,8 +174,9 @@ define([
             this.model.openSelectedGroups();
         }
       }
-      if (event.keyCode === clearKey) {
-        this.model.deleteObject();
+      if (event.keyCode === deleteKey) {
+        console.log('deleting');
+        this.model.geometryDeleted();
       }
       if (event.keyCode === panKey) {
         pan = true;

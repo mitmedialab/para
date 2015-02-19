@@ -91,6 +91,15 @@ define([
       return false;
     },
 
+    /* removeAllMembers;
+    * removes all members from this list
+    */
+    removeAllMembers: function(){
+      for(var i=this.members.length-1;i>=0;i--){
+        this.removeMember(this.members[i]);
+      }
+    },
+
     removeMember: function(data) {
       var index = $.inArray(data, this.members);
       if (index === -1) {
@@ -154,6 +163,15 @@ define([
         }
       }
       return null;
+    },
+
+    /* getListMembers
+    * returns all members of this list which are themselves lists
+    */
+    getListMembers: function(){
+      return this.members.filter(function(member){
+        return member.get('type')==='list';
+      });
     },
 
     /*closeMembers

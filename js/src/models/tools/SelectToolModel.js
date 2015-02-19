@@ -302,7 +302,6 @@ define([
         var d1 = startDist;
         var d2x = startWidth / 2 - startDist.x;
         var d2y = startWidth / 2 - startDist.x;
-
         var d3 = event.point.subtract(posPoint);
 
         var rscaleX = d3.x / d1.x;
@@ -330,7 +329,7 @@ define([
 
       if (literal) {
 
-        return literal.position;
+        return literal.position;  
       }
       return null;
     },

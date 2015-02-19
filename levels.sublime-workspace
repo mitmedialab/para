@@ -4,6 +4,42 @@
 		"selected_items":
 		[
 			[
+				"is",
+				"isConstrained"
+			],
+			[
+				"un",
+				"uncompileTransforms"
+			],
+			[
+				"tras",
+				"translation_delta"
+			],
+			[
+				"add",
+				"addToOpenLists"
+			],
+			[
+				"ret",
+				"returnedLists"
+			],
+			[
+				"open",
+				"openedLists"
+			],
+			[
+				"ope",
+				"openedLists"
+			],
+			[
+				"op",
+				"openedLists"
+			],
+			[
+				"opened",
+				"openedLists"
+			],
+			[
 				"t",
 				"tmatrix"
 			],
@@ -82,10 +118,6 @@
 			[
 				"curr",
 				"currentNode"
-			],
-			[
-				"add",
-				"addChildNode"
 			],
 			[
 				"scre",
@@ -482,38 +514,6 @@
 			[
 				"target",
 				"targetPoint"
-			],
-			[
-				"center",
-				"centerGeom"
-			],
-			[
-				"diff",
-				"diffTarget"
-			],
-			[
-				"con",
-				"con_center"
-			],
-			[
-				"caN",
-				"canvasDown"
-			],
-			[
-				"show",
-				"shownPrototype"
-			],
-			[
-				"getP",
-				"getPrototypeById"
-			],
-			[
-				"master",
-				"master_path"
-			],
-			[
-				"is",
-				"isProto"
 			]
 		]
 	},
@@ -523,7 +523,7 @@
 			"file": "js/src/models/StateManagerModel.js",
 			"settings":
 			{
-				"buffer_size": 31058,
+				"buffer_size": 30787,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "js/src/models/data/PointNode.js",
 			"settings":
 			{
-				"buffer_size": 1206,
+				"buffer_size": 1240,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,7 +539,7 @@
 			"file": "js/src/models/data/PathNode.js",
 			"settings":
 			{
-				"buffer_size": 5322,
+				"buffer_size": 5257,
 				"line_ending": "Unix"
 			}
 		},
@@ -547,15 +547,7 @@
 			"file": "js/src/models/data/ListNode.js",
 			"settings":
 			{
-				"buffer_size": 5545,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/data/Instance.js",
-			"settings":
-			{
-				"buffer_size": 22133,
+				"buffer_size": 9836,
 				"line_ending": "Unix"
 			}
 		},
@@ -579,15 +571,23 @@
 			"file": "js/src/models/data/Generator.js",
 			"settings":
 			{
-				"buffer_size": 2336,
+				"buffer_size": 2340,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "Searching 71 files for \"setRange\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Generator.js:\n   36        },\n   37  \n   38:       setRange: function(start, end, loop) {\n   39          this.setStart(start);\n   40          this.setEnd(end);\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js:\n  287            var generator = new Generator();\n  288            generator.addChildNode(list);\n  289:           generator.setRange(0, selectedShapes.length);\n  290  \n  291            visitor.addList(list);\n\n2 matches across 2 files\n",
+			"file": "js/src/models/data/Instance.js",
 			"settings":
 			{
-				"buffer_size": 587,
+				"buffer_size": 22519,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 71 files for \"setRange\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Generator.js:\n   36        },\n   37  \n   38:       setRange: function(start, end, loop) {\n   39          this.setStart(start);\n   40          this.setEnd(end);\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js:\n  287            var generator = new Generator();\n  288            generator.addChildNode(list);\n  289:           generator.setRange(0, selectedShapes.length);\n  290  \n  291            visitor.addList(list);\n\n2 matches across 2 files\n\n\nSearching 71 files for \"modifyProperty\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Generator.js:\n   47  \n   48        setValue: function(value) {\n   49:         this.modifyProperty({value:  {val:value,operator:'set'}});\n   50        },\n   51  \n   ..\n   56  \n   57        setStart: function(value) {\n   58:         this.modifyProperty({start_val:  {val:value,operator:'set'}});\n   59        },\n   60  \n   61        setEnd: function(value) {\n   62:         this.modifyProperty({end_val: {val:value,operator:'set'}});\n   63        },\n   64  \n   65        setLoop: function(value) {\n   66:         this.modifyProperty({loop: {val:value,operator:'set'}});\n   67        },\n   68  \n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Instance.js:\n  394  		},\n  395  \n  396: 		modifyProperty: function(data, mode, modifier) {\n  397  			var matrix = this.get('matrix');\n  398  			var proto_incremented = false;\n  ...\n  404  						protoNode._setPropertiesToInstance(data, this);\n  405  					}\n  406: 					protoNode.modifyProperty(data, 'standard', 'none');\n  407  					proto_incremented = true;\n  408  				}\n  ...\n  414  				} else if (modifier === 'relative') {\n  415  					for (var i = 0; i < inheritors.length; i++) {\n  416: 						inheritors[i].modifyProperty(data, 'standard', 'none');\n  417  					}\n  418  \n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ListNode.js:\n   32        if (data instanceof Array) {\n   33          for (var i = 0; i < data.length; i++) {\n   34:           data[i].modifyProperty()\n   35            this.members.push(data[i]);\n   36          }\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js:\n  619        for (var i = 0; i < selectedShapes.length; i++) {\n  620          var instance = selectedShapes[i];\n  621:         instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));\n  622        }\n  623        this.compile();\n  ...\n  671        for (var i = 0; i < selectedShapes.length; i++) {\n  672          var instance = selectedShapes[i];\n  673:         instance.modifyProperty(style_data, this.get('tool-mode'), this.get('tool-modifier'));\n  674        }\n  675        this.compile();\n\n10 matches across 4 files\n\n\nSearching 71 files for \"closeMembers\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ListNode.js:\n  108      },\n  109  \n  110:     /*closeMembers\n  111       * recursively closes all members\n  112       *of this list\n  113       */\n  114:     closeMembers: function() {\n  115        for (var i = 0; i < this.members.length; i++) {\n  116          if (this.members[i].get('type') === 'list') {\n  117:           this.members[i].closeMembers();\n  118            this.members[i].set('open', false);\n  119          }\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Visitor.js:\n  287  						var parentList = openLists[i];\n  288  						removeFromOpen.push(parentList);\n  289: 						parentList.closeMembers();\n  290  						for (var j = closedLists.length - 1; j >= 0; j--) {\n  291  							if (parentList.hasMember(closedLists[j], true)) {\n\n4 matches across 2 files\n",
+			"settings":
+			{
+				"buffer_size": 3759,
 				"line_ending": "Unix",
 				"name": "Find Results",
 				"scratch": true
@@ -605,12 +605,15 @@
 			"file": "js/src/models/data/Visitor.js",
 			"settings":
 			{
-				"buffer_size": 7923,
+				"buffer_size": 6772,
 				"line_ending": "Unix"
 			}
 		},
 		{
+			"contents": "/*SelectToolModel.js\n *base model class for all direct manipulation tool models*/\n\ndefine([\n  'underscore',\n  'paper',\n  'backbone',\n  'models/tools/BaseToolModel',\n  'utils/PPoint'\n\n\n\n], function(_, paper, Backbone, BaseToolModel, PPoint) {\n  var segments = [];\n  var literal;\n  var handle;\n  var segmentMod = false;\n  var copyReset = true;\n  //keeps track of when a copy was released to set correct position data for the new instance\n  var copyInitialized = false;\n  var startPoint, startDist, startWidth, startHeight = null;\n  var dHitOptions = {\n    segments: true,\n    curves: true,\n    handles: true,\n    tolerance: 5,\n  };\n\n  var hitOptions = {\n    stroke: true,\n    fill: true,\n    bounds: true,\n    center: true,\n    tolerance: 2\n  };\n\n  var SelectToolModel = BaseToolModel.extend({\n    defaults: _.extend({}, BaseToolModel.prototype.defaults, {\n      selected_shapes: null,\n      selections: null,\n      current_sel_index: 0,\n      mode: 'select'\n    }),\n\n    initialize: function() {\n      BaseToolModel.prototype.initialize.apply(this, arguments);\n      this.set('selected_shapes', []);\n      this.set('selections', []);\n      //this.on('change:literals',this.triggerChange);\n\n    },\n\n\n    deselectAll: function() {\n      // TODO: do this across all selections\n\n      var selected_shapes = this.get('selected_shapes');\n      for (var i = selected_shapes.length - 1; i >= 0; i--) {\n        selected_shapes[i].set('selected', false);\n        selected_shapes[i].setSelectionForInheritors(false);\n      }\n      this.set('selected_shapes', []);\n    },\n\n    addSelectedShape: function(data) {\n      if (data instanceof Array) {\n        for (var i = 0; i < data.length; i++) {\n          this.addSingleShape(data[i]);\n        }\n      } else {\n        this.addSingleShape(data);\n      }\n    },\n\n    addSingleShape: function(instance) {\n      var selected_shapes = this.get('selected_shapes');\n      if (!_.contains(selected_shapes, instance)) {\n        instance.set('selected', true);\n        instance.set('sel_palette_index', this.get('current_sel_index'));\n        selected_shapes.push(instance);\n        this.set('selected_shapes', selected_shapes);\n      }\n    },\n\n    removeSelectedShape: function(data) {\n      if (data instanceof Array) {\n        for (var i = 0; i < data.length; i++) {\n          this.removeSingleShape(data[i]);\n        }\n      } else {\n        this.removeSingleShape(data);\n      }\n    },\n\n    removeSingleShape: function(shape) {\n      shape.set('selected', false);\n      shape.setSelectionForInheritors(false);\n      var selected_shapes = this.get('selected_shapes');\n      var index = $.inArray(shape, selected_shapes);\n      selected_shapes.splice(shape, 1);\n    },\n\n    // EXPERIMENTAL\n    saveSelection: function() {\n      var selections = this.get('selections');\n      selections.push(this.get('selected_shapes'));\n      this.set('selected_shapes', []);\n      this.set('selections', selections);\n      var current_sel_index = this.get('current_sel_index');\n      current_sel_index += 1;\n      this.set('current_sel_index', current_sel_index);\n    },\n\n    resetSelections: function() {\n      this.deselectAll();\n      var selections = this.get('selections');\n      for (var i = 0; i < selections.length; i++) {\n        this.set('selected_shapes', selections[i]);\n        this.deselectAll();\n      }\n      this.set('selections', []);\n      this.set('current_sel_index', 0);\n    },\n\n    getCurrentSelection: function() {\n      var selections = this.get('selected_shapes');\n      return selections;\n    },\n    // END EXPERIMENTAL\n\n\n    getLastSelected: function() {\n      var selected_shapes = this.get('selected_shapes');\n      if (selected_shapes.length > 0) {\n        return selected_shapes[selected_shapes.length - 1];\n      }\n      return null;\n    },\n\n    /*mousedown event\n     */\n    mouseDown: function(event) {\n      switch (this.get('mode')) {\n        case 'select':\n          this.selectDown(event);\n          break;\n        case 'dselect':\n          this.dSelectDown(event);\n          break;\n        case 'rotate':\n        case 'scale':\n          this.rotateDown(event);\n          startDist = event.point.subtract(literal.position);\n\n          startWidth = literal.bounds.width;\n          startHeight = literal.bounds.height;\n\n          break;\n      }\n    },\n\n    rotateDown: function(event) {\n      if (event.modifiers.option) {\n        this.selectDown(event, true);\n      } else {\n        this.selectDown(event);\n      }\n    },\n\n\n    selectDown: function(event, noDeselect) {\n      //automaticall deselect all on mousedown if shift modifier is not enabled\n      if (!event.modifiers.shift) {\n        if (!noDeselect) {\n          this.deselectAll();\n        }\n      }\n      var hitResult = paper.project.hitTest(event.point, hitOptions);\n\n      if (hitResult) {\n\n        var path = hitResult.item;\n\n        literal = path;\n\n      }\n      var constrain = event.modifiers.command;\n      this.trigger('geometrySelected', literal, constrain);\n\n\n\n    },\n\n    dSelectDown: function(event, noDeselect) {\n      //automaticall deselect all on mousedown if shift modifier is not enabled\n      console.log('dselect down');\n\n      if (!event.modifiers.shift) {\n        if (!noDeselect) {\n          this.deselectAll();\n        }\n      }\n\n\n      var hitResult = paper.project.hitTest(event.point, dHitOptions);\n\n      if (hitResult) {\n\n        if (hitResult.type == 'segment') {\n          hitResult.segment.fullySelected = true;\n          segments.push(hitResult.segment);\n        } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {\n          handle = hitResult.type;\n          segments.push(hitResult.segment);\n        } else if (hitResult.type == 'curve') {\n          console.log('hit result', hitResult.location);\n          segments.push(hitResult.location._segment1);\n          segments.push(hitResult.location._segment2);\n        }\n\n\n      }\n\n      this.trigger('geometryDSelected', segments, event.modifiers.command);\n\n\n    },\n\n    triggerChange: function() {\n      this.trigger('geometrySelected', literal);\n    },\n\n\n    //mouse drag event\n    mouseDrag: function(event) {\n      switch (this.get('mode')) {\n        case 'select':\n          this.selectDrag(event);\n          break;\n        case 'dselect':\n          this.dSelectDrag(event);\n          break;\n        case 'rotate':\n          this.rotateDrag(event);\n          break;\n        case 'scale':\n          this.scaleDrag(event);\n          break;\n      }\n    },\n\n    selectDrag: function(event) {\n\n      if (event.modifiers.option && copyReset) {\n        copyReset = false;\n        copyInitialized = true;\n        this.trigger('addInstance');\n      }\n\n      var data = {};\n      data.translation_delta = {\n        operator: 'add',\n        x: event.delta.x,\n        y: event.delta.y\n      };\n      this.trigger('geometryModified', data, event.modifiers);\n\n\n    },\n\n    dSelectDrag: function(event) {\n      var data = {};\n      data.translation_delta = {\n        operator: 'add',\n        x: event.delta.x,\n        y: event.delta.y\n      };\n      this.trigger('geometrySegmentModified', data, handle, event.modifiers);\n\n\n    },\n\n    rotateDrag: function(event) {\n      var posPoint = this.getRelativePoint();\n      if (posPoint) {\n        var angle = event.lastPoint.subtract(posPoint).angle;\n        var dAngle = event.point.subtract(posPoint).angle;\n        var data = {};\n        data.rotation_delta = {\n          val: dAngle - angle,\n          operator: 'add'\n        };\n        this.trigger('geometryModified', data, event.modifiers);\n\n      }\n\n    },\n\n    scaleDrag: function(event) {\n      var posPoint = this.getRelativePoint();\n      if (posPoint) {\n        var d1 = startDist;\n        var d2x = startWidth / 2 - startDist.x;\n        var d2y = startWidth / 2 - startDist.x;\n\n        var d3 = event.point.subtract(posPoint);\n\n        var rscaleX = d3.x / d1.x;\n        var rscaleY = d3.y / d1.y;\n\n        var tScaleX = ((startWidth / 2) * rscaleX) / ((d3.x + d2x) / rscaleX);\n        var tScaleY = ((startHeight / 2) * rscaleY) / ((d3.y + d2y) / rscaleY);\n        tScaleX = (tScaleX === 0) ? 1 : tScaleX;\n        tScaleY = (tScaleY === 0) ? 1 : tScaleY;\n\n        var data = {};\n        data.set = true;\n        data.scaling_delta = {\n          x: tScaleX,\n          y: tScaleY,\n          operator: 'add'\n        };\n        this.trigger('geometryModified', data, event.modifiers);\n\n      }\n\n    },\n\n    getRelativePoint: function() {\n\n      if (literal) {\n\n        return literal.position;\n      }\n      return null;\n    },\n\n    dblClick: function(event) {\n      if (this.currentPaths.length > 0) {\n        this.trigger('moveDownNode', this.currentPaths[this.currentPaths.length - 1]);\n      } else {\n        this.trigger('moveUpNode');\n      }\n    },\n\n\n    //mouse up event\n    mouseUp: function(event) {\n      var selected_shapes = this.get('selected_shapes');\n      for (var i = 0; i < selected_shapes.length; i++) {\n\n        if (copyInitialized) {\n          copyInitialized = false;\n          console.log(\"setting position\");\n          //this.trigger('setPositionForIntialized',event.point);\n        }\n        // selected_shapes[i].setSelectionForInheritors(true,false);\n\n\n\n      }\n      literal = null;\n      segments = [];\n      handle = null;\n      copyReset = true;\n\n    },\n\n\n\n  });\n\n  return SelectToolModel;\n\n});",
 			"file": "js/src/models/tools/SelectToolModel.js",
+			"file_size": 9347,
+			"file_write_time": 1423760688000000,
 			"settings":
 			{
 				"buffer_size": 9347,
@@ -634,10 +637,7 @@
 			}
 		},
 		{
-			"contents": "/* ConstraintToolModel.js\n * Model class for the constraint tools, which allows for the creation of basic constraints.\n * \n * The constraint tool works by allowing the user to construct a constraint through interaction\n * with the UI in stages, captured in this tool's code as states. The user can move through\n * the process by satisfying the requirements for a stage and then making a definitive indication\n * to the model to move to the next state ( currently, through an 'n' keypress ). Similarly,\n * they can move backwards through a 'b' keypress, or even return the state to the initial\n * by switching off the constraint tool. The stages of interaction are indicated below:\n *\n * 1) 'references': The user, just like with the selection tool, selects a set of instances\n *                  to have their properties constrained.\n *\n * 2) 'property':   Handles show up on a representative of the references selected representing\n *                  each primitive property of instances. The user can select a property \n *                  by clicking on it; this is the property of the references to constrain.\n *\n * 3) 'relatives':  The user, just like with the selection tool, selects a set of instances\n *                  to have their properties constrained to.\n *\n * 4) 'value':      The exact property to be constrained to for the relatives, based on a function\n *                  operating on a list of their properties, is specified. The exact UI\n *                  corresponding to the property as well as the means of selection vary between \n *                  properties; using position as an example, the UI elements are dashed horizontal\n *                  and vertical lines at the max, min, and avg x- and y-positions of the relatives.\n *                  Selection is done by clicking on one of the lines.\n *\n * 5) 'expression': The user types in an expression and chooses a relation in the UI elements that\n *                  appear in the Parameters menu. This expression then relates the reference \n *                  properties to the relative value specified. \n *\n *\n */\n\ndefine([\n    'underscore',\n    'paper',\n    'backbone',\n    'models/tools/BaseToolModel',\n    'utils/PPoint',\n    'utils/PaperUI',\n    'utils/PaperUIEvents',\n    'utils/Utils'\n], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIEvents, Utils) {\n\n  // hit testing for clicking Paper UI elements\n  var hitOptions = {\n    stroke: true,\n    bounds: true,\n    center: true,\n    tolerance: 3\n  };\n\n  // map property names for UI to instance properties to constrain\n  //\n  // NOTE: ideally this would be 1-1; i.e. constraining translation_delta\n  // would actually constrain position. In reality, an instance's position\n  // is based on both an original position AND a translation_delta. Thus\n  // making a position constraint really only constrains a delta for now.\n  // \n  // UPSHOT: there should be properties on the instance which directly \n  // relate to the properties to be constrained\n  var propToConstraintMap = {\n    'position': 'translation_delta',\n    'scale': 'scaling_delta',\n    'orientation': 'rotation_delta'\n  };\n\n  // model definition\n  var ConstraintToolModel = BaseToolModel.extend({\n \n    /*\n     * Creates attributes on the model for keeping track of the model's\n     * state.\n     */\n    defaults: _.extend({}, BaseToolModel.prototype.defaults, {\n      references: null,       // list of reference instances\n      relatives: null,        // list of relative instances\n      type: 'equal',          // relation for constraint\n      expression: '',         // the entered constraint expression\n      props_selected: null,   // a list of properties to be constrained\n      mode: 'references',     // indicator for current state\n      constrainToVal: [],     // array for specifying value constrained to\n    }),\n\n    /*\n     * Sets up the model.\n     */\n    initialize: function() {\n      BaseToolModel.prototype.initialize.apply(this, arguments);\n      this.set('references', []);\n      this.set('relatives', []);\n    },\n\n    /*\n     * Changes the constraint in state to reflect the selected relation (<, =, >).\n     * Currently only these three relations are supported, with names:\n     * 'less', 'equal', 'more'\n     * For convenience, they correspond to ids of UI elements.\n     *\n     * @param type - string for relation name\n     */\n    setConstraintType: function(type) {\n      this.set('type', type);\n      var result = {};\n      result['type'] = type;\n      console.log('[INFO] Selected Constraint Type: ' + type);\n      return type;\n    },\n\n    /*\n     * Changes the constraint in state to reflect comparison with the given expression. \n     * The expression is first validated and then set.\n     * \n     * @param exp - a string for the expression\n     */\n    setConstraintExpression: function(exp) {\n      var result = {};\n      if (this.validate(exp)) {\n        this.set('expression', exp);\n        result['expression'] = 'true';\n        console.log('[INFO] Valid Expression Entered: ' + exp);\n      } else {\n        result['expression'] = 'false';\n        console.log('[INFO] Invalid Expression Entered: ' + exp);\n      }\n      return result;\n    },\n\n    /*\n     * Validates the expression passed so that a constraint can be made.\n     * Validation should ensure that no injections are being made,\n     * since eval is used to evaluate the expression; it should also\n     * ensure that the expression is mathematically valid.\n     *\n     * @param exp - a string for the expression to validate\n     *\n     * TODO: IMPLEMENT THIS FUNCTION   \n     */\n    validate: function(exp) {\n      return true;\n    },\n\n    /*\n     * Sets the property that will be constrained in state. Note that \n     * these are only fundamental properties, such as position and scale.\n     *\n     * @param property - string for the name of the property to constrain\n     */\n    setConstraintProperty: function(property) {\n      // TODO: change this to adding to current set to allow for more than one selected constraint\n      var selected_props = [property];\n      var result = {};\n      result['property'] = property;\n      this.set('props_selected', selected_props);\n      console.log('Selected Constraint Property: ' + property);\n      return result;\n    },\n\n    /*\n     * Make sure the tool has a state which is workable. That is, relatives \n     * should not exist without references, etc.\n     *\n     * TODO: IMPLEMENT THIS FUNCTION\n     */\n    validateState: function() {\n\n    },\n\n    /*\n     * Move the state of the tool forward to allow for the next stage\n     * in constraint creation. Ensures that the current state's info\n     * is saved into state so that the next stage is meaningful.\n     *\n     */\n    advance: function() {\n      var state = this.get('mode');\n      switch ( state ) {\n        case 'references':\n          this.get('sm').delegateMethod('select', 'saveSelection');\n          this.set('mode', 'property');\n          console.log('[INFO] Advanced constraint tool mode to property');\n          break;\n        case 'property':\n          this.set('mode', 'relatives');\n          console.log('[INFO] Advanced constraint tool mode to relatives');\n          break;\n        case 'relatives':\n          this.set('mode', 'value');\n          console.log('[INFO] Advanced constraint tool mode to value');\n          break;\n        case 'value':\n          this.set('mode', 'expression');\n          console.log('[INFO] Advanced constraint tool mode to expression');\n          break;\n        case 'expression':\n          this.createConstraint();\n          this.clearState();\n          console.log('[INFO] Reset constraint tool state');\n          break; \n      }\n    },\n\n    /*\n     * Takes a list of instances, checks their validity, and sets them \n     * in the constraint tool reference state.\n     *\n     * @param instanceList - a list of instances\n     */\n    referencesSelection: function( instanceList ) {\n      if ( instanceList.length > 0 ) {\n        this.set('references', instanceList);\n      }\n    },\n\n    /*\n     * Takes a list of instances, checks their validity, and sets them \n     * in the constraint tool relatives state.\n     *\n     * @param instanceList - a list of instances\n     */\n    relativesSelection: function( instanceList ) {\n      if ( instanceList.length > 0 ) {\n        this.set('relatives', instanceList);\n      }\n    },\n    \n    /*\n     * Uses the constraint tool state which has been specified through\n     * the stages of interaction to construct the constraint on the \n     * references and relatives as desired. \n     */\n    createConstraint: function() {\n      var constrainToVal = this.get('constrainToVal');\n      var references = this.get('references');\n      var relatives = this.get('relatives');\n      var expression = this.get('expression');\n      var generator = references[0].getGenerator();\n      \n      var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );\n      var refProp = refPropList[0];\n      var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); \n      console.log(\"relList\",relPropList,\"refProp\",refProp);\n\n      var relativeF = function() {\n        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));\n        if(generator){\n          var i = generator.getValue();\n          \n          console.log('constraint value of i:',i);\n\n        }\n        var evaluation = eval( expression );\n        refProp.setValue( evaluation );\n        return evaluation;  \n      };\n\n      refProp.setConstraint(relativeF);\n\n\n      /* \n      var relDeltaList = Utils.getPropConstraintFromList( relatives, rewordToVal.slice(1, rewordToVal.length) );\n      var relativeDeltaF = function() {\n        var x = Utils[rewordToVal[0]]( relDeltaList.map( function( prop ) { return prop.getValue() }));\n        var evaluation = eval( expression );\n        refDelta.setValue( evaluation );\n        return evaluation; \n      };\n\n      refDelta.setConstraint( relativeF );*/\n    },\n\n   /* createListConstraint: function(){\n  \n      var constrainToVal = this.get('constrainToVal');\n      var references = this.get('references');\n      var relatives = this.get('relatives');\n      var expression = this.get('expression');\n      var generator = references[0].getGenerator();\n\n      var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );\n      var refProp = refPropList[0];\n      var relPropList = Utils.getPropConstraintFromList( relatives, constrainToVal.slice(1, constrainToVal.length) ); \n      console.log(\"relList\",relPropList,\"refProp\",refProp);\n\n      var relativeF = function() {\n        var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));\n        var i = generator.getValue();\n        var evaluation = eval( expression );\n        refProp.setValue( evaluation );\n        return evaluation;  \n      };\n\n      refProp.setConstraint(relativeF);\n    },*/\n\n    /*\n     * Rewords the specified value to be constrained to (a property list)\n     * so that the terms used in the UI (scale, position) map to instance\n     * properties.\n     *\n     * NOTE: Ideally, this should never have to be used.  \n     */\n    rewordConstraint: function() {\n      var constrainToVal = this.get('constrainToVal');\n      for (var i = 0; i < constrainToVal.length; i++) {\n        if (constrainToVal[i] in propToConstraintMap) {\n          constrainToVal[i] = propToConstraintMap[constrainToVal[i]];\n        }\n      }\n    },\n\n    /*\n     * Handles mouseDown events on the canvas when the constraint tool is\n     * being used. For each different state of the tool, the event is \n     * handled appropriately.\n     *\n     * state 'references': delegate mouseDown events to the selection tool\n     *                     for selection of reference instances\n     *\n     * state 'property':   do nothing\n     *\n     * state 'relatives':  delegate mouseDown events to the selection tool\n     *                     for selection of relative instances\n     * \n     * state 'value':      test for hits on UI elements that specify value\n     *                     to constrain to\n     *\n     * state 'expression': do nothing\n     */\n    mouseDown: function(event) {\n      var state = this.get('mode');\n      switch ( state ) {\n        case 'references':\n          // TODO: check if selection already exists, set to references if so, OR clear selections when constraint tool selected\n          var sm = this.get('sm');\n          this.get('sm').delegateMethod('select', 'mouseDown', event);\n          var references = this.get('sm').delegateMethod('select', 'getCurrentSelection');\n          this.referencesSelection( references );\n          break;\n        case 'relatives':\n          this.get('sm').delegateMethod('select', 'mouseDown', event);\n          var references = this.get('references'); \n          var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');\n          this.relativesSelection( relatives );\n          //this.get('sm').constrain( references[0], relatives[0] );\n          PaperUI.drawPositionDelimiters( references, relatives, {'max-translation_delta-x': true, 'max-translation_delta-y': true, 'avg-translation_delta-x': true, 'avg-translation_delta-y': true, 'min-translation_delta-x': true, 'min-translation_delta-y': true});\n          break;\n        case 'value':\n          var hitResult = paper.project.hitTest(event.point, hitOptions);\n          if ( hitResult ) {\n            var path = hitResult.item;\n            if ( path.name.indexOf( 'delimit' ) === 0 ) {\n              var propSplit = path.name.split('-');\n              propSplit = propSplit.slice( 1, propSplit.length );\n              this.set( 'constrainToVal', propSplit );\n              this.rewordConstraint();\n            }\n          }\n          break;\n        case 'expression':\n          // TODO: check if expression has been submitted?\n          break; \n      } \n    \n    },\n\n    mouseDrag: function(event) {\n            \n    },\n\n    dblClick: function(event) {\n      \n    },\n\n    mouseUp: function(event) {\n      \n    },\n\n    mouseMove: function(event) {\n\n    },\n\n    /*\n     * Resets the state of the constraint tool so that it is as if it has\n     * just been selected, or is not selected at all, and removes all UI \n     * elements associated with it. \n     */\n    clearState: function() {\n      this.get('sm').delegateMethod('select', 'resetSelections');\n      this.set('references', []);\n      this.set('relatives', []);\n      this.set('type', 'equal');\n      this.set('expression', '');\n      this.set('props_selected', []);\n      this.set('mode', 'references');\n      PaperUI.clear();\n    }, \n \n\n\n    /*\n     *  Constraint Tool UI Listeners, passed to Para UI\n     */\n\n    /*\n     *\n     */\n    delimiterHighlight: function( event ) {\n      var path = event.target;\n      // TODO: be pickier about these style changes \n      path.strokeColor = 'red'; \n      path.strokeWidth = 1.3*path.strokeWidth;  \n    },\n    \n    /*\n     *\n     */\n    delimiterSelect: function( event ) {\n      var path = event.target;\n      // TODO: be pickier about these style changes\n      path.strokeColor = 'blue';\n      path.strokeWidth = 1.3*path.strokeWidth;\n      this.set('constrainToVal', path.getName()); // TODO: implement path.getName, prob by extending Paper path \n    }\n  \n  });\n\n  \n\n\n\n  return ConstraintToolModel;\n\n});  \n\n    \n",
 			"file": "js/src/models/tools/ConstraintToolModel.js",
-			"file_size": 15519,
-			"file_write_time": 1423774754000000,
 			"settings":
 			{
 				"buffer_size": 15531,
@@ -824,7 +824,7 @@
 	],
 	"find":
 	{
-		"height": 123.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -850,6 +850,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"closedLists",
+			"ti_matrix",
+			"listsToCompile",
+			"console.log",
+			"filterSelection",
+			"modifyProperty:",
+			"openedLists",
+			"closeMembers",
+			"console.log",
+			"modifyProperty",
 			"\n      ",
 			"'end'",
 			"'end",
@@ -967,17 +977,7 @@
 			"stroke_wei",
 			"styleModified",
 			"console.log('selected tool style =',selectedTool.get('style'));",
-			"console.log(\"selected",
-			"console.log(selected",
-			".prototype.",
-			"accessProperty",
-			"PProperty",
-			"console.log",
-			".val",
-			"fill_colorR",
-			" fill_colorR",
-			"fillColorR",
-			"inheritProperty"
+			"console.log(\"selected"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -985,6 +985,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"lists",
 			"'end_val'",
 			"'start_val'",
 			"listsToCompile",
@@ -1052,7 +1053,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1060,15 +1061,15 @@
 					"file": "js/src/models/StateManagerModel.js",
 					"settings":
 					{
-						"buffer_size": 31058,
+						"buffer_size": 30787,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8744,
-								8744
+								24081,
+								24094
 							]
 						],
 						"settings":
@@ -1079,7 +1080,7 @@
 							"word_wrap": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4652.0,
+						"translation.y": 20603.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1089,15 +1090,15 @@
 					"file": "js/src/models/data/PointNode.js",
 					"settings":
 					{
-						"buffer_size": 1206,
+						"buffer_size": 1240,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								464,
-								464
+								1173,
+								1173
 							]
 						],
 						"settings":
@@ -1107,7 +1108,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 17.0,
+						"translation.y": 46.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1117,15 +1118,15 @@
 					"file": "js/src/models/data/PathNode.js",
 					"settings":
 					{
-						"buffer_size": 5322,
+						"buffer_size": 5257,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3386,
-								3396
+								1893,
+								1893
 							]
 						],
 						"settings":
@@ -1135,7 +1136,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1470.0,
+						"translation.y": 632.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1145,19 +1146,15 @@
 					"file": "js/src/models/data/ListNode.js",
 					"settings":
 					{
-						"buffer_size": 5545,
+						"buffer_size": 9836,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3550,
-								3550
-							],
-							[
-								3602,
-								3602
+								645,
+								645
 							]
 						],
 						"settings":
@@ -1167,40 +1164,13 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1866.0,
+						"translation.y": 174.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "js/src/models/data/Instance.js",
-					"settings":
-					{
-						"buffer_size": 22133,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								9898,
-								9898
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2591.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
 					"file": "js/src/utils/PFloat.js",
 					"settings":
 					{
@@ -1221,13 +1191,13 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 110.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "js/src/utils/PPoint.js",
 					"settings":
 					{
@@ -1256,23 +1226,23 @@
 			]
 		},
 		{
-			"selected": 7,
+			"selected": 5,
 			"sheets":
 			[
 				{
-					"buffer": 7,
+					"buffer": 6,
 					"file": "js/src/models/data/Generator.js",
 					"settings":
 					{
-						"buffer_size": 2336,
+						"buffer_size": 2340,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								568,
-								568
+								985,
+								985
 							]
 						],
 						"settings":
@@ -1282,7 +1252,34 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 657.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "js/src/models/data/Instance.js",
+					"settings":
+					{
+						"buffer_size": 22519,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1578,
+								1578
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1189.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1291,7 +1288,7 @@
 					"buffer": 8,
 					"settings":
 					{
-						"buffer_size": 587,
+						"buffer_size": 3759,
 						"regions":
 						{
 							"match":
@@ -1306,6 +1303,62 @@
 									[
 										477,
 										485
+									],
+									[
+										783,
+										797
+									],
+									[
+										936,
+										950
+									],
+									[
+										1077,
+										1091
+									],
+									[
+										1216,
+										1230
+									],
+									[
+										1405,
+										1419
+									],
+									[
+										1641,
+										1655
+									],
+									[
+										1874,
+										1888
+									],
+									[
+										2144,
+										2158
+									],
+									[
+										2447,
+										2461
+									],
+									[
+										2705,
+										2719
+									],
+									[
+										3013,
+										3025
+									],
+									[
+										3123,
+										3135
+									],
+									[
+										3305,
+										3317
+									],
+									[
+										3588,
+										3600
 									]
 								],
 								"scope": ""
@@ -1314,14 +1367,14 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								3593,
+								3593
 							]
 						],
 						"settings":
 						{
 							"detect_indentation": false,
-							"output_tag": 1,
+							"output_tag": 3,
 							"result_base_dir": "",
 							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
 							"result_line_regex": "^ +([0-9]+):",
@@ -1329,7 +1382,7 @@
 							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1666.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1356,7 +1409,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1087.0,
+						"translation.y": 1308.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1366,15 +1419,15 @@
 					"file": "js/src/models/data/Visitor.js",
 					"settings":
 					{
-						"buffer_size": 7923,
+						"buffer_size": 6772,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2155,
-								2155
+								647,
+								647
 							]
 						],
 						"settings":
@@ -1383,7 +1436,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2698.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1400,8 +1453,8 @@
 						"selection":
 						[
 							[
-								1098,
-								1098
+								8406,
+								8406
 							]
 						],
 						"settings":
@@ -1411,7 +1464,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4045.0,
+						"translation.y": 4956.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1428,8 +1481,8 @@
 						"selection":
 						[
 							[
-								4316,
-								4316
+								3614,
+								3617
 							]
 						],
 						"settings":
@@ -1438,8 +1491,8 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 1252.0,
+						"translation.x": 8.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1456,8 +1509,8 @@
 						"selection":
 						[
 							[
-								7162,
-								7170
+								164,
+								164
 							]
 						],
 						"settings":
@@ -1467,7 +1520,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4538.0,
+						"translation.y": 77.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1484,8 +1537,8 @@
 						"selection":
 						[
 							[
-								14790,
-								14795
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1494,8 +1547,8 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 6298.0,
+						"translation.x": 13.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1531,7 +1584,7 @@
 		"cols":
 		[
 			0.0,
-			0.485593075286,
+			0.391564420318,
 			1.0
 		],
 		"rows":
@@ -1574,6 +1627,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 331.0,
+	"side_bar_width": 246.0,
 	"status_bar_visible": true
 }

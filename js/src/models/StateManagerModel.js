@@ -614,6 +614,21 @@ define(['jquery',
     },
 
 
+    /*geometryDeleted
+    * triggers a delete action on the visitor
+    */
+    geometryDeleted:function(){
+       var selectedShapes = selectTool.get('selected_shapes');
+      for (var i = 0; i < selectedShapes.length; i++) {
+        console.log('deleting at ',i);
+        var instance = selectedShapes[i];
+        visitor.removeInstance(rootNode,null,instance);
+      }
+      selectTool.deselectAll();
+      this.compile();
+    },
+
+
     /* geometrySegmentModified
      * callback that is triggered when a geometry segment is transformed
      * by the user
@@ -983,40 +998,7 @@ define(['jquery',
       }
     },
 
-
-
-    updateCopyNum: function(number) {
-      if (selectTool.selectedNodes.length > 0) {
-        this.rootChange(true);
-
-        for (var i = 0; i < selectTool.selectedNodes.length; i++) {
-
-          selectTool.selectedNodes[i].incrementCopyNum(number);
-        }
-        this.rootChange(false);
-
-
-      }
-      currentNode.update([{}]);
-      // this.rootRender();
-      paper.view.draw();
-    },
-
-
-
-    deleteObject: function() {
-      if (selectTool.selectedNodes.length > 0) {
-        for (var i = 0; i < selectTool.selectedNodes.length; i++) {
-          if (!selectTool.selectedNodes[i].isFollowPath) {
-            selectTool.selectedNodes[i].deleteNode();
-          }
-        }
-      }
-      currentNode.update([{}]);
-      // this.rootRender();
-      paper.view.draw();
-    },
-
+  
   });
 
   return StateManagerModel;

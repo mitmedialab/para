@@ -95,6 +95,36 @@ define([
 			}
 		},
 
+
+		removeInstance: function(node,departureNode,target){
+			console.log('removeInstance called for',node.get('id'));
+			if(node===target){
+				console.log('found target', node.get('type'));
+				node.deleteSelf();
+				for(var j=0;j<lists.length;j++){
+					if(lists[j]===node){
+						lists.splice(j,1);
+						lists = lists.concat(node.getListMembers());
+						node.removeAllMembers();
+						break;
+					}
+					else{
+						lists[j].recRemoveMember(target);
+					}
+				}
+				if(departureNode){
+					departureNode.removeChildNode(node);
+				}
+
+			}
+			else{
+				for(var i=0;i<node.children.length;i++){
+					console.log('checking child at',i);
+					node.children[i].visit(this,'removeInstance',node,target);
+				}
+			}
+		},
+
 		/*visit
 		 * visitor method to walk the tree and compute and render each
 		 * node on the screen according to type;
@@ -128,7 +158,7 @@ define([
 			var state = state_data.list;
 			if (state === store) {
 				for (var k = 0; k < node.children.length; k++) {
-					node.children[k].visit(this, node, state_data);
+					node.children[k].visit(this, 'visit', node, state_data);
 				}
 			} else if (state === compile) {
 				node.compile();
@@ -136,7 +166,7 @@ define([
 				for (var i = 0; i < node.members.length; i++) {
 					member = node.members[i];
 					if (member.get('type') === 'list') {
-						member.visit(this, node, state_data);
+						member.visit(this, 'visit',node, state_data);
 					}
 				}
 				return;
@@ -158,7 +188,7 @@ define([
 					node.compile();
 					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {
-						children[i].visit(this, node, state_data);
+						children[i].visit(this, 'visit',node, state_data);
 					}
 					break;
 			}

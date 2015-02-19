@@ -138,48 +138,22 @@ define([
 			SceneNode.prototype.initialize.apply(this, arguments);
 		},
 
-
-
-		/* Overriding methods for add and remove child node*/
-		addChildNode: function(child) {
-			/*if (selectedInstances) {
-				console.log('selected instances',selectedInstances);
-				for (var i = 0; i < selectedInstances.length; i++) {
-					if (selectedInstances[i].get('type') === 'list') {
-						console.log('removing list at',i);
-						this.removeListsItem(selectedInstances[i]);
-					}
-				}
+		/* deleteSelf
+		* function called before instance is removed from
+		* scene graph
+		*/
+		deleteSelf:function(){
+			var geom = this.get('geom');
+			if(geom){
+				geom.remove();
 			}
-			var lists = this.get('lists');
-			if (child.get('type') === 'list') {
-				lists.push(child);
-				console.log('adding list to node');
-			}
-			this.set('lists', lists);*/
-			SceneNode.prototype.addChildNode.call(this, child);
-		},
-
-
-		removeChildNode: function(child) {
-			/*	if (child.get('type') === 'list') {
-					this.removeListsItem(child);
-				}*/
-			SceneNode.prototype.removeChildNode.call(this, child);
-		},
-
-
-		removeListsItem: function(instance) {
-			var lists = this.get('lists');
-			var index = $.inArray(instance, lists);
-			if (index !== -1) {
-				lists.splice(index, 1);
+			for(var i=0;i<this.children.length;i++){
+				this.children[i].deleteSelf();
+				//this.children[i].destroy();
 			}
 		},
 
-
-
-		/*hasMember, getMember
+		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
 		 * evaluation and access functions to assist in managing lists
 		 */
 
@@ -222,6 +196,10 @@ define([
 			if (this.generator) {
 				return this.generator;
 			}
+		},
+
+		recRemoveMember: function(data){
+			return false;
 		},
 
 		/* create
@@ -311,7 +289,7 @@ define([
 		},
 
 
-		/*setPropertiesToInstance
+		/*_setPropertiesToInstance
 		 * sets delta to match properties of a given instance, depending on the properties of the
 		 * data that is passed in
 		 */
@@ -331,7 +309,7 @@ define([
 		},
 
 
-		/*rsetPropertiesToPrototype
+		/*_setPropertiesToPrototype
 		 * removes property of instance so that it is overriden by prototype,
 		 * if property exists in the data
 		 */
@@ -357,18 +335,6 @@ define([
 		},
 
 
-		resetPathDeltas: function() {
-			var geom = new paper.Path();
-			geom.importJSON(this.get('master_path'));
-			var path_deltas = [];
-			for (var i = 0; i < geom.segments.length; i++) {
-				path_deltas.push(new PPoint(0, 0));
-			}
-			this.set('path_deltas', path_deltas);
-			geom.remove();
-			geom = null;
-		},
-
 		exportJSON: function() {
 			return this.toJSON();
 		},
@@ -377,35 +343,14 @@ define([
 			this.set(data.toJSON);
 		},
 
-		/*normalizeGeometry
-		 */
-		normalizeGeometry: function(path, matrix) {
-			var data = {};
-			return data;
-		},
 
-
-		setAbsolutePosition: function(data) {
-			var center = this.get('center').clone();
-			var translation_delta = this.get(translation_delta);
-			var x_diff = center.x - data.x;
-			var y_diff = center.y - data.y;
-			var m_data = {
-				x: x_diff,
-				y: y_diff,
-				operator: 'set'
-			};
-			translation_delta.modify(m_data);
-		},
-
-		getRelativeVal: function(property_name, data) {
-			var property = this.get("abs_" + property_name);
-			if (property) {
-				var diff = property.sub(data, true);
-				return diff;
-			}
-		},
-
+		/*modifyProperty
+		* called to update the property of an instance
+		* data: defines the property to be modifed, along with the 
+		* new values
+		* mode: proxy or standard: determines what is being updated (prototype or object)
+		* modifer: overide or relative: determines how the updates should be implemented
+		*/
 		modifyProperty: function(data, mode, modifier) {
 			var matrix = this.get('matrix');
 			var proto_incremented = false;
@@ -457,7 +402,6 @@ define([
 		 */
 
 		inheritProperty: function(property_name) {
-			//console.log('inheriting at',property_name,this.get('type'));
 			if (!this.get(property_name).isNull()) {
 				var property = this.get(property_name);
 				return property;
@@ -469,7 +413,6 @@ define([
 					return this.get('proto_node').inheritProperty(property_name);
 				}
 			}
-			//console.log('property is null');
 			return null;
 		},
 
@@ -597,16 +540,15 @@ define([
 		},
 
 
-		/*only called on a render function-
-		propagates the instances' properties with that of the data*/
-
+		/* compile
+		computes the current properties of the instance given current 
+		constraints and inheritance */
 		compile: function() {
 			this.compileTransforms();
 		},
 
 		compileTransforms: function() {
-			  //console.log('compiling t', this.get('id'), 'instance');
-
+			//console.log('compiling t', this.get('id'), 'instance');
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');
@@ -631,7 +573,9 @@ define([
 
 		},
 
-
+		/*render
+		* draws instance on canvas
+		*/
 		render: function() {
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
