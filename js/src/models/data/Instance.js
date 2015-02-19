@@ -184,17 +184,17 @@ define([
 			return [];
 		},
 
-		/* setGenerator, getGenerator
-		 * sets and gets the generator for this list
+		/* setSampler, getSampler
+		 * sets and gets the sampler for this list
 		 * which can be used to define iterative constraints
 		 */
-		setGenerator: function(generator) {
-			this.generator = generator;
+		setSampler: function(sampler) {
+			this.sampler = sampler;
 		},
 
-		getGenerator: function(generator) {
-			if (this.generator) {
-				return this.generator;
+		getSampler: function(sampler) {
+			if (this.sampler) {
+				return this.sampler;
 			}
 		},
 
@@ -352,7 +352,7 @@ define([
 		* modifer: overide or relative: determines how the updates should be implemented
 		*/
 		modifyProperty: function(data, mode, modifier) {
-			var matrix = this.get('matrix');
+			console.log('modifying with',data);
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
@@ -635,12 +635,13 @@ define([
 			var inheritor_selected = this.get('inheritor_selected');
 			var bbox, inheritor_bbox;
 			//if (selected_indexes.length === 0) {
+				geom.selected = selected;
+
 			if (selected) {
 				// EXPERIMENTAL
 				// geom.selectedColor = this.get('primary_selection_color');
 				geom.selectedColor = this.getSelectionColor();
-				geom.selected = selected;
-
+				
 				// g_bbox.selectedColor = this.get('primary_selection_color');
 				bbox = this.renderBoundingBox(geom);
 				bbox.selectedColor = this.getSelectionColor();

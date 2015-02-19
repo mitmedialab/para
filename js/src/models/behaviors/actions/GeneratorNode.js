@@ -1,4 +1,4 @@
-/*GeneratorNode.js
+/*SamplerNode.js
 Node that triggers (runs) subsequent chain of behaviors 
 until end statement is passed back up execution chain
 */
@@ -9,8 +9,8 @@ define([
 
   function(BaseNode) {
 
-    var GeneratorNode = BaseNode.extend({
-      name: 'generator',
+    var SamplerNode = BaseNode.extend({
+      name: 'sampler',
      type: 'procedure',
 
       constructor: function() {
@@ -25,7 +25,7 @@ define([
         var endCheck;
         if (this.next) {
           while (endCheck != this.end) {
-            //console.log("=====generator_tick=======");
+            //console.log("=====sampler_tick=======");
             endCheck = this.next.trigger();
           }
         }
@@ -33,5 +33,5 @@ define([
 
     });
 
-    return GeneratorNode;
+    return SamplerNode;
   });

@@ -89,9 +89,9 @@ define([
 
 		render: function(root) {
 			for (var i = 0; i < renderQueue.length; i++) {
-				if (renderQueue[i].get('type') !== 'generator') {
-					renderQueue[i].render();
-				}
+				
+				renderQueue[i].render();
+				
 			}
 		},
 

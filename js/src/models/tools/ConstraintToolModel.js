@@ -235,7 +235,7 @@ define([
       var references = this.get('references');
       var relatives = this.get('relatives');
       var expression = this.get('expression');
-      var generator = references[0].getGenerator();
+      var sampler = references[0].getSampler();
       
       var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );
       var refProp = refPropList[0];
@@ -244,8 +244,8 @@ define([
 
       var relativeF = function() {
         var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));
-        if(generator){
-          var i = generator.getValue();
+        if(sampler){
+          var i = sampler.getValue();
           
           console.log('constraint value of i:',i);
 
@@ -276,7 +276,7 @@ define([
       var references = this.get('references');
       var relatives = this.get('relatives');
       var expression = this.get('expression');
-      var generator = references[0].getGenerator();
+      var sampler = references[0].getSampler();
 
       var refPropList = Utils.getPropConstraintFromList( references, constrainToVal.slice(1, constrainToVal.length) );
       var refProp = refPropList[0];
@@ -285,7 +285,7 @@ define([
 
       var relativeF = function() {
         var x = Utils[constrainToVal[0]]( relPropList.map( function( prop ) { return prop.getValue(); }));
-        var i = generator.getValue();
+        var i = sampler.getValue();
         var evaluation = eval( expression );
         refProp.setValue( evaluation );
         return evaluation;  

@@ -13,7 +13,7 @@ define(['jquery',
   'models/data/EllipseNode',
   'models/data/ListNode',
   'models/data/Instance',
-  'models/data/Generator',
+  'models/data/Sampler',
   'models/tools/ToolCollection',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
@@ -24,7 +24,7 @@ define(['jquery',
   'utils/PPoint',
   'utils/ColorUtils',
   'utils/PaperUI',
-], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, Generator, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, PaperUI) {
+], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, Sampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, PaperUI) {
 
   var rootNode, uninstantiated, visitor, currentNode, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
 
@@ -282,19 +282,23 @@ define(['jquery',
         if (selectedShapes.length > 0) {
 
           var list = new ListNode();
+           var sampler = new Sampler();
+          sampler.addChildNode(list);
+          list.setSampler(sampler);
+
           list.addMember(selectedShapes);
 
-          var generator = new Generator();
-          generator.addChildNode(list);
-          generator.setRange(0, selectedShapes.length);
-          list.setGenerator(generator);
+         
           visitor.addList(list);
           selectTool.deselectAll();
-          currentNode.addChildNode(generator);
+          currentNode.addChildNode(sampler);
           selectTool.addSelectedShape(list);
+          var m_d = list.members[0].accessProperty('translation_delta');
+          sampler.modifyProperty({translation_delta:m_d});
         }
       }
       this.compile();
+
     },
 
     /*openSelectedGroups
@@ -450,101 +454,6 @@ define(['jquery',
       this.compile();
     },
 
-    /*constrain
-     * placeholder function for setting constraints
-     * between instances
-     */
-
-    constrain: function(relInstance, refInstance) {
-      /*example which sets one-way offset constraint on x coordinate of translation delta*/
-
-      var offset = 100;
-      /*constraint function
-      * IMPORTANT: for each constraint function to work correctly
-      * you must both set the value of the constrained property
-      and return the new value (even though this seems redundant) */
-      var relativeF = function() {
-        //access translation delta properties for both relative and reference objects
-        var ref = refInstance.inheritProperty('translation_delta');
-        var rel = relInstance.inheritProperty('translation_delta');
-        //set the x value of the reference property to the x value of the relative property + the offset
-        ref.setX(rel.getX() + offset);
-        //console.log('Constrained value: ', rel.getX() + offset);
-        //return the offset x value of the relative property
-        return rel.getX() + offset;
-      };
-
-
-      //var offset = 0.5;
-      /*constraint function
-      * IMPORTANT: for each constraint function to work correctly
-      * you must both set the value of the constrained property
-      and return the new value (even though this seems redundant) */
-      // refInstance.set('fill_color',relInstance.inheritProperty('fill_color').clone());
-      /* var relativeF = function() {
-          //access translation delta properties for both relative and reference objects
-          var ref = refInstance.inheritProperty('fill_color');
-          var rel = relInstance.inheritProperty('fill_color');
-          //set the x value of the reference property to the x value of the relative property + the offset
-          ref.setR(rel.getR() + 0.2);
-          ref.setG(rel.getG() + 0.2);
-          ref.setB(rel.getB() + 0.2);
-          //return the offset x value of the relative property
-          return {
-            r: rel.getR() + 0.2,
-            b: rel.getG() + 0.2,
-            c: rel.getB() + 0.2,
-            a: 1
-          };
-        };
-
-        //set the constraint on the x property of the ref translation 
-        refInstance.inheritProperty('fill_color').setConstraint(relativeF);
-
-          /*var relativeF = function(){
-             //access translation delta properties for both relative and reference objects
-             var ref = refInstance.inheritProperty('translation_delta');
-             var rel = relInstance.inheritProperty('translation_delta');
-             //set the x value of the reference property to the x value of the relative property + the offset
-             ref.setX(rel.getX()+100);
-             ref.setX(rel.getY()+100);
-             //return the offset x value of the relative property
-             return {x:rel.getX()+100,
-                    y: rel.getY()+100};
-           };*/
-
-      //set the constraint on the x property of the ref translation 
-      //refInstance.inheritProperty('translation_delta').setConstraint(relativeF);
-
-
-
-      /*example which sets two-way equality constraint on rotation_delta*/
-      /* constraint function
-       * requires two, one for both relative and reference properties
-       * will not work correctly if other objects are also set to have
-       * equal constraints with objects that are pre-constrained
-       * will likely need a constraint manager to handle equality constraints in the
-       * future
-       */
-      /* var equalFRef = function(){
-         var ref = refInstance.inheritProperty('rotation_delta');
-         var rel = relInstance.inheritProperty('rotation_delta');
-         rel.setValue(ref.val.getValue());
-         return  ref.val.getValue();
-       };
-
-        var equalFRel = function(){
-         var ref = refInstance.inheritProperty('rotation_delta');
-         var rel = relInstance.inheritProperty('rotation_delta');
-        ref.setValue(rel.val.getValue());
-         return  rel.val.getValue();
-       };
-
-       refInstance.inheritProperty('rotation_delta').setConstraint(equalFRef);
-       relInstance.inheritProperty('rotation_delta').setConstraint(equalFRel);*/
-
-    },
-
     /* geometryDSelected
      * callback that is triggered when a new geometry
      * object is direct-selected by the user
@@ -608,6 +517,7 @@ define(['jquery',
       var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
+        console.log('modifying with data',data);
         instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
       }
       this.compile();

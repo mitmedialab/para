@@ -1,0 +1,31 @@
+/*SamplerView.js
+ *  view for each sampler element */
+
+define([
+  'jquery',
+  'underscore',
+  'backbone',
+  'paper',
+  'utils/PPoint'
+
+], function($, _, Backbone) {
+
+
+  var SamplerView = Backbone.View.extend({
+
+    defaults: {
+
+    },
+
+    initialize: function(){
+
+    },
+
+    
+
+  });
+
+  return SamplerView;
+
+
+});

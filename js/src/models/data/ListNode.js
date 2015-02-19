@@ -23,17 +23,17 @@ define([
       this.get('translation_delta').setNull(false);
     },
 
-    printMembers:function(){
-   
+    printMembers: function() {
+
       var ids = [];
-      for (var i=0;i<this.members.length;i++){
-        
-        if(this.members[i].get('type')==='list'){
-           this.members[i].printMembers();
-         }
-         ids = ids.concat(this.members[i].get('id'));
+      for (var i = 0; i < this.members.length; i++) {
+
+        if (this.members[i].get('type') === 'list') {
+          this.members[i].printMembers();
+        }
+        ids = ids.concat(this.members[i].get('id'));
       }
-      console.log('total members for',this.get('id'),ids.length,ids);
+      console.log('total members for', this.get('id'), ids.length, ids);
     },
 
     /* addMember, removeMember
@@ -62,6 +62,9 @@ define([
         });
         // console.log("t-delta after", data.accessProperty('translation_delta'));
         this.members.push(data);
+      }
+      if (this.sampler) {
+        this.sampler.setRange(0, this.members.length - 1);
       }
     },
 
@@ -92,10 +95,10 @@ define([
     },
 
     /* removeAllMembers;
-    * removes all members from this list
-    */
-    removeAllMembers: function(){
-      for(var i=this.members.length-1;i>=0;i--){
+     * removes all members from this list
+     */
+    removeAllMembers: function() {
+      for (var i = this.members.length - 1; i >= 0; i--) {
         this.removeMember(this.members[i]);
       }
     },
@@ -107,10 +110,14 @@ define([
       } else {
         var member = this.members.splice(index, 1)[0];
         member.modifyProperty({
-           'translation_delta': this.accessProperty('translation_delta')
-         });
+          'translation_delta': this.accessProperty('translation_delta')
+        });
+        if (this.sampler) {
+          this.sampler.setRange(0, this.members.length - 1);
+        }
         return true;
       }
+
     },
 
     /*recRemoveMember
@@ -166,11 +173,11 @@ define([
     },
 
     /* getListMembers
-    * returns all members of this list which are themselves lists
-    */
-    getListMembers: function(){
-      return this.members.filter(function(member){
-        return member.get('type')==='list';
+     * returns all members of this list which are themselves lists
+     */
+    getListMembers: function() {
+      return this.members.filter(function(member) {
+        return member.get('type') === 'list';
       });
     },
 
@@ -232,11 +239,12 @@ define([
     },
 
     compileMembers: function() {
-     // console.log('compiling list', this.get('id'), this.accessProperty('translation_delta'), this.get('tmatrix'));
+      // console.log('compiling list', this.get('id'), this.accessProperty('translation_delta'), this.get('tmatrix'));
       //console.log('num members = ', this.members.length, 'num geom =', geomList.length);
       // console.log('tdelta',this.accessProperty('translation_delta'));
       //console.log('l-matrix',this.get('tmatrix'));
       var translation_delta = this.get('translation_delta');
+      var l_matrix;
       for (var i = 0; i < this.members.length; i++) {
 
         var i_matricies = this.compileTransforms();
@@ -244,7 +252,7 @@ define([
         var member = this.members[i];
         var mtd = member.get('translation_delta');
         var m_tmatrix = member.get('tmatrix');
-        var l_matrix = i_matricies.tmatrix;
+        l_matrix = i_matricies.tmatrix;
         var xC = translation_delta.x.isConstrained();
         var yC = translation_delta.y.isConstrained();
         var mxC = mtd.x.isConstrained();
@@ -262,9 +270,12 @@ define([
           l_matrix.ty = 0;
         }
         m_tmatrix.concatenate(l_matrix);
-        if (this.generator) {
-          this.generator.increment();
+        if (this.sampler) {
+          this.sampler.increment();
         }
+      }
+      if (this.sampler) {
+        this.sampler.get('tmatrix').concatenate(l_matrix);
       }
     },
 

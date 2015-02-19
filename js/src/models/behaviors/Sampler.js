@@ -1,4 +1,4 @@
-/*Generator.js
+/*Sampler.js
  */
 define([
     'models/behaviors/BaseBehavior',
@@ -7,9 +7,9 @@ define([
 
   function(BaseBehavior, BehaviorUpdates) {
 
-    var Generator = BaseBehavior.extend({
-      name: 'generator',
-      type: 'generator',
+    var Sampler = BaseBehavior.extend({
+      name: 'sampler',
+      type: 'sampler',
 
        constructor: function() {
         this.behaviors = [];
@@ -42,7 +42,7 @@ define([
 
       calculate: function(data) {
        if(this.datatype.type!= 'root'){
-          console.log("generator calculate for",this.sname);
+          console.log("sampler calculate for",this.sname);
         }
         while(!this.iterator.terminate){
           var  dataR = this.iterator.calculate();
@@ -73,5 +73,5 @@ define([
 
     });
 
-    return Generator;
+    return Sampler;
   });
