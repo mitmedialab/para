@@ -15,18 +15,22 @@ define([
   //booleans for keeping track of whether user is clicking on sub or main canvas
   var sub, main, inactive, active;
   var sb;
-  var saveKey = 83;
-  var loadKey = 76;
-  var panKey = 32;
-  var rootKey = 82;
-  var groupKey = 71;
-  var deleteKey = 67;
-  var upArrow = 38;
-  var downArrow = 40;
-  var rightArrow = 39;
-  var leftArrow = 37;
-  var pan, alt, cmd, shift = false;
-  var advanceKey = 78; // EXPERIMENTAL
+  var saveKey = 83;                           // s
+  var loadKey = 76;                           // l
+  var panKey = 32;                            // 
+  var rootKey = 82;                           // r
+  var groupKey = 71;                          // g
+  var deleteKey = 67;                         // c
+  var upArrow = 38;                           // up arrow
+  var downArrow = 40;                         // down arrow
+  var rightArrow = 39;                        // right arrow
+  var leftArrow = 37;                         // left arrow
+  var pan, alt, cmd, shift = false; 
+  
+  // explore ensuring key combinations (e.g. shift-click selects but shift advances)
+  var advanceKey = 78;                        // n EXPERIMENTAL
+  var retreatKey = 66;                        // b EXPERIMENTAL                           
+  
   var last = {
     x: 0,
     y: 0

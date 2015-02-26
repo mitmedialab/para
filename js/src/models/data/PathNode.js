@@ -36,6 +36,7 @@ define([
      * returns the transformation data
      */
     normalizeGeometry: function(path, matrix) {
+
       var data = {};
       data.rotation_delta = new PFloat(matrix.rotation);
       if (data.rotation_delta > 360 || data.rotation_delta < 0) {
@@ -66,11 +67,13 @@ define([
       path.visible = false;
       path.selected = false;
       path.data.nodetype = this.get('name');
-      var segments = path.segments;
-      for(var j=0;j<segments.length;j++){
-        var pointNode = new PointNode();
-        pointNode.normalizeGeometry(segments[j]);
-        this.addChildNode(pointNode);
+      if ( path.segments ) {
+        var segments = path.segments;
+        for(var j=0;j<segments.length;j++){
+          var pointNode = new PointNode();
+          pointNode.normalizeGeometry(segments[j]);
+          this.addChildNode(pointNode);
+        }
       }
       var pathJSON = path.exportJSON({
         asString: true

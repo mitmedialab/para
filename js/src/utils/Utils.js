@@ -31,6 +31,7 @@ define([
     getPropFromList: function( instanceList, propertySplit ) {
       return instanceList.map( function( instance ) {
         var property = instance.accessProperty( propertySplit[0] );
+        if ( propertySplit.length == 1 ) { return property; }
         for ( var i = 1; i < propertySplit.length - 1; i++ ) {
           property = property[propertySplit[i]];
         }
@@ -119,6 +120,11 @@ define([
 
     propSpecifierToReference: function( instanceList, propSpecifier ) {
       
+    },
+
+    // make sure we're not passing events for things like UI to canvas
+    validateEvent: function( event ) {
+      return (!event.item || event.item.name != 'ui');
     }
   };
   
