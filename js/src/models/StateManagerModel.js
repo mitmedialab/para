@@ -282,23 +282,39 @@ define(['jquery',
         if (selectedShapes.length > 0) {
 
           var list = new ListNode();
-           var sampler = new Sampler();
+          var sampler = new Sampler();
           sampler.addChildNode(list);
           list.setSampler(sampler);
-
           list.addMember(selectedShapes);
-
-         
           visitor.addList(list);
           selectTool.deselectAll();
           currentNode.addChildNode(sampler);
           selectTool.addSelectedShape(list);
           var m_d = list.members[0].accessProperty('translation_delta');
-          sampler.modifyProperty({translation_delta:m_d});
+          sampler.modifyProperty({
+            translation_delta: m_d
+          });
         }
       }
       this.compile();
 
+    },
+
+    applySampleToInstance: function() {
+      console.log('applying sample');
+      var selectedShapes = selectTool.get('selected_shapes');
+      for (var i = 0; i < selectedShapes.length; i++) {
+        var instance = selectedShapes[i];
+        var sampler = new Sampler();
+        sampler.addChildNode(instance);
+        currentNode.addChildNode(sampler);
+        var m_d = instance.accessProperty('translation_delta');
+        sampler.modifyProperty({
+          translation_delta: m_d
+        });
+        sampler.setRange(0, 20, true);
+      }
+      this.compile();
     },
 
     /*openSelectedGroups
@@ -308,11 +324,11 @@ define(['jquery',
     openSelectedGroups: function() {
       var selectedShapes = selectTool.get('selected_shapes');
       var members = [];
-    
-        var openedLists = visitor.toggleOpen(selectedShapes);
-        for(var i=0;i<openedLists.length;i++){
-          members = members.concat(openedLists[i].members);
-        
+
+      var openedLists = visitor.toggleOpen(selectedShapes);
+      for (var i = 0; i < openedLists.length; i++) {
+        members = members.concat(openedLists[i].members);
+
       }
       selectTool.removeSelectedShape(openedLists);
       selectTool.addSelectedShape(members);
@@ -517,7 +533,7 @@ define(['jquery',
       var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
-        console.log('modifying with data',data);
+        console.log('modifying with data', data);
         instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
       }
       this.compile();
@@ -525,14 +541,14 @@ define(['jquery',
 
 
     /*geometryDeleted
-    * triggers a delete action on the visitor
-    */
-    geometryDeleted:function(){
-       var selectedShapes = selectTool.get('selected_shapes');
+     * triggers a delete action on the visitor
+     */
+    geometryDeleted: function() {
+      var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
-        console.log('deleting at ',i);
+        console.log('deleting at ', i);
         var instance = selectedShapes[i];
-        visitor.removeInstance(rootNode,null,instance);
+        visitor.removeInstance(rootNode, null, instance);
       }
       selectTool.deselectAll();
       this.compile();
@@ -908,7 +924,7 @@ define(['jquery',
       }
     },
 
-  
+
   });
 
   return StateManagerModel;

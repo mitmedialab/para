@@ -1,4 +1,4 @@
-/*FÏ.js
+/*behavior.js
 * node that manages procedural behaviors and 
 renders children according to these behaviors
 

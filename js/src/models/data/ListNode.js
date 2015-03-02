@@ -24,7 +24,6 @@ define([
     },
 
     printMembers: function() {
-
       var ids = [];
       for (var i = 0; i < this.members.length; i++) {
 
@@ -246,7 +245,7 @@ define([
       var translation_delta = this.get('translation_delta');
       var l_matrix;
       for (var i = 0; i < this.members.length; i++) {
-
+        console.log('compiling transform for index',i);
         var i_matricies = this.compileTransforms();
         //  console.log('l-matrix', this.get('tmatrix'));
         var member = this.members[i];

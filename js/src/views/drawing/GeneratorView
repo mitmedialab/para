@@ -1,5 +1,5 @@
-/*SamplerView.js
- *  view for each sampler element */
+/*GeneratorView.js
+ *  view for each generator element */
 
 define([
   'jquery',
@@ -11,7 +11,7 @@ define([
 ], function($, _, Backbone) {
 
 
-  var SamplerView = Backbone.View.extend({
+  var GeneratorView = Backbone.View.extend({
 
     defaults: {
 
@@ -25,7 +25,7 @@ define([
 
   });
 
-  return SamplerView;
+  return GeneratorView;
 
 
 });

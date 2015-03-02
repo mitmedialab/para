@@ -16,8 +16,11 @@ define([
         name: 'sampler',
         type: 'sampler',
         value: null,
+        sample_value: null,
         start_val: null,
         end_val: null,
+        max_val: null,
+        min_val: null,
         loop: null,
       }),
 
@@ -25,32 +28,35 @@ define([
 
         this.set('start_val', new PFloat(0, 'set'));
         this.set('end_val', new PFloat(0, 'set'));
+        this.set('max_val', new PFloat(0, 'set'));
+        this.set('min_val', new PFloat(0, 'set'));
         this.set('value', new PFloat(0, 'set'));
+        this.set('sample_value', new PFloat(1, 'set'));
         this.set('loop', new PBool(false));
         Instance.prototype.initialize.apply(this, arguments);
 
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 60));
         var cornerSize = new paper.Size(10, 10);
         var path = new paper.Path.Rectangle(rectangle, cornerSize);
-        path.strokeColor ='#B2B2B2';
+        path.strokeColor = '#B2B2B2';
         path.fillColor = 'white';
         path.fillColor.alpha = 0.95;
         this.get('translation_delta').setNull(false);
 
         this.startText = new paper.PointText({
-          point:  new paper.Point(15,20),
+          point: new paper.Point(15, 20),
           content: 'start:',
           justification: 'left',
           fontSize: 15,
           fontFamily: 'Source Sans Pro',
           fillColor: '#34332F'
         });
-         this.endText = new paper.PointText({
-          point:  new paper.Point(15,45),
+        this.endText = new paper.PointText({
+          point: new paper.Point(15, 45),
           content: 'end:',
           justification: 'left',
           fontSize: 15,
-           fontFamily: 'Source Sans Pro',
+          fontFamily: 'Source Sans Pro',
           fillColor: '#34332F',
         });
         var geom = new paper.Group();
@@ -67,9 +73,9 @@ define([
         Instance.prototype.reset.call(this, arguments);
         var start = this.accessProperty('start_val');
         this.setValue(start);
-        var geom =this.get('geom');
-        geom.position.x=0;
-        geom.position.y=0;
+        var geom = this.get('geom');
+        geom.position.x = 0;
+        geom.position.y = 0;
 
       },
 
@@ -81,6 +87,11 @@ define([
           this.setLoop(loop);
         }
 
+      },
+
+      setMaxMin: function(max, min) {
+        this.setMax(max);
+        this.setMin(min);
       },
 
       setValue: function(value) {
@@ -104,7 +115,7 @@ define([
             operator: 'set'
           }
         });
-        this.startText.content = 'start: '+this.accessProperty('start_val');
+        this.startText.content = 'start: ' + this.accessProperty('start_val');
       },
 
       setEnd: function(value) {
@@ -114,7 +125,26 @@ define([
             operator: 'set'
           }
         });
-        this.endText.content = 'end: '+this.accessProperty('end_val');
+        this.endText.content = 'end: ' + this.accessProperty('end_val');
+      },
+
+      setMax: function(value) {
+        this.modifyProperty({
+          max: {
+            val: value,
+            operator: 'set'
+          }
+        });
+
+      },
+
+      setMin: function(value) {
+        this.modifyProperty({
+          min: {
+            val: value,
+            operator: 'set'
+          }
+        });
       },
 
       setLoop: function(value) {
@@ -139,7 +169,19 @@ define([
             this.setValue(start);
           }
         }
-        // console.log('incrementing sampler to:',this.accessProperty('value'));
+      },
+
+      sample: function() {
+        if (this.children.length > 0) {
+          var path = this.children[0].get('geom').clone();
+          var length = path.length;
+          var maxDist = length / (this.accessProperty('end_val') - this.accessProperty('start_val') + 1);
+          path.flatten(maxDist);
+          var position = {x:path.segments[this.accessProperty('value')].point.x,y:path.segments[this.accessProperty('value')].point.x};
+          console.log("sample value of the sampler", position,"increment_value",this.accessProperty('value'));
+          path.remove();
+          return  position;
+        }
       },
 
       render: function() {

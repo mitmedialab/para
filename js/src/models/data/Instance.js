@@ -352,7 +352,6 @@ define([
 		* modifer: overide or relative: determines how the updates should be implemented
 		*/
 		modifyProperty: function(data, mode, modifier) {
-			console.log('modifying with',data);
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
