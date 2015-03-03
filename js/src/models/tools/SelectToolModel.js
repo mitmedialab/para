@@ -47,7 +47,6 @@ define([
       this.set('selected_shapes', []);
       this.set('selections', []);
       //this.on('change:literals',this.triggerChange);
-
     },
 
 
@@ -299,30 +298,26 @@ define([
     scaleDrag: function(event) {
       var posPoint = this.getRelativePoint();
       if (posPoint) {
-        var d1 = startDist;
-        var d2x = startWidth / 2 - startDist.x;
-        var d2y = startWidth / 2 - startDist.x;
-        var d3 = event.point.subtract(posPoint);
 
-        var rscaleX = d3.x / d1.x;
-        var rscaleY = d3.y / d1.y;
+        var clickPos = startDist; //position of clicked point, relative to center
+        var dragPos = event.point.subtract(posPoint); //position of the point dragged to (relative to center)
+        var draggedVect = dragPos; //vector of dragged pt movement
+        var signedX = clickPos.x/Math.abs(clickPos.x); //either -1 or 1 depending on what quadrant of the shape the user clicks
+        var signedY = clickPos.y/Math.abs(clickPos.y); //x = -1 in Q2 and Q3, x = -1 in Q1 and Q2
+        var centerDist = clickPos.length; //distance from center of shape to clicked point
+        const SCALING_FACTOR = 1;
+        var scaleX = 1 + (draggedVect.x * signedX * SCALING_FACTOR)/centerDist;
+        var scaleY = 1 + (draggedVect.y * signedY * SCALING_FACTOR)/centerDist;
 
-        var tScaleX = ((startWidth / 2) * rscaleX) / ((d3.x + d2x) / rscaleX);
-        var tScaleY = ((startHeight / 2) * rscaleY) / ((d3.y + d2y) / rscaleY);
-        tScaleX = (tScaleX === 0) ? 1 : tScaleX;
-        tScaleY = (tScaleY === 0) ? 1 : tScaleY;
-
-        var data = {};
-        data.set = true;
-        data.scaling_delta = {
-          x: tScaleX,
-          y: tScaleY,
-          operator: 'add'
+         var data = {};
+         data.set = true;
+         data.scaling_delta = {
+           x: scaleX,
+           y: scaleY,
+           operator: 'set'
         };
-        this.trigger('geometryModified', data, event.modifiers);
-
+        this.trigger('geometryModified', data, event.modifiers);  
       }
-
     },
 
     getRelativePoint: function() {
