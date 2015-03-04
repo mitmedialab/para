@@ -205,9 +205,6 @@ define([
     },
 
     /*
-<<<<<<< HEAD
-     * Takes a list of instances, checks their validity, and sets them
-=======
      *
      *
      *
@@ -236,7 +233,6 @@ define([
 
     /*
      * Takes a list of instances, checks their validity, and sets them 
->>>>>>> sumit-dev
      * in the constraint tool reference state.
      *
      * @param instanceList - a list of instances

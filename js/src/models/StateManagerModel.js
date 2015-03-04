@@ -261,26 +261,25 @@ define(['jquery',
      * behavior probably should be to create a prototype which encapsulates
      * all those objects rather than one prototype per object
      */
-    addInstance: function( inst, parent ) {
+    addInstance: function( instance, parent ) {
       if ( instance ) {
         if ( parent ) {
-          parent.addChildNode( inst );
+          parent.addChildNode( instance );
         } else {
-          rootNode.addChildNode( inst );
+          rootNode.addChildNode( instance );
         }
         this.compile();
       }
       else if (this.get('state') === 'selectTool') {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length == 1) {
-          var instance = selectedShapes[0];
-          var newInstance = instance.create();
+          var inst = selectedShapes[0];
+          var newInstance = inst.create();
           currentNode.addChildNode(newInstance);
           visitor.addToOpenLists(newInstance);
-          instance.set('selected', false);
+          inst.set('selected', false);
           newInstance.set('selected', true);
           selectedShapes[0] = newInstance;
-          var id = instance.get('id');
           this.compile();
         }
       }
@@ -929,7 +928,7 @@ define(['jquery',
       }
 
     }
-
+  
   });
 
   return StateManagerModel;
