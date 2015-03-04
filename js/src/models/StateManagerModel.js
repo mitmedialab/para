@@ -23,8 +23,10 @@ define(['jquery',
   'models/data/Visitor',
   'utils/PPoint',
   'utils/ColorUtils',
-  'utils/PaperUI',
-], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, PaperUI) {
+  'utils/Utils',
+  'utils/PaperUIHelper',
+], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, Utils, PaperUIHelper) {
+
 
   var rootNode, uninstantiated, visitor, currentNode, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
 
@@ -56,6 +58,10 @@ define(['jquery',
       mainView._project.activate();
       subView = paper.View._viewsById['sub-canvas'];
       currentView = mainView;
+
+      // setup helpers and factories
+      PaperUIHelper.setup( this );
+
       //setup user tool managers
 
       selectTool = new SelectToolModel({
@@ -141,7 +147,6 @@ define(['jquery',
       //setup default zeros for zoom and pan
       this.zeroedZoom = paper.view.zoom;
       this.zeroedPan = paper.view.center.clone();
-
     },
 
     undo: function() {
@@ -256,8 +261,16 @@ define(['jquery',
      * behavior probably should be to create a prototype which encapsulates
      * all those objects rather than one prototype per object
      */
-    addInstance: function() {
-      if (this.get('state') === 'selectTool') {
+    addInstance: function( inst, parent ) {
+      if ( instance ) {
+        if ( parent ) {
+          parent.addChildNode( inst );
+        } else {
+          rootNode.addChildNode( inst );
+        }
+        this.compile();
+      }
+      else if (this.get('state') === 'selectTool') {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length == 1) {
           var instance = selectedShapes[0];
@@ -543,6 +556,10 @@ define(['jquery',
       this.compile();
     },
 
+    // TODO: check that this meshes 
+    removeInstance: function( instance ) {
+      visitor.removeInstance( rootNode, null, instance);
+    },
 
     /* geometrySegmentModified
      * callback that is triggered when a geometry segment is transformed
@@ -610,7 +627,6 @@ define(['jquery',
       visitor.compileInstances(rootNode);
       visitor.compileLists();
       visitor.render(rootNode);
-      PaperUI.redraw();
 
       //used to switch canvas, not currently being used
       //currentView._project.activate();
@@ -658,7 +674,7 @@ define(['jquery',
 
     //triggered by paper tool on a mouse down event
     toolMouseDown: function(event, pan) {
-      if (!event.modifiers.space) {
+      if (!event.modifiers.space && Utils.validateEvent(event)) {
         var selectedTool = toolCollection.get(this.get('state'));
         selectedTool.mouseDown(event);
       }
@@ -667,7 +683,7 @@ define(['jquery',
     toolMouseUp: function(event, pan) {
       var selectedTool = toolCollection.get(this.get('state'));
 
-      if (!event.modifiers.space) {
+      if (!event.modifiers.space && Utils.validateEvent(event)) {
         selectedTool.mouseUp(event);
       }
       if (selectedTool.get('mode') !== 'pen') {
@@ -677,7 +693,7 @@ define(['jquery',
 
 
     toolMouseDrag: function(event) {
-      if (!event.modifiers.space) {
+      if (!event.modifiers.space && Utils.validateEvent(event)) {
         var selectedTool = toolCollection.get(this.get('state'));
         selectedTool.mouseDrag(event);
       }
@@ -717,7 +733,7 @@ define(['jquery',
 
 
     toolMouseMove: function(event) {
-      if (!event.modifers.space) {
+      if (!event.modifers.space && Utils.validateEvent(event)) {
         var selectedTool = toolCollection.get(this.get('state'));
         selectedTool.mouseMove(event);
       }
@@ -911,8 +927,8 @@ define(['jquery',
         }
 
       }
-    },
 
+    }
 
   });
 

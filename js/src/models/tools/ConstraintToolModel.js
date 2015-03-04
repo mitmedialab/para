@@ -33,15 +33,16 @@
  */
 
 define([
-  'underscore',
-  'paper',
-  'backbone',
-  'models/tools/BaseToolModel',
-  'utils/PPoint',
-  'utils/PaperUI',
-  'utils/PaperUIEvents',
-  'utils/Utils'
-], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIEvents, Utils) {
+    'underscore',
+    'paper',
+    'backbone',
+    'models/tools/BaseToolModel',
+    'utils/PPoint',
+    'utils/PaperUIHelper',
+    'utils/PaperUIEvents',
+    'utils/Utils'
+], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUIHelper, PaperUIEvents, Utils) {
+
 
   // hit testing for clicking Paper UI elements
   var hitOptions = {
@@ -124,6 +125,7 @@ define([
         result['expression'] = 'false';
         console.log('[INFO] Invalid Expression Entered: ' + exp);
       }
+      this.advance(); // slightly hacky
       return result;
     },
 
@@ -153,7 +155,8 @@ define([
       var result = {};
       result['property'] = property;
       this.set('props_selected', selected_props);
-      console.log('Selected Constraint Property: ' + property);
+      console.log('[INFO] Selected Constraint Property: ' + property);
+      this.advance();
       return result;
     },
 
@@ -202,14 +205,47 @@ define([
     },
 
     /*
+<<<<<<< HEAD
      * Takes a list of instances, checks their validity, and sets them
+=======
+     *
+     *
+     *
+     */
+    retreat: function() {
+      var state = this.get('mode');
+      switch ( state ) {
+        case 'expression':
+          this.removeDelimiters();
+          console.log('[INFO] Retreated and deselected delimiter');
+          break;
+        case 'value':
+          this.deselectRelatives();
+          console.log('[INFO] Retreated and deslected relatives');
+          break;
+        case 'relatives':
+          this.deselectProperty();
+          console.log('[INFO] Retreated and deselected property');
+          break;
+        case 'property':
+          this.deselectReferences();
+          console.log('[INFO] Retreated and deselected references');
+          break;
+      }
+    },
+
+    /*
+     * Takes a list of instances, checks their validity, and sets them 
+>>>>>>> sumit-dev
      * in the constraint tool reference state.
      *
      * @param instanceList - a list of instances
      */
-    referencesSelection: function(instanceList) {
-      if (instanceList.length > 0) {
+
+     selectReferences: function( instanceList ) {
+      if ( instanceList.length > 0 ) {
         this.set('references', instanceList);
+        // this.sm.delegateMethod('select', 'setSelectionColor', color);
       }
     },
 
@@ -219,10 +255,59 @@ define([
      *
      * @param instanceList - a list of instances
      */
-    relativesSelection: function(instanceList) {
-      if (instanceList.length > 0) {
+
+    selectRelatives: function( instanceList ) {
+      if ( instanceList.length > 0 ) {
+
         this.set('relatives', instanceList);
+        // this.sm.delegateMethod('select', 'setSelectionColor', color);
       }
+    },
+
+
+    deselectReferences: function() {
+      this.sm.delegateMethod('select', 'deselectCurrent');
+      this.set('references', []);
+    },
+
+    deselectRelatives: function() {
+      this.sm.delegateMethod('select', 'deselectCurrent');
+      this.set('relatives', []);
+    },
+   
+    deselectProperty: function() {
+      // reset UI element
+      this.set('props_selected', []);
+    },
+
+    createDelimiters: function() {
+      // get props selected, stick function names in front, delegate to PaperUIHelper, store results
+      var property = this.get('props_selected')[0];
+      var references = this.get('references');
+      var relatives = this.get('relatives');
+      var delimiters;
+      switch ( property ) {
+        case 'position':
+          var pos_delim_ind = {'avg-translation_delta-x': true, 'avg-translation_delta-y': true};
+          delimiters = PaperUIHelper.drawPositionDelimiters( references, relatives, pos_delim_ind );
+          break;
+        case 'scale':
+          var scale_delim_ind = {'avg-scaling_delta-x': true, 'avg-scaling_delta-y': true};
+          delimiters = PaperUIHelper.drawScaleDelimiters( references, relatives, scale_delim_ind ); 
+          break;
+        case 'orientation':
+          var orient_delim_ind = {'avg-rotation_delta': true};
+          delimiters = PaperUIHelper.drawOrientationDelimiters( references, relatives, orient_delim_ind );
+      }
+      return delimiters;
+    },
+
+    removeDelimiters: function() {
+      var delimiters = this.get('delimiters');
+      for (var i = 0; i < delimiters.length; i++) {
+        PaperUIHelper.remove(delimiters[i]);
+      }
+      this.set('delimiters', []);
     },
 
     /*
@@ -253,19 +338,6 @@ define([
       };
 
       refProp.setConstraint(relativeF);
-
-
-
-      /* 
-      var relDeltaList = Utils.getPropConstraintFromList( relatives, rewordToVal.slice(1, rewordToVal.length) );
-      var relativeDeltaF = function() {
-        var x = Utils[rewordToVal[0]]( relDeltaList.map( function( prop ) { return prop.getValue() }));
-        var evaluation = eval( expression );
-        refDelta.setValue( evaluation );
-        return evaluation; 
-      };
-
-      refDelta.setConstraint( relativeF );*/
     },
 
     /* createListConstraint: function(){
@@ -334,34 +406,19 @@ define([
           var sm = this.get('sm');
           this.get('sm').delegateMethod('select', 'mouseDown', event);
           var references = this.get('sm').delegateMethod('select', 'getCurrentSelection');
-          this.referencesSelection(references);
+
+          this.selectReferences( references );
+          this.advance();
           break;
         case 'relatives':
           this.get('sm').delegateMethod('select', 'mouseDown', event);
           var references = this.get('references');
           var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');
-          this.relativesSelection(relatives);
-          //this.get('sm').constrain( references[0], relatives[0] );
-          PaperUI.drawPositionDelimiters(references, relatives, {
-            'max-translation_delta-x': true,
-            'max-translation_delta-y': true,
-            'avg-translation_delta-x': true,
-            'avg-translation_delta-y': true,
-            'min-translation_delta-x': true,
-            'min-translation_delta-y': true
-          });
-          break;
-        case 'value':
-          var hitResult = paper.project.hitTest(event.point, hitOptions);
-          if (hitResult) {
-            var path = hitResult.item;
-            if (path.name.indexOf('delimit') === 0) {
-              var propSplit = path.name.split('-');
-              propSplit = propSplit.slice(1, propSplit.length);
-              this.set('constrainToVal', propSplit);
-              this.rewordConstraint();
-            }
-          }
+
+          this.selectRelatives( relatives );
+          var delimiters = this.createDelimiters(); 
+          PaperUIHelper.addDelimiterListeners( this, delimiters ); 
+          this.advance();
           break;
         case 'expression':
           // TODO: check if expression has been submitted?
@@ -399,8 +456,10 @@ define([
       this.set('expression', '');
       this.set('props_selected', []);
       this.set('mode', 'references');
-      PaperUI.clear();
-    },
+
+      PaperUIHelper.clear();
+    }, 
+ 
 
 
 

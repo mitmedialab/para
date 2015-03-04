@@ -1,6 +1,6 @@
-/* PaperUIEvents.js
+/* PaperUIHelperEvents.js
  *
- * A namespace which holds different event listeners useful in Para interactions to place on PaperUI elements.
+ * A namespace which holds different event listeners useful in Para interactions to place on PaperUIHelper elements.
  *
  */
 
@@ -12,7 +12,7 @@ define([
   'utils/PPoint'
 ], function($, _, paper, backbone, PPoint) {
 
-  var PaperUIEvents = {
+  var PaperUIHelperEvents = {
 
     addEventListener: function( path, eventName, response ) {
       path[eventName] = response;
@@ -38,5 +38,5 @@ define([
     }
   };
 
-  return PaperUIEvents;
+  return PaperUIHelperEvents;
 });

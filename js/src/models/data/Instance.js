@@ -692,8 +692,7 @@ define([
 				geom.selected = false;
 			} else {
 				if (!geom) {
-					console.log("creating new geom");
-					geom = new paper.Path();
+                                   geom = new paper.Path();
 				}
 				geom.importJSON(this.accessProperty('master_path'));
 			}
