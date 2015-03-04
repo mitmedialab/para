@@ -13,7 +13,7 @@ define(['jquery',
   'models/data/EllipseNode',
   'models/data/ListNode',
   'models/data/Instance',
-  'models/data/Sampler',
+  'models/data/PathSampler',
   'models/tools/ToolCollection',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
@@ -24,7 +24,7 @@ define(['jquery',
   'utils/PPoint',
   'utils/ColorUtils',
   'utils/PaperUI',
-], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, Sampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, PaperUI) {
+], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, PaperUI) {
 
   var rootNode, uninstantiated, visitor, currentNode, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
 
@@ -282,18 +282,10 @@ define(['jquery',
         if (selectedShapes.length > 0) {
 
           var list = new ListNode();
-          var sampler = new Sampler();
-          sampler.addChildNode(list);
-          list.setSampler(sampler);
           list.addMember(selectedShapes);
           visitor.addList(list);
           selectTool.deselectAll();
-          currentNode.addChildNode(sampler);
           selectTool.addSelectedShape(list);
-          var m_d = list.members[0].accessProperty('translation_delta');
-          sampler.modifyProperty({
-            translation_delta: m_d
-          });
         }
       }
       this.compile();
@@ -305,13 +297,10 @@ define(['jquery',
       var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
-        var sampler = new Sampler();
-        sampler.addChildNode(instance);
-        currentNode.addChildNode(sampler);
-        var m_d = instance.accessProperty('translation_delta');
-        sampler.modifyProperty({
-          translation_delta: m_d
-        });
+        var sampler = new PathSampler();
+        sampler.addMember(instance);
+        visitor.addList(sampler);
+
         sampler.setRange(0, 20, true);
       }
       this.compile();

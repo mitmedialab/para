@@ -137,6 +137,7 @@ define([
 			});
 			switch (node.get('type')) {
 				case 'list':
+				case 'sampler':
 					this.visitList(node, departureNode, state_data);
 					break;
 				default:

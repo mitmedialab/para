@@ -46,24 +46,19 @@ define([
       };
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
-          //console.log(i);
-          //console.log("t-delta prior", data[i].accessProperty('translation_delta'));
+
           data[i].modifyProperty({
             'translation_delta': neg_delta
           });
-          // console.log("t-delta after", data[i].accessProperty('translation_delta'));
           this.members.push(data[i]);
         }
       } else {
-        // console.log("t-delta prior", data.accessProperty('translation_delta'));
+
         data.modifyProperty({
           'translation_delta': neg_delta
         });
-        // console.log("t-delta after", data.accessProperty('translation_delta'));
+
         this.members.push(data);
-      }
-      if (this.sampler) {
-        this.sampler.setRange(0, this.members.length - 1);
       }
     },
 
@@ -111,9 +106,7 @@ define([
         member.modifyProperty({
           'translation_delta': this.accessProperty('translation_delta')
         });
-        if (this.sampler) {
-          this.sampler.setRange(0, this.members.length - 1);
-        }
+
         return true;
       }
 
@@ -234,48 +227,36 @@ define([
     },
 
     compile: function() {
-      this.compileMembers();
+      for (var i = 0; i < this.members.length; i++) {
+        this.compileMemberAt(i);
+      }
     },
 
-    compileMembers: function() {
-      // console.log('compiling list', this.get('id'), this.accessProperty('translation_delta'), this.get('tmatrix'));
-      //console.log('num members = ', this.members.length, 'num geom =', geomList.length);
-      // console.log('tdelta',this.accessProperty('translation_delta'));
-      //console.log('l-matrix',this.get('tmatrix'));
+    compileMemberAt: function(index) {
+      console.log('compiling transform for index', index);
       var translation_delta = this.get('translation_delta');
-      var l_matrix;
-      for (var i = 0; i < this.members.length; i++) {
-        console.log('compiling transform for index',i);
-        var i_matricies = this.compileTransforms();
-        //  console.log('l-matrix', this.get('tmatrix'));
-        var member = this.members[i];
-        var mtd = member.get('translation_delta');
-        var m_tmatrix = member.get('tmatrix');
-        l_matrix = i_matricies.tmatrix;
-        var xC = translation_delta.x.isConstrained();
-        var yC = translation_delta.y.isConstrained();
-        var mxC = mtd.x.isConstrained();
-        var myC = mtd.y.isConstrained();
-        if (xC && !mxC) {
-          m_tmatrix.tx = 0;
-        }
-        if (yC && !myC) {
-          m_tmatrix.ty = 0;
-        }
-        if (mxC) {
-          l_matrix.tx = 0;
-        }
-        if (myC) {
-          l_matrix.ty = 0;
-        }
-        m_tmatrix.concatenate(l_matrix);
-        if (this.sampler) {
-          this.sampler.increment();
-        }
+      var i_matricies = this.compileTransforms();
+      var member = this.members[index];
+      var mtd = member.get('translation_delta');
+      var m_tmatrix = member.get('tmatrix');
+      var l_matrix = i_matricies.tmatrix;
+      var xC = translation_delta.x.isConstrained();
+      var yC = translation_delta.y.isConstrained();
+      var mxC = mtd.x.isConstrained();
+      var myC = mtd.y.isConstrained();
+      if (xC && !mxC) {
+        m_tmatrix.tx = 0;
       }
-      if (this.sampler) {
-        this.sampler.get('tmatrix').concatenate(l_matrix);
+      if (yC && !myC) {
+        m_tmatrix.ty = 0;
       }
+      if (mxC) {
+        l_matrix.tx = 0;
+      }
+      if (myC) {
+        l_matrix.ty = 0;
+      }
+      m_tmatrix.concatenate(l_matrix);
     },
 
     compileTransforms: function() {
@@ -312,6 +293,7 @@ define([
 
     render: function() {
       var bbox = this.renderBoundingBox();
+      console.log('rendering list, bbox=',bbox);
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
       if (this.get('open')) {

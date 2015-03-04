@@ -1,24 +1,25 @@
 /*Sampler.js
  * base class for sampler datatype
+ * inherits from ListNode
  */
 
 define([
     'underscore',
-    'models/data/Instance',
+    'models/data/ListNode',
     'utils/PFloat',
     'utils/PBool',
     'paper'
   ],
 
-  function(_, Instance, PFloat, PBool, paper) {
-    var Sampler = Instance.extend({
-      defaults: _.extend({}, Instance.prototype.defaults, {
+  function(_, ListNode, PFloat, PBool, paper) {
+    var Sampler = ListNode.extend({
+      defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'sampler',
         type: 'sampler',
+        index: null,
         value: null,
-        sample_value: null,
-        start_val: null,
-        end_val: null,
+        start_index: null,
+        end_index: null,
         max_val: null,
         min_val: null,
         loop: null,
@@ -26,14 +27,14 @@ define([
 
       initialize: function() {
 
-        this.set('start_val', new PFloat(0, 'set'));
-        this.set('end_val', new PFloat(0, 'set'));
-        this.set('max_val', new PFloat(0, 'set'));
+        this.set('start_index', new PFloat(0, 'set'));
+        this.set('end_index', new PFloat(0, 'set'));
+        this.set('max_val', new PFloat(1, 'set'));
         this.set('min_val', new PFloat(0, 'set'));
         this.set('value', new PFloat(0, 'set'));
-        this.set('sample_value', new PFloat(1, 'set'));
+        this.set('index', new PFloat(0, 'set'));
         this.set('loop', new PBool(false));
-        Instance.prototype.initialize.apply(this, arguments);
+        ListNode.prototype.initialize.apply(this, arguments);
 
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 60));
         var cornerSize = new paper.Size(10, 10);
@@ -69,9 +70,19 @@ define([
 
       },
 
+      //overrides ListNode addMember and removeMember functions
+      addMember: function(data) {
+        ListNode.prototype.addMember.call(this, data);
+      },
+
+      removeMember: function(data) {
+        ListNode.prototype.removeMember.call(this, data);
+      },
+
+
       reset: function() {
-        Instance.prototype.reset.call(this, arguments);
-        var start = this.accessProperty('start_val');
+        ListNode.prototype.reset.call(this, arguments);
+        var start = this.accessProperty('start_index');
         this.setValue(start);
         var geom = this.get('geom');
         geom.position.x = 0;
@@ -80,7 +91,6 @@ define([
       },
 
       setRange: function(start, end, loop) {
-        //console.log('end',end);
         this.setStart(start);
         this.setEnd(end);
         if (loop) {
@@ -103,29 +113,42 @@ define([
         });
       },
 
-      getValue: function() {
-        return this.accessProperty('value');
+
+
+      setIndex: function(value) {
+        this.modifyProperty({
+          index: {
+            val: value,
+            operator: 'set'
+          }
+        });
+      },
+
+      getIndex: function() {
+        return this.accessProperty('index');
       },
 
 
       setStart: function(value) {
         this.modifyProperty({
-          start_val: {
+          start_index: {
             val: value,
             operator: 'set'
           }
         });
-        this.startText.content = 'start: ' + this.accessProperty('start_val');
+        this.startText.content = 'start: ' + this.accessProperty('start_index');
       },
 
       setEnd: function(value) {
+        console.log('end value',value);
         this.modifyProperty({
-          end_val: {
+          end_index: {
             val: value,
             operator: 'set'
           }
         });
-        this.endText.content = 'end: ' + this.accessProperty('end_val');
+        console.log('end =',this.accessProperty('end_index'));
+        this.endText.content = 'end: ' + this.accessProperty('end_index');
       },
 
       setMax: function(value) {
@@ -157,38 +180,55 @@ define([
       },
 
       increment: function() {
-        var start = this.accessProperty('start_val');
-        var end = this.accessProperty('end_val');
-        var value = this.accessProperty('value');
+        var start = this.accessProperty('start_index');
+        var end = this.accessProperty('end_index');
+        var index = this.accessProperty('index');
         var loop = this.accessProperty('loop');
-        if (value < end) {
-          var newVal = value + 1;
-          this.setValue(newVal);
+        if (index < end) {
+          var newIndex = index + 1;
+          this.setIndex(newIndex);
         } else {
           if (loop) {
-            this.setValue(start);
+            this.setIndex(start);
           }
         }
       },
 
-      sample: function() {
+
+      getValue: function() {
+        return this.accessProperty('value');
+      },
+
+      /*sample: function() {
         if (this.children.length > 0) {
           var path = this.children[0].get('geom').clone();
           var length = path.length;
-          var maxDist = length / (this.accessProperty('end_val') - this.accessProperty('start_val') + 1);
+          var maxDist = length / (this.accessProperty('end_index') - this.accessProperty('start_index') + 1);
           path.flatten(maxDist);
-          var position = {x:path.segments[this.accessProperty('value')].point.x,y:path.segments[this.accessProperty('value')].point.x};
-          console.log("sample value of the sampler", position,"increment_value",this.accessProperty('value'));
+          //var position = {x:path.segments[this.accessProperty('value')].point.x,y:path.segments[this.accessProperty('value')].point.x};
+          //console.log("sample value of the sampler", position,"increment_value",this.accessProperty('value'));
           path.remove();
-          return  position;
+         // return  position;
         }
+      },*/
+
+      compile: function() {
+        for (var i = 0; i < this.members.length; i++) {
+          this.compileMemberAt(i);
+          this.increment();
+        }
+
       },
 
+
       render: function() {
+        console.log('render sampler');
+        ListNode.prototype.render.call(this, arguments);
         var geom = this.get('geom');
-        geom.transform(this.get('tmatrix'));
-        this.renderSelection(geom);
-        geom.selected = false;
+        var bottomLeft = this.get('screen_bottom_left');
+        geom.position = new paper.Point(bottomLeft.x, bottomLeft.y);
+        //this.renderSelection(geom);
+        //geom.selected = false;
       },
 
 

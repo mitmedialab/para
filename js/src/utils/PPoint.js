@@ -94,6 +94,7 @@ define([
 			 * values of this object
 			 */
 			toPaperPoint: function() {
+				
 				return new paper.Point(this.getX(), this.getY());
 			},
 

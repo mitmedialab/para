@@ -183,24 +183,18 @@ define([
 			console.log('checking instance');
 			return [];
 		},
-
-		/* setSampler, getSampler
-		 * sets and gets the sampler for this list
-		 * which can be used to define iterative constraints
-		 */
-		setSampler: function(sampler) {
-			this.sampler = sampler;
-		},
-
-		getSampler: function(sampler) {
-			if (this.sampler) {
-				return this.sampler;
-			}
-		},
-
 		recRemoveMember: function(data){
 			return false;
 		},
+
+		/* getIndex 
+		* dummy return to prevent error in constraint tool
+		*/
+		getIndex:function(){
+			return null;
+		},
+
+		
 
 		/* create
 		 * Prototypal inheritance action:

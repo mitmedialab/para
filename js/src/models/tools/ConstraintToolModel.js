@@ -235,44 +235,25 @@ define([
       var references = this.get('references');
       var relatives = this.get('relatives');
       var expression = this.get('expression');
-      var sampler = references[0].getSampler();
 
-      if (relatives[0].get('type') === 'sampler') {
-        var refP = references[0].inheritProperty('translation_delta');
-        var relativeS = function() {
-          var x = relatives[0].sample();
-          //console.log('x=', x);
-          /*if (sampler) {
-           relatives[0].setValue(sampler.getValue());
-          }*/
-          var evaluation = eval(expression);
-          refP.setValue(evaluation);
-          return evaluation;
-        };
-        refP.setConstraint(relativeS);
-      } else {
+      var refPropList = Utils.getPropConstraintFromList(references, constrainToVal.slice(1, constrainToVal.length));
+      var refProp = refPropList[0];
+      var relPropList = Utils.getPropConstraintFromList(relatives, constrainToVal.slice(1, constrainToVal.length));
+      console.log("relList", relPropList, "refProp", refProp);
 
-        var refPropList = Utils.getPropConstraintFromList(references, constrainToVal.slice(1, constrainToVal.length));
-        var refProp = refPropList[0];
-        var relPropList = Utils.getPropConstraintFromList(relatives, constrainToVal.slice(1, constrainToVal.length));
-        console.log("relList", relPropList, "refProp", refProp);
+      var relativeF = function() {
+        var x = Utils[constrainToVal[0]](relPropList.map(function(prop) {
+          return prop.getValue();
+        }));
 
-        var relativeF = function() {
-          var x = Utils[constrainToVal[0]](relPropList.map(function(prop) {
-            return prop.getValue();
-          }));
-          if (sampler) {
-            var i = sampler.getValue();
+        var i = references[0].getIndex();
+        var evaluation = eval(expression);
+        refProp.setValue(evaluation);
+        return evaluation;
+      };
 
+      refProp.setConstraint(relativeF);
 
-          }
-          var evaluation = eval(expression);
-          refProp.setValue(evaluation);
-          return evaluation;
-        };
-
-        refProp.setConstraint(relativeF);
-      }
 
 
       /* 
