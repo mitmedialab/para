@@ -140,6 +140,9 @@ define([
       }
 
       var points = this.get('points');
+      var delta = new paper.Segment(new paper.Point(data.translation_delta.x,data.translation_delta.y),null,null);
+      delta.transform(this.get('ri_matrix'));
+      delta.transform(this.get('si_matrix'));
       var geom = this.get('geom');
       var masterPath = JSON.parse(this.get('master_path').getValue());
       var selectedPoints = points.filter(function(point) {
@@ -154,19 +157,19 @@ define([
           case 'segment':
           case 'curve':
             var p = selectedPoint.get('position');
-            p.add(data.translation_delta);
+            p.add(delta.point);
             break;
           case 'handle-in':
             var hi = selectedPoint.get('handle_in');
-            hi.add(data.translation_delta);
+            hi.add(delta.point);
             break;
 
           case 'handle-out':
             var ho = selectedPoint.get('handle_out');
-            ho.add(data.translation_delta);
-
+            ho.add(delta.point);
             break;
         }
+        delta.remove();
         var pos = selectedPoint.get('position').getValue();
         var handleIn =  selectedPoint.get('handle_in').getValue();
         var handleOut = selectedPoint.get('handle_out').getValue();
