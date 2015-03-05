@@ -56,6 +56,7 @@ define([
       var selected_shapes = this.get('selected_shapes');
       for (var i = selected_shapes.length - 1; i >= 0; i--) {
         selected_shapes[i].set('selected', false);
+        selected_shapes[i].deselectSegments();
         selected_shapes[i].setSelectionForInheritors(false);
       }
       this.set('selected_shapes', []);
@@ -204,23 +205,23 @@ define([
       var hitResult = paper.project.hitTest(event.point, dHitOptions);
 
       if (hitResult) {
-
+        var path = hitResult.segment.path;
         if (hitResult.type == 'segment') {
           hitResult.segment.fullySelected = true;
-          segments.push(hitResult.segment);
+          segments.push({index:hitResult.segment.index,type:hitResult.type});
         } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
           handle = hitResult.type;
-          segments.push(hitResult.segment);
+         segments.push({index:hitResult.segment.index,type:hitResult.type});
         } else if (hitResult.type == 'curve') {
           console.log('hit result', hitResult.location);
-          segments.push(hitResult.location._segment1);
-          segments.push(hitResult.location._segment2);
+          segments.push({index:hitResult.location._segment1.index,type:hitResult.type});
+          segments.push({index:hitResult.location._segment2.index,type:hitResult.type});
         }
 
+        this.trigger('geometryDSelected', path, segments, event.modifiers.command);
 
       }
 
-      this.trigger('geometryDSelected', segments, event.modifiers.command);
 
 
     },

@@ -69,22 +69,17 @@ define([
           addedToList = addedToList ? true : this.members[i].addMemberToOpen(data);
         }
         if (addedToList) {
-          console.log('adding to list', this.get('id'));
           if (data.get('type') === 'list') {
             for (var j = 0; j < data.members.length; j++) {
               var removed = this.removeMember(data.members[j]);
-              console.log('removing data member at ', j, removed);
             }
           }
           this.addMember(data);
           return true;
         } else {
-          console.log('already added');
           return true;
         }
-      } else {
-        console.log('list not open');
-      }
+      } 
       return false;
     },
 
@@ -233,7 +228,6 @@ define([
     },
 
     compileMemberAt: function(index) {
-      console.log('compiling transform for index', index);
       var translation_delta = this.get('translation_delta');
       var i_matricies = this.compileTransforms();
       var member = this.members[index];
@@ -260,7 +254,6 @@ define([
     },
 
     compileTransforms: function() {
-      //console.log('compiling t', this.get('id'), 'list');
       var rmatrix = this.get('rmatrix').clone();
       var smatrix = this.get('smatrix').clone();
       var tmatrix = this.get('tmatrix').clone();
@@ -293,7 +286,6 @@ define([
 
     render: function() {
       var bbox = this.renderBoundingBox();
-      console.log('rendering list, bbox=',bbox);
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
       if (this.get('open')) {

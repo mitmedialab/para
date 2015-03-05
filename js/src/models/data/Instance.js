@@ -139,15 +139,15 @@ define([
 		},
 
 		/* deleteSelf
-		* function called before instance is removed from
-		* scene graph
-		*/
-		deleteSelf:function(){
+		 * function called before instance is removed from
+		 * scene graph
+		 */
+		deleteSelf: function() {
 			var geom = this.get('geom');
-			if(geom){
+			if (geom) {
 				geom.remove();
 			}
-			for(var i=0;i<this.children.length;i++){
+			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].deleteSelf();
 				//this.children[i].destroy();
 			}
@@ -183,18 +183,18 @@ define([
 			console.log('checking instance');
 			return [];
 		},
-		recRemoveMember: function(data){
+		recRemoveMember: function(data) {
 			return false;
 		},
 
 		/* getIndex 
-		* dummy return to prevent error in constraint tool
-		*/
-		getIndex:function(){
-			return null;
+		 * dummy return to prevent error in constraint tool
+		 */
+		getIndex: function() {
+			return 0;
 		},
 
-		
+
 
 		/* create
 		 * Prototypal inheritance action:
@@ -339,12 +339,12 @@ define([
 
 
 		/*modifyProperty
-		* called to update the property of an instance
-		* data: defines the property to be modifed, along with the 
-		* new values
-		* mode: proxy or standard: determines what is being updated (prototype or object)
-		* modifer: overide or relative: determines how the updates should be implemented
-		*/
+		 * called to update the property of an instance
+		 * data: defines the property to be modifed, along with the
+		 * new values
+		 * mode: proxy or standard: determines what is being updated (prototype or object)
+		 * modifer: overide or relative: determines how the updates should be implemented
+		 */
 		modifyProperty: function(data, mode, modifier) {
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
@@ -567,8 +567,8 @@ define([
 		},
 
 		/*render
-		* draws instance on canvas
-		*/
+		 * draws instance on canvas
+		 */
 		render: function() {
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
@@ -628,13 +628,13 @@ define([
 			var inheritor_selected = this.get('inheritor_selected');
 			var bbox, inheritor_bbox;
 			//if (selected_indexes.length === 0) {
-				geom.selected = selected;
+			geom.selected = selected;
 
 			if (selected) {
 				// EXPERIMENTAL
 				// geom.selectedColor = this.get('primary_selection_color');
 				geom.selectedColor = this.getSelectionColor();
-				
+
 				// g_bbox.selectedColor = this.get('primary_selection_color');
 				bbox = this.renderBoundingBox(geom);
 				bbox.selectedColor = this.getSelectionColor();
@@ -692,8 +692,10 @@ define([
 				geom.selected = false;
 			} else {
 				if (!geom) {
-                                   geom = new paper.Path();
+					geom = new paper.Path();
 				}
+				console.log('importing master path');
+				console.log('masterPath=',this.accessProperty('master_path'));
 				geom.importJSON(this.accessProperty('master_path'));
 			}
 			geom.data.instance = this;

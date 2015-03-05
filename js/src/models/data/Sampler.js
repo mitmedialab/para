@@ -83,7 +83,7 @@ define([
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
         var start = this.accessProperty('start_index');
-        this.setValue(start);
+        this.setIndex(start);
         var geom = this.get('geom');
         geom.position.x = 0;
         geom.position.y = 0;
@@ -140,14 +140,12 @@ define([
       },
 
       setEnd: function(value) {
-        console.log('end value',value);
         this.modifyProperty({
           end_index: {
             val: value,
             operator: 'set'
           }
         });
-        console.log('end =',this.accessProperty('end_index'));
         this.endText.content = 'end: ' + this.accessProperty('end_index');
       },
 
@@ -199,30 +197,14 @@ define([
         return this.accessProperty('value');
       },
 
-      /*sample: function() {
-        if (this.children.length > 0) {
-          var path = this.children[0].get('geom').clone();
-          var length = path.length;
-          var maxDist = length / (this.accessProperty('end_index') - this.accessProperty('start_index') + 1);
-          path.flatten(maxDist);
-          //var position = {x:path.segments[this.accessProperty('value')].point.x,y:path.segments[this.accessProperty('value')].point.x};
-          //console.log("sample value of the sampler", position,"increment_value",this.accessProperty('value'));
-          path.remove();
-         // return  position;
-        }
-      },*/
-
+  
       compile: function() {
-        for (var i = 0; i < this.members.length; i++) {
-          this.compileMemberAt(i);
-          this.increment();
-        }
+     
 
       },
 
 
       render: function() {
-        console.log('render sampler');
         ListNode.prototype.render.call(this, arguments);
         var geom = this.get('geom');
         var bottomLeft = this.get('screen_bottom_left');

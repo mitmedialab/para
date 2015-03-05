@@ -36,13 +36,16 @@ define([
           var width = path.bounds.width;
           var interval = length / (this.accessProperty('end_index') - this.accessProperty('start_index'));
           var index = this.getIndex();
+          var l = interval*index;
           var targetPoint = path.getPointAt(interval*index);
-          targetPoint.x = targetPoint.x-width;
-          targetPoint.y = targetPoint.y-height;
-          var value = TrigFunc.map(targetPoint.y,0,height,0,1);
-          console.log('value=',value);
-          this.setValue(value);
-          return this.accessProperty(value);
+          targetPoint.x = targetPoint.x-path.bounds.bottomLeft.x;
+          targetPoint.y = targetPoint.y-path.bounds.bottomLeft.y;
+          console.log("targetPoint",targetPoint.x,targetPoint.y);
+          var value = 0-TrigFunc.map(targetPoint.y,0,height,0,1);
+          console.log('index=', index, 'interval=',interval,'unmappedPos=',l,'value=',value);
+          this.setValue(targetPoint.x);
+          this.increment();
+          return this.accessProperty('value');
         }
       },
     });

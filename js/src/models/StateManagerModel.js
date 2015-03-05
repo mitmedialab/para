@@ -14,6 +14,7 @@ define(['jquery',
   'models/data/ListNode',
   'models/data/Instance',
   'models/data/PathSampler',
+  'models/data/ListSampler',
   'models/tools/ToolCollection',
   'models/tools/PolyToolModel',
   'models/tools/SelectToolModel',
@@ -25,7 +26,7 @@ define(['jquery',
   'utils/ColorUtils',
   'utils/Utils',
   'utils/PaperUIHelper',
-], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, Utils, PaperUIHelper) {
+], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ListSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, Utils, PaperUIHelper) {
 
 
   var rootNode, uninstantiated, visitor, currentNode, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
@@ -293,7 +294,7 @@ define(['jquery',
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length > 0) {
 
-          var list = new ListNode();
+          var list = new ListSampler();
           list.addMember(selectedShapes);
           visitor.addList(list);
           selectTool.deselectAll();
@@ -313,7 +314,7 @@ define(['jquery',
         sampler.addMember(instance);
         visitor.addList(sampler);
 
-        sampler.setRange(0, 20, true);
+        sampler.setRange(0, 5, true);
       }
       this.compile();
     },
@@ -475,21 +476,16 @@ define(['jquery',
      * callback that is triggered when a new geometry
      * object is direct-selected by the user
      */
-    geometryDSelected: function(segments, override) {
+    geometryDSelected: function(path, segments, override) {
       //console.log('triggered');
       if (segments.length > 0) {
-        var path = segments[0].path;
 
         var instance = path.data.instance;
         //console.log('dselected', override);
         if (!instance.get('proto_node') || override) {
           selectTool.addSelectedShape(instance);
           instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-
-          var selected_indexes = instance.get('selected_indexes');
-          for (var i = 0; i < segments.length; i++) {
-            selected_indexes.push(segments[i].index);
-          }
+          instance.setSelectedSegments(segments);
         }
       }
 
@@ -534,7 +530,6 @@ define(['jquery',
       var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
-        console.log('modifying with data', data);
         instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
       }
       this.compile();
@@ -564,14 +559,11 @@ define(['jquery',
      * callback that is triggered when a geometry segment is transformed
      * by the user
      */
-    geometrySegmentModified: function(data, handle, modifiers) {
+    geometrySegmentModified: function( data, handle, modifiers) {
       var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
-        var selected_indexes = instance.get('selected_indexes');
-        for (var j = 0; j < selected_indexes.length; j++) {
-          instance.modifyPoints(selected_indexes[j], data, handle, this.get('tool-mode'), this.get('tool-modifier'));
-        }
+        instance.modifyPoints( data, this.get('tool-mode'), this.get('tool-modifier')); 
       }
       this.compile();
 

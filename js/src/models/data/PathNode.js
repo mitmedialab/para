@@ -24,12 +24,15 @@ define([
 
       name: 'path',
       type: 'geometry',
+      points: null,
     }),
 
 
     initialize: function(data) {
       Instance.prototype.initialize.apply(this, arguments);
+      this.set('points', []);
     },
+
     /*normalizeGeometry
      * generates a set of transformation data based on the matrix
      * then inverts the matrix and normalizes the path based on these values
@@ -43,11 +46,11 @@ define([
         data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
       }
       data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
-      
-      var translation_delta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
-      var position = new PPoint(0,0 ,'set');
 
-      data.translation_delta=translation_delta;
+      var translation_delta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
+      var position = new PPoint(0, 0, 'set');
+
+      data.translation_delta = translation_delta;
       data.position = position;
 
       data.rotation_origin = new PPoint(0, 0, 'set');
@@ -57,7 +60,7 @@ define([
       data.stroke_color = new PColor(path.strokeColor.red, path.strokeColor.green, path.strokeColor.blue, path.strokeColor.alpha);
 
       data.stroke_width = new PFloat(path.strokeWidth);
-    
+
       var imatrix = matrix.inverted();
       path.transform(imatrix);
 
@@ -67,23 +70,26 @@ define([
       path.visible = false;
       path.selected = false;
       path.data.nodetype = this.get('name');
-      if ( path.segments ) {
+      var points = this.get('points');
+      if (path.segments) {
         var segments = path.segments;
-        for(var j=0;j<segments.length;j++){
+        for (var j = 0; j < segments.length; j++) {
           var pointNode = new PointNode();
           pointNode.normalizeGeometry(segments[j]);
           this.addChildNode(pointNode);
+          points.push(pointNode);
+
         }
       }
       var pathJSON = path.exportJSON({
         asString: true
       });
       this.set('master_path', new PFloat(pathJSON));
-     
+
       path.remove();
       for (var property in data) {
         if (data.hasOwnProperty(property)) {
-          
+
           data[property].setNull(false);
         }
       }
@@ -91,73 +97,116 @@ define([
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
       this.setPathAltered();
-      
+
 
       return data;
     },
 
-    setPathAltered: function(){
+    setPathAltered: function() {
       var path_altered = this.get('path_altered');
       path_altered.setValue(true);
-      this.set('path_altered',path_altered);
+      this.set('path_altered', path_altered);
       var inheritors = this.get('inheritors');
-      for(var i=0;i<inheritors.length;i++){
-         inheritors[i].setPathAltered();
+      for (var i = 0; i < inheritors.length; i++) {
+        inheritors[i].setPathAltered();
+      }
+    },
+
+
+    //sets selection for segments
+    setSelectedSegments: function(segments) {
+      var points = this.get('points');
+      for (var i = 0; i < segments.length; i++) {
+        var index = segments[i].index;
+        var point = points[index];
+        point.set('selected', segments[i].type);
+      }
+    },
+
+    deselectSegments: function(){
+         var points = this.get('points');
+      for (var i = 0; i < points.length; i++) {    
+        points[i].set('selected', false);
       }
     },
 
     /* modifyPoints
      * called when segment in geometry is modified
      */
-    modifyPoints: function(segment_index, data, handle, mode, modifier) {
+    modifyPoints: function(data, mode, modifier) {
       var proto_node = this.get('proto_node');
       if (mode === 'proxy' && proto_node) {
-        proto_node.modifyPoints(segment_index, data, handle, 'none');
+        proto_node.modifyPoints(data, mode, modifier);
       }
 
-      var master_pathJSON = this.accessProperty('master_path');
-      var master_path = new paper.Path();
-      master_path.importJSON(master_pathJSON);
-      if (data.translation_delta) {
-        var tmatrix = this.get('tmatrix');
-        var rmatrix = this.get('rmatrix');
-        var smatrix = this.get('smatrix');
-        master_path.transform(rmatrix);
-        master_path.transform(smatrix);
-        master_path.transform(tmatrix);
-        var delta = new paper.Point(data.translation_delta.x, data.translation_delta.y);
-        if (!handle) {
-          master_path.segments[segment_index].point = master_path.segments[segment_index].point.add(delta);
-        } else {
-          if (handle === 'handle-in') {
-            master_path.segments[segment_index].handleIn = master_path.segments[segment_index].handleIn.add(delta);
-            master_path.segments[segment_index].handleOut = master_path.segments[segment_index].handleOut.subtract(delta);
+      var points = this.get('points');
+      var geom = this.get('geom');
+      var masterPath = JSON.parse(this.get('master_path').getValue());
+      var selectedPoints = points.filter(function(point) {
+        return point.get('selected');
+      });
+      //maintains constraints on points
+      for (var i = 0; i < selectedPoints.length; i++) {
+        var selectedPoint = selectedPoints[i];
 
-          } else {
-            master_path.segments[segment_index].handleOut = master_path.segments[segment_index].handleOut.add(delta);
-            master_path.segments[segment_index].handleIn = master_path.segments[segment_index].handleIn.subtract(delta);
+        var geomS = geom.segments[selectedPoint.get('index')];
+        switch (selectedPoint.get('selected')) {
+          case 'segment':
+          case 'curve':
+            var p = selectedPoint.get('position');
+            p.add(data.translation_delta);
+            break;
+          case 'handle-in':
+            var hi = selectedPoint.get('handle_in');
+            hi.add(data.translation_delta);
+            break;
 
-          }
+          case 'handle-out':
+            var ho = selectedPoint.get('handle_out');
+            ho.add(data.translation_delta);
+
+            break;
         }
-        var rinverted = rmatrix.inverted();
-        var sinverted = smatrix.inverted();
-        var tinverted = tmatrix.inverted();
+        var pos = selectedPoint.get('position').getValue();
+        var handleIn =  selectedPoint.get('handle_in').getValue();
+        var handleOut = selectedPoint.get('handle_out').getValue();
+       // console.log('prior to altering segment', masterPath[1].segments[selectedPoint.get('index')]);
+        masterPath[1].segments[selectedPoint.get('index')] = [[pos.x,pos.y],[handleIn.x,handleIn.y],[handleOut.x,handleOut.y]];
+        //console.log('altered segment', masterPath[1].segments[selectedPoint.get('index')]);
 
-        master_path.transform(tinverted);
-        master_path.transform(sinverted);
-        master_path.transform(rinverted);
-      
       }
+      var master = this.get('master_path');
+      master.setValue(JSON.stringify(masterPath));
+      this.set('master_path',master);
+      this.setPathAltered();
 
-      this.set('master_path', new PFloat(master_path.exportJSON({
-        asString: true
-      })));
-      master_path.remove();
-      var path_altered = this.get('path_altered');
-    
-      path_altered.setNull(false);
-       this.setPathAltered();
+
+
     },
+
+    renderSelection: function(geom) {
+      //var selected = this.get('selected');
+      //if (!selected) {
+      var points = this.get('points');
+      for (var i = 0; i < points.length; i++) {
+        var selectedPoint = points[i];
+        var geomS = geom.segments[selectedPoint.get('index')];
+        switch (selectedPoint.get('selected')) {
+          case 'segment':
+          case 'curve':
+          case 'handle-in':
+          case 'handle-out':
+            geomS.selected = true;
+            break;
+        }
+      }
+      //}
+
+      Instance.prototype.renderSelection.call(this, geom);
+
+    }
+
+
 
   });
 
