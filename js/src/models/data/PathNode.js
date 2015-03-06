@@ -39,6 +39,7 @@ define([
 
       var data = {};
       data.rotation_delta = new PFloat(matrix.rotation);
+      // TODO: make some normalizations util function
       if (data.rotation_delta > 360 || data.rotation_delta < 0) {
         data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
       }
@@ -57,7 +58,7 @@ define([
       data.stroke_color = new PColor(path.strokeColor.red, path.strokeColor.green, path.strokeColor.blue, path.strokeColor.alpha);
 
       data.stroke_width = new PFloat(path.strokeWidth);
-    
+
       var imatrix = matrix.inverted();
       path.transform(imatrix);
 
@@ -80,7 +81,7 @@ define([
       });
       this.set('master_path', new PFloat(pathJSON));
      
-      path.remove();
+      path.remove(); // WARNING: Memory leak??
       for (var property in data) {
         if (data.hasOwnProperty(property)) {
           

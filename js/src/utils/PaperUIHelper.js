@@ -14,7 +14,8 @@ define([
   'utils/Utils',
   'utils/PColor',
   'models/data/PaperUI',
-], function($, _, paper, Utils, PColor, PaperUI) {
+  'models/data/PaperUIItem',
+], function($, _, paper, Utils, PColor, PaperUI, PaperUIItem) {
  
   
   var PaperUIHelper = {
@@ -317,6 +318,83 @@ define([
 
     },
 
+    createConstraintWheel: function( instances, name ) {
+      // create paper path for constraint wheel
+      var wheelPath = paper.project.importSVG($('#constraint-wheel-box').get(0));
+        
+      // translate center to corner of bounding box
+      // TODO: more than just one instance
+      var instance = instances[0].get('geom');
+      var wheelCenter = new paper.Point(wheelPath.bounds.x + wheelPath.bounds.width / 2, wheelPath.bounds.y + wheelPath.bounds.height / 2);
+      wheelPath.scale( 0.6, wheelCenter );
+      wheelPath.translate( instance.bounds.x + instance.bounds.width - wheelCenter.x, instance.bounds.y - wheelCenter.y );
+      wheelPath.name = name;
+      var uiNode = this.createUINodeFromPath( wheelPath );
+      return [uiNode]; 
+    },
+
+    addConstraintWheelHandlers: function( constraintTool, constraintWheel ) {
+      // for each highest level part
+      // onMouseEnter turn pink (inactive)
+      // onMouseClick turn red and send prop to ctool
+      // onMouseLeave turn to normal (inactive)
+      //
+
+      var wheel_container = constraintWheel.get('geom');
+      var true_wheel = wheel_container.children[0];
+      for (var i = 0; i < true_wheel.children.length; i++) {
+        (function( wheel_group ) {
+          wheel_group.originalFill = wheel_group.fillColor;
+          wheel_group.onMouseEnter = function( event ) {
+            if (!wheel_group.active) {
+              wheel_group.fillColor = '#ff7777';
+            }
+          }
+
+          wheel_group.onMouseLeave = function( event ) {
+            if (!wheel_group.active) {
+              wheel_group.fillColor = wheel_group.originalFill;
+            }
+          }
+
+          wheel_group.onClick = function( event ) {
+            // clear all other properties of active state 
+            // (maybe change for future if multiple prop selection desirable)
+            for (var j = 0; j < true_wheel.children.length; j++) {
+              if (true_wheel.children[j].active) { 
+                true_wheel.children[j].fillColor = true_wheel.children[j].originalFill;
+                true_wheel.children.active = false;
+              }   
+            } 
+            
+            wheel_group.fillColor = '#ff0000';
+            wheel_group.active = true;
+
+            // only works if property variable in constsraint tool
+            // is the same as wheel item name
+            constraintTool.set( wheel_container.name, wheel_group.name );
+          }      
+
+        }( true_wheel.children[i] ))
+      }
+    },
+
+    createUINodeFromPath: function( path ) {
+      var uiNode;
+      // TODO: fix hacky way of dealing with items as opposed to strict paths
+      if ( !path.segments || !path.fillColor ) {
+        uiNode = new PaperUIItem();
+      } else {
+        uiNode = new PaperUI();
+      }
+      var matrix = new paper.Matrix();
+      matrix.translate(path.bounds.center.x, path.bounds.center.y);
+      uiNode.normalizeGeometry( path, matrix ); 
+      this.sm.addInstance( uiNode );
+      this.pathReferences.push( uiNode );
+      return uiNode;
+    },
+
     /*
      * Remove all Paper UI elements from the canvas, as well as from
      * tracking.
@@ -339,10 +417,7 @@ define([
      * handling with respect to UI elements with the current paradigm.
      */
     redraw: function() {
-      // TODO: fix this bizarre hack by somehow copying the geometry and style of each referenced path into new path objects
-      for (var i = 0; i < this.pathReferences.length; i++) {
-        this.pathReferences[i] = new paper.Path( {'segments': this.pathReferences[i].segments, 'strokeColor': this.pathReferences[i].strokeColor, 'dashArray': this.pathReferences[i].dashArray, 'name': this.pathReferences[i].name} );
-      }
+    
     }
   };
 

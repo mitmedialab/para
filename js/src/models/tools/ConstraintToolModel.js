@@ -181,6 +181,8 @@ define([
         case 'references':
           this.get('sm').delegateMethod('select', 'saveSelection');
           this.set('mode', 'property');
+          var ref_wheel = PaperUIHelper.createConstraintWheel( this.get('references'), 'ref-wheel' )[0];
+          PaperUIHelper.addConstraintWheelHandlers( this, ref_wheel );
           console.log('[INFO] Advanced constraint tool mode to property');
           break;
         case 'property':
