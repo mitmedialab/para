@@ -28,7 +28,18 @@ define([
       },
 
 
-      getValue: function() {
+      getMultiplier: function() {
+        if (this.members.length > 0) {
+          var path = this.members[0].get('geom');
+          var width = path.bounds.width;
+          var m = TrigFunc.map(width, 1, 1000, 1, 100);
+          console.log('multiplier=',m);
+          this.setMultiplier(width);
+        }
+         return this.accessProperty('multiplier');
+      },
+
+        getValue: function() {
         if (this.members.length > 0) {
           var path = this.members[0].get('geom');
           if (path.segments[0].point.y === path.segments[path.segments.length - 1].point.y) {
@@ -47,11 +58,12 @@ define([
             if (targetPoint) {
               console.log('target point=', targetPoint.x, targetPoint.y);
               targetPoint.x = targetPoint.x - path.bounds.bottomLeft.x;
-              targetPoint.y = targetPoint.y - path.bounds.bottomLeft.y;
+              targetPoint.y = -(targetPoint.y - path.bounds.bottomLeft.y);
               console.log("targetPoint", targetPoint.x, targetPoint.y);
-              var value = 0 - TrigFunc.map(targetPoint.y, 0, height, 0, 100);
+              var value = TrigFunc.map(targetPoint.y, 0, height, 0, 1);
               console.log('value=', value);
               this.setValue(value);
+              this.setMultiplier(width);
             } else {
               console.log('target point not found');
               this.setValue(0);

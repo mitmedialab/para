@@ -326,7 +326,12 @@ define([
 
       var relativeF = function() {
         var x = Utils[constrainToVal[0]](relPropList.map(function(prop) {
-          return prop.getValue();
+          var v = prop.getValue();
+          console.log('has multiplier:',prop.has('multiplier'));
+          if(prop.has('multiplier')){
+            return v*prop.getMultiplier();
+          }
+          return v;
         }));
 
         var i = references[0].getIndex();

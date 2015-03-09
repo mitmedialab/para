@@ -18,6 +18,7 @@ define([
         type: 'sampler',
         index: null,
         value: null,
+        multiplier: null,
         start_index: null,
         end_index: null,
         max_val: null,
@@ -33,6 +34,8 @@ define([
         this.set('min_val', new PFloat(0, 'set'));
         this.set('value', new PFloat(0, 'set'));
         this.set('index', new PFloat(0, 'set'));
+        this.set('multiplier', new PFloat(1, 'set'));
+
         this.set('loop', new PBool(false));
         ListNode.prototype.initialize.apply(this, arguments);
 
@@ -120,6 +123,16 @@ define([
       setValue: function(value) {
         this.modifyProperty({
           value: {
+            val: value,
+            operator: 'set'
+          }
+        });
+      },
+
+
+      setMultiplier: function(value) {
+        this.modifyProperty({
+          multiplier: {
             val: value,
             operator: 'set'
           }
