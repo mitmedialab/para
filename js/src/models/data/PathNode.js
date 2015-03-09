@@ -182,9 +182,6 @@ define([
       master.setValue(JSON.stringify(masterPath));
       this.set('master_path',master);
       this.setPathAltered();
-
-
-
     },
 
     renderSelection: function(geom) {

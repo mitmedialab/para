@@ -6,20 +6,23 @@ define([
   'jquery',
   'underscore',
   'paper',
-  'models/data/Instance'
+  'models/data/Instance',
+  'utils/PFloat'
 
-], function($, _, paper, Instance) {
+], function($, _, paper, Instance, PFloat) {
 
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
       name: 'list',
       type: 'list',
+      member_count:null,
       open: false, //indicates whether list is open or not;
     }),
 
     initialize: function() {
       Instance.prototype.initialize.apply(this, arguments);
       this.members = [];
+      this.set('member_count',new PFloat(0));
       this.get('translation_delta').setNull(false);
     },
 
@@ -53,13 +56,14 @@ define([
           this.members.push(data[i]);
         }
       } else {
-
+       
         data.modifyProperty({
           'translation_delta': neg_delta
         });
 
         this.members.push(data);
       }
+      this.get('member_count').setValue(this.members.length);
     },
 
     addMemberToOpen: function(data) {
@@ -104,6 +108,7 @@ define([
 
         return true;
       }
+        this.get('member_count').setValue(this.members.length);
 
     },
 
@@ -301,7 +306,6 @@ define([
       }
 
       for (var k = 0; k < this.members.length; k++) {
-
         this.updateBoundingBox(this.members[k]);
       }
 
@@ -311,23 +315,8 @@ define([
         var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
         var bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
         this.set('bbox', bbox);
-
-        var screen_bounds = bbox.bounds;
-        this.set({
-          screen_top_left: screen_bounds.topLeft,
-          screen_top_right: screen_bounds.topRight,
-          screen_bottom_right: screen_bounds.bottomRight,
-          screen_bottom_left: screen_bounds.bottomLeft,
-          center: screen_bounds.center,
-          left_center: screen_bounds.leftCenter,
-          right_center: screen_bounds.rightCenter,
-          bottom_center: screen_bounds.bottomCenter,
-          top_center: screen_bounds.topCenter,
-          area: screen_bounds.area,
-          screen_width: screen_bounds.width,
-          screen_height: screen_bounds.height,
-        });
-
+        bbox.sendToBack();
+        this.updateScreenBounds(bbox);
         return bbox;
       }
     },

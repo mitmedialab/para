@@ -36,47 +36,60 @@ define([
         this.set('loop', new PBool(false));
         ListNode.prototype.initialize.apply(this, arguments);
 
-        var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 60));
+        var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
         var cornerSize = new paper.Size(10, 10);
-        var path = new paper.Path.Rectangle(rectangle, cornerSize);
-        path.strokeColor = '#B2B2B2';
-        path.fillColor = 'white';
-        path.fillColor.alpha = 0.95;
+        var path = new paper.Path.Rectangle(rectangle);
+        path.strokeColor = this.get('primary_selection_color');
+        //path.fillColor = 'white';
+        //path.fillColor.alpha = 0.95;
         this.get('translation_delta').setNull(false);
 
         this.startText = new paper.PointText({
-          point: new paper.Point(15, 20),
-          content: 'start:',
+          point: new paper.Point(5, 13),
+          content: 'range:',
           justification: 'left',
-          fontSize: 15,
+          fontSize: 12,
           fontFamily: 'Source Sans Pro',
-          fillColor: '#34332F'
+          fillColor: this.get('primary_selection_color')
         });
-        this.endText = new paper.PointText({
-          point: new paper.Point(15, 45),
-          content: 'end:',
-          justification: 'left',
-          fontSize: 15,
-          fontFamily: 'Source Sans Pro',
-          fillColor: '#34332F',
-        });
+
         var geom = new paper.Group();
         geom.addChild(path);
         geom.addChild(this.startText);
-        geom.addChild(this.endText);
-        this.startText.data.instance = geom.data.instance = path.data.instance = this.endText.data.instance = this;
+        this.startText.data.instance = geom.data.instance = path.data.instance = this;
 
         this.set('geom', geom);
+        this.indexNumbers = [];
 
       },
 
       //overrides ListNode addMember and removeMember functions
       addMember: function(data) {
         ListNode.prototype.addMember.call(this, data);
+        var diff = this.members.length - this.indexNumbers.length;
+        for (var i = 0; i < diff; i++) {
+          var numText = new paper.PointText({
+            point: new paper.Point(0, 0),
+            content: '0',
+            justification: 'left',
+            fontSize: 12,
+            fontFamily: 'Source Sans Pro',
+            fillColor: this.get('primary_selection_color')
+          });
+          this.indexNumbers.push(numText);
+        }
+        for(var j=0;i<this.members.length;j++){
+          this.members[j].bringToFront();
+        }
       },
 
       removeMember: function(data) {
         ListNode.prototype.removeMember.call(this, data);
+        var diff = this.members.length - this.indexNumbers.length;
+        for (var i = 0; i < diff; i++) {
+          var numText = this.indexNumbers.pop();
+          numText.remove();
+        }
       },
 
 
@@ -136,7 +149,6 @@ define([
             operator: 'set'
           }
         });
-        this.startText.content = 'start: ' + this.accessProperty('start_index');
       },
 
       setEnd: function(value) {
@@ -146,7 +158,20 @@ define([
             operator: 'set'
           }
         });
-        this.endText.content = 'end: ' + this.accessProperty('end_index');
+      },
+
+      //places a constraint on the end and start values
+      constrainRange: function(list) {
+        console.log('attempting to constrain range');
+        if (list.get('type') === 'list' || list.get('type') === 'sampler') {
+          var endIndex = this.get('end_index');
+          var constraintF = function() {
+            var num = list.members.length-1;
+            endIndex.setValue(num);
+            return num;
+          };
+          endIndex.setConstraint(constraintF);
+        }
       },
 
       setMax: function(value) {
@@ -197,9 +222,10 @@ define([
         return this.accessProperty('value');
       },
 
-  
+
       compile: function() {
-     
+
+
 
       },
 
@@ -207,10 +233,33 @@ define([
       render: function() {
         ListNode.prototype.render.call(this, arguments);
         var geom = this.get('geom');
-        var bottomLeft = this.get('screen_bottom_left');
-        geom.position = new paper.Point(bottomLeft.x, bottomLeft.y);
+        var bottomLeft = this.get('screen_bottom_left').getValue();
+        for (var i = 0; i < this.indexNumbers.length; i++) {
+          var numText = this.indexNumbers[i];
+          numText.content = (i+1);
+          numText.position = this.members[i].get('screen_bottom_left').toPaperPoint();
+          numText.position.x += 10;
+          numText.position.y -= 10;
+          if (this.get('open')) {
+            numText.visible = true;
+          } else {
+            numText.visible = false;
+          }
+          numText.bringToFront();
+        }
+
+        geom.position = new paper.Point(bottomLeft.x + geom.bounds.width / 2, bottomLeft.y + geom.bounds.height / 2);
+        this.startText.content = 'range: ' + this.accessProperty('start_index') + ' - ' + this.accessProperty('end_index');
+
         //this.renderSelection(geom);
-        //geom.selected = false;
+        if (this.get('selected') || this.get('open')) {
+          geom.visible = true;
+        } else {
+          geom.visible = false;
+        }
+
+
+
       },
 
 

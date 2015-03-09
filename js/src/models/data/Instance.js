@@ -84,6 +84,18 @@ define([
 
 			this.set('position', new PPoint(0, 0));
 			this.set('center', new PPoint(0, 0));
+			this.set('screen_top_left', new PPoint(0, 0));
+			this.set('screen_top_right', new PPoint(0, 0));
+			this.set('screen_height', new PFloat(0));
+			this.set('screen_width', new PFloat(0));
+			this.set('screen_bottom_right', new PPoint(0, 0));
+			this.set('screen_bottom_left', new PPoint(0, 0));
+			this.set('screen_bottom_left', new PPoint(0, 0));
+			this.set('screen_left_center', new PPoint(0, 0));
+			this.set('screen_right_center', new PPoint(0, 0));
+			this.set('screen_top_center', new PPoint(0, 0));
+			this.set('screen_bottom_center', new PPoint(0, 0));
+			this.set('area', new PFloat(0));
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
 			this.set('alpha', new PFloat(1));
@@ -302,6 +314,11 @@ define([
 			}
 		},
 
+		//placeholder function
+		deselectSegments: function() {
+
+		},
+
 
 		/*_setPropertiesToPrototype
 		 * removes property of instance so that it is overriden by prototype,
@@ -497,9 +514,8 @@ define([
 		updateBoundingBox: function(instance) {
 			if (instance.get('screen_top_left') && instance.get('screen_bottom_right')) {
 				var i_bbox = this.get('i_bbox');
-				var i_topLeft = instance.get('screen_top_left').clone();
-				var i_bottomRight = instance.get('screen_bottom_right').clone();
-
+				var i_topLeft = instance.get('screen_top_left').getValue();
+				var i_bottomRight = instance.get('screen_bottom_right').getValue();
 
 				if (!i_bbox.topLeft) {
 					i_bbox.topLeft = i_topLeft;
@@ -601,6 +617,7 @@ define([
 			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
 			bbox.data.instance = this;
 			this.set('bbox', bbox);
+			bbox.sendToBack();
 			return bbox;
 		},
 
@@ -695,7 +712,7 @@ define([
 					geom = new paper.Path();
 				}
 				console.log('importing master path');
-				console.log('masterPath=',this.accessProperty('master_path'));
+				console.log('masterPath=', this.accessProperty('master_path'));
 				geom.importJSON(this.accessProperty('master_path'));
 			}
 			geom.data.instance = this;
@@ -706,23 +723,7 @@ define([
 			geom.transform(rmatrix);
 			geom.transform(tmatrix);
 
-			var screen_bounds = geom.bounds;
-			//screen_bounds.selected = selected;
-			this.set({
-				screen_top_left: screen_bounds.topLeft,
-				screen_top_right: screen_bounds.topRight,
-				screen_bottom_right: screen_bounds.bottomRight,
-				screen_bottom_left: screen_bounds.bottomLeft,
-				center: screen_bounds.center,
-				left_center: screen_bounds.leftCenter,
-				right_center: screen_bounds.rightCenter,
-				bottom_center: screen_bounds.bottomCenter,
-				top_center: screen_bounds.topCenter,
-				area: screen_bounds.area,
-				screen_width: screen_bounds.width,
-				screen_height: screen_bounds.height,
-			});
-
+			this.updateScreenBounds(geom);
 			this.set('geom', geom);
 			var p_altered = this.get('path_altered');
 			p_altered.setValue(false);
@@ -778,6 +779,23 @@ define([
 			}
 			this.set('mod', mod);
 			this.set('alpha', alpha);
+		},
+
+		updateScreenBounds: function(targetGeom) {
+			var screen_bounds = targetGeom.bounds;
+			var center = this.get('center');
+			center.setValue(screen_bounds.center);
+			this.get('screen_top_left').setValue(screen_bounds.topLeft);
+			this.get('screen_top_right').setValue(screen_bounds.topRight);
+			this.get('screen_bottom_right').setValue(screen_bounds.bottomRight);
+			this.get('screen_bottom_left').setValue(screen_bounds.bottomLeft);
+			this.get('screen_left_center').setValue(screen_bounds.leftCenter);
+			this.get('screen_right_center').setValue(screen_bounds.rightCenter);
+			this.get('screen_bottom_center').setValue(screen_bounds.bottomCenter);
+			this.get('screen_top_center').setValue(screen_bounds.topCenter);
+			this.get('area').setValue(screen_bounds.area);
+			this.get('screen_width').setValue(screen_bounds.width);
+			this.get('screen_height').setValue(screen_bounds.height);
 		}
 
 	});

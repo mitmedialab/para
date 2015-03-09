@@ -316,7 +316,9 @@ define([
       var references = this.get('references');
       var relatives = this.get('relatives');
       var expression = this.get('expression');
-     
+      if(relatives[0].get('type')==='sampler'){
+        relatives[0].constrainRange(references[0]);
+      }
       var refPropList = Utils.getPropConstraintFromList(references, constrainToVal.slice(1, constrainToVal.length));
       var refProp = refPropList[0];
       var relPropList = Utils.getPropConstraintFromList(relatives, constrainToVal.slice(1, constrainToVal.length));
