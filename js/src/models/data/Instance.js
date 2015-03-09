@@ -366,6 +366,7 @@ define([
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
+			console.log('attempting modify for',this.get('id'));
 			if (mode === 'proxy') {
 				if (protoNode) {
 					if (modifier === 'override') {
@@ -390,7 +391,10 @@ define([
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
 					if (this.has(p)) {
+						console.log('has property',this.get('id'));
+
 						var property = this.get(p);
+						property.setNull(false);
 						property.modify(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
