@@ -297,6 +297,9 @@ define([
     },
 
     scaleDrag: function(event) {
+      var selectedShapes = this.get('selected_shapes');
+      var scaleDelta = selectedShapes[0].accessProperty('scaling_delta');
+      console.log('scaleDelta',scaleDelta);
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 

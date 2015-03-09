@@ -81,7 +81,7 @@ define([
           });
           this.indexNumbers.push(numText);
         }
-        for(var j=0;i<this.members.length;j++){
+        for(var j=0;j<this.members.length;j++){
           this.members[j].bringToFront();
         }
       },

@@ -94,6 +94,7 @@ define([
 
         paper.view.parent = this;
         paper.view.on('frame', this.animate);
+        window.onbeforeunload = function(){ return 'unsaved changes'; };
 
       },
 
