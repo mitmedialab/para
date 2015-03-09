@@ -82,7 +82,7 @@ define([
           this.indexNumbers.push(numText);
         }
         for(var j=0;j<this.members.length;j++){
-          this.members[j].bringToFront();
+          this.members[j].get('geom').bringToFront();
         }
       },
 
