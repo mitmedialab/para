@@ -14,11 +14,12 @@
 
 			defaults: {
 				operator: 'add',
-				isNull: true
+				isNull: true,
+				myArray: null
 
 			},
 
-			initialize: function() {
+			initialize: function(arg) {
 
 			},
 

@@ -101,8 +101,9 @@ define([
 				} else {
 					this.setValue(this.val.getValue() * val);
 				}
-			}
+			},
 
+			
 		});
 
 		return PFloat;

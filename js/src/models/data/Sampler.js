@@ -81,9 +81,7 @@ define([
           });
           this.indexNumbers.push(numText);
         }
-        for(var j=0;j<this.members.length;j++){
-          this.members[j].get('geom').bringToFront();
-        }
+
       },
 
       removeMember: function(data) {
@@ -175,11 +173,10 @@ define([
 
       //places a constraint on the end and start values
       constrainRange: function(list) {
-        console.log('attempting to constrain range');
         if (list.get('type') === 'list' || list.get('type') === 'sampler') {
-          var endIndex = this.get('end_index');
+          var endIndex = this.inheritProperty('end_index');
           var constraintF = function() {
-            var num = list.members.length-1;
+            var num = list.getMemberNumber();
             endIndex.setValue(num);
             return num;
           };
@@ -235,6 +232,15 @@ define([
         return this.accessProperty('value');
       },
 
+      getEndIndex: function() {
+        return this.accessProperty('end_index')
+
+      },
+
+      getStartIndex: function() {
+        return this.accessProperty('start_index');
+      },
+
 
       compile: function() {
 
@@ -249,7 +255,7 @@ define([
         var bottomLeft = this.get('screen_bottom_left').getValue();
         for (var i = 0; i < this.indexNumbers.length; i++) {
           var numText = this.indexNumbers[i];
-          numText.content = (i+1);
+          numText.content = (i + 1);
           numText.position = this.members[i].get('screen_bottom_left').toPaperPoint();
           numText.position.x += 10;
           numText.position.y -= 10;

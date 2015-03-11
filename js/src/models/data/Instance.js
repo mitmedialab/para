@@ -192,7 +192,6 @@ define([
 		},
 
 		addMemberToOpen: function(data, added_bool) {
-			console.log('checking instance');
 			return [];
 		},
 		recRemoveMember: function(data) {
@@ -346,8 +345,8 @@ define([
 		},
 
 
-		exportJSON: function() {
-			return this.toJSON();
+		toJSON: function() {
+
 		},
 
 		parseJSON: function(data) {
@@ -366,7 +365,6 @@ define([
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
-			console.log('attempting modify for',this.get('id'));
 			if (mode === 'proxy') {
 				if (protoNode) {
 					if (modifier === 'override') {
@@ -391,7 +389,6 @@ define([
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
 					if (this.has(p)) {
-						console.log('has property',this.get('id'));
 
 						var property = this.get(p);
 						property.setNull(false);
@@ -422,7 +419,6 @@ define([
 			} else {
 				if (this.has('proto_node')) {
 					if (property_name === 'path_altered') {
-						console.log('checking proto for path_altered');
 					}
 					return this.get('proto_node').inheritProperty(property_name);
 				}
@@ -487,14 +483,12 @@ define([
 					if (recurse > 0) {
 						if (mode === 'proxy') {
 							proto.set('inheritor_selected', 'proxy');
-							//console.log('set inheritor selected to proxy');
 
 						} else {
 							proto.set('inheritor_selected', 'standard');
 							alpha = proto.get('alpha');
 							alpha.setValue(1);
 							proto.set('alpha', alpha);
-							//console.log('set alpha to 1 for proto');
 						}
 					} else {
 						proto.set('inheritor_selected', false);
@@ -561,7 +555,6 @@ define([
 		},
 
 		compileTransforms: function() {
-			//console.log('compiling t', this.get('id'), 'instance');
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');
@@ -715,8 +708,6 @@ define([
 				if (!geom) {
 					geom = new paper.Path();
 				}
-				console.log('importing master path');
-				console.log('masterPath=', this.accessProperty('master_path'));
 				geom.importJSON(this.accessProperty('master_path'));
 			}
 			geom.data.instance = this;

@@ -21,7 +21,7 @@ define([
 	var store = 0;
 	var compile = 1;
 	var render = 2;
-
+	
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
 
@@ -97,9 +97,7 @@ define([
 
 
 		removeInstance: function(node,departureNode,target){
-			console.log('removeInstance called for',node.get('id'));
 			if(node===target){
-				console.log('found target', node.get('type'));
 				node.deleteSelf();
 				for(var j=0;j<lists.length;j++){
 					if(lists[j]===node){
@@ -119,7 +117,6 @@ define([
 			}
 			else{
 				for(var i=0;i<node.children.length;i++){
-					console.log('checking child at',i);
 					node.children[i].visit(this,'removeInstance',node,target);
 				}
 			}

@@ -63,7 +63,14 @@ define([
 
         this.members.push(data);
       }
-      this.get('member_count').setValue(this.members.length);
+     
+       var md = {};
+        md.member_count = {
+          val: this.members.length,
+          operator: 'set'
+        };
+         this.modifyProperty(md);
+
     },
 
     addMemberToOpen: function(data) {
@@ -108,7 +115,13 @@ define([
 
         return true;
       }
-        this.get('member_count').setValue(this.members.length);
+
+       var md = {};
+        md.member_count = {
+          val: this.members.length,
+          operator: 'set'
+        };
+         this.modifyProperty(md);
 
     },
 
@@ -173,6 +186,9 @@ define([
       });
     },
 
+    getMemberNumber: function(){
+      return this.accessProperty('member_count');
+    },
     /*closeMembers
      * recursively closes all members
      *of this list

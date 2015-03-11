@@ -115,10 +115,7 @@ define([
                 this.vistied= false;
             },
 
-            /*TODO: write export JSON function*/
-            exportJSON: function(data){
-                return {};
-            },
+            
             /*================ SceneNode method defintions ================*/
 
             //destructor: clears all this.children and sets parent to null

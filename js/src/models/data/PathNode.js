@@ -173,9 +173,7 @@ define([
         var pos = selectedPoint.get('position').getValue();
         var handleIn =  selectedPoint.get('handle_in').getValue();
         var handleOut = selectedPoint.get('handle_out').getValue();
-       // console.log('prior to altering segment', masterPath[1].segments[selectedPoint.get('index')]);
         masterPath[1].segments[selectedPoint.get('index')] = [[pos.x,pos.y],[handleIn.x,handleIn.y],[handleOut.x,handleOut.y]];
-        //console.log('altered segment', masterPath[1].segments[selectedPoint.get('index')]);
 
       }
       var master = this.get('master_path');
