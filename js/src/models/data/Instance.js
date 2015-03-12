@@ -580,7 +580,7 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.renderGeom();
-					this.renderStyle(geom);
+                                        this.renderStyle(geom);
 					this.renderSelection(geom);
 					this.set('rendered', true);
 					return geom;
@@ -699,9 +699,10 @@ define([
 				geom.selected = false;
 			} else {
 				if (!geom) {
-                                   geom = new paper.Path();
+                                  geom = new paper.Path();
 				}
-				geom.importJSON(this.accessProperty('master_path'));
+                                geom.importJSON(this.accessProperty('master_path'));
+                                
 			}
 			geom.data.instance = this;
 

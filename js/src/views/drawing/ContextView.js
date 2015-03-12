@@ -60,9 +60,6 @@ var template,source, model, view, menuX, menuY, currentNode;
           this.hideWheel();
           this.hideExpEditor();
           break;
-        case 'property':
-          this.showWheel();
-          break;
         case 'relatives':
           this.unfocusWheel();
           break;
@@ -182,7 +179,8 @@ var template,source, model, view, menuX, menuY, currentNode;
     },
 
     hideExpEditor: function() {
-      this.$('#expInput').css({
+      $('#expression').val('');
+      $('#expInput').css({
         display: 'none'
       });
       this.editorVisible = false;
@@ -207,7 +205,7 @@ var template,source, model, view, menuX, menuY, currentNode;
     constraintExpressionChange: function(event) {
       var element = $(event.target);
       var elementText = element.val();
-      console.log('Registered expression input change: ' + elementText);
+      console.log('[INFO] Registered expression input change: ' + elementText);
       model.setConstraintExpression(elementText);
     },
 

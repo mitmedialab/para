@@ -97,7 +97,7 @@ define([
 
 
 		removeInstance: function(node,departureNode,target){
-			console.log('removeInstance called for',node.get('id'));
+			//console.log('removeInstance called for',node.get('id'));
 			if(node===target){
 				console.log('found target', node.get('type'));
 				node.deleteSelf();
@@ -119,7 +119,7 @@ define([
 			}
 			else{
 				for(var i=0;i<node.children.length;i++){
-					console.log('checking child at',i);
+					// console.log('checking child at',i);
 					node.children[i].visit(this,'removeInstance',node,target);
 				}
 			}

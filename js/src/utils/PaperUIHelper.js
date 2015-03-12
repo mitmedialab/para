@@ -75,8 +75,7 @@ define([
      * @param relatives  - The instances to compute properties from
      * @param delimiters - An object containing desired delimiters
      */
-    drawPositionDelimiters: function( references, relatives, delimiters ) {
-
+    drawPositionDelimiters: function( instances, instancesName, delimiters ) {
       var newPaths = [];
       // go through each delimiter and draw a line if the
       // delimiter is in the delimiters object
@@ -87,7 +86,7 @@ define([
         var axis = property_split[property_split.length - 1];
 
         // compute the value to draw for
-        var value = Utils[func]( Utils.getPropFromList( relatives, property_split.slice(1, property_split.length) ) );
+        var value = Utils[func]( Utils.getPropFromList( instances, property_split.slice(1, property_split.length) ) );
 
        
         // create the line corresponding to the value and axis
@@ -103,7 +102,8 @@ define([
           });
         }
         
-        path.name = 'delimit-' + property;
+        // NOTE: be careful about instancesName containing '-' 
+        path.name = instancesName + '-delimit-' + property;
         path.strokeColor = '#A5FF00';
         path.strokeWidth = 3;
         path.fillColor = '#A5FF00'; // weirdly required for instance
@@ -131,10 +131,10 @@ define([
      * @param relatives  - The instances to compute properties from
      * @param delimiters - An object containing desired delimiters
      */
-    drawScaleDelimiters: function( references, relatives, delimiters ) {
+    drawScaleDelimiters: function( instances, instancesName, delimiters ) {
     
-      var ref = references[0].get('geom');
-      var rel = relatives[0].get('geom'); 
+      // NOTE: only works on one instance
+      var geom  = instances[0].get('geom'); 
       var newPaths = [];
       // go through each delimiter and draw a line if the
       // delimiter is in the delimiters object
@@ -147,17 +147,17 @@ define([
         // create the line corresponding to the value and axis
         if ( axis == 'x' ) {
           path = new paper.Path({
-            segments: [[rel.bounds.x - .2 * rel.bounds.width, rel.bounds.y - .1 * rel.bounds.height], [rel.bounds.x + 1.2 * rel.bounds.width, rel.bounds.y - .1 * rel.bounds.height]]
+            segments: [[geom.bounds.x - .2 * geom.bounds.width, geom.bounds.y - .1 * geom.bounds.height], [geom.bounds.x + 1.2 * geom.bounds.width, geom.bounds.y - .1 * geom.bounds.height]]
           });
         }
 
         if ( axis == 'y' ) {
           path = new paper.Path({
-            segments: [[rel.bounds.x + 1.1 * rel.bounds.width, rel.bounds.y - .2 * rel.bounds.height], [rel.bounds.x + 1.1 * rel.bounds.width, rel.bounds.y + 1.2 * rel.bounds.height]]
+            segments: [[geom.bounds.x + 1.1 * geom.bounds.width, geom.bounds.y - .2 * geom.bounds.height], [geom.bounds.x + 1.1 * geom.bounds.width, geom.bounds.y + 1.2 * geom.bounds.height]]
           });
         }
        
-        path.name = 'delimit-' + property;
+        path.name = instancesName + '-delimit-' + property;
         path.strokeColor = '#A5FF00';
         path.strokeWidth = 3;
         path.fillColor = '#A5FF00'; // weirdly required for instance
@@ -185,15 +185,15 @@ define([
      * @param relatives  - The instances to compute properties from
      * @param delimiters - An object containing desired delimiters
      */
-    drawOrientationDelimiters: function( references, relatives, delimiters ) {
+    drawOrientationDelimiters: function( instances, instancesName, delimiters ) {
       // draw dashed circle with arrows for each orientation
       
-      var ref = references[0].get('geom');
-      var rel = relatives[0].get('geom'); 
+      // NOTE only works for one instance
+      var geom = instances[0].get('geom'); 
       var newPaths = [];
       
-      var center = new paper.Point( rel.bounds.x + rel.bounds.width / 2, rel.bounds.y + rel.bounds.height / 2 );
-      var radius = 1.1 * Utils.max(rel.bounds.width / 2, rel.bounds.height / 2);
+      var center = new paper.Point( geom.bounds.x + geom.bounds.width / 2, geom.bounds.y + geom.bounds.height / 2 );
+      var radius = 1.1 * Utils.max(geom.bounds.width / 2, geom.bounds.height / 2);
       var bound_circle = new paper.Path.Circle({
         center: center,
         radius: radius 
@@ -221,7 +221,7 @@ define([
         var axis = property_split[property_split.length - 1];
 
         // compute the value to draw for
-        var orientation = Utils[func]( Utils.getPropFromList( relatives, property_split.slice(1, property_split.length) ) );
+        var orientation = Utils[func]( Utils.getPropFromList( instances, property_split.slice(1, property_split.length) ) );
 
         // create the line corresponding to the value and axis
 
@@ -240,7 +240,7 @@ define([
         var path = arrow1; 
         // TODO: figure out how to make compound path with second arrow
 
-        path.name = 'delimit-' + property;
+        path.name = instancesName + '-delimit-' + property;
         path.strokeColor = '#A5FF00';
         path.strokeWidth = 3;
         path.fillColor = '#A5FF00'; // weirdly required for instance
@@ -261,7 +261,9 @@ define([
       for (var i = 0; i < uiNodes.length; i++) {
         (function( uiNode ) {
           var geom = uiNode.get('geom');
-          if ( geom.name.indexOf('delimit') != 0 ) {
+          var nameSplit = geom.name.split('-');
+
+          if ( nameSplit[1] != 'delimit' ) {
             return;
           }
           geom.onMouseEnter = function( event ) {
@@ -275,9 +277,8 @@ define([
             geom.strokeColor = "#ff0000";
             geom.active = true;
 
-            var propSplit = geom.name.split('-');
-            propSplit = propSplit.slice( 1, propSplit.length );
-            constraintTool.set( 'constrainToVal', propSplit );
+            propSplit = nameSplit.slice( 2, nameSplit.length );
+            constraintTool.set( nameSplit[0], propSplit );
             constraintTool.rewordConstraint();
             constraintTool.advance(); 
           }
@@ -342,37 +343,48 @@ define([
 
       var wheel_container = constraintWheel.get('geom');
       var true_wheel = wheel_container.children[0];
+      var ui_handler = this;
       for (var i = 0; i < true_wheel.children.length; i++) {
         (function( wheel_group ) {
           wheel_group.originalFill = wheel_group.fillColor;
+          wheel_group.originalStroke = wheel_group.strokeColor;
           wheel_group.onMouseEnter = function( event ) {
             if (!wheel_group.active) {
+              wheel_group.strokeColor = '#ff7777';
               wheel_group.fillColor = '#ff7777';
             }
           }
 
           wheel_group.onMouseLeave = function( event ) {
             if (!wheel_group.active) {
+              wheel_group.strokeColor = wheel_group.originalStroke;
               wheel_group.fillColor = wheel_group.originalFill;
             }
           }
 
           wheel_group.onClick = function( event ) {
-            // clear all other properties of active state 
-            // (maybe change for future if multiple prop selection desirable)
+            // don't let any other properties be selected
             for (var j = 0; j < true_wheel.children.length; j++) {
-              if (true_wheel.children[j].active) { 
-                true_wheel.children[j].fillColor = true_wheel.children[j].originalFill;
-                true_wheel.children.active = false;
-              }   
+              if (true_wheel.children[j].active) {
+                return; 
+              }
+              true_wheel.children[j].active = true;   
             } 
             
+            wheel_group.strokeColor = '#ff0000';
             wheel_group.fillColor = '#ff0000';
             wheel_group.active = true;
 
-            // only works if property variable in constsraint tool
-            // is the same as wheel item name
-            constraintTool.set( wheel_container.name, wheel_group.name );
+            var relevance;
+            if ( wheel_container.name == 'ref-wheel' ) {
+              relevance = 'reference';
+            } else if ( wheel_container.name == 'rel-wheel' ) {
+              relevance = 'relative';
+            }
+
+            constraintTool.setConstraintProperty( relevance, wheel_group.name );
+            var delimiters = constraintTool.createDelimiters( relevance );
+            ui_handler.addDelimiterListeners( constraintTool, delimiters );
           }      
 
         }( true_wheel.children[i] ))
@@ -395,6 +407,12 @@ define([
       return uiNode;
     },
 
+    remove: function( uiNode ) {
+      for ( var i = 0; i < this.pathReferences.length; i++ ) {
+        if ( this.pathReferences[i].get('geom').name == uiNode.get('geom').name ) { this.pathReferences.splice(i, 1); }
+      }
+      this.sm.removeInstance( uiNode );
+    },
     /*
      * Remove all Paper UI elements from the canvas, as well as from
      * tracking.
