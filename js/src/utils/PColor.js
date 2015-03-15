@@ -143,14 +143,14 @@ define([
 			 * converts hex values to color values
 			 * calls super modify following this conversion
 			 */
-			modify: function(style_data) {
+			modifyProperty: function(style_data) {
 				var data = {
 					operator: 'set',
 					r: ColorUtils.hexToR(style_data),
 					g: ColorUtils.hexToG(style_data),
 					b: ColorUtils.hexToB(style_data)
 				};
-				PConstraint.prototype.modify.call(this, data);
+				PConstraint.prototype.modifyProperty.call(this, data);
 			}
 
 		});

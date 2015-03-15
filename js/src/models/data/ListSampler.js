@@ -1,5 +1,5 @@
 /*ListSampler.js
- * sampler that pulls values from a list, used when converting standard list 
+ * sampler that pulls values from a list, used when converting standard list
  * into one that is being constrained iteratively.
  * inherits from Sampler
  */
@@ -16,25 +16,29 @@ define([
   function(_, Sampler, PFloat, PBool, paper) {
     var ListSampler = Sampler.extend({
       defaults: _.extend({}, Sampler.prototype.defaults, {
-      name: 'list_sampler'
-    
+        name: 'list_sampler'
+
 
       }),
 
-   //overrides ListNode addMember and removeMember functions
+      //overrides ListNode addMember and removeMember functions
       addMember: function(data) {
         Sampler.prototype.addMember.call(this, data);
         this.setRange(0, this.members.length - 1);
       },
 
       removeMember: function(data) {
-       Sampler.prototype.removeMember.call(this, data);
+        Sampler.prototype.removeMember.call(this, data);
         this.setRange(0, this.members.length - 1);
       },
 
-      compile: function(){
+      compile: function() {
         for (var i = 0; i < this.members.length; i++) {
-          this.compileMemberAt(i);
+          var i_matricies = this.compileTransforms();
+          this.compileMemberAt(i, 'translation_delta', i_matricies);
+          this.compileMemberAt(i, 'scaling_delta', i_matricies);
+          this.compileMemberAt(i, 'rotation_delta', i_matricies);
+
           this.increment();
         }
       }

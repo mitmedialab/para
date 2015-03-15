@@ -7,11 +7,13 @@ define([
     'underscore',
     'models/data/ListNode',
     'utils/PFloat',
+    'utils/PPoint',
+
     'utils/PBool',
     'paper'
   ],
 
-  function(_, ListNode, PFloat, PBool, paper) {
+  function(_, ListNode, PFloat, PPoint, PBool, paper) {
     var Sampler = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'sampler',
@@ -19,6 +21,7 @@ define([
         index: null,
         value: null,
         multiplier: null,
+        multiplier_map: null,
         start_index: null,
         end_index: null,
         max_val: null,
@@ -35,17 +38,15 @@ define([
         this.set('value', new PFloat(0, 'set'));
         this.set('index', new PFloat(0, 'set'));
         this.set('multiplier', new PFloat(1, 'set'));
-
+        this.set('multiplier_map', new PPoint(0, 1, 'set'));
         this.set('loop', new PBool(false));
         ListNode.prototype.initialize.apply(this, arguments);
+        this.get('translation_delta').setNull(false);
 
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
-        var cornerSize = new paper.Size(10, 10);
         var path = new paper.Path.Rectangle(rectangle);
         path.strokeColor = this.get('primary_selection_color');
-        //path.fillColor = 'white';
-        //path.fillColor.alpha = 0.95;
-        this.get('translation_delta').setNull(false);
+       
 
         this.startText = new paper.PointText({
           point: new paper.Point(5, 13),
@@ -184,6 +185,38 @@ define([
         }
       },
 
+      constrainMultiplier: function(property) {
+        var multiplier_map = {
+          x: 0,
+          y: 0,
+          operator: 'set'
+        };
+        switch (property) {
+          case 'translation_delta':
+            multiplier_map.x = 1;
+            multiplier_map.y = 100;
+            break;
+          case 'scaling_delta':
+            multiplier_map.x = 0.5;
+            multiplier_map.y = 2;
+            break;
+          case 'rotation_delta':
+            multiplier_map.x = 0;
+            multiplier_map.y = 360;
+            break;
+          case 'stroke_color':
+          case 'fill_color':
+            multiplier_map.x = 0;
+            multiplier_map.y = 255;
+            break;
+          case 'stroke_weight':
+            multiplier_map.x = 0.1;
+            multiplier_map.y = 10;
+        }
+        var data = {'multiplier_map':multiplier_map};
+        this.modifyProperty(data);
+      },
+
       setMax: function(value) {
         this.modifyProperty({
           max: {
@@ -233,7 +266,7 @@ define([
       },
 
       getEndIndex: function() {
-        return this.accessProperty('end_index')
+        return this.accessProperty('end_index');
 
       },
 

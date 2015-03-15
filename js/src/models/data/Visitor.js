@@ -7,36 +7,45 @@
 define([
 	'underscore',
 	'backbone',
-	'models/data/Instance'
+	'models/data/functions/FunctionManager',
+	'models/data/Instance',
+	'models/data/functions/FunctionNode'
 
 
-], function(_, Backbone, Instance) {
+], function(_, Backbone, FunctionManager, Instance, FunctionNode) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
 	//stores para lists
-	var lists = [];
+	var lists;
 	var openLists = [];
 	var renderQueue = [];
 	var store = 0;
 	var compile = 1;
 	var render = 2;
-	
+
+	var functionManager = new FunctionManager();
+	var rootNode, currentNode;
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
 
-		initialize: function() {},
+		initialize: function() {
+			//setup root node
+			rootNode = new FunctionNode();
+			rootNode.open();
+			lists = rootNode.lists;
+			rootNode.set('name', 'root');
+			this.listenTo(rootNode, 'parseJSON', this.parseJSON);
+			currentNode = rootNode;
+		},
 
 
 		/*resetPrototypes
 		 * resets the prototypes recursively.
 		 * Called before visiting the root node
 		 */
-		resetPrototypes: function(prototypes) {
-			/*for (var i = 0; i < prototypes.length; i++) {
-				prototypes[i].reset();
-				this.resetPrototypes(prototypes[i].children);
-			}*/
+		resetPrototypes: function() {
+
 			for (var i = 0; i < renderQueue.length; i++) {
 				renderQueue[i].reset();
 			}
@@ -77,47 +86,61 @@ define([
 			}
 		},
 
-		compileInstances: function(root) {
+		compileFunctions: function() {
 			var state_data = {
-				list: store,
+				func: compile,
 				instance: compile
 			};
-			//console.log('state_data_ compile instances',state_data);
+			var functions = functionManager.functions;
+			for (var i = 0; i < functions.length; i++) {
+				this.visit(functions[i], null, state_data);
+			}
+		},
 
-			this.visit(root, null, state_data);
+		compileInstances: function() {
+			if (currentNode === rootNode) {
+				var state_data = {
+					list: store,
+					instance: compile,
+					func: compile,
+				};
+
+				this.visit(currentNode, null, state_data);
+			}
 		},
 
 		render: function(root) {
 			for (var i = 0; i < renderQueue.length; i++) {
-				
+
 				renderQueue[i].render();
-				
+
 			}
 		},
 
 
-		removeInstance: function(node,departureNode,target){
-			if(node===target){
+		removeInstance: function(node, departureNode, target) {
+			if (!node) {
+				node = currentNode;
+			}
+			if (node === target) {
 				node.deleteSelf();
-				for(var j=0;j<lists.length;j++){
-					if(lists[j]===node){
-						lists.splice(j,1);
+				for (var j = 0; j < lists.length; j++) {
+					if (lists[j] === node) {
+						lists.splice(j, 1);
 						lists = lists.concat(node.getListMembers());
 						node.removeAllMembers();
 						break;
-					}
-					else{
+					} else {
 						lists[j].recRemoveMember(target);
 					}
 				}
-				if(departureNode){
+				if (departureNode) {
 					departureNode.removeChildNode(node);
 				}
 
-			}
-			else{
-				for(var i=0;i<node.children.length;i++){
-					node.children[i].visit(this,'removeInstance',node,target);
+			} else {
+				for (var i = 0; i < node.children.length; i++) {
+					node.children[i].visit(this, 'removeInstance', node, target);
 				}
 			}
 		},
@@ -127,7 +150,6 @@ define([
 		 * node on the screen according to type;
 		 */
 		visit: function(node, departureNode, state_data) {
-			//console.log('state_data_ visit',state_data);
 
 			node.set({
 				visited: true
@@ -136,6 +158,10 @@ define([
 				case 'list':
 				case 'sampler':
 					this.visitList(node, departureNode, state_data);
+					break;
+				case 'function':
+
+					this.visitFunction(node, departureNode, state_data);
 					break;
 				default:
 					this.visitInstance(node, departureNode, state_data);
@@ -164,19 +190,35 @@ define([
 				for (var i = 0; i < node.members.length; i++) {
 					member = node.members[i];
 					if (member.get('type') === 'list') {
-						member.visit(this, 'visit',node, state_data);
+						member.visit(this, 'visit', node, state_data);
 					}
 				}
 				return;
 			}
 		},
 
+		/* visitFunction
+		 * called for visit to function node
+		 */
+		visitFunction: function(node, departureNode, state_data) {
+			var state = state_data.func;
+			switch (state) {
+				case compile:
+					node.compile();
+					renderQueue.push(node);
+					if (node.get('open')) {
+						var children = node.children;
+						for (var i = 0; i < children.length; i++) {
+							children[i].visit(this, 'visit', node, state_data);
+						}
+					}
+					break;
+			}
+		},
 		/* visitInstance
 		 * called for visit to instance node
-		 * determines if node
 		 */
 		visitInstance: function(node, departureNode, state_data) {
-			//console.log('state_data_ visit',state_data);
 
 			var state = state_data.instance;
 			var children = node.children;
@@ -186,12 +228,30 @@ define([
 					node.compile();
 					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {
-						children[i].visit(this, 'visit',node, state_data);
+						children[i].visit(this, 'visit', node, state_data);
 					}
 					break;
 			}
 
 
+		},
+
+
+		//=======function managment methods==========//
+
+		addFunction: function(selected_shapes) {
+			functionManager.createFunction('my_function', selected_shapes);
+		},
+
+		addShape: function(instance, parent) {
+			if (instance) {
+				if (parent) {
+					parent.addChildNode(instance);
+				} else {
+					currentNode.addChildNode(instance);
+				}
+				this.addToOpenLists(instance);
+			}
 		},
 
 
@@ -202,13 +262,11 @@ define([
 		 * on the array which are members of the added list
 		 */
 		addList: function(list) {
-		
+
 			if (!this.addToOpenLists(list)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
-					//console.log('checking list at ', i);
 					if (list.hasMember(lists[i], true)) {
 						lists.splice(i, 1);
-						//console.log('removing closed list member at ', i);
 					}
 				}
 				lists.push(list);
@@ -227,7 +285,6 @@ define([
 			for (var i = 0; i < lists.length; i++) {
 				addedToList = addedToList ? true : lists[i].addMemberToOpen(instance);
 			}
-			console.log('added to list from visitor', addedToList);
 			return addedToList;
 		},
 
@@ -264,28 +321,56 @@ define([
 			return sInstances;
 		},
 
-		/* openList
-		 * sets list argument to
-		 * open and pops it from the lists to the openLists array
-		 * returns list that was opened
+		/* toggleOpen
+		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function(items) {
+
+			var functions = items.filter(function(item) {
+				return item.get('type') === 'function';
+			});
+			if (functions.length > 0) {
+				currentNode.close();
+				this.closeAllLists();
+				currentNode = functions[functions.length - 1];
+				lists = functions[functions.length - 1].lists;
+				return functionManager.openFunction(functions[functions.length - 1]);
+			} else {
+				return this.toggleOpenLists(items);
+			}
+		},
+
+		closeAllLists:function(){
+			for(var i=0;i<lists.length;i++){
+				lists[i].closeAllMembers();
+				lists[i].set('open', false);
+			}
+		},
+
+
+		toggleOpenLists: function(items) {
+
 			var openedLists = [];
-			var returnedLists = [];
+			var openedItems = [];
+			var members = [];
 			for (var j = 0; j < items.length; j++) {
 				var item = items[j];
 				for (var i = 0; i < lists.length; i++) {
 					if ($.inArray(lists[i], openedLists) === -1) {
 						var r = lists[i].toggleOpen(item);
 						if (r) {
-							returnedLists = returnedLists.concat(r);
+							openedItems = openedItems.concat(r);
 							openedLists.push(lists[i]);
 						}
 
 					}
 				}
 			}
-			return returnedLists;
+			for (var k = 0; k < openedItems.length; k++) {
+				members = members.concat(openedLists[k].members);
+
+			}
+			return members;
 		},
 
 		toggleClosed: function(items) {

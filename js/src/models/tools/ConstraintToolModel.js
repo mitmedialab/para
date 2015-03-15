@@ -318,6 +318,7 @@ define([
       var expression = this.get('expression');
       if(relatives[0].get('type')==='sampler'){
         relatives[0].constrainRange(references[0]);
+        relatives[0].constrainMultiplier(constrainToVal.slice(1, constrainToVal.length)[0]);
       }
       var refPropList = Utils.getPropConstraintFromList(references, constrainToVal.slice(1, constrainToVal.length));
       var refProp = refPropList[0];
@@ -328,8 +329,10 @@ define([
         var x = Utils[constrainToVal[0]](relPropList.map(function(prop) {
           var v = prop.getValue();
           if(prop.has('multiplier')){
+             console.log('multiplied val=',v, prop.getMultiplier(), v*prop.getMultiplier());
             return v*prop.getMultiplier();
           }
+
           return v;
         }));
 

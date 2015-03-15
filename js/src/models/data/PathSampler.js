@@ -15,7 +15,8 @@ define([
   function(_, Sampler, PFloat, PBool, TrigFunc, paper) {
     var PathSampler = Sampler.extend({
       defaults: _.extend({}, Sampler.prototype.defaults, {
-        name: 'path_sampler'
+        name: 'path_sampler',
+        multTarget: 'width'
 
       }),
 
@@ -31,9 +32,11 @@ define([
       getMultiplier: function() {
         if (this.members.length > 0) {
           var path = this.members[0].get('geom');
-          var width = path.bounds.width;
-          var m = TrigFunc.map(width, 1, 1000, 1, 100);
-          this.setMultiplier(width);
+          var val = path.bounds[this.get('multTarget')];
+          var multiplier_map = this.accessProperty('multiplier_map');
+          console.log('min,max',multiplier_map.x, multiplier_map.y);
+          var m = TrigFunc.map(val, 1, 1000, multiplier_map.x, multiplier_map.y);
+          this.setMultiplier(val);
         }
         return this.accessProperty('multiplier');
       },
@@ -64,6 +67,7 @@ define([
             }
           }
           this.increment();
+          console.log('value=',this.accessProperty('value'));
           return this.accessProperty('value');
         }
       },

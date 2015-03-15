@@ -31,6 +31,18 @@ define([
                 SceneNode.numNodeInstances++;
             },
 
+            /* extend
+        * function for adding in functionality via mixins
+        */
+        extend: function( source) {
+            for (var k in source) {
+                if (source.hasOwnProperty(k) && !this.hasOwnProperty(k)) {
+                    this[k] = source[k];
+                }
+            }
+            return this;
+        },
+
 
            /* clone: function(){
                  var clone= Backbone.Model.prototype.clone.apply(this,arguments);

@@ -7,22 +7,23 @@ define([
   'underscore',
   'paper',
   'models/data/Instance',
-  'utils/PFloat'
+  'utils/PFloat',
+  'utils/PConstraint'
 
-], function($, _, paper, Instance, PFloat) {
+], function($, _, paper, Instance, PFloat,PConstraint) {
 
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
       name: 'list',
       type: 'list',
-      member_count:null,
+      member_count: null,
       open: false, //indicates whether list is open or not;
     }),
 
     initialize: function() {
       Instance.prototype.initialize.apply(this, arguments);
       this.members = [];
-      this.set('member_count',new PFloat(0));
+      this.set('member_count', new PFloat(0));
       this.get('translation_delta').setNull(false);
     },
 
@@ -56,20 +57,20 @@ define([
           this.members.push(data[i]);
         }
       } else {
-       
+
         data.modifyProperty({
           'translation_delta': neg_delta
         });
 
         this.members.push(data);
       }
-     
-       var md = {};
-        md.member_count = {
-          val: this.members.length,
-          operator: 'set'
-        };
-         this.modifyProperty(md);
+
+      var md = {};
+      md.member_count = {
+        val: this.members.length,
+        operator: 'set'
+      };
+      this.modifyProperty(md);
 
     },
 
@@ -90,7 +91,7 @@ define([
         } else {
           return true;
         }
-      } 
+      }
       return false;
     },
 
@@ -116,12 +117,12 @@ define([
         return true;
       }
 
-       var md = {};
-        md.member_count = {
-          val: this.members.length,
-          operator: 'set'
-        };
-         this.modifyProperty(md);
+      var md = {};
+      md.member_count = {
+        val: this.members.length,
+        operator: 'set'
+      };
+      this.modifyProperty(md);
 
     },
 
@@ -186,7 +187,7 @@ define([
       });
     },
 
-    getMemberNumber: function(){
+    getMemberNumber: function() {
       return this.accessProperty('member_count');
     },
     /*closeMembers
@@ -244,34 +245,52 @@ define([
 
     compile: function() {
       for (var i = 0; i < this.members.length; i++) {
-        this.compileMemberAt(i);
+        var i_matricies = this.compileTransforms();
+        this.compileMemberAt(i, 'translation_delta', i_matricies);
+        this.compileMemberAt(i, 'rotation_delta', i_matricies);
+
       }
     },
 
-    compileMemberAt: function(index) {
-      var translation_delta = this.get('translation_delta');
-      var i_matricies = this.compileTransforms();
-      var member = this.members[index];
-      var mtd = member.get('translation_delta');
-      var m_tmatrix = member.get('tmatrix');
-      var l_matrix = i_matricies.tmatrix;
-      var xC = translation_delta.x.isConstrained();
-      var yC = translation_delta.y.isConstrained();
-      var mxC = mtd.x.isConstrained();
-      var myC = mtd.y.isConstrained();
-      if (xC && !mxC) {
-        m_tmatrix.tx = 0;
+    compileMemberAt: function(index, propname, i_matricies) {
+
+      var delta = this.inheritProperty(propname);
+      if (delta) {
+        var member = this.members[index];
+        var geom = member.get('geom');
+        if(geom){
+          member.get('geom').bringToFront();
+        }
+        var mtd = member.inheritProperty(propname);
+        var matrixMap = this.get('matrix_map');
+        console.log('matrixMap', matrixMap[propname].properties);
+        var matrix_props = matrixMap[propname].properties;
+        var m_tmatrix = member.get(matrixMap[propname].name);
+        var l_matrix = i_matricies[matrixMap[propname].name];
+        var dC = delta.isConstrained();
+        var mC = mtd.isConstrained();
+        for (var p in matrix_props) {
+          if (delta.hasOwnProperty(p)) {
+            console.log('p=', p);
+            var pC = false;
+            var mPC = false;
+            if(delta[p] instanceof PConstraint){
+             pC = delta[p].isConstrained();
+            mPC = mtd[p].isConstrained();
+            }
+            for (var i = 0; i < matrix_props[p].length; i++) {
+              if ((pC || dC) && !mPC && !mC) {
+                m_tmatrix[matrix_props[p][i]] = 0;
+              }
+              if (mPC || mC) {
+                l_matrix[matrix_props[p][i]] = 0;
+              }
+            }
+          }
+        }
+
+        m_tmatrix.concatenate(l_matrix);
       }
-      if (yC && !myC) {
-        m_tmatrix.ty = 0;
-      }
-      if (mxC) {
-        l_matrix.tx = 0;
-      }
-      if (myC) {
-        l_matrix.ty = 0;
-      }
-      m_tmatrix.concatenate(l_matrix);
     },
 
     compileTransforms: function() {

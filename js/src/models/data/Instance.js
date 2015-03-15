@@ -12,8 +12,10 @@ define([
 	'utils/PFloat',
 	'utils/PColor',
 	'utils/PBool',
+	'utils/PConstraint',
 	'utils/TrigFunc'
-], function(_, $, paper, SceneNode, PPoint, PFloat, PColor, PBool, TrigFunc) {
+], function(_, $, paper, SceneNode, PPoint, PFloat, PColor, PBool, PConstraint, TrigFunc) {
+
 
 
 	var Instance = SceneNode.extend({
@@ -78,6 +80,28 @@ define([
 			sel_palette_index: 0,
 
 			lists: null,
+			matrix_map: {
+				translation_delta: {
+					name: 'tmatrix',
+					properties: {
+						x: ['tx'],
+						y: ['ty']
+					}
+				},
+				scaling_delta: {
+					name: 'smatrix',
+					properties: {
+						x: ['a'],
+						y: ['d']
+					}
+				},
+				rotation_delta: {
+					name: 'rmatrix',
+					properties: {
+						val: ['a', 'b', 'c', 'd']
+					}
+				}
+			}
 		},
 
 		initialize: function() {
@@ -146,9 +170,10 @@ define([
 			this.set('id', new Date().getTime().toString());
 
 			this.set('lists', []);
-
+			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
 		},
+
 
 		/* deleteSelf
 		 * function called before instance is removed from
@@ -258,6 +283,22 @@ define([
 			this.set('rmatrix', rmatrix);
 			this.set('smatrix', smatrix);
 			this.set('tmatrix', tmatrix);
+		},
+
+		// sets the geom visibility to false
+		hide: function(){
+			var geom = this.get('geom');
+			if(geom){
+				geom.visible = false;
+				geom.selected = false;
+			}
+		},
+
+		show: function(){
+			var geom = this.get('geom');
+			if(geom){
+				geom.visible = true;
+			}
 		},
 
 
@@ -392,7 +433,7 @@ define([
 
 						var property = this.get(p);
 						property.setNull(false);
-						property.modify(data_property);
+						property.modifyProperty(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
 							if (property.getValue() > 360 || property.getValue() < 0) {
@@ -418,12 +459,16 @@ define([
 				return property;
 			} else {
 				if (this.has('proto_node')) {
-					if (property_name === 'path_altered') {
-					}
+					if (property_name === 'path_altered') {}
 					return this.get('proto_node').inheritProperty(property_name);
 				}
 			}
 			return null;
+		},
+
+		activateProperty: function(property_name) {
+			this.get(property_name).setNull(false);
+			return this.get(property_name);
 		},
 
 
@@ -586,10 +631,12 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.renderGeom();
-					this.renderStyle(geom);
-					this.renderSelection(geom);
+					if (geom) {
+						this.renderStyle(geom);
+						this.renderSelection(geom);
+					}
 					this.set('rendered', true);
-					return geom;
+
 				}
 				return 'root';
 			}
@@ -693,39 +740,42 @@ define([
 
 
 		renderGeom: function() {
+			var visible = this.get('visible');
 			var geom = this.get('geom');
-			var rmatrix = this.get('rmatrix');
-			var smatrix = this.get('smatrix');
-			var tmatrix = this.get('tmatrix');
+		
+		
+				var rmatrix = this.get('rmatrix');
+				var smatrix = this.get('smatrix');
+				var tmatrix = this.get('tmatrix');
 
-			var path_altered = this.get('path_altered').getValue();
-			if (!path_altered && geom) {
-				geom.transform(this.get('ti_matrix'));
-				geom.transform(this.get('ri_matrix'));
-				geom.transform(this.get('si_matrix'));
-				geom.selected = false;
-			} else {
-				if (!geom) {
-					geom = new paper.Path();
+				var path_altered = this.get('path_altered').getValue();
+				if (!path_altered && geom) {
+					geom.transform(this.get('ti_matrix'));
+					geom.transform(this.get('ri_matrix'));
+					geom.transform(this.get('si_matrix'));
+					geom.selected = false;
+				} else {
+					if (!geom) {
+						geom = new paper.Path();
+					}
+					geom.importJSON(this.accessProperty('master_path'));
 				}
-				geom.importJSON(this.accessProperty('master_path'));
-			}
-			geom.data.instance = this;
+				geom.data.instance = this;
 
-			var position = this.get('position').toPaperPoint();
-			geom.position = position;
-			geom.transform(smatrix);
-			geom.transform(rmatrix);
-			geom.transform(tmatrix);
+				var position = this.get('position').toPaperPoint();
+				geom.position = position;
+				geom.transform(smatrix);
+				geom.transform(rmatrix);
+				geom.transform(tmatrix);
 
-			this.updateScreenBounds(geom);
-			this.set('geom', geom);
-			var p_altered = this.get('path_altered');
-			p_altered.setValue(false);
-			this.set('path_altered', p_altered);
-
-			return geom;
-
+				this.updateScreenBounds(geom);
+				this.set('geom', geom);
+				var p_altered = this.get('path_altered');
+				p_altered.setValue(false);
+				this.set('path_altered', p_altered);
+				geom.visible = visible;
+				return geom;
+			
 		},
 
 

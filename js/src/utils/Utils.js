@@ -61,6 +61,9 @@ define([
           return instance;
         }
         var property = instance.inheritProperty( propertySplit[0] );
+        if(!property       ){
+          property = instance.activateProperty(propertySplit[0]);
+        }
         for ( var i = 1; i < propertySplit.length; i++ ) {
           property = property[propertySplit[i]];
         }

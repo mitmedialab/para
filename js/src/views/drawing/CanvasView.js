@@ -23,6 +23,7 @@ define([
   var panKey = 32; // 
   var rootKey = 82; // r
   var groupKey = 71; // g
+  var functionKey = 70; //f
   var deleteKey = 67; // c
   var upArrow = 38; // up arrow
   var downArrow = 40; // down arrow
@@ -173,7 +174,6 @@ define([
 
     /* canvas event functions */
     canvasKeydown: function(event) {
-      console.log(event.keyCode);
       /*if (event.keyCode == saveKey) {
         this.model.save();
       }*/
@@ -181,11 +181,14 @@ define([
       if (event.keyCode == sampleKey) {
         this.model.applySampleToInstance();
       }
+      if (event.keyCode == functionKey) {
+        this.model.createFunction();
+      }
       if (shift) {
         if (event.keyCode == upArrow) {
           this.model.closeSelectedGroups();
         } else if (event.keyCode == downArrow) {
-          this.model.openSelectedGroups();
+          this.model.openSelected();
         }
       }
       if (event.keyCode === deleteKey) {
@@ -206,7 +209,6 @@ define([
         shift = true;
       }
       if (event.keyCode === rootKey) {
-        this.model.moveToRoot();
       }
       if (event.keyCode === groupKey) {
         this.model.groupInstance();
