@@ -37,21 +37,32 @@ define([
 				centers.y+=center.y;
 			}
 			centers.x/=childList.length;
-			centers.y/=childList.length
+			centers.y/=childList.length;
 			var data = {translation_delta:centers};
 			f.modifyProperty(data);
 			this.functions.push(f);
 		},
 
-		openFunction: function(func) {
-			console.log('opening function',func.get('id'));
-			this.closeAllFunctions();
+		toggleOpenFunctions: function(currentNode, func) {
+			currentNode.close();
 			var children = func.open();
-			return children;
+			return {toSelect:children, currentNode:func, lists:func.lists};
 		},
 
-		closeFunction: function(func) {
-			func.close();
+		toggleClosedFunctions: function(currentNode, rootNode) {
+				var nCurrent;
+				var parent = currentNode.close();
+				var toSelect = currentNode;
+				if (parent) {
+					console.log('setting current to parent');
+					nCurrent = parent;
+				}
+				else{
+					nCurrent = rootNode;
+				}
+				nCurrent.open();
+				return {currentNode:nCurrent, toSelect:toSelect};
+			
 		},
 
 		closeAllFunctions: function() {

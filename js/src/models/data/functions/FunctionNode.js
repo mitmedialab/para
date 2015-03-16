@@ -68,8 +68,10 @@ define([
 			close: function(){
 				this.set('open',false);
 				for(var i=0;i<this.children.length;i++){
+					this.children[i].close();
 					this.children[i].hide();
 				}
+				return this.getParentNode();
 			},
 
 			compile: function() {

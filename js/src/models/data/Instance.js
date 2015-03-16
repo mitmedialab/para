@@ -230,7 +230,12 @@ define([
 			return 0;
 		},
 
-
+		/*close
+		* used mainly for closing functions
+		*/
+		close: function(){
+			return this.getParentNode();
+		},
 
 		/* create
 		 * Prototypal inheritance action:

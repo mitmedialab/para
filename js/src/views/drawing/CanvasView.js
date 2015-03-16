@@ -186,7 +186,7 @@ define([
       }
       if (shift) {
         if (event.keyCode == upArrow) {
-          this.model.closeSelectedGroups();
+          this.model.closeSelected();
         } else if (event.keyCode == downArrow) {
           this.model.openSelected();
         }

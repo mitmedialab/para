@@ -105,7 +105,7 @@ define([
 					func: compile,
 				};
 
-				this.visit(currentNode, null, state_data);
+				this.visit(rootNode, null, state_data);
 			}
 		},
 
@@ -325,23 +325,52 @@ define([
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function(items) {
-
 			var functions = items.filter(function(item) {
 				return item.get('type') === 'function';
 			});
 			if (functions.length > 0) {
-				currentNode.close();
 				this.closeAllLists();
-				currentNode = functions[functions.length - 1];
-				lists = functions[functions.length - 1].lists;
-				return functionManager.openFunction(functions[functions.length - 1]);
+				var data = functionManager.toggleOpenFunctions(currentNode,functions[functions.length - 1]);
+				lists = data.lists;
+				currentNode = data.currentNode;
+				return data.toSelect;
 			} else {
 				return this.toggleOpenLists(items);
 			}
 		},
 
-		closeAllLists:function(){
-			for(var i=0;i<lists.length;i++){
+		toggleClosed: function(items) {
+			if (openLists.length > 0) {
+				return this.toggleClosedLists(items);
+			} else {
+				this.closeAllLists();
+				var data = functionManager.toggleClosedFunctions(currentNode,rootNode);
+				currentNode =  data.currentNode;
+				return data.toSelect;
+			}
+		},	
+
+		toggleClosedLists: function(items) {
+			var toggledLists = [];
+			var returnedLists = [];
+			for (var j = 0; j < items.length; j++) {
+				var item = items[j];
+				for (var i = 0; i < lists.length; i++) {
+					if ($.inArray(lists[i], toggledLists) === -1) {
+						var r = lists[i].toggleClosed(item);
+						if (r) {
+							returnedLists = returnedLists.concat(r);
+							toggledLists.push(lists[i]);
+						}
+
+					}
+				}
+			}
+			return returnedLists;
+		},
+
+		closeAllLists: function() {
+			for (var i = 0; i < lists.length; i++) {
 				lists[i].closeAllMembers();
 				lists[i].set('open', false);
 			}
@@ -371,25 +400,6 @@ define([
 
 			}
 			return members;
-		},
-
-		toggleClosed: function(items) {
-			var toggledLists = [];
-			var returnedLists = [];
-			for (var j = 0; j < items.length; j++) {
-				var item = items[j];
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], toggledLists) === -1) {
-						var r = lists[i].toggleClosed(item);
-						if (r) {
-							returnedLists = returnedLists.concat(r);
-							toggledLists.push(lists[i]);
-						}
-
-					}
-				}
-			}
-			return returnedLists;
 		},
 
 

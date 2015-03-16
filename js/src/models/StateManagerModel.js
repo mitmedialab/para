@@ -317,11 +317,11 @@ define(['jquery',
      * attempts to close selected items, if they are lists
      * and updates selection accordingly
      */
-    closeSelectedGroups: function() {
+    closeSelected: function() {
       var selectedShapes = selectTool.get('selected_shapes');
-      var toggledLists = visitor.toggleClosed(selectedShapes);
-      selectTool.removeSelectedShape(selectedShapes);
-      selectTool.addSelectedShape(toggledLists);
+      var newItems = visitor.toggleClosed(selectedShapes);
+      selectTool.deselectAll();
+      selectTool.addSelectedShape(newItems);
       this.compile();
     },
 
