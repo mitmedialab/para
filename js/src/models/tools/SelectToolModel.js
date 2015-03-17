@@ -213,7 +213,6 @@ define([
           handle = hitResult.type;
          segments.push({index:hitResult.segment.index,type:hitResult.type});
         } else if (hitResult.type == 'curve') {
-          console.log('hit result', hitResult.location);
           segments.push({index:hitResult.location._segment1.index,type:hitResult.type});
           segments.push({index:hitResult.location._segment2.index,type:hitResult.type});
         }
@@ -299,7 +298,7 @@ define([
     scaleDrag: function(event) {
       var selectedShapes = this.get('selected_shapes');
       var scaleDelta = selectedShapes[0].accessProperty('scaling_delta');
-      console.log('scaleDelta',scaleDelta);
+      console.log('scaleDelta',scaleDelta)
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 

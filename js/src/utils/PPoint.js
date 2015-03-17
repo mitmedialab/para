@@ -177,6 +177,13 @@ define([
 			},
 
 
+			toJSON: function(){
+				var data = this.getValue();
+				data.type = 'PPoint';
+				return data;
+			},
+
+
 
 		});
 

@@ -1,0 +1,2 @@
+/*ParameterNode.js
+instance that acts as a parameter for a function and can be used to transfer its effects to other instances*/

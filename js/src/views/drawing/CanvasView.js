@@ -18,172 +18,181 @@ define([
 
 
   var sampleKey = 83;
-                       // s
-  var loadKey = 76;                           // l
-  var panKey = 32;                            // 
-  var rootKey = 82;                           // r
-  var groupKey = 71;                          // g
-  var deleteKey = 67;                         // c
-  var upArrow = 38;                           // up arrow
-  var downArrow = 40;                         // down arrow
-  var rightArrow = 39;                        // right arrow
-  var leftArrow = 37;                         // left arrow
-  var pan, alt, cmd, shift = false; 
-  
+  // s
+  var loadKey = 76; // l
+  var panKey = 32; // 
+  var rootKey = 82; // r
+  var groupKey = 71; // g
+  var functionKey = 70; //f
+  var deleteKey = 67; // c
+  var paramKey = 80;// p
+  var upArrow = 38; // up arrow
+  var downArrow = 40; // down arrow
+  var rightArrow = 39; // right arrow
+  var leftArrow = 37; // left arrow
+  var pan, alt, cmd, shift = false;
+
   // explore ensuring key combinations (e.g. shift-click selects but shift advances)
-  var advanceKey = 78;                        // n EXPERIMENTAL
-  var retreatKey = 66;                        // b EXPERIMENTAL                           
-  
+  var advanceKey = 78; // n EXPERIMENTAL
+  var retreatKey = 66; // b EXPERIMENTAL                           
+
   var last = {
     x: 0,
     y: 0
   };
   var CanvasView = Backbone.View.extend({
-      //
+    //
 
-      defaults: {
+    defaults: {
 
-      },
+    },
 
-      initialize: function(obj, event_bus) {
-        $(".sub-canvas-container").resizable();
-        prototypes = [];
-        currentId = -1;
-        sub = {
-          down: false,
-          inside: false
-        };
-        main = {
-          down: false,
-          inside: false
-        };
-        inactive = sub;
-        active = main;
-
-
-        this.event_bus = event_bus;
-
-        //TODO: this is a hacky way to to detect key events
-        _.bindAll(this, "canvasKeydown");
-        _.bindAll(this, "canvasKeyup");
-
-        $(document).bind('keydown', this.canvasKeydown);
-        $(document).bind('keyup', this.canvasKeyup);
-        $(window).bind('focus', this.setFocus);
-        $(window).on("resize", this.resizeCanvas);
-
-        $("#sub-canvas").bind('mousedown', this.subCanvasMouseDown);
-        $("#sub-canvas").bind('mouseup', {
-          parent: this
-        }, this.subCanvasMouseUp);
-
-        $("#sub-canvas").bind('mouseenter', this.enterSub);
-        $("#sub-canvas").bind('mouseleave', this.leaveSub);
-        $("#sub-canvas").bind('dblclick', {
-          parent: this
-        }, this.subDblclick);
-
-        //bind paper tool events
-        tool = new paper.Tool();
-        tool.activate();
-        tool.parent = this;
-        tool.attach('mousedown', this.toolMouseDown);
-        tool.attach('mousedrag', this.toolMouseDrag);
-        tool.attach('mouseup', this.toolMouseUp);
-        this.listenTo(this.model, 'centerGeom', this.centerGeom);
-
-        paper.view.parent = this;
-        paper.view.on('frame', this.animate);
-        window.onbeforeunload = function(){ return 'unsaved changes'; };
-
-      },
-
-      //canvas events
-      events: {
-        'mousedown': 'canvasMouseDown',
-        'mouseup': 'canvasMouseUp',
-        'mousemove': 'canvasMouseMove',
-        'mouseenter': 'enterMain',
-        'mouseleave': 'leaveMain',
-        'mousewheel': 'canvasMousewheel',
-        'dblclick': 'canvasDblclick'
-      },
-
-      setFocus: function() {
-        pan = false;
-        alt = false;
-      },
-
-      /* sets main canvas as active 
-       * by setting inactive to subDown
-       */
-      setMainActive: function() {
-        inactive = sub;
-        active = main;
-      },
-
-      /* sets sub canvas as active 
-       * by setting inactive to mainDown
-       */
-      setSubActive: function() {
-        inactive = main;
-        active = sub;
-
-      },
+    initialize: function(obj, event_bus) {
+      $(".sub-canvas-container").resizable();
+      prototypes = [];
+      currentId = -1;
+      sub = {
+        down: false,
+        inside: false
+      };
+      main = {
+        down: false,
+        inside: false
+      };
+      inactive = sub;
+      active = main;
 
 
-      resizeCanvas: function() {
-        var c = $('#canvas');
-        c.attr('width', $(window).attr('innerWidth'));
-        c.attr('height', $(window).attr('innerHeight'));
+      this.event_bus = event_bus;
 
-        paper.view.draw();
+      //TODO: this is a hacky way to to detect key events
+      _.bindAll(this, "canvasKeydown");
+      _.bindAll(this, "canvasKeyup");
 
-      },
+      $(document).bind('keydown', this.canvasKeydown);
+      $(document).bind('keyup', this.canvasKeyup);
+      $(window).bind('focus', this.setFocus);
+      $(window).on("resize", this.resizeCanvas);
 
-      /* tool mouse event functions */
+      $("#sub-canvas").bind('mousedown', this.subCanvasMouseDown);
+      $("#sub-canvas").bind('mouseup', {
+        parent: this
+      }, this.subCanvasMouseUp);
 
-      toolMouseDown: function(event) {
-        if (!inactive.inside) {
-          this.parent.model.toolMouseDown(event, pan);
-        }
-      },
+      $("#sub-canvas").bind('mouseenter', this.enterSub);
+      $("#sub-canvas").bind('mouseleave', this.leaveSub);
+      $("#sub-canvas").bind('dblclick', {
+        parent: this
+      }, this.subDblclick);
 
-      toolMouseUp: function(event) {
-        this.parent.model.toolMouseUp(event, pan);
-      },
+      //bind paper tool events
+      tool = new paper.Tool();
+      tool.activate();
+      tool.parent = this;
+      tool.attach('mousedown', this.toolMouseDown);
+      tool.attach('mousedrag', this.toolMouseDrag);
+      tool.attach('mouseup', this.toolMouseUp);
+      this.listenTo(this.model, 'centerGeom', this.centerGeom);
 
-      toolMouseDrag: function(event) {
-        if (!inactive.down) {
+      paper.view.parent = this;
+      paper.view.on('frame', this.animate);
+      window.onbeforeunload = function() {
+        return 'unsaved changes';
+      };
 
-          this.parent.model.toolMouseDrag(event, pan);
-        }
-      },
+    },
+
+    //canvas events
+    events: {
+      'mousedown': 'canvasMouseDown',
+      'mouseup': 'canvasMouseUp',
+      'mousemove': 'canvasMouseMove',
+      'mouseenter': 'enterMain',
+      'mouseleave': 'leaveMain',
+      'mousewheel': 'canvasMousewheel',
+      'dblclick': 'canvasDblclick'
+    },
+
+    setFocus: function() {
+      pan = false;
+      alt = false;
+    },
+
+    /* sets main canvas as active 
+     * by setting inactive to subDown
+     */
+    setMainActive: function() {
+      inactive = sub;
+      active = main;
+    },
+
+    /* sets sub canvas as active 
+     * by setting inactive to mainDown
+     */
+    setSubActive: function() {
+      inactive = main;
+      active = sub;
+
+    },
 
 
-      toolMouseMove: function(event) {
-        this.parent.model.toolMouseMove(event);
-      },
+    resizeCanvas: function() {
+      var c = $('#canvas');
+      c.attr('width', $(window).attr('innerWidth'));
+      c.attr('height', $(window).attr('innerHeight'));
 
-      animate: function(event) {
-        this.parent.model.animate();
-      },
+      paper.view.draw();
 
-      /* canvas event functions */
-      canvasKeydown: function(event) {
-        console.log(event.keyCode);
-        /*if (event.keyCode == saveKey) {
-          this.model.save();
-        }*/
-      
+    },
+
+    /* tool mouse event functions */
+
+    toolMouseDown: function(event) {
+      if (!inactive.inside) {
+        this.parent.model.toolMouseDown(event, pan);
+      }
+    },
+
+    toolMouseUp: function(event) {
+      this.parent.model.toolMouseUp(event, pan);
+    },
+
+    toolMouseDrag: function(event) {
+      if (!inactive.down) {
+
+        this.parent.model.toolMouseDrag(event, pan);
+      }
+    },
+
+
+    toolMouseMove: function(event) {
+      this.parent.model.toolMouseMove(event);
+    },
+
+    animate: function(event) {
+      this.parent.model.animate();
+    },
+
+    /* canvas event functions */
+    canvasKeydown: function(event) {
+      /*if (event.keyCode == saveKey) {
+        this.model.save();
+      }*/
+
       if (event.keyCode == sampleKey) {
         this.model.applySampleToInstance();
       }
+      if (event.keyCode == functionKey) {
+        this.model.createFunction();
+      }
+      if (event.keyCode == paramKey) {
+        this.model.createParams();
+      }
       if (shift) {
         if (event.keyCode == upArrow) {
-          this.model.closeSelectedGroups();
+          this.model.closeSelected();
         } else if (event.keyCode == downArrow) {
-          this.model.openSelectedGroups();
+          this.model.openSelected();
         }
       }
       if (event.keyCode === deleteKey) {
@@ -204,7 +213,6 @@ define([
         shift = true;
       }
       if (event.keyCode === rootKey) {
-        this.model.moveToRoot();
       }
       if (event.keyCode === groupKey) {
         this.model.groupInstance();
@@ -298,10 +306,7 @@ define([
     },
 
     canvasDblclick: function(event) {
-      /*this.setMainActive();
-      this.model.toggleView(true);
-      $('#sub-canvas').css('background-color', '#232323');
-      $('#canvas').css('background-color', '#5B5B5B');*/
+      this.model.canvasDblclick();
     },
 
     subDblclick: function(event) {
@@ -332,6 +337,6 @@ define([
 
   });
 
-return CanvasView;
+  return CanvasView;
 
 });

@@ -14,11 +14,12 @@
 
 			defaults: {
 				operator: 'add',
-				isNull: true
+				isNull: true,
+				myArray: null
 
 			},
 
-			initialize: function() {
+			initialize: function(arg) {
 
 			},
 
@@ -92,7 +93,7 @@
 			* when shapes are transformed by the user to
 			* update their properties
 			*/
-			modify: function(data) {
+			modifyProperty: function(data) {
 				for (var p in data) {
 					if (data.hasOwnProperty(p)) {
 						var data_property = data[p];

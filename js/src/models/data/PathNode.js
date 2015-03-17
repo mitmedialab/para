@@ -42,6 +42,7 @@ define([
 
       var data = {};
       data.rotation_delta = new PFloat(matrix.rotation);
+      // TODO: make some normalizations util function
       if (data.rotation_delta > 360 || data.rotation_delta < 0) {
         data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
       }
@@ -86,7 +87,10 @@ define([
       });
       this.set('master_path', new PFloat(pathJSON));
 
-      path.remove();
+      // WARNING: Memory leak??
+      path.remove(); 
+      path = null;
+
       for (var property in data) {
         if (data.hasOwnProperty(property)) {
 
@@ -173,9 +177,7 @@ define([
         var pos = selectedPoint.get('position').getValue();
         var handleIn =  selectedPoint.get('handle_in').getValue();
         var handleOut = selectedPoint.get('handle_out').getValue();
-       // console.log('prior to altering segment', masterPath[1].segments[selectedPoint.get('index')]);
         masterPath[1].segments[selectedPoint.get('index')] = [[pos.x,pos.y],[handleIn.x,handleIn.y],[handleOut.x,handleOut.y]];
-        //console.log('altered segment', masterPath[1].segments[selectedPoint.get('index')]);
 
       }
       var master = this.get('master_path');

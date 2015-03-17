@@ -12,33 +12,37 @@ define([
 	'utils/PFloat',
 	'utils/PColor',
 	'utils/PBool',
+	'utils/PConstraint',
 	'utils/TrigFunc'
-], function(_, $, paper, SceneNode, PPoint, PFloat, PColor, PBool, TrigFunc) {
+], function(_, $, paper, SceneNode, PPoint, PFloat, PColor, PBool, PConstraint, TrigFunc) {
+
 
 
 	var Instance = SceneNode.extend({
-		name: 'instance',
-		type: 'instance',
+		
 
 		defaults: {
-			visible: true,
+			
+			//selection defaults
 			selected: false,
 			proto_selected: false,
 			inheritor_selected: false,
 			ancestor_selected: false,
 			selected_indexes: null,
+
+			//bounding box defaults
 			bbox: null,
 			i_bbox: null,
 			inheritorbbox: null,
-			closed: false,
-
+			width: 0,
+			height: 0,
 			//screen properies
 			screen_position: null,
 			screen_width: 0,
 			screen_height: 0,
-			order: 0,
-
-			/*constrainable properties*/
+			
+			/*==begin JSON export===*/
+			/*constrainable properties to export to JSON*/
 			position: null,
 			translation_delta: null,
 			absolute_position: null,
@@ -49,11 +53,17 @@ define([
 			stroke_color: null,
 			fill_color: null,
 			stroke_width: null,
-			width: 0,
-			height: 0,
 			master_path: null,
 			path_altered: null,
 
+			/*basic datatypes to export to JSON*/
+			name: 'instance',
+			type: 'instance',
+			visible: true,
+			closed: false,
+			order: 0,
+
+			/*==end JSON export===*/
 
 			center: null,
 			rmatrix: null,
@@ -77,7 +87,29 @@ define([
 			selection_palette: ['#A5FF00', '#0D7C1F', '#FF4D4D', '#33D6FF', '#E698D2'],
 			sel_palette_index: 0,
 
-			lists: null,
+			//no JSON Export required
+			matrix_map: {
+				translation_delta: {
+					name: 'tmatrix',
+					properties: {
+						x: ['tx'],
+						y: ['ty']
+					}
+				},
+				scaling_delta: {
+					name: 'smatrix',
+					properties: {
+						x: ['a'],
+						y: ['d']
+					}
+				},
+				rotation_delta: {
+					name: 'rmatrix',
+					properties: {
+						val: ['a', 'b', 'c', 'd']
+					}
+				}
+			}
 		},
 
 		initialize: function() {
@@ -145,10 +177,11 @@ define([
 
 			this.set('id', new Date().getTime().toString());
 
-			this.set('lists', []);
-
+			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
+			console.log('to_json:',this.toJSON());
 		},
+
 
 		/* deleteSelf
 		 * function called before instance is removed from
@@ -192,7 +225,6 @@ define([
 		},
 
 		addMemberToOpen: function(data, added_bool) {
-			console.log('checking instance');
 			return [];
 		},
 		recRemoveMember: function(data) {
@@ -206,7 +238,12 @@ define([
 			return 0;
 		},
 
-
+		/*close
+		* used mainly for closing functions
+		*/
+		close: function(){
+			return this.getParentNode();
+		},
 
 		/* create
 		 * Prototypal inheritance action:
@@ -259,6 +296,22 @@ define([
 			this.set('rmatrix', rmatrix);
 			this.set('smatrix', smatrix);
 			this.set('tmatrix', tmatrix);
+		},
+
+		// sets the geom visibility to false
+		hide: function(){
+			var geom = this.get('geom');
+			if(geom){
+				geom.visible = false;
+				geom.selected = false;
+			}
+		},
+
+		show: function(){
+			var geom = this.get('geom');
+			if(geom){
+				geom.visible = true;
+			}
 		},
 
 
@@ -346,8 +399,14 @@ define([
 		},
 
 
-		exportJSON: function() {
-			return this.toJSON();
+		toJSON: function() {
+			var data = {};
+
+			//loop through defaults to export and call toJSON
+			/*for defaults:
+				data[default[k]]:default[k].toJSON();
+			}*/
+
 		},
 
 		parseJSON: function(data) {
@@ -366,7 +425,6 @@ define([
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
 			var inheritors = this.get('inheritors');
-			console.log('attempting modify for',this.get('id'));
 			if (mode === 'proxy') {
 				if (protoNode) {
 					if (modifier === 'override') {
@@ -391,11 +449,10 @@ define([
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
 					if (this.has(p)) {
-						console.log('has property',this.get('id'));
 
 						var property = this.get(p);
 						property.setNull(false);
-						property.modify(data_property);
+						property.modifyProperty(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
 							if (property.getValue() > 360 || property.getValue() < 0) {
@@ -421,13 +478,16 @@ define([
 				return property;
 			} else {
 				if (this.has('proto_node')) {
-					if (property_name === 'path_altered') {
-						console.log('checking proto for path_altered');
-					}
+					if (property_name === 'path_altered') {}
 					return this.get('proto_node').inheritProperty(property_name);
 				}
 			}
 			return null;
+		},
+
+		activateProperty: function(property_name) {
+			this.get(property_name).setNull(false);
+			return this.get(property_name);
 		},
 
 
@@ -487,14 +547,12 @@ define([
 					if (recurse > 0) {
 						if (mode === 'proxy') {
 							proto.set('inheritor_selected', 'proxy');
-							//console.log('set inheritor selected to proxy');
 
 						} else {
 							proto.set('inheritor_selected', 'standard');
 							alpha = proto.get('alpha');
 							alpha.setValue(1);
 							proto.set('alpha', alpha);
-							//console.log('set alpha to 1 for proto');
 						}
 					} else {
 						proto.set('inheritor_selected', false);
@@ -561,7 +619,6 @@ define([
 		},
 
 		compileTransforms: function() {
-			//console.log('compiling t', this.get('id'), 'instance');
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');
@@ -593,10 +650,13 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.renderGeom();
-					this.renderStyle(geom);
-					this.renderSelection(geom);
+					if (geom) {
+						this.renderStyle(geom);
+						this.renderSelection(geom);
+					}
+
 					this.set('rendered', true);
-					return geom;
+
 				}
 				return 'root';
 			}
@@ -700,41 +760,43 @@ define([
 
 
 		renderGeom: function() {
+			var visible = this.get('visible');
 			var geom = this.get('geom');
-			var rmatrix = this.get('rmatrix');
-			var smatrix = this.get('smatrix');
-			var tmatrix = this.get('tmatrix');
 
-			var path_altered = this.get('path_altered').getValue();
-			if (!path_altered && geom) {
-				geom.transform(this.get('ti_matrix'));
-				geom.transform(this.get('ri_matrix'));
-				geom.transform(this.get('si_matrix'));
-				geom.selected = false;
-			} else {
-				if (!geom) {
-					geom = new paper.Path();
+		
+				var rmatrix = this.get('rmatrix');
+				var smatrix = this.get('smatrix');
+				var tmatrix = this.get('tmatrix');
+
+				var path_altered = this.get('path_altered').getValue();
+				if (!path_altered && geom) {
+					geom.transform(this.get('ti_matrix'));
+					geom.transform(this.get('ri_matrix'));
+					geom.transform(this.get('si_matrix'));
+					geom.selected = false;
+				} else {
+					if (!geom) {
+						geom = new paper.Path();
+					}
+					geom.importJSON(this.accessProperty('master_path'));
 				}
-				console.log('importing master path');
-				console.log('masterPath=', this.accessProperty('master_path'));
-				geom.importJSON(this.accessProperty('master_path'));
-			}
-			geom.data.instance = this;
+				geom.data.instance = this;
 
-			var position = this.get('position').toPaperPoint();
-			geom.position = position;
-			geom.transform(smatrix);
-			geom.transform(rmatrix);
-			geom.transform(tmatrix);
 
-			this.updateScreenBounds(geom);
-			this.set('geom', geom);
-			var p_altered = this.get('path_altered');
-			p_altered.setValue(false);
-			this.set('path_altered', p_altered);
+				var position = this.get('position').toPaperPoint();
+				geom.position = position;
+				geom.transform(smatrix);
+				geom.transform(rmatrix);
+				geom.transform(tmatrix);
 
-			return geom;
-
+				this.updateScreenBounds(geom);
+				this.set('geom', geom);
+				var p_altered = this.get('path_altered');
+				p_altered.setValue(false);
+				this.set('path_altered', p_altered);
+				geom.visible = visible;
+				return geom;
+			
 		},
 
 

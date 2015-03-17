@@ -31,6 +31,18 @@ define([
                 SceneNode.numNodeInstances++;
             },
 
+            /* extend
+        * function for adding in functionality via mixins
+        */
+        extend: function( source) {
+            for (var k in source) {
+                if (source.hasOwnProperty(k) && !this.hasOwnProperty(k)) {
+                    this[k] = source[k];
+                }
+            }
+            return this;
+        },
+
 
            /* clone: function(){
                  var clone= Backbone.Model.prototype.clone.apply(this,arguments);
@@ -115,10 +127,7 @@ define([
                 this.vistied= false;
             },
 
-            /*TODO: write export JSON function*/
-            exportJSON: function(data){
-                return {};
-            },
+            
             /*================ SceneNode method defintions ================*/
 
             //destructor: clears all this.children and sets parent to null

@@ -29,7 +29,7 @@ define(['jquery',
 ], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ListSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, Utils, PaperUIHelper) {
 
 
-  var rootNode, uninstantiated, visitor, currentNode, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
+  var uninstantiated, visitor, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
 
   var currentView, subView, mainView;
   var undoManager;
@@ -61,7 +61,7 @@ define(['jquery',
       currentView = mainView;
 
       // setup helpers and factories
-      PaperUIHelper.setup( this );
+      PaperUIHelper.setup(this);
 
       //setup user tool managers
 
@@ -106,12 +106,6 @@ define(['jquery',
       //setup visitor
       visitor = new Visitor();
 
-      //setup root node
-      rootNode = new Instance(null);
-      rootNode.set('name', 'root');
-      this.listenTo(rootNode, 'parseJSON', this.parseJSON);
-      currentNode = rootNode;
-
       //clear local storage
       localStorage.clear();
       this.modified = false;
@@ -139,10 +133,6 @@ define(['jquery',
         }
       });
 
-      undoManager = new Backbone.UndoManager({
-        track: true,
-        register: rootNode
-      });
 
 
       //setup default zeros for zoom and pan
@@ -150,18 +140,7 @@ define(['jquery',
       this.zeroedPan = paper.view.center.clone();
     },
 
-    undo: function() {
-      undoManager.undo();
-      paper.view.draw();
 
-    },
-
-    redo: function() {
-      undoManager.redo();
-      paper.view.draw();
-
-
-    },
 
     setState: function(state, mode) {
       this.clearIrrelevantState();
@@ -172,10 +151,7 @@ define(['jquery',
         var currentTool = toolCollection.get(this.get('state'));
         currentTool.set('mode', mode);
       }
-      if (state === 'polyTool') {
-        this.moveToRoot();
-
-      }
+     
     },
 
     clearIrrelevantState: function() {
@@ -248,9 +224,7 @@ define(['jquery',
       }
       pathNode.normalizeGeometry(literal, matrix);
       selectTool.addSelectedShape(pathNode);
-
-      currentNode.addChildNode(pathNode);
-      visitor.addToOpenLists(pathNode);
+      visitor.addShape(pathNode);
       currentTool.set('literals', []);
       this.compile();
 
@@ -262,28 +236,22 @@ define(['jquery',
      * behavior probably should be to create a prototype which encapsulates
      * all those objects rather than one prototype per object
      */
-    addInstance: function( instance, parent ) {
-      if ( instance ) {
-        if ( parent ) {
-          parent.addChildNode( instance );
-        } else {
-          rootNode.addChildNode( instance );
-        }
-        this.compile();
-      }
-      else if (this.get('state') === 'selectTool') {
+    addInstance: function(instance, parent) {
+      if (this.get('state') === 'selectTool') {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length == 1) {
           var inst = selectedShapes[0];
           var newInstance = inst.create();
-          currentNode.addChildNode(newInstance);
-          visitor.addToOpenLists(newInstance);
+          visitor.addShape(newInstance);
           inst.set('selected', false);
           newInstance.set('selected', true);
           selectedShapes[0] = newInstance;
-          this.compile();
+
         }
+      } else {
+        visitor.addShape(instance, parent);
       }
+      this.compile();
     },
 
     /*groupInstance
@@ -305,6 +273,25 @@ define(['jquery',
 
     },
 
+    /*createFunction
+     * creates a function from a set of selected instances
+     */
+    createFunction: function() {
+      var selectedShapes = selectTool.get('selected_shapes');
+      if (selectedShapes.length > 0) {
+        visitor.addFunction(selectedShapes);
+      }
+      this.compile();
+    },
+
+    createParams: function(){
+      var selectedShapes = selectTool.get('selected_shapes');
+      if (selectedShapes.length > 0) {
+        visitor.createParams(selectedShapes);
+      }
+      this.compile();
+    },
+
     applySampleToInstance: function() {
       console.log('applying sample');
       var selectedShapes = selectTool.get('selected_shapes');
@@ -323,17 +310,14 @@ define(['jquery',
      * attempts to open selected items, if they are lists
      * and updates selection accordingly
      */
-    openSelectedGroups: function() {
+    openSelected: function() {
       var selectedShapes = selectTool.get('selected_shapes');
       var members = [];
 
-      var openedLists = visitor.toggleOpen(selectedShapes);
-      for (var i = 0; i < openedLists.length; i++) {
-        members = members.concat(openedLists[i].members);
-
-      }
-      selectTool.removeSelectedShape(openedLists);
-      selectTool.addSelectedShape(members);
+      var newItems = visitor.toggleOpen(selectedShapes);
+     
+      selectTool.deselectAll();
+      selectTool.addSelectedShape(newItems);
       this.compile();
     },
 
@@ -341,11 +325,11 @@ define(['jquery',
      * attempts to close selected items, if they are lists
      * and updates selection accordingly
      */
-    closeSelectedGroups: function() {
+    closeSelected: function() {
       var selectedShapes = selectTool.get('selected_shapes');
-      var toggledLists = visitor.toggleClosed(selectedShapes);
-      selectTool.removeSelectedShape(selectedShapes);
-      selectTool.addSelectedShape(toggledLists);
+      var newItems = visitor.toggleClosed(selectedShapes);
+      selectTool.deselectAll();
+      selectTool.addSelectedShape(newItems);
       this.compile();
     },
 
@@ -385,38 +369,6 @@ define(['jquery',
 
     },
 
-    /*geometryDeepCopied
-     * makes an independent clone of the object being copied and
-     * transfers selection to that object
-     * TODO: deep copy all descendants of copy
-     * look into dynamically re-assigining prototype
-     */
-    geometryDeepCopied: function(event) {
-      var instances = [];
-      var selectedShapes = selectTool.get('selected_shapes');
-      for (var i = selectedShapes.length - 1; i >= 0; i--) {
-
-        var instance = selectedShapes[i];
-        var newInstance = new PolygonNode();
-        instance.copyAttributes(newInstance);
-        var geom = instance.inheritGeom().clone();
-
-        geom.fillColor = 'red';
-        newInstance.set('master_path', geom);
-        visitor.addGeomFunction(newInstance);
-        instances.push(newInstance);
-
-        currentNode.addChildNode(newInstance);
-        newInstance.set('selected', true);
-        instance.set('selected', false);
-        selectedShapes[i] = newInstance;
-      }
-      this.compile();
-
-      for (var j = 0; j < instances.length; j++) {
-        this.trigger('prototypeCreated', instances[j]);
-      }
-    },
 
     // TESTING
     setConstraintProperty: function(data) {
@@ -544,26 +496,26 @@ define(['jquery',
       for (var i = 0; i < selectedShapes.length; i++) {
         console.log('deleting at ', i);
         var instance = selectedShapes[i];
-        visitor.removeInstance(rootNode, null, instance);
+        visitor.removeInstance(null, null, instance);
       }
       selectTool.deselectAll();
       this.compile();
     },
 
     // TODO: check that this meshes 
-    removeInstance: function( instance ) {
-      visitor.removeInstance( rootNode, null, instance);
+    removeInstance: function(instance) {
+      visitor.removeInstance(null, null, instance);
     },
 
     /* geometrySegmentModified
      * callback that is triggered when a geometry segment is transformed
      * by the user
      */
-    geometrySegmentModified: function( data, handle, modifiers) {
+    geometrySegmentModified: function(data, handle, modifiers) {
       var selectedShapes = selectTool.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
-        instance.modifyPoints( data, this.get('tool-mode'), this.get('tool-modifier')); 
+        instance.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
       }
       this.compile();
 
@@ -594,6 +546,7 @@ define(['jquery',
      * updates the color/ fill/ stroke weight of selected shapes
      */
     styleModified: function(style_data) {
+      console.log('style_data',style_data);
       var selectedShapes = selectTool.get('selected_shapes');
 
       for (var i = 0; i < selectedShapes.length; i++) {
@@ -614,10 +567,11 @@ define(['jquery',
 
       //mainView._project.clear();
       // subView._project.clear();
-      visitor.resetPrototypes(rootNode.children);
-      visitor.compileInstances(rootNode);
+      visitor.resetPrototypes();
+      visitor.compileFunctions();
+      visitor.compileInstances();
       visitor.compileLists();
-      visitor.render(rootNode);
+      visitor.render();
 
       //used to switch canvas, not currently being used
       //currentView._project.activate();
@@ -645,23 +599,8 @@ define(['jquery',
 
     },
 
-    moveToRoot: function() {
-      if (currentNode !== rootNode) {
-        this.setCurrentNode(rootNode.children[0]);
-      }
-      // this.rootRender();
-    },
-    //moves down based on path
-    moveDownNode: function(path) {
-      var children = currentNode.children;
-      for (var i = 0; i < children.length; i++) {
-        if (children[i].containsPath(path) && children[i].type != 'path' && children[i].type != 'polygon') {
-          currentNode = children[i];
-          toolCollection.get(this.get('state')).currentNode = children[i];
-        }
-      }
+    
 
-    },
 
     //triggered by paper tool on a mouse down event
     toolMouseDown: function(event, pan) {
@@ -761,6 +700,9 @@ define(['jquery',
     },
 
     canvasDblclick: function(event) {
+      console.log('double clicked');
+      visitor.toggleItems(selectTool.get('selected_shapes'));
+      this.compile();
       // var selectedTool = toolCollection.get(this.get('state'));
       //selectedTool.dblClick(event);
 
@@ -787,7 +729,7 @@ define(['jquery',
     save: function() {
 
       var id = Date.now();
-      var data = JSON.stringify(rootNode.exportJSON());
+      var data = {};//JSON.stringify(rootNode.exportJSON());
 
       this.saveToLocal(id, data);
 
@@ -830,7 +772,7 @@ define(['jquery',
       this.load(JSON.parse(data));
     },
 
-    export: function(filename) {
+    /*export: function(filename) {
       if (rootNode.children.length > 0) {
 
         this.setCurrentNode(rootNode.children[0]);
@@ -875,7 +817,7 @@ define(['jquery',
       paper.view.draw();
       this.modified = false;
       this.trigger('disableSave', !this.modified);
-    },
+    },*/
 
     loadFile: function(file) {
       var reader = new FileReader();
@@ -920,7 +862,7 @@ define(['jquery',
       }
 
     }
-  
+
   });
 
   return StateManagerModel;

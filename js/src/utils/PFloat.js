@@ -101,8 +101,15 @@ define([
 				} else {
 					this.setValue(this.val.getValue() * val);
 				}
-			}
+			},
 
+			toJSON: function(){
+				var data = this.getValue() // 5
+				data.type=''
+				return data;
+			},
+
+			
 		});
 
 		return PFloat;

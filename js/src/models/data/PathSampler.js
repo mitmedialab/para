@@ -15,7 +15,8 @@ define([
   function(_, Sampler, PFloat, PBool, TrigFunc, paper) {
     var PathSampler = Sampler.extend({
       defaults: _.extend({}, Sampler.prototype.defaults, {
-        name: 'path_sampler'
+        name: 'path_sampler',
+        multTarget: 'width'
 
       }),
 
@@ -31,45 +32,42 @@ define([
       getMultiplier: function() {
         if (this.members.length > 0) {
           var path = this.members[0].get('geom');
-          var width = path.bounds.width;
-          var m = TrigFunc.map(width, 1, 1000, 1, 100);
-          console.log('multiplier=',m);
-          this.setMultiplier(width);
+          var val = path.bounds[this.get('multTarget')];
+          var multiplier_map = this.accessProperty('multiplier_map');
+          console.log('min,max',multiplier_map.x, multiplier_map.y);
+          var m = TrigFunc.map(val, 1, 1000, multiplier_map.x, multiplier_map.y);
+          this.setMultiplier(val);
         }
-         return this.accessProperty('multiplier');
+        return this.accessProperty('multiplier');
       },
 
-        getValue: function() {
+      getValue: function() {
         if (this.members.length > 0) {
           var path = this.members[0].get('geom');
           if (path.segments[0].point.y === path.segments[path.segments.length - 1].point.y) {
             this.setValue(0);
-            console.log('y positions are equal');
           } else {
             var length = path.length;
             var height = path.bounds.height;
             var width = path.bounds.width;
-            console.log('end index', this.get('end_index'), this.get('end_index').getValue());
-            var interval = (length / (this.get('end_index').getValue() - this.get('start_index').getValue())) - 0.1;
+            var end_index = this.getEndIndex();
+            var start_index = this.getStartIndex();
+            var interval = (length / (end_index - start_index)) - 0.1;
             var index = this.getIndex();
             var l = interval * index;
-            console.log('index=', index, 'interval=', interval, 'unmappedPos=', l);
             var targetPoint = path.getPointAt(interval * index);
             if (targetPoint) {
-              console.log('target point=', targetPoint.x, targetPoint.y);
               targetPoint.x = targetPoint.x - path.bounds.bottomLeft.x;
               targetPoint.y = -(targetPoint.y - path.bounds.bottomLeft.y);
-              console.log("targetPoint", targetPoint.x, targetPoint.y);
               var value = TrigFunc.map(targetPoint.y, 0, height, 0, 1);
-              console.log('value=', value);
               this.setValue(value);
               this.setMultiplier(width);
             } else {
-              console.log('target point not found');
               this.setValue(0);
             }
           }
           this.increment();
+          console.log('value=',this.accessProperty('value'));
           return this.accessProperty('value');
         }
       },

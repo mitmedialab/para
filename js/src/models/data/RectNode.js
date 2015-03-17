@@ -66,7 +66,6 @@ define([
           new_master.visible = false;
           this.set('master_path',new_master.exportJSON());
           new_master.remove();
-          console.log('reset path to ',data.value);
       }
     }
 
