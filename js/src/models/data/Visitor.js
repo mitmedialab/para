@@ -118,11 +118,14 @@ define([
 		},
 
 
+
 		removeInstance: function(node, departureNode, target) {
 			if (!node) {
 				node = currentNode;
 			}
 			if (node === target) {
+
+
 				node.deleteSelf();
 				for (var j = 0; j < lists.length; j++) {
 					if (lists[j] === node) {

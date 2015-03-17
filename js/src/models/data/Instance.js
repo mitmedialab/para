@@ -640,6 +640,7 @@ define([
 						this.renderStyle(geom);
 						this.renderSelection(geom);
 					}
+
 					this.set('rendered', true);
 
 				}
@@ -747,7 +748,7 @@ define([
 		renderGeom: function() {
 			var visible = this.get('visible');
 			var geom = this.get('geom');
-		
+
 		
 				var rmatrix = this.get('rmatrix');
 				var smatrix = this.get('smatrix');
@@ -766,6 +767,7 @@ define([
 					geom.importJSON(this.accessProperty('master_path'));
 				}
 				geom.data.instance = this;
+
 
 				var position = this.get('position').toPaperPoint();
 				geom.position = position;

@@ -75,13 +75,19 @@ define([
      * state.
      */
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
-      references: null, // list of reference instances
-      relatives: null, // list of relative instances
-      type: 'equal', // relation for constraint
-      expression: '', // the entered constraint expression
-      props_selected: null, // a list of properties to be constrained
-      mode: 'references', // indicator for current state
-      constrainToVal: [], // array for specifying value constrained to
+
+      references: null,       // list of reference instances
+      relatives: null,        // list of relative instances
+      type: 'equal',          // relation for constraint
+      expression: '',         // the entered constraint expression
+      ref_prop: null,         // the property of the references to be constrained
+      rel_prop: null,         // the property of the relatives to be constrained
+      mode: 'references',     // indicator for current state
+      constrainFromVal: [],     // array for specifying value constrained to
+      constrainToVal: [],
+
+      uiElements: {'ref_delimiters': [], 'rel_delimiters': []}
+
     }),
 
     /*
@@ -149,15 +155,17 @@ define([
      *
      * @param property - string for the name of the property to constrain
      */
-    setConstraintProperty: function(property) {
-      // TODO: change this to adding to current set to allow for more than one selected constraint
-      var selected_props = [property];
-      var result = {};
-      result['property'] = property;
-      this.set('props_selected', selected_props);
+    setConstraintProperty: function(relevance, property) {
+      var internal_prop;
+      if ( relevance == 'reference' ) { 
+        internal_prop = 'ref_prop';
+      } else if ( relevance == 'relative' ) {
+        internal_prop = 'rel_prop';
+      }
+      
+      this.set(internal_prop, property);
       console.log('[INFO] Selected Constraint Property: ' + property);
       this.advance();
-      return result;
     },
 
     /*
@@ -181,18 +189,30 @@ define([
       switch (state) {
         case 'references':
           this.get('sm').delegateMethod('select', 'saveSelection');
-          this.set('mode', 'property');
-          console.log('[INFO] Advanced constraint tool mode to property');
+          this.set('mode', 'ref_prop');
+          var ref_wheel = PaperUIHelper.createConstraintWheel( this.get('references'), 'ref-wheel' )[0];
+          PaperUIHelper.addConstraintWheelHandlers( this, ref_wheel );
+          console.log('[INFO] Advanced constraint tool mode to ref_prop');
           break;
-        case 'property':
-          this.set('mode', 'relatives');
+        case 'ref_prop':
+          this.set('mode', 'ref_value');
+          console.log('[INFO] Advanced constraint tool mode to ref_value');
+          break;
+        case 'ref_value':
+          this.set('mode','relatives');
           console.log('[INFO] Advanced constraint tool mode to relatives');
           break;
         case 'relatives':
-          this.set('mode', 'value');
-          console.log('[INFO] Advanced constraint tool mode to value');
+          this.set('mode', 'rel_prop');
+          var rel_wheel = PaperUIHelper.createConstraintWheel( this.get('relatives'), 'rel-wheel' )[0];
+          PaperUIHelper.addConstraintWheelHandlers( this, rel_wheel );
+          console.log('[INFO] Advanced constraint tool mode to rel_prop');
           break;
-        case 'value':
+        case 'rel_prop':
+          this.set('mode', 'rel_value');
+          console.log('[INFO] Advanced constraint tool mode to rel_value');
+          break;
+        case 'rel_value':
           this.set('mode', 'expression');
           console.log('[INFO] Advanced constraint tool mode to expression');
           break;
@@ -224,7 +244,7 @@ define([
           this.deselectProperty();
           console.log('[INFO] Retreated and deselected property');
           break;
-        case 'property':
+        case 'ref_prop':
           this.deselectReferences();
           console.log('[INFO] Retreated and deselected references');
           break;
@@ -273,37 +293,63 @@ define([
    
     deselectProperty: function() {
       // reset UI element
-      this.set('props_selected', []);
+      this.set('ref_prop', []);
     },
 
-    createDelimiters: function() {
+    createDelimiters: function( relevance ) {
       // get props selected, stick function names in front, delegate to PaperUIHelper, store results
-      var property = this.get('props_selected')[0];
-      var references = this.get('references');
-      var relatives = this.get('relatives');
+      var instances;
+      var instancesName;
+      var property;
+      var delimsName;
+      if ( relevance == 'reference' ) {
+        instances = this.get('references');
+        instancesName = 'constrainFromVal';
+        property = this.get('ref_prop');
+        delimsName = 'ref_delimiters';
+      } else if ( relevance == 'relative' ) {
+        instances = this.get('relatives');
+        instancesName = 'constrainToVal';
+        property = this.get('rel_prop');
+        delimsName = 'rel_delimiters';
+      }
+      
       var delimiters;
       switch ( property ) {
         case 'position':
           var pos_delim_ind = {'avg-translation_delta-x': true, 'avg-translation_delta-y': true};
-          delimiters = PaperUIHelper.drawPositionDelimiters( references, relatives, pos_delim_ind );
+          delimiters = PaperUIHelper.drawPositionDelimiters( instances, instancesName, pos_delim_ind );
           break;
         case 'scale':
           var scale_delim_ind = {'avg-scaling_delta-x': true, 'avg-scaling_delta-y': true};
-          delimiters = PaperUIHelper.drawScaleDelimiters( references, relatives, scale_delim_ind ); 
+          delimiters = PaperUIHelper.drawScaleDelimiters( instances, instancesName, scale_delim_ind ); 
           break;
         case 'orientation':
           var orient_delim_ind = {'avg-rotation_delta': true};
-          delimiters = PaperUIHelper.drawOrientationDelimiters( references, relatives, orient_delim_ind );
+          delimiters = PaperUIHelper.drawOrientationDelimiters( instances, instancesName, orient_delim_ind );
       }
+      
+      var uiElements = this.get('uiElements');
+      uiElements[delimsName].push.apply(uiElements[delimsName], delimiters);
+      this.set('uiElements', uiElements);
       return delimiters;
     },
 
-    removeDelimiters: function() {
-      var delimiters = this.get('delimiters');
+    removeDelimiters: function( relevance ) {
+      var uiElements = this.get('uiElements');
+      var delims_name, delimiters;
+      if ( relevance == 'reference' ) { 
+        delims_name = 'ref_delimiters';
+      } else if ( relevance == 'relevance' ) {
+        delims_name = 'rel_delimiters';
+      }
+      delimiters = uiElements[delims_name];
       for (var i = 0; i < delimiters.length; i++) {
         PaperUIHelper.remove(delimiters[i]);
       }
-      this.set('delimiters', []);
+      delimiters = [];
+      uiElements[delims_name] = delimiters;
+      this.set('uiElements', uiElements);
     },
 
     /*
@@ -312,6 +358,7 @@ define([
      * references and relatives as desired.
      */
     createConstraint: function() {
+      var constrainFromVal = this.get('constrainFromVal');
       var constrainToVal = this.get('constrainToVal');
       var references = this.get('references');
       var relatives = this.get('relatives');
@@ -323,7 +370,7 @@ define([
       var refPropList = Utils.getPropConstraintFromList(references, constrainToVal.slice(1, constrainToVal.length));
       var refProp = refPropList[0];
       var relPropList = Utils.getPropConstraintFromList(relatives, constrainToVal.slice(1, constrainToVal.length));
-      console.log("relList", relPropList, "refProp", refProp);
+
 
       var relativeF = function() {
         var x = Utils[constrainToVal[0]](relPropList.map(function(prop) {
@@ -378,9 +425,13 @@ define([
      */
     rewordConstraint: function() {
       var constrainToVal = this.get('constrainToVal');
+      var constrainFromVal = this.get('constrainFromVal');
       for (var i = 0; i < constrainToVal.length; i++) {
         if (constrainToVal[i] in propToConstraintMap) {
           constrainToVal[i] = propToConstraintMap[constrainToVal[i]];
+        }
+        if (constrainFromVal[i] in propToConstraintMap) {
+          constrainFromVal[i] = propToConstraintMap[constrainFromVal[i]];
         }
       }
     },
@@ -417,12 +468,10 @@ define([
           break;
         case 'relatives':
           this.get('sm').delegateMethod('select', 'mouseDown', event);
-          var references = this.get('references');
+
           var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');
 
           this.selectRelatives( relatives );
-          var delimiters = this.createDelimiters(); 
-          PaperUIHelper.addDelimiterListeners( this, delimiters ); 
           this.advance();
           break;
         case 'expression':
@@ -459,10 +508,13 @@ define([
       this.set('relatives', []);
       this.set('type', 'equal');
       this.set('expression', '');
-      this.set('props_selected', []);
+      this.set('ref_prop', []);
+      this.set('rel_prop', []);
       this.set('mode', 'references');
+      this.set('constrainToVal', []);
+      this.set('constrainFromVal', []);
+      PaperUIHelper.clear(); // TODO: clears everything, want to clear only constraint tool ui
 
-      PaperUIHelper.clear();
     }, 
  
 

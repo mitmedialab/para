@@ -42,6 +42,7 @@ define([
 
       var data = {};
       data.rotation_delta = new PFloat(matrix.rotation);
+      // TODO: make some normalizations util function
       if (data.rotation_delta > 360 || data.rotation_delta < 0) {
         data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
       }
@@ -86,7 +87,10 @@ define([
       });
       this.set('master_path', new PFloat(pathJSON));
 
-      path.remove();
+      // WARNING: Memory leak??
+      path.remove(); 
+      path = null;
+
       for (var property in data) {
         if (data.hasOwnProperty(property)) {
 
