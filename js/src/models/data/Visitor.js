@@ -98,15 +98,15 @@ define([
 		},
 
 		compileInstances: function() {
-			if (currentNode === rootNode) {
+		
 				var state_data = {
 					list: store,
 					instance: compile,
 					func: compile,
 				};
 
-				this.visit(rootNode, null, state_data);
-			}
+				this.visit(currentNode, null, state_data);
+			
 		},
 
 		render: function(root) {
@@ -160,7 +160,6 @@ define([
 					this.visitList(node, departureNode, state_data);
 					break;
 				case 'function':
-
 					this.visitFunction(node, departureNode, state_data);
 					break;
 				default:
@@ -206,7 +205,7 @@ define([
 				case compile:
 					node.compile();
 					renderQueue.push(node);
-					if (node.get('open')) {
+					if (node.get('open') || node.get('called')) {
 						var children = node.children;
 						for (var i = 0; i < children.length; i++) {
 							children[i].visit(this, 'visit', node, state_data);
@@ -219,7 +218,6 @@ define([
 		 * called for visit to instance node
 		 */
 		visitInstance: function(node, departureNode, state_data) {
-
 			var state = state_data.instance;
 			var children = node.children;
 
@@ -238,9 +236,18 @@ define([
 
 
 		//=======function managment methods==========//
-
+		//need to put something in here where you can't have an item in a function that is also in an opened list?
 		addFunction: function(selected_shapes) {
+			lists = lists.filter(function(item){
+				return selected_shapes.indexOf(item)===-1;
+			});
 			functionManager.createFunction('my_function', selected_shapes);
+		},
+
+		createParams: function(selected_shapes){
+			for(var i=0;i<selected_shapes.length;i++){
+				functionManager.addParamToFunction(currentNode, selected_shapes[i]);
+			}
 		},
 
 		addShape: function(instance, parent) {
@@ -321,6 +328,20 @@ define([
 			return sInstances;
 		},
 
+		/* toggleItems
+		* toggles item funcitonality according to item type
+		*/
+		toggleItems: function(items){
+			var lastSelected = items[items.length-1];
+			switch(lastSelected.get('type')){
+				case 'function':
+					functionManager.callFunction(lastSelected);
+				break;
+				default:
+				break;
+			}
+		},
+
 		/* toggleOpen
 		 * returns children of opened function or members of opened lists
 		 */
@@ -339,6 +360,9 @@ define([
 			}
 		},
 
+		/* toggleClosed
+		 * closes open functions or selected open lists
+		 */
 		toggleClosed: function(items) {
 			if (openLists.length > 0) {
 				return this.toggleClosedLists(items);
@@ -346,10 +370,14 @@ define([
 				this.closeAllLists();
 				var data = functionManager.toggleClosedFunctions(currentNode,rootNode);
 				currentNode =  data.currentNode;
+				lists = currentNode.lists;
 				return data.toSelect;
 			}
 		},	
 
+		/* toggleClosedLists
+		 * closes selected open lists
+		 */
 		toggleClosedLists: function(items) {
 			var toggledLists = [];
 			var returnedLists = [];

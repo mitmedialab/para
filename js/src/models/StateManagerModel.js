@@ -284,6 +284,14 @@ define(['jquery',
       this.compile();
     },
 
+    createParams: function(){
+      var selectedShapes = selectTool.get('selected_shapes');
+      if (selectedShapes.length > 0) {
+        visitor.createParams(selectedShapes);
+      }
+      this.compile();
+    },
+
     applySampleToInstance: function() {
       console.log('applying sample');
       var selectedShapes = selectTool.get('selected_shapes');
@@ -692,6 +700,9 @@ define(['jquery',
     },
 
     canvasDblclick: function(event) {
+      console.log('double clicked');
+      visitor.toggleItems(selectTool.get('selected_shapes'));
+      this.compile();
       // var selectedTool = toolCollection.get(this.get('state'));
       //selectedTool.dblClick(event);
 

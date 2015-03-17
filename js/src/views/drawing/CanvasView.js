@@ -25,6 +25,7 @@ define([
   var groupKey = 71; // g
   var functionKey = 70; //f
   var deleteKey = 67; // c
+  var paramKey = 80;// p
   var upArrow = 38; // up arrow
   var downArrow = 40; // down arrow
   var rightArrow = 39; // right arrow
@@ -184,6 +185,9 @@ define([
       if (event.keyCode == functionKey) {
         this.model.createFunction();
       }
+      if (event.keyCode == paramKey) {
+        this.model.createParams();
+      }
       if (shift) {
         if (event.keyCode == upArrow) {
           this.model.closeSelected();
@@ -302,10 +306,7 @@ define([
     },
 
     canvasDblclick: function(event) {
-      /*this.setMainActive();
-      this.model.toggleView(true);
-      $('#sub-canvas').css('background-color', '#232323');
-      $('#canvas').css('background-color', '#5B5B5B');*/
+      this.model.canvasDblclick();
     },
 
     subDblclick: function(event) {

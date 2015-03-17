@@ -46,7 +46,7 @@ define([
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
         var path = new paper.Path.Rectangle(rectangle);
         path.strokeColor = this.get('primary_selection_color');
-       
+
 
         this.startText = new paper.PointText({
           point: new paper.Point(5, 13),
@@ -94,6 +94,21 @@ define([
         }
       },
 
+      //returns all non-list members
+      getInstanceMembers: function(memberList) {
+        if (!memberList) {
+          memberList = [];
+        }
+        for (var i = 0; i < this.members; i++) {
+          if (this.members[i].get('type') !== 'list' || 'sampler') {
+            memberList.push(this.members[i]);
+          } else {
+            this.members[i].getInstanceMembers(memberList);
+          }
+
+        }
+        return memberList;
+      },
 
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
@@ -213,7 +228,9 @@ define([
             multiplier_map.x = 0.1;
             multiplier_map.y = 10;
         }
-        var data = {'multiplier_map':multiplier_map};
+        var data = {
+          'multiplier_map': multiplier_map
+        };
         this.modifyProperty(data);
       },
 
