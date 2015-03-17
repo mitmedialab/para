@@ -30,6 +30,8 @@ define([
 			this._val.set(val);
 		},		
 
+		//no toJSON required
+
 	});
 
 	return PProperty;

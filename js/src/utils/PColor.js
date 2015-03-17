@@ -151,7 +151,14 @@ define([
 					b: ColorUtils.hexToB(style_data)
 				};
 				PConstraint.prototype.modifyProperty.call(this, data);
-			}
+			},
+
+			toJSON: function(){
+				var data = this.getValue();
+				data.type = 'PColor';
+				return data;
+			},
+
 
 		});
 

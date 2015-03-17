@@ -19,28 +19,30 @@ define([
 
 
 	var Instance = SceneNode.extend({
-		name: 'instance',
-		type: 'instance',
+		
 
 		defaults: {
-			visible: true,
+			
+			//selection defaults
 			selected: false,
 			proto_selected: false,
 			inheritor_selected: false,
 			ancestor_selected: false,
 			selected_indexes: null,
+
+			//bounding box defaults
 			bbox: null,
 			i_bbox: null,
 			inheritorbbox: null,
-			closed: false,
-
+			width: 0,
+			height: 0,
 			//screen properies
 			screen_position: null,
 			screen_width: 0,
 			screen_height: 0,
-			order: 0,
-
-			/*constrainable properties*/
+			
+			/*==begin JSON export===*/
+			/*constrainable properties to export to JSON*/
 			position: null,
 			translation_delta: null,
 			absolute_position: null,
@@ -51,11 +53,17 @@ define([
 			stroke_color: null,
 			fill_color: null,
 			stroke_width: null,
-			width: 0,
-			height: 0,
 			master_path: null,
 			path_altered: null,
 
+			/*basic datatypes to export to JSON*/
+			name: 'instance',
+			type: 'instance',
+			visible: true,
+			closed: false,
+			order: 0,
+
+			/*==end JSON export===*/
 
 			center: null,
 			rmatrix: null,
@@ -79,7 +87,7 @@ define([
 			selection_palette: ['#A5FF00', '#0D7C1F', '#FF4D4D', '#33D6FF', '#E698D2'],
 			sel_palette_index: 0,
 
-			lists: null,
+			//no JSON Export required
 			matrix_map: {
 				translation_delta: {
 					name: 'tmatrix',
@@ -169,9 +177,9 @@ define([
 
 			this.set('id', new Date().getTime().toString());
 
-			this.set('lists', []);
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
+			console.log('to_json:',this.toJSON());
 		},
 
 
@@ -392,6 +400,12 @@ define([
 
 
 		toJSON: function() {
+			var data = {};
+
+			//loop through defaults to export and call toJSON
+			/*for defaults:
+				data[default[k]]:default[k].toJSON();
+			}*/
 
 		},
 

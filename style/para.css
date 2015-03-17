@@ -613,13 +613,40 @@ span:focus{
     box-shadow:none;
 }
 
-#context-menu,  #behavior-types-menu{
+#context-menu,  #behavior-types-menu, .layers-menu{
     position: absolute;
     visibility: hidden;
     z-index: 2;
     //min-width:140px;
     //min-height:60px;
     background: rgba(250,250,250,0.95)    
+}
+.layers-menu{
+    visibility: visible;
+}
+.layers-menu li{
+    list-style-type: none;
+    width: 170px;
+    height: 20px;
+    padding:0;
+    margin: 0;
+}
+.layers-menu ul{
+    width:180px;
+    padding:5px;
+    margin:0;
+}
+
+.layers-menu div{
+    float: left;
+    height:20;
+}
+
+.layers-menu div#visible, .layers-menu div#filled {
+    width:20px;
+}
+.layers-menu div#name{
+    width: 130px;
 }
 
 #constraint-menu {

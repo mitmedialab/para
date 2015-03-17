@@ -103,6 +103,12 @@ define([
 				}
 			},
 
+			toJSON: function(){
+				var data = this.getValue() // 5
+				data.type=''
+				return data;
+			},
+
 			
 		});
 
