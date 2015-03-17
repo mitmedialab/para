@@ -313,6 +313,25 @@ define([
         var scaleX = 1 + (draggedVect.x * signedX * SCALING_FACTOR)/centerDist;
         var scaleY = 1 + (draggedVect.y * signedY * SCALING_FACTOR)/centerDist;
 
+        if (event.modifiers.shift) {
+          scaleY = scaleDelta.y * scaleX/scaleDelta.x;
+          scaleX = scaleDelta.x * scaleX/scaleDelta.x;
+        }
+
+        // vertical and horiz snapping feature, needs work
+        // else {
+        //   console.log('draggedVect.y ' + draggedVect.y);
+        //   console.log('draggedVect.x ' + draggedVect.x);
+        //   if (Math.abs(draggedVect.y/draggedVect.x) > 20) {
+        //     console.log('y threshold');
+        //     scaleX = 1;
+        //   }
+        //   else if (Math.abs(draggedVect.x/draggedVect.y) > 20) {
+        //     console.log('x threshold');
+        //     scaleY = 1;
+        //   }
+        // }
+
          var data = {};
          data.set = true;
          data.scaling_delta = {

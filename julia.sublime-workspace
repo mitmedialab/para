@@ -1,0 +1,862 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"followPath",
+				"followPathBehavior"
+			],
+			[
+				"get",
+				"getLeft"
+			],
+			[
+				"tra",
+				"transform"
+			],
+			[
+				"insta",
+				"instance_literals"
+			],
+			[
+				"to",
+				"toJSON"
+			],
+			[
+				"rotation",
+				"rotationOrigin"
+			],
+			[
+				"node",
+				"nodeParent"
+			],
+			[
+				"co",
+				"concatenate"
+			],
+			[
+				"mid",
+				"midpoint"
+			],
+			[
+				"follow",
+				"FollowPathBehavior"
+			],
+			[
+				"instan",
+				"instanceParentIndex"
+			],
+			[
+				"instanc",
+				"instance_literals"
+			],
+			[
+				"instances",
+				"instances"
+			],
+			[
+				"instance",
+				"instanceParentIndex"
+			],
+			[
+				"inst",
+				"instanceParentIndex"
+			],
+			[
+				"beh",
+				"behaviorNode"
+			],
+			[
+				"method",
+				"methodName"
+			],
+			[
+				"clear",
+				"clearScaffolds"
+			],
+			[
+				"pap",
+				"PaperManager"
+			],
+			[
+				"strok",
+				"strokeColor"
+			],
+			[
+				"key",
+				"keyCode"
+			],
+			[
+				"curre",
+				"currentNode"
+			],
+			[
+				"pare",
+				"instanceParentIndex"
+			],
+			[
+				"event",
+				"event_bus"
+			],
+			[
+				"inter",
+				"intersections"
+			],
+			[
+				"act",
+				"activeLayer"
+			],
+			[
+				"ex",
+				"excludeIndex"
+			],
+			[
+				"remo",
+				"removeInstanceAt"
+			],
+			[
+				"Path",
+				"pathChild"
+			],
+			[
+				"le",
+				"length-1"
+			],
+			[
+				"scaff",
+				"scaffoldLine"
+			],
+			[
+				"Vec",
+				"Vec2"
+			],
+			[
+				"de",
+				"deps"
+			],
+			[
+				"con",
+				"conditional_line"
+			],
+			[
+				"even",
+				"event_bus"
+			],
+			[
+				"tar",
+				"targetVal"
+			],
+			[
+				"num",
+				"numInstances"
+			],
+			[
+				"curren",
+				"currentNode"
+			],
+			[
+				"cop",
+				"copyBehavior"
+			],
+			[
+				"be",
+				"behaviorNode"
+			],
+			[
+				"poi",
+				"pointBC"
+			],
+			[
+				"Poi",
+				"pointAC"
+			],
+			[
+				"sca",
+				"scaffold"
+			],
+			[
+				"a",
+				"anchor"
+			],
+			[
+				"hide",
+				"hideMenu"
+			],
+			[
+				"root",
+				"rootRender"
+			],
+			[
+				"Beh",
+				"behaviorManagerModel"
+			],
+			[
+				"contains",
+				"containsPath"
+			],
+			[
+				"conta",
+				"containsPath"
+			],
+			[
+				"render",
+				"renderSignature"
+			],
+			[
+				"curr",
+				"currentNode"
+			],
+			[
+				"fu",
+				"function"
+			],
+			[
+				"name",
+				"nameVal"
+			],
+			[
+				"symbo",
+				"symbol_literal"
+			],
+			[
+				"current",
+				"currentPathNode"
+			],
+			[
+				"path",
+				"path_literal"
+			],
+			[
+				"canvas",
+				"canvasDblclick"
+			],
+			[
+				"dis",
+				"distributeBehavior"
+			],
+			[
+				"cav",
+				"canvasMousewheel"
+			],
+			[
+				"meth",
+				"methodName"
+			],
+			[
+				"pro",
+				"prototype"
+			],
+			[
+				"intersection",
+				"intersectionFound"
+			],
+			[
+				"interse",
+				"intersectionFound"
+			],
+			[
+				"up",
+				"updateInstances"
+			],
+			[
+				"create",
+				"createInstances"
+			],
+			[
+				"paren",
+				"nodeParent"
+			],
+			[
+				"update",
+				"updateMembers"
+			],
+			[
+				"che",
+				"checkIntersections"
+			],
+			[
+				"currently",
+				"currentlySelected"
+			],
+			[
+				"mousedown",
+				"mousedown"
+			],
+			[
+				"pad",
+				"padding-right"
+			],
+			[
+				"mar",
+				"margin-right"
+			],
+			[
+				"margin",
+				"margin-left"
+			],
+			[
+				"add",
+				"addChildNode"
+			],
+			[
+				"str",
+				"strokeColor"
+			],
+			[
+				"Pa",
+				"PaperManager"
+			],
+			[
+				"Pp",
+				"paper"
+			],
+			[
+				"paper",
+				"PaperMananger"
+			],
+			[
+				"GE",
+				"GeometryNode"
+			],
+			[
+				"di",
+				"display"
+			],
+			[
+				"marg",
+				"margin-bottom"
+			],
+			[
+				"p",
+				"padding"
+			],
+			[
+				"bac",
+				"background-color"
+			],
+			[
+				"margi",
+				"margin-top"
+			],
+			[
+				"ba",
+				"background-color"
+			],
+			[
+				"list",
+				"list-style-type"
+			],
+			[
+				"i",
+				"inline"
+			],
+			[
+				"Geom",
+				"GeometryNode"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "js/src/models/tools/SelectToolModel.js",
+			"settings":
+			{
+				"buffer_size": 10636,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/PolygonNode.js",
+			"settings":
+			{
+				"buffer_size": 1581,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/RectNode.js",
+			"settings":
+			{
+				"buffer_size": 2007,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/Instance.js",
+			"settings":
+			{
+				"buffer_size": 22259,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 67.0,
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"js",
+				"JSHint"
+			],
+			[
+				"j",
+				"JSHint"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 514.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/Julia/Documents/para/js/src/models/behaviors/FollowPathBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/RootManager.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/CanvasView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/GeometryNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ContextView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/router.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/main.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/utils/Vec2D.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PaperManager.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/BehaviorNode.js",
+		"/Users/jejacobs/Desktop/test2.svg",
+		"/Users/jejacobs/Desktop/test.svg",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/CopyBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/StateManagerModel.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/utils/TrigFunc.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ToolCollection.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/Instance.js",
+		"/Users/jejacobs/Library/Application Support/Sublime Text 2/Packages/JsFormat/JsFormat.sublime-settings",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/ParentBehavior.js",
+		"/Users/jejacobs/Library/Application Support/Sublime Text 2/Packages/JsFormat/Default (OSX).sublime-keymap",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/css/basic.css",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/.gitignore",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/index.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/PropertyView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/DrawingView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/TestNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Utils.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Actions/ParentBehavior.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/PathEditing.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Actions/FollowPathAction",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/app.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/BezierTool.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/index2.html",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ShapeToolModel.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PaperManager",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/canvas.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/PathTool.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/SceneNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PathNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/GeometryNode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ShapeToolModel",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ObjectsView",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/.jshintrc",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/README.md",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/DrawingView.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/mygenerator.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/snode.js",
+		"/Users/jejacobs/Documents/Adobe/dev/sketches/pathsketch.html"
+	],
+	"find":
+	{
+		"height": 74.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
+			"",
+			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"scale",
+			"startpoint",
+			"startdist",
+			"paper",
+			"console.log",
+			"startwidth",
+			"operator",
+			"scale",
+			"updateOrigin",
+			"console.l",
+			"console.log",
+			";\n",
+			"\n        ",
+			"console.log",
+			"setOrigin",
+			"updateOrigin",
+			"\"",
+			".follow",
+			"follow",
+			"checkDistanceIncrement",
+			"toggleRotat",
+			"c",
+			"clear",
+			".clear",
+			"clearScaffolds",
+			"position",
+			".position",
+			"update",
+			"createInstanceFromPath: function(path)",
+			"createInstanceAt",
+			".update",
+			".matrix",
+			"update",
+			".position",
+			"increment",
+			"console",
+			"this.midpoint",
+			"intersection",
+			"\"",
+			"console.log",
+			"u_data",
+			"\"",
+			"instance_literal",
+			"\"",
+			"path_literal",
+			"instance_literal",
+			"getLiteral",
+			"\"",
+			"= 1",
+			"=1",
+			"containsPath",
+			".selected =",
+			"masterPath",
+			"visible = false",
+			"- 1",
+			"-1",
+			".anchor=true",
+			"/* ",
+			"rotation:",
+			"delta",
+			"updat",
+			"clear",
+			"setSelection",
+			"              this.trigger('rootUpdate');\n",
+			"checkDistanceIncrement",
+			"render",
+			"getLeft",
+			"extendBehavior",
+			"\"",
+			"this.children",
+			"checkIntersection",
+			"check",
+			"\"",
+			"render",
+			".anchors",
+			"removeAnchors",
+			"this.anchors ",
+			"project.active",
+			"prokect.active",
+			"\"",
+			"exclude",
+			"\"",
+			"intersec",
+			"instance_literals.",
+			", ",
+			"'update'",
+			"clearScaffolds",
+			"clearScaffods",
+			"clear",
+			"drawAnchor",
+			"console.log",
+			"Vec2d",
+			"\"",
+			"event_bus",
+			"eventBus",
+			"'+",
+			"BehaviorManagerModel",
+			"\"",
+			"boolB",
+			"boolA",
+			"PathNode",
+			"TrigFunc",
+			"createInstance",
+			";\n",
+			"push",
+			"currentRender",
+			"'currentRender'",
+			"shiftClick",
+			"0.75",
+			"console.log(",
+			"console.log",
+			"\"",
+			"currentRender",
+			".render(",
+			"\"",
+			"DistributeBehavior",
+			".proto",
+			".prototye",
+			"menuY",
+			"open",
+			"openMenu",
+			"behaviorManage",
+			"//selects or deselects all path instances\n    selectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = true;\n      }\n\n    },\n\n    deselectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = false;\n      }\n        for (var i = 0; i < this.instances_.length; i++) {\n        this.instances[i].selected = false;\n      }\n\n    },",
+			"deselectAll",
+			".selected=",
+			".setSelection",
+			"\"",
+			".clear"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"'",
+			"delta",
+			".delta",
+			"'",
+			"data[i]",
+			"'",
+			"path_literal",
+			"'",
+			"master",
+			"getMasterPath",
+			"'",
+			"extendBehaviorFirst",
+			"'",
+			"['update']",
+			"Vec2D",
+			"'",
+			"propB",
+			"propA",
+			"'",
+			"//console.log",
+			"this.currentNode",
+			"currentNode",
+			".nodeParent",
+			"'",
+			"this.parent",
+			"this.children",
+			"children",
+			"parent"
+		],
+		"reverse": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "js/src/models/tools/SelectToolModel.js",
+					"settings":
+					{
+						"buffer_size": 10636,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9462,
+								9022
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2087.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "js/src/models/data/PolygonNode.js",
+					"settings":
+					{
+						"buffer_size": 1581,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/src/models/data/RectNode.js",
+					"settings":
+					{
+						"buffer_size": 2007,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1647,
+								1647
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/src/models/data/Instance.js",
+					"settings":
+					{
+						"buffer_size": 22259,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3568,
+								3568
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1654.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"",
+				"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 247.0,
+	"status_bar_visible": true
+}
