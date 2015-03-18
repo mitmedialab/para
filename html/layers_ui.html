@@ -1,0 +1,18 @@
+<!--======================= LAYERS MENU ========================-->
+<div id="layer-palette" class="layers-menu section_background ">
+ <header >
+    <h2>Parameters</h2>
+    <div class="clearfix"></div>
+  </header>
+<ul id ="layers">
+    <script id="layerTemplate" type="text/x-handlebars-template">
+  {{#each layer}}
+  <li>
+    <div class='visible' id={{visible_active}}></div>
+    <div class='name'>{{name}}</div>
+    <div class='filled' id={{filled_active}}></div>
+  </li>
+   {{/each}}
+   </script>
+</ul>
+</div>

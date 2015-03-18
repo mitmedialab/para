@@ -8,10 +8,12 @@ define([
 		'paper',
 		'models/data/Instance',
 		'utils/PConstraint',
+		'views/drawing/LayersView',
+
 	],
 
 
-	function(_, paper, Instance, PConstraint) {
+	function(_, paper, Instance, PConstraint, LayerView) {
 		var svgstring = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 792" enable-background="new 0 0 612 792" xml:space="preserve"><g><path fill="none" stroke="#76787B" stroke-width="1.6375" stroke-miterlimit="10" d="M10,1.9c0,0-3.7,4-10,4s-10-4-10-4 s3.7-7.7,10-7.7S10,1.9,10,1.9z"/><ellipse fill="#76787B" cx="-0.3" cy="-0.9" rx="4.8" ry="5"/></g></svg>';
 		var FunctionNode = Instance.extend({
 
@@ -24,6 +26,7 @@ define([
 				f_arguments: null,
 				open: false,
 				called: false,
+				showLayers: 'hidden',
 			}),
 
 			initialize: function() {
@@ -58,15 +61,23 @@ define([
 				this.set('geom', geom);
 				this.lists = [];
 				this.functions = [];
+				this.layerView = new LayerView({
+					el: 'body',
+					model: this,
+				});
+				this.pcount = 1;
 
 			},
 
 
 			addParameter: function(param) {
+				param.setName('param_'+this.pcount);
+				this.pcount++;
 				this.get('f_parameters').push(param);
 				if (this.children.indexOf(param) === -1) {
 					this.addChildNode(param);
 				}
+				this.trigger('change:f_parameters');
 			},
 
 			open: function() {
@@ -88,6 +99,7 @@ define([
 
 			call: function() {
 				this.set('called', true);
+				this.set('showLayers', 'visible');
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].show();
 				}
@@ -95,6 +107,7 @@ define([
 
 			uncall: function() {
 				this.set('called', false);
+				this.set('showLayers', 'hidden');
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].hide();
 				}
@@ -104,13 +117,13 @@ define([
 				var open = this.get('open');
 				var called = this.get('called');
 				var params = this.get('f_parameters');
-				 var args = this.get('f_arguments');
+				var args = this.get('f_arguments');
 				if (!open && called) {
 					for (var i = 0; i < params.length; i++) {
 						if (args.length > i) {
-							params[i].set('visible',true);
+							params[i].set('visible', true);
 						} else {
-							params[i].set('visible',false);
+							params[i].set('visible', false);
 						}
 					}
 				} else if (open) {

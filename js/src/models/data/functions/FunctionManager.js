@@ -6,7 +6,8 @@ define([
 	'underscore',
 	'backbone',
 	'models/data/functions/FunctionNode',
-	'utils/Utils'
+	'utils/Utils',
+
 ], function(_, Backbone, FunctionNode, Utils) {
 	//datastructure to store path functions
 
@@ -18,13 +19,13 @@ define([
 			this.set('param_name', name);
 		},
 
-		renderStyle: function(geom){
+		renderStyle: function(geom) {
 			console.log('rendering style of param');
 			geom.fillColor = 'black';
 			geom.fillColor.alpha = 0.25;
 			geom.dashArray = [6, 8];
 			geom.strokeColor = '#989898';
-			geom.strokeWidth= 2.5;
+			geom.strokeWidth = 2.5;
 			geom.visible = this.get('visible');
 		}
 	};
@@ -37,7 +38,7 @@ define([
 		initialize: function() {
 			this.rootFunctions = [];
 			this.functions = this.rootFunctions;
-
+			
 		},
 
 		createFunction: function(name, childList) {
@@ -69,7 +70,7 @@ define([
 						var center = childList[i].accessProperty('center');
 						centers.x += center.x;
 						centers.y += center.y;
-					break;
+						break;
 				}
 			}
 			centers.x /= childList.length;
@@ -81,13 +82,14 @@ define([
 			this.functions.push(f);
 		},
 
-		callFunction: function(func){
-			console.log('checking function called',func.get('called'));
-			if(!func.get('called')){
+		callFunction: function(func) {
+			console.log('checking function called', func.get('called'));
+			if (!func.get('called')) {
 				func.call();
-			}
-			else{
+			
+			} else {
 				func.uncall();
+				
 			}
 		},
 
@@ -130,17 +132,17 @@ define([
 
 		convert: function(instance) {
 			console.log('converting instance');
-		
-			console.log('parameterNode',ParameterNode);
+
+			console.log('parameterNode', ParameterNode);
 			for (var k in ParameterNode) {
 				if (ParameterNode.hasOwnProperty(k)) {
-					console.log('converting property',k);
+					console.log('converting property', k);
 					instance[k] = ParameterNode[k];
 				}
 			}
 		},
 
-		addParamToFunction: function(func,instance){
+		addParamToFunction: function(func, instance) {
 			this.convert(instance);
 			func.addParameter(instance);
 		},

@@ -535,12 +535,16 @@ header button, .sub-header button {
     width: 16px;
 }
 
-.properties header{
+.properties header, .layers-menu header{
     padding: 4%;
     box-sizing: border-box;
     line-height: 10pt;
     background-color: rgba(200, 200, 200, 0.88);
 }
+.layers-menu header{
+    height:33px
+}
+
 #horz-toolbar header {
         background-color: rgba(200, 200, 200, 0.88);
         width:20px;
@@ -626,27 +630,53 @@ span:focus{
 }
 .layers-menu li{
     list-style-type: none;
-    width: 170px;
+    width: 140px;
     height: 20px;
     padding:0;
     margin: 0;
+    border-bottom: 1px solid #B2B2B2;
 }
 .layers-menu ul{
-    width:180px;
-    padding:5px;
+    width:140px;
+    padding:0;
     margin:0;
 }
 
-.layers-menu div{
+.layers-menu div.visible, .layers-menu div.filled, .layers-menu div.name{
     float: left;
-    height:20;
+    height:20px;
+    border-right: 1px solid #B2B2B2;
+
 }
 
-.layers-menu div#visible, .layers-menu div#filled {
+.layers-menu div.visible, .layers-menu div.filled {
     width:20px;
+    background-image: url(../images/layer_icons.svg);
+      background-position-x: 0px;
+ background-size: 20px 80px;
+  background-repeat: no-repeat;
+  
 }
-.layers-menu div#name{
-    width: 130px;
+.layers-menu div.visible{
+    background-position-y: 0px;
+}
+
+.layers-menu div.filled{
+    background-position-y: -40px;
+}
+
+.layers-menu div#active.visible{
+    background-position-y: -20px;
+}
+
+.layers-menu div#active.filled{
+    background-position-y: -60px;
+}
+
+.layers-menu div.name{
+    width: 100px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 #constraint-menu {

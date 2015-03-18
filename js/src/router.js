@@ -54,6 +54,8 @@ define([
         el: '#context-menu',
         model: constraintToolModel,
       });
+
+     
       propertyView.render();
 
     });
