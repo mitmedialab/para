@@ -25,7 +25,7 @@ define([
 			var id = this.model.get('id');
 			this.$el.attr('id', 'layer_' + id); //;
 			this.$el.css({
-				visibility: 'hidden'
+				visibility: 'visible'
 			});
 			this.setPosition();
 			this.tsource = this.$('#layerTemplate').html();

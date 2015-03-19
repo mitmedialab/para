@@ -25,7 +25,7 @@ define([
 				f_parameters: null,
 				open: false,
 				called: false,
-				showLayers: 'hidden',
+				showLayers: 'visible',
 			}),
 
 			initialize: function() {
@@ -112,41 +112,47 @@ define([
 
 			open: function() {
 				this.set('open', true);
+				this.set('showLayers', 'hidden');
+
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].show();
 				}
+				this.trigger('change:showLayers');
+
 				return this.children;
 			},
 
 			close: function() {
 				this.set('open', false);
+				this.set('showLayers', 'visible');
+
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].close();
 					this.children[i].hide();
 				}
+				this.trigger('change:showLayers');
+
 				return this.getParentNode();
 			},
 
 			call: function() {
 				this.set('called', true);
-				this.set('showLayers', 'visible');
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].show();
 				}
 				var params = this.get('f_parameters');
-				for(var j=0;j<params.length;j++){
+				for (var j = 0; j < params.length; j++) {
 					params[j].setCalled(true);
 				}
 			},
 
 			uncall: function() {
 				this.set('called', false);
-				this.set('showLayers', 'hidden');
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].hide();
 				}
 				var params = this.get('f_parameters');
-				for(var j=0;j<params.length;j++){
+				for (var j = 0; j < params.length; j++) {
 					params[j].setCalled(false);
 				}
 			},
