@@ -292,6 +292,77 @@ define([
       }
     },
 
+    delimiterFunctions: {
+      setTentative: function( geom, color ) {
+
+      },
+
+      setActive: function( geom, color ) {
+
+      },
+
+      removeTentative: function( geom ) {
+
+      },
+
+      setDownPoint: function( geom, event ) {
+
+      },
+
+      checkClick: function( geom, event ) {
+
+      }
+    },
+
+    addPositionRefListeners: function( constraintTool, posDelimNodes ) {
+      // have to do x and y sep
+      // on mouse down, change constraint tool mousemove
+      //  if x delim mousemove checks x change
+      //  if y delim mousemove checks y change
+      // on mouse up, reset constraint tool mousemove
+      //  get change, update expression and constraintTo/FromVal
+      //
+      var enterColorChange = function( geom ) { 
+        if ( !geom.active ) { geom.strokeColor = '#ff7777'; }
+      }
+
+      var leaveColorChange = function( geom ) {
+        if ( !geom.active ) { geom.strokeColor = '#A5FF00'; }
+      }      
+
+      var setActive = function( uiNode ) {
+        uiNode.set('stroke_color', new PColor(255, 0, 0));
+        var geom = uiNode.get('geom');
+        var nameSplit = geom.name.split('-');
+        geom.strokeColor = '#ff0000';
+        geom.active = true;
+
+        propSplit = nameSplit.slice( 2, nameSplit.length );
+        constraintTool.set( nameSplit[0], propSplit );
+        constraintTool.rewordConstraint();
+      }
+
+      var mouseDown = function( event ) {
+        // set constraint tool mouse move
+        //
+      }
+
+      var mouseUp = function( event ) {
+        // if up point is same as down point
+        //  setActive
+        //  draw flashing rel at new point? or flashing update rel pos to new point? (TEMP)
+        // reset constraint tool mouse move
+      }
+    },
+
+    addScaleRefListeners: function( constraintTool, scaleDelimNodes ) {
+
+    },
+
+    addOrientationRefListeners: function( constraintTool, rotDelimNodes ) {
+
+    },
+
     /*
      * Draw rectangles expanded around a reference edge representing 
      * the reference edge weight with as well as minimum, maximum, 
@@ -334,61 +405,128 @@ define([
       return [uiNode]; 
     },
 
-    addConstraintWheelHandlers: function( constraintTool, constraintWheel ) {
+    addConstraintWheelHandlers: function( constraintTool, refWheel, relWheel ) {
+      
       // for each highest level part
       // onMouseEnter turn pink (inactive)
       // onMouseClick turn red and send prop to ctool
       // onMouseLeave turn to normal (inactive)
-      //
 
-      var wheel_container = constraintWheel.get('geom');
-      var true_wheel = wheel_container.children[0];
+      var ref_wheel_container = refWheel.get('geom');
+      var rel_wheel_container = relWheel.get('geom');
+      var ref_true_wheel = ref_wheel_container.children[0];
+      var rel_true_wheel = rel_wheel_container.children[0];
       var ui_handler = this;
-      for (var i = 0; i < true_wheel.children.length; i++) {
-        (function( wheel_group ) {
-          wheel_group.originalFill = wheel_group.fillColor;
-          wheel_group.originalStroke = wheel_group.strokeColor;
-          wheel_group.onMouseEnter = function( event ) {
-            if (!wheel_group.active) {
-              wheel_group.strokeColor = '#ff7777';
-              wheel_group.fillColor = '#ff7777';
+      for (var i = 0; i < ref_true_wheel.children.length; i++) {
+        (function( ref_wheel_group, rel_wheel_group ) {
+
+          ref_wheel_group.originalFill = ref_wheel_group.fillColor;
+          rel_wheel_group.originalFill = ref_wheel_group.fillColor;
+          ref_wheel_group.originalStroke = rel_wheel_group.strokeColor;
+          rel_wheel_group.originalStroke = rel_wheel_group.strokeColor;
+          
+          if ( ref_wheel_group.name == 'position' ) {
+            ref_wheel_group.strokeColor = '#ff0000';
+            ref_wheel_group.fillColor = '#ff0000';
+            ref_wheel_group.active = true;
+            constraintTool.setConstraintProperty( 'reference', ref_wheel_group.name );
+          }
+
+          if ( rel_wheel_group.name == 'position' ) {
+            rel_wheel_group.strokeColor = '#ff0000';
+            rel_wheel_group.fillColor = '#ff0000';
+            rel_wheel_group.active = true;
+            constraintTool.setConstraintProperty( 'relative', rel_wheel_group.name );
+          }
+
+          ref_wheel_group.onMouseEnter = function( event ) {
+            if (!ref_wheel_group.active) {
+              ref_wheel_group.strokeColor = '#ff7777';
+              ref_wheel_group.fillColor = '#ff7777';
             }
           }
 
-          wheel_group.onMouseLeave = function( event ) {
-            if (!wheel_group.active) {
-              wheel_group.strokeColor = wheel_group.originalStroke;
-              wheel_group.fillColor = wheel_group.originalFill;
+          rel_wheel_group.onMouseEnter = function( event ) {
+            if (!rel_wheel_group.active) {
+              rel_wheel_group.strokeColor = '#ff7777';
+              rel_wheel_group.fillColor = '#ff7777';
             }
           }
 
-          wheel_group.onClick = function( event ) {
-            // don't let any other properties be selected
-            for (var j = 0; j < true_wheel.children.length; j++) {
-              if (true_wheel.children[j].active) {
-                return; 
-              }
-              true_wheel.children[j].active = true;   
-            } 
+          ref_wheel_group.onMouseLeave = function( event ) {
+            if (!ref_wheel_group.active) {
+              ref_wheel_group.strokeColor = ref_wheel_group.originalStroke;
+              ref_wheel_group.fillColor = ref_wheel_group.originalFill;
+            }
+          }
+
+          rel_wheel_group.onMouseLeave = function( event ) {
+            if (!rel_wheel_group.active) {
+              rel_wheel_group.strokeColor = rel_wheel_group.originalStroke;
+              rel_wheel_group.fillColor = rel_wheel_group.originalFill;
+            }
+          }
+              
+          ref_wheel_group.onClick = function( event ) {
+           
+            for ( var j = 0; j < ref_true_wheel.children.length; j++ ) {
+              ref_true_wheel.children[j].strokeColor = ref_true_wheel.children[j].originalStroke;
+              ref_true_wheel.children[j].fillColor = ref_true_wheel.children[j].originalFill;
+              rel_true_wheel.children[j].strokeColor = rel_true_wheel.children[j].originalStroke;
+              rel_true_wheel.children[j].fillColor = rel_true_wheel.children[j].originalFill;
+              ref_true_wheel.children[j].active = rel_true_wheel.children[j].active = false;
+            }
+             
+            ref_wheel_group.strokeColor = '#ff0000';
+            ref_wheel_group.fillColor = '#ff0000';
+            ref_wheel_group.active = true;
+
+            rel_wheel_group.strokeColor = '#ff0000';
+            rel_wheel_group.fillColor = '#ff0000';
+            rel_wheel_group.active = true;
+          
             
-            wheel_group.strokeColor = '#ff0000';
-            wheel_group.fillColor = '#ff0000';
-            wheel_group.active = true;
+            constraintTool.setConstraintProperty( 'reference', ref_wheel_group.name );
+            constraintTool.setConstraintProperty( 'relative', rel_wheel_group.name );
 
-            var relevance;
-            if ( wheel_container.name == 'ref-wheel' ) {
-              relevance = 'reference';
-            } else if ( wheel_container.name == 'rel-wheel' ) {
-              relevance = 'relative';
+            constraintTool.removeDelimiters( 'reference' );
+            constraintTool.removeDelimiters( 'relative' );
+            
+            //var delimiters = constraintTool.createDelimiters( 'reference' );
+            /*
+            ui_handler.addDelimiterListeners( constraintTool, delimiters, 'reference' );
+            */
+          }     
+
+          rel_wheel_group.onClick = function( event ) {
+
+            for ( var j = 0; j < ref_true_wheel.children.length; j++ ) {
+              rel_true_wheel.children[j].strokeColor = rel_true_wheel.children[j].originalStroke;
+              rel_true_wheel.children[j].fillColor = rel_true_wheel.children[j].originalFill;
+              rel_wheel_group.active = false;
             }
+            
+            rel_wheel_group.strokeColor = '#ff0000';
+            rel_wheel_group.fillColor = '#ff0000';
+            rel_wheel_group.active = true;
 
-            constraintTool.setConstraintProperty( relevance, wheel_group.name );
-            var delimiters = constraintTool.createDelimiters( relevance );
-            ui_handler.addDelimiterListeners( constraintTool, delimiters );
-          }      
+            constraintTool.setConstraintProperty( 'relative', rel_wheel_group.name );
+           
+            // TODO: figure out how these delimiter listeners work
+            constraintTool.removeDelimiters( 'reference' ); 
+            constraintTool.removeDelimiters( 'relative' );
+            /*
+            var ref_delimiters = constraintTool.createDelimiters( 'reference' );
+            var rel_delimiters = constraintTool.createDelimiters( 'relative' );
+            ui_handler.addDelimiterListeners( constraintTool, delimiters, 'relative' );
+            */
+          }
 
-        }( true_wheel.children[i] ))
+        }( ref_true_wheel.children[i], rel_true_wheel.children[i] ))
       }
+
+      var ref_delimiters = constraintTool.createDelimiters( 'reference' );
+      ui_handler.addDelimiterListeners( constraintTool, ref_delimiters, 'reference' );
     },
 
     createUINodeFromPath: function( path ) {

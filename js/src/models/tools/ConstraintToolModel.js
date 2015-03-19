@@ -51,6 +51,14 @@ define([
     tolerance: 3
   };
 
+  var mouseHitOptions = {
+    stroke: true,
+    fill: true,
+    bounds: true,
+    center: true,
+    tolerance: 2
+  };
+
   // map property names for UI to instance properties to constrain
   //
   // NOTE: ideally this would be 1-1; i.e. constraining translation_delta
@@ -68,7 +76,29 @@ define([
 
   // model definition
   var ConstraintToolModel = BaseToolModel.extend({
- 
+
+
+    //  getSelectionByMouse(event)
+    //    finds the smallest active selection containing the given mouse pos
+    //    returns null if none
+    //  mouseDown
+    //    ref = getSelectionByMouse
+    //    references = ref (if not null)
+    //  mouseUp
+    //    rel = getSelectionByMouse
+    //    relatives = rel (if not null)
+    //    clearPreviousConstraint (if not null)
+    //    startConstraint (if not null)
+    //  startConstraint
+    //    show ref and rel wheels, default position
+    //    show ref pos delimiters
+    //  clearPrevConstraint
+    //    remove ref&rel wheels
+    //    remove ref and rel delimiters
+    //  createConstraint
+    //    establish constraint, current code
+
+
     /*
      * Creates attributes on the model for keeping track of the model's
      * state.
@@ -79,12 +109,12 @@ define([
       type: 'equal',          // relation for constraint
       expression: '',         // the entered constraint expression
       ref_prop: null,         // the property of the references to be constrained
-      rel_prop: null,         // the property of the relatives to be constrained
-      mode: 'references',     // indicator for current state
-      constrainFromVal: [],     // array for specifying value constrained to
-      constrainToVal: [],
+      rel_prop: null,         // the property of the relatives to be mode: 'references',     // indicator for current state
+      constrainFromVal: null,     // array for specifying value constrained to
+      constrainToVal: null,
 
-      uiElements: {'ref_delimiters': [], 'rel_delimiters': []}
+      arrow: null,
+      uiElements: {'ref_delimiters': [], 'rel_delimiters': [], 'arrows': []}
     }),
 
     /*
@@ -92,8 +122,6 @@ define([
      */
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
-      this.set('references', []);
-      this.set('relatives', []);
     },
 
     /*
@@ -106,8 +134,6 @@ define([
      */
     setConstraintType: function(type) {
       this.set('type', type);
-      var result = {};
-      result['type'] = type;
       console.log('[INFO] Selected Constraint Type: ' + type);
       return type;
     },
@@ -162,7 +188,7 @@ define([
       
       this.set(internal_prop, property);
       console.log('[INFO] Selected Constraint Property: ' + property);
-      this.advance();
+      //this.advance();
     },
 
     /*
@@ -333,7 +359,7 @@ define([
       var delims_name, delimiters;
       if ( relevance == 'reference' ) { 
         delims_name = 'ref_delimiters';
-      } else if ( relevance == 'relevance' ) {
+      } else if ( relevance == 'relative' ) {
         delims_name = 'rel_delimiters';
       }
       delimiters = uiElements[delims_name];
@@ -442,6 +468,7 @@ define([
      */
     mouseDown: function(event) {
       var state = this.get('mode');
+      /*
       switch ( state ) {
         case 'references':
           // TODO: check if selection already exists, set to references if so, OR clear selections when constraint tool selected
@@ -460,12 +487,48 @@ define([
         case 'expression':
           // TODO: check if expression has been submitted?
           break; 
-      } 
-    
+      } */
+   
+
+      // TODO: REALLY SHOULD TEST FOR A SELECTION, NOT INSTANCE
+
+      var hitResult = paper.project.hitTest(event.point, mouseHitOptions);
+      // TODO: generalize
+      if ( hitResult ) { 
+        if ( !hitResult.item.data.instance ) { return; }
+        var instance = hitResult.item.data.instance;
+        this.set('references', [instance]);
+      }
     },
 
     mouseDrag: function(event) {
-            
+      if ( !this.get('references') ) { return; }
+
+      var vector = (event.lastPoint.subtract(event.downPoint)).normalize(10);
+      var arrowPath = this.get('arrow');
+      if ( event.downPoint != event.lastPoint && !arrowPath ) {
+        arrowPath = new paper.Group([
+          new paper.Path([event.downPoint, event.lastPoint]),
+          new paper.Path([
+            event.lastPoint.add(vector.rotate(135)),
+            event.lastPoint,
+            event.lastPoint.add(vector.rotate(-135))
+          ])
+        ]);
+        arrowPath.strokeColor = '#A5FF00';
+      } else if ( event.downPoint != event.lastPoint  ) {
+        arrowPath.children[0].removeSegment(1);
+        arrowPath.children[0].add(event.lastPoint);
+        arrowPath.children[1].remove(); // TODO: check for memory leak
+        var arrowHead = new paper.Path([
+          event.lastPoint.add(vector.rotate(135)),
+          event.lastPoint,
+          event.lastPoint.add(vector.rotate(-135))
+        ]);
+        arrowHead.strokeColor = '#A5FF00';
+        arrowPath.addChild(arrowHead);
+      }
+      this.set('arrow', arrowPath);
     },
 
     dblClick: function(event) {
@@ -473,7 +536,27 @@ define([
     },
 
     mouseUp: function(event) {
-      
+      //TODO: Really should use selection, rather than instance
+
+      // have to work around arrow itself being hit testable
+      var hitResult = paper.project.hitTest(event.point.add(new paper.Point(3, 3)), mouseHitOptions);
+      if ( hitResult ) {
+        // TODO: generalize to lists?
+        if ( !hitResult.item.data.instance ) { return; }
+        var instance = hitResult.item.data.instance;
+        this.set('relatives', [instance]);
+
+        var arrow = this.get('arrow');
+        var uiElements = this.get('uiElements');
+        uiElements.arrows.push(arrow);
+        this.set('uiElements', uiElements);
+        this.set('arrow', null);
+
+        // create ref, rel wheels
+        var ref_wheel = PaperUIHelper.createConstraintWheel( this.get('references'), 'ref-wheel' )[0];
+        var rel_wheel = PaperUIHelper.createConstraintWheel( this.get('relatives'), 'rel-wheel' )[0];
+        PaperUIHelper.addConstraintWheelHandlers( this, ref_wheel, rel_wheel );
+      } 
     },
 
     mouseMove: function(event) {
@@ -499,32 +582,105 @@ define([
       PaperUIHelper.clear(); // TODO: clears everything, want to clear only constraint tool ui
     }, 
  
-
-
-    /*
-     *  Constraint Tool UI Listeners, passed to Para UI
-     */
-
-    /*
-     *
-     */
-    delimiterHighlight: function( event ) {
-      var path = event.target;
-      // TODO: be pickier about these style changes 
-      path.strokeColor = 'red'; 
-      path.strokeWidth = 1.3*path.strokeWidth;  
-    },
     
+
     /*
-     *
+     *  Constraint Tool UI Elements - Delimiters 
      */
-    delimiterSelect: function( event ) {
-      var path = event.target;
-      // TODO: be pickier about these style changes
-      path.strokeColor = 'blue';
-      path.strokeWidth = 1.3*path.strokeWidth;
-      this.set('constrainToVal', path.getName()); // TODO: implement path.getName, prob by extending Paper path 
+
+    /*
+    createDelimiters: function( instances, property, delimSetName ) {
+      switch ( property ) {
+        case 'position':
+          this.createPositionDelimiters( instances, delimSetName );
+          break;
+        case 'scale':
+          this.createScaleDelimiters( instances, delimSetName );
+          break;
+        case 'rotation':
+          this.createRotationDelimiters( instances, delimSetName );
+          break;
+        default:
+          console.log('[ERROR] Property not recognized for delimiter creation');
+          break;
+      }
+    },
+
+    createPositionDelimiters: function( instances, delimSetName ) {
+
+    },
+
+    createScaleDelimiters: function( instances, delimSetName ) {
+
+    },
+
+    createRotationDelimiters: function( instances, delimSetName ) {
+
+    },
+
+    setDelimiterListeners: function( name, property, listener_set ) {
+
+    },
+
+    setPositionDelimiterListeners: function( delims, listener_set ) {
+      
+      onMouseOver = function( event ) {
+        if ( !delim.active ) {
+          delim.setColor
+        }
+      }
+
+      onMouseClick = function( event ) {
+        delim.setColor
+        delim.setActive
+
+        constraintTool.setRefProp
+        constraintTool.setRefVal
+        if ref_prop == rel_prop
+          constraintTool.setRelProp
+          constraintTool.setRelVal
+      }
+
+      onMouseDrag = function( event ) {
+        delim.updatePos // if name = x or name = y, do different update
+          
+      }
+
+      onMouseUp = function( event ) {
+        updateExpression
+      }
+    },
+
+    setScaleDelimiterListeners: function( delims, listener_set ) {
+      
+      onMouseOver = function( event ) {
+
+      }
+
+      onMouseClick = function( event ) {
+
+      }
+
+      onMouseDrag = function( event ) {
+
+      }
+    },
+
+    setRotationDelimiterListeners: function( delims, listener_set ) {
+      
+      onMouseOver = function( event ) {
+
+      }
+
+      onMouseClick = function( event ) {
+
+      }
+
+      onMouseDrag = function( event ) {
+
+      }
     }
+    */
   
   });
 

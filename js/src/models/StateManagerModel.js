@@ -294,7 +294,7 @@ define(['jquery',
         if (selectedShapes.length > 0) {
 
           var list = new ListNode();
-           var sampler = new Sampler();
+          var sampler = new Sampler();
           sampler.addChildNode(list);
           list.setSampler(sampler);
 

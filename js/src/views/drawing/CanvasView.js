@@ -21,6 +21,7 @@ define([
   var rootKey = 82;                           // r
   var groupKey = 71;                          // g
   var deleteKey = 67;                         // c
+  var ctrlKey = 17;                           // ctrl
   var upArrow = 38;                           // up arrow
   var downArrow = 40;                         // down arrow
   var rightArrow = 39;                        // right arrow
