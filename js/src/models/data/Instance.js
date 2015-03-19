@@ -190,7 +190,6 @@ define([
 
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
-			console.log('to_json:', this.toJSON());
 		},
 
 
@@ -509,7 +508,9 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
-
+			if(this.isSelfConstrained()){
+				this.getValue();
+			}
 			var property = this.inheritProperty(property_name);
 			if (property) {
 				return property.getValue();
@@ -550,18 +551,34 @@ define([
 
 
 		setValue: function(data) {
+			console.log('calling set value for',this.get('id'),data);
 			for (var prop in data) {
+
 				if (data.hasOwnProperty(prop)) {
-					this.get(prop).modifyProperty(data[prop]);
+					var p = data[prop];
+					if(typeof data[prop]!=='object'){
+						p = {val:data[prop]};
+					}
+					p.operator ='set';
+					console.log('set value_data',prop,p);
+					this.get(prop).modifyProperty(p);
 				}
 			}
 		},
 
 		getValue: function() {
-			console.log('getting value for',this.get('type'),this.get('name'));
+			//console.log('getting value for',this.get('type'),this.get('name'));
 			var constrainMap = this.get('constrain_map');
 			var data = {};
-			if (!this.isSelfConstrained()) {
+			var isSelfConstrained =this.isSelfConstrained();
+			var constraintCalled =  false;
+			if(this.reference){
+				console.log('reference found');
+				constraintCalled = this.reference.get('called');
+			}
+			if (isSelfConstrained && constraintCalled) {
+				return this.getSelfConstraint().getValue();
+			} else {
 				for (var i = 0; i < constrainMap.length; i++) {
 					var prop = this.inheritProperty(constrainMap[i]);
 					var c = prop.getConstraint();
@@ -570,15 +587,19 @@ define([
 					} else {
 						for (var p in c) {
 							if (p !== 'self' && c[p]) {
-								data[constrainMap[i]][p] = c[p];
+								data[constrainMap[i]] = {};
+								//console.log('p',p,constrainMap[i],data[constrainMap[i]],c,c[p]);
+								data[constrainMap[i]][p] = c[p].getValue();
 							}
 						}
 					}
 
 				}
-			} else {
-				return this.getSelfConstraint.getValue();
-
+				console.log('getting value',data);
+				return data;
+				//console.log('instance is constrained',this.get('id'));
+				//console.log('constraint =',this.getSelfConstraint());
+				//console.log('constraint value =',this.getSelfConstraint().getValue());
 			}
 		},
 

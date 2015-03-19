@@ -19,7 +19,6 @@
 
 			},
 
-
 			/* setNull
 			*  sets property default isNull to true
 			* used for prototpical inheritance functionality
@@ -40,12 +39,16 @@
 			* or initializes a new one if it does not exist
 			* expects paramter to be a function
 			*/
-			setConstraint: function(func){
+			setConstraint: function(func,r){
 				if (!this.isSelfConstrained()) {
 					this.constraint = new PProperty(func);
 				}
 				else{
 					this.constraint.setValue(func);
+				}
+				if(r){
+					console.log('setting reference to',r);
+					this.reference=r;
 				}
 				//this.trigger('constraint_set');
 			},

@@ -28,7 +28,6 @@ define([
 				visibility: 'hidden'
 			});
 			this.setPosition();
-			console.log('view el', this.el);
 			this.tsource = this.$('#layerTemplate').html();
 			this.template = Handlebars.default.compile(this.tsource);
 			this.listenTo(this.model, "change:showLayers", this.showLayers);
@@ -58,7 +57,6 @@ define([
 		},
 
 		updateParameters: function() {
-			console.log('adding parameter');
 			var parameters = this.model.get('f_parameters');
 			var contexts = [];
 
@@ -78,7 +76,6 @@ define([
 				layer: contexts
 			};
 			var html = this.template(data);
-			console.log('html', html, data);
 			$('#layers').html(html);
 		},
 
@@ -118,7 +115,6 @@ define([
 		},
 
 		showLayers: function() {
-			console.log('show layers');
 			var visibility = this.model.get('showLayers');
 
 			this.$el.css({

@@ -70,7 +70,7 @@ define([
 
 
 			addParameter: function(param) {
-				param.setName('param_'+this.pcount);
+				param.setName('param_' + this.pcount);
 				this.pcount++;
 				this.get('f_parameters').push(param);
 				if (this.children.indexOf(param) === -1) {
@@ -80,33 +80,32 @@ define([
 			},
 
 			/* requestArgument
-			* called when argument icon is clicked, triggers
-			* the functionManager to send this function
-			* a list of currently selected shapes
-			*/
-			requestArgument: function(id){
+			 * called when argument icon is clicked, triggers
+			 * the functionManager to send this function
+			 * a list of currently selected shapes
+			 */
+			requestArgument: function(id) {
 				console.log('requesting argument');
 				this.selectedParam = this.getParamById(id);
-				this.trigger('request_selected',this);
+				this.trigger('request_selected', this);
 			},
 
 			/* setArgument
-			* sets the argument of the currently selected
-			* parameter
-			*/
-			setArgument: function(instance){
-				console.log('setting argument');
+			 * sets the argument of the currently selected
+			 * parameter
+			 */
+			setArgument: function(instance) {
 
-				if(this.selectedParam){
+				if (this.selectedParam) {
 					this.selectedParam.setArgument(instance);
 					this.trigger('change:f_parameters');
 				}
 			},
 
-			getParamById: function(id){
+			getParamById: function(id) {
 				var params = this.get('f_parameters');
-				var param = params.filter(function(item){
-					return item.get('id')===id;
+				var param = params.filter(function(item) {
+					return item.get('id') === id;
 				})[0];
 				return param;
 			},
@@ -134,6 +133,10 @@ define([
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].show();
 				}
+				var params = this.get('f_parameters');
+				for(var j=0;j<params.length;j++){
+					params[j].setCalled(true);
+				}
 			},
 
 			uncall: function() {
@@ -142,20 +145,21 @@ define([
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].hide();
 				}
+				var params = this.get('f_parameters');
+				for(var j=0;j<params.length;j++){
+					params[j].setCalled(false);
+				}
 			},
 
 			compile: function() {
 				var open = this.get('open');
 				var called = this.get('called');
 				var params = this.get('f_parameters');
-				if (!open && called) {
+				if (!open) {
 					for (var i = 0; i < params.length; i++) {
-						if (params[i].get('f_argument')){
-							params[i].set('visible', true);
-						} else {
-							params[i].set('visible', false);
-						}
+						params[i].set('visible', false);
 					}
+
 				} else if (open) {
 					this.children.forEach(function(child) {
 						child.set('visible', true);

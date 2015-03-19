@@ -19,6 +19,10 @@ define([
 			this.set('param_name', name);
 		},
 
+		setCalled: function(called){
+			this.set('called',called);
+		},
+
 		renderStyle: function(geom) {
 			console.log('rendering style of param');
 			geom.fillColor = 'black';
@@ -39,14 +43,15 @@ define([
 			this.set('f_argument', instance);
 			var relative = instance;
 			var reference = this;
-
 			var cf = function() {
 				var v = reference.getValue();
+				console.log('instance constraint value',v);
 				relative.setValue(v);
 				return v;
 			};
-
-			instance.setConstraint(cf);
+			console.log('cf',cf);
+			instance.setConstraint(cf,reference);
+			console.log('cf_cjs',instance.getSelfConstraint().getValue());
 		}
 	};
 
