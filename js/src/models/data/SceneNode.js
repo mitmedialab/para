@@ -5,18 +5,20 @@
 
 define([
     'underscore',
-    'backbone'
+    'backbone',
+        'utils/PConstraint',
+
     
 
-], function(_, Backbone) {
+], function(_, Backbone, PConstraint) {
 
 
-    var SceneNode = Backbone.Model.extend({
-            defaults:{
+    var SceneNode = PConstraint.extend({
+            defaults: _.extend({}, PConstraint.prototype.defaults, {
                 visited:false,
                 rendered: false,
                 edges: null,
-            },
+            }),
 
 
             initialize: function() {

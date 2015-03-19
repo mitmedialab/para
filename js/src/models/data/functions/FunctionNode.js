@@ -23,7 +23,6 @@ define([
 				type: 'function',
 				f_name: '',
 				f_parameters: null,
-				f_arguments: null,
 				open: false,
 				called: false,
 				showLayers: 'hidden',
@@ -32,7 +31,6 @@ define([
 			initialize: function() {
 				Instance.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
-				this.set('f_arguments', []);
 				this.get('translation_delta').setNull(false);
 				var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 100));
 				var path = new paper.Path.Rectangle(rectangle);
@@ -66,6 +64,7 @@ define([
 					model: this,
 				});
 				this.pcount = 1;
+				this.selectedParam = null;
 
 			},
 
@@ -78,6 +77,38 @@ define([
 					this.addChildNode(param);
 				}
 				this.trigger('change:f_parameters');
+			},
+
+			/* requestArgument
+			* called when argument icon is clicked, triggers
+			* the functionManager to send this function
+			* a list of currently selected shapes
+			*/
+			requestArgument: function(id){
+				console.log('requesting argument');
+				this.selectedParam = this.getParamById(id);
+				this.trigger('request_selected',this);
+			},
+
+			/* setArgument
+			* sets the argument of the currently selected
+			* parameter
+			*/
+			setArgument: function(instance){
+				console.log('setting argument');
+
+				if(this.selectedParam){
+					this.selectedParam.setArgument(instance);
+					this.trigger('change:f_parameters');
+				}
+			},
+
+			getParamById: function(id){
+				var params = this.get('f_parameters');
+				var param = params.filter(function(item){
+					return item.get('id')===id;
+				})[0];
+				return param;
 			},
 
 			open: function() {
@@ -117,10 +148,9 @@ define([
 				var open = this.get('open');
 				var called = this.get('called');
 				var params = this.get('f_parameters');
-				var args = this.get('f_arguments');
 				if (!open && called) {
 					for (var i = 0; i < params.length; i++) {
-						if (args.length > i) {
+						if (params[i].get('f_argument')){
 							params[i].set('visible', true);
 						} else {
 							params[i].set('visible', false);

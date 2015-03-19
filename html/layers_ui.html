@@ -7,7 +7,7 @@
 <ul id ="layers">
     <script id="layerTemplate" type="text/x-handlebars-template">
   {{#each layer}}
-  <li>
+  <li id={{param_id}}>
     <div class='visible' id={{visible_active}}></div>
     <div class='name'>{{name}}</div>
     <div class='filled' id={{filled_active}}></div>

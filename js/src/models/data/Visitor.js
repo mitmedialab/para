@@ -7,12 +7,11 @@
 define([
 	'underscore',
 	'backbone',
-	'models/data/functions/FunctionManager',
 	'models/data/Instance',
 	'models/data/functions/FunctionNode'
 
 
-], function(_, Backbone, FunctionManager, Instance, FunctionNode) {
+], function(_, Backbone, Instance, FunctionNode) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -24,7 +23,7 @@ define([
 	var compile = 1;
 	var render = 2;
 
-	var functionManager = new FunctionManager();
+	
 	var rootNode, currentNode;
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
@@ -91,7 +90,7 @@ define([
 				func: compile,
 				instance: compile
 			};
-			var functions = functionManager.functions;
+			var functions = this.functionManager.functions;
 			for (var i = 0; i < functions.length; i++) {
 				this.visit(functions[i], null, state_data);
 			}
@@ -244,12 +243,12 @@ define([
 			lists = lists.filter(function(item){
 				return selected_shapes.indexOf(item)===-1;
 			});
-			functionManager.createFunction('my_function', selected_shapes);
+			this.functionManager.createFunction('my_function', selected_shapes);
 		},
 
 		createParams: function(selected_shapes){
 			for(var i=0;i<selected_shapes.length;i++){
-				functionManager.addParamToFunction(currentNode, selected_shapes[i]);
+				this.functionManager.addParamToFunction(currentNode, selected_shapes[i]);
 			}
 		},
 
@@ -338,7 +337,7 @@ define([
 			var lastSelected = items[items.length-1];
 			switch(lastSelected.get('type')){
 				case 'function':
-					functionManager.callFunction(lastSelected);
+					this.functionManager.callFunction(lastSelected);
 				break;
 				default:
 				break;
@@ -354,7 +353,7 @@ define([
 			});
 			if (functions.length > 0) {
 				this.closeAllLists();
-				var data = functionManager.toggleOpenFunctions(currentNode,functions[functions.length - 1]);
+				var data = this.functionManager.toggleOpenFunctions(currentNode,functions[functions.length - 1]);
 				lists = data.lists;
 				currentNode = data.currentNode;
 				return data.toSelect;
@@ -371,7 +370,7 @@ define([
 				return this.toggleClosedLists(items);
 			} else {
 				this.closeAllLists();
-				var data = functionManager.toggleClosedFunctions(currentNode,rootNode);
+				var data = this.functionManager.toggleClosedFunctions(currentNode,rootNode);
 				currentNode =  data.currentNode;
 				lists = currentNode.lists;
 				return data.toSelect;

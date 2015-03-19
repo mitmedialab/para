@@ -12,7 +12,7 @@ define([
 	//datastructure to store path functions
 
 	var functioncount = 0;
-
+	var SelectTool;
 	var ParameterNode = {
 
 		setName: function(name) {
@@ -27,6 +27,26 @@ define([
 			geom.strokeColor = '#989898';
 			geom.strokeWidth = 2.5;
 			geom.visible = this.get('visible');
+		},
+
+
+		//sets the argument for this parameter
+		setArgument: function(instance) {
+			var currentArgument = this.get('f_argument');
+			if(currentArgument){
+				currentArgument.removeConstraint() ;
+			}
+			this.set('f_argument', instance);
+			var relative = instance;
+			var reference = this;
+
+			var cf = function() {
+				var v = reference.getValue();
+				relative.setValue(v);
+				return v;
+			};
+
+			instance.setConstraint(cf);
 		}
 	};
 
@@ -38,7 +58,7 @@ define([
 		initialize: function() {
 			this.rootFunctions = [];
 			this.functions = this.rootFunctions;
-			
+
 		},
 
 		createFunction: function(name, childList) {
@@ -80,16 +100,17 @@ define([
 			};
 			f.modifyProperty(data);
 			this.functions.push(f);
+			this.listenTo(f, 'request_selected', this.sendSelectedInstances);
 		},
 
 		callFunction: function(func) {
 			console.log('checking function called', func.get('called'));
 			if (!func.get('called')) {
 				func.call();
-			
+
 			} else {
 				func.uncall();
-				
+
 			}
 		},
 
@@ -146,6 +167,12 @@ define([
 			this.convert(instance);
 			func.addParameter(instance);
 		},
+
+		sendSelectedInstances: function(func) {
+			var selected = this.selectTool.get('selected_shapes')[0];
+			func.setArgument(selected);
+		}
+
 
 	});
 	return FunctionManager;

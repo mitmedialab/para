@@ -19,10 +19,10 @@ define([
 
 
 	var Instance = SceneNode.extend({
-		
 
-		defaults: {
-			
+
+		defaults: _.extend({}, SceneNode.prototype.defaults, {
+
 			//selection defaults
 			selected: false,
 			proto_selected: false,
@@ -40,12 +40,11 @@ define([
 			screen_position: null,
 			screen_width: 0,
 			screen_height: 0,
-			
+
 			/*==begin JSON export===*/
 			/*constrainable properties to export to JSON*/
 			position: null,
 			translation_delta: null,
-			absolute_position: null,
 			scaling_origin: null,
 			scaling_delta: null,
 			rotation_origin: null,
@@ -64,6 +63,18 @@ define([
 			order: 0,
 
 			/*==end JSON export===*/
+
+			//map of constrainable properties
+			constrain_map: ['position',
+				'translation_delta',
+				'scaling_origin',
+				'scaling_delta',
+				'rotation_origin',
+				'rotation_delta',
+				'stroke_color',
+				'fill_color',
+				'stroke_width',
+			],
 
 			center: null,
 			rmatrix: null,
@@ -110,7 +121,7 @@ define([
 					}
 				}
 			}
-		},
+		}),
 
 		initialize: function() {
 
@@ -179,7 +190,7 @@ define([
 
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
-			console.log('to_json:',this.toJSON());
+			console.log('to_json:', this.toJSON());
 		},
 
 
@@ -239,9 +250,9 @@ define([
 		},
 
 		/*close
-		* used mainly for closing functions
-		*/
-		close: function(){
+		 * used mainly for closing functions
+		 */
+		close: function() {
 			return this.getParentNode();
 		},
 
@@ -299,17 +310,17 @@ define([
 		},
 
 		// sets the geom visibility to false
-		hide: function(){
+		hide: function() {
 			var geom = this.get('geom');
-			if(geom){
+			if (geom) {
 				geom.visible = false;
 				geom.selected = false;
 			}
 		},
 
-		show: function(){
+		show: function() {
 			var geom = this.get('geom');
-			if(geom){
+			if (geom) {
 				geom.visible = true;
 			}
 		},
@@ -460,7 +471,7 @@ define([
 							}
 						}
 						this.set(p, property);
-						this.trigger('change:'+p);
+						this.trigger('change:' + p);
 					}
 				}
 			}
@@ -498,6 +509,7 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
+
 			var property = this.inheritProperty(property_name);
 			if (property) {
 				return property.getValue();
@@ -505,6 +517,69 @@ define([
 				return null;
 			}
 
+
+		},
+
+
+		/* isConstrained
+		 * returns object with booleans for each property based on constraint status
+		 */
+		isConstrained: function() {
+			var constrainMap = this.get('constrainMap');
+			var data = {};
+			data.self = this.isSelfConstrained();
+			for (var i = 0; i < constrainMap.length; i++) {
+				data[constrainMap[i]] = this.get(constrainMap[i]).isConstrained();
+			}
+			return data;
+		},
+
+		/* getConstraint
+		 * returns true if constraint exists
+		 * false if not
+		 */
+		getConstraint: function() {
+			var constrainMap = this.get('constrain_map');
+			var data = {};
+			data.self = this.getSelfConstraint();
+			for (var i = 0; i < constrainMap.length; i++) {
+				data[constrainMap[i]] = this.get(constrainMap[i]).getConstraint();
+			}
+			return data;
+		},
+
+
+		setValue: function(data) {
+			for (var prop in data) {
+				if (data.hasOwnProperty(prop)) {
+					this.get(prop).modifyProperty(data[prop]);
+				}
+			}
+		},
+
+		getValue: function() {
+			console.log('getting value for',this.get('type'),this.get('name'));
+			var constrainMap = this.get('constrain_map');
+			var data = {};
+			if (!this.isSelfConstrained()) {
+				for (var i = 0; i < constrainMap.length; i++) {
+					var prop = this.inheritProperty(constrainMap[i]);
+					var c = prop.getConstraint();
+					if (c.self) {
+						data[constrainMap[i]] = c.self.getValue();
+					} else {
+						for (var p in c) {
+							if (p !== 'self' && c[p]) {
+								data[constrainMap[i]][p] = c[p];
+							}
+						}
+					}
+
+				}
+			} else {
+				return this.getSelfConstraint.getValue();
+
+			}
 		},
 
 
@@ -616,6 +691,7 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
+			this.getValue();
 			this.compileTransforms();
 		},
 
@@ -764,40 +840,40 @@ define([
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 
-		
-				var rmatrix = this.get('rmatrix');
-				var smatrix = this.get('smatrix');
-				var tmatrix = this.get('tmatrix');
 
-				var path_altered = this.get('path_altered').getValue();
-				if (!path_altered && geom) {
-					geom.transform(this.get('ti_matrix'));
-					geom.transform(this.get('ri_matrix'));
-					geom.transform(this.get('si_matrix'));
-					geom.selected = false;
-				} else {
-					if (!geom) {
-						geom = new paper.Path();
-					}
-					geom.importJSON(this.accessProperty('master_path'));
+			var rmatrix = this.get('rmatrix');
+			var smatrix = this.get('smatrix');
+			var tmatrix = this.get('tmatrix');
+
+			var path_altered = this.get('path_altered').getValue();
+			if (!path_altered && geom) {
+				geom.transform(this.get('ti_matrix'));
+				geom.transform(this.get('ri_matrix'));
+				geom.transform(this.get('si_matrix'));
+				geom.selected = false;
+			} else {
+				if (!geom) {
+					geom = new paper.Path();
 				}
-				geom.data.instance = this;
+				geom.importJSON(this.accessProperty('master_path'));
+			}
+			geom.data.instance = this;
 
 
-				var position = this.get('position').toPaperPoint();
-				geom.position = position;
-				geom.transform(smatrix);
-				geom.transform(rmatrix);
-				geom.transform(tmatrix);
+			var position = this.get('position').toPaperPoint();
+			geom.position = position;
+			geom.transform(smatrix);
+			geom.transform(rmatrix);
+			geom.transform(tmatrix);
 
-				this.updateScreenBounds(geom);
-				this.set('geom', geom);
-				var p_altered = this.get('path_altered');
-				p_altered.setValue(false);
-				this.set('path_altered', p_altered);
-				geom.visible = visible;
-				return geom;
-			
+			this.updateScreenBounds(geom);
+			this.set('geom', geom);
+			var p_altered = this.get('path_altered');
+			p_altered.setValue(false);
+			this.set('path_altered', p_altered);
+			geom.visible = visible;
+			return geom;
+
 		},
 
 

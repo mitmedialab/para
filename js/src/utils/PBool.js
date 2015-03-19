@@ -6,12 +6,12 @@
 
 define([
 		'utils/PProperty',
-		'utils/PConstraint'
+		'utils/PFloat'
 	],
 
-	function(PProperty, PConstraint) {
+	function(PProperty, PFloat) {
 
-		var PBool = PConstraint.extend({
+		var PBool = PFloat.extend({
 
 			/* constructor
 			* val: initial value of the float
@@ -25,7 +25,7 @@ define([
 				else if(val===false){
 					this.val = new PProperty(0);
 				}
-				PConstraint.apply(this, arguments);
+				PFloat.apply(this, arguments);
 				if (operator) {
 					this.set('operator', operator);
 				}
@@ -51,11 +51,11 @@ define([
 			*/
 			getValue: function() {
 				var v;
-				if(!this.isConstrained()){
+				if(!this.isSelfConstrained()){
 					v= this.val.getValue();
 				}
 				else{
-					v =this.getConstraint().getValue();
+					v =this.getSelfConstraint().getValue();
 				}
 				if(v===1){
 				return true;

@@ -31,32 +31,59 @@ define([
 				this.setNull(false);
 			},
 
+			/* isConstrained
+			* returns object with booleans for each property based on constraint status
+			*/
+			isConstrained: function() {
+				var data = {};
+				data.self = this.isSelfConstrained();
+				data.x = this.x.isConstrained().self;
+				data.y = this.y.isConstrained().self;
+				return data;
+			},
+
+			/* getConstraint
+			* returns true if constraint exists
+			* false if not
+			*/
+			getConstraint: function() {
+				var data = {};
+				data.self = this.getSelfConstraint();
+				data.x = this.x.getConstraint().self;
+				data.y = this.y.getConstraint().self;
+				return data;
+			},
+
 			/* setValue
 			 * accepts an object with x,y properties as an argument
 			 */
 			setValue: function(point) {
-				this.setX(point.x);
-				this.setY(point.y);
+				if(point.x){
+					this.setX(point.x);
+				}
+				if(point.y){
+					this.setY(point.y);
+				}
 			},
 
 			/* getValue
 			 * returns an object with current x and y values as properties
 			 */
 			getValue: function() {
-				if (!this.isConstrained()) {
+				if (!this.isSelfConstrained()) {
 					return {
 						x: this.getX(),
 						y: this.getY(),
 					};
 				} else {
-					return this.getConstraint().getValue();
+					return this.getSelfConstraint().getValue();
 				}
 			},
 
 			/*get and set funcitons for x and y*/
 			getX: function() {
-				if (this.isConstrained()) {
-					return this.getConstraint().getValue().x;
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().x;
 				} else {
 					return this.x.getValue();
 				}
@@ -64,8 +91,8 @@ define([
 			},
 
 			getY: function() {
-				if (this.isConstrained()) {
-					return this.getConstraint().getValue().y;
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().y;
 				} else {
 					return this.y.getValue();
 				}

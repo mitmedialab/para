@@ -87,6 +87,7 @@ define([
 
       //bind paper tool events
       tool = new paper.Tool();
+      tool.name = 'canvas_tool';
       tool.activate();
       tool.parent = this;
       tool.attach('mousedown', this.toolMouseDown);
@@ -154,6 +155,7 @@ define([
     },
 
     toolMouseUp: function(event) {
+      console.log('tool mouse up');
       this.parent.model.toolMouseUp(event, pan);
     },
 
@@ -266,6 +268,7 @@ define([
     },
 
     canvasMouseUp: function(event) {
+
       if (sub.down) {}
       main.down = false;
       sub.down = false;

@@ -160,6 +160,12 @@ define([
       }
     },
 
+
+    //placeholder to prevent error
+    getValue:function(){ 
+    
+    },
+
     renderGeomo: function() {
       var geom = this.get('geom');
 

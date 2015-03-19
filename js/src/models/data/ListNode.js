@@ -267,16 +267,16 @@ define([
         var matrix_props = matrixMap[propname].properties;
         var m_tmatrix = member.get(matrixMap[propname].name);
         var l_matrix = i_matricies[matrixMap[propname].name];
-        var dC = delta.isConstrained();
-        var mC = mtd.isConstrained();
+        var dC = delta.isSelfConstrained();
+        var mC = mtd.isSelfConstrained();
         for (var p in matrix_props) {
           if (delta.hasOwnProperty(p)) {
             console.log('p=', p);
             var pC = false;
             var mPC = false;
             if(delta[p] instanceof PConstraint){
-             pC = delta[p].isConstrained();
-            mPC = mtd[p].isConstrained();
+             pC = delta[p].isSelfConstrained();
+            mPC = mtd[p].isSelfConstrained();
             }
             for (var i = 0; i < matrix_props[p].length; i++) {
               if ((pC || dC) && !mPC && !mC) {

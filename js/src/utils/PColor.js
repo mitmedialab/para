@@ -40,11 +40,37 @@ define([
 				this.setNull(false);
 			},
 
+			/* isConstrained
+			 * returns object with booleans for each property based on constraint status
+			 */
+			isConstrained: function() {
+				var data = {};
+				data.self = this.isSelfConstrained();
+				data.r = this.r.isConstrained().self;
+				data.g = this.g.isConstrained().self;
+				data.b = this.r.isConstrained().self;
+				data.a = this.g.isConstrained().self;
+				return data;
+			},
+
+			/* getConstraint
+			 * returns object containing all constraints
+			 */
+			getConstraint: function() {
+				var data = {};
+				data.self = this.getSelfConstraint();
+				data.r = this.r.getConstraint().self;
+				data.g = this.g.getConstraint().self;
+				data.b = this.r.getConstraint().self;
+				data.a = this.g.getConstraint().self;
+				return data;
+			},
+
+
 			/* setValue
 			 * sets rgb values
 			 */
 			setValue: function(r, g, b, a) {
-
 				this.setR(r);
 				this.setG(g);
 				this.setB(b);
@@ -57,7 +83,7 @@ define([
 			 * returns an object with current rgba values as properties
 			 */
 			getValue: function() {
-				if (!this.isConstrained()) {
+				if (!this.isSelfConstrained()) {
 					return {
 						r: this.getR(),
 						g: this.getG(),
@@ -65,38 +91,38 @@ define([
 						a: this.getA()
 					};
 				} else {
-					return this.getConstraint().getValue();
+					return this.getSelfConstraint().getValue();
 				}
 			},
 
 			/*get and set funcitons for rgba*/
 			getR: function() {
-				if (this.isConstrained()) {
-					return this.getConstraint().getValue().r;
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().r;
 				} else {
 					return this.r.getValue();
 				}
 			},
 
 			getG: function() {
-				if (this.isConstrained()) {
-					return this.getConstraint().getValue().g;
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().g;
 				} else {
 					return this.g.getValue();
 				}
 			},
 
 			getB: function() {
-				if (this.isConstrained()) {
-					return this.getConstraint().getValue().b;
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().b;
 				} else {
 					return this.b.getValue();
 				}
 			},
 
 			getA: function() {
-				if (this.isConstrained()) {
-					return this.getConstraint().getValue().a;
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().a;
 				} else {
 					return this.a.getValue();
 				}
@@ -135,7 +161,7 @@ define([
 			 * values of this object
 			 */
 			toPaperColor: function() {
-				
+
 				return new paper.Color(this.getR(), this.getG(), this.getB(), this.getA());
 			},
 
@@ -153,7 +179,7 @@ define([
 				PConstraint.prototype.modifyProperty.call(this, data);
 			},
 
-			toJSON: function(){
+			toJSON: function() {
 				var data = this.getValue();
 				data.type = 'PColor';
 				return data;

@@ -19,9 +19,6 @@
 
 			},
 
-			initialize: function(arg) {
-
-			},
 
 			/* setNull
 			*  sets property default isNull to true
@@ -44,7 +41,7 @@
 			* expects paramter to be a function
 			*/
 			setConstraint: function(func){
-				if (!this.isConstrained()) {
+				if (!this.isSelfConstrained()) {
 					this.constraint = new PProperty(func);
 				}
 				else{
@@ -53,38 +50,39 @@
 				//this.trigger('constraint_set');
 			},
 
-			/*getConstraint
-			* returns the constraint of this property
-			* if it exists.
-			*/
-			getConstraint: function() {
-				if (this.constraint) {
-					return this.constraint;
-
-				} 
-			},
+			
 
 			/* removeConstraint
 			* removes the constraint of this property
 			*/
 			removeConstraint: function(axis) {
-				if (this.isConstrained()) {
+				if (this.isSelfConstrained()) {
 						this.constraint.setValue(null);
 						delete this.constraint;
 					}
 				
 			},
 
-			/* isConstrained
-			* returns true if constraint exists
+			/* isSelfConstrained
+			* checks for constraint applied to this object returns true if constraint exists
 			* false if not
 			*/
-			isConstrained: function() {
+			isSelfConstrained: function() {
 				if (this.constraint) {
 					return true;
 				} else {
 					return false;
 				}
+			},
+
+			/*getSelfConstraint
+			* checks for constraint applied to this object returns the constraint of this object 
+			* if it exists.
+			*/
+			getSelfConstraint: function() {
+				if (this.constraint) {
+					return this.constraint;
+				} 
 			},
 
 			/* modify
