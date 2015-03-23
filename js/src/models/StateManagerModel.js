@@ -300,13 +300,15 @@ define(['jquery',
     applySampleToInstance: function() {
       console.log('applying sample');
       var selectedShapes = selectTool.get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
+      for (var i = selectedShapes.length-1; i >=0 ; i--) {
         var instance = selectedShapes[i];
         var sampler = new PathSampler();
         sampler.addMember(instance);
         visitor.addList(sampler);
-
         sampler.setRange(0, 5, true);
+        selectTool.removeSelectedShape(instance);
+      selectTool.addSelectedShape(sampler);
+
       }
       this.compile();
     },

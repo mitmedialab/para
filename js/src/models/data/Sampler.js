@@ -135,33 +135,17 @@ define([
       },
 
       setValue: function(value) {
-        this.modifyProperty({
-          value: {
-            val: value,
-            operator: 'set'
-          }
-        });
+       var v = this.get('value');
+        v.setValue(value);
       },
-
 
       setMultiplier: function(value) {
-        this.modifyProperty({
-          multiplier: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('multiplier').setValue(value);
       },
 
-
-
       setIndex: function(value) {
-        this.modifyProperty({
-          index: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('index').setValue(value);
+      
       },
 
       getIndex: function() {
@@ -170,21 +154,11 @@ define([
 
 
       setStart: function(value) {
-        this.modifyProperty({
-          start_index: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('start_index').setValue(value);
       },
 
       setEnd: function(value) {
-        this.modifyProperty({
-          end_index: {
-            val: value,
-            operator: 'set'
-          }
-        });
+       this.get('end_index').setValue(value);
       },
 
       //places a constraint on the end and start values
@@ -235,31 +209,16 @@ define([
       },
 
       setMax: function(value) {
-        this.modifyProperty({
-          max: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('max').setValue(value);
 
       },
 
       setMin: function(value) {
-        this.modifyProperty({
-          min: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('min').setValue(value);
       },
 
       setLoop: function(value) {
-        this.modifyProperty({
-          loop: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('loop').setValue(value);
       },
 
       increment: function() {

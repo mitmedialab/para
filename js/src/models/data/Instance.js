@@ -456,7 +456,6 @@ define([
 				}
 			}
 			var constrained_props = this.getValue();
-
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
@@ -616,8 +615,8 @@ define([
 
 				}
 				return data;
-
 			}
+
 		},
 
 
