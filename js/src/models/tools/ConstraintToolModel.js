@@ -204,6 +204,7 @@ define([
           break;
         case 'relatives':
           this.set('mode', 'rel_prop');
+          //error here: draws a wheel even if no instances are selected
           var rel_wheel = PaperUIHelper.createConstraintWheel( this.get('relatives'), 'rel-wheel' )[0];
           PaperUIHelper.addConstraintWheelHandlers( this, rel_wheel );
           console.log('[INFO] Advanced constraint tool mode to rel_prop');

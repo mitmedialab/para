@@ -455,6 +455,8 @@ define([
 
 				}
 			}
+			var constrained_props = this.getValue();
+
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
@@ -462,6 +464,7 @@ define([
 
 						var property = this.get(p);
 						property.setNull(false);
+
 						property.modifyProperty(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
@@ -469,6 +472,11 @@ define([
 								property.setValue(TrigFunc.wrap(property.getValue(), 0, 360));
 							}
 						}
+						if (_.has(constrained_props, p)) {
+							var d = TrigFunc.merge(property.getValue(), constrained_props[p]);
+							property.setValue(d);
+						}
+
 						this.set(p, property);
 						this.trigger('change:' + p);
 					}
@@ -508,7 +516,7 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
-			if(this.isSelfConstrained()){
+			if (this.isSelfConstrained()) {
 				this.getValue();
 			}
 			var property = this.inheritProperty(property_name);
@@ -549,31 +557,38 @@ define([
 			return data;
 		},
 
-
+		/*setValue
+		* modifies the properties of this instance in accordance with the 
+		* data passed in
+		* note- in future should unifiy this with the modify property function?
+		*/
 		setValue: function(data) {
-			console.log('calling set value for',this.get('id'),data);
 			for (var prop in data) {
 
 				if (data.hasOwnProperty(prop)) {
 					var p = data[prop];
-					if(typeof data[prop]!=='object'){
-						p = {val:data[prop]};
+					if (typeof data[prop] !== 'object') {
+						p = {
+							val: data[prop]
+						};
 					}
-					p.operator ='set';
-					console.log('set value_data',prop,p);
+					p.operator = 'set';
 					this.get(prop).modifyProperty(p);
 				}
 			}
 		},
 
+
+		/* getValue
+		* returns an object containing all constrained properties of
+		* this instance
+		*/
 		getValue: function() {
-			//console.log('getting value for',this.get('type'),this.get('name'));
 			var constrainMap = this.get('constrain_map');
 			var data = {};
-			var isSelfConstrained =this.isSelfConstrained();
-			var constraintCalled =  false;
-			if(this.reference){
-				console.log('reference found');
+			var isSelfConstrained = this.isSelfConstrained();
+			var constraintCalled = false;
+			if (this.reference) {
 				constraintCalled = this.reference.get('called');
 			}
 			if (isSelfConstrained && constraintCalled) {
@@ -581,25 +596,27 @@ define([
 			} else {
 				for (var i = 0; i < constrainMap.length; i++) {
 					var prop = this.inheritProperty(constrainMap[i]);
-					var c = prop.getConstraint();
-					if (c.self) {
-						data[constrainMap[i]] = c.self.getValue();
-					} else {
-						for (var p in c) {
-							if (p !== 'self' && c[p]) {
-								data[constrainMap[i]] = {};
-								//console.log('p',p,constrainMap[i],data[constrainMap[i]],c,c[p]);
-								data[constrainMap[i]][p] = c[p].getValue();
+					if (prop) {
+						var c = prop.getConstraint();
+						if (c.self) {
+							data[constrainMap[i]] = c.self.getValue();
+						} else {
+							data[constrainMap[i]] = {};
+							for (var p in c) {
+								if (p !== 'self' && c[p]) {
+									console.log('p', p, constrainMap[i], data[constrainMap[i]], c, c[p]);
+									data[constrainMap[i]][p] = c[p].getValue();
+								}
+							}
+							if (_.isEmpty(data[constrainMap[i]])) {
+								delete(data[constrainMap[i]]);
 							}
 						}
 					}
 
 				}
-				console.log('getting value',data);
 				return data;
-				//console.log('instance is constrained',this.get('id'));
-				//console.log('constraint =',this.getSelfConstraint());
-				//console.log('constraint value =',this.getSelfConstraint().getValue());
+
 			}
 		},
 
@@ -712,7 +729,6 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
-			this.getValue();
 			this.compileTransforms();
 		},
 

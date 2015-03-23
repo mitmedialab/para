@@ -155,7 +155,6 @@ define([
     },
 
     toolMouseUp: function(event) {
-      console.log('tool mouse up');
       this.parent.model.toolMouseUp(event, pan);
     },
 

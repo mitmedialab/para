@@ -115,11 +115,18 @@ define([
 		},
 
 		showLayers: function() {
+			if(this.model.get('name')!=='root'){
 			var visibility = this.model.get('showLayers');
 
 			this.$el.css({
 				visibility: visibility
 			});
+			}
+			else{
+				this.$el.css({
+				visibility: 'hidden'
+			});
+			}
 		}
 
 

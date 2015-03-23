@@ -24,7 +24,6 @@ define([
 		},
 
 		renderStyle: function(geom) {
-			console.log('rendering style of param');
 			geom.fillColor = 'black';
 			geom.fillColor.alpha = 0.25;
 			geom.dashArray = [6, 8];
@@ -45,13 +44,11 @@ define([
 			var reference = this;
 			var cf = function() {
 				var v = reference.getValue();
-				console.log('instance constraint value',v);
+				console.log('reference constraint value',v);
 				relative.setValue(v);
 				return v;
 			};
-			console.log('cf',cf);
 			instance.setConstraint(cf,reference);
-			console.log('cf_cjs',instance.getSelfConstraint().getValue());
 		}
 	};
 
@@ -169,8 +166,10 @@ define([
 		},
 
 		addParamToFunction: function(func, instance) {
-			this.convert(instance);
-			func.addParameter(instance);
+			if(func.get('name')!=='root'){
+				this.convert(instance);
+				func.addParameter(instance);
+			}
 		},
 
 		sendSelectedInstances: function(func) {
