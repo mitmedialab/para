@@ -45,9 +45,9 @@ define([
 		 */
 		resetPrototypes: function() {
 
-			for (var i = 0; i < renderQueue.length; i++) {
-				renderQueue[i].reset();
-			}
+			//for (var i = 0; i < renderQueue.length; i++) {
+				//renderQueue[i].reset();
+			//}
 			renderQueue = [];
 		},
 
@@ -186,6 +186,7 @@ define([
 					node.children[k].visit(this, 'visit', node, state_data);
 				}
 			} else if (state === compile) {
+				node.reset();
 				node.compile();
 				renderQueue.push(node);
 				for (var i = 0; i < node.members.length; i++) {
@@ -205,6 +206,7 @@ define([
 			var state = state_data.func;
 			switch (state) {
 				case compile:
+					node.reset();
 					node.compile();
 					renderQueue.push(node);
 					if (node.get('open') || node.get('called')) {
@@ -225,6 +227,7 @@ define([
 
 			switch (state) {
 				case compile:
+					node.reset();
 					node.compile();
 					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {

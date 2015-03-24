@@ -68,9 +68,7 @@ define([
       data.width = new PFloat(path.bounds.width);
       data.height = new PFloat(path.bounds.height);
 
-      path.visible = false;
-      path.selected = false;
-      path.data.nodetype = this.get('name');
+
       var points = this.get('points');
       if (path.segments) {
         var segments = path.segments;
@@ -82,14 +80,13 @@ define([
 
         }
       }
-      var pathJSON = path.exportJSON({
-        asString: true
-      });
-      this.set('master_path', new PFloat(pathJSON));
 
-      // WARNING: Memory leak??
-      path.remove(); 
-      path = null;
+      path.visible = false;
+      path.selected = false;
+      path.data.nodetype = this.get('name');
+      path.data.instance = this;
+      this.set('geom', path);
+
 
       for (var property in data) {
         if (data.hasOwnProperty(property)) {
@@ -101,7 +98,6 @@ define([
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
       this.setPathAltered();
-
 
       return data;
     },
@@ -127,9 +123,9 @@ define([
       }
     },
 
-    deselectSegments: function(){
-         var points = this.get('points');
-      for (var i = 0; i < points.length; i++) {    
+    deselectSegments: function() {
+      var points = this.get('points');
+      for (var i = 0; i < points.length; i++) {
         points[i].set('selected', false);
       }
     },
@@ -144,51 +140,96 @@ define([
       }
 
       var points = this.get('points');
-      var delta = new paper.Segment(new paper.Point(data.translation_delta.x,data.translation_delta.y),null,null);
+      var delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
       delta.transform(this.get('ri_matrix'));
       delta.transform(this.get('si_matrix'));
       var geom = this.get('geom');
-      var masterPath = JSON.parse(this.get('master_path').getValue());
       var selectedPoints = points.filter(function(point) {
         return point.get('selected');
       });
       //maintains constraints on points
+      var indicies = [];
       for (var i = 0; i < selectedPoints.length; i++) {
         var selectedPoint = selectedPoints[i];
 
         var geomS = geom.segments[selectedPoint.get('index')];
+        indicies.push({
+          index: selectedPoint.get('index'),
+          type: selectedPoint.get('selected')
+        });
         switch (selectedPoint.get('selected')) {
           case 'segment':
           case 'curve':
             var p = selectedPoint.get('position');
             p.add(delta.point);
+            geomS.point.x += data.translation_delta.x;
+            geomS.point.y += data.translation_delta.y;
+
             break;
           case 'handle-in':
             var hi = selectedPoint.get('handle_in');
             hi.add(delta.point);
+            geomS.handleIn.x += data.translation_delta.x;
+            geomS.handleIn.y += data.translation_delta.y;
             break;
 
           case 'handle-out':
             var ho = selectedPoint.get('handle_out');
             ho.add(delta.point);
+            geomS.handleOut.x += data.translation_delta.x;
+            geomS.handleOut.y += data.translation_delta.y;
             break;
         }
-        delta.remove();
-        var pos = selectedPoint.get('position').getValue();
-        var handleIn =  selectedPoint.get('handle_in').getValue();
-        var handleOut = selectedPoint.get('handle_out').getValue();
-        masterPath[1].segments[selectedPoint.get('index')] = [[pos.x,pos.y],[handleIn.x,handleIn.y],[handleOut.x,handleOut.y]];
 
       }
-      var master = this.get('master_path');
-      master.setValue(JSON.stringify(masterPath));
-      this.set('master_path',master);
-      this.setPathAltered();
+      var inheritors = this.get('inheritors');
+      for (var j = 0; j < inheritors.length; j++) {
+        inheritors[j].modifyPointsByIndex(delta.point, indicies);
+      }
     },
 
+     /* modifyPointsByIndex
+     * called by prototpye to update inheritor points
+     * note: does not actually correspond to prototypal inheritance
+     * model since that would require repeatedly cloning paperjs objects
+     * which would be too memory intensive. Instead just applies transformations
+     * on the prototype's geometry to those of the inheritor
+     */
+    modifyPointsByIndex: function(point, indicies) {
+      var geom = this.get('geom');
+      geom.transform(this.get('ti_matrix'));
+      geom.transform(this.get('ri_matrix'));
+      geom.transform(this.get('si_matrix'));
+      for (var i = 0; i < indicies.length; i++) {
+        var geomS = geom.segments[indicies[i].index];
+        switch (indicies[i].type) {
+          case 'segment':
+          case 'curve':
+            geomS.point.x += point.x;
+            geomS.point.y += point.y;
+
+            break;
+          case 'handle-in':
+            geomS.handleIn.x += point.x;
+            geomS.handleIn.y += point.y;
+            break;
+
+          case 'handle-out':
+            geomS.handleOut.x += point.x;
+            geomS.handleOut.y += point.y;
+            break;
+        }
+      }
+      this.setPathAltered();
+      var inheritors = this.get('inheritors');
+      for (var j = 0; j < inheritors.length; j++) {
+        inheritors[j].modifyPointsByIndex(point, indicies);
+      }
+    },
+
+
     renderSelection: function(geom) {
-      //var selected = this.get('selected');
-      //if (!selected) {
+
       var points = this.get('points');
       for (var i = 0; i < points.length; i++) {
         var selectedPoint = points[i];
@@ -202,7 +243,6 @@ define([
             break;
         }
       }
-      //}
 
       Instance.prototype.renderSelection.call(this, geom);
 

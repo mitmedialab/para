@@ -55,7 +55,8 @@ define([
             userParams[1].val = data.value;
           }
           this.set('userParams',userParams);
-
+          this.get('geom').remove();
+          this.set('geom',null);
           var new_master;
           if(this.get('name')==='rectangle'){
             new_master = new paper.Path.Rectangle(new paper.Point(0,0), userParams[0].val, userParams[1].val);
@@ -64,9 +65,9 @@ define([
            new_master =new paper.Path.Ellipse(new paper.Point(0,0), userParams[0].val, userParams[1].val);
           }
           new_master.visible = false;
-          this.set('master_path',new_master.exportJSON());
-          new_master.remove();
-      }
+          this.set('geom',new_master);
+        }
+          
     }
 
   });

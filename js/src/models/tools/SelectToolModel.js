@@ -200,7 +200,7 @@ define([
           this.deselectAll();
         }
       }
-      
+
       var hitResult = paper.project.hitTest(event.point, dHitOptions);
       console.log(hitResult);
       if (hitResult) {
@@ -220,8 +220,6 @@ define([
         this.trigger('geometryDSelected', path, segments, event.modifiers.command);
 
       }
-
-
 
     },
 

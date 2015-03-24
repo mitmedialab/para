@@ -49,7 +49,9 @@ define([
           var radius = this.get('width')/2;
           var new_master =new paper.Path.RegularPolygon(new paper.Point(0,0), data.value, radius);
           new_master.visible = false;
-          this.set('master_path',new_master.exportJSON());
+          this.get('geom').remove();
+          this.set('geom',null);
+          this.set('geom',new_master);
           new_master.remove();
       }
     }

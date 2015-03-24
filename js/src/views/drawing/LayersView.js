@@ -33,7 +33,7 @@ define([
 			this.listenTo(this.model, "change:showLayers", this.showLayers);
 			this.listenTo(this.model, "change:translation_delta", this.setPosition);
 			this.listenTo(this.model, 'change:f_parameters', this.updateParameters);
-
+			
 			//this.tool = new paper.Tool();
 			//this.tool.parent = this;
 			//this.tool.name = 'layer_tool';

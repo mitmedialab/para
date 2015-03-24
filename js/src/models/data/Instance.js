@@ -52,7 +52,6 @@ define([
 			stroke_color: null,
 			fill_color: null,
 			stroke_width: null,
-			master_path: null,
 			path_altered: null,
 
 			/*basic datatypes to export to JSON*/
@@ -166,9 +165,6 @@ define([
 			stroke_width.setNull(true);
 			this.set('stroke_width', stroke_width);
 
-			var master_path = new PFloat(0);
-			master_path.setNull(true);
-			this.set('master_path', master_path);
 
 			this.set('tmatrix', new paper.Matrix());
 			this.set('smatrix', new paper.Matrix());
@@ -274,8 +270,17 @@ define([
 			instance.set('rotation_origin', position.clone());
 			instance.set('scaling_origin', position.clone());
 			instance.set('translation_delta', this.get('translation_delta').clone());
+			var g_clone = this.get('geom').clone();
+		   	g_clone.transform(this.get('ti_matrix'));
+			g_clone.transform(this.get('ri_matrix'));
+			g_clone.transform(this.get('si_matrix'));
+			g_clone.data.instance = instance;
+			g_clone.data.nodetype = instance.get('name');
+			instance.set('geom',g_clone);
 			return instance;
 		},
+
+
 
 		reset: function() {
 			this.set('rendered', false);
@@ -614,7 +619,7 @@ define([
 					}
 
 				}
-				return data;
+		return data;
 			}
 
 		},
@@ -876,25 +881,17 @@ define([
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 
-
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');
 
 			var path_altered = this.get('path_altered').getValue();
-			if (!path_altered && geom) {
+			if (!path_altered) {
 				geom.transform(this.get('ti_matrix'));
 				geom.transform(this.get('ri_matrix'));
 				geom.transform(this.get('si_matrix'));
 				geom.selected = false;
-			} else {
-				if (!geom) {
-					geom = new paper.Path();
-				}
-				geom.importJSON(this.accessProperty('master_path'));
-			}
-			geom.data.instance = this;
-
+			} 
 
 			var position = this.get('position').toPaperPoint();
 			geom.position = position;
@@ -903,13 +900,11 @@ define([
 			geom.transform(tmatrix);
 
 			this.updateScreenBounds(geom);
-			this.set('geom', geom);
 			var p_altered = this.get('path_altered');
 			p_altered.setValue(false);
 			this.set('path_altered', p_altered);
 			geom.visible = visible;
 			return geom;
-
 		},
 
 
