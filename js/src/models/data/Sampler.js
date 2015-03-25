@@ -94,22 +94,6 @@ define([
         }
       },
 
-      //returns all non-list members
-      getInstanceMembers: function(memberList) {
-        if (!memberList) {
-          memberList = [];
-        }
-        for (var i = 0; i < this.members; i++) {
-          if (this.members[i].get('type') !== 'list' || 'sampler') {
-            memberList.push(this.members[i]);
-          } else {
-            this.members[i].getInstanceMembers(memberList);
-          }
-
-        }
-        return memberList;
-      },
-
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
         var start = this.accessProperty('start_index');
@@ -249,14 +233,6 @@ define([
       getStartIndex: function() {
         return this.accessProperty('start_index');
       },
-
-
-      compile: function() {
-
-
-
-      },
-
 
       render: function() {
         ListNode.prototype.render.call(this, arguments);

@@ -309,10 +309,6 @@ define([
 			rmatrix.reset();
 			smatrix.reset();
 			tmatrix.reset();
-
-			this.set('rmatrix', rmatrix);
-			this.set('smatrix', smatrix);
-			this.set('tmatrix', tmatrix);
 		},
 
 		//triggered on change of select property, removes bbox
@@ -337,6 +333,13 @@ define([
 			var geom = this.get('geom');
 			if (geom) {
 				geom.visible = true;
+			}
+		},
+
+		bringToFront: function(){
+			var geom = this.get('geom');
+			if (geom) {
+				geom.bringToFront();
 			}
 		},
 

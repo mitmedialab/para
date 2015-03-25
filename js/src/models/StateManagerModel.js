@@ -555,7 +555,6 @@ define(['jquery',
      * updates the color/ fill/ stroke weight of selected shapes
      */
     styleModified: function(style_data) {
-      console.log('style_data', style_data);
       var selectedShapes = selectTool.get('selected_shapes');
 
       for (var i = 0; i < selectedShapes.length; i++) {

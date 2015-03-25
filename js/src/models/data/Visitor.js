@@ -22,8 +22,9 @@ define([
 	var store = 0;
 	var compile = 1;
 	var render = 2;
+	var visit = 3;
 
-	
+
 	var rootNode, currentNode;
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
@@ -46,7 +47,7 @@ define([
 		resetPrototypes: function() {
 
 			//for (var i = 0; i < renderQueue.length; i++) {
-				//renderQueue[i].reset();
+			//renderQueue[i].reset();
 			//}
 			renderQueue = [];
 		},
@@ -97,15 +98,15 @@ define([
 		},
 
 		compileInstances: function() {
-		
-				var state_data = {
-					list: store,
-					instance: compile,
-					func: compile,
-				};
 
-				this.visit(currentNode, null, state_data);
-			
+			var state_data = {
+				list: store,
+				instance: compile,
+				func: compile,
+			};
+
+			this.visit(currentNode, null, state_data);
+
 		},
 
 		render: function(root) {
@@ -189,14 +190,27 @@ define([
 				node.reset();
 				node.compile();
 				renderQueue.push(node);
+				var s_d = {
+					list: visit
+				};
 				for (var i = 0; i < node.members.length; i++) {
 					member = node.members[i];
-					if (member.get('type') === 'list') {
+					if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+						member.visit(this, 'visit', node, s_d);
+					}
+				}
+			} else if (state == visit) {
+				renderQueue.push(node);
+				for (var j = 0; j < node.members.length; j++) {
+					member = node.members[j];
+					if (member.get('type') === 'list' || member.get('type') === 'sampler') {
 						member.visit(this, 'visit', node, state_data);
 					}
 				}
-				return;
 			}
+
+			return;
+
 		},
 
 		/* visitFunction
@@ -243,14 +257,15 @@ define([
 		//=======function managment methods==========//
 		//need to put something in here where you can't have an item in a function that is also in an opened list?
 		addFunction: function(selected_shapes) {
-			lists = lists.filter(function(item){
-				return selected_shapes.indexOf(item)===-1;
+			lists = lists.filter(function(item) {
+				console.log('removing list from current list tracker');
+				return selected_shapes.indexOf(item) === -1;
 			});
 			this.functionManager.createFunction('my_function', selected_shapes);
 		},
 
-		createParams: function(selected_shapes){
-			for(var i=0;i<selected_shapes.length;i++){
+		createParams: function(selected_shapes) {
+			for (var i = 0; i < selected_shapes.length; i++) {
 				this.functionManager.addParamToFunction(currentNode, selected_shapes[i]);
 			}
 		},
@@ -321,6 +336,7 @@ define([
 			var itemFound = false;
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
+
 				if (item) {
 					sInstances.push(item);
 					itemFound = true;
@@ -334,16 +350,16 @@ define([
 		},
 
 		/* toggleItems
-		* toggles item funcitonality according to item type
-		*/
-		toggleItems: function(items){
-			var lastSelected = items[items.length-1];
-			switch(lastSelected.get('type')){
+		 * toggles item funcitonality according to item type
+		 */
+		toggleItems: function(items) {
+			var lastSelected = items[items.length - 1];
+			switch (lastSelected.get('type')) {
 				case 'function':
 					this.functionManager.callFunction(lastSelected);
-				break;
+					break;
 				default:
-				break;
+					break;
 			}
 		},
 
@@ -356,7 +372,7 @@ define([
 			});
 			if (functions.length > 0) {
 				this.closeAllLists();
-				var data = this.functionManager.toggleOpenFunctions(currentNode,functions[functions.length - 1]);
+				var data = this.functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
 				lists = data.lists;
 				currentNode = data.currentNode;
 				return data.toSelect;
@@ -373,17 +389,18 @@ define([
 				return this.toggleClosedLists(items);
 			} else {
 				this.closeAllLists();
-				var data = this.functionManager.toggleClosedFunctions(currentNode,rootNode);
-				currentNode =  data.currentNode;
+				var data = this.functionManager.toggleClosedFunctions(currentNode, rootNode);
+				currentNode = data.currentNode;
 				lists = currentNode.lists;
 				return data.toSelect;
 			}
-		},	
+		},
 
 		/* toggleClosedLists
 		 * closes selected open lists
 		 */
 		toggleClosedLists: function(items) {
+			console.log('toggle closed list')
 			var toggledLists = [];
 			var returnedLists = [];
 			for (var j = 0; j < items.length; j++) {
@@ -395,7 +412,6 @@ define([
 							returnedLists = returnedLists.concat(r);
 							toggledLists.push(lists[i]);
 						}
-
 					}
 				}
 			}

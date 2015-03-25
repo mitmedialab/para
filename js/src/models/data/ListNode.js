@@ -10,7 +10,7 @@ define([
   'utils/PFloat',
   'utils/PConstraint'
 
-], function($, _, paper, Instance, PFloat,PConstraint) {
+], function($, _, paper, Instance, PFloat, PConstraint) {
 
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -73,6 +73,26 @@ define([
       this.modifyProperty(md);
 
     },
+
+    // sets the geom visibility to false
+    hide: function() {
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].hide();
+      }
+    },
+
+    show: function() {
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].show();
+      }
+    },
+
+    bringToFront: function() {
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].bringToFront();
+      }
+    },
+
 
     addMemberToOpen: function(data) {
       if (this.get('open')) {
@@ -187,6 +207,23 @@ define([
       });
     },
 
+    //returns all non-list members
+    getInstanceMembers: function(memberList) {
+      if (!memberList) {
+        memberList = [];
+      }
+      for (var i = 0; i < this.members.length; i++) {
+        if (this.members[i].get('type') !== 'list' || this.members[i].get('type') !== 'sampler') {
+          memberList.push(this.members[i]);
+        } else {
+          this.members[i].getInstanceMembers(memberList);
+        }
+
+      }
+      console.log('get member list', memberList);
+      return memberList;
+    },
+
     getMemberNumber: function() {
       return this.accessProperty('member_count');
     },
@@ -243,90 +280,70 @@ define([
       return null;
     },
 
+
+  
     compile: function() {
+      this.compileTransforms();
+
       for (var i = 0; i < this.members.length; i++) {
-        var i_matricies = this.compileTransforms();
-        this.compileMemberAt(i, 'translation_delta', i_matricies);
-        this.compileMemberAt(i, 'rotation_delta', i_matricies);
+        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+            this.members[i].reset();
+          }
+        this.compileMemberAt(i, 'translation_delta', this.get('tmatrix'));
+        this.compileMemberAt(i, 'rotation_delta', this.get('rmatrix'));
+        this.compileMemberAt(i, 'scaling_delta', this.get('smatrix'));
+        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+            this.members[i].compile();
+        }
 
       }
     },
 
-    compileMemberAt: function(index, propname, i_matricies) {
-
+    
+    compileMemberAt: function(index, propname, l_matrix) {
       var delta = this.inheritProperty(propname);
       if (delta) {
         var member = this.members[index];
-        var geom = member.get('geom');
-        if(geom){
-          member.get('geom').bringToFront();
-        }
-        var mtd = member.inheritProperty(propname);
+        member.bringToFront();
+        var member_property = member.inheritProperty(propname);
         var matrixMap = this.get('matrix_map');
-        console.log('matrixMap', matrixMap[propname].properties);
         var matrix_props = matrixMap[propname].properties;
-        var m_tmatrix = member.get(matrixMap[propname].name);
-        var l_matrix = i_matricies[matrixMap[propname].name];
-        var dC = delta.isSelfConstrained();
-        var mC = mtd.isSelfConstrained();
+        var member_matrix = member.get(matrixMap[propname].name);
+        var delta_constrained = delta.isSelfConstrained();
+        var member_property_constrained = member_property.isSelfConstrained();
         for (var p in matrix_props) {
           if (delta.hasOwnProperty(p)) {
-            console.log('p=', p);
-            var pC = false;
-            var mPC = false;
-            if(delta[p] instanceof PConstraint){
-             pC = delta[p].isSelfConstrained();
-            mPC = mtd[p].isSelfConstrained();
+            var delta_subproperty_constrained = false;
+            var member_subproperty_constrained = false;
+            if (delta[p] instanceof PConstraint) {
+              delta_subproperty_constrained = delta[p].isSelfConstrained();
+              member_subproperty_constrained = member_property[p].isSelfConstrained();
             }
             for (var i = 0; i < matrix_props[p].length; i++) {
-              if ((pC || dC) && !mPC && !mC) {
-                m_tmatrix[matrix_props[p][i]] = 0;
+              if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
+                console.log('reseting member matrix',matrix_props[p][i]);
+                member_matrix[matrix_props[p][i]] = 0;
               }
-              if (mPC || mC) {
+              if (member_subproperty_constrained || member_property_constrained) {
+                 console.log('reseting list matrix',matrix_props[p][i]);
                 l_matrix[matrix_props[p][i]] = 0;
               }
             }
           }
         }
-
-        m_tmatrix.concatenate(l_matrix);
+        member_matrix.concatenate(l_matrix);
       }
     },
 
-    compileTransforms: function() {
-      var rmatrix = this.get('rmatrix').clone();
-      var smatrix = this.get('smatrix').clone();
-      var tmatrix = this.get('tmatrix').clone();
+  compileTransforms: function() {
+    Instance.prototype.compileTransforms.call(this,arguments);
 
-      var rotation_origin = this.get('rotation_origin').toPaperPoint();
-      var scaling_origin = this.get('scaling_origin').toPaperPoint();
-
-
-      var scaling_delta = this.accessProperty('scaling_delta');
-      var rotation_delta = this.accessProperty('rotation_delta');
-      var translation_delta = this.inheritProperty('translation_delta');
-
-      if (rotation_delta) {
-        rmatrix.rotate(rotation_delta, rotation_origin);
-      }
-      if (scaling_delta) {
-        smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
-      }
-      if (translation_delta) {
-        tmatrix.translate(translation_delta.toPaperPoint());
-      }
-      return {
-        tmatrix: tmatrix,
-        rmatrix: rmatrix,
-        smatrix: smatrix
-      };
-    },
-
-//triggered on change of select property, removes bbox
+  },
+    //triggered on change of select property, removes bbox
     selectionChange: function() {
-      Instance.prototype.selectionChange.call(this,arguments);
+      Instance.prototype.selectionChange.call(this, arguments);
       if (!this.get('selected')) {
-          this.get('ui').visible = false;  
+        this.get('ui').visible = false;
       }
     },
 
@@ -334,8 +351,8 @@ define([
       var bbox = this.renderBoundingBox();
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
-      this.set('geom',null);
-      this.set('geom',bbox);
+      this.set('geom', null);
+      this.set('geom', bbox);
       if (this.get('open')) {
         bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
         bbox.strokeWidth = 1;

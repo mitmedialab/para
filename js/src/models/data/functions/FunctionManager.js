@@ -19,8 +19,8 @@ define([
 			this.set('param_name', name);
 		},
 
-		setCalled: function(called){
-			this.set('called',called);
+		setCalled: function(called) {
+			this.set('called', called);
 		},
 
 		renderStyle: function(geom) {
@@ -36,19 +36,19 @@ define([
 		//sets the argument for this parameter
 		setArgument: function(instance) {
 			var currentArgument = this.get('f_argument');
-			if(currentArgument){
-				currentArgument.removeConstraint() ;
+			if (currentArgument) {
+				currentArgument.removeConstraint();
 			}
 			this.set('f_argument', instance);
 			var relative = instance;
 			var reference = this;
 			var cf = function() {
 				var v = reference.getValue();
-				console.log('reference constraint value',v);
+				console.log('reference constraint value', v);
 				relative.setValue(v);
 				return v;
 			};
-			instance.setConstraint(cf,reference);
+			instance.setConstraint(cf, reference);
 		}
 	};
 
@@ -74,25 +74,33 @@ define([
 			for (var i = 0; i < childList.length; i++) {
 				//this.convert(paramList[i]);
 				//f.addParameter(paramList[i]);
-				childList[i].set('selected',false);
+				childList[i].hide();
+				childList[i].set('selected', false);
+				var center = childList[i].accessProperty('center');
+				centers.x += center.x;
+				centers.y += center.y;
 				switch (childList[i].get('type')) {
+
 					case 'list':
 					case 'sampler':
+						console.log('adding list to function');
 						f.lists.push(childList[i]);
 						var members = childList[i].getInstanceMembers();
+						console.log('list members', members);
 						members.forEach(function(item) {
+							console.log('adding list child to function');
 							f.addChildNode(item);
+							item.hide();
 						});
 						break;
 					case 'function':
+						console.log('adding function to function');
 						f.functions.push(childList[i]);
 						break;
 					default:
 						f.addChildNode(childList[i]);
-						childList[i].hide();
-						var center = childList[i].accessProperty('center');
-						centers.x += center.x;
-						centers.y += center.y;
+
+
 						break;
 				}
 			}
@@ -167,7 +175,7 @@ define([
 		},
 
 		addParamToFunction: function(func, instance) {
-			if(func.get('name')!=='root'){
+			if (func.get('name') !== 'root') {
 				this.convert(instance);
 				func.addParameter(instance);
 			}
