@@ -186,9 +186,10 @@ define([
 
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
+			this.on('change:selected', this.selectionChange);
 		},
 
-
+		
 		/* deleteSelf
 		 * function called before instance is removed from
 		 * scene graph
@@ -271,12 +272,13 @@ define([
 			instance.set('scaling_origin', position.clone());
 			instance.set('translation_delta', this.get('translation_delta').clone());
 			var g_clone = this.get('geom').clone();
-		   	g_clone.transform(this.get('ti_matrix'));
+			g_clone.transform(this.get('ti_matrix'));
 			g_clone.transform(this.get('ri_matrix'));
 			g_clone.transform(this.get('si_matrix'));
 			g_clone.data.instance = instance;
+			g_clone.data.geom = true;
 			g_clone.data.nodetype = instance.get('name');
-			instance.set('geom',g_clone);
+			instance.set('geom', g_clone);
 			return instance;
 		},
 
@@ -311,6 +313,15 @@ define([
 			this.set('rmatrix', rmatrix);
 			this.set('smatrix', smatrix);
 			this.set('tmatrix', tmatrix);
+		},
+
+		//triggered on change of select property, removes bbox
+		selectionChange: function() {
+			if (!this.get('selected')) {
+				if (this.get('bbox')) {
+					this.get('bbox').remove();
+				}
+			}
 		},
 
 		// sets the geom visibility to false
@@ -562,10 +573,10 @@ define([
 		},
 
 		/*setValue
-		* modifies the properties of this instance in accordance with the 
-		* data passed in
-		* note- in future should unifiy this with the modify property function?
-		*/
+		 * modifies the properties of this instance in accordance with the
+		 * data passed in
+		 * note- in future should unifiy this with the modify property function?
+		 */
 		setValue: function(data) {
 			for (var prop in data) {
 
@@ -584,9 +595,9 @@ define([
 
 
 		/* getValue
-		* returns an object containing all constrained properties of
-		* this instance
-		*/
+		 * returns an object containing all constrained properties of
+		 * this instance
+		 */
 		getValue: function() {
 			var constrainMap = this.get('constrain_map');
 			var data = {};
@@ -619,7 +630,7 @@ define([
 					}
 
 				}
-		return data;
+				return data;
 			}
 
 		},
@@ -792,9 +803,7 @@ define([
 		},
 
 		renderBoundingBox: function(geom) {
-			if (this.get('bbox')) {
-				this.get('bbox').remove();
-			}
+
 			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
 			bbox.data.instance = this;
@@ -891,7 +900,7 @@ define([
 				geom.transform(this.get('ri_matrix'));
 				geom.transform(this.get('si_matrix'));
 				geom.selected = false;
-			} 
+			}
 
 			var position = this.get('position').toPaperPoint();
 			geom.position = position;

@@ -322,24 +322,27 @@ define([
       };
     },
 
-
+//triggered on change of select property, removes bbox
+    selectionChange: function() {
+      Instance.prototype.selectionChange.call(this,arguments);
+      if (!this.get('selected')) {
+          this.get('ui').visible = false;  
+      }
+    },
 
     render: function() {
       var bbox = this.renderBoundingBox();
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
+      this.set('geom',null);
+      this.set('geom',bbox);
       if (this.get('open')) {
         bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
         bbox.strokeWidth = 1;
       }
-
     },
 
     renderBoundingBox: function() {
-      if (this.get('bbox')) {
-        this.get('bbox').remove();
-      }
-
       for (var k = 0; k < this.members.length; k++) {
         this.updateBoundingBox(this.members[k]);
       }

@@ -49,6 +49,9 @@ define([
           var radius = this.get('width')/2;
           var new_master =new paper.Path.RegularPolygon(new paper.Point(0,0), data.value, radius);
           new_master.visible = false;
+        new_master.data.instance = this;
+     new_master.data.geom = true;
+     new_master.data.nodetype =this.get('name');
           this.get('geom').remove();
           this.set('geom',null);
           this.set('geom',new_master);

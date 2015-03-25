@@ -300,14 +300,14 @@ define(['jquery',
     applySampleToInstance: function() {
       console.log('applying sample');
       var selectedShapes = selectTool.get('selected_shapes');
-      for (var i = selectedShapes.length-1; i >=0 ; i--) {
+      for (var i = selectedShapes.length - 1; i >= 0; i--) {
         var instance = selectedShapes[i];
         var sampler = new PathSampler();
         sampler.addMember(instance);
         visitor.addList(sampler);
         sampler.setRange(0, 5, true);
         selectTool.removeSelectedShape(instance);
-      selectTool.addSelectedShape(sampler);
+        selectTool.addSelectedShape(sampler);
 
       }
       this.compile();
@@ -403,12 +403,16 @@ define(['jquery',
      * object is selected by the user
      */
     geometrySelected: function(literal, constrain) {
+      var styledata = {};
       if (literal) {
-        var styledata = {
-          fill_color: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
-          stroke_color: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
-          stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
-        };
+        if (literal.data.geom) {
+          styledata = {
+            fill_color: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
+            stroke_color: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
+            stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
+          };
+          this.setToolStyle(styledata);
+        }
 
         var linstance = literal.data.instance;
         var sInstances = visitor.filterSelection(linstance);
@@ -416,8 +420,6 @@ define(['jquery',
           var instance = sInstances[j];
           selectTool.addSelectedShape(instance);
           instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-
-          this.setToolStyle(styledata);
 
           if (selectTool.get('selected_shapes').length === 1) {
             var params = instance.get('userParams');

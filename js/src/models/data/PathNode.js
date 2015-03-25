@@ -85,7 +85,9 @@ define([
       path.selected = false;
       path.data.nodetype = this.get('name');
       path.data.instance = this;
+      path.data.geom = true;
       this.set('geom', path);
+
 
 
       for (var property in data) {

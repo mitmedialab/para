@@ -62,7 +62,7 @@ define([
         geom.addChild(this.startText);
         this.startText.data.instance = geom.data.instance = path.data.instance = this;
 
-        this.set('geom', geom);
+        this.set('ui', geom);
         this.indexNumbers = [];
 
       },
@@ -114,9 +114,9 @@ define([
         ListNode.prototype.reset.call(this, arguments);
         var start = this.accessProperty('start_index');
         this.setIndex(start);
-        var geom = this.get('geom');
-        geom.position.x = 0;
-        geom.position.y = 0;
+        var ui = this.get('ui');
+        ui.position.x = 0;
+        ui.position.y = 0;
 
       },
 
@@ -135,7 +135,7 @@ define([
       },
 
       setValue: function(value) {
-       var v = this.get('value');
+        var v = this.get('value');
         v.setValue(value);
       },
 
@@ -145,7 +145,7 @@ define([
 
       setIndex: function(value) {
         this.get('index').setValue(value);
-      
+
       },
 
       getIndex: function() {
@@ -158,7 +158,7 @@ define([
       },
 
       setEnd: function(value) {
-       this.get('end_index').setValue(value);
+        this.get('end_index').setValue(value);
       },
 
       //places a constraint on the end and start values
@@ -260,7 +260,7 @@ define([
 
       render: function() {
         ListNode.prototype.render.call(this, arguments);
-        var geom = this.get('geom');
+        var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();
         for (var i = 0; i < this.indexNumbers.length; i++) {
           var numText = this.indexNumbers[i];
@@ -276,14 +276,14 @@ define([
           numText.bringToFront();
         }
 
-        geom.position = new paper.Point(bottomLeft.x + geom.bounds.width / 2, bottomLeft.y + geom.bounds.height / 2);
+        ui.position = new paper.Point(bottomLeft.x + ui.bounds.width / 2, bottomLeft.y + ui.bounds.height / 2);
         this.startText.content = 'range: ' + this.accessProperty('start_index') + ' - ' + this.accessProperty('end_index');
 
         //this.renderSelection(geom);
         if (this.get('selected') || this.get('open')) {
-          geom.visible = true;
+          ui.visible = true;
         } else {
-          geom.visible = false;
+          ui.visible = false;
         }
 
 

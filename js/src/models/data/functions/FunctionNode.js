@@ -51,12 +51,12 @@ define([
 					fillColor: this.get('primary_selection_color')
 				});
 
-				var geom = new paper.Group();
-				geom.addChild(path);
-				geom.addChild(eye);
-				geom.addChild(this.nameText);
-				this.nameText.data.instance = geom.data.instance = path.data.instance = eye.data.instance = this;
-				this.set('geom', geom);
+				var ui = new paper.Group();
+				ui.addChild(path);
+				ui.addChild(eye);
+				ui.addChild(this.nameText);
+				this.nameText.data.instance = ui.data.instance = path.data.instance = eye.data.instance = this;
+				this.set('ui', ui);
 				this.lists = [];
 				this.functions = [];
 				this.layerView = new LayerView({
@@ -174,20 +174,20 @@ define([
 			},
 
 			render: function() {
-				var geom = this.get('geom');
+				var ui = this.get('ui');
 				var open = this.get('open');
 				if (!open) {
-					geom.visible = true;
-					geom.position = this.get('translation_delta').toPaperPoint();
+					ui.visible = true;
+					ui.position = this.get('translation_delta').toPaperPoint();
 					this.nameText.content = this.get('f_name');
-					this.renderSelection(geom.children['box']);
+					this.renderSelection(ui.children['box']);
 					if (this.get('called')) {
-						geom.children['eye'].visible = true;
+						ui.children['eye'].visible = true;
 					} else {
-						geom.children['eye'].visible = false;
+						ui.children['eye'].visible = false;
 					}
 				} else {
-					geom.visible = false;
+					ui.visible = false;
 				}
 
 			}

@@ -74,6 +74,7 @@ define([
 			for (var i = 0; i < childList.length; i++) {
 				//this.convert(paramList[i]);
 				//f.addParameter(paramList[i]);
+				childList[i].set('selected',false);
 				switch (childList[i].get('type')) {
 					case 'list':
 					case 'sampler':
