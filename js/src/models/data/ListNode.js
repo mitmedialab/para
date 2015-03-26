@@ -293,15 +293,14 @@ define([
 
 
     compile: function() {
-      this.compileTransforms();
-
       for (var i = 0; i < this.members.length; i++) {
+       var i_matricies =  this.compileTransforms();
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
           this.members[i].reset();
         }
-        this.compileMemberAt(i, 'translation_delta', this.get('tmatrix'));
-        this.compileMemberAt(i, 'rotation_delta', this.get('rmatrix'));
-        this.compileMemberAt(i, 'scaling_delta', this.get('smatrix'));
+        this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
+        this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
+        this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
           this.members[i].compile();
         }
@@ -346,7 +345,32 @@ define([
     },
 
     compileTransforms: function() {
-      Instance.prototype.compileTransforms.call(this, arguments);
+      var rmatrix = this.get('rmatrix').clone();
+      var smatrix = this.get('smatrix').clone();
+      var tmatrix = this.get('tmatrix').clone();
+
+      var rotation_origin = this.get('rotation_origin').toPaperPoint();
+      var scaling_origin = this.get('scaling_origin').toPaperPoint();
+
+
+      var scaling_delta = this.accessProperty('scaling_delta');
+      var rotation_delta = this.accessProperty('rotation_delta');
+      var translation_delta = this.inheritProperty('translation_delta');
+
+      if (rotation_delta) {
+        rmatrix.rotate(rotation_delta, rotation_origin);
+      }
+      if (scaling_delta) {
+        smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
+      }
+      if (translation_delta) {
+        tmatrix.translate(translation_delta.toPaperPoint());
+      }
+      return {
+        tmatrix: tmatrix,
+        rmatrix: rmatrix,
+        smatrix: smatrix
+      };//Instance.prototype.compileTransforms.call(this, arguments);
 
     },
     //triggered on change of select property, removes bbox
