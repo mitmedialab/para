@@ -139,7 +139,6 @@ define([
       if (index === -1) {
         return false;
       } else {
-        console.log('member length before', this.members.length);
         var member = this.members.splice(index, 1)[0];
         member.modifyProperty({
           'translation_delta': this.accessProperty('translation_delta')

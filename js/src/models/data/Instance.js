@@ -8,13 +8,16 @@ define([
 	'jquery',
 	'paper',
 	'models/data/SceneNode',
+	'models/data/InheritorCollection',
+
 	'utils/PPoint',
 	'utils/PFloat',
 	'utils/PColor',
 	'utils/PBool',
+	'utils/PProperty',
 	'utils/PConstraint',
 	'utils/TrigFunc'
-], function(_, $, paper, SceneNode, PPoint, PFloat, PColor, PBool, PConstraint, TrigFunc) {
+], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PProperty, PConstraint, TrigFunc) {
 
 
 
@@ -53,6 +56,7 @@ define([
 			fill_color: null,
 			stroke_width: null,
 			path_altered: null,
+			val: null,
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
@@ -60,7 +64,6 @@ define([
 			visible: true,
 			closed: false,
 			order: 0,
-
 			/*==end JSON export===*/
 
 			//map of constrainable properties
@@ -73,6 +76,7 @@ define([
 				'stroke_color',
 				'fill_color',
 				'stroke_width',
+				'inheritors',
 			],
 
 			center: null,
@@ -168,7 +172,10 @@ define([
 
 			this.set('tmatrix', new paper.Matrix());
 			this.set('smatrix', new paper.Matrix());
-			this.set('inheritors', []);
+			this.set('inheritors', new InheritorCollection(this));
+			this.get('inheritors').setNull(false);
+			this.set('val', new PProperty(0));
+
 			this.set('sibling_instances', []);
 			this.set('rmatrix', new paper.Matrix());
 
@@ -205,10 +212,10 @@ define([
 				//this.children[i].destroy();
 			}
 			var parent = this.getParentNode();
-			if(parent){
+			if (parent) {
 				parent.removeChildNode(this);
 			}
-			this.trigger('delete',this);
+			this.trigger('delete', this);
 		},
 
 		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
@@ -268,10 +275,9 @@ define([
 			var instance = new this.constructor();
 			this.set('is_proto', true);
 
-			var inheritors = this.get('inheritors');
+			var inheritorCollection = this.get('inheritors');
 			instance.set('proto_node', this);
-			inheritors.push(instance);
-			this.set('inheritors', inheritors);
+			inheritorCollection.addInheritor(instance);
 			var position = this.get('position');
 			instance.set('position', position.clone());
 			instance.set('rotation_origin', position.clone());
@@ -285,6 +291,7 @@ define([
 			g_clone.data.geom = true;
 			g_clone.data.nodetype = instance.get('name');
 			instance.set('geom', g_clone);
+			this.addChildNode(instance);
 			return instance;
 		},
 
@@ -480,6 +487,7 @@ define([
 
 				}
 			}
+			
 			var constrained_props = this.getValue();
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
@@ -503,6 +511,7 @@ define([
 
 						this.set(p, property);
 						this.trigger('change:' + p);
+
 					}
 				}
 			}
@@ -540,7 +549,7 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
-			if (this.isSelfConstrained()) {
+			if(this.isSelfConstrained()){
 				this.getValue();
 			}
 			var property = this.inheritProperty(property_name);
@@ -587,9 +596,11 @@ define([
 		 * note- in future should unifiy this with the modify property function?
 		 */
 		setValue: function(data) {
+			console.log('setting value for',this.get('id'));
 			for (var prop in data) {
-
 				if (data.hasOwnProperty(prop)) {
+					console.log('setting prop for', prop);
+
 					var p = data[prop];
 					if (typeof data[prop] !== 'object') {
 						p = {
@@ -616,7 +627,10 @@ define([
 				constraintCalled = this.reference.get('called');
 			}
 			if (isSelfConstrained && constraintCalled) {
-				return this.getSelfConstraint().getValue();
+				var constraint = this.getSelfConstraint().getValue();
+				console.log('instance is constrained',this.get('id'),constraint);
+				return constraint;
+
 			} else {
 				for (var i = 0; i < constrainMap.length; i++) {
 					var prop = this.inheritProperty(constrainMap[i]);
@@ -628,7 +642,6 @@ define([
 							data[constrainMap[i]] = {};
 							for (var p in c) {
 								if (p !== 'self' && c[p]) {
-									console.log('p', p, constrainMap[i], data[constrainMap[i]], c, c[p]);
 									data[constrainMap[i]][p] = c[p].getValue();
 								}
 							}
@@ -638,14 +651,6 @@ define([
 						}
 					}
 
-				}
-				var inheritors = this.get('inheritors');
-				if (inheritors.length > 0) {
-					var inheritorValues = [];
-					for (var j = 0; j <= inheritors.length; j++) {
-						inheritorValues.push(inheritors[i].getValue());
-					}
-					data.inheritors = inheritorValues;
 				}
 				return data;
 			}
@@ -682,7 +687,7 @@ define([
 		 * ancestors.
 		 */
 		setSelectionForInheritors: function(select, mode, modifer, recurse) {
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			var alpha;
 			var proto = this.get('proto_node');
 			if (proto) {
@@ -833,7 +838,7 @@ define([
 			if (this.get('inheritor_bbox')) {
 				this.get('inheritor_bbox').remove();
 			}
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			for (var k = 0; k < inheritors.length; k++) {
 				this.updateBoundingBox(inheritors[k]);
 			}
@@ -950,7 +955,7 @@ define([
 		},
 
 		animateAlpha: function(levels, property, mode, modifier, curlevel) {
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			var alpha = this.get('alpha');
 			var mod = this.get('mod');
 			if (alpha.getValue() < 0.65) {

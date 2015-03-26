@@ -380,12 +380,13 @@ define([
              console.log('multiplied val=',v, prop.getMultiplier(), v*prop.getMultiplier());
             return v*prop.getMultiplier();
           }
-
           return v;
         }));
 
         var i = references[0].getIndex();
         var evaluation = eval(expression);
+         console.log('regular constraint set',evaluation);
+
         refProp.setValue(evaluation);
         return evaluation;
       };

@@ -17,12 +17,16 @@ define([
 		 */
 		constructor: function(val, operator) {
 			this._val = cjs(val);
+			//this.storage =  val;
 			if (operator) {
 				this.set('operator', operator);
 			}
 			
 		},
 		getValue: function() {
+			/*if(this.storage instanceof Function){
+				console.log("function storage=",this.storage);
+			}*/
 			return this._val.get();
 		},
 

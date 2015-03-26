@@ -382,6 +382,7 @@ define([
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function(items) {
+			//TODO: fix this so it closes selected open lists first...
 			var lists = items.filter(function(item) {
 				return (item.get('type') === 'list' || item.get('type') === 'sampler') ;
 			});
