@@ -8,12 +8,11 @@
 define([
 
 		'paper',
-		'cjs',
 		'utils/PFloat',
 		'utils/PConstraint'
 	],
 
-	function(paper, cjs, PFloat, PConstraint) {
+	function(paper,  PFloat, PConstraint) {
 
 		var PPoint = PConstraint.extend({
 			/* constructor

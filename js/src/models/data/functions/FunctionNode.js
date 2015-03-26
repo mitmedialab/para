@@ -73,8 +73,21 @@ define([
 				param.setName('param_' + this.pcount);
 				this.pcount++;
 				this.get('f_parameters').push(param);
+				this.listenTo(param, 'delete', this.removeParameter);
 				if (this.children.indexOf(param) === -1) {
 					this.addChildNode(param);
+				}
+				this.trigger('change:f_parameters');
+			},
+
+			removeParameter: function(param) {
+				var params = this.get('f_parameters');
+				var index = $.inArray(param, params);
+				if (index === -1) {
+					return false;
+				} else {
+					params.splice(index, 1);
+					this.stopListening(param);
 				}
 				this.trigger('change:f_parameters');
 			},
@@ -85,7 +98,7 @@ define([
 			 * a list of currently selected shapes
 			 */
 			requestArgument: function(id) {
-				console.log('requesting argument');
+				//console.log('requesting argument');
 				this.selectedParam = this.getParamById(id);
 				this.trigger('request_selected', this);
 			},

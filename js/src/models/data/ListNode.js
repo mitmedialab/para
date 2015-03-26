@@ -25,6 +25,7 @@ define([
       this.members = [];
       this.set('member_count', new PFloat(0));
       this.get('translation_delta').setNull(false);
+
     },
 
     printMembers: function() {
@@ -54,6 +55,7 @@ define([
           data[i].modifyProperty({
             'translation_delta': neg_delta
           });
+          this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
         }
       } else {
@@ -61,7 +63,7 @@ define([
         data.modifyProperty({
           'translation_delta': neg_delta
         });
-
+        this.listenTo(data, 'delete', this.deleteMember);
         this.members.push(data);
       }
 
@@ -124,11 +126,20 @@ define([
       }
     },
 
+    /* deleteMember
+     * callback triggered when a member is deleted by some other entity
+     */
+    deleteMember: function(target) {
+      this.stopListening(target);
+      this.removeMember(target);
+    },
+
     removeMember: function(data) {
       var index = $.inArray(data, this.members);
       if (index === -1) {
         return false;
       } else {
+        console.log('member length before', this.members.length);
         var member = this.members.splice(index, 1)[0];
         member.modifyProperty({
           'translation_delta': this.accessProperty('translation_delta')
@@ -281,25 +292,25 @@ define([
     },
 
 
-  
+
     compile: function() {
       this.compileTransforms();
 
       for (var i = 0; i < this.members.length; i++) {
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
-            this.members[i].reset();
-          }
+          this.members[i].reset();
+        }
         this.compileMemberAt(i, 'translation_delta', this.get('tmatrix'));
         this.compileMemberAt(i, 'rotation_delta', this.get('rmatrix'));
         this.compileMemberAt(i, 'scaling_delta', this.get('smatrix'));
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
-            this.members[i].compile();
+          this.members[i].compile();
         }
 
       }
     },
 
-    
+
     compileMemberAt: function(index, propname, l_matrix) {
       var delta = this.inheritProperty(propname);
       if (delta) {
@@ -321,11 +332,11 @@ define([
             }
             for (var i = 0; i < matrix_props[p].length; i++) {
               if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
-                console.log('reseting member matrix',matrix_props[p][i]);
+                console.log('reseting member matrix', matrix_props[p][i]);
                 member_matrix[matrix_props[p][i]] = 0;
               }
               if (member_subproperty_constrained || member_property_constrained) {
-                 console.log('reseting list matrix',matrix_props[p][i]);
+                console.log('reseting list matrix', matrix_props[p][i]);
                 l_matrix[matrix_props[p][i]] = 0;
               }
             }
@@ -335,10 +346,10 @@ define([
       }
     },
 
-  compileTransforms: function() {
-    Instance.prototype.compileTransforms.call(this,arguments);
+    compileTransforms: function() {
+      Instance.prototype.compileTransforms.call(this, arguments);
 
-  },
+    },
     //triggered on change of select property, removes bbox
     selectionChange: function() {
       Instance.prototype.selectionChange.call(this, arguments);

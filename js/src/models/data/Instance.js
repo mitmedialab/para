@@ -189,12 +189,13 @@ define([
 			this.on('change:selected', this.selectionChange);
 		},
 
-		
+
 		/* deleteSelf
 		 * function called before instance is removed from
 		 * scene graph
 		 */
 		deleteSelf: function() {
+			this.reset();
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
@@ -203,6 +204,11 @@ define([
 				this.children[i].deleteSelf();
 				//this.children[i].destroy();
 			}
+			var parent = this.getParentNode();
+			if(parent){
+				parent.removeChildNode(this);
+			}
+			this.trigger('delete',this);
 		},
 
 		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
@@ -336,7 +342,7 @@ define([
 			}
 		},
 
-		bringToFront: function(){
+		bringToFront: function() {
 			var geom = this.get('geom');
 			if (geom) {
 				geom.bringToFront();
@@ -632,6 +638,14 @@ define([
 						}
 					}
 
+				}
+				var inheritors = this.get('inheritors');
+				if (inheritors.length > 0) {
+					var inheritorValues = [];
+					for (var j = 0; j <= inheritors.length; j++) {
+						inheritorValues.push(inheritors[i].getValue());
+					}
+					data.inheritors = inheritorValues;
 				}
 				return data;
 			}

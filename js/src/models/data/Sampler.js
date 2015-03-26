@@ -87,7 +87,8 @@ define([
 
       removeMember: function(data) {
         ListNode.prototype.removeMember.call(this, data);
-        var diff = this.members.length - this.indexNumbers.length;
+        var diff = this.indexNumbers.length-this.members.length;
+        console.log('diff',diff);
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
           numText.remove();

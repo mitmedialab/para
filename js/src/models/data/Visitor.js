@@ -17,7 +17,6 @@ define([
 
 	//stores para lists
 	var lists;
-	var openLists = [];
 	var renderQueue = [];
 	var store = 0;
 	var compile = 1;
@@ -133,9 +132,7 @@ define([
 						lists = lists.concat(node.getListMembers());
 						node.removeAllMembers();
 						break;
-					} else {
-						lists[j].recRemoveMember(target);
-					}
+					} 
 				}
 				if (departureNode) {
 					departureNode.removeChildNode(node);
@@ -385,7 +382,10 @@ define([
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function(items) {
-			if (openLists.length > 0) {
+			var lists = items.filter(function(item) {
+				return (item.get('type') === 'list' || item.get('type') === 'sampler') ;
+			});
+			if (lists.length > 0) {
 				return this.toggleClosedLists(items);
 			} else {
 				this.closeAllLists();
@@ -400,7 +400,6 @@ define([
 		 * closes selected open lists
 		 */
 		toggleClosedLists: function(items) {
-			console.log('toggle closed list')
 			var toggledLists = [];
 			var returnedLists = [];
 			for (var j = 0; j < items.length; j++) {
