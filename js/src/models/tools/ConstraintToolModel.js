@@ -38,10 +38,16 @@ define([
     'backbone',
     'models/tools/BaseToolModel',
     'utils/PPoint',
+    'models/data/PaperUI',
     'utils/PaperUIHelper',
     'utils/PaperUIEvents',
-    'utils/Utils'
-], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUIHelper, PaperUIEvents, Utils) {
+    'utils/Utils',
+    'models/data/Constraint',
+    'models/data/paperUI/Delimiter',
+    'models/data/paperUI/PositionDelimiter',
+    'models/data/paperUI/ScaleDelimiter',
+    'models/data/paperUI/RotationDelimiter'
+], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIHelper, PaperUIEvents, Utils, Constraint, Delimiter, PositionDelimiter, ScaleDelimiter, RotationDelimiter) {
 
   // hit testing for clicking Paper UI elements
   var hitOptions = {
@@ -99,22 +105,9 @@ define([
     //    establish constraint, current code
 
 
-    /*
-     * Creates attributes on the model for keeping track of the model's
-     * state.
-     */
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
-      references: null,       // list of reference instances
-      relatives: null,        // list of relative instances
-      type: 'equal',          // relation for constraint
-      expression: '',         // the entered constraint expression
-      ref_prop: null,         // the property of the references to be constrained
-      rel_prop: null,         // the property of the relatives to be mode: 'references',     // indicator for current state
-      constrainFromVal: null,     // array for specifying value constrained to
-      constrainToVal: null,
-
-      arrow: null,
-      uiElements: {'ref_delimiters': [], 'rel_delimiters': [], 'arrows': []}
+      current_constraint: null,
+      constraints: {},
     }),
 
     /*
@@ -122,6 +115,7 @@ define([
      */
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
+      this.set('current_constraint', new Constraint());
     },
 
     /*
@@ -467,100 +461,70 @@ define([
      * state 'expression': do nothing
      */
     mouseDown: function(event) {
-      var state = this.get('mode');
-      /*
-      switch ( state ) {
-        case 'references':
-          // TODO: check if selection already exists, set to references if so, OR clear selections when constraint tool selected
-          var sm = this.get('sm');
-          this.get('sm').delegateMethod('select', 'mouseDown', event);
-          var references = this.get('sm').delegateMethod('select', 'getCurrentSelection');
-          this.selectReferences( references );
-          this.advance();
-          break;
-        case 'relatives':
-          this.get('sm').delegateMethod('select', 'mouseDown', event);
-          var relatives = this.get('sm').delegateMethod('select', 'getCurrentSelection');
-          this.selectRelatives( relatives );
-          this.advance();
-          break;
-        case 'expression':
-          // TODO: check if expression has been submitted?
-          break; 
-      } */
-   
-
-      // TODO: REALLY SHOULD TEST FOR A SELECTION, NOT INSTANCE
-
-      var hitResult = paper.project.hitTest(event.point, mouseHitOptions);
-      // TODO: generalize
-      if ( hitResult ) { 
-        if ( !hitResult.item.data.instance ) { return; }
-        var instance = hitResult.item.data.instance;
-        this.set('references', [instance]);
+      var hitResult = paper.project.hitTest( event.point, mouseHitOptions );
+      if ( hitResult && !(hitResult.item.data.instance instanceof PaperUI) ) {
+        this.get('current_constraint').set('relatives', hitResult.item.data.instance);
+        this.creatingArrow = true;
+      }
+      else if ( hitResult && (hitResult.item.data.instance instanceof Delimiter) ) {
+        this.dragDelimiter = hitResult.item.data.instance;
+        this.draggingDelimiter = true;
+        this.dragDelimiter.dragging = true;
+        console.log('hey');
       }
     },
 
     mouseDrag: function(event) {
-      if ( !this.get('references') ) { return; }
-
-      var vector = (event.lastPoint.subtract(event.downPoint)).normalize(10);
-      var arrowPath = this.get('arrow');
-      if ( event.downPoint != event.lastPoint && !arrowPath ) {
-        arrowPath = new paper.Group([
-          new paper.Path([event.downPoint, event.lastPoint]),
-          new paper.Path([
-            event.lastPoint.add(vector.rotate(135)),
-            event.lastPoint,
-            event.lastPoint.add(vector.rotate(-135))
-          ])
-        ]);
-        arrowPath.strokeColor = '#A5FF00';
-      } else if ( event.downPoint != event.lastPoint  ) {
-        arrowPath.children[0].removeSegment(1);
-        arrowPath.children[0].add(event.lastPoint);
-        arrowPath.children[1].remove(); // TODO: check for memory leak
-        var arrowHead = new paper.Path([
-          event.lastPoint.add(vector.rotate(135)),
-          event.lastPoint,
-          event.lastPoint.add(vector.rotate(-135))
-        ]);
-        arrowHead.strokeColor = '#A5FF00';
-        arrowPath.addChild(arrowHead);
+      if ( this.creatingArrow ) {
+        var arrow = this.get('current_constraint').get('arrow');
+        arrow.set('head', event.lastPoint);
+        arrow.redrawHead();
       }
-      this.set('arrow', arrowPath);
-    },
-
-    dblClick: function(event) {
-      
+      else if ( this.draggingDelimiter ) {
+        if ( this.dragDelimiter instanceof PositionDelimiter ) {
+          var axis = this.dragDelimiter.get('axis');
+          var geom = this.dragDelimiter.get('geom');
+          geom.position[axis] = event.lastPoint[axis];
+        }
+        if ( this.dragDelimiter instanceof ScaleDelimiter ) {
+          var axis = this.dragDelimiter.get('axis');
+          var geom = this.dragDelimiter.get('geom');
+          var axis_scale = Math.abs((event.lastPoint[axis] - geom.bounds.center[axis]) / (geom.bounds[axis] - geom.bounds.center[axis]));
+          
+          if ( axis == 'x' ) {
+            geom.scale(axis_scale, 1);
+          } else {
+            geom.scale(1, axis_scale);
+          }
+          geom.changeScale *= axis_scale;
+        }
+        if ( this.dragDelimiter instanceof RotationDelimiter ) {
+          var geom = this.dragDelimiter.get('geom');
+          var ref_point = geom.position;
+          var angle = event.lastPoint.subtract(ref_point).angle;
+          var dAngle = event.point.subtract(ref_point).angle;
+          geom.rotate(dAngle - angle);
+          geom.changeRotation += (dAngle - angle);
+        }
+      }
     },
 
     mouseUp: function(event) {
-      //TODO: Really should use selection, rather than instance
-
-      // have to work around arrow itself being hit testable
       var hitResult = paper.project.hitTest(event.point.add(new paper.Point(3, 3)), mouseHitOptions);
-      if ( hitResult ) {
-        // TODO: generalize to lists?
-        if ( !hitResult.item.data.instance ) { return; }
-        var instance = hitResult.item.data.instance;
-        this.set('relatives', [instance]);
-
-        var arrow = this.get('arrow');
-        var uiElements = this.get('uiElements');
-        uiElements.arrows.push(arrow);
-        this.set('uiElements', uiElements);
-        this.set('arrow', null);
-
-        // create ref, rel wheels
-        var ref_wheel = PaperUIHelper.createConstraintWheel( this.get('references'), 'ref-wheel' )[0];
-        var rel_wheel = PaperUIHelper.createConstraintWheel( this.get('relatives'), 'rel-wheel' )[0];
-        PaperUIHelper.addConstraintWheelHandlers( this, ref_wheel, rel_wheel );
+      if ( hitResult && !(hitResult.item.data.instance instanceof PaperUI) && this.creatingArrow ) {
+        if ( this.get('current_constraint').get('relatives').get('id') == hitResult.item.data.instance.get('id') ) {
+          this.get('current_constraint').reset();
+          return;
+        }
+        this.get('current_constraint').set('references', hitResult.item.data.instance);        //current_constraint.createWheels(); 
+        this.creatingArrow = false;
+      } else if ( this.creatingArrow ) {
+        this.get('current_constraint').reset();
+      } else if ( this.draggingDelimiter ) {
+        this.dragDelimiter.dragging = false;
+        this.dragDelimiter = null;
+        this.draggingDelimiter = null;
       } 
-    },
-
-    mouseMove: function(event) {
-
     },
 
     /*
@@ -569,119 +533,10 @@ define([
      * elements associated with it. 
      */
     clearState: function() {
-      this.get('sm').delegateMethod('select', 'resetSelections');
-      this.set('references', []);
-      this.set('relatives', []);
-      this.set('type', 'equal');
-      this.set('expression', '');
-      this.set('ref_prop', []);
-      this.set('rel_prop', []);
-      this.set('mode', 'references');
-      this.set('constrainToVal', []);
-      this.set('constrainFromVal', []);
-      PaperUIHelper.clear(); // TODO: clears everything, want to clear only constraint tool ui
+      this.set('current_constraint', null);
+      this.set('constraints', {});
     }, 
  
-    
-
-    /*
-     *  Constraint Tool UI Elements - Delimiters 
-     */
-
-    /*
-    createDelimiters: function( instances, property, delimSetName ) {
-      switch ( property ) {
-        case 'position':
-          this.createPositionDelimiters( instances, delimSetName );
-          break;
-        case 'scale':
-          this.createScaleDelimiters( instances, delimSetName );
-          break;
-        case 'rotation':
-          this.createRotationDelimiters( instances, delimSetName );
-          break;
-        default:
-          console.log('[ERROR] Property not recognized for delimiter creation');
-          break;
-      }
-    },
-
-    createPositionDelimiters: function( instances, delimSetName ) {
-
-    },
-
-    createScaleDelimiters: function( instances, delimSetName ) {
-
-    },
-
-    createRotationDelimiters: function( instances, delimSetName ) {
-
-    },
-
-    setDelimiterListeners: function( name, property, listener_set ) {
-
-    },
-
-    setPositionDelimiterListeners: function( delims, listener_set ) {
-      
-      onMouseOver = function( event ) {
-        if ( !delim.active ) {
-          delim.setColor
-        }
-      }
-
-      onMouseClick = function( event ) {
-        delim.setColor
-        delim.setActive
-
-        constraintTool.setRefProp
-        constraintTool.setRefVal
-        if ref_prop == rel_prop
-          constraintTool.setRelProp
-          constraintTool.setRelVal
-      }
-
-      onMouseDrag = function( event ) {
-        delim.updatePos // if name = x or name = y, do different update
-          
-      }
-
-      onMouseUp = function( event ) {
-        updateExpression
-      }
-    },
-
-    setScaleDelimiterListeners: function( delims, listener_set ) {
-      
-      onMouseOver = function( event ) {
-
-      }
-
-      onMouseClick = function( event ) {
-
-      }
-
-      onMouseDrag = function( event ) {
-
-      }
-    },
-
-    setRotationDelimiterListeners: function( delims, listener_set ) {
-      
-      onMouseOver = function( event ) {
-
-      }
-
-      onMouseClick = function( event ) {
-
-      }
-
-      onMouseDrag = function( event ) {
-
-      }
-    }
-    */
-  
   });
 
   

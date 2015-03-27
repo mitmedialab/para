@@ -13,7 +13,7 @@ define([
 
   var PaperUI = PathNode.extend({
     
-    defaults: _.extend({}, PathNode.prototype.defaultss, {
+    defaults: _.extend({}, PathNode.prototype.defaults, {
       name: 'ui',
     }),
 
