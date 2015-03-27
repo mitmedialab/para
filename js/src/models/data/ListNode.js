@@ -233,6 +233,14 @@ define([
       return memberList;
     },
 
+
+    propertyModified: function(event) {
+      console.log('triggering list modified');
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].trigger('modified', this.members[i]);
+      }
+    },
+
     getMemberNumber: function() {
       return this.accessProperty('member_count');
     },
@@ -293,7 +301,7 @@ define([
 
     compile: function() {
       for (var i = 0; i < this.members.length; i++) {
-       var i_matricies =  this.compileTransforms();
+        var i_matricies = this.compileTransforms();
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
           this.members[i].reset();
         }
@@ -329,6 +337,7 @@ define([
             }
             for (var i = 0; i < matrix_props[p].length; i++) {
               if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
+
                 member_matrix[matrix_props[p][i]] = 0;
               }
               if (member_subproperty_constrained || member_property_constrained) {
@@ -367,7 +376,7 @@ define([
         tmatrix: tmatrix,
         rmatrix: rmatrix,
         smatrix: smatrix
-      };//Instance.prototype.compileTransforms.call(this, arguments);
+      }; //Instance.prototype.compileTransforms.call(this, arguments);
 
     },
     //triggered on change of select property, removes bbox
