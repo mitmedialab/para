@@ -564,6 +564,16 @@ define(['jquery',
 
     },
 
+    setScaffold: function(val){
+            var selectedShapes = selectTool.get('selected_shapes');
+
+       for (var i = 0; i < selectedShapes.length; i++) {
+        var instance = selectedShapes[i];
+        instance.isReturned = val;
+      }
+      this.compile();
+    },
+
     /* compile
      * resets the geometry functions
      * to remove all active instances and then

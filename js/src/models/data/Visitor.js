@@ -132,7 +132,7 @@ define([
 						lists = lists.concat(node.getListMembers());
 						node.removeAllMembers();
 						break;
-					} 
+					}
 				}
 				if (departureNode) {
 					departureNode.removeChildNode(node);
@@ -220,11 +220,18 @@ define([
 					node.reset();
 					node.compile();
 					renderQueue.push(node);
-					if (node.get('open') || node.get('called')) {
-						for (var i = 0; i < children.length; i++) {
+
+					var children = node.children;
+					for (var i = 0; i < children.length; i++) {
+						if (!node.get('open') && node.get('called')) {
+							if (children[i].isReturned) {
+								children[i].visit(this, 'visit', node, state_data);
+							}
+						} else if (node.get('open')) {
 							children[i].visit(this, 'visit', node, state_data);
 						}
 					}
+
 					break;
 			}
 		},
@@ -383,7 +390,7 @@ define([
 		toggleClosed: function(items) {
 			//TODO: fix this so it closes selected open lists first...
 			var lists = items.filter(function(item) {
-				return (item.get('type') === 'list' || item.get('type') === 'sampler') ;
+				return (item.get('type') === 'list' || item.get('type') === 'sampler');
 			});
 			if (lists.length > 0) {
 				return this.toggleClosedLists(items);

@@ -187,12 +187,15 @@ define([
 					}*/
 					this.children.forEach(function(child) {
 						if(!child.isReturned){
+							console.log('setting child to non-visible');
 							child.set('visible', false);
 						}
 					});
 
 				} else if (open) {
 					this.children.forEach(function(child) {
+													console.log('setting child to visible');
+
 						child.set('visible', true);
 					});
 				}

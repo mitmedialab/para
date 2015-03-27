@@ -83,12 +83,17 @@ define([
       'change #stroke': 'colorInputChange',
       'click #no-color': 'clearColor',
       'click .behaviorRemove': 'removeBehavior',
+      'click #scaffold': 'setScaffold',
       // testing
     },
 
     removeBehavior: function(event) {
       var name = $(event.target).attr('id');
       this.model.removeBehavior(name);
+    },
+
+    setScaffold: function(event){
+      this.model.setScaffold(event.target.checked);
     },
 
     clearColor: function(event) {
