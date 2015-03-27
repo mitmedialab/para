@@ -221,7 +221,6 @@ define([
 					node.compile();
 					renderQueue.push(node);
 					if (node.get('open') || node.get('called')) {
-						var children = node.children;
 						for (var i = 0; i < children.length; i++) {
 							children[i].visit(this, 'visit', node, state_data);
 						}

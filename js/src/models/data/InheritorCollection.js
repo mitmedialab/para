@@ -11,10 +11,15 @@ define([
 	function(_, PConstraint, PFloat) {
 
 		var InheritorCollection = PConstraint.extend({
+			
+			defaults: _.extend({}, PConstraint.prototype.defaults, {
+				name: 'InheritorCollection'
+			}),
+
+
 			constructor: function(instance_parent) {
 				PConstraint.apply(this, arguments);
 				this.inheritors = [];
-				this.num = new PFloat(0);
 				this.set('operator', 'set');
 				this.instance_parent = instance_parent;
 			},
@@ -25,14 +30,20 @@ define([
 
 			addInheritor: function(inheritor) {
 				this.inheritors.push(inheritor);
-				this.num.setValue(1);
+				this.listenTo(inheritor, 'modified', this.propertyModified);
+
 			},
 
 			removeInheritor: function(inheritor) {
 				inheritor.deleteSelf();
 				var index = _.indexOf(this.inheritors, inheritor);
 				this.inheritors.splice(index, 1);
-				this.num.setValue(1);
+
+			},
+
+			propertyModified: function(event) {
+				console.log('triggering inheritor modified');
+				this.trigger('modified', this);
 			},
 
 			isConstrained: function() {
@@ -87,8 +98,7 @@ define([
 						inheritor_values.push(this.inheritors[i].getValue());
 					}
 					return {
-						inheritors: inheritor_values,
-						num: this.num.getValue()
+						inheritors: inheritor_values
 					};
 				} else {
 					return this.getSelfConstraint().getValue();
@@ -106,9 +116,9 @@ define([
 			},
 
 			//overrides PConstraint modifyProperty method
-			modifyProperty: function(data){
-				console.log('modify property for inheritors',data);
-				if(data.inheritors){
+			modifyProperty: function(data) {
+				console.log('modify property for inheritors', data);
+				if (data.inheritors) {
 					this.setValue(data);
 				}
 			}

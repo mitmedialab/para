@@ -194,6 +194,14 @@ define([
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
 			this.on('change:selected', this.selectionChange);
+			this.isReturned = false;
+			
+			var parent = this;
+			_.each(this.attributes, function(val, key) {
+				if (val instanceof PConstraint) {
+					parent.listenTo(val, 'modified', parent.propertyModified);
+				}
+			});
 		},
 
 
@@ -279,10 +287,10 @@ define([
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
 			var position = this.get('position');
-			instance.set('position', position.clone());
-			instance.set('rotation_origin', position.clone());
-			instance.set('scaling_origin', position.clone());
-			instance.set('translation_delta', this.get('translation_delta').clone());
+			instance.get('position').setValue(position.clone().getValue());
+			instance.get('rotation_origin').setValue(position.clone().getValue());
+			instance.get('scaling_origin').setValue(position.clone().getValue());
+			instance.get('translation_delta').setValue(this.get('translation_delta').getValue());
 			var g_clone = this.get('geom').clone();
 			g_clone.transform(this.get('ti_matrix'));
 			g_clone.transform(this.get('ri_matrix'));
@@ -340,12 +348,19 @@ define([
 				geom.visible = false;
 				geom.selected = false;
 			}
+			this.clearBoundingBoxes();
+			for(var i=0;i<this.children.length;i++){
+				this.children[i].hide();
+			}
 		},
 
 		show: function() {
 			var geom = this.get('geom');
 			if (geom) {
 				geom.visible = true;
+			}
+			for(var i=0;i<this.children.length;i++){
+				this.children[i].show();
 			}
 		},
 
@@ -359,12 +374,27 @@ define([
 
 		resetProperties: function() {
 			this.clear().set(this.defaults);
-			this.set('position', new PPoint(0, 0));
-			this.set('translation_delta', new PPoint(0, 0));
-			this.set('center', new PPoint(0, 0));
-			this.set('scaling_origin', new PPoint(0, 0));
-			this.set('rotation_origin', new PPoint(0, 0));
-			this.set('matrix', new paper.Matrix());
+			this.get('position').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('translation_delta').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('center').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('scaling_origin').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('rotation_origin').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('matrix').reset();
 		},
 
 
@@ -396,15 +426,15 @@ define([
 		 */
 		_setPropertiesToInstance: function(data, instance) {
 			if (data.translation_delta) {
-				this.set('translation_delta', instance.get('translation_delta').clone());
+				this.get('translation_delta').setValue(instance.get('translation_delta').getValue());
 			}
 
 			if (data.rotation_delta) {
-				this.set('rotation_delta', instance.get('rotation_delta'));
+				this.get('rotation_delta').setValue(instance.get('rotation_delta').getValue());
 
 			}
 			if (data.scaling_delta) {
-				this.set('scaling_delta', instance.get('scaling_delta'));
+				this.get('scaling_delta').setValue(instance.get('scaling_delta').getValue());
 
 			}
 		},
@@ -487,7 +517,7 @@ define([
 
 				}
 			}
-			
+
 			var constrained_props = this.getValue();
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
@@ -504,9 +534,11 @@ define([
 								property.setValue(TrigFunc.wrap(property.getValue(), 0, 360));
 							}
 						}
-						if (_.has(constrained_props, p)) {
-							var d = TrigFunc.merge(property.getValue(), constrained_props[p]);
-							property.setValue(d);
+						if (constrained_props) {
+							if (_.has(constrained_props, p)) {
+								var d = TrigFunc.merge(property.getValue(), constrained_props[p]);
+								property.setValue(d);
+							}
 						}
 
 						this.set(p, property);
@@ -515,6 +547,10 @@ define([
 					}
 				}
 			}
+		},
+
+		propertyModified: function(event) {
+			this.trigger('modified', this);
 		},
 
 		/*inheritProperty
@@ -549,7 +585,7 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
-			if(this.isSelfConstrained()){
+			if (this.isSelfConstrained()) {
 				this.getValue();
 			}
 			var property = this.inheritProperty(property_name);
@@ -596,10 +632,8 @@ define([
 		 * note- in future should unifiy this with the modify property function?
 		 */
 		setValue: function(data) {
-			console.log('setting value for',this.get('id'));
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
-					console.log('setting prop for', prop);
 
 					var p = data[prop];
 					if (typeof data[prop] !== 'object') {
@@ -628,7 +662,6 @@ define([
 			}
 			if (isSelfConstrained && constraintCalled) {
 				var constraint = this.getSelfConstraint().getValue();
-				console.log('instance is constrained',this.get('id'),constraint);
 				return constraint;
 
 			} else {
@@ -703,13 +736,13 @@ define([
 							proto.set('inheritor_selected', 'standard');
 							alpha = proto.get('alpha');
 							alpha.setValue(1);
-							proto.set('alpha', alpha);
+							proto.get('alpha').setValue(alpha.getValue());
 						}
 					} else {
 						proto.set('inheritor_selected', false);
 						alpha = proto.get('alpha');
 						alpha.setValue(1);
-						proto.set('alpha', alpha);
+						proto.get('alpha').setValue(alpha.getValue());
 					}
 					proto.setSelectionForInheritors(select, 'standard', 'none', 0);
 				}
@@ -720,7 +753,7 @@ define([
 				inheritors[i].set('proto_selected', select);
 				alpha = inheritors[i].get('alpha');
 				alpha.setValue(1);
-				inheritors[i].set('alpha', alpha);
+				inheritors[i].get('alpha').setValue(alpha.getValue());
 			}
 		},
 
@@ -852,6 +885,15 @@ define([
 			}
 		},
 
+		clearBoundingBoxes: function(){
+			if(this.get('bbox')){
+				this.get('bbox').remove();
+			}
+			if(this.get('inheritor_bbox')){
+				this.get('inheritor_bbox').remove();
+			}
+		},
+
 		renderSelection: function(geom) {
 			var selected = this.get('selected');
 			var proto_selected = this.get('proto_selected');
@@ -933,20 +975,20 @@ define([
 			this.updateScreenBounds(geom);
 			var p_altered = this.get('path_altered');
 			p_altered.setValue(false);
-			this.set('path_altered', p_altered);
+			this.get('path_altered').setValue(p_altered);
 			geom.visible = visible;
 			return geom;
 		},
 
 
 		copyAttributes: function(clone, deep) {
-			clone.set('position', this.get('position').clone());
-			clone.set('translation_delta', this.get('translation_delta').clone());
-			clone.set('rotation_delta', this.get('rotation_delta'));
-			clone.set('scaling_delta', this.get('scaling_delta').clone());
-			clone.set('center', this.get('center').clone());
-			clone.set('scaling_origin', this.get('scaling_origin').clone());
-			clone.set('rotation_origin', this.get('rotation_origin').clone());
+			clone.get('position').setValue(this.get('position').getValue());
+			clone.get('translation_delta').setValue(this.get('translation_delta').clone());
+			clone.get('rotation_delta').setValue(this.get('rotation_delta').getValue());
+			clone.get('scaling_delta').setValue(this.get('scaling_delta').getValue());
+			clone.get('center').setValue(this.get('center').getValue());
+			clone.get('scaling_origin').setValue(this.get('scaling_origin').getValue());
+			clone.get('rotation_origin').setValue(this.get('rotation_origin').getValue());
 			clone.set('rmatrix', this.get('rmatrix').clone());
 			clone.set('smatrix', this.get('smatrix').clone());
 			clone.set('tmatrix', this.get('tmatrix').clone());
@@ -969,21 +1011,19 @@ define([
 			if (mode === 'proxy') {
 				var proto = this.get('proto_node');
 				if (proto) {
-					proto.set('alpha', alpha.clone());
+					proto.get('alpha').setValue(alpha.getValue());
 					proto.get('geom').fillColor.alpha = alpha.getValue();
 				}
 			} else {
 				for (var i = 0; i < inheritors.length; i++) {
 					var inheritor = inheritors[i];
 					if (inheritor.get(property).isNull() || modifier != 'none') {
-						inheritor.set('alpha', alpha.clone());
+						inheritor.get('alpha').setValue(alpha.getValue());
 						inheritor.get('geom').fillColor.alpha = alpha.getValue();
 						inheritor.animateAlpha(levels, property, mode, modifier, curlevel + 1);
 					}
 				}
 			}
-			this.set('mod', mod);
-			this.set('alpha', alpha);
 		},
 
 		updateScreenBounds: function(targetGeom) {

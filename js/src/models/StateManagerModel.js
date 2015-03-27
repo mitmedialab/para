@@ -247,7 +247,6 @@ define(['jquery',
         if (selectedShapes.length == 1) {
           var inst = selectedShapes[0];
           var newInstance = inst.create();
-          visitor.addShape(newInstance);
           inst.set('selected', false);
           newInstance.set('selected', true);
           selectedShapes[0] = newInstance;
@@ -368,7 +367,7 @@ define(['jquery',
           break;
       }
       for (var i = 0; i < selectedShapes.length; i++) {
-        selectedShapes[i].animateAlpha(levels, property, this.get('tool-mode'), this.get('tool-modifier'), 0);
+        //selectedShapes[i].animateAlpha(levels, property, this.get('tool-mode'), this.get('tool-modifier'), 0);
 
 
       }

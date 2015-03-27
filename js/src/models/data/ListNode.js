@@ -230,7 +230,6 @@ define([
         }
 
       }
-      console.log('get member list', memberList);
       return memberList;
     },
 
@@ -330,11 +329,9 @@ define([
             }
             for (var i = 0; i < matrix_props[p].length; i++) {
               if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
-                console.log('reseting member matrix', matrix_props[p][i]);
                 member_matrix[matrix_props[p][i]] = 0;
               }
               if (member_subproperty_constrained || member_property_constrained) {
-                console.log('reseting list matrix', matrix_props[p][i]);
                 l_matrix[matrix_props[p][i]] = 0;
               }
             }

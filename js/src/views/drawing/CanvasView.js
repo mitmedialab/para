@@ -287,7 +287,7 @@ define([
 
 
     canvasMouseMove: function(event) {
-      this.event_bus.trigger('canvasMouseMove', event);
+      //this.event_bus.trigger('canvasMouseMove', event);
 
       if (active) {
         var delta = {

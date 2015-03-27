@@ -151,7 +151,14 @@ define([
 			call: function() {
 				this.set('called', true);
 				for (var i = 0; i < this.children.length; i++) {
-					this.children[i].show();
+					console.log('child is returned',this.children[i].isReturned);
+					if(this.children[i].isReturned ){
+						this.children[i].show();
+					}
+					else{
+						console.log('hiding child');
+						this.children[i].hide();
+					}
 				}
 				var params = this.get('f_parameters');
 				for (var j = 0; j < params.length; j++) {
@@ -175,9 +182,14 @@ define([
 				var called = this.get('called');
 				var params = this.get('f_parameters');
 				if (!open) {
-					for (var i = 0; i < params.length; i++) {
+					/*for (var i = 0; i < params.length; i++) {
 						params[i].set('visible', false);
-					}
+					}*/
+					this.children.forEach(function(child) {
+						if(!child.isReturned){
+							child.set('visible', false);
+						}
+					});
 
 				} else if (open) {
 					this.children.forEach(function(child) {

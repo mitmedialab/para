@@ -6,9 +6,10 @@ define([
 	'underscore',
 	'backbone',
 	'models/data/functions/FunctionNode',
+	'utils/PConstraint',
 	'utils/Utils',
 
-], function(_, Backbone, FunctionNode, Utils) {
+], function(_, Backbone, FunctionNode, PConstraint, Utils) {
 	//datastructure to store path functions
 
 	var functioncount = 0;
@@ -21,6 +22,11 @@ define([
 
 		setCalled: function(called) {
 			this.set('called', called);
+			if (called) {
+				if (this.cf) {
+					this.cf.call(this);
+				}
+			}
 		},
 
 		renderStyle: function(geom) {
@@ -42,13 +48,21 @@ define([
 			this.set('f_argument', instance);
 			var relative = instance;
 			var reference = this;
-			var cf = function() {
+			this.cf = function() {
 				var v = reference.getValue();
 				console.log('reference constraint value', v);
 				relative.setValue(v);
 				return v;
 			};
-			instance.setConstraint(cf, reference);
+			instance.setConstraint(this.cf, reference);
+		},
+
+		propertyModified: function() {
+			console.log('triggering param modified');
+			this.trigger('modified', this);
+			if (this.cf && this.get('called')) {
+				this.cf.call(this);
+			}
 		}
 	};
 
@@ -172,6 +186,14 @@ define([
 					instance[k] = ParameterNode[k];
 				}
 			}
+			console.log(instance.propertyModified);
+			var parent = instance;
+			_.each(instance.attributes, function(val, key) {
+				if (val instanceof PConstraint) {
+					instance.stopListening(val);
+					instance.listenTo(val, 'modified', instance.propertyModified);
+				}
+			});
 		},
 
 		addParamToFunction: function(func, instance) {

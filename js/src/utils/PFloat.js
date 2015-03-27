@@ -5,14 +5,19 @@
  */
 
 define([
+	'underscore',
 		'utils/PProperty',
 		'utils/PConstraint'
 	],
 
-	function(PProperty, PConstraint) {
+	function(_,PProperty, PConstraint) {
+
+
 
 		var PFloat = PConstraint.extend({
-
+			defaults: _.extend({}, PConstraint.prototype.defaults, {
+				name: 'PFloat'
+			}),
 			/* constructor
 			 * val: initial value of the float
 			 * operator: optional argument to specify the
@@ -33,7 +38,7 @@ define([
 			 * returns object with booleans for each property based on constraint status
 			 */
 			isConstrained: function() {
-				var data = {}
+				var data = {};
 				data.self = this.isSelfConstrained();
 				return data;
 			},
@@ -42,7 +47,7 @@ define([
 			 * returns constraint if it exists
 			 */
 			getConstraint: function() {
-				var data = {}
+				var data = {};
 				data.self = this.getSelfConstraint();
 				return data;
 			},
@@ -51,7 +56,7 @@ define([
 			 */
 			setValue: function(val) {
 				this.val.setValue(val);
-				this.trigger('change'+val);
+				this.trigger('change' + val);
 			},
 
 			/*
@@ -122,10 +127,11 @@ define([
 			},
 
 			toJSON: function() {
-				var data = this.getValue() // 5
-				data.type = ''
+				var data = this.getValue();// 5
+				data.type = '';
 				return data;
 			},
+
 
 
 		});

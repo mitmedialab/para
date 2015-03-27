@@ -15,6 +15,10 @@ define([
 	function(paper,  PFloat, PConstraint) {
 
 		var PPoint = PConstraint.extend({
+
+			defaults: _.extend({}, PConstraint.prototype.defaults, {
+				name: 'PPoint'
+			}),
 			/* constructor
 			 * x, y: initial x and y coordinates
 			 * operator: optional argument to specify the

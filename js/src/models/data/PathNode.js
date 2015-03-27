@@ -41,32 +41,31 @@ define([
     normalizeGeometry: function(path, matrix) {
 
       var data = {};
-      data.rotation_delta = new PFloat(matrix.rotation);
       // TODO: make some normalizations util function
-      if (data.rotation_delta > 360 || data.rotation_delta < 0) {
-        data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
-      }
-      data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
+    
+      data.rotation_delta = {val:matrix.rotation};
+      
+      data.scaling_delta ={x:matrix.scaling.x, y:matrix.scaling.y, operator:'add'};
 
-      var translation_delta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
-      var position = new PPoint(0, 0, 'set');
+      var translation_delta = {x:matrix.translation.x, y:matrix.translation.y, operator:'add'};
+      var position = {x:0, y:0, operator:'set'};
 
       data.translation_delta = translation_delta;
       data.position = position;
 
-      data.rotation_origin = new PPoint(0, 0, 'set');
-      data.scaling_origin = new PPoint(0, 0, 'set');
+      data.rotation_origin = {x:0, y:0, operator:'set'};
+      data.scaling_origin = {x:0, y:0, operator:'set'};
 
-      data.fill_color = new PColor(path.fillColor.red, path.fillColor.green, path.fillColor.blue, path.fillColor.alpha);
-      data.stroke_color = new PColor(path.strokeColor.red, path.strokeColor.green, path.strokeColor.blue, path.strokeColor.alpha);
+      data.fill_color = path.fillColor.toCSS(true);
+      data.stroke_color = path.strokeColor.toCSS(true);
 
-      data.stroke_width = new PFloat(path.strokeWidth);
+      data.stroke_width ={val:path.strokeWidth};
 
       var imatrix = matrix.inverted();
       path.transform(imatrix);
 
-      data.width = new PFloat(path.bounds.width);
-      data.height = new PFloat(path.bounds.height);
+      this.set('width',path.bounds.width);
+     this.set('height',path.bounds.height);
 
 
       var points = this.get('points');
@@ -89,14 +88,7 @@ define([
       this.set('geom', path);
 
 
-
-      for (var property in data) {
-        if (data.hasOwnProperty(property)) {
-
-          data[property].setNull(false);
-        }
-      }
-      this.set(data);
+      this.modifyProperty(data);
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
       this.setPathAltered();
@@ -107,7 +99,6 @@ define([
     setPathAltered: function() {
       var path_altered = this.get('path_altered');
       path_altered.setValue(true);
-      this.set('path_altered', path_altered);
       var inheritors = this.get('inheritors');
       for (var i = 0; i < inheritors.length; i++) {
         inheritors[i].setPathAltered();

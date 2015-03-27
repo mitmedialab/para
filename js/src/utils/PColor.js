@@ -19,6 +19,10 @@ define([
 	function(paper, cjs, PFloat, PConstraint, ColorUtils) {
 
 		var PColor = PConstraint.extend({
+
+			defaults: _.extend({}, PConstraint.prototype.defaults, {
+				name: 'PColor'
+			}),
 			/* constructor
 			 * r,g,b,a: initial color values
 			 * operator: optional argument to specify the
