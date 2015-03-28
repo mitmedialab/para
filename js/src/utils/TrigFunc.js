@@ -177,7 +177,6 @@ define([
 
 			var distance = upper - lower;
 			var times = (value - lower) / distance;
-
 			return value - (times * distance);
 		};
 

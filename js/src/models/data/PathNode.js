@@ -42,30 +42,59 @@ define([
 
       var data = {};
       // TODO: make some normalizations util function
-    
-      data.rotation_delta = {val:matrix.rotation};
-      
-      data.scaling_delta ={x:matrix.scaling.x, y:matrix.scaling.y, operator:'add'};
+      var rotation_delta;
+      if(matrix.rotation<0){
+        rotation_delta = 360+matrix.rotation;
+      }
+      else{
+        rotation_delta = matrix.rotation;
+      }
+      data.rotation_delta = {val:rotation_delta};
+      console.log('normalized_rotation',data.rotation_delta.val, matrix.rotation);
 
-      var translation_delta = {x:matrix.translation.x, y:matrix.translation.y, operator:'add'};
-      var position = {x:0, y:0, operator:'set'};
+      data.scaling_delta = {
+        x: matrix.scaling.x,
+        y: matrix.scaling.y,
+        operator: 'add'
+      };
+
+      var translation_delta = {
+        x: matrix.translation.x,
+        y: matrix.translation.y,
+        operator: 'add'
+      };
+      var position = {
+        x: 0,
+        y: 0,
+        operator: 'set'
+      };
 
       data.translation_delta = translation_delta;
       data.position = position;
 
-      data.rotation_origin = {x:0, y:0, operator:'set'};
-      data.scaling_origin = {x:0, y:0, operator:'set'};
+      data.rotation_origin = {
+        x: 0,
+        y: 0,
+        operator: 'set'
+      };
+      data.scaling_origin = {
+        x: 0,
+        y: 0,
+        operator: 'set'
+      };
 
       data.fill_color = path.fillColor.toCSS(true);
       data.stroke_color = path.strokeColor.toCSS(true);
 
-      data.stroke_width ={val:path.strokeWidth};
+      data.stroke_width = {
+        val: path.strokeWidth
+      };
 
       var imatrix = matrix.inverted();
       path.transform(imatrix);
 
-      this.set('width',path.bounds.width);
-     this.set('height',path.bounds.height);
+      this.set('width', path.bounds.width);
+      this.set('height', path.bounds.height);
 
 
       var points = this.get('points');
@@ -99,7 +128,7 @@ define([
     setPathAltered: function() {
       var path_altered = this.get('path_altered');
       path_altered.setValue(true);
-      var inheritors = this.get('inheritors');
+      var inheritors = this.get('inheritors').accessProperty();
       for (var i = 0; i < inheritors.length; i++) {
         inheritors[i].setPathAltered();
       }
@@ -175,13 +204,13 @@ define([
         }
 
       }
-      var inheritors = this.get('inheritors');
+      var inheritors = this.get('inheritors').accessProperty();
       for (var j = 0; j < inheritors.length; j++) {
         inheritors[j].modifyPointsByIndex(delta.point, indicies);
       }
     },
 
-     /* modifyPointsByIndex
+    /* modifyPointsByIndex
      * called by prototpye to update inheritor points
      * note: does not actually correspond to prototypal inheritance
      * model since that would require repeatedly cloning paperjs objects

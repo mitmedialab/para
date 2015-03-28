@@ -367,7 +367,7 @@ define(['jquery',
           break;
       }
       for (var i = 0; i < selectedShapes.length; i++) {
-        //selectedShapes[i].animateAlpha(levels, property, this.get('tool-mode'), this.get('tool-modifier'), 0);
+        selectedShapes[i].animateAlpha(levels, property, this.get('tool-mode'), this.get('tool-modifier'), 0);
 
 
       }

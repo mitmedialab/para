@@ -496,7 +496,7 @@ define([
 		modifyProperty: function(data, mode, modifier) {
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			if (mode === 'proxy') {
 				if (protoNode) {
 					if (modifier === 'override') {

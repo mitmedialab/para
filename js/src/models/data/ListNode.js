@@ -241,6 +241,8 @@ define([
       }
     },
 
+
+
     getMemberNumber: function() {
       return this.accessProperty('member_count');
     },
