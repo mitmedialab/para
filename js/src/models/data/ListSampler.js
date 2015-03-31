@@ -32,16 +32,10 @@ define([
         this.setRange(0, this.members.length - 1);
       },
 
-      compile: function() {
-        for (var i = 0; i < this.members.length; i++) {
-          var i_matricies = this.compileTransforms();
-          this.compileMemberAt(i, 'translation_delta', i_matricies);
-          this.compileMemberAt(i, 'scaling_delta', i_matricies);
-          this.compileMemberAt(i, 'rotation_delta', i_matricies);
-
-          this.increment();
-        }
-      }
+     compileMemberAt: function(index, propname, l_matrix){
+      Sampler.prototype.compileMemberAt.call(this,index, propname, l_matrix);
+      this.increment();
+     }
 
 
 

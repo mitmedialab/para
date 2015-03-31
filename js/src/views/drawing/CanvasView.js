@@ -87,6 +87,7 @@ define([
 
       //bind paper tool events
       tool = new paper.Tool();
+      tool.name = 'canvas_tool';
       tool.activate();
       tool.parent = this;
       tool.attach('mousedown', this.toolMouseDown);
@@ -266,6 +267,7 @@ define([
     },
 
     canvasMouseUp: function(event) {
+
       if (sub.down) {}
       main.down = false;
       sub.down = false;
@@ -285,7 +287,7 @@ define([
 
 
     canvasMouseMove: function(event) {
-      this.event_bus.trigger('canvasMouseMove', event);
+      //this.event_bus.trigger('canvasMouseMove', event);
 
       if (active) {
         var delta = {

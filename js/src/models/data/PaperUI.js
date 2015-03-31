@@ -21,6 +21,13 @@ define([
     initialize: function(data) {
       PathNode.prototype.initialize.apply(this, arguments);
     },
+
+    
+    //placeholder to prevent error
+    getValue:function(){ 
+    
+    },
+
    
   });
 

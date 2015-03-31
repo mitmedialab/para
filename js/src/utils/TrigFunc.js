@@ -3,12 +3,13 @@
  */
 
 define([
+		'underscore',
 		'toolbox',
 		'utils/PPoint'
 
 	],
 
-	function(Toolbox, PPoint) {
+	function(_, Toolbox, PPoint) {
 
 
 		var TrigFunc = Toolbox.Base.extend({
@@ -176,8 +177,27 @@ define([
 
 			var distance = upper - lower;
 			var times = (value - lower) / distance;
-
 			return value - (times * distance);
+		};
+
+
+		//merges properties of two objects (recursive)
+		TrigFunc.merge = function(d1, d2) {
+			if (!_.isObject(d2)) {
+				return d2;
+			} else {
+				var d3 = {};
+				for (var p in d1) {
+					if (d1.hasOwnProperty(p)) {
+						if (d2.hasOwnProperty(p)) {
+							d3[p] = TrigFunc.merge(d1[p], d2[p]);
+						} else {
+							d3[p] = d1[p];
+						}
+					}
+				}
+				return d3;
+			}
 		};
 
 

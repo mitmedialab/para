@@ -201,11 +201,11 @@ define([
         }
       }
 
-
       var hitResult = paper.project.hitTest(event.point, dHitOptions);
-
+      console.log(hitResult);
       if (hitResult) {
-        var path = hitResult.segment.path;
+                var path = hitResult.item;
+
         if (hitResult.type == 'segment') {
           hitResult.segment.fullySelected = true;
           segments.push({index:hitResult.segment.index,type:hitResult.type});
@@ -220,8 +220,6 @@ define([
         this.trigger('geometryDSelected', path, segments, event.modifiers.command);
 
       }
-
-
 
     },
 
@@ -298,7 +296,7 @@ define([
     scaleDrag: function(event) {
       var selectedShapes = this.get('selected_shapes');
       var scaleDelta = selectedShapes[0].accessProperty('scaling_delta');
-      console.log('scaleDelta',scaleDelta)
+      console.log('scaleDelta',scaleDelta);
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 

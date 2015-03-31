@@ -26,10 +26,12 @@ define(['jquery',
   'utils/ColorUtils',
   'utils/Utils',
   'utils/PaperUIHelper',
-], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ListSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, Utils, PaperUIHelper) {
+  'models/data/functions/FunctionManager',
+
+], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ListSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, Utils, PaperUIHelper, FunctionManager) {
 
 
-  var uninstantiated, visitor, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
+  var uninstantiated, visitor, functionManager, toolCollection, polyTool, selectTool, rotateTool, followPathTool, constraintTool, clutch;
 
   var currentView, subView, mainView;
   var undoManager;
@@ -103,8 +105,11 @@ define(['jquery',
       // EXPERIMENTAL: Tool Function-call delegation, should be for each tool
       this.listenTo(constraintTool, 'delegateMethod', this.delegateMethod);
 
-      //setup visitor
+      //setup visitor and function manager
       visitor = new Visitor();
+      functionManager = new FunctionManager();
+      visitor.functionManager = functionManager;
+      functionManager.selectTool = selectTool;
 
       //clear local storage
       localStorage.clear();
@@ -151,7 +156,7 @@ define(['jquery',
         var currentTool = toolCollection.get(this.get('state'));
         currentTool.set('mode', mode);
       }
-     
+
     },
 
     clearIrrelevantState: function() {
@@ -242,7 +247,6 @@ define(['jquery',
         if (selectedShapes.length == 1) {
           var inst = selectedShapes[0];
           var newInstance = inst.create();
-          visitor.addShape(newInstance);
           inst.set('selected', false);
           newInstance.set('selected', true);
           selectedShapes[0] = newInstance;
@@ -284,7 +288,7 @@ define(['jquery',
       this.compile();
     },
 
-    createParams: function(){
+    createParams: function() {
       var selectedShapes = selectTool.get('selected_shapes');
       if (selectedShapes.length > 0) {
         visitor.createParams(selectedShapes);
@@ -295,13 +299,15 @@ define(['jquery',
     applySampleToInstance: function() {
       console.log('applying sample');
       var selectedShapes = selectTool.get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
+      for (var i = selectedShapes.length - 1; i >= 0; i--) {
         var instance = selectedShapes[i];
         var sampler = new PathSampler();
         sampler.addMember(instance);
         visitor.addList(sampler);
-
         sampler.setRange(0, 5, true);
+        selectTool.removeSelectedShape(instance);
+        selectTool.addSelectedShape(sampler);
+
       }
       this.compile();
     },
@@ -315,7 +321,7 @@ define(['jquery',
       var members = [];
 
       var newItems = visitor.toggleOpen(selectedShapes);
-     
+
       selectTool.deselectAll();
       selectTool.addSelectedShape(newItems);
       this.compile();
@@ -396,12 +402,16 @@ define(['jquery',
      * object is selected by the user
      */
     geometrySelected: function(literal, constrain) {
+      var styledata = {};
       if (literal) {
-        var styledata = {
-          fill_color: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
-          stroke_color: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
-          stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
-        };
+        if (literal.data.geom) {
+          styledata = {
+            fill_color: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
+            stroke_color: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
+            stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
+          };
+          this.setToolStyle(styledata);
+        }
 
         var linstance = literal.data.instance;
         var sInstances = visitor.filterSelection(linstance);
@@ -409,8 +419,6 @@ define(['jquery',
           var instance = sInstances[j];
           selectTool.addSelectedShape(instance);
           instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-
-          this.setToolStyle(styledata);
 
           if (selectTool.get('selected_shapes').length === 1) {
             var params = instance.get('userParams');
@@ -546,7 +554,6 @@ define(['jquery',
      * updates the color/ fill/ stroke weight of selected shapes
      */
     styleModified: function(style_data) {
-      console.log('style_data',style_data);
       var selectedShapes = selectTool.get('selected_shapes');
 
       for (var i = 0; i < selectedShapes.length; i++) {
@@ -555,6 +562,16 @@ define(['jquery',
       }
       this.compile();
 
+    },
+
+    setScaffold: function(val){
+            var selectedShapes = selectTool.get('selected_shapes');
+
+       for (var i = 0; i < selectedShapes.length; i++) {
+        var instance = selectedShapes[i];
+        instance.isReturned = val;
+      }
+      this.compile();
     },
 
     /* compile
@@ -599,7 +616,6 @@ define(['jquery',
 
     },
 
-    
 
 
     //triggered by paper tool on a mouse down event
@@ -729,7 +745,7 @@ define(['jquery',
     save: function() {
 
       var id = Date.now();
-      var data = {};//JSON.stringify(rootNode.exportJSON());
+      var data = {}; //JSON.stringify(rootNode.exportJSON());
 
       this.saveToLocal(id, data);
 

@@ -10,7 +10,7 @@ define([
   'utils/PFloat',
   'utils/PConstraint'
 
-], function($, _, paper, Instance, PFloat,PConstraint) {
+], function($, _, paper, Instance, PFloat, PConstraint) {
 
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -25,6 +25,7 @@ define([
       this.members = [];
       this.set('member_count', new PFloat(0));
       this.get('translation_delta').setNull(false);
+
     },
 
     printMembers: function() {
@@ -54,6 +55,7 @@ define([
           data[i].modifyProperty({
             'translation_delta': neg_delta
           });
+          this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
         }
       } else {
@@ -61,7 +63,7 @@ define([
         data.modifyProperty({
           'translation_delta': neg_delta
         });
-
+        this.listenTo(data, 'delete', this.deleteMember);
         this.members.push(data);
       }
 
@@ -73,6 +75,26 @@ define([
       this.modifyProperty(md);
 
     },
+
+    // sets the geom visibility to false
+    hide: function() {
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].hide();
+      }
+    },
+
+    show: function() {
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].show();
+      }
+    },
+
+    bringToFront: function() {
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].bringToFront();
+      }
+    },
+
 
     addMemberToOpen: function(data) {
       if (this.get('open')) {
@@ -102,6 +124,14 @@ define([
       for (var i = this.members.length - 1; i >= 0; i--) {
         this.removeMember(this.members[i]);
       }
+    },
+
+    /* deleteMember
+     * callback triggered when a member is deleted by some other entity
+     */
+    deleteMember: function(target) {
+      this.stopListening(target);
+      this.removeMember(target);
     },
 
     removeMember: function(data) {
@@ -187,6 +217,32 @@ define([
       });
     },
 
+    //returns all non-list members
+    getInstanceMembers: function(memberList) {
+      if (!memberList) {
+        memberList = [];
+      }
+      for (var i = 0; i < this.members.length; i++) {
+        if (this.members[i].get('type') !== 'list' || this.members[i].get('type') !== 'sampler') {
+          memberList.push(this.members[i]);
+        } else {
+          this.members[i].getInstanceMembers(memberList);
+        }
+
+      }
+      return memberList;
+    },
+
+
+    propertyModified: function(event) {
+      console.log('triggering list modified');
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].trigger('modified', this.members[i]);
+      }
+    },
+
+
+
     getMemberNumber: function() {
       return this.accessProperty('member_count');
     },
@@ -243,53 +299,56 @@ define([
       return null;
     },
 
+
+
     compile: function() {
       for (var i = 0; i < this.members.length; i++) {
         var i_matricies = this.compileTransforms();
-        this.compileMemberAt(i, 'translation_delta', i_matricies);
-        this.compileMemberAt(i, 'rotation_delta', i_matricies);
+        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+          this.members[i].reset();
+        }
+        this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
+        this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
+        this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
+        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+          this.members[i].compile();
+        }
 
       }
     },
 
-    compileMemberAt: function(index, propname, i_matricies) {
 
+    compileMemberAt: function(index, propname, l_matrix) {
       var delta = this.inheritProperty(propname);
       if (delta) {
         var member = this.members[index];
-        var geom = member.get('geom');
-        if(geom){
-          member.get('geom').bringToFront();
-        }
-        var mtd = member.inheritProperty(propname);
+        member.bringToFront();
+        var member_property = member.inheritProperty(propname);
         var matrixMap = this.get('matrix_map');
-        console.log('matrixMap', matrixMap[propname].properties);
         var matrix_props = matrixMap[propname].properties;
-        var m_tmatrix = member.get(matrixMap[propname].name);
-        var l_matrix = i_matricies[matrixMap[propname].name];
-        var dC = delta.isConstrained();
-        var mC = mtd.isConstrained();
+        var member_matrix = member.get(matrixMap[propname].name);
+        var delta_constrained = delta.isSelfConstrained();
+        var member_property_constrained = member_property.isSelfConstrained();
         for (var p in matrix_props) {
           if (delta.hasOwnProperty(p)) {
-            console.log('p=', p);
-            var pC = false;
-            var mPC = false;
-            if(delta[p] instanceof PConstraint){
-             pC = delta[p].isConstrained();
-            mPC = mtd[p].isConstrained();
+            var delta_subproperty_constrained = false;
+            var member_subproperty_constrained = false;
+            if (delta[p] instanceof PConstraint) {
+              delta_subproperty_constrained = delta[p].isSelfConstrained();
+              member_subproperty_constrained = member_property[p].isSelfConstrained();
             }
             for (var i = 0; i < matrix_props[p].length; i++) {
-              if ((pC || dC) && !mPC && !mC) {
-                m_tmatrix[matrix_props[p][i]] = 0;
+              if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
+
+                member_matrix[matrix_props[p][i]] = 0;
               }
-              if (mPC || mC) {
+              if (member_subproperty_constrained || member_property_constrained) {
                 l_matrix[matrix_props[p][i]] = 0;
               }
             }
           }
         }
-
-        m_tmatrix.concatenate(l_matrix);
+        member_matrix.concatenate(l_matrix);
       }
     },
 
@@ -319,27 +378,30 @@ define([
         tmatrix: tmatrix,
         rmatrix: rmatrix,
         smatrix: smatrix
-      };
+      }; //Instance.prototype.compileTransforms.call(this, arguments);
+
     },
-
-
+    //triggered on change of select property, removes bbox
+    selectionChange: function() {
+      Instance.prototype.selectionChange.call(this, arguments);
+      if (!this.get('selected')) {
+        this.get('ui').visible = false;
+      }
+    },
 
     render: function() {
       var bbox = this.renderBoundingBox();
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
+      this.set('geom', null);
+      this.set('geom', bbox);
       if (this.get('open')) {
         bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
         bbox.strokeWidth = 1;
       }
-
     },
 
     renderBoundingBox: function() {
-      if (this.get('bbox')) {
-        this.get('bbox').remove();
-      }
-
       for (var k = 0; k < this.members.length; k++) {
         this.updateBoundingBox(this.members[k]);
       }

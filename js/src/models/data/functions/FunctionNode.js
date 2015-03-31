@@ -8,10 +8,12 @@ define([
 		'paper',
 		'models/data/Instance',
 		'utils/PConstraint',
+		'views/drawing/LayersView',
+
 	],
 
 
-	function(_, paper, Instance, PConstraint) {
+	function(_, paper, Instance, PConstraint, LayerView) {
 		var svgstring = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 792" enable-background="new 0 0 612 792" xml:space="preserve"><g><path fill="none" stroke="#76787B" stroke-width="1.6375" stroke-miterlimit="10" d="M10,1.9c0,0-3.7,4-10,4s-10-4-10-4 s3.7-7.7,10-7.7S10,1.9,10,1.9z"/><ellipse fill="#76787B" cx="-0.3" cy="-0.9" rx="4.8" ry="5"/></g></svg>';
 		var FunctionNode = Instance.extend({
 
@@ -21,15 +23,14 @@ define([
 				type: 'function',
 				f_name: '',
 				f_parameters: null,
-				f_arguments: null,
 				open: false,
 				called: false,
+				showLayers: 'visible',
 			}),
 
 			initialize: function() {
 				Instance.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
-				this.set('f_arguments', []);
 				this.get('translation_delta').setNull(false);
 				var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 100));
 				var path = new paper.Path.Rectangle(rectangle);
@@ -50,46 +51,118 @@ define([
 					fillColor: this.get('primary_selection_color')
 				});
 
-				var geom = new paper.Group();
-				geom.addChild(path);
-				geom.addChild(eye);
-				geom.addChild(this.nameText);
-				this.nameText.data.instance = geom.data.instance = path.data.instance = eye.data.instance = this;
-				this.set('geom', geom);
+				var ui = new paper.Group();
+				ui.addChild(path);
+				ui.addChild(eye);
+				ui.addChild(this.nameText);
+				this.nameText.data.instance = ui.data.instance = path.data.instance = eye.data.instance = this;
+				this.set('ui', ui);
 				this.lists = [];
 				this.functions = [];
+				this.layerView = new LayerView({
+					el: 'body',
+					model: this,
+				});
+				this.pcount = 1;
+				this.selectedParam = null;
 
 			},
 
 
 			addParameter: function(param) {
+				param.setName('param_' + this.pcount);
+				this.pcount++;
 				this.get('f_parameters').push(param);
+				this.listenTo(param, 'delete', this.removeParameter);
 				if (this.children.indexOf(param) === -1) {
 					this.addChildNode(param);
 				}
+				this.trigger('change:f_parameters');
+			},
+
+			removeParameter: function(param) {
+				var params = this.get('f_parameters');
+				var index = $.inArray(param, params);
+				if (index === -1) {
+					return false;
+				} else {
+					params.splice(index, 1);
+					this.stopListening(param);
+				}
+				this.trigger('change:f_parameters');
+			},
+
+			/* requestArgument
+			 * called when argument icon is clicked, triggers
+			 * the functionManager to send this function
+			 * a list of currently selected shapes
+			 */
+			requestArgument: function(id) {
+				//console.log('requesting argument');
+				this.selectedParam = this.getParamById(id);
+				this.trigger('request_selected', this);
+			},
+
+			/* setArgument
+			 * sets the argument of the currently selected
+			 * parameter
+			 */
+			setArgument: function(instance) {
+
+				if (this.selectedParam) {
+					this.selectedParam.setArgument(instance);
+					this.trigger('change:f_parameters');
+				}
+			},
+
+			getParamById: function(id) {
+				var params = this.get('f_parameters');
+				var param = params.filter(function(item) {
+					return item.get('id') === id;
+				})[0];
+				return param;
 			},
 
 			open: function() {
 				this.set('open', true);
+				this.set('showLayers', 'hidden');
+
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].show();
 				}
+				this.trigger('change:showLayers');
+
 				return this.children;
 			},
 
 			close: function() {
 				this.set('open', false);
+				this.set('showLayers', 'visible');
+
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].close();
 					this.children[i].hide();
 				}
+				this.trigger('change:showLayers');
+
 				return this.getParentNode();
 			},
 
 			call: function() {
 				this.set('called', true);
 				for (var i = 0; i < this.children.length; i++) {
-					this.children[i].show();
+					console.log('child is returned',this.children[i].isReturned);
+					if(this.children[i].isReturned ){
+						this.children[i].show();
+					}
+					else{
+						console.log('hiding child');
+						this.children[i].hide();
+					}
+				}
+				var params = this.get('f_parameters');
+				for (var j = 0; j < params.length; j++) {
+					params[j].setCalled(true);
 				}
 			},
 
@@ -98,43 +171,51 @@ define([
 				for (var i = 0; i < this.children.length; i++) {
 					this.children[i].hide();
 				}
+				var params = this.get('f_parameters');
+				for (var j = 0; j < params.length; j++) {
+					params[j].setCalled(false);
+				}
 			},
 
 			compile: function() {
 				var open = this.get('open');
 				var called = this.get('called');
 				var params = this.get('f_parameters');
-				 var args = this.get('f_arguments');
-				if (!open && called) {
-					for (var i = 0; i < params.length; i++) {
-						if (args.length > i) {
-							params[i].set('visible',true);
-						} else {
-							params[i].set('visible',false);
+				if (!open) {
+					/*for (var i = 0; i < params.length; i++) {
+						params[i].set('visible', false);
+					}*/
+					this.children.forEach(function(child) {
+						if(!child.isReturned){
+							console.log('setting child to non-visible');
+							child.set('visible', false);
 						}
-					}
+					});
+
 				} else if (open) {
 					this.children.forEach(function(child) {
+													console.log('setting child to visible');
+
 						child.set('visible', true);
 					});
 				}
 			},
 
 			render: function() {
-				var geom = this.get('geom');
+				var ui = this.get('ui');
 				var open = this.get('open');
 				if (!open) {
-					geom.visible = true;
-					geom.position = this.get('translation_delta').toPaperPoint();
+					ui.visible = true;
+					ui.position = this.get('translation_delta').toPaperPoint();
 					this.nameText.content = this.get('f_name');
-					this.renderSelection(geom.children['box']);
+					this.renderSelection(ui.children['box']);
 					if (this.get('called')) {
-						geom.children['eye'].visible = true;
+						ui.children['eye'].visible = true;
 					} else {
-						geom.children['eye'].visible = false;
+						ui.children['eye'].visible = false;
 					}
 				} else {
-					geom.visible = false;
+					ui.visible = false;
 				}
 
 			}

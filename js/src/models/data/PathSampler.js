@@ -20,6 +20,11 @@ define([
 
       }),
 
+      initialize:function(){
+          Sampler.prototype.initialize.call(this, arguments);
+          this.listenTo(this, "change:selected", this.modifySelection);
+      },
+
       //only allowed to have one member at a time
       addMember: function(data) {
         if (this.members.length > 0) {
@@ -34,13 +39,47 @@ define([
           var path = this.members[0].get('geom');
           var val = path.bounds[this.get('multTarget')];
           var multiplier_map = this.accessProperty('multiplier_map');
-          console.log('min,max',multiplier_map.x, multiplier_map.y);
           var m = TrigFunc.map(val, 1, 1000, multiplier_map.x, multiplier_map.y);
           this.setMultiplier(val);
         }
         return this.accessProperty('multiplier');
       },
 
+      /* modifyProperty, modifyPoints, setSelectedSegments
+      * passes all transformations onto path member
+      */
+      modifyProperty: function(data, mode, modifier) {
+        if (this.members.length > 0) {
+          var m = this.members[0];
+          m.modifyProperty(data, mode, modifier);
+        }
+      },
+
+      modifyPoints: function(data, mode, modifier) {
+        if (this.members.length > 0) {
+          var m = this.members[0];
+          m.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
+        }
+
+      },
+
+      setSelectedSegments: function(segments) {
+        if (this.members.length > 0) {
+          var m = this.members[0];
+          m.setSelectedSegments(segments);
+        }
+      },
+
+      modifySelection: function(){
+          if (this.members.length > 0) {
+          var m = this.members[0];
+          m.set('selected',this.get('selected'));
+        }
+      },
+
+      /* getValue
+      * returns a value based on the geometry of the path member
+      */
       getValue: function() {
         if (this.members.length > 0) {
           var path = this.members[0].get('geom');
@@ -67,7 +106,6 @@ define([
             }
           }
           this.increment();
-          console.log('value=',this.accessProperty('value'));
           return this.accessProperty('value');
         }
       },

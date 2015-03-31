@@ -62,7 +62,7 @@ define([
         geom.addChild(this.startText);
         this.startText.data.instance = geom.data.instance = path.data.instance = this;
 
-        this.set('geom', geom);
+        this.set('ui', geom);
         this.indexNumbers = [];
 
       },
@@ -87,36 +87,21 @@ define([
 
       removeMember: function(data) {
         ListNode.prototype.removeMember.call(this, data);
-        var diff = this.members.length - this.indexNumbers.length;
+        var diff = this.indexNumbers.length-this.members.length;
+        console.log('diff',diff);
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
           numText.remove();
         }
       },
 
-      //returns all non-list members
-      getInstanceMembers: function(memberList) {
-        if (!memberList) {
-          memberList = [];
-        }
-        for (var i = 0; i < this.members; i++) {
-          if (this.members[i].get('type') !== 'list' || 'sampler') {
-            memberList.push(this.members[i]);
-          } else {
-            this.members[i].getInstanceMembers(memberList);
-          }
-
-        }
-        return memberList;
-      },
-
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
         var start = this.accessProperty('start_index');
         this.setIndex(start);
-        var geom = this.get('geom');
-        geom.position.x = 0;
-        geom.position.y = 0;
+        var ui = this.get('ui');
+        ui.position.x = 0;
+        ui.position.y = 0;
 
       },
 
@@ -135,33 +120,17 @@ define([
       },
 
       setValue: function(value) {
-        this.modifyProperty({
-          value: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        var v = this.get('value');
+        v.setValue(value);
       },
-
 
       setMultiplier: function(value) {
-        this.modifyProperty({
-          multiplier: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('multiplier').setValue(value);
       },
 
-
-
       setIndex: function(value) {
-        this.modifyProperty({
-          index: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('index').setValue(value);
+
       },
 
       getIndex: function() {
@@ -170,21 +139,11 @@ define([
 
 
       setStart: function(value) {
-        this.modifyProperty({
-          start_index: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('start_index').setValue(value);
       },
 
       setEnd: function(value) {
-        this.modifyProperty({
-          end_index: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('end_index').setValue(value);
       },
 
       //places a constraint on the end and start values
@@ -235,31 +194,16 @@ define([
       },
 
       setMax: function(value) {
-        this.modifyProperty({
-          max: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('max').setValue(value);
 
       },
 
       setMin: function(value) {
-        this.modifyProperty({
-          min: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('min').setValue(value);
       },
 
       setLoop: function(value) {
-        this.modifyProperty({
-          loop: {
-            val: value,
-            operator: 'set'
-          }
-        });
+        this.get('loop').setValue(value);
       },
 
       increment: function() {
@@ -291,17 +235,9 @@ define([
         return this.accessProperty('start_index');
       },
 
-
-      compile: function() {
-
-
-
-      },
-
-
       render: function() {
         ListNode.prototype.render.call(this, arguments);
-        var geom = this.get('geom');
+        var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();
         for (var i = 0; i < this.indexNumbers.length; i++) {
           var numText = this.indexNumbers[i];
@@ -317,14 +253,14 @@ define([
           numText.bringToFront();
         }
 
-        geom.position = new paper.Point(bottomLeft.x + geom.bounds.width / 2, bottomLeft.y + geom.bounds.height / 2);
+        ui.position = new paper.Point(bottomLeft.x + ui.bounds.width / 2, bottomLeft.y + ui.bounds.height / 2);
         this.startText.content = 'range: ' + this.accessProperty('start_index') + ' - ' + this.accessProperty('end_index');
 
         //this.renderSelection(geom);
         if (this.get('selected') || this.get('open')) {
-          geom.visible = true;
+          ui.visible = true;
         } else {
-          geom.visible = false;
+          ui.visible = false;
         }
 
 

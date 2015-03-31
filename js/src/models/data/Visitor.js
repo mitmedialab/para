@@ -7,24 +7,23 @@
 define([
 	'underscore',
 	'backbone',
-	'models/data/functions/FunctionManager',
 	'models/data/Instance',
 	'models/data/functions/FunctionNode'
 
 
-], function(_, Backbone, FunctionManager, Instance, FunctionNode) {
+], function(_, Backbone, Instance, FunctionNode) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
 	//stores para lists
 	var lists;
-	var openLists = [];
 	var renderQueue = [];
 	var store = 0;
 	var compile = 1;
 	var render = 2;
+	var visit = 3;
 
-	var functionManager = new FunctionManager();
+
 	var rootNode, currentNode;
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
@@ -46,9 +45,9 @@ define([
 		 */
 		resetPrototypes: function() {
 
-			for (var i = 0; i < renderQueue.length; i++) {
-				renderQueue[i].reset();
-			}
+			//for (var i = 0; i < renderQueue.length; i++) {
+			//renderQueue[i].reset();
+			//}
 			renderQueue = [];
 		},
 
@@ -91,22 +90,22 @@ define([
 				func: compile,
 				instance: compile
 			};
-			var functions = functionManager.functions;
+			var functions = this.functionManager.functions;
 			for (var i = 0; i < functions.length; i++) {
 				this.visit(functions[i], null, state_data);
 			}
 		},
 
 		compileInstances: function() {
-		
-				var state_data = {
-					list: store,
-					instance: compile,
-					func: compile,
-				};
 
-				this.visit(currentNode, null, state_data);
-			
+			var state_data = {
+				list: store,
+				instance: compile,
+				func: compile,
+			};
+
+			this.visit(currentNode, null, state_data);
+
 		},
 
 		render: function(root) {
@@ -133,8 +132,6 @@ define([
 						lists = lists.concat(node.getListMembers());
 						node.removeAllMembers();
 						break;
-					} else {
-						lists[j].recRemoveMember(target);
 					}
 				}
 				if (departureNode) {
@@ -187,16 +184,30 @@ define([
 					node.children[k].visit(this, 'visit', node, state_data);
 				}
 			} else if (state === compile) {
+				node.reset();
 				node.compile();
 				renderQueue.push(node);
+				var s_d = {
+					list: visit
+				};
 				for (var i = 0; i < node.members.length; i++) {
 					member = node.members[i];
-					if (member.get('type') === 'list') {
+					if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+						member.visit(this, 'visit', node, s_d);
+					}
+				}
+			} else if (state == visit) {
+				renderQueue.push(node);
+				for (var j = 0; j < node.members.length; j++) {
+					member = node.members[j];
+					if (member.get('type') === 'list' || member.get('type') === 'sampler') {
 						member.visit(this, 'visit', node, state_data);
 					}
 				}
-				return;
 			}
+
+			return;
+
 		},
 
 		/* visitFunction
@@ -206,14 +217,21 @@ define([
 			var state = state_data.func;
 			switch (state) {
 				case compile:
+					node.reset();
 					node.compile();
 					renderQueue.push(node);
-					if (node.get('open') || node.get('called')) {
-						var children = node.children;
-						for (var i = 0; i < children.length; i++) {
+
+					var children = node.children;
+					for (var i = 0; i < children.length; i++) {
+						if (!node.get('open') && node.get('called')) {
+							if (children[i].isReturned) {
+								children[i].visit(this, 'visit', node, state_data);
+							}
+						} else if (node.get('open')) {
 							children[i].visit(this, 'visit', node, state_data);
 						}
 					}
+
 					break;
 			}
 		},
@@ -226,6 +244,7 @@ define([
 
 			switch (state) {
 				case compile:
+					node.reset();
 					node.compile();
 					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {
@@ -241,15 +260,16 @@ define([
 		//=======function managment methods==========//
 		//need to put something in here where you can't have an item in a function that is also in an opened list?
 		addFunction: function(selected_shapes) {
-			lists = lists.filter(function(item){
-				return selected_shapes.indexOf(item)===-1;
+			lists = lists.filter(function(item) {
+				console.log('removing list from current list tracker');
+				return selected_shapes.indexOf(item) === -1;
 			});
-			functionManager.createFunction('my_function', selected_shapes);
+			this.functionManager.createFunction('my_function', selected_shapes);
 		},
 
-		createParams: function(selected_shapes){
-			for(var i=0;i<selected_shapes.length;i++){
-				functionManager.addParamToFunction(currentNode, selected_shapes[i]);
+		createParams: function(selected_shapes) {
+			for (var i = 0; i < selected_shapes.length; i++) {
+				this.functionManager.addParamToFunction(currentNode, selected_shapes[i]);
 			}
 		},
 
@@ -319,6 +339,7 @@ define([
 			var itemFound = false;
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
+
 				if (item) {
 					sInstances.push(item);
 					itemFound = true;
@@ -332,16 +353,16 @@ define([
 		},
 
 		/* toggleItems
-		* toggles item funcitonality according to item type
-		*/
-		toggleItems: function(items){
-			var lastSelected = items[items.length-1];
-			switch(lastSelected.get('type')){
+		 * toggles item funcitonality according to item type
+		 */
+		toggleItems: function(items) {
+			var lastSelected = items[items.length - 1];
+			switch (lastSelected.get('type')) {
 				case 'function':
-					functionManager.callFunction(lastSelected);
-				break;
+					this.functionManager.callFunction(lastSelected);
+					break;
 				default:
-				break;
+					break;
 			}
 		},
 
@@ -354,7 +375,7 @@ define([
 			});
 			if (functions.length > 0) {
 				this.closeAllLists();
-				var data = functionManager.toggleOpenFunctions(currentNode,functions[functions.length - 1]);
+				var data = this.functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
 				lists = data.lists;
 				currentNode = data.currentNode;
 				return data.toSelect;
@@ -367,16 +388,20 @@ define([
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function(items) {
-			if (openLists.length > 0) {
+			//TODO: fix this so it closes selected open lists first...
+			var lists = items.filter(function(item) {
+				return (item.get('type') === 'list' || item.get('type') === 'sampler');
+			});
+			if (lists.length > 0) {
 				return this.toggleClosedLists(items);
 			} else {
 				this.closeAllLists();
-				var data = functionManager.toggleClosedFunctions(currentNode,rootNode);
-				currentNode =  data.currentNode;
+				var data = this.functionManager.toggleClosedFunctions(currentNode, rootNode);
+				currentNode = data.currentNode;
 				lists = currentNode.lists;
 				return data.toSelect;
 			}
-		},	
+		},
 
 		/* toggleClosedLists
 		 * closes selected open lists
@@ -393,7 +418,6 @@ define([
 							returnedLists = returnedLists.concat(r);
 							toggledLists.push(lists[i]);
 						}
-
 					}
 				}
 			}

@@ -8,21 +8,24 @@ define([
 	'jquery',
 	'paper',
 	'models/data/SceneNode',
+	'models/data/InheritorCollection',
+
 	'utils/PPoint',
 	'utils/PFloat',
 	'utils/PColor',
 	'utils/PBool',
+	'utils/PProperty',
 	'utils/PConstraint',
 	'utils/TrigFunc'
-], function(_, $, paper, SceneNode, PPoint, PFloat, PColor, PBool, PConstraint, TrigFunc) {
+], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PProperty, PConstraint, TrigFunc) {
 
 
 
 	var Instance = SceneNode.extend({
-		
 
-		defaults: {
-			
+
+		defaults: _.extend({}, SceneNode.prototype.defaults, {
+
 			//selection defaults
 			selected: false,
 			proto_selected: false,
@@ -40,12 +43,11 @@ define([
 			screen_position: null,
 			screen_width: 0,
 			screen_height: 0,
-			
+
 			/*==begin JSON export===*/
 			/*constrainable properties to export to JSON*/
 			position: null,
 			translation_delta: null,
-			absolute_position: null,
 			scaling_origin: null,
 			scaling_delta: null,
 			rotation_origin: null,
@@ -53,8 +55,8 @@ define([
 			stroke_color: null,
 			fill_color: null,
 			stroke_width: null,
-			master_path: null,
 			path_altered: null,
+			val: null,
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
@@ -62,8 +64,20 @@ define([
 			visible: true,
 			closed: false,
 			order: 0,
-
 			/*==end JSON export===*/
+
+			//map of constrainable properties
+			constrain_map: ['position',
+				'translation_delta',
+				'scaling_origin',
+				'scaling_delta',
+				'rotation_origin',
+				'rotation_delta',
+				'stroke_color',
+				'fill_color',
+				'stroke_width',
+				'inheritors',
+			],
 
 			center: null,
 			rmatrix: null,
@@ -110,7 +124,7 @@ define([
 					}
 				}
 			}
-		},
+		}),
 
 		initialize: function() {
 
@@ -155,13 +169,13 @@ define([
 			stroke_width.setNull(true);
 			this.set('stroke_width', stroke_width);
 
-			var master_path = new PFloat(0);
-			master_path.setNull(true);
-			this.set('master_path', master_path);
 
 			this.set('tmatrix', new paper.Matrix());
 			this.set('smatrix', new paper.Matrix());
-			this.set('inheritors', []);
+			this.set('inheritors', new InheritorCollection(this));
+			this.get('inheritors').setNull(false);
+			this.set('val', new PProperty(0));
+
 			this.set('sibling_instances', []);
 			this.set('rmatrix', new paper.Matrix());
 
@@ -179,7 +193,15 @@ define([
 
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
-			console.log('to_json:',this.toJSON());
+			this.on('change:selected', this.selectionChange);
+			this.isReturned = false;
+			
+			var parent = this;
+			_.each(this.attributes, function(val, key) {
+				if (val instanceof PConstraint) {
+					parent.listenTo(val, 'modified', parent.propertyModified);
+				}
+			});
 		},
 
 
@@ -188,6 +210,7 @@ define([
 		 * scene graph
 		 */
 		deleteSelf: function() {
+			this.reset();
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
@@ -196,6 +219,11 @@ define([
 				this.children[i].deleteSelf();
 				//this.children[i].destroy();
 			}
+			var parent = this.getParentNode();
+			if (parent) {
+				parent.removeChildNode(this);
+			}
+			this.trigger('delete', this);
 		},
 
 		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
@@ -239,9 +267,9 @@ define([
 		},
 
 		/*close
-		* used mainly for closing functions
-		*/
-		close: function(){
+		 * used mainly for closing functions
+		 */
+		close: function() {
 			return this.getParentNode();
 		},
 
@@ -255,17 +283,27 @@ define([
 			var instance = new this.constructor();
 			this.set('is_proto', true);
 
-			var inheritors = this.get('inheritors');
+			var inheritorCollection = this.get('inheritors');
 			instance.set('proto_node', this);
-			inheritors.push(instance);
-			this.set('inheritors', inheritors);
+			inheritorCollection.addInheritor(instance);
 			var position = this.get('position');
-			instance.set('position', position.clone());
-			instance.set('rotation_origin', position.clone());
-			instance.set('scaling_origin', position.clone());
-			instance.set('translation_delta', this.get('translation_delta').clone());
+			instance.get('position').setValue(position.clone().getValue());
+			instance.get('rotation_origin').setValue(position.clone().getValue());
+			instance.get('scaling_origin').setValue(position.clone().getValue());
+			instance.get('translation_delta').setValue(this.get('translation_delta').getValue());
+			var g_clone = this.get('geom').clone();
+			g_clone.transform(this.get('ti_matrix'));
+			g_clone.transform(this.get('ri_matrix'));
+			g_clone.transform(this.get('si_matrix'));
+			g_clone.data.instance = instance;
+			g_clone.data.geom = true;
+			g_clone.data.nodetype = instance.get('name');
+			instance.set('geom', g_clone);
+			this.addChildNode(instance);
 			return instance;
 		},
+
+
 
 		reset: function() {
 			this.set('rendered', false);
@@ -292,37 +330,71 @@ define([
 			rmatrix.reset();
 			smatrix.reset();
 			tmatrix.reset();
-
-			this.set('rmatrix', rmatrix);
-			this.set('smatrix', smatrix);
-			this.set('tmatrix', tmatrix);
 		},
 
-		// sets the geom visibility to false
-		hide: function(){
-			var geom = this.get('geom');
-			if(geom){
-				geom.visible = false;
-				geom.selected = false;
+		//triggered on change of select property, removes bbox
+		selectionChange: function() {
+			if (!this.get('selected')) {
+				if (this.get('bbox')) {
+					this.get('bbox').remove();
+				}
 			}
 		},
 
-		show: function(){
+		// sets the geom visibility to false
+		hide: function() {
 			var geom = this.get('geom');
-			if(geom){
+			if (geom) {
+				geom.visible = false;
+				geom.selected = false;
+			}
+			this.clearBoundingBoxes();
+			for(var i=0;i<this.children.length;i++){
+				this.children[i].hide();
+			}
+		},
+
+		show: function() {
+			var geom = this.get('geom');
+			if (geom) {
 				geom.visible = true;
+			}
+			for(var i=0;i<this.children.length;i++){
+				this.children[i].show();
+			}
+		},
+
+		bringToFront: function() {
+			var geom = this.get('geom');
+			if (geom) {
+				geom.bringToFront();
 			}
 		},
 
 
 		resetProperties: function() {
 			this.clear().set(this.defaults);
-			this.set('position', new PPoint(0, 0));
-			this.set('translation_delta', new PPoint(0, 0));
-			this.set('center', new PPoint(0, 0));
-			this.set('scaling_origin', new PPoint(0, 0));
-			this.set('rotation_origin', new PPoint(0, 0));
-			this.set('matrix', new paper.Matrix());
+			this.get('position').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('translation_delta').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('center').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('scaling_origin').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('rotation_origin').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('matrix').reset();
 		},
 
 
@@ -354,15 +426,15 @@ define([
 		 */
 		_setPropertiesToInstance: function(data, instance) {
 			if (data.translation_delta) {
-				this.set('translation_delta', instance.get('translation_delta').clone());
+				this.get('translation_delta').setValue(instance.get('translation_delta').getValue());
 			}
 
 			if (data.rotation_delta) {
-				this.set('rotation_delta', instance.get('rotation_delta'));
+				this.get('rotation_delta').setValue(instance.get('rotation_delta').getValue());
 
 			}
 			if (data.scaling_delta) {
-				this.set('scaling_delta', instance.get('scaling_delta'));
+				this.get('scaling_delta').setValue(instance.get('scaling_delta').getValue());
 
 			}
 		},
@@ -424,7 +496,7 @@ define([
 		modifyProperty: function(data, mode, modifier) {
 			var proto_incremented = false;
 			var protoNode = this.get('proto_node');
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			if (mode === 'proxy') {
 				if (protoNode) {
 					if (modifier === 'override') {
@@ -445,6 +517,8 @@ define([
 
 				}
 			}
+
+			var constrained_props = this.getValue();
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
@@ -452,6 +526,7 @@ define([
 
 						var property = this.get(p);
 						property.setNull(false);
+
 						property.modifyProperty(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
@@ -459,10 +534,23 @@ define([
 								property.setValue(TrigFunc.wrap(property.getValue(), 0, 360));
 							}
 						}
+						if (constrained_props) {
+							if (_.has(constrained_props, p)) {
+								var d = TrigFunc.merge(property.getValue(), constrained_props[p]);
+								property.setValue(d);
+							}
+						}
+
 						this.set(p, property);
+						this.trigger('change:' + p);
+
 					}
 				}
 			}
+		},
+
+		propertyModified: function(event) {
+			this.trigger('modified', this);
 		},
 
 		/*inheritProperty
@@ -497,11 +585,107 @@ define([
 		 * to return the appropriate value
 		 */
 		accessProperty: function(property_name) {
+			if (this.isSelfConstrained()) {
+				this.getValue();
+			}
 			var property = this.inheritProperty(property_name);
 			if (property) {
 				return property.getValue();
 			} else {
 				return null;
+			}
+
+
+		},
+
+
+		/* isConstrained
+		 * returns object with booleans for each property based on constraint status
+		 */
+		isConstrained: function() {
+			var constrainMap = this.get('constrainMap');
+			var data = {};
+			data.self = this.isSelfConstrained();
+			for (var i = 0; i < constrainMap.length; i++) {
+				data[constrainMap[i]] = this.get(constrainMap[i]).isConstrained();
+			}
+			return data;
+		},
+
+		/* getConstraint
+		 * returns true if constraint exists
+		 * false if not
+		 */
+		getConstraint: function() {
+			var constrainMap = this.get('constrain_map');
+			var data = {};
+			data.self = this.getSelfConstraint();
+			for (var i = 0; i < constrainMap.length; i++) {
+				data[constrainMap[i]] = this.get(constrainMap[i]).getConstraint();
+			}
+			return data;
+		},
+
+		/*setValue
+		 * modifies the properties of this instance in accordance with the
+		 * data passed in
+		 * note- in future should unifiy this with the modify property function?
+		 */
+		setValue: function(data) {
+			for (var prop in data) {
+				if (data.hasOwnProperty(prop)) {
+
+					var p = data[prop];
+					if (typeof data[prop] !== 'object') {
+						p = {
+							val: data[prop]
+						};
+					}
+					p.operator = 'set';
+					this.get(prop).modifyProperty(p);
+				}
+			}
+		},
+
+
+		/* getValue
+		 * returns an object containing all constrained properties of
+		 * this instance
+		 */
+		getValue: function() {
+			var constrainMap = this.get('constrain_map');
+			var data = {};
+			var isSelfConstrained = this.isSelfConstrained();
+			var constraintCalled = false;
+			if (this.reference) {
+				constraintCalled = this.reference.get('called');
+			}
+			if (isSelfConstrained && constraintCalled) {
+				var constraint = this.getSelfConstraint().getValue();
+				return constraint;
+
+			} else {
+				for (var i = 0; i < constrainMap.length; i++) {
+					var prop = this.inheritProperty(constrainMap[i]);
+					if (prop) {
+						var c = prop.getConstraint();
+						if (c.self) {
+							data[constrainMap[i]] = c.self.getValue();
+						} else {
+							data[constrainMap[i]] = {};
+							for (var p in c) {
+								if (p !== 'self' && c[p]) {
+									data[constrainMap[i]][p] = c[p].getValue();
+								}
+							}
+							if (_.isEmpty(data[constrainMap[i]])) {
+								delete(data[constrainMap[i]]);
+							}
+						}
+					}
+
+				}
+				return data;
 			}
 
 		},
@@ -536,7 +720,7 @@ define([
 		 * ancestors.
 		 */
 		setSelectionForInheritors: function(select, mode, modifer, recurse) {
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			var alpha;
 			var proto = this.get('proto_node');
 			if (proto) {
@@ -552,13 +736,13 @@ define([
 							proto.set('inheritor_selected', 'standard');
 							alpha = proto.get('alpha');
 							alpha.setValue(1);
-							proto.set('alpha', alpha);
+							proto.get('alpha').setValue(alpha.getValue());
 						}
 					} else {
 						proto.set('inheritor_selected', false);
 						alpha = proto.get('alpha');
 						alpha.setValue(1);
-						proto.set('alpha', alpha);
+						proto.get('alpha').setValue(alpha.getValue());
 					}
 					proto.setSelectionForInheritors(select, 'standard', 'none', 0);
 				}
@@ -569,7 +753,7 @@ define([
 				inheritors[i].set('proto_selected', select);
 				alpha = inheritors[i].get('alpha');
 				alpha.setValue(1);
-				inheritors[i].set('alpha', alpha);
+				inheritors[i].get('alpha').setValue(alpha.getValue());
 			}
 		},
 
@@ -674,9 +858,7 @@ define([
 		},
 
 		renderBoundingBox: function(geom) {
-			if (this.get('bbox')) {
-				this.get('bbox').remove();
-			}
+
 			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
 			bbox.data.instance = this;
@@ -689,7 +871,7 @@ define([
 			if (this.get('inheritor_bbox')) {
 				this.get('inheritor_bbox').remove();
 			}
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			for (var k = 0; k < inheritors.length; k++) {
 				this.updateBoundingBox(inheritors[k]);
 			}
@@ -700,6 +882,15 @@ define([
 				var inheritor_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
 				this.set('inheritor_bbox', inheritor_bbox);
 				return inheritor_bbox;
+			}
+		},
+
+		clearBoundingBoxes: function(){
+			if(this.get('bbox')){
+				this.get('bbox').remove();
+			}
+			if(this.get('inheritor_bbox')){
+				this.get('inheritor_bbox').remove();
 			}
 		},
 
@@ -763,51 +954,41 @@ define([
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 
-		
-				var rmatrix = this.get('rmatrix');
-				var smatrix = this.get('smatrix');
-				var tmatrix = this.get('tmatrix');
+			var rmatrix = this.get('rmatrix');
+			var smatrix = this.get('smatrix');
+			var tmatrix = this.get('tmatrix');
 
-				var path_altered = this.get('path_altered').getValue();
-				if (!path_altered && geom) {
-					geom.transform(this.get('ti_matrix'));
-					geom.transform(this.get('ri_matrix'));
-					geom.transform(this.get('si_matrix'));
-					geom.selected = false;
-				} else {
-					if (!geom) {
-						geom = new paper.Path();
-					}
-					geom.importJSON(this.accessProperty('master_path'));
-				}
-				geom.data.instance = this;
+			var path_altered = this.get('path_altered').getValue();
+			if (!path_altered) {
+				geom.transform(this.get('ti_matrix'));
+				geom.transform(this.get('ri_matrix'));
+				geom.transform(this.get('si_matrix'));
+				geom.selected = false;
+			}
 
+			var position = this.get('position').toPaperPoint();
+			geom.position = position;
+			geom.transform(smatrix);
+			geom.transform(rmatrix);
+			geom.transform(tmatrix);
 
-				var position = this.get('position').toPaperPoint();
-				geom.position = position;
-				geom.transform(smatrix);
-				geom.transform(rmatrix);
-				geom.transform(tmatrix);
-
-				this.updateScreenBounds(geom);
-				this.set('geom', geom);
-				var p_altered = this.get('path_altered');
-				p_altered.setValue(false);
-				this.set('path_altered', p_altered);
-				geom.visible = visible;
-				return geom;
-			
+			this.updateScreenBounds(geom);
+			var p_altered = this.get('path_altered');
+			p_altered.setValue(false);
+			this.get('path_altered').setValue(p_altered);
+			geom.visible = visible;
+			return geom;
 		},
 
 
 		copyAttributes: function(clone, deep) {
-			clone.set('position', this.get('position').clone());
-			clone.set('translation_delta', this.get('translation_delta').clone());
-			clone.set('rotation_delta', this.get('rotation_delta'));
-			clone.set('scaling_delta', this.get('scaling_delta').clone());
-			clone.set('center', this.get('center').clone());
-			clone.set('scaling_origin', this.get('scaling_origin').clone());
-			clone.set('rotation_origin', this.get('rotation_origin').clone());
+			clone.get('position').setValue(this.get('position').getValue());
+			clone.get('translation_delta').setValue(this.get('translation_delta').clone());
+			clone.get('rotation_delta').setValue(this.get('rotation_delta').getValue());
+			clone.get('scaling_delta').setValue(this.get('scaling_delta').getValue());
+			clone.get('center').setValue(this.get('center').getValue());
+			clone.get('scaling_origin').setValue(this.get('scaling_origin').getValue());
+			clone.get('rotation_origin').setValue(this.get('rotation_origin').getValue());
 			clone.set('rmatrix', this.get('rmatrix').clone());
 			clone.set('smatrix', this.get('smatrix').clone());
 			clone.set('tmatrix', this.get('tmatrix').clone());
@@ -816,7 +997,7 @@ define([
 		},
 
 		animateAlpha: function(levels, property, mode, modifier, curlevel) {
-			var inheritors = this.get('inheritors');
+			var inheritors = this.get('inheritors').accessProperty();
 			var alpha = this.get('alpha');
 			var mod = this.get('mod');
 			if (alpha.getValue() < 0.65) {
@@ -830,21 +1011,19 @@ define([
 			if (mode === 'proxy') {
 				var proto = this.get('proto_node');
 				if (proto) {
-					proto.set('alpha', alpha.clone());
+					proto.get('alpha').setValue(alpha.getValue());
 					proto.get('geom').fillColor.alpha = alpha.getValue();
 				}
 			} else {
 				for (var i = 0; i < inheritors.length; i++) {
 					var inheritor = inheritors[i];
 					if (inheritor.get(property).isNull() || modifier != 'none') {
-						inheritor.set('alpha', alpha.clone());
+						inheritor.get('alpha').setValue(alpha.getValue());
 						inheritor.get('geom').fillColor.alpha = alpha.getValue();
 						inheritor.animateAlpha(levels, property, mode, modifier, curlevel + 1);
 					}
 				}
 			}
-			this.set('mod', mod);
-			this.set('alpha', alpha);
 		},
 
 		updateScreenBounds: function(targetGeom) {
