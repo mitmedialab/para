@@ -479,6 +479,10 @@ define([
 			/*for defaults:
 				data[default[k]]:default[k].toJSON();
 			}*/
+			myJSON = {};
+			myJSON.position = this.get('position').toJSON();
+			//
+			return myJSON;
 
 		},
 

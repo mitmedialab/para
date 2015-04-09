@@ -902,6 +902,7 @@ margin-left: 5px;
     padding: 10px; 
   border-radius: 5px 0 0 5px;
     border-bottom: solid 1px #34332F;
+      border-top: solid 1px #34332F;
     color: #ccc;
 }
 
