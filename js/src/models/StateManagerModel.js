@@ -26,7 +26,6 @@ define(['jquery',
   'utils/ColorUtils',
   'utils/Utils',
   'utils/PaperUIHelper',
-  'models/data/functions/FunctionManager',
 
 ], function($, _, paper, Backbone, UndoManager, GeometryNode, PathNode, PolygonNode, RectNode, EllipseNode, ListNode, Instance, PathSampler, ListSampler, ToolCollection, PolyToolModel, SelectToolModel, FollowPathToolModel, ConstraintToolModel, FileSaver, Visitor, PPoint, ColorUtils, Utils, PaperUIHelper, FunctionManager) {
 
@@ -107,9 +106,7 @@ define(['jquery',
 
       //setup visitor and function manager
       visitor = new Visitor();
-      functionManager = new FunctionManager();
-      visitor.functionManager = functionManager;
-      functionManager.selectTool = selectTool;
+      visitor.setSelectTool(selectTool);
 
       //clear local storage
       localStorage.clear();

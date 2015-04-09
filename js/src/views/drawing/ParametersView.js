@@ -8,47 +8,20 @@ define([
 	'paper',
 	'backbone',
 	'handlebars',
-	'fancytree',
-	"text!html/layers_ui.html"
+	"text!html/params_ui.html"
 
-], function($, _, paper, Backbone, Handlebars, fancytree, ui) {
-	var shapeTree, listTree, shapeRoot, listRoot;
-		var testSource = [
-    {title: "Shape 1", key: "1"},
-      {title: "Shape 5", key: "7"},
-        {title: "Shape 6", key: "8"},
-    {title: "Shape 2", key: "2", folder: true, children: [
-      {title: "Inheritor 1", key: "3"},
-      {title: "Inheritor 2", key: "4"}
-    ]}
-  ];
+], function($, _, paper, Backbone, Handlebars, ui) {
 
-  	var listSource = [
-    {title: "List 1", key: "10",data:{list:true}},
-      {title: "List 2", key: "11",data:{list:true}},
-        {title: "List 3", key: "12",data:{list:true}},
-  ];
-	var LayersView = Backbone.View.extend({
-
+	var ParametersView = Backbone.View.extend({
+	
 		events: {
 			'mousedown.filled': 'argumentClicked',
 		},
 
 		initialize: function(obj) {
-			
-			this.$el.append(ui);
-			this.$('#shapes').fancytree({ source: testSource});
-			this.$('#lists').fancytree({ source: listSource});
-			shapeTree = $("#shapes").fancytree("getTree");
-			$("#shapes").bind("click",this.layerClicked);
-			shapeRoot = $("#shapes").fancytree("getRootNode");
-			shapeRoot.addChildren({
-    			title: "Shape 3",
-    			key: 5
-  			});
-			console.log("We have " + shapeTree.count() + " nodes.");
-
-			/*this.setElement(this.$('#layer-palette'));
+			this.activeParam = null;
+			this.$el.prepend(ui);
+			this.setElement(this.$('#layer-palette'));
 			var id = this.model.get('id');
 			this.$el.attr('id', 'layer_' + id); //;
 			this.$el.css({
@@ -65,7 +38,7 @@ define([
 			//this.tool.parent = this;
 			//this.tool.name = 'layer_tool';
 			//this.tool.attach('mouseup', this.mouseUp);
-			//$('body').bind('mouseup', this.mouseUp);*/
+			//$('body').bind('mouseup', this.mouseUp);
 
 		},
 
@@ -106,26 +79,15 @@ define([
 			$('#layers').html(html);
 		},
 
-		layerClicked: function(event) {
+		argumentClicked: function(event) {
 			
-			var id = event.target.id;
-			var classes = event.target.className.split(/\s+/);
-			console.log('layer clicked',id,classes);
-			switch(id){
-				case 'constraint':
-					
-				break;
-				case 'visible':
-					if(!_.contains(classes,'hidden')){
-						$(event.target).addClass('hidden');
-					}
-					else{
-						console.log('removing class');
-						$(event.target).removeClass('hidden');
-
-					}
-				break;
+			var paramId = $(event.target).parent().attr('id');
+			
+			if(this.model.requestArgument(paramId)){
+				$(event.target).attr('id','active');
 			}
+			//console.log('argument clicked',this.activeParam);
+			//this.tool.activate();
 		},
 
 		/*mouseUp: function(event) {
@@ -169,5 +131,5 @@ define([
 
 
 	});
-	return LayersView;
+	return ParametersView;
 });

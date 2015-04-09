@@ -15,7 +15,8 @@ require.config({
         "iris-color-picker": "../../bower_components/iris-color-picker/dist/iris",
         "jquery-cookie" : "../../bower_components/jquery-cookie/jquery.cookie",
         "html": "../../html",
-        "cjs": "../../bower_components/constraintjs/build/cjs.min"        
+        "cjs": "../../bower_components/constraintjs/build/cjs.min" ,
+        "fancytree": "../../bower_components/fancytree/dist/jquery.fancytree"
     },
   
     shim: {       
@@ -32,6 +33,9 @@ require.config({
             deps: ["backbone"]
         },
         "iris-color-picker":{
+            deps: ["jquery", "jquery-ui"]
+        },
+        "fancytree":{
             deps: ["jquery", "jquery-ui"]
         }
     }

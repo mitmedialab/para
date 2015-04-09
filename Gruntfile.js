@@ -52,6 +52,12 @@ module.exports = function (grunt) {
                     cwd: "bower_components/jqueryui/themes/base/",
                     src: ["*.css"],
                     dest: "build/style/jqueryui"
+                },
+                {
+                    expand: true,
+                    cwd: "bower_components/fancytree/dist/skin-bootstrap/",
+                    src: ["*.css"],
+                    dest: "build/style/fancytree"
                 }]
             }
         },

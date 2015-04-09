@@ -8,10 +8,12 @@ define([
 	'underscore',
 	'backbone',
 	'models/data/Instance',
-	'models/data/functions/FunctionNode'
+	'models/data/functions/FunctionNode',
+	'models/data/functions/FunctionManager',
+	'views/drawing/LayersView'
 
 
-], function(_, Backbone, Instance, FunctionNode) {
+], function(_, Backbone, Instance, FunctionNode, FunctionManager, LayersView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -24,7 +26,7 @@ define([
 	var visit = 3;
 
 
-	var rootNode, currentNode;
+	var rootNode, currentNode, layersView, functionManager;
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
 
@@ -36,8 +38,15 @@ define([
 			rootNode.set('name', 'root');
 			this.listenTo(rootNode, 'parseJSON', this.parseJSON);
 			currentNode = rootNode;
+			functionManager = new FunctionManager();
+			layersView = new LayersView({
+				el: '#layers-constraints-container',
+				model: this
+			});
 		},
-
+		setSelectTool: function(st){
+			functionManager.selectTool = st;
+		},
 
 		/*resetPrototypes
 		 * resets the prototypes recursively.
@@ -90,7 +99,7 @@ define([
 				func: compile,
 				instance: compile
 			};
-			var functions = this.functionManager.functions;
+			var functions = functionManager.functions;
 			for (var i = 0; i < functions.length; i++) {
 				this.visit(functions[i], null, state_data);
 			}
@@ -264,12 +273,12 @@ define([
 				console.log('removing list from current list tracker');
 				return selected_shapes.indexOf(item) === -1;
 			});
-			this.functionManager.createFunction('my_function', selected_shapes);
+			functionManager.createFunction('my_function', selected_shapes);
 		},
 
 		createParams: function(selected_shapes) {
 			for (var i = 0; i < selected_shapes.length; i++) {
-				this.functionManager.addParamToFunction(currentNode, selected_shapes[i]);
+				functionManager.addParamToFunction(currentNode, selected_shapes[i]);
 			}
 		},
 
@@ -282,6 +291,7 @@ define([
 				}
 				this.addToOpenLists(instance);
 			}
+			this.layersView.addShape(instance.toJSON());
 		},
 
 
@@ -359,7 +369,7 @@ define([
 			var lastSelected = items[items.length - 1];
 			switch (lastSelected.get('type')) {
 				case 'function':
-					this.functionManager.callFunction(lastSelected);
+					functionManager.callFunction(lastSelected);
 					break;
 				default:
 					break;
@@ -375,7 +385,7 @@ define([
 			});
 			if (functions.length > 0) {
 				this.closeAllLists();
-				var data = this.functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
+				var data = functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
 				lists = data.lists;
 				currentNode = data.currentNode;
 				return data.toSelect;
@@ -396,7 +406,7 @@ define([
 				return this.toggleClosedLists(items);
 			} else {
 				this.closeAllLists();
-				var data = this.functionManager.toggleClosedFunctions(currentNode, rootNode);
+				var data = functionManager.toggleClosedFunctions(currentNode, rootNode);
 				currentNode = data.currentNode;
 				lists = currentNode.lists;
 				return data.toSelect;

@@ -8,12 +8,12 @@ define([
 		'paper',
 		'models/data/Instance',
 		'utils/PConstraint',
-		'views/drawing/LayersView',
+		'views/drawing/ParametersView',
 
 	],
 
 
-	function(_, paper, Instance, PConstraint, LayerView) {
+	function(_, paper, Instance, PConstraint, ParametersView) {
 		var svgstring = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 792" enable-background="new 0 0 612 792" xml:space="preserve"><g><path fill="none" stroke="#76787B" stroke-width="1.6375" stroke-miterlimit="10" d="M10,1.9c0,0-3.7,4-10,4s-10-4-10-4 s3.7-7.7,10-7.7S10,1.9,10,1.9z"/><ellipse fill="#76787B" cx="-0.3" cy="-0.9" rx="4.8" ry="5"/></g></svg>';
 		var FunctionNode = Instance.extend({
 
@@ -59,7 +59,7 @@ define([
 				this.set('ui', ui);
 				this.lists = [];
 				this.functions = [];
-				this.layerView = new LayerView({
+				this.layerView = new ParametersView({
 					el: 'body',
 					model: this,
 				});

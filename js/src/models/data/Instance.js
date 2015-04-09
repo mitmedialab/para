@@ -197,6 +197,7 @@ define([
 			this.isReturned = false;
 			
 			var parent = this;
+
 			_.each(this.attributes, function(val, key) {
 				if (val instanceof PConstraint) {
 					parent.listenTo(val, 'modified', parent.propertyModified);
@@ -1012,7 +1013,7 @@ define([
 				var proto = this.get('proto_node');
 				if (proto) {
 					proto.get('alpha').setValue(alpha.getValue());
-					proto.get('geom').fillColor.alpha = alpha.getValue();
+					proto.get('geom   ').fillColor.alpha = alpha.getValue();
 				}
 			} else {
 				for (var i = 0; i < inheritors.length; i++) {

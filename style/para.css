@@ -535,7 +535,7 @@ header button, .sub-header button {
     width: 16px;
 }
 
-.properties header, .layers-menu header{
+.properties header{
     padding: 4%;
     box-sizing: border-box;
     line-height: 10pt;
@@ -868,5 +868,166 @@ span:focus{
     border-radius:0px !important; 
     box-shadow: none !important;
     opacity: 1 !important; 
+}
+
+/* list and tree styling */
+
+.constraint-container{
+    float:left;
+    width:60px;
+}
+.constraint-container header {
+  height: 32px;
+  line-height: 20pt;
+  padding-left: 10px;
+  background-color: inherit;
+}
+
+.constraint-menu{
+width: 30px;
+float: left;
+margin:0;
+margin-left: 5px;
+}
+.constraint-menu ul {
+  list-style-type: none;
+    margin: 0px;
+  padding: 0px;
+  
+}
+.constraint-menu  ul li {
+  height: 40px;
+  padding:10px;
+  background-color: #666666;
+    padding: 10px; 
+  border-radius: 5px 0 0 5px;
+    border-bottom: solid 1px #34332F;
+    color: #ccc;
+}
+
+.constraint-menu ul li.opened {
+    height: 125px;
+    background-color: #ccc;
+    color: #34332F;
+
+}
+
+div.constraint_selector {
+  width: 25px;
+  height: 275px;
+  float: left;
+  background-color: #ccc;
+  margin:0;
+}
+
+
+
+.properties-wrapper.layers-wrapper{
+    float:left;
+}
+
+.layers-wrapper .properties-container{
+    overflow-y: hidden;
+    background: none;
+
+}
+
+.layers-wrapper .properties {
+    width: 300px;
+}
+
+#layers{
+    overflow-y: scroll;
+    max-height: 100%;
+}
+#layers-container{
+  width: 240px; 
+  float:right; 
+}
+
+#layers header{
+    padding: 4%;
+    box-sizing: border-box;
+    line-height: 3pt;
+    background-color: rgba(58,58,58, 0.88);
+    color:#cccccc;
+}
+
+span.fancytree-node{
+    background-color: #CCCCCC;
+    height: 30px;
+    border-bottom: 1px solid #999999;
+}
+span.fancytree-node.fancytree-active{
+    background-color: #9294A0;
+}
+
+ul.fancytree-container{
+    font-family: "Source Sans Pro";
+    font-weight: 100;
+    font-size: 12px;
+    padding:0px;
+    margin: 0;
+    width: 225px;
+    background-color: #CCCCCC;
+    border: none;
+}
+
+ul.fancytree-container ul {
+  padding: 0;
+  margin: 0;
+}
+ul.fancytree-container ul span.fancytree-title {
+    margin: 6px 0 0 1.5em;
+}
+span.fancytree-title{
+    margin-top:6px;
+}
+
+.fancytree-container.fancytree-treefocus span.fancytree-title:hover,span.fancytree-node.fancytree-active span.fancytree-title, .fancytree-container.fancytree-treefocus span.fancytree-node.fancytree-focused span.fancytree-title {
+    background-color: inherit;
+    border:none;
+}
+
+span.fancytree-icon, span.fancytree-expander, span.fancytree-constraint, div.constraint_icon{
+    width: 25px;
+    height: 25px;
+    background-image: url(../images/layer_icons.svg);
+    background-position-x: 0px;
+    background-position-y: -25px;
+    background-size: 25px 275px;
+    background-repeat: no-repeat;
+}
+
+div.constraint_icon {
+  height: 30px;
+  width: 25px;
+  border: solid 1px #999;
+  border-right:none;
+border-radius: 20px 0 0 20px;
+ background-position-y: -123px;
+ position:relative;
+
+}
+
+
+span.fancytree-icon.hidden{
+        background-position-y: 0px;
+
+}
+
+span.fancytree-expander{
+       background-position-y: -225px; 
+}
+
+span.fancytree-expanded span.fancytree-expander{
+       background-position-y: -250px; 
+}
+span.fancytree-constraint{
+       background-position-y: -150px; 
+}
+
+span.sampler{
+       background-position-y: -100px; 
 }
 
