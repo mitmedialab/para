@@ -291,7 +291,7 @@ define([
 				}
 				this.addToOpenLists(instance);
 			}
-			this.layersView.addShape(instance.toJSON());
+			layersView.addShape(instance.toJSON());
 		},
 
 

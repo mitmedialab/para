@@ -4,15 +4,19 @@
    
 </header>
 <div class='constraint-menu'>
-<ul>
-  <li >c1</li>
-  <li class = 'opened'>c2</li>
-  <li>c3</li>
+<ul id = 'constraint_list'>
+   <script id="constraint_template" type="text/x-handlebars-template">
+  {{#each constraint}}
+  <li id={{key}} class={{status}}>{{title}}</li>
+   {{/each}}
+ </script>
 </ul>
 </div>
 <div id='constraint_viz' class='constraint_selector'>
 <div id="constraint_rel" class="constraint_icon"></div>
+
 <div id="constraint_ref" class="constraint_icon"></div>
+<div id="connector_line"></div>
 </div>
 </div>
 <div id = "layers-container">
