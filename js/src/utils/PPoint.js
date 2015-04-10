@@ -210,6 +210,7 @@ define([
 			toJSON: function(){
 				var data = this.getValue();
 				data.type = 'PPoint';
+				data.isNull = this.isNull();
 				return data;
 			},
 

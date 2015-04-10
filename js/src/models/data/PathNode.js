@@ -121,6 +121,8 @@ define([
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
       this.setPathAltered();
+      var json = this.toJSON();
+      console.log("path json" ,json, JSON.stringify(json));
 
       return data;
     },

@@ -127,8 +127,8 @@ define([
 			},
 
 			toJSON: function() {
-				var data = this.getValue();// 5
-				data.type = '';
+				var data = this.getValue();
+				data.type = 'PFloat';
 				return data;
 			},
 
