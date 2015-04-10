@@ -252,6 +252,7 @@ define(['jquery',
       this.compile();
     },
 
+
     constraintSet:function(constraint_data){
       this.visitor.addConstraint(constraint_data);
     },
