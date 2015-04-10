@@ -242,12 +242,8 @@ define(['jquery',
       if (this.get('state') === 'selectTool') {
         var selectedShapes = selectTool.get('selected_shapes');
         if (selectedShapes.length == 1) {
-          var inst = selectedShapes[0];
-          var newInstance = inst.create();
-          inst.set('selected', false);
-          newInstance.set('selected', true);
+          var newInstance = visitor.addInstance(selectedShapes[0]);
           selectedShapes[0] = newInstance;
-
         }
       } else {
         visitor.addShape(instance, parent);
@@ -572,24 +568,14 @@ define(['jquery',
     },
 
     /* compile
-     * resets the geometry functions
+     * resets the geometry functions@
      * to remove all active instances and then
      * visits the root node to
      * begin the rendering process
      */
     compile: function() {
 
-      //mainView._project.clear();
-      // subView._project.clear();
-      visitor.resetPrototypes();
-      visitor.compileFunctions();
-      visitor.compileInstances();
-      visitor.compileLists();
-      visitor.render();
-
-      //used to switch canvas, not currently being used
-      //currentView._project.activate();
-      //console.log('paper shapes',mainView._project.activeLayer.children.length);
+     visitor.compile();
       mainView.draw();
 
     },

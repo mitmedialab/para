@@ -76,6 +76,15 @@ define([
 
     },
 
+    toJSON: function(){
+      var data = Instance.prototype.toJSON.call(this,arguments);
+      data.members = [];
+      for(var i=0;i<this.members.length;i++){
+        data.members.push(this.members[i].get('id'));
+      }
+      return data;
+    },
+
     // sets the geom visibility to false
     hide: function() {
       for (var i = 0; i < this.members.length; i++) {

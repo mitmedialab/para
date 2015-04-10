@@ -988,6 +988,9 @@ ul.fancytree-container ul {
   padding: 0;
   margin: 0;
 }
+ul.fancytree-container ul li span{
+    padding-left: 10px;
+}
 ul.fancytree-container ul span.fancytree-title {
     margin: 6px 0 0 1.5em;
 }

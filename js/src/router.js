@@ -55,7 +55,6 @@ define([
         model: constraintToolModel,
       });
 
-     
       propertyView.render();
 
     });

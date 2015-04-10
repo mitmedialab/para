@@ -16,7 +16,7 @@ require.config({
         "jquery-cookie" : "../../bower_components/jquery-cookie/jquery.cookie",
         "html": "../../html",
         "cjs": "../../bower_components/constraintjs/build/cjs.min" ,
-        "fancytree": "../../bower_components/fancytree/dist/jquery.fancytree"
+        "fancytree": "../../bower_components/fancytree/dist/jquery.fancytree-all.min"
     },
   
     shim: {       

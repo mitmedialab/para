@@ -24,6 +24,7 @@ define([
 	var compile = 1;
 	var render = 2;
 	var visit = 3;
+	var search = 4;
 
 
 	var rootNode, currentNode, layersView, functionManager;
@@ -44,7 +45,7 @@ define([
 				model: this
 			});
 		},
-		setSelectTool: function(st){
+		setSelectTool: function(st) {
 			functionManager.selectTool = st;
 		},
 
@@ -64,20 +65,26 @@ define([
 		 * returns prototype by id
 		 */
 		getPrototypeById: function(root, id) {
-			var match = null;
-			this.visitBfs(root, function(node) {
-				if (node.get('type') === 'root') {
-					return; // do not process roots
-				}
-				var pId = node.get('id');
-				if (pId === id) {
-					match = node;
-					return node;
-				}
-			});
+			var state_data = {
+				list: search,
+				instance: search,
+				func: search,
+				data: id
+			};
+			var match = this.visit(root, null, state_data);
 			return match;
 		},
 
+
+		compile: function() {
+
+			this.resetPrototypes();
+			this.compileFunctions();
+			this.compileInstances();
+			this.compileLists();
+			this.render();
+
+		},
 		/* computeLists
 		 * method to begin rendering process of lists
 		 * following rendering of all non-list items in the tree
@@ -118,6 +125,7 @@ define([
 		},
 
 		render: function(root) {
+			_.sortBy(renderQueue,function(item){ return item.get('order'); });
 			for (var i = 0; i < renderQueue.length; i++) {
 
 				renderQueue[i].render();
@@ -159,21 +167,20 @@ define([
 		 * node on the screen according to type;
 		 */
 		visit: function(node, departureNode, state_data) {
-
 			node.set({
 				visited: true
 			});
 			switch (node.get('type')) {
 				case 'list':
 				case 'sampler':
-					this.visitList(node, departureNode, state_data);
-					break;
+					return this.visitList(node, departureNode, state_data);
+
 				case 'function':
-					this.visitFunction(node, departureNode, state_data);
-					break;
+					return this.visitFunction(node, departureNode, state_data);
+
 				default:
-					this.visitInstance(node, departureNode, state_data);
-					break;
+					return this.visitInstance(node, departureNode, state_data);
+
 			}
 
 		},
@@ -188,31 +195,48 @@ define([
 		visitList: function(node, departureNode, state_data) {
 			var member;
 			var state = state_data.list;
-			if (state === store) {
-				for (var k = 0; k < node.children.length; k++) {
-					node.children[k].visit(this, 'visit', node, state_data);
-				}
-			} else if (state === compile) {
-				node.reset();
-				node.compile();
-				renderQueue.push(node);
-				var s_d = {
-					list: visit
-				};
-				for (var i = 0; i < node.members.length; i++) {
-					member = node.members[i];
-					if (member.get('type') === 'list' || member.get('type') === 'sampler') {
-						member.visit(this, 'visit', node, s_d);
+			switch (state) {
+				case store:
+					for (var k = 0; k < node.children.length; k++) {
+						node.children[k].visit(this, 'visit', node, state_data);
 					}
-				}
-			} else if (state == visit) {
-				renderQueue.push(node);
-				for (var j = 0; j < node.members.length; j++) {
-					member = node.members[j];
-					if (member.get('type') === 'list' || member.get('type') === 'sampler') {
-						member.visit(this, 'visit', node, state_data);
+					break;
+				case compile:
+					node.reset();
+					node.compile();
+					renderQueue.push(node);
+					var s_d = {
+						list: visit
+					};
+					for (var i = 0; i < node.members.length; i++) {
+						member = node.members[i];
+						if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+							member.visit(this, 'visit', node, s_d);
+						}
 					}
-				}
+					break;
+				case visit:
+					renderQueue.push(node);
+					for (var j = 0; j < node.members.length; j++) {
+						member = node.members[j];
+						if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+							member.visit(this, 'visit', node, state_data);
+						}
+					}
+					break;
+				case search:
+					if (node.get('id') == state_data.data) {
+						return node;
+					} else {
+						for (var l = 0; l < node.members.length; l++) {
+							var match = node.members[l].visit(this, 'visit', node, state_data);
+							if (match) {
+								return match;
+							}
+						}
+					}
+					break;
+
 			}
 
 			return;
@@ -224,13 +248,14 @@ define([
 		 */
 		visitFunction: function(node, departureNode, state_data) {
 			var state = state_data.func;
+			var children = node.children;
+
 			switch (state) {
 				case compile:
 					node.reset();
 					node.compile();
 					renderQueue.push(node);
 
-					var children = node.children;
 					for (var i = 0; i < children.length; i++) {
 						if (!node.get('open') && node.get('called')) {
 							if (children[i].isReturned) {
@@ -242,6 +267,18 @@ define([
 					}
 
 					break;
+				case search:
+					if (node.get('id') == state_data.data) {
+						return node;
+					} else {
+						for (var j = 0; j < children.length; j++) {
+							var match = children[j].visit(this, 'visit', node, state_data);
+							if (match) {
+								return match;
+							}
+						}
+					}
+					break;
 			}
 		},
 		/* visitInstance
@@ -250,14 +287,34 @@ define([
 		visitInstance: function(node, departureNode, state_data) {
 			var state = state_data.instance;
 			var children = node.children;
-
 			switch (state) {
 				case compile:
 					node.reset();
 					node.compile();
+					var dIndex = 0;
+					if(departureNode){
+						dIndex = departureNode.get('order');
+					}
+					node.set('order',dIndex+node.getIndex());
 					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {
 						children[i].visit(this, 'visit', node, state_data);
+					}
+					break;
+				case search:
+					console.log('searching instance', state_data.data);
+
+					console.log('node id', node.get('id'));
+					if (node.get('id') === state_data.data) {
+						console.log('found match!');
+						return node;
+					} else {
+						for (var j = 0; j < children.length; j++) {
+							var match = children[j].visit(this, 'visit', node, state_data);
+							if (match) {
+								return match;
+							}
+						}
 					}
 					break;
 			}
@@ -294,6 +351,41 @@ define([
 			layersView.addShape(instance.toJSON());
 		},
 
+		reorderShapes: function(movedId, relativeId, mode) {
+			console.log('reorder shapes', movedId, relativeId, mode);
+			var movedShape = this.getPrototypeById(rootNode, movedId);
+			var relativeShape = this.getPrototypeById(rootNode, relativeId);
+			console.log('shape=', movedShape, relativeShape);
+			if (movedShape && relativeShape) {
+				switch (mode) {
+					case 'over':
+						relativeShape.addInheritor(movedShape);
+						break;
+					default:
+						if (movedShape.isSibling(relativeShape)) {
+							switch (mode) {
+								case 'after':
+									movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
+									break;
+								case 'before':
+									movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
+									break;
+							}
+						}
+						break;
+				}
+			}
+			this.compile();
+		},
+
+		//called when creating an instance which inherits from existing shape
+		addInstance: function(parent) {
+			var newInstance = parent.create();
+			parent.set('selected', false);
+			newInstance.set('selected', true);
+			layersView.addInstance(newInstance.toJSON(), parent.get('id'));
+			return newInstance;
+		},
 
 		//=======list heirarchy managment methods==========//
 
@@ -311,9 +403,8 @@ define([
 				}
 				lists.push(list);
 			}
-			for (var j = lists.length - 1; j >= 0; j--) {
-				lists[j].printMembers();
-			}
+
+			layersView.addList(list.toJSON());
 
 		},
 

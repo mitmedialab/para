@@ -21,10 +21,12 @@ define([
 
 
 	var exporting_properties = ['position', 'translation_delta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
-			'rotation_delta', 'stroke_color', 'fill_color', 'stroke_width', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'];
+		'rotation_delta', 'stroke_color', 'fill_color', 'stroke_width', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
+	];
 
 	var constraints = ['position', 'translation_delta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
-			'rotation_delta', 'stroke_color', 'fill_color', 'stroke_width',  'val'];
+		'rotation_delta', 'stroke_color', 'fill_color', 'stroke_width', 'val'
+	];
 
 	var Instance = SceneNode.extend({
 
@@ -200,7 +202,7 @@ define([
 			SceneNode.prototype.initialize.apply(this, arguments);
 			this.on('change:selected', this.selectionChange);
 			this.isReturned = false;
-			
+
 			var parent = this;
 
 			_.each(this.attributes, function(val, key) {
@@ -268,9 +270,9 @@ define([
 		/* getIndex 
 		 * dummy return to prevent error in constraint tool
 		 */
-		getIndex: function() {
+		/*getIndex: function() {
 			return 0;
-		},
+		},*/
 
 		/*close
 		 * used mainly for closing functions
@@ -289,27 +291,47 @@ define([
 			var instance = new this.constructor();
 			this.set('is_proto', true);
 
-			var inheritorCollection = this.get('inheritors');
-			instance.set('proto_node', this);
-			inheritorCollection.addInheritor(instance);
+
 			var position = this.get('position');
 			instance.get('position').setValue(position.clone().getValue());
 			instance.get('rotation_origin').setValue(position.clone().getValue());
 			instance.get('scaling_origin').setValue(position.clone().getValue());
 			instance.get('translation_delta').setValue(this.get('translation_delta').getValue());
+			this.addInheritor(instance);
+			return instance;
+		},
+
+		addInheritor: function(instance) {
+			var inheritorCollection = this.get('inheritors');
+			instance.set('proto_node', this);
+			inheritorCollection.addInheritor(instance);
+			instance.reset();
+			
 			var g_clone = this.get('geom').clone();
 			g_clone.transform(this.get('ti_matrix'));
 			g_clone.transform(this.get('ri_matrix'));
 			g_clone.transform(this.get('si_matrix'));
-			g_clone.data.instance = instance;
-			g_clone.data.geom = true;
-			g_clone.data.nodetype = instance.get('name');
-			instance.set('geom', g_clone);
+			instance.changeGeomInheritance(g_clone);
 			this.addChildNode(instance);
-			return instance;
 		},
 
+		changeGeomInheritance: function(geom) {
+			if (this.get('geom')) {
+				this.get('geom').remove();
+			}
+			geom.data.instance = this;
+			geom.data.geom = true;
+			geom.data.nodetype = this.get('name');
+			this.set('geom', geom);
+			for (var i = 0; i < this.children.length; i++) {
+				if (this.children[i].get('name') === 'point') {
+					this.children[i].deleteSelf();
+				} else {
+					this.children[i].changeGeomInheritance(geom.clone());
+				}
 
+			}
+		},
 
 		reset: function() {
 			this.set('rendered', false);
@@ -355,7 +377,7 @@ define([
 				geom.selected = false;
 			}
 			this.clearBoundingBoxes();
-			for(var i=0;i<this.children.length;i++){
+			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].hide();
 			}
 		},
@@ -365,7 +387,7 @@ define([
 			if (geom) {
 				geom.visible = true;
 			}
-			for(var i=0;i<this.children.length;i++){
+			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].show();
 			}
 		},
@@ -478,81 +500,17 @@ define([
 
 
 		toJSON: function() {
-			
-		
-
-			// var testList1 = {'thing1': 1, 'thing2': 2, 'thing3': 3, 'thing4': 4}
-			// var properties = ['thing2', 'thing4'];
-
-			// position: null,
-			// translation_delta: null,
-			// scaling_origin: null,
-			// scaling_delta: null,
-			// rotation_origin: null,
-			// rotation_delta: null,
-			// stroke_color: null,
-			// fill_color: null,
-			// stroke_width: null,
-			// path_altered: null,
-			// val: null,
-
-			// name: 'instance',
-			// type: 'instance',
-			// visible: true,
-			// closed: false,
-			// order: 0,
-
-
-
-
 			var data = {};
 			var target = this;
 			_.each(exporting_properties, function(property) {
 				if (_.contains(constraints, property)) {
 					data[property] = target.get(property).toJSON();
 
-				}
-				else {
+				} else {
 					data[property] = target.get(property);
 				}
 			});
 			return data;
-
-			// _.each(testList1, function(property) {
-			// 	if (_.contains(properties, property)) {
-			// 		console.log(property);
-			// 	}
-			// })
-			// _.each(this.attributes, function(default_property){
-				
-			// 	exporting_properties[default_property]:default_property.toJSON();
-				
-			// })
-			// return exporting_properties;
-
-			// var dummy = [1, 2, 3];
-
-			// var data = {};
-
-
-			// _.mapObject(exporting_properties, function(val, key){
-			// 	return key.toJSON();
-			// });
-
-			// _.map(dummy, function(num){
-			// 	return num+1;
-			// })
-
-
-			//loop through defaults to export and call toJSON
-			/*for defaults:
-				data[default[k]]:default[k].toJSON();
-			}*/
-			myJSON = {};
-			myJSON.position = this.get('position').toJSON();
-			//
-			return myJSON;
-
 		},
 
 		parseJSON: function(data) {
@@ -959,11 +917,11 @@ define([
 			}
 		},
 
-		clearBoundingBoxes: function(){
-			if(this.get('bbox')){
+		clearBoundingBoxes: function() {
+			if (this.get('bbox')) {
 				this.get('bbox').remove();
 			}
-			if(this.get('inheritor_bbox')){
+			if (this.get('inheritor_bbox')) {
 				this.get('inheritor_bbox').remove();
 			}
 		},
@@ -1027,7 +985,7 @@ define([
 		renderGeom: function() {
 			var visible = this.get('visible');
 			var geom = this.get('geom');
-
+			geom.bringToFront();
 			var rmatrix = this.get('rmatrix');
 			var smatrix = this.get('smatrix');
 			var tmatrix = this.get('tmatrix');

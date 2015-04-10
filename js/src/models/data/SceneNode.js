@@ -6,37 +6,39 @@
 define([
     'underscore',
     'backbone',
-        'utils/PConstraint',
+    'utils/PConstraint',
 
-    
+
 
 ], function(_, Backbone, PConstraint) {
 
 
     var SceneNode = PConstraint.extend({
-            defaults: _.extend({}, PConstraint.prototype.defaults, {
-                visited:false,
-                rendered: false,
-                edges: null,
-            }),
+        defaults: _.extend({}, PConstraint.prototype.defaults, {
+            visited: false,
+            rendered: false,
+            edges: null,
+        }),
 
 
-            initialize: function() {
-                this.set({edges:[]});
-                  //parent node
-                this.nodeParent = null;
-                //array to store children
-                this.children = [];
-                //array to store edges (for graph)
+        initialize: function() {
+            this.set({
+                edges: []
+            });
+            //parent node
+            this.nodeParent = null;
+            //array to store children
+            this.children = [];
+            //array to store edges (for graph)
 
-                //Global property that keeps track of total # of nodes
-                SceneNode.numNodeInstances++;
-            },
+            //Global property that keeps track of total # of nodes
+            SceneNode.numNodeInstances++;
+        },
 
-            /* extend
-        * function for adding in functionality via mixins
-        */
-        extend: function( source) {
+        /* extend
+         * function for adding in functionality via mixins
+         */
+        extend: function(source) {
             for (var k in source) {
                 if (source.hasOwnProperty(k) && !this.hasOwnProperty(k)) {
                     this[k] = source[k];
@@ -46,278 +48,295 @@ define([
         },
 
 
-           /* clone: function(){
-                 var clone= Backbone.Model.prototype.clone.apply(this,arguments);
-                var children = [];
-                var edges = [];
-                for(var i=0;i<this.children.length;i++){
-                        var cchild = this.children[i].clone();
-                        children.push(cchild);
+        /* clone: function(){
+              var clone= Backbone.Model.prototype.clone.apply(this,arguments);
+             var children = [];
+             var edges = [];
+             for(var i=0;i<this.children.length;i++){
+                     var cchild = this.children[i].clone();
+                     children.push(cchild);
+             }
+             var cedges = this.get('edges');
+              for(var j=0;j<cedges.length;j++){
+                     var edge = cedges[j].clone();
+                     edge.set('y',this);
+             }
+             clone.children = children;
+             clone.set('edges',edges);
+             clone.nodeParent = this.nodeParent;
+             return clone; 
+
+         },*/
+        /*visit
+         * placeholder visit function for
+         * external vistior tree traversal
+         */
+        visit: function(visitor, visitFunction, departureNode, state_data) {
+            return visitor[visitFunction](this, departureNode, state_data);
+        },
+
+
+        /*getEdge
+         * searches edge array for matching x value
+         * and returns relevant edge
+         */
+        getEdge: function(x) {
+            var edges = this.get('edges');
+
+            for (var i = 0; i < edges.length; i++) {
+                if (edges[i].get('x') === x) {
+                    return edges[i];
                 }
-                var cedges = this.get('edges');
-                 for(var j=0;j<cedges.length;j++){
-                        var edge = cedges[j].clone();
-                        edge.set('y',this);
+            }
+            return null;
+        },
+
+        /*edgesRendered
+         * checks to see if all x values of edges connected to this node
+         * have been rendered
+         */
+        edgesRendered: function() {
+            var edges = this.get('edges');
+            //console.log("edges length",edges.length);
+            for (var i = 0; i < edges.length; i++) {
+                if (!edges[i].get('x').get('rendered')) {
+                    return false;
                 }
-                clone.children = children;
-                clone.set('edges',edges);
-                clone.nodeParent = this.nodeParent;
-                return clone; 
+            }
+            return true;
+        },
 
-            },*/
-            /*visit
-            * placeholder visit function for 
-            * external vistior tree traversal
-            */
-            visit: function(visitor,visitFunction,departureNode,state_data) {
-              visitor[visitFunction](this,departureNode,state_data);   
-            },
+        /*addEdge
+         * checks to see if edge with x already exists
+         * in edge list. If not, adds a new edge
+         * otherwise, throws an error.
+         * TODO: merge/ overwrite conflicting edges
+         */
+        addEdge: function(edge, x) {
+            var edges = this.get('edges');
+            if (!this.getEdge(x)) {
+                edges.push(edge);
+                this.set('edges', edges);
+            } else {
+                console.error("adding overriding edge");
+            }
+
+        },
+
+        /*reset
+         *resets visited value after graph traversal is complete
+         */
+        reset: function() {
+            this.vistied = false;
+        },
 
 
-            /*getEdge
-            * searches edge array for matching x value 
-            * and returns relevant edge
-            */
-            getEdge: function(x){
-                var edges = this.get('edges');
+        /*================ SceneNode method defintions ================*/
 
-                for(var i=0;i<edges.length;i++){
-                    if(edges[i].get('x') ===x){
-                        return edges[i];
-                    }
-                }
+        //destructor: clears all this.children and sets parent to null
+        clear: function() {
+
+            this.nodeParent = null;
+            for (var i = 0; i < this.children.length; i++) {
+                this.children[i].clear();
+                this.children[i] = null;
+            }
+
+            //this.children.clear();
+            return true;
+
+
+        },
+
+        //returns parent node
+        getParentNode: function() {
+
+            if (this.nodeParent !== null) {
+                return this.nodeParent;
+            } else {
                 return null;
-            },
+            }
+        },
 
-            /*edgesRendered
-            * checks to see if all x values of edges connected to this node 
-            * have been rendered
-            */
-            edgesRendered:function(){
-                var edges = this.get('edges');
-                //console.log("edges length",edges.length);
-                for(var i=0;i<edges.length;i++){
-                    if(!edges[i].get('x').get('rendered')){
-                        return false;
-                    }
+        //returns this.children array
+        getChildren: function() {
+            return this.children;
+        },
+        //returns other nodes with the same parent
+        getSiblings: function() {
+            var index = this.getIndex();
+            var siblings = this.nodeParent.getChildren();
+            var cut = siblings.splice(index, 1);
+
+            if (cut == this) {
+                return siblings;
+            }
+
+        },
+
+        isSibling: function(sibling) {
+            return _.contains(sibling.getParentNode().children, this);
+        },
+
+        setChildBefore: function(child, sibling) {
+            if (child.isSibling(sibling)) {
+
+                var childIndex = child.getIndex();
+                console.log('child_index', childIndex);
+                this.children.splice(childIndex, 1);
+                var siblingIndex = sibling.getIndex();
+                this.children.splice(siblingIndex, 0, child);
+                console.log('child_index', child.getIndex());
+            }
+        },
+
+        setChildAfter: function(child, sibling) {
+            if (child.isSibling(sibling)) {
+                console.log('num of children',this.children.length);
+                var childIndex = child.getIndex();
+                console.log('child_index', childIndex);
+                this.children.splice(childIndex, 1);
+                var siblingIndex = sibling.getIndex();
+                this.children.splice(siblingIndex + 1, 0, child);
+                console.log('child_index', child.getIndex());
+
+            }
+        },
+
+        getIndex: function() {
+          return _.indexOf(this.getParentNode().children,this);
+        },
+
+        descendantOf: function(node) {
+            for (var i = 0; i < this.children.length; i++) {
+                if (this.children[i] === node || this.children[i].descendantOf(node)) {
+                    return true;
                 }
+            }
+
+            return false;
+
+
+        },
+
+        /*returns heierarchal level in tree*/
+        getLevelInTree: function(level) {
+            if (this.get('name') == 'root') {
+                return level;
+            } else {
+                level++;
+
+                return this.nodeParent.getLevelInTree(level);
+            }
+
+        },
+
+        //returns child at specified index 
+        getChildAt: function(index) {
+
+            if (this.children.length > index) {
+                return this.children[index];
+            }
+            return null;
+        },
+
+        //returns number of this.children        
+        getNumChildren: function() {
+            return this.children.length;
+        },
+
+        //sets parent node. 
+        //If node already has a parent, it removes itself from the parent's this.children
+        setParentNode: function(node) {
+            ////console.log('parent='+this.nodeParent);
+            if (node !== null) {
+                if (this.nodeParent !== null) {
+                    this.nodeParent.removeChildNode(this);
+                }
+                this.nodeParent = node;
                 return true;
-            },
+            }
+            return false;
+        },
 
-            /*addEdge
-            * checks to see if edge with x already exists
-            * in edge list. If not, adds a new edge
-            * otherwise, throws an error.
-            * TODO: merge/ overwrite conflicting edges
-            */
-            addEdge: function(edge,x){
-                 var edges = this.get('edges');
-                if(!this.getEdge(x)){                    
-                    edges.push(edge);
-                    this.set('edges',edges);
-                }
-                else{
-                    console.error("adding overriding edge");
-                }
+        removeParentNode: function() {
 
-            },
 
-            /*reset
-            *resets visited value after graph traversal is complete
-            */
-            reset: function(){
-                this.vistied= false;
-            },
-
-            
-            /*================ SceneNode method defintions ================*/
-
-            //destructor: clears all this.children and sets parent to null
-            clear: function() {
-
+            if (this.nodeParent !== null) {
                 this.nodeParent = null;
-                for (var i = 0; i < this.children.length; i++) {
-                    this.children[i].clear();
-                    this.children[i] = null;
-                }
-
-                //this.children.clear();
                 return true;
 
+            }
+            return false;
+        },
+        //adds new child and sets child parent to this
+        addChildNode: function(node) {
 
-            },
+            if (node !== null) {
+                //console.log("adding node",this.name,node.name);
+                node.setParentNode(this);
+                this.children.push(node);
+                node.index = this.children.length - 1;
 
-            //returns parent node
-            getParentNode: function() {
+                return true;
+            }
 
-                if (this.nodeParent !== null) {
-                    return this.nodeParent;
-                } else {
-                    return null;
-                }
-            },
+            return false;
 
-            //returns this.children array
-            getChildren: function() {
-                return this.children;
-            },
-            //returns other nodes with the same parent
-            getSiblings: function() {
-                var index = this.getIndex();
-                var siblings = this.nodeParent.getChildren();
-                var cut = siblings.splice(index,1);
-              
-                if(cut == this){
-                    return siblings;
-                }
-                
-            },
+        },
+        //removes child node from list of this.children- does not delete the removed child!
+        removeChildNode: function(node) {
+            //console.log("number of this.children="+this.children.length);
+            if (node !== null && this.children.length > 0) {
+                // //console.log("attempting to remove");
+                for (var i = 0; i < this.children.length; i++) {
 
-            getIndex: function(){
-                var siblings = this.nodeParent.getChildren();
-                for(var i=0;i<siblings.length;i++){
-                    if(siblings[i]==this){
-                        return i;
+                    if (this.children[i] == node) {
+                        this.children[i].removeParentNode();
+                        var child = this.children.splice(i, 1)[0];
+                        //console.log("number of this.children="+this.children.length);
+
+                        return child;
+
                     }
                 }
-                return null;
-            },
+            }
+            return false;
+        },
 
-            descendantOf: function(node){
-                for(var i=0;i<this.children.length;i++){
-                    if (this.children[i]===node || this.children[i].descendantOf(node)){
+        removeChildAt: function(i) {
+            if (this.children[i] !== null) {
+                this.children[i].removeParentNode();
+                var child = this.children.splice(i, 1)[0];
+                return child;
+
+            }
+        },
+
+        //recursively searches all sub this.children for child to remove- depth first. Not very efficient. double check to see if this is actually working correctly...
+        recursiveRemoveChildNode: function(node) {
+            ////console.log("starting recurse at node:"+this.name);
+            if (node !== null && this.children.length > 0) {
+                for (var i = 0; i < this.children.length; i++) {
+                    // //console.log("-----checking child at:"+i);
+                    if (this.children[i] == node) {
+                        this.children.splice(i, 1);
+                        // //console.log('found node to remove at parent:' + this.name + ' , index:' + i);
                         return true;
-                    } 
-                }
+                    } else {
 
-                return false;
-
-
-            },
-
-            /*returns heierarchal level in tree*/
-            getLevelInTree: function(level){
-                if(this.get('name')=='root'){
-                    return level;
-                }
-                else{
-                    level++;
-
-                   return this.nodeParent.getLevelInTree(level);
-                }
-
-            },
-
-            //returns child at specified index 
-            getChildAt: function(index) {
-
-                if (this.children.length > index) {
-                    return this.children[index];
-                }
-                return null;
-            },
-
-            //returns number of this.children        
-            getNumChildren: function() {
-                return this.children.length;
-            },
-
-            //sets parent node. 
-            //If node already has a parent, it removes itself from the parent's this.children
-            setParentNode: function(node) {
-                ////console.log('parent='+this.nodeParent);
-                if (node !== null) {
-                    if (this.nodeParent !== null) {
-                        this.nodeParent.removeChildNode(this);
-                    }
-                    this.nodeParent = node;
-                    return true;
-                }
-                return false;
-            },
-
-            removeParentNode: function() {
-
-
-                if (this.nodeParent !== null) {
-                    this.nodeParent = null;
-                    return true;
-
-                }
-                return false;
-            },
-            //adds new child and sets child parent to this
-            addChildNode: function(node) {
-
-                if (node !== null) {
-                    //console.log("adding node",this.name,node.name);
-                    node.setParentNode(this);
-                    this.children.push(node);
-                    node.index = this.children.length-1;
-
-                    return true;
-                }
-
-                return false;
-
-            },
-            //removes child node from list of this.children- does not delete the removed child!
-            removeChildNode: function(node) {
-                 //console.log("number of this.children="+this.children.length);
-                if (node !== null && this.children.length > 0) {
-                    // //console.log("attempting to remove");
-                    for (var i = 0; i < this.children.length; i++) {
-
-                        if (this.children[i] == node) {
-                            this.children[i].removeParentNode();
-                            var child = this.children.splice(i, 1)[0];
-                            //console.log("number of this.children="+this.children.length);
-
-                            return child;
-
-                        }
-                    }
-                }
-                return false;
-            },
-
-            removeChildAt: function(i){
-                if (this.children[i] !==null) {
-                            this.children[i].removeParentNode();
-                           var child= this.children.splice(i, 1)[0];
-                            return child;
-
-                }
-            },
-
-            //recursively searches all sub this.children for child to remove- depth first. Not very efficient. double check to see if this is actually working correctly...
-            recursiveRemoveChildNode: function(node) {
-                ////console.log("starting recurse at node:"+this.name);
-                if (node !== null && this.children.length > 0) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        // //console.log("-----checking child at:"+i);
-                        if (this.children[i] == node) {
-                            this.children.splice(i, 1);
-                           // //console.log('found node to remove at parent:' + this.name + ' , index:' + i);
+                        if (this.children[i].recursiveRemoveChildNode(node)) {
                             return true;
-                        } else {
-
-                            if (this.children[i].recursiveRemoveChildNode(node)) {
-                                return true;
-                            }
                         }
                     }
                 }
-                return false;
-            },
-
-            
-
+            }
+            return false;
+        },
 
 
 
-
-        });
+    });
 
 
 
