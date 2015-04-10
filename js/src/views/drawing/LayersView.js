@@ -111,7 +111,7 @@ define([
 					},
 					dragDrop: function(node, data) {
 						data.otherNode.moveTo(node, data.hitMode);
-						view.dropCompleted(data.otherNode,node,data.hitMode);
+						view.dropCompleted(data.otherNode, node, data.hitMode);
 					}
 				}
 			});
@@ -119,7 +119,23 @@ define([
 				source: [],
 				extensions: ["dnd", "edit"],
 				expand: this.treeExpanded,
-				collapse: this.treeCollapsed
+				collapse: this.treeCollapsed,
+				dnd: {
+					autoExpandMS: 400,
+					focusOnClick: true,
+					preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+					preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+					dragStart: function(node, data) {
+						return true;
+					},
+					dragEnter: function(node, data) {
+						return true;
+					},
+					dragDrop: function(node, data) {
+						data.otherNode.moveTo(node, data.hitMode);
+						view.dropCompleted(data.otherNode, node, data.hitMode);
+					}
+				}
 			});
 			shapeTree = $("#shapes").fancytree("getTree");
 			listTree = $("#lists").fancytree("getTree");
@@ -139,7 +155,11 @@ define([
 
 			$("#shapes").bind("click", {
 				view: this
-			}, this.layerClicked);
+			}, this.shapeClicked);
+			$("#lists").bind("click", {
+				view: this
+			}, this.listClicked);
+
 
 			shapeRoot = $("#shapes").fancytree("getRootNode");
 			listRoot = $("#lists").fancytree("getRootNode");
@@ -302,30 +322,37 @@ define([
 
 		},
 
-		dropCompleted:function(nodeA,nodeB, hitMode){
-			console.log('dropCompleted',nodeA,nodeB,hitMode);
-			this.model.reorderShapes(nodeA.key,nodeB.key,hitMode);
+		dropCompleted: function(nodeA, nodeB, hitMode) {
+			console.log('dropCompleted', nodeA, nodeB, hitMode);
+			this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
 		},
 
-		layerClicked: function(event) {
+		shapeClicked: function(event) {
 
-			/*var id = event.target.id;
+			var id = event.target.id;
 			var classes = event.target.className.split(/\s+/);
-			console.log('layer clicked', id, classes);
+			var activeNode = shapeTree.getActiveNode();
 			switch (id) {
 				case 'constraint':
-
 					break;
 				case 'visible':
-					if (!_.contains(classes, 'hidden')) {
-						$(event.target).addClass('hidden');
-					} else {
-						console.log('removing class');
-						$(event.target).removeClass('hidden');
-
-					}
+					event.data.view.toggleVisibility(activeNode, classes);
 					break;
-			}*/
+			}
+		},
+
+		listClicked:function(event){
+
+		},
+
+		toggleVisibility: function(activeNode, classes) {
+			if (!_.contains(classes, 'hidden')) {
+				$(event.target).addClass('hidden');
+			} else {
+				console.log('removing class');
+				$(event.target).removeClass('hidden');
+			}
+			this.model.toggleShapeVisibility(activeNode.key);
 		},
 
 		addShape: function(shape) {
@@ -360,9 +387,13 @@ define([
 					list: true
 				}
 			};
-			var listNode= listRoot.addChildren(listData);
+			var listNode = listRoot.addChildren(listData);
 
 		},
+
+		addConstraint: function(data){
+			console.log('adding constraint',data);
+		}
 
 
 

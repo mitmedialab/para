@@ -194,9 +194,9 @@ define([
 
 				} else if (open) {
 					this.children.forEach(function(child) {
-													console.log('setting child to visible');
+						//console.log('setting child to visible');
 
-						child.set('visible', true);
+						//child.set('visible', true);
 					});
 				}
 			},

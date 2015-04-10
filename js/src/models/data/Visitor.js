@@ -125,7 +125,9 @@ define([
 		},
 
 		render: function(root) {
-			_.sortBy(renderQueue,function(item){ return item.get('order'); });
+			_.sortBy(renderQueue, function(item) {
+				return item.get('order');
+			});
 			for (var i = 0; i < renderQueue.length; i++) {
 
 				renderQueue[i].render();
@@ -184,6 +186,7 @@ define([
 			}
 
 		},
+
 
 		/*visitList- THIS IS SLOW- SPEED IT UP
 		 * visitor method for computing lists
@@ -292,10 +295,10 @@ define([
 					node.reset();
 					node.compile();
 					var dIndex = 0;
-					if(departureNode){
+					if (departureNode) {
 						dIndex = departureNode.get('order');
 					}
-					node.set('order',dIndex+node.getIndex());
+					node.set('order', dIndex + node.getIndex());
 					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {
 						children[i].visit(this, 'visit', node, state_data);
@@ -345,10 +348,18 @@ define([
 					parent.addChildNode(instance);
 				} else {
 					currentNode.addChildNode(instance);
+					this.addToOpenLists(instance);
 				}
-				this.addToOpenLists(instance);
+
 			}
-			layersView.addShape(instance.toJSON());
+			if(instance.get('name')!=='ui-item' && instance.get('name')!=='ui'){
+				layersView.addShape(instance.toJSON());
+
+			}
+		},
+
+		addConstraint: function(constraint_data) {
+			layersView.addConstraint(constraint_data);
 		},
 
 		reorderShapes: function(movedId, relativeId, mode) {
@@ -376,6 +387,16 @@ define([
 				}
 			}
 			this.compile();
+		},
+
+		toggleShapeVisibility: function(shapeId) {
+			var shape = this.getPrototypeById(rootNode, shapeId);
+			console.log('toggling visible', shapeId, shape);
+			if (shape) {
+				shape.set('visible', !shape.get('visible'));
+				shape.set('selected', false);
+				this.compile();
+			}
 		},
 
 		//called when creating an instance which inherits from existing shape

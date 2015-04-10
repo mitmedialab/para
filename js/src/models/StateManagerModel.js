@@ -96,6 +96,7 @@ define(['jquery',
       this.listenTo(toolCollection, "geometrySegmentModified", this.geometrySegmentModified);
       this.listenTo(toolCollection, 'updateProperties', this.updateProperties);
       this.listenTo(toolCollection, "addInstance", this.addInstance);
+      this.listenTo(toolCollection,"constraintSet", this.setConstraint);
       this.listenTo(toolCollection, "setPositionForIntialized", this.setPositionForInitialized);
       this.listenTo(toolCollection, 'setState', this.setState);
       this.on('change:tool-mode', this.modeChanged);
@@ -249,6 +250,10 @@ define(['jquery',
         visitor.addShape(instance, parent);
       }
       this.compile();
+    },
+
+    constraintSet:function(constraint_data){
+      this.visitor.addConstraint(constraint_data);
     },
 
     /*groupInstance

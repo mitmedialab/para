@@ -391,6 +391,8 @@ define([
       };
 
       refProp.setConstraint(relativeF);
+      var constraint_data = {id:new Date().getTime().toString(),ref:references[0].get('id'),rel:relatives[0].get('id')};
+      this.trigger('constraintSet',constraint_data);
     },
 
     /* createListConstraint: function(){
