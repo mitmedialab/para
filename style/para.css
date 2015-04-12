@@ -874,7 +874,7 @@ span:focus{
 
 .constraint-container{
     float:left;
-    width:60px;
+    width:30px;
 }
 .constraint-container header {
   height: 32px;
@@ -887,8 +887,7 @@ span:focus{
 width: 30px;
 float: left;
 margin:0;
-margin-left: 5px;
-  min-height: 10px;
+min-height: 10px;
 
 }
 .constraint-menu ul {
@@ -914,11 +913,12 @@ margin-left: 5px;
 }
 
 div.constraint_selector {
-  width: 25px;
+  width: 30px;
   height: 275px;
   float: left;
   background-color: #ccc;
   margin:0;
+   border-radius: 2px 0 0 2px;
 }
 div#connector_line {
     border-left: 2px solid #76787b;
@@ -940,7 +940,7 @@ div#connector_line {
 }
 
 .layers-wrapper .properties {
-    width: 300px;
+    width: 270px;
 }
 
 #layers{
@@ -959,7 +959,7 @@ div#connector_line {
     color:#cccccc;
 }
 
-div#lists, div#shapes {
+div.ui_tree {
   min-height: 30px;
   background-color: #cccccc;
 }

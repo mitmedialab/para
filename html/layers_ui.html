@@ -4,17 +4,8 @@
    
 </header>
 <div class='constraint-menu'>
-<ul id = 'constraint_list'>
-   <script id="constraint_template" type="text/x-handlebars-template">
-  {{#each constraint}}
-  <li id={{key}} class={{status}}>{{title}}</li>
-   {{/each}}
- </script>
-</ul>
-</div>
-<div id='constraint_viz' class='constraint_selector'>
+<div id='constraint_viz' class='constraint_selector'></div>
 <div id="constraint_rel" class="constraint_icon"></div>
-
 <div id="constraint_ref" class="constraint_icon"></div>
 <div id="connector_line"></div>
 </div>
@@ -27,20 +18,23 @@
      <div class="clearfix"></div>
    </header>
 <div id = 'layers'>
-
+  <header >
+      <h2>
+     Constraints
+     </h2>
+   </header>
+<div id ="constraints" class='ui_tree'></div>
    <header >
       <h2>
      Lists
      </h2>
    </header>
-<div id ="lists">
-</div>
+<div id ="lists" class='ui_tree'></div>
    <header >
       <h2>
      Shapes
      </h2>
    </header>
-<div id ="shapes">
-</div>
+<div id ="shapes"  class='ui_tree'></div>
 </div>
  </div>

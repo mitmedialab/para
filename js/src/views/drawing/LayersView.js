@@ -91,8 +91,8 @@ define([
 		initialize: function(obj) {
 			this.$el.append(ui);
 
-			source = $('#constraint_template').html();
-			template = Handlebars.default.compile(source);
+			//source = $('#constraint_template').html();
+			//template = Handlebars.default.compile(source);
 			var view = this;
 			this.$('#shapes').fancytree({
 				source: [],
@@ -137,6 +137,29 @@ define([
 					}
 				}
 			});
+
+			this.$('#constraints').fancytree({
+				source: [],
+				extensions: ["dnd", "edit"],
+				collapse: this.treeCollapsed,
+				dnd: {
+					autoExpandMS: 400,
+					focusOnClick: true,
+					preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+					preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+					dragStart: function(node, data) {
+						return true;
+					},
+					dragEnter: function(node, data) {
+						return true;
+					},
+					dragDrop: function(node, data) {
+						data.otherNode.moveTo(node, data.hitMode);
+						view.dropCompleted(data.otherNode, node, data.hitMode);
+					}
+				}
+			});
+
 			shapeTree = $("#shapes").fancytree("getTree");
 			listTree = $("#lists").fancytree("getTree");
 			$("#shapes").bind('fancytreeexpand', {
@@ -172,9 +195,7 @@ define([
 			var data = {
 				constraint: constraintSource
 			};
-			var html = template(data);
-
-			$('#constraint_list').html(html);
+			
 			$('#constraint_list').bind("click", {
 				view: this
 			}, this.constraintClicked);
