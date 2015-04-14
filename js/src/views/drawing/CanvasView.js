@@ -195,7 +195,7 @@ define([
       }
       if (event.keyCode === deleteKey) {
         console.log('deleting');
-        this.model.geometryDeleted();
+        this.model.deleteInstance();
       }
       if (event.keyCode === panKey) {
         pan = true;

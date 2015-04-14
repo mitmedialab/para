@@ -137,7 +137,7 @@ define([
 		},
 
 
-		removeShapes: function(selected_shapes){
+		removeShape: function(selected_shapes){
 			for(var i=0;i<selected_shapes.length;i++){
 				this.removeInstance(null, null, selected_shapes[i]);
 			}

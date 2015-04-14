@@ -221,18 +221,18 @@ define([
       var endHeight = geom.bounds.height;
       var wDiff = (endWidth - startWidth)/2;
       var hDiff = (endHeight - startHeight)/2;
-      var sizeDelta = new paper.Segment(new paper.Point(wDiff, hDiff), null, null);
+      /*var sizeDelta = new paper.Segment(new paper.Point(wDiff, hDiff), null, null);
       sizeDelta.transform(this.get('rmatrix'));
       sizeDelta.transform(this.get('smatrix'));
       console.log('start,end,diff', startWidth, startHeight, endWidth, endHeight, sizeDelta.point);
-      this.modifyProperty({translation_delta:{x:sizeDelta.point.x,y:sizeDelta.point.y, operator:'add'}});
-    
+      //this.modifyProperty({translation_delta:{x:sizeDelta.point.x,y:sizeDelta.point.y, operator:'add'}});
+    */
       var inheritors = this.get('inheritors').accessProperty();
       for (var j = 0; j < inheritors.length; j++) {
         inheritors[j].modifyPointsByIndex(delta.point, indicies);
       }
-      sizeDelta.remove();
-      sizeDelta = null;
+     // sizeDelta.remove();
+      //sizeDelta = null;
       delta.remove();
       delta = null;
     },

@@ -64,8 +64,6 @@ define([
 
     },
 
-
-
     setState: function(state, mode) {
       console.log('set state', this.get('state'));
       console.log('current tool', this.get('tool_collection').get(state));
@@ -78,7 +76,7 @@ define([
         var currentTool = this.get('tool_collection').get(this.get('state'));
         currentTool.set('mode', mode);
       }
-      this.trigger('compileRequest')
+      this.trigger('compileRequest');
     },
 
 
@@ -172,8 +170,7 @@ define([
      */
     deleteInstance: function() {
       var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      this.trigger('removeShapes', selectedShapes);
-      this.get('selectTool').deselectAll();
+      this.trigger('removeShape', selectedShapes);
     },
 
     removeFromSelection: function(instances) {
