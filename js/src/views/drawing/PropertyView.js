@@ -28,6 +28,8 @@ define([
       this.listenTo(this.model, 'disableSave', this.disableSave);
 
       this.listenTo(this.model, 'geometrySelected', this.geometrySelected);
+      this.listenTo(this.model, 'geometryDeselected', this.geometryDeselected);
+
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
 
       this.listenTo(this.model, 'toolViewUpdate', this.update);
@@ -224,6 +226,11 @@ define([
       this.delegateEvents();  
     },
 
+   geometryDeselected: function(data,params,id) {
+      this.undelegateEvents();
+      this.clearParams(params,id);
+      this.delegateEvents();  
+    },
 
     toggleFillStroke: function(event) {
       var id = event.target.id;
@@ -378,6 +385,12 @@ define([
       $('#saveFile').attr('disabled', false);
     },
 
+
+    clearParams: function(){
+       var html = template({});
+      var count = 0;
+      $('#parameters').html(html);
+    },
 
     //triggered when StateManager finds selection point
     setParams: function(userParams,id) {

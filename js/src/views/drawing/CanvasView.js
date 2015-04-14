@@ -105,13 +105,13 @@ define([
 
     //canvas events
     events: {
-      'mousedown': 'canvasMouseDown',
+      /*'mousedown': 'canvasMouseDown',
       'mouseup': 'canvasMouseUp',
       'mousemove': 'canvasMouseMove',
       'mouseenter': 'enterMain',
       'mouseleave': 'leaveMain',
       'mousewheel': 'canvasMousewheel',
-      'dblclick': 'canvasDblclick'
+      'dblclick': 'canvasDblclick'*/
     },
 
     setFocus: function() {
@@ -171,7 +171,7 @@ define([
     },
 
     animate: function(event) {
-      this.parent.model.animate();
+      //this.parent.model.animate();
     },
 
     /* canvas event functions */
@@ -180,9 +180,6 @@ define([
         this.model.save();
       }*/
 
-      if (event.keyCode == sampleKey) {
-        this.model.applySampleToInstance();
-      }
       if (event.keyCode == functionKey) {
         this.model.createFunction();
       }
@@ -216,7 +213,7 @@ define([
       if (event.keyCode === rootKey) {
       }
       if (event.keyCode === groupKey) {
-        this.model.groupInstance();
+        this.model.createList();
       }
       // EXPERIMENTAL
       if (event.keyCode === advanceKey) {

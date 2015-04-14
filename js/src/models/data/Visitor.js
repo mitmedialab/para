@@ -10,10 +10,11 @@ define([
 	'models/data/Instance',
 	'models/data/functions/FunctionNode',
 	'models/data/functions/FunctionManager',
-	'views/drawing/LayersView'
+	'models/data/ListSampler', //TODO: create list manager
+	'views/drawing/LayersView',
 
 
-], function(_, Backbone, Instance, FunctionNode, FunctionManager, LayersView) {
+], function(_, Backbone, Instance, FunctionNode, FunctionManager, ListSampler, LayersView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -136,6 +137,12 @@ define([
 		},
 
 
+		removeShapes: function(selected_shapes){
+			for(var i=0;i<selected_shapes.length;i++){
+				this.removeInstance(null, null, selected_shapes[i]);
+			}
+			this.trigger('selectionChanged', []);
+		},
 
 		removeInstance: function(node, departureNode, target) {
 			if (!node) {
@@ -307,9 +314,7 @@ define([
 				case search:
 					console.log('searching instance', state_data.data);
 
-					console.log('node id', node.get('id'));
 					if (node.get('id') === state_data.data) {
-						console.log('found match!');
 						return node;
 					} else {
 						for (var j = 0; j < children.length; j++) {
@@ -334,30 +339,36 @@ define([
 				return selected_shapes.indexOf(item) === -1;
 			});
 			functionManager.createFunction('my_function', selected_shapes);
+			this.compile();
 		},
 
 		createParams: function(selected_shapes) {
 			for (var i = 0; i < selected_shapes.length; i++) {
 				functionManager.addParamToFunction(currentNode, selected_shapes[i]);
 			}
+			this.compile();
 		},
 
-		addShape: function(instance, parent) {
-			if (instance) {
-				if (parent) {
-					parent.addChildNode(instance);
-				} else {
-					currentNode.addChildNode(instance);
-					this.addToOpenLists(instance);
+		addShape: function(shape) {
+			
+				if (!shape.parentNode) {
+					currentNode.addChildNode(shape);
 				}
-
+			this.addToOpenLists(shape);
+			if(shape.get('name')!=='ui-item' && shape.get('name')!=='ui'){
+				layersView.addShape(shape.toJSON());
 			}
-			if(instance.get('name')!=='ui-item' && instance.get('name')!=='ui'){
-				layersView.addShape(instance.toJSON());
-
-			}
+			this.compile();
 		},
-
+		
+		//called when creating an instance which inherits from existing shape
+		addInstance: function(parent) {
+			var newInstance = parent.create();
+			parent.set('selected', false);
+			newInstance.set('selected', true);
+			layersView.addInstance(newInstance.toJSON(), parent.get('id'));
+			return newInstance;
+		},
 		
 
 		addConstraint: function(constraint_data) {
@@ -391,6 +402,25 @@ define([
 			this.compile();
 		},
 
+		selectShape: function(id){
+			var shape = this.getPrototypeById(rootNode,id);
+			console.log('shape',shape);
+			if(shape){	
+				this.trigger('addToSelection',shape);
+			}
+		},
+
+		selectionChanged: function(selected_shapes, added_shape){
+			this.trigger('selectionChanged',selected_shapes);
+		},
+
+		deselectShape: function(id){
+			var shape = this.getPrototypeById(rootNode,id);
+			if(shape){	
+				this.trigger('removeFromSelection',shape);
+			}
+		},
+
 		toggleShapeVisibility: function(shapeId) {
 			var shape = this.getPrototypeById(rootNode, shapeId);
 			console.log('toggling visible', shapeId, shape);
@@ -401,14 +431,7 @@ define([
 			}
 		},
 
-		//called when creating an instance which inherits from existing shape
-		addInstance: function(parent) {
-			var newInstance = parent.create();
-			parent.set('selected', false);
-			newInstance.set('selected', true);
-			layersView.addInstance(newInstance.toJSON(), parent.get('id'));
-			return newInstance;
-		},
+		
 
 		//=======list heirarchy managment methods==========//
 
@@ -416,8 +439,9 @@ define([
 		 *adds a list to the closedlist array and removes any items
 		 * on the array which are members of the added list
 		 */
-		addList: function(list) {
-
+		addList: function(selectedShapes) {
+ 		var list = new ListSampler();
+          list.addMember(selectedShapes);
 			if (!this.addToOpenLists(list)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
 					if (list.hasMember(lists[i], true)) {
@@ -428,7 +452,8 @@ define([
 			}
 
 			layersView.addList(list.toJSON());
-
+			this.trigger('addToSelection',list);
+			this.compile();
 		},
 
 		/* addToOpenLists
@@ -441,8 +466,6 @@ define([
 			}
 			return addedToList;
 		},
-
-
 
 		/*removeList
 		 *removes list item recursively checking sublists
@@ -470,30 +493,18 @@ define([
 				}
 			}
 			//add in originally selected index if no lists have been added
-			if (!itemFound) {
-				sInstances.push(lInstance);
+			if (itemFound) {
+				this.trigger('selectionFiltered');
 			}
-			return sInstances;
+			
 		},
 
-		/* toggleItems
-		 * toggles item funcitonality according to item type
-		 */
-		toggleItems: function(items) {
-			var lastSelected = items[items.length - 1];
-			switch (lastSelected.get('type')) {
-				case 'function':
-					functionManager.callFunction(lastSelected);
-					break;
-				default:
-					break;
-			}
-		},
 
 		/* toggleOpen
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function(items) {
+			var toSelect;
 			var functions = items.filter(function(item) {
 				return item.get('type') === 'function';
 			});
@@ -502,10 +513,11 @@ define([
 				var data = functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
 				lists = data.lists;
 				currentNode = data.currentNode;
-				return data.toSelect;
+				toSelect = data.toSelect;
 			} else {
-				return this.toggleOpenLists(items);
+				toSelect = this.toggleOpenLists(items);
 			}
+			this.trigger('addToSelection',toSelect);
 		},
 
 		/* toggleClosed
@@ -513,18 +525,21 @@ define([
 		 */
 		toggleClosed: function(items) {
 			//TODO: fix this so it closes selected open lists first...
+			var toSelect;
 			var lists = items.filter(function(item) {
 				return (item.get('type') === 'list' || item.get('type') === 'sampler');
 			});
 			if (lists.length > 0) {
-				return this.toggleClosedLists(items);
+				toSelect= this.toggleClosedLists(items);
 			} else {
 				this.closeAllLists();
 				var data = functionManager.toggleClosedFunctions(currentNode, rootNode);
 				currentNode = data.currentNode;
 				lists = currentNode.lists;
-				return data.toSelect;
+				toSelect = data.toSelect;
 			}
+			this.trigger('addToSelection',toSelect);
+
 		},
 
 		/* toggleClosedLists

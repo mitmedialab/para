@@ -140,11 +140,14 @@ define([
     //sets selection for segments
     setSelectedSegments: function(segments) {
       var points = this.get('points');
+      var selectedPoints = [];
       for (var i = 0; i < segments.length; i++) {
         var index = segments[i].index;
         var point = points[index];
         point.set('selected', segments[i].type);
+        selectedPoints.push(point);
       }
+      return selectedPoints;
     },
 
     deselectSegments: function() {

@@ -20,7 +20,9 @@ define([
         fill_color: '#ffffff',
         stroke_color: '#000000',
         stroke_width: 1
-      }
+      },
+      'tool-mode': 'standard',
+      'tool-modifier': 'none',
 
     },
 
@@ -33,7 +35,12 @@ define([
 
     reset: function() {
 
-    }
+    },
+
+     modeChanged: function(mode,modifier) {
+      this.set('tool-mode',mode);
+      this.set('tool-modifier',modfier);
+    },
 
 
   });

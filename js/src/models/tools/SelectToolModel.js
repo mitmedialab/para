@@ -62,7 +62,7 @@ define([
       this.set('selected_shapes', []);
     },
 
-    addSelectedShape: function(data) {
+    addSelectedShape: function(data, mode, modifier) {
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
           this.addSingleShape(data[i]);
@@ -76,6 +76,7 @@ define([
       var selected_shapes = this.get('selected_shapes');
       if (!_.contains(selected_shapes, instance)) {
         instance.set('selected', true);
+        instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
         instance.set('sel_palette_index', this.get('current_sel_index'));
         selected_shapes.push(instance);
         this.set('selected_shapes', selected_shapes);
@@ -111,6 +112,13 @@ define([
       this.set('current_sel_index', current_sel_index);
     },
 
+    changeModeForSelection: function(mode, modifier) {
+      var selectedShapes = this.get('selected_shapes');
+      for (var i = 0; i < selectedShapes.length; i++) {
+        selectedShapes[i].setSelectionForInheritors(true, mode, modifier, 1);
+      }
+    },
+
     resetSelections: function() {
       this.deselectAll();
       var selections = this.get('selections');
@@ -136,6 +144,27 @@ define([
       }
       return null;
     },
+
+    modifyGeometry: function(data, modifiers) {
+      var selectedShapes = this.get('selected_shapes');
+      for (var i = 0; i < selectedShapes.length; i++) {
+        var instance = selectedShapes[i];
+        instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+      }
+      this.trigger('geometryModified');
+    },
+
+
+    modifySegment: function(data, handle, modifiers) {
+      var selectedShapes = this.get('selected_shapes');
+      for (var i = 0; i < selectedShapes.length; i++) {
+        var instance = selectedShapes[i];
+        console.log('selected_shape',instance);
+        instance.nodeParent.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
+      }
+      this.trigger('geometryModified');
+    },
+
 
     /*mousedown event
      */
@@ -170,6 +199,7 @@ define([
 
     selectDown: function(event, noDeselect) {
       //automaticall deselect all on mousedown if shift modifier is not enabled
+      var instance = null;
       if (!event.modifiers.shift) {
         if (!noDeselect) {
           this.deselectAll();
@@ -182,14 +212,18 @@ define([
         var path = hitResult.item;
 
         literal = path;
+        instance = literal.data.instance;
 
       }
       var constrain = event.modifiers.command;
-      this.trigger('geometrySelected', literal, constrain);
+
+      this.addSelectedShape(instance, this.get('tool-mode'), this.get('tool-modifier'));
+      this.trigger('geometrySelected', instance, constrain);
 
 
 
     },
+
 
     dSelectDown: function(event, noDeselect) {
       //automaticall deselect all on mousedown if shift modifier is not enabled
@@ -204,27 +238,42 @@ define([
       var hitResult = paper.project.hitTest(event.point, dHitOptions);
       console.log(hitResult);
       if (hitResult) {
-                var path = hitResult.item;
-
+        var path = hitResult.item;
+        var instance = path.data.instance;
         if (hitResult.type == 'segment') {
           hitResult.segment.fullySelected = true;
-          segments.push({index:hitResult.segment.index,type:hitResult.type});
+          segments.push({
+            index: hitResult.segment.index,
+            type: hitResult.type
+          });
         } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
           handle = hitResult.type;
-         segments.push({index:hitResult.segment.index,type:hitResult.type});
+          segments.push({
+            index: hitResult.segment.index,
+            type: hitResult.type
+          });
         } else if (hitResult.type == 'curve') {
-          segments.push({index:hitResult.location._segment1.index,type:hitResult.type});
-          segments.push({index:hitResult.location._segment2.index,type:hitResult.type});
+          segments.push({
+            index: hitResult.location._segment1.index,
+            type: hitResult.type
+          });
+          segments.push({
+            index: hitResult.location._segment2.index,
+            type: hitResult.type
+          });
         }
+        if (!instance.get('proto_node')) {
+          var points = instance.setSelectedSegments(segments);
+          this.addSelectedShape(points);
+          this.trigger('geometrySelected', instance, points);
 
-        this.trigger('geometryDSelected', path, segments, event.modifiers.command);
-
+        }
       }
 
     },
 
     triggerChange: function() {
-      this.trigger('geometrySelected', literal);
+      this.trigger('geometrySelected', literal.data.instance);
     },
 
 
@@ -247,11 +296,14 @@ define([
     },
 
     selectDrag: function(event) {
-
       if (event.modifiers.option && copyReset) {
         copyReset = false;
         copyInitialized = true;
-        this.trigger('addInstance');
+        var currentShape = this.getLastSelected();
+        var instance = currentShape.create();
+        this.removeSelectedShape(currentShape);
+        this.addSelectedShape(instance);
+        this.trigger('addInstance', instance);
       }
 
       var data = {};
@@ -260,7 +312,7 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
-      this.trigger('geometryModified', data, event.modifiers);
+      this.modifyGeometry(data, event.modifiers);
 
 
     },
@@ -272,7 +324,7 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
-      this.trigger('geometrySegmentModified', data, handle, event.modifiers);
+     this.modifySegment(data, handle, event.modifiers);
 
 
     },
@@ -287,7 +339,7 @@ define([
           val: dAngle - angle,
           operator: 'add'
         };
-        this.trigger('geometryModified', data, event.modifiers);
+        this.modifyGeometry(data, event.modifiers);
 
       }
 
@@ -296,23 +348,23 @@ define([
     scaleDrag: function(event) {
       var selectedShapes = this.get('selected_shapes');
       var scaleDelta = selectedShapes[0].accessProperty('scaling_delta');
-      console.log('scaleDelta',scaleDelta);
+      console.log('scaleDelta', scaleDelta);
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 
         var clickPos = startDist; //position of clicked point, relative to center
         var dragPos = event.point.subtract(posPoint); //position of the point dragged to (relative to center)
         var draggedVect = dragPos; //vector of dragged pt movement
-        var signedX = clickPos.x/Math.abs(clickPos.x); //either -1 or 1 depending on what quadrant of the shape the user clicks
-        var signedY = clickPos.y/Math.abs(clickPos.y); //x = -1 in Q2 and Q3, x = -1 in Q1 and Q2
+        var signedX = clickPos.x / Math.abs(clickPos.x); //either -1 or 1 depending on what quadrant of the shape the user clicks
+        var signedY = clickPos.y / Math.abs(clickPos.y); //x = -1 in Q2 and Q3, x = -1 in Q1 and Q2
         var centerDist = clickPos.length; //distance from center of shape to clicked point
         const SCALING_FACTOR = 1;
-        var scaleX = 1 + (draggedVect.x * signedX * SCALING_FACTOR)/centerDist;
-        var scaleY = 1 + (draggedVect.y * signedY * SCALING_FACTOR)/centerDist;
+        var scaleX = 1 + (draggedVect.x * signedX * SCALING_FACTOR) / centerDist;
+        var scaleY = 1 + (draggedVect.y * signedY * SCALING_FACTOR) / centerDist;
 
         if (event.modifiers.shift) {
-          scaleY = scaleDelta.y * scaleX/scaleDelta.x;
-          scaleX = scaleDelta.x * scaleX/scaleDelta.x;
+          scaleY = scaleDelta.y * scaleX / scaleDelta.x;
+          scaleX = scaleDelta.x * scaleX / scaleDelta.x;
         }
 
         // vertical and horiz snapping feature, needs work
@@ -329,14 +381,14 @@ define([
         //   }
         // }
 
-         var data = {};
-         data.set = true;
-         data.scaling_delta = {
-           x: scaleX,
-           y: scaleY,
-           operator: 'set'
+        var data = {};
+        data.set = true;
+        data.scaling_delta = {
+          x: scaleX,
+          y: scaleY,
+          operator: 'set'
         };
-        this.trigger('geometryModified', data, event.modifiers);  
+        this.modifyGeometry(data, event.modifiers);
       }
     },
 
@@ -344,7 +396,7 @@ define([
 
       if (literal) {
 
-        return literal.position;  
+        return literal.position;
       }
       return null;
     },
@@ -365,13 +417,7 @@ define([
 
         if (copyInitialized) {
           copyInitialized = false;
-          console.log("setting position");
-          //this.trigger('setPositionForIntialized',event.point);
         }
-        // selected_shapes[i].setSelectionForInheritors(true,false);
-
-
-
       }
       literal = null;
       segments = [];

@@ -411,7 +411,7 @@ define([
       for ( var i = 0; i < this.pathReferences.length; i++ ) {
         if ( this.pathReferences[i].get('geom').name == uiNode.get('geom').name ) { this.pathReferences.splice(i, 1); }
       }
-      this.sm.removeInstance( uiNode );
+      this.sm.deleteInstance( uiNode );
     },
     /*
      * Remove all Paper UI elements from the canvas, as well as from
@@ -419,7 +419,7 @@ define([
      */
     clear: function() {
       for (var i = 0; i < this.pathReferences.length; i++) {
-        this.sm.removeInstance( this.pathReferences[i] );
+        this.sm.deleteInstance( this.pathReferences[i] );
       }
       this.pathReferences = [];
       this.sm.compile();

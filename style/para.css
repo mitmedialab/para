@@ -153,6 +153,9 @@ input[type="range"]:active::-webkit-slider-thumb {
     z-index:100;
 }
 
+.toolbar-wrapper {
+  float: left;
+}
 .proto-wrapper, .sub-canvas-wrapper{
     float: left;
    padding: 36px 0px 0px 0px;
@@ -536,7 +539,7 @@ header button, .sub-header button {
 }
 
 .properties header{
-    padding: 4%;
+    padding: 10px;
     box-sizing: border-box;
     line-height: 10pt;
     background-color: rgba(200, 200, 200, 0.88);
@@ -877,7 +880,7 @@ span:focus{
     width:30px;
 }
 .constraint-container header {
-  height: 32px;
+  height: 33px;
   line-height: 20pt;
   padding-left: 10px;
   background-color: inherit;
@@ -916,7 +919,7 @@ div.constraint_selector {
   width: 30px;
   height: 275px;
   float: left;
-  background-color: #ccc;
+  background-color: rgba(250,250,250,.95);
   margin:0;
    border-radius: 2px 0 0 2px;
 }
@@ -930,7 +933,7 @@ div#connector_line {
 
 
 .properties-wrapper.layers-wrapper{
-    float:left;
+    /*float:left;*/
 }
 
 .layers-wrapper .properties-container{
@@ -940,15 +943,17 @@ div#connector_line {
 }
 
 .layers-wrapper .properties {
-    width: 270px;
+    width: 300px;
 }
 
 #layers{
     overflow-y: scroll;
+      max-height: 500px;
 }
 #layers-container{
-  width: 240px; 
+  width: 270px; 
   float:right; 
+  background-color: rgba(250,250,250,.95);
 }
 
 #layers header{
@@ -961,7 +966,6 @@ div#connector_line {
 
 div.ui_tree {
   min-height: 30px;
-  background-color: #cccccc;
 }
 
 span.fancytree-node{
@@ -1009,7 +1013,7 @@ span.fancytree-icon, span.fancytree-expander, span.fancytree-constraint, div.con
     background-image: url(../images/layer_icons.svg);
     background-position-x: 0px;
     background-position-y: -25px;
-    background-size: 25px 275px;
+    background-size: 25px 325px;
     background-repeat: no-repeat;
 }
 
@@ -1040,6 +1044,17 @@ span.fancytree-expanded span.fancytree-expander{
 }
 span.fancytree-constraint{
        background-position-y: -150px; 
+}
+span.fancytree-select-button{
+  background-position-y: -300px;
+  float: right;
+  margin-right: 2px;
+
+}
+span.fancytree-select-button.selected{
+  background-position-y: -275px;
+  float: right;
+  margin-right: 2px;
 }
 
 .fancytree-container span.fancytree-node.fancytree-selected span.fancytree-title,

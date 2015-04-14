@@ -7,14 +7,17 @@ define([
   'paper',
   'backbone',
   'models/tools/BaseToolModel',
-], function(_, paper, Backbone, BaseToolModel) {
+  'models/data/PolygonNode',
+  'models/data/PathNode',
+  'models/data/RectNode',
+  'models/data/EllipseNode'
+], function(_, paper, Backbone, BaseToolModel, PolygonNode,PathNode,RectNode,EllipseNode) {
 
   var sideNum = 6;
   var rotationAmt = 0;
   var startPosition = null;
   var polyPath = null;
   var drag = false;
-  var literal = null;
   var segment, mode, type = null;
   var types = ['point', 'handleIn', 'handleOut'];
 
@@ -113,7 +116,8 @@ define([
           matrix.reset();
           matrix.translate(polyPath.bounds.center.x, polyPath.bounds.center.y);
           matrix.rotate(rotationAmt);
-          this.trigger('geometryAdded', polyPath);
+          this.createShape(polyPath);
+
         } else {
           polyPath.remove();
         }
@@ -135,7 +139,7 @@ define([
           matrix.rotate(rotationAmt);
 
 
-          this.trigger('geometryAdded', polyPath);
+          this.createShape(polyPath);
 
         } else {
           polyPath.remove();
@@ -145,6 +149,30 @@ define([
       }
       drag = false;
 
+    },
+
+    createShape: function(path){
+
+      var matrix = this.get('matrix');
+
+      var pathNode;
+      switch (this.get('mode')) {
+        case 'poly':
+          pathNode = new PolygonNode();
+          break;
+        case 'ellipse':
+          pathNode = new EllipseNode();
+          break;
+        case 'rect':
+          pathNode = new RectNode();
+          break;
+        case 'pen':
+          pathNode = new PathNode();
+          break;
+
+      }
+      pathNode.normalizeGeometry(path, matrix);
+      this.trigger('geometryAdded',pathNode);
     },
 
     //mouse drag event

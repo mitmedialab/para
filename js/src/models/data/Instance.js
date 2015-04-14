@@ -298,6 +298,7 @@ define([
 			instance.get('scaling_origin').setValue(position.clone().getValue());
 			instance.get('translation_delta').setValue(this.get('translation_delta').getValue());
 			this.addInheritor(instance);
+			this.addChildNode(instance);
 			return instance;
 		},
 
