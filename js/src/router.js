@@ -9,11 +9,11 @@ define([
   'views/drawing/PropertyView',
   'views/drawing/ContextView',
   'views/drawing/ProtoView',
-  'models/StateManagerModel',
+  'models/data/PropertiesManager',
   'models/tools/ToolManager',
   'models/data/Visitor',
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, StateManagerModel, ToolManager, Visitor) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, PropertiesManager, ToolManager, Visitor) {
 
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
@@ -25,10 +25,12 @@ define([
     var app_router = new AppRouter();
 
     app_router.on('route:defaultAction', function(actions) {
-      var stateManager = new StateManagerModel({});
+      var canvas = $('canvas').get(0);
+      paper.setup(canvas);
+
+      var propertiesManager = new PropertiesManager();
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
-
       var toolManager = new ToolManager();
 
 
@@ -45,7 +47,7 @@ define([
 
       visitor.listenTo(toolManager, 'compileRequest', visitor.compile);
       visitor.listenTo(toolManager, 'addShape', visitor.addShape);
-            visitor.listenTo(toolManager, 'removeShape', visitor.removeShape);
+      visitor.listenTo(toolManager, 'removeShape', visitor.removeShape);
 
       visitor.listenTo(toolManager, 'addInstance', visitor.addInstance);
       visitor.listenTo(toolManager, 'addConstraint', visitor.addConstraint);
@@ -62,8 +64,6 @@ define([
         el: '#tool-elements',
         model: toolManager
       });
-
-
       //setup the canvas view
       var canvasView = new CanvasView({
         el: '#canvas-container',
@@ -73,7 +73,7 @@ define([
 
       var propertyView = new PropertyView({
         el: '#prop-menu',
-        model: stateManager
+        model:  propertiesManager
       });
       var contextView = new ContextView({
         el: '#context-menu',

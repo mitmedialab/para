@@ -16,9 +16,6 @@ define([
   var sub, main, inactive, active;
   var sb;
 
-
-  var sampleKey = 83;
-  // s
   var loadKey = 76; // l
   var panKey = 32; // 
   var rootKey = 82; // r
@@ -105,13 +102,13 @@ define([
 
     //canvas events
     events: {
-      /*'mousedown': 'canvasMouseDown',
+      'mousedown': 'canvasMouseDown',
       'mouseup': 'canvasMouseUp',
       'mousemove': 'canvasMouseMove',
       'mouseenter': 'enterMain',
       'mouseleave': 'leaveMain',
       'mousewheel': 'canvasMousewheel',
-      'dblclick': 'canvasDblclick'*/
+      'dblclick': 'canvasDblclick'
     },
 
     setFocus: function() {

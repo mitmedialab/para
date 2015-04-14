@@ -48,7 +48,7 @@ define([
       BaseToolModel.prototype.initialize.apply(this, arguments);
       this.set('selected_shapes', []);
       this.set('selections', []);
-      this.on('change:mode', this.convertSelection);
+      //this.on('change:mode', this.convertSelection);
     },
 
     convertSelection: function() {
@@ -120,7 +120,6 @@ define([
         instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
         instance.set('sel_palette_index', this.get('current_sel_index'));
         selected_shapes.push(instance);
-        this.set('selected_shapes', selected_shapes);
       }
     },
 
@@ -379,7 +378,6 @@ define([
         y: event.delta.y
       };
       this.modifySegment(data, handle, event.modifiers);
-
 
     },
 

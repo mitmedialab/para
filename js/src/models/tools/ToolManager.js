@@ -6,12 +6,16 @@ define([
   'jquery',
   'underscore',
   'backbone',
+    'paper',
+
   'models/tools/BaseToolModel',
   'models/tools/SelectToolModel',
   'models/tools/PolyToolModel',
   'models/tools/ConstraintToolModel',
-  'utils/Utils'
-], function($, _, Backbone, BaseToolModel, SelectToolModel, PolyToolModel, ConstraintToolModel, Utils) {
+  'utils/Utils',  
+  'utils/PaperUIHelper',
+
+], function($, _, Backbone, paper, BaseToolModel, SelectToolModel, PolyToolModel, ConstraintToolModel, Utils,PaperUIHelper) {
 
   var toolNameMap;
   var ToolManager = Backbone.Model.extend({
@@ -41,7 +45,7 @@ define([
         id: 'constraintTool',
       });
 
-      constraintTool.set('sm', this);
+      constraintTool.sm = this;
       var toolCollection = new Backbone.Collection({});
       this.set('tool_collection', toolCollection);
       this.listenTo(toolCollection, 'geometryAdded', this.geometryAdded);
@@ -61,7 +65,12 @@ define([
         'constraint': constraintTool
       };
 
+ // setup helpers and factories
+      PaperUIHelper.setup(this);
 
+        //setup default zeros for zoom and pan
+      this.zeroedZoom = paper.view.zoom;
+      this.zeroedPan = paper.view.center.clone();
     },
 
     setState: function(state, mode) {
@@ -101,7 +110,7 @@ define([
       var state = this.get('state');
       switch (state) {
         case 'constraintTool':
-          this.get('constraintTool').clearState();
+          this.get('tool_collection').get('constraintTool').clearState();
           break;
         default:
       }
@@ -265,12 +274,8 @@ define([
 
     },
     // END TESTING
-
-
-
     //triggered by paper tool on a mouse down event
     toolMouseDown: function(event, pan) {
-
       if (!event.modifiers.space && Utils.validateEvent(event)) {
         var selectedTool = this.get('tool_collection').get(this.get('state'));
         selectedTool.mouseDown(event);
@@ -301,9 +306,59 @@ define([
         var selectedTool = this.get('tool_collection').get(this.get('state'));
         selectedTool.mouseMove(event);
       }
-
-
     },
+
+       canvasMouseDrag: function(delta, pan) {
+      if (pan) {
+        var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
+        paper.view.scrollBy(inverseDelta);
+
+        event.preventDefault();
+      }
+    },
+
+    changeZoom: function(oldZoom, delta, c, p) {
+      var newZoom = this.calcZoom(oldZoom, delta);
+      var beta = oldZoom / newZoom;
+      var pc = p.subtract(c);
+      var a = p.subtract(pc.multiply(beta)).subtract(c);
+      return {
+        z: newZoom,
+        o: a
+      };
+    },
+
+    calcZoom: function(oldZoom, delta) {
+      var factor = 1.05;
+      if (delta < 0) {
+        return oldZoom * factor;
+      }
+      if (delta > 0) {
+        return oldZoom / factor;
+      }
+    },
+
+
+
+    canvasMouseWheel: function(event, pan, modify) {
+      var delta = event.originalEvent.wheelDelta; //paper.view.center
+
+      if (pan) {
+
+        var mousePos = new paper.Point(event.offsetX, event.offsetY);
+        var viewPosition = paper.view.viewToProject(mousePos);
+        var data = this.changeZoom(paper.view.zoom, delta, paper.view.center, viewPosition);
+        paper.view.zoom = data.z;
+        paper.view.center = paper.view.center.add(data.o);
+        event.preventDefault();
+        paper.view.draw();
+      } 
+    },
+
+    canvasDblclick: function(event) {
+    
+    },
+
   });
   return ToolManager;
 });

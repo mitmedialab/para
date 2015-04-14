@@ -887,6 +887,7 @@ define([
 			geom.fillColor = fill_color;
 			geom.strokeColor = stroke_color;
 			geom.strokeWidth = stroke_width;
+			geom.visible = this.get('visible');
 		},
 
 		renderBoundingBox: function(geom) {

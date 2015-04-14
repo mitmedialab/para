@@ -33,7 +33,7 @@ body {
     font-size: 12px;
     letter-spacing: 2px;
     text-rendering: geometricPrecision;
-
+    overflow: hidden;
     background-color: #232323;
 }
 

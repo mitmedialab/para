@@ -6,29 +6,17 @@
 
 define([
   'underscore',
+  'backbone',
   'paper',
-  'models/data/PathNode',
 
-], function(_, paper, PathNode) {
+], function(_, Backbone, paper) {
 
-  var PaperUI = PathNode.extend({
+  var PaperUI = Backbone.Model.extend({
     
-    defaults: _.extend({}, PathNode.prototype.defaultss, {
-      name: 'ui',
-    }),
-
-    // TODO: perhaps allow this to take path data and normalize it?
     initialize: function(data) {
-      PathNode.prototype.initialize.apply(this, arguments);
-    },
 
-    
-    //placeholder to prevent error
-    getValue:function(){ 
-    
-    },
-
-   
+      Backbone.Model.prototype.initialize.apply(this, arguments);
+    } 
   });
 
   return PaperUI;

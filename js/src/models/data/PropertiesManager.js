@@ -1,43 +1,26 @@
-/*StateManagerModel.js
- *model that manages all base shapes*/
+/*PropertiesManager.js
+ *manages properties of shape*/
 
 define(['jquery',
   'underscore',
-  'paper',
   'backbone',
   'backbone.undo',
   'filesaver',
-  'utils/PPoint',
   'utils/ColorUtils',
 
-  'utils/PaperUIHelper',
-
-], function($, _, paper, Backbone, UndoManager, FileSaver,PPoint, ColorUtils,PaperUIHelper, FunctionManager) {
+], function($, _, Backbone, UndoManager, FileSaver,ColorUtils) {
 
 
   var uninstantiated;
   var undoLimit = 15;
 
-  var StateManagerModel = Backbone.Model.extend({
+  var PropertiesManager = Backbone.Model.extend({
 
     defaults: {
 
     },
 
     initialize: function(attributes, options) {
-      //setup paperscopes
-      var canvas = $('canvas').get(0);
-      paper.setup(canvas);
-     
-
-      // setup helpers and factories
-      PaperUIHelper.setup(this);
-
-
-
-
-      // this.listenTo(toolCollection, 'updateProperties', this.updateProperties);
-
       //clear local storage
       localStorage.clear();
       this.modified = false;
@@ -66,12 +49,12 @@ define(['jquery',
       });
 
 
-      //setup default zeros for zoom and pan
-      this.zeroedZoom = paper.view.zoom;
-      this.zeroedPan = paper.view.center.clone();
+    
     },
 
+
     /*animate: function() {
+
       var selectedShapes = selectTool.get('selected_shapes');
       var property;
       var levels = 1;
@@ -94,8 +77,6 @@ define(['jquery',
       paper.view.draw();
 
     },*/
-
-
 
     geometrySelected: function(instance) {
       var styledata = {};
@@ -145,55 +126,7 @@ define(['jquery',
     },
 
 
-    canvasMouseDrag: function(delta, pan) {
-      if (pan) {
-        var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
-        paper.view.scrollBy(inverseDelta);
-
-        event.preventDefault();
-      }
-    },
-
-    changeZoom: function(oldZoom, delta, c, p) {
-      var newZoom = this.calcZoom(oldZoom, delta);
-      var beta = oldZoom / newZoom;
-      var pc = p.subtract(c);
-      var a = p.subtract(pc.multiply(beta)).subtract(c);
-      return {
-        z: newZoom,
-        o: a
-      };
-    },
-
-    calcZoom: function(oldZoom, delta) {
-      var factor = 1.05;
-      if (delta < 0) {
-        return oldZoom * factor;
-      }
-      if (delta > 0) {
-        return oldZoom / factor;
-      }
-    },
-
-
-
-    canvasMouseWheel: function(event, pan, modify) {
-      var delta = event.originalEvent.wheelDelta; //paper.view.center
-
-      if (pan) {
-
-        var mousePos = new paper.Point(event.offsetX, event.offsetY);
-        var viewPosition = paper.view.viewToProject(mousePos);
-        var data = this.changeZoom(paper.view.zoom, delta, paper.view.center, viewPosition);
-        paper.view.zoom = data.z;
-        paper.view.center = paper.view.center.add(data.o);
-        event.preventDefault();
-        paper.view.draw();
-      } 
-    },
-
-    canvasDblclick: function(event) {
-    },
+   
 
 
 
@@ -303,6 +236,6 @@ define(['jquery',
 
   });
 
-  return StateManagerModel;
+  return PropertiesManager;
 
 });
