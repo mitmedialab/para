@@ -984,7 +984,6 @@ define([
 
 		renderGeom: function() {
 			var visible = this.get('visible');
-			console.log('visible=',visible);
 			var geom = this.get('geom');
 			geom.bringToFront();
 			var rmatrix = this.get('rmatrix');

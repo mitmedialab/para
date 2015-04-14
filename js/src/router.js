@@ -11,7 +11,7 @@ define([
   'views/drawing/ProtoView',
   'models/StateManagerModel',
   'models/tools/ToolManager',
-    'models/data/Visitor',
+  'models/data/Visitor',
 
 ], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, StateManagerModel, ToolManager, Visitor) {
 
@@ -28,12 +28,12 @@ define([
       var stateManager = new StateManagerModel({});
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
-     
-      var  toolManager = new ToolManager();
+
+      var toolManager = new ToolManager();
 
 
       //setup visitor and function manager
-     var visitor = new Visitor();
+      var visitor = new Visitor();
 
 
       /* event listener registers */
@@ -51,9 +51,12 @@ define([
       visitor.listenTo(toolManager, 'addList', visitor.addList);
       visitor.listenTo(toolManager, 'addFunction', visitor.addFunction);
       visitor.listenTo(toolManager, 'addParams', visitor.addParams);
+      visitor.listenTo(toolManager, 'toggleOpen', visitor.toggleOpen);
+      visitor.listenTo(toolManager, 'toggleClosed', visitor.toggleClosed);
 
 
-       var toolView = new ToolView({
+
+      var toolView = new ToolView({
         el: '#tool-elements',
         model: toolManager
       });
@@ -65,7 +68,7 @@ define([
         model: toolManager
       }, event_bus);
 
-     
+
       var propertyView = new PropertyView({
         el: '#prop-menu',
         model: stateManager

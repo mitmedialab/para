@@ -43,14 +43,15 @@ define([
       var data = {};
       // TODO: make some normalizations util function
       var rotation_delta;
-      if(matrix.rotation<0){
-        rotation_delta = 360+matrix.rotation;
-      }
-      else{
+      if (matrix.rotation < 0) {
+        rotation_delta = 360 + matrix.rotation;
+      } else {
         rotation_delta = matrix.rotation;
       }
-      data.rotation_delta = {val:rotation_delta};
-      console.log('normalized_rotation',data.rotation_delta.val, matrix.rotation);
+      data.rotation_delta = {
+        val: rotation_delta
+      };
+      console.log('normalized_rotation', data.rotation_delta.val, matrix.rotation);
 
       data.scaling_delta = {
         x: matrix.scaling.x,
@@ -122,7 +123,7 @@ define([
       path_altered.setNull(false);
       this.setPathAltered();
       var json = this.toJSON();
-      console.log("path json" ,json, JSON.stringify(json));
+      console.log("path json", json, JSON.stringify(json));
 
       return data;
     },
@@ -139,12 +140,14 @@ define([
 
     //sets selection for segments
     setSelectedSegments: function(segments) {
+      console.log('segments', segments);
       var points = this.get('points');
       var selectedPoints = [];
       for (var i = 0; i < segments.length; i++) {
         var index = segments[i].index;
         var point = points[index];
-        point.set('selected', segments[i].type);
+        point.set('selection_type', segments[i].type);
+        point.set('selected', true);
         selectedPoints.push(point);
       }
       return selectedPoints;
@@ -161,36 +164,41 @@ define([
      * called when segment in geometry is modified
      */
     modifyPoints: function(data, mode, modifier) {
+      console.log('data', data, this.get('points'));
       var proto_node = this.get('proto_node');
       if (mode === 'proxy' && proto_node) {
         proto_node.modifyPoints(data, mode, modifier);
       }
-
       var points = this.get('points');
       var delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
       delta.transform(this.get('ri_matrix'));
       delta.transform(this.get('si_matrix'));
       var geom = this.get('geom');
+      var startWidth = geom.bounds.width;
+      var startHeight = geom.bounds.height;
+
       var selectedPoints = points.filter(function(point) {
         return point.get('selected');
       });
       //maintains constraints on points
       var indicies = [];
       for (var i = 0; i < selectedPoints.length; i++) {
-        var selectedPoint = selectedPoints[i];
 
+        var selectedPoint = selectedPoints[i];
+        console.log('found selectedPoint', selectedPoint, selectedPoint.get('selected'));
         var geomS = geom.segments[selectedPoint.get('index')];
         indicies.push({
           index: selectedPoint.get('index'),
-          type: selectedPoint.get('selected')
+          type: selectedPoint.get('selection_type')
         });
-        switch (selectedPoint.get('selected')) {
+        switch (selectedPoint.get('selection_type')) {
           case 'segment':
           case 'curve':
             var p = selectedPoint.get('position');
             p.add(delta.point);
             geomS.point.x += data.translation_delta.x;
             geomS.point.y += data.translation_delta.y;
+            console.log('setting position of point');
 
             break;
           case 'handle-in':
@@ -209,10 +217,24 @@ define([
         }
 
       }
+      var endWidth = geom.bounds.width;
+      var endHeight = geom.bounds.height;
+      var wDiff = (endWidth - startWidth)/2;
+      var hDiff = (endHeight - startHeight)/2;
+      var sizeDelta = new paper.Segment(new paper.Point(wDiff, hDiff), null, null);
+      sizeDelta.transform(this.get('rmatrix'));
+      sizeDelta.transform(this.get('smatrix'));
+      console.log('start,end,diff', startWidth, startHeight, endWidth, endHeight, sizeDelta.point);
+      this.modifyProperty({translation_delta:{x:sizeDelta.point.x,y:sizeDelta.point.y, operator:'add'}});
+    
       var inheritors = this.get('inheritors').accessProperty();
       for (var j = 0; j < inheritors.length; j++) {
         inheritors[j].modifyPointsByIndex(delta.point, indicies);
       }
+      sizeDelta.remove();
+      sizeDelta = null;
+      delta.remove();
+      delta = null;
     },
 
     /* modifyPointsByIndex
@@ -256,25 +278,24 @@ define([
 
 
     renderSelection: function(geom) {
+      Instance.prototype.renderSelection.call(this, geom);
 
+      var pointSelected = false;
       var points = this.get('points');
       for (var i = 0; i < points.length; i++) {
         var selectedPoint = points[i];
         var geomS = geom.segments[selectedPoint.get('index')];
-        switch (selectedPoint.get('selected')) {
-          case 'segment':
-          case 'curve':
-          case 'handle-in':
-          case 'handle-out':
-            geomS.selected = true;
-            break;
+        if (selectedPoint.get('selected')) {
+          geomS.selected = true;
+          pointSelected = true;
         }
       }
+      if (!this.get('geom').selected && pointSelected) {
+        this.get('geom').selected = true;
+      }
 
-      Instance.prototype.renderSelection.call(this, geom);
 
     }
-
 
 
   });

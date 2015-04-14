@@ -244,7 +244,6 @@ define([
 
 
     propertyModified: function(event) {
-      console.log('triggering list modified');
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].trigger('modified', this.members[i]);
       }

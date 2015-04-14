@@ -23,7 +23,9 @@ define([
     segments: true,
     curves: true,
     handles: true,
+    fill: true,
     tolerance: 5,
+
   };
 
   var hitOptions = {
@@ -46,9 +48,48 @@ define([
       BaseToolModel.prototype.initialize.apply(this, arguments);
       this.set('selected_shapes', []);
       this.set('selections', []);
-      //this.on('change:literals',this.triggerChange);
+      this.on('change:mode', this.convertSelection);
     },
 
+    convertSelection: function() {
+      console.log('convertSelection');
+      var selected_shapes = this.get('selected_shapes');
+      if (selected_shapes.length > 0) {
+        var toAdd = [];
+        var toRemove = [];
+        var mode = this.get('mode');
+        console.log('switched to', mode);
+        if (mode === 'dselect') {
+          for (var j = 0; j < selected_shapes.length; j++) {
+            if (selected_shapes[j].get('points')) {
+              toRemove.push(selected_shapes[j]);
+              var points = selected_shapes[j].get('points');
+              for (var k = 0; k < points.length; k++) {
+                var point = points[k];
+                if (!_.contains(toAdd, point)) {
+                  toAdd.push(point);
+                }
+              }
+            }
+          }
+
+        } else {
+          for (var i = 0; i < selected_shapes.length; i++) {
+            if (selected_shapes[i].get('name') === 'point') {
+              toRemove.push(selected_shapes[i]);
+              var parent = selected_shapes[i].nodeParent;
+              if (!_.contains(toAdd, parent)) {
+                toAdd.push(parent);
+              }
+            }
+          }
+        }
+        console.log('toAdd, toRemove', toAdd, toRemove);
+        this.removeSelectedShape(toRemove);
+        this.addSelectedShape(toAdd);
+      }
+
+    },
 
     deselectAll: function() {
       // TODO: do this across all selections
@@ -147,11 +188,13 @@ define([
 
     modifyGeometry: function(data, modifiers) {
       var selectedShapes = this.get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
-        var instance = selectedShapes[i];
-        instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+      if (selectedShapes.length > 0) {
+        for (var i = 0; i < selectedShapes.length; i++) {
+          var instance = selectedShapes[i];
+          instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+        }
+        this.trigger('geometryModified');
       }
-      this.trigger('geometryModified');
     },
 
 
@@ -159,7 +202,7 @@ define([
       var selectedShapes = this.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
-        console.log('selected_shape',instance);
+        console.log('selected_shape', instance, instance.nodeParent);
         instance.nodeParent.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
       }
       this.trigger('geometryModified');
@@ -200,6 +243,7 @@ define([
     selectDown: function(event, noDeselect) {
       //automaticall deselect all on mousedown if shift modifier is not enabled
       var instance = null;
+      var modifier = null;
       if (!event.modifiers.shift) {
         if (!noDeselect) {
           this.deselectAll();
@@ -214,12 +258,13 @@ define([
         literal = path;
         instance = literal.data.instance;
 
+
+        modifier = event.modifiers.command;
+
+        this.addSelectedShape(instance, this.get('tool-mode'), this.get('tool-modifier'));
       }
-      var constrain = event.modifiers.command;
 
-      this.addSelectedShape(instance, this.get('tool-mode'), this.get('tool-modifier'));
-      this.trigger('geometrySelected', instance, constrain);
-
+      this.trigger('geometrySelected', instance, null, modifier);
 
 
     },
@@ -227,8 +272,6 @@ define([
 
     dSelectDown: function(event, noDeselect) {
       //automaticall deselect all on mousedown if shift modifier is not enabled
-      console.log('dselect down');
-
       if (!event.modifiers.shift) {
         if (!noDeselect) {
           this.deselectAll();
@@ -236,10 +279,11 @@ define([
       }
 
       var hitResult = paper.project.hitTest(event.point, dHitOptions);
-      console.log(hitResult);
+      var instance, points;
       if (hitResult) {
         var path = hitResult.item;
-        var instance = path.data.instance;
+        instance = path.data.instance;
+        console.log('hitResult', hitResult.type);
         if (hitResult.type == 'segment') {
           hitResult.segment.fullySelected = true;
           segments.push({
@@ -261,14 +305,21 @@ define([
             index: hitResult.location._segment2.index,
             type: hitResult.type
           });
+        } else if (hitResult.type == 'fill') {
+          for (var i = 0; i < path.segments.length; i++) {
+            segments.push({
+              index: path.segments[i].index,
+              type: 'segment'
+            });
+          }
         }
         if (!instance.get('proto_node')) {
-          var points = instance.setSelectedSegments(segments);
+          points = instance.setSelectedSegments(segments);
           this.addSelectedShape(points);
-          this.trigger('geometrySelected', instance, points);
-
         }
       }
+      this.trigger('geometrySelected', instance, points);
+
 
     },
 
@@ -279,19 +330,22 @@ define([
 
     //mouse drag event
     mouseDrag: function(event) {
-      switch (this.get('mode')) {
-        case 'select':
-          this.selectDrag(event);
-          break;
-        case 'dselect':
-          this.dSelectDrag(event);
-          break;
-        case 'rotate':
-          this.rotateDrag(event);
-          break;
-        case 'scale':
-          this.scaleDrag(event);
-          break;
+      var selectedShapes = this.get('selected_shapes');
+      if (selectedShapes.length > 0) {
+        switch (this.get('mode')) {
+          case 'select':
+            this.selectDrag(event);
+            break;
+          case 'dselect':
+            this.dSelectDrag(event);
+            break;
+          case 'rotate':
+            this.rotateDrag(event);
+            break;
+          case 'scale':
+            this.scaleDrag(event);
+            break;
+        }
       }
     },
 
@@ -324,7 +378,7 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
-     this.modifySegment(data, handle, event.modifiers);
+      this.modifySegment(data, handle, event.modifiers);
 
 
     },

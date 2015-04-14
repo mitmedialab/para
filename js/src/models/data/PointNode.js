@@ -22,6 +22,7 @@ define([
       type: 'geometry',
       index: -1,
       selected: false,
+      selection_type: 'none'
     }),
 
 

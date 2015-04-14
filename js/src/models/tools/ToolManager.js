@@ -78,6 +78,7 @@ define([
         var currentTool = this.get('tool_collection').get(this.get('state'));
         currentTool.set('mode', mode);
       }
+      this.trigger('compileRequest')
     },
 
 
@@ -148,7 +149,7 @@ define([
       this.trigger('addConstraint', constraint_data);
     },
 
-    geometrySelected: function(instance, segments) {
+    geometrySelected: function(instance, segments, modifier) {
       var selectTool = this.get('tool_collection').get('selectTool');
       this.trigger('selectionChanged', selectTool.get('selected_shapes'), instance, segments);
     },
@@ -165,7 +166,6 @@ define([
       }
       this.trigger('compileRequest');
     },
-
 
     /*geometryDeleted
      * triggers a delete action on the visitor
@@ -200,7 +200,7 @@ define([
     createList: function() {
       var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
       if (selectedShapes.length > 0) {
-        this.get('selectTool').deselectAll();
+        this.get('tool_collection').get('selectTool').deselectAll();
         this.trigger('addList', selectedShapes);
       }
     },
@@ -232,7 +232,7 @@ define([
     openSelected: function() {
       var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
       this.trigger('toggleOpen', selectedShapes);
-      this.deselectAll();
+      this.get('tool_collection').get('selectTool').deselectAll();
 
     },
 

@@ -326,8 +326,6 @@ define([
 					}
 					break;
 			}
-
-
 		},
 
 
@@ -411,7 +409,17 @@ define([
 		},
 
 		selectionChanged: function(selected_shapes, added_shape){
-			this.trigger('selectionChanged',selected_shapes);
+			var filtered = false;
+			if(added_shape){
+				if(added_shape.get('name')!='point'){
+
+					filtered = this.filterSelection(added_shape);
+					console.log('filtered selection',filtered,added_shape);
+				}
+			}
+			if(!filtered){
+				this.compile();
+			}
 		},
 
 		deselectShape: function(id){
@@ -484,9 +492,10 @@ define([
 		filterSelection: function(lInstance) {
 			var sInstances = [];
 			var itemFound = false;
+			console.log('total num lists',lists.length);
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
-
+				console.log('item',i,lInstance.get('id'), lInstance.get('name'),lists[i].toJSON().members);
 				if (item) {
 					sInstances.push(item);
 					itemFound = true;
@@ -494,8 +503,10 @@ define([
 			}
 			//add in originally selected index if no lists have been added
 			if (itemFound) {
-				this.trigger('selectionFiltered');
+				this.trigger('selectionFiltered',sInstances);
+				return true;
 			}
+			return false;
 			
 		},
 
@@ -517,6 +528,7 @@ define([
 			} else {
 				toSelect = this.toggleOpenLists(items);
 			}
+			console.log('toSelect',toSelect);
 			this.trigger('addToSelection',toSelect);
 		},
 
