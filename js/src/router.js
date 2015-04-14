@@ -29,12 +29,7 @@ define([
 
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
-      var constraintToolModel = new ConstraintToolModel({
-        id: 'constraintTool'
-      });
-      var stateManager = new StateManagerModel({}, {
-        constrainer: constraintToolModel
-      });
+      var stateManager = new StateManagerModel();
 
       //setup the canvas view
       var canvasView = new CanvasView({
@@ -49,10 +44,6 @@ define([
       var propertyView = new PropertyView({
         el: '#prop-menu',
         model: stateManager
-      });
-      var contextView = new ContextView({
-        el: '#context-menu',
-        model: constraintToolModel,
       });
       propertyView.render();
 

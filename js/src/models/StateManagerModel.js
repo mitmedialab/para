@@ -72,9 +72,10 @@ define(['jquery',
       followPathTool = new FollowPathToolModel({
         id: 'followPathTool'
       });
-
-      constraintTool = options.constrainer;
-      constraintTool.set('sm', this);
+      constraintTool = new ConstraintToolModel({
+        id: 'constraintTool'
+      });
+      constraintTool.sm = this;
 
       toolCollection = new ToolCollection([polyTool, selectTool, followPathTool, constraintTool]);
 

@@ -56,6 +56,34 @@ define([
       this.set('geom', full_geom);
     },
 
+    update: function( fromSide, axis, amount ) {
+      // unscale
+      var geom = this.get('geom');
+      if ( this.get('axis') == 'x' ) {
+        geom.scale( 1 / (this['rel_change']['x'] * this['rel_change']['y']), 1 );
+      } else {
+        geom.scale( 1 / (this['rel_change']['x'] * this['rel_change']['y']), 1 );
+      }
+
+      if ( fromSide == 'ref' ) {
+        var refProp = this.get('constraint').get('ref_prop');
+        this['rel_change'][axis] = 1 + (amount / this.changeFactor[axis]); 
+      }
+      if ( fromSide == 'rel' ) {
+        var refProp = this.get('constraint').get('ref_prop');
+        this['rel_change'] = amount;
+        this.changeFactor['x'] = (this['ref_change']['x']) / (this['rel_change']['x'] - 1);
+        if ( refProp == 'position') {
+          this.changeFactor['y'] = (this['ref_change']['y']) / (this['rel_change']['y'] - 1);
+        }
+      }
+      if ( this.get('axis') == 'x' ) {
+        geom.scale( this['rel_change']['x'] * this['rel_change']['y'], 1 );
+      } else {
+        geom.scale( 1, this['rel_change']['x'] * this['rel_change']['y'] );
+      }
+    },
+
     addListeners: function() {
       var geom = this.get('geom');
       geom.onMouseEnter = this.onMouseEnter.bind(this);

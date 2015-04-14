@@ -21,6 +21,19 @@ define([
       var i_axis = ax_inverse[axis];
       var center = this.get('constraint').get(side_extend).get('geom').bounds.center;
       this.originalValue = center[axis];
+     
+      // start experimental 
+      this.origin = center[axis];
+      this.ref_change = {'x': 0, 'y': 0};
+      this.rel_change = {'x': 0, 'y': 0};
+      if ( this.get('constraint').get('ref_prop') == 'scale' ) {
+        this.changeFactor = {'x': 180, 'y': 180};
+      }
+      if ( this.get('constraint').get('ref_prop') == 'rotation' ) {
+        this.changeFactor = {'x': 1, 'y': 1};
+      }
+      // end experimental
+
       var start = new paper.Point(center);
       var end = new paper.Point(center); 
       start[i_axis] = paper.view.bounds[i_axis] - 10 * paper.view.bounds[dist[i_axis]];
@@ -34,6 +47,36 @@ define([
 
       path.data.instance = this;
       this.set('geom', path);
+    },
+
+    update: function( fromSide, axis, amount ) {
+      if ( fromSide == 'ref' ) {
+        var refProp = this.get('constraint').get('ref_prop');
+        this['ref_change'][axis] = amount;
+        if ( refProp == 'scale' ) {
+          this['rel_change'][axis] = this.changeFactor[axis] * (amount - 1);
+        }
+        if ( refProp == 'rotation' ) {
+          this['rel_change'][axis] = this.changeFactor[axis] * amount; 
+        }
+      }
+      if ( fromSide == 'rel' ) {
+        var refProp = this.get('constraint').get('ref_prop');
+        var noramlize = amount / (this['rel_change']['x'] + this['rel_change']['y']);
+        this['rel_change']['x'] *= normalize;
+        this['rel_change']['y'] *= normalize;
+        if ( refProp == 'scale' ) {
+          this.changeFactor['x'] = this['rel_change']['x'] / (this['ref_change']['x'] - 1);
+          this.changeFactor['y'] = this['rel_change']['y'] / (this['ref_change']['y'] - 1); 
+        }
+        if ( refProp == 'rotation' ) {
+          this.changeFactor['x'] = this['rel_change']['x'] / this['ref_change']['x'];
+          this.changeFactor['y'] = this['rel_change']['y'] / this['ref_change']['y'];
+        }
+      }
+
+      var geom = this.get('geom');
+      geom.position[this.get('axis')] = this['origin'] + this['rel_change']['x'] + this['rel_change']['y'];
     },
 
     addListeners: function() {

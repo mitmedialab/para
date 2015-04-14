@@ -61,6 +61,35 @@ define([
       this.set('geom', full_geom);
     },
 
+    update: function( fromSide, axis, amount ) {
+      if ( fromSide == 'ref' ) {
+        var refProp = this.get('constraint').get('ref_prop');
+        if ( refProp == 'scale' ) {
+          this['rel_change'][axis] = this.changeFactor[axis] * (amount - 1);
+        }
+        if ( refProp == 'position' ) {
+          this['rel_change'][axis] = this.changeFactor[axis] * amount;  
+        } 
+      }
+      if ( fromSide == 'rel' ) {
+        var refProp = this.get('constraint').get('ref_prop');
+        var normalize = amount / (this['rel_change']['x'] + this['rel_change']['y']);
+        this['rel_change']['x'] *= normalize;
+        this['rel_change']['y'] *= normalize;
+        if ( refProp == 'scale' ) {
+          this.changeFactor['x'] = this['rel_change']['x'] / (this['ref_change']['x'] - 1);
+          this.changeFactor['y'] = this['rel_change']['y'] / (this['ref_change']['y'] - 1);
+        }
+        if ( refProp == 'position' ) {
+          this.changeFactor['x'] = this['rel_change']['x'] / this['ref_change']['x'];
+          this.changeFactor['y'] = this['rel_change']['y'] / this['ref_change']['y'];
+        }
+
+        var geom = this.get('geom');
+        geom.position[this.get('axis')] = this['origin'] + this['rel_change']['x'] + this['rel_change']['y'];
+      }
+    },
+
     addListeners: function() {
       var geom = this.get('geom');
       geom.onMouseEnter = this.onMouseEnter.bind(this);

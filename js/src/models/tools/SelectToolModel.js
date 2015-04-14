@@ -76,9 +76,7 @@ define([
       var selected_shapes = this.get('selected_shapes');
       if (!_.contains(selected_shapes, instance)) {
         instance.set('selected', true);
-        instance.set('sel_palette_index', this.get('current_sel_index'));
         selected_shapes.push(instance);
-        this.set('selected_shapes', selected_shapes);
       }
     },
 
@@ -171,7 +169,6 @@ define([
     selectDown: function(event, noDeselect) {
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
-        console.log('hoho');
         if (!noDeselect) {
           this.deselectAll();
         }
@@ -277,8 +274,6 @@ define([
         y: event.delta.y
       };
       this.trigger('geometrySegmentModified', data, handle, event.modifiers);
-
-
     },
 
     rotateDrag: function(event) {
@@ -321,9 +316,7 @@ define([
           operator: 'add'
         };
         this.trigger('geometryModified', data, event.modifiers);
-
       }
-
     },
 
     getRelativePoint: function() {
