@@ -158,10 +158,11 @@ define([
 
     relMouseDown: function(event) {
       var constraint = this.get('currentConstraint');
-      var reference = constraint.get('reference');
-      var hitResult = paper.project.hitTest( event.point, hitOptions );
+      var reference = constraint.get('references');
+      var hitResult = paper.project.hitTest( event.point, mouseHitOptions );
       if ( hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id ) {
         this.set('mode', 'ref');
+        this.modeSwitch();
         return;
       }
       if ( hitResult && hitResult.item.type && hitResult.item.type == 'handle' && hitResult.item.active ) {

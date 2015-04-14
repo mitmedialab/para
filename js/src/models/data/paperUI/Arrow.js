@@ -46,7 +46,6 @@ define([
 
     show: function() {
       if ( this.get('geometry') ) {
-        console.log('[ERROR] Arrow is already visible, show() does nothing.');
         return;
       }
       this.draw();

@@ -56,6 +56,7 @@ define([
         var rel_geom = relatives.get('geom');
         var ref_geom = references.get('geom');
         var proxy =  rel_geom.clone();
+        proxy.name = 'proxy';
         proxy.bringToFront();
         proxy.visible = false;
         proxy.show = function() { 
@@ -67,8 +68,10 @@ define([
           proxy.visible = false; 
         }
         proxy.reset = function() {
-          proxy.position = rel_geom.position;
-          proxy.matrix = rel_geom.matrix;
+          this.scaling = 1; 
+          this.position = rel_geom.position;
+          this.rotation = rel_geom.rotation;
+          paper.view.draw();
         }
         proxy.matchProperty = function( ref_prop, rel_prop ) {
           var refPropValue, relPropValue;

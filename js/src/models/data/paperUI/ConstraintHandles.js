@@ -48,13 +48,10 @@ define([
 
       // svg arrows
       var yarrow = paper.project.importSVG(document.getElementById('yarrow')).children[0];
-      console.log('yarrow', yarrow);
       var xarrow = yarrow.clone();
       xarrow.rotate(90);
-      console.log('xarrow', xarrow);
       var xyarrow = yarrow.clone();
       xyarrow.rotate(-45);
-      console.log('xyarrow', xyarrow);
       yarrow.position = corners[1].bounds.center;
       xarrow.position = corners[3].bounds.center;
       xyarrow.position = corners[0].bounds.center;
@@ -200,11 +197,13 @@ define([
       if ( this.get('side') == 'ref' ) {
         applyClick( ref_target, ref_geom, 'ref' );
         applyClick( rel_target, rel_geom, 'rel' );
-        //proxy.reset();
+        constraint.get('proxy').reset();
+        constraint.get('rel_handle').redraw();
         //proxy.matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );  
       } else {
         applyClick( rel_target, rel_geom, 'rel' );
-        //proxy.reset();
+        constraint.get('proxy').reset();
+        constraint.get('rel_handle').redraw();
         //proxy.matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );  
       }
 
