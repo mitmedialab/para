@@ -160,8 +160,12 @@ define([
       var constraint = this.get('currentConstraint');
       var reference = constraint.get('reference');
       var hitResult = paper.project.hitTest( event.point, hitOptions );
-      if ( hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id ) {
+      if ( hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id ) {
         this.set('mode', 'ref');
+        return;
+      }
+      if ( hitResult && hitResult.item.type && hitResult.item.type == 'handle' && hitResult.item.active ) {
+        this.draggingHandle = constraint.get('rel_prop');
       }
     },
 
@@ -174,7 +178,46 @@ define([
     },
 
     relMouseDrag: function(event) {
-      if ( event.modifiers.shift ) {
+      if ( event.modifiers.shift && this.draggingHandle ) {
+        var constraint = this.get('currentConstraint');
+        var proxy = constraint.get('proxy');
+        var arrow = constraint.get('arrow');
+        var rel_geom = constraint.get('relatives').get('geom');
+        switch ( this.draggingHandle ) {
+          case 'scale_x':
+            var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
+            proxy.scaling = new paper.Point(x_scale, proxy.scaling.y); 
+            break;
+          case 'scale_y':
+            var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
+            proxy.scaling = new paper.Point(proxy.scaling.x, y_scale); 
+            break;
+          case 'scale_xy':
+            var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
+            var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
+            proxy.scaling = new paper.Point(x_scale, y_scale);
+            break;
+          case 'position_x':
+            proxy.position.x = event.point.x;
+            arrow.redrawTail(proxy);
+            break;
+          case 'position_y':
+            proxy.position.y = event.point.y;
+            arrow.redrawTail(proxy);
+            break;
+          case 'position_xy':
+            proxy.position.x = event.point.x;
+            proxy.position.y = event.point.y;
+            arrow.redrawTail(proxy);
+            break;
+          case 'rotation':
+            var angle = event.lastPoint.subtract( proxy.position ).angle;
+            var dAngle = event.point.subtract( proxy.position ).angle; 
+            proxy.rotation = (proxy.rotation + (dAngle - angle));
+            break;
+        }
+
+        constraint.get('rel_handle').redraw();
         // check handle being dragged
         // if scale_x
         //   proxy.scaling.x = Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width

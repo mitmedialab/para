@@ -18,8 +18,8 @@ define([
       relatives: null,
       ref_type: 'shape',
       rel_type: 'shape',
-      ref_prop: ['position_x', 'position_y'],
-      rel_prop: ['position_x', 'position_y'],
+      ref_prop: 'position_xy',
+      rel_prop: 'position_xy', 
       expression: '',
       type: '=',
 

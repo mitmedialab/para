@@ -80,6 +80,7 @@ define([
         handles.children[i].originalStroke = handles.children[i].strokeColor;
         handles.children[i].originalFill = handles.children[i].fillColor;
         handles.children[i].active = false;
+        if ( handles.children[i].name != 'delbox' && handles.children[i].name != 'corner' ) { handles.children[i].type = 'handle'; }
       }
 
       this.set('geometry', handles);
@@ -110,9 +111,27 @@ define([
 
     redraw: function() {
       var geometry = this.get('geometry');
-      geometry.remove();
-      geometry = null;
-      this.draw();
+      var object_geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('proxy');
+      var delbox = geometry.children['delbox'];
+      delbox.bounds = object_geom.bounds;
+      var corners = geometry.getItems({name: 'corner'});
+      for ( var i = 0; i < 9; i++ ) {
+        corners[i].position = new paper.Point(delbox.bounds.x + (i % 3) / 2.0 * delbox.bounds.width, delbox.bounds.y + Math.floor(i / 3) / 2.0 * delbox.bounds.height, 3, 3 );
+      }
+
+      var yarrow = geometry.children['scale_y'];
+      var xarrow = geometry.children['scale_x'];
+      var xyarrow = geometry.children['scale_xy'];
+      var rotator = geometry.children['rotation'];
+      yarrow.position = corners[1].position;
+      xarrow.position = corners[3].position;
+      xyarrow.position = corners[0].position;
+      rotator.position = new paper.Point( corners[8].bounds.x + 10, corners[8].bounds.y + 10 );
+
+      var cross_v = geometry.children['position_x'];
+      var cross_h = geometry.children['position_y'];
+      cross_v.position = object_geom.position;
+      cross_h.position = object_geom.position;
     },
 
     addListeners: function() {
@@ -126,6 +145,8 @@ define([
 
     //******** DEFAULT LISTENERS *********//
     onMouseDown: function( event ) {
+      if ( event.modifiers.shift ) { return; }
+
       var constraint = this.get('constraint');
       var ref_geom = constraint.get('ref_handle').get('geometry');
       var rel_geom = constraint.get('rel_handle').get('geometry');
@@ -198,6 +219,8 @@ define([
     },
 
     onMouseEnter: function( event ) {
+      if ( event.modifiers.shift ) { return; }
+
       var target = event.target;
       if ( target.name == 'delbox' || target.name == 'corner' ) { return; }
 
@@ -211,6 +234,8 @@ define([
     },
 
     onMouseLeave: function( event ) {
+      if ( event.modifiers.shift ) { return; }
+
       var target = event.target;
       if ( target.name == 'delbox' || target.name == 'corner' ) { return; }
 

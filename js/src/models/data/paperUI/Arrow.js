@@ -63,6 +63,17 @@ define([
       this.draw();
     },
 
+    redrawTail: function(geom) {
+      var arrow = this.get('geometry');
+      var newTail = geom.position;
+      var currentAngle = this.get('tail').subtract(this.get('head')).angle;
+      var newAngle = geom.position.subtract(this.get('head')).angle;
+      this.set('tail', newTail);
+      arrow.rotate(newAngle - currentAngle, this.get('head'));
+      arrow.children[0].removeSegment(0);
+      arrow.children[0].insert(0, newTail);
+    },
+
     //********* DEFAULT LISTENERS **********//
     onMouseEnter: function( event ) {
     
