@@ -39,16 +39,11 @@ define([
 
 
       /* event listener registers */
-      this.listenTo(visitor, "geometrySelected", this.geometrySelected);
-      this.listenTo(visitor, "geometryDeselected", this.geometryDeselected);
       toolManager.listenTo(visitor, 'selectionFiltered', toolManager.selectionFiltered);
-      toolManager.listenTo(visitor, "addToSelection", toolManager.addToSelection);
-      toolManager.listenTo(visitor, "removeFromSelection", toolManager.removeFromSelection);
 
       visitor.listenTo(toolManager, 'compileRequest', visitor.compile);
       visitor.listenTo(toolManager, 'addShape', visitor.addShape);
       visitor.listenTo(toolManager, 'removeShape', visitor.removeShape);
-
       visitor.listenTo(toolManager, 'addInstance', visitor.addInstance);
       visitor.listenTo(toolManager, 'addConstraint', visitor.addConstraint);
       visitor.listenTo(toolManager, 'selectionChanged', visitor.selectionChanged);

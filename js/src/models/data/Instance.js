@@ -378,24 +378,27 @@ define([
 
 		// sets the geom visibility to false
 		hide: function() {
-			var geom = this.get('geom');
-			if (geom) {
-				geom.visible = false;
-				geom.selected = false;
-			}
-			this.clearBoundingBoxes();
-			for (var i = 0; i < this.children.length; i++) {
-				this.children[i].hide();
-			}
+			this.set('visible',false);
+			this.set('selected',false);
 		},
 
 		show: function() {
-			var geom = this.get('geom');
-			if (geom) {
-				geom.visible = true;
-			}
+			this.set('visible',true);
+		
+		},
+
+		hideChildren: function() {
+			this.hide();
+			
 			for (var i = 0; i < this.children.length; i++) {
-				this.children[i].show();
+				this.children[i].hideChildren();
+			}
+		},
+
+		showChildren: function() {
+			this.set('visible',true);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].showChildren();
 			}
 		},
 
@@ -405,7 +408,6 @@ define([
 				geom.bringToFront();
 			}
 		},
-
 
 		resetProperties: function() {
 			this.clear().set(this.defaults);

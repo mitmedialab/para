@@ -27,7 +27,6 @@ define([
       'tool_modifier': 'none',
     },
     events: {
-
       'change:tool-mode': this.modeChanged,
       'change:tool-modifier': this.modeChanged
     },
@@ -158,7 +157,6 @@ define([
 
     geometrySelected: function(instance, segments, modifier) {
       var selectTool = this.get('tool_collection').get('selectTool');
-      console.log('selected shapes',selectTool.get('selected_shapes'));
       this.trigger('selectionChanged', selectTool.get('selected_shapes'), instance, segments);
     },
 
@@ -183,23 +181,10 @@ define([
       this.trigger('removeShape', selectedShapes);
     },
 
-    removeFromSelection: function(instances) {
-      var selectTool = this.get('tool_collection').get('selectTool');
-      selectTool.removeSelectedShape(instances);
-      this.trigger('compileRequest');
-
-    },
-
-    addToSelection: function(instances) {
-      var selectTool = this.get('tool_collection').get('selectTool');
-      selectTool.addSelectedShape(instances);
-      this.trigger('compileRequest');
-    },
-
     selectionFiltered: function(newSelection, toRemove) {
+      console.trace();
       var selectTool = this.get('tool_collection').get('selectTool');
       console.log('new selection, to remove',newSelection, toRemove);
-
       selectTool.removeSelectedShape(toRemove);
       selectTool.addSelectedShape(newSelection);
       this.trigger('compileRequest');

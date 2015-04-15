@@ -65,14 +65,21 @@ define([
 		/* getPrototypeById 
 		 * returns prototype by id
 		 */
-		getPrototypeById: function(root, id) {
+		getPrototypeById: function(id,start) {
 			var state_data = {
 				list: search,
 				instance: search,
 				func: search,
 				data: id
 			};
-			var match = this.visit(root, null, state_data);
+			
+			var match;
+			if(start){
+				match = this.visit(start, null, state_data);
+			}
+			else{
+				match = this.visit(rootNode, null, state_data);
+			}
 			return match;
 		},
 
@@ -371,8 +378,8 @@ define([
 
 		reorderShapes: function(movedId, relativeId, mode) {
 			console.log('reorder shapes', movedId, relativeId, mode);
-			var movedShape = this.getPrototypeById(rootNode, movedId);
-			var relativeShape = this.getPrototypeById(rootNode, relativeId);
+			var movedShape = this.getPrototypeById(movedId);
+			var relativeShape = this.getPrototypeById(relativeId);
 			console.log('shape=', movedShape, relativeShape);
 			if (movedShape && relativeShape) {
 				switch (mode) {
@@ -397,50 +404,80 @@ define([
 		},
 
 		selectShape: function(id) {
-			var shape = this.getPrototypeById(rootNode, id);
+			var shape = this.getPrototypeById(id);
 			console.log('shape', shape);
 			if (shape) {
-				this.trigger('addToSelection', shape);
+				this.trigger('selectionFiltered', shape, []);
 			}
+
 		},
 
 		selectionChanged: function(selected_shapes, added_shape) {
-			if (selected_shapes.length > 0) {
-				var filtered = false;
+			var filtered = false;
+			if (selected_shapes.length > 0) {	
 				if (added_shape) {
 					if (added_shape.get('name') != 'point') {
 						filtered = this.filterSelection(added_shape);
-						console.log('filtered selection', filtered, added_shape);
-						if(filtered){
-							return;
-						}
 					}
 				}
 			}
 
-			console.log('recompiling');
-			this.compile();
+			if(!filtered){
+				this.compile();
+			}
+
+			layersView.updateSelection(selected_shapes);
+
+
+		},
+
+			/* filterSelection
+		 * returns array of selected objects based on selected instances
+		 * and state of lists which contain those objects(open vs closed)
+		 */
+		filterSelection: function(lInstance) {
+			var sInstances = [];
+			var itemFound = false;
+			console.log('total num lists', lists.length);
+			for (var i = 0; i < lists.length; i++) {
+				var item = lists[i].getMember(lInstance);
+				console.log('item', i, lInstance.get('id'), lInstance.get('name'), lists[i].toJSON().members);
+				if (item) {
+					sInstances.push(item);
+					itemFound = true;
+				}
+			}
+			//add in originally selected index if no lists have been added
+			if (itemFound) {
+				this.trigger('selectionFiltered', sInstances, lInstance);
+				return true;
+			}
+			return false;
 
 		},
 
 		deselectShape: function(id) {
-			var shape = this.getPrototypeById(rootNode, id);
+			var shape = this.getPrototypeById(id);
 			if (shape) {
-				this.trigger('removeFromSelection', shape);
+				this.trigger('selectionFiltered', [], shape);
 			}
 		},
 
-		toggleShapeVisibility: function(shapeId) {
-			var shape = this.getPrototypeById(rootNode, shapeId);
-			console.log('toggling visible', shapeId, shape);
+		hideShape: function(shapeId) {
+			var shape = this.getPrototypeById(shapeId);
 			if (shape) {
-				shape.set('visible', !shape.get('visible'));
-				shape.set('selected', false);
+				shape.hide();
+				this.trigger('selectionFiltered', [], shape);
+			}
+		},
+
+		showShape: function(shapeId){
+			var shape = this.getPrototypeById(shapeId);
+			if (shape) {
+				shape.show();
 				this.compile();
 			}
 		},
-
-
 
 		//=======list heirarchy managment methods==========//
 
@@ -485,30 +522,7 @@ define([
 			}
 		},
 
-		/* filterSelection
-		 * returns array of selected objects based on selected instances
-		 * and state of lists which contain those objects(open vs closed)
-		 */
-		filterSelection: function(lInstance) {
-			var sInstances = [];
-			var itemFound = false;
-			console.log('total num lists', lists.length);
-			for (var i = 0; i < lists.length; i++) {
-				var item = lists[i].getMember(lInstance);
-				console.log('item', i, lInstance.get('id'), lInstance.get('name'), lists[i].toJSON().members);
-				if (item) {
-					sInstances.push(item);
-					itemFound = true;
-				}
-			}
-			//add in originally selected index if no lists have been added
-			if (itemFound) {
-				this.trigger('selectionFiltered', sInstances, lInstance);
-				return true;
-			}
-			return false;
-
-		},
+	
 
 
 		/* toggleOpen
@@ -549,7 +563,7 @@ define([
 				currentNode = data.currentNode;
 				lists = currentNode.lists;
 			}
-			this.trigger('addToSelection', data.toSelect, data.toRemove);
+			this.trigger('selectionFiltered', data.toSelect, data.toRemove);
 
 		},
 

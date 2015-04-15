@@ -205,7 +205,6 @@ define([
 			connector = $('#connector_line');
 			this.hideConstraintIcons();
 			this.resetConstraintHeight();
-			this.listenTo(this.model,'selectionChanged',this.changeSelection);
 		},
 
 		hideConstraintIcons: function() {
@@ -221,7 +220,7 @@ define([
 		},
 
 		positionConstraintIcons: function(checkVisible) {
-			this.deselectAllNodes();
+			this.toggleConstraintsForAllNodes();
 			if (currentRef && currentRel) {
 				var ref = shapeTree.getNodeByKey(currentRef);
 				var rel = shapeTree.getNodeByKey(currentRel);
@@ -309,7 +308,7 @@ define([
 
 		},
 
-		deselectAllNodes: function() {
+		toggleConstraintsForAllNodes: function() {
 			var selectedNodes = shapeTree.getSelectedNodes();
 			selectedNodes = selectedNodes.concat(listTree.getSelectedNodes());
 			selectedNodes.forEach(function(item) {
@@ -350,16 +349,16 @@ define([
 		itemClicked: function(event) {
 
 			var id = event.target.id;
-			var classes = event.target.className.split(/\s+/);
+
 			var activeNode = shapeTree.getActiveNode();
 			switch (id) {
 				case 'constraint':
 					break;
 				case 'visible':
-					event.data.view.toggleVisibility(event.target, activeNode, classes);
+					event.data.view.toggleVisibility(activeNode);
 					break;
 				case 'select_button':
-					event.data.view.toggleSelection(event.target, activeNode, classes);
+					event.data.view.toggleSelection(activeNode);
 			}
 		},
 
@@ -367,59 +366,83 @@ define([
 
 		},
 
-		toggleVisibility: function(target, activeNode, classes) {
-			if (!_.contains(classes, 'hidden')) {
-				$(target).addClass('hidden');
+		toggleVisibility: function(activeNode) {
+			var shape = this.model.getPrototypeById(activeNode.key);
+			console.log('shape',shape);
+			if (shape.get('visible')) {
+				this.hideNode(activeNode);
+				this.deselectNode(activeNode);
+				this.model.hideShape(activeNode.key);
 			} else {
-				$(target).removeClass('hidden');
+				this.showNode(activeNode);
+				this.model.showShape(activeNode.key);
 			}
-			this.model.toggleShapeVisibility(activeNode.key);
 		},
 
-		toggleSelection: function(target, activeNode, classes) {
-			this.deselectAll(shapeRoot, activeNode);
-			if (!_.contains(classes, 'selected')) {
-				$(target).addClass('selected');
+		toggleSelection: function(activeNode) {
+			var select = this.model.getPrototypeById(activeNode.key).get('selected');
+			this.deselectAll(shapeRoot,true);
+			if (!select) {
 				this.model.selectShape(activeNode.key);
+				this.selectNode(activeNode);
 			} else {
-				$(target).removeClass('selected');
 				this.model.deselectShape(activeNode.key);
+				this.deselectNode(activeNode);
 			}
 		},
 
-		selectionChanged: function(selected_shapes){
-			console.log('alter selection called',selected_shapes);
+		updateSelection: function(selected_shapes){
+			this.deselectAll(shapeRoot);
+			this.deselectAll(listRoot);
+			for(var i=0;i<selected_shapes.length;i++){
+				var node;
+				console.log('type',selected_shapes[i].get('type'));
+				switch(selected_shapes[i].get('type')){
+					case 'list':
+					case 'sampler':
+						node = listTree.getNodeByKey(selected_shapes[i].get('id'));
+						break;
+					case 'geometry':
+						node = shapeTree.getNodeByKey(selected_shapes[i].get('id'));
+						break;	
+				}
+				this.selectNode(node);
+			}
 		},
 
-		deselectAll: function(root, activeNode) {
+		deselectAll: function(root,toModel) {
 			var children = root.getChildren();
-			if(root.li){
-				var s = $(root.li).find('#select_button');
-				if(s.length>0 && $(s[0]).hasClass('selected')){
-					console.log('removing class');
-					$(s[0]).removeClass('selected');
+			if (root.li) {
+				this.deselectNode(root);
+				if(toModel){
 					this.model.deselectShape(root.key);
 				}
+
 			}
 			if (children) {
 				for (var i = 0; i < children.length; i++) {
-					this.deselectAll(children[i], activeNode);
+					this.deselectAll(children[i],toModel);
 				}
 			}
 		},
 
 		addShape: function(shape) {
+			this.deselectAll(shapeRoot);
+			this.deselectAll(listRoot);
 			console.log('shape', shape);
 			var s = {
 				title: shape.name,
 				key: shape.id
 			};
-			shapeRoot.addChildren(s);
+			var node = shapeRoot.addChildren(s);
+			this.selectNode(node);
 			this.resetConstraintHeight();
 
 		},
 
 		addInstance: function(shape, pId) {
+			this.deselectAll(shapeRoot);
+			this.deselectAll(listRoot);
 			var parentNode = shapeTree.getNodeByKey(pId);
 			if (parentNode) {
 				var s = {
@@ -427,26 +450,48 @@ define([
 					key: shape.id
 				};
 				var node = parentNode.addChildren(s);
+				this.selectNode(node);
+
 				this.resetConstraintHeight();
 			}
 		},
 
 		addList: function(list) {
+			this.deselectAll(shapeRoot);
+			this.deselectAll(listRoot);
 			console.log('list', list);
 			var listData = {
 				title: list.name,
-				key: list.id,
-				data: {
-					list: true
-				}
+				key: list.id
 			};
 			var listNode = listRoot.addChildren(listData);
-
+			this.selectNode(listNode);
+			this.resetConstraintHeight();
 		},
 
 		addConstraint: function(data) {
 			console.log('adding constraint', data);
-		}
+		},
+
+		selectNode: function(node) {
+			var b = $(node.li).find('#select_button');
+			$(b[0]).addClass('selected');
+		},
+
+		deselectNode: function(node) {
+			var b = $(node.li).find('#select_button');
+			$(b[0]).removeClass('selected');
+		},
+
+		hideNode: function(node) {
+			var b = $(node.li).find('#visible');
+			$(b[0]).addClass('hidden');
+		},
+
+		showNode: function(node) {
+			var b = $(node.li).find('#visible');
+			$(b[0]).removeClass('hidden');
+		},
 
 
 
