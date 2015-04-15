@@ -65,23 +65,49 @@ define([
 		/* getPrototypeById 
 		 * returns prototype by id
 		 */
-		getPrototypeById: function(id,start) {
+		getPrototypeById: function(id, start) {
 			var state_data = {
 				list: search,
 				instance: search,
 				func: search,
 				data: id
 			};
-			
+
 			var match;
-			if(start){
-				match = this.visit(start, null, state_data);
+			var startNode = rootNode;
+			if (start) {
+				startNode = start;
 			}
-			else{
-				match = this.visit(rootNode, null, state_data);
-			}
+
+
+			match = this.visit(startNode, null, state_data);
+
 			return match;
 		},
+
+		/* getPrototypeById 
+		 * returns prototype by id
+		 */
+		getListById: function(id) {
+		
+			var state_data = {
+				list: search,
+				instance: search,
+				func: search,
+				data: id
+			};
+			console.log('getListByID',state_data.list,state_data);
+			var match = false;
+			for (var i = 0; i < lists.length; i++) {
+				console.log('checking list at ',i,lists[i]);
+				match = this.visitList(lists[i], null, state_data);
+				if (match) {
+					return match;
+				}
+			}
+			return false;
+		},
+
 
 
 		compile: function() {
@@ -208,6 +234,7 @@ define([
 		visitList: function(node, departureNode, state_data) {
 			var member;
 			var state = state_data.list;
+			console.log('visiting list',state_data.list,state_data);
 			switch (state) {
 				case store:
 					for (var k = 0; k < node.children.length; k++) {
@@ -238,13 +265,18 @@ define([
 					}
 					break;
 				case search:
-					if (node.get('id') == state_data.data) {
+					console.log('searching list',state_data.data,node.get('id'),state_data.data===node.get('id'));
+					if (node.get('id') === state_data.data) {
+						console.log('match found');
 						return node;
 					} else {
 						for (var l = 0; l < node.members.length; l++) {
-							var match = node.members[l].visit(this, 'visit', node, state_data);
-							if (match) {
-								return match;
+							member = node.members[j];
+							if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+								var match = node.members[l].visit(this, 'visit', node, state_data);
+								if (match) {
+									return match;
+								}
 							}
 						}
 					}
@@ -403,18 +435,55 @@ define([
 			this.compile();
 		},
 
-		selectShape: function(id) {
-			var shape = this.getPrototypeById(id);
-			console.log('shape', shape);
-			if (shape) {
-				this.trigger('selectionFiltered', shape, []);
+		selectShape: function(shape) {
+			if(typeof shape === 'string'){
+				var selected = this.getPrototypeById(shape);
+				this.trigger('selectionFiltered', selected, []);
 			}
+			else{
+			this.trigger('selectionFiltered', shape, []);
 
+			}
+			
+
+		},
+
+		deselectShape: function(shape) {
+			if(typeof shape === 'string'){
+				var selected = this.getPrototypeById(shape);
+				this.trigger('selectionFiltered', [], selected);
+			}
+			else{
+				this.trigger('selectionFiltered', [], shape);
+			}
+		},
+
+		hideShape: function(shape) {
+			if(typeof shape === 'string'){
+				var selected = this.getPrototypeById(shape);
+				selected.hide();
+				this.trigger('selectionFiltered', [], selected);
+			}
+			else{
+				shape.hide();
+				this.trigger('selectionFiltered', [], shape);
+			}
+		},
+
+		showShape: function(shape) {
+			if(typeof shape === 'string'){
+				var selected = this.getPrototypeById(shape);
+				selected.show();
+			}
+			else{
+				shape.show();
+				this.trigger('selectionFiltered', [], shape);
+			}
 		},
 
 		selectionChanged: function(selected_shapes, added_shape) {
 			var filtered = false;
-			if (selected_shapes.length > 0) {	
+			if (selected_shapes.length > 0) {
 				if (added_shape) {
 					if (added_shape.get('name') != 'point') {
 						filtered = this.filterSelection(added_shape);
@@ -422,7 +491,7 @@ define([
 				}
 			}
 
-			if(!filtered){
+			if (!filtered) {
 				this.compile();
 			}
 
@@ -431,7 +500,7 @@ define([
 
 		},
 
-			/* filterSelection
+		/* filterSelection
 		 * returns array of selected objects based on selected instances
 		 * and state of lists which contain those objects(open vs closed)
 		 */
@@ -456,28 +525,7 @@ define([
 
 		},
 
-		deselectShape: function(id) {
-			var shape = this.getPrototypeById(id);
-			if (shape) {
-				this.trigger('selectionFiltered', [], shape);
-			}
-		},
-
-		hideShape: function(shapeId) {
-			var shape = this.getPrototypeById(shapeId);
-			if (shape) {
-				shape.hide();
-				this.trigger('selectionFiltered', [], shape);
-			}
-		},
-
-		showShape: function(shapeId){
-			var shape = this.getPrototypeById(shapeId);
-			if (shape) {
-				shape.show();
-				this.compile();
-			}
-		},
+	
 
 		//=======list heirarchy managment methods==========//
 
@@ -498,7 +546,7 @@ define([
 			}
 
 			layersView.addList(list.toJSON());
-			this.trigger('selectionFiltered', list,selectedShapes);
+			this.trigger('selectionFiltered', list, selectedShapes);
 		},
 
 		/* addToOpenLists
@@ -522,7 +570,6 @@ define([
 			}
 		},
 
-	
 
 
 		/* toggleOpen

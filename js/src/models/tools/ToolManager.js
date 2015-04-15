@@ -182,7 +182,6 @@ define([
     },
 
     selectionFiltered: function(newSelection, toRemove) {
-      console.trace();
       var selectTool = this.get('tool_collection').get('selectTool');
       console.log('new selection, to remove',newSelection, toRemove);
       selectTool.removeSelectedShape(toRemove);

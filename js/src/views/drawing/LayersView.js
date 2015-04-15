@@ -178,10 +178,10 @@ define([
 
 			$("#shapes").bind("click", {
 				view: this
-			}, this.itemClicked);
+			}, this.shapeClicked);
 			$("#lists").bind("click", {
 				view: this
-			}, this.itemClicked);
+			}, this.listClicked);
 
 
 			shapeRoot = $("#shapes").fancytree("getRootNode");
@@ -346,82 +346,89 @@ define([
 			this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
 		},
 
-		itemClicked: function(event) {
-
+		shapeClicked: function(event) {
 			var id = event.target.id;
-
 			var activeNode = shapeTree.getActiveNode();
+			var shape = event.data.view.model.getPrototypeById(activeNode.key);
+			event.data.view.itemClicked(id, activeNode, shape);
+		},
+
+		listClicked: function(event) {
+			var id = event.target.id;
+			var activeNode = listTree.getActiveNode();
+			var shape = event.data.view.model.getListById(activeNode.key);
+			event.data.view.itemClicked(id, activeNode, shape);
+		},
+
+		itemClicked: function(id, activeNode, shape) {
+
 			switch (id) {
 				case 'constraint':
 					break;
 				case 'visible':
-					event.data.view.toggleVisibility(activeNode);
+					this.toggleVisibility(activeNode, shape);
 					break;
 				case 'select_button':
-					event.data.view.toggleSelection(activeNode);
+					this.toggleSelection(activeNode, shape);
 			}
 		},
 
-		listClicked: function(event) {
+		toggleVisibility: function(activeNode, shape) {
 
-		},
-
-		toggleVisibility: function(activeNode) {
-			var shape = this.model.getPrototypeById(activeNode.key);
-			console.log('shape',shape);
+			console.log('shape', shape);
 			if (shape.get('visible')) {
 				this.hideNode(activeNode);
 				this.deselectNode(activeNode);
-				this.model.hideShape(activeNode.key);
+				this.model.hideShape(shape);
 			} else {
 				this.showNode(activeNode);
-				this.model.showShape(activeNode.key);
+				this.model.showShape(shape);
 			}
 		},
 
-		toggleSelection: function(activeNode) {
-			var select = this.model.getPrototypeById(activeNode.key).get('selected');
-			this.deselectAll(shapeRoot,true);
+		toggleSelection: function(activeNode, shape) {
+			var select = shape.get('selected');
+			this.deselectAll(shapeRoot, true);
 			if (!select) {
-				this.model.selectShape(activeNode.key);
+				this.model.selectShape(shape);
 				this.selectNode(activeNode);
 			} else {
-				this.model.deselectShape(activeNode.key);
+				this.model.deselectShape(shape);
 				this.deselectNode(activeNode);
 			}
 		},
 
-		updateSelection: function(selected_shapes){
+		updateSelection: function(selected_shapes) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
-			for(var i=0;i<selected_shapes.length;i++){
+			for (var i = 0; i < selected_shapes.length; i++) {
 				var node;
-				console.log('type',selected_shapes[i].get('type'));
-				switch(selected_shapes[i].get('type')){
+				console.log('type', selected_shapes[i].get('type'));
+				switch (selected_shapes[i].get('type')) {
 					case 'list':
 					case 'sampler':
 						node = listTree.getNodeByKey(selected_shapes[i].get('id'));
 						break;
 					case 'geometry':
 						node = shapeTree.getNodeByKey(selected_shapes[i].get('id'));
-						break;	
+						break;
 				}
 				this.selectNode(node);
 			}
 		},
 
-		deselectAll: function(root,toModel) {
+		deselectAll: function(root, toModel) {
 			var children = root.getChildren();
 			if (root.li) {
 				this.deselectNode(root);
-				if(toModel){
+				if (toModel) {
 					this.model.deselectShape(root.key);
 				}
 
 			}
 			if (children) {
 				for (var i = 0; i < children.length; i++) {
-					this.deselectAll(children[i],toModel);
+					this.deselectAll(children[i], toModel);
 				}
 			}
 		},
