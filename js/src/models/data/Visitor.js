@@ -130,18 +130,16 @@ define([
 				return item.get('order');
 			});
 			for (var i = 0; i < renderQueue.length; i++) {
-
 				renderQueue[i].render();
 
 			}
 		},
 
 
-		removeShape: function(selected_shapes){
-			for(var i=0;i<selected_shapes.length;i++){
+		removeShape: function(selected_shapes) {
+			for (var i = 0; i < selected_shapes.length; i++) {
 				this.removeInstance(null, null, selected_shapes[i]);
 			}
-			this.trigger('selectionChanged', []);
 		},
 
 		removeInstance: function(node, departureNode, target) {
@@ -149,8 +147,6 @@ define([
 				node = currentNode;
 			}
 			if (node === target) {
-
-
 				node.deleteSelf();
 				for (var j = 0; j < lists.length; j++) {
 					if (lists[j] === node) {
@@ -348,17 +344,17 @@ define([
 		},
 
 		addShape: function(shape) {
-			
-				if (!shape.parentNode) {
-					currentNode.addChildNode(shape);
-				}
+
+			if (!shape.parentNode) {
+				currentNode.addChildNode(shape);
+			}
 			this.addToOpenLists(shape);
-			if(shape.get('name')!=='ui-item' && shape.get('name')!=='ui'){
+			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				layersView.addShape(shape.toJSON());
 			}
 			this.compile();
 		},
-		
+
 		//called when creating an instance which inherits from existing shape
 		addInstance: function(parent) {
 			var newInstance = parent.create();
@@ -367,7 +363,7 @@ define([
 			layersView.addInstance(newInstance.toJSON(), parent.get('id'));
 			return newInstance;
 		},
-		
+
 
 		addConstraint: function(constraint_data) {
 			layersView.addConstraint(constraint_data);
@@ -400,32 +396,37 @@ define([
 			this.compile();
 		},
 
-		selectShape: function(id){
-			var shape = this.getPrototypeById(rootNode,id);
-			console.log('shape',shape);
-			if(shape){	
-				this.trigger('addToSelection',shape);
+		selectShape: function(id) {
+			var shape = this.getPrototypeById(rootNode, id);
+			console.log('shape', shape);
+			if (shape) {
+				this.trigger('addToSelection', shape);
 			}
 		},
 
-		selectionChanged: function(selected_shapes, added_shape){
-			var filtered = false;
-			if(added_shape){
-				if(added_shape.get('name')!='point'){
-
-					filtered = this.filterSelection(added_shape);
-					console.log('filtered selection',filtered,added_shape);
+		selectionChanged: function(selected_shapes, added_shape) {
+			if (selected_shapes.length > 0) {
+				var filtered = false;
+				if (added_shape) {
+					if (added_shape.get('name') != 'point') {
+						filtered = this.filterSelection(added_shape);
+						console.log('filtered selection', filtered, added_shape);
+						if(filtered){
+							return;
+						}
+					}
 				}
 			}
-			if(!filtered){
-				this.compile();
-			}
+
+			console.log('recompiling');
+			this.compile();
+
 		},
 
-		deselectShape: function(id){
-			var shape = this.getPrototypeById(rootNode,id);
-			if(shape){	
-				this.trigger('removeFromSelection',shape);
+		deselectShape: function(id) {
+			var shape = this.getPrototypeById(rootNode, id);
+			if (shape) {
+				this.trigger('removeFromSelection', shape);
 			}
 		},
 
@@ -439,7 +440,7 @@ define([
 			}
 		},
 
-		
+
 
 		//=======list heirarchy managment methods==========//
 
@@ -448,8 +449,8 @@ define([
 		 * on the array which are members of the added list
 		 */
 		addList: function(selectedShapes) {
- 		var list = new ListSampler();
-          list.addMember(selectedShapes);
+			var list = new ListSampler();
+			list.addMember(selectedShapes);
 			if (!this.addToOpenLists(list)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
 					if (list.hasMember(lists[i], true)) {
@@ -460,8 +461,7 @@ define([
 			}
 
 			layersView.addList(list.toJSON());
-			this.trigger('addToSelection',list);
-			this.compile();
+			this.trigger('selectionFiltered', list,selectedShapes);
 		},
 
 		/* addToOpenLists
@@ -492,10 +492,10 @@ define([
 		filterSelection: function(lInstance) {
 			var sInstances = [];
 			var itemFound = false;
-			console.log('total num lists',lists.length);
+			console.log('total num lists', lists.length);
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
-				console.log('item',i,lInstance.get('id'), lInstance.get('name'),lists[i].toJSON().members);
+				console.log('item', i, lInstance.get('id'), lInstance.get('name'), lists[i].toJSON().members);
 				if (item) {
 					sInstances.push(item);
 					itemFound = true;
@@ -503,11 +503,11 @@ define([
 			}
 			//add in originally selected index if no lists have been added
 			if (itemFound) {
-				this.trigger('selectionFiltered',sInstances);
+				this.trigger('selectionFiltered', sInstances, lInstance);
 				return true;
 			}
 			return false;
-			
+
 		},
 
 
@@ -515,21 +515,21 @@ define([
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function(items) {
-			var toSelect;
+			var data;
 			var functions = items.filter(function(item) {
 				return item.get('type') === 'function';
 			});
 			if (functions.length > 0) {
 				this.closeAllLists();
-				var data = functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
+				data = functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
 				lists = data.lists;
 				currentNode = data.currentNode;
-				toSelect = data.toSelect;
 			} else {
-				toSelect = this.toggleOpenLists(items);
+				data = this.toggleOpenLists(items);
 			}
-			console.log('toSelect',toSelect);
-			this.trigger('addToSelection',toSelect);
+			console.log('toggleOpen', data.toSelect, data.toRemove);
+			this.trigger('selectionFiltered', data.toSelect, data.toRemove);
+
 		},
 
 		/* toggleClosed
@@ -537,20 +537,19 @@ define([
 		 */
 		toggleClosed: function(items) {
 			//TODO: fix this so it closes selected open lists first...
-			var toSelect;
+			var data;
 			var lists = items.filter(function(item) {
 				return (item.get('type') === 'list' || item.get('type') === 'sampler');
 			});
 			if (lists.length > 0) {
-				toSelect= this.toggleClosedLists(items);
+				data = this.toggleClosedLists(items);
 			} else {
 				this.closeAllLists();
-				var data = functionManager.toggleClosedFunctions(currentNode, rootNode);
+				data = functionManager.toggleClosedFunctions(currentNode, rootNode);
 				currentNode = data.currentNode;
 				lists = currentNode.lists;
-				toSelect = data.toSelect;
 			}
-			this.trigger('addToSelection',toSelect);
+			this.trigger('addToSelection', data.toSelect, data.toRemove);
 
 		},
 
@@ -572,7 +571,10 @@ define([
 					}
 				}
 			}
-			return returnedLists;
+			return {
+				toSelect: returnedLists,
+				toRemove: items
+			};
 		},
 
 		closeAllLists: function() {
@@ -605,7 +607,10 @@ define([
 				members = members.concat(openedLists[k].members);
 
 			}
-			return members;
+			return {
+				toSelect: members,
+				toRemove: openedLists
+			};
 		},
 
 

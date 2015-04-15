@@ -158,6 +158,7 @@ define([
 
     geometrySelected: function(instance, segments, modifier) {
       var selectTool = this.get('tool_collection').get('selectTool');
+      console.log('selected shapes',selectTool.get('selected_shapes'));
       this.trigger('selectionChanged', selectTool.get('selected_shapes'), instance, segments);
     },
 
@@ -195,9 +196,11 @@ define([
       this.trigger('compileRequest');
     },
 
-    selectionFiltered: function(newSelection) {
+    selectionFiltered: function(newSelection, toRemove) {
       var selectTool = this.get('tool_collection').get('selectTool');
-      selectTool.removeSelectedShape(selectTool.getLastSelected());
+      console.log('new selection, to remove',newSelection, toRemove);
+
+      selectTool.removeSelectedShape(toRemove);
       selectTool.addSelectedShape(newSelection);
       this.trigger('compileRequest');
 
@@ -206,7 +209,6 @@ define([
     createList: function() {
       var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
       if (selectedShapes.length > 0) {
-        this.get('tool_collection').get('selectTool').deselectAll();
         this.trigger('addList', selectedShapes);
       }
     },
@@ -249,7 +251,7 @@ define([
     closeSelected: function() {
       var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
       this.trigger('toggleClosed', selectedShapes);
-      this.deselectAll();
+      this.get('tool_collection').get('selectTool').deselectAll();
     },
 
 

@@ -210,8 +210,14 @@ define([
 					parent.listenTo(val, 'modified', parent.propertyModified);
 				}
 			});
+
+			//this.on('change:selected',this.checkChange);
 		},
 
+		checkChange:function(){
+			console.log('selection change',this.get('selected'));
+			console.trace();
+		},
 
 		/* deleteSelf
 		 * function called before instance is removed from

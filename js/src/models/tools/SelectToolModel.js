@@ -52,13 +52,11 @@ define([
     },
 
     convertSelection: function() {
-      console.log('convertSelection');
       var selected_shapes = this.get('selected_shapes');
       if (selected_shapes.length > 0) {
         var toAdd = [];
         var toRemove = [];
         var mode = this.get('mode');
-        console.log('switched to', mode);
         if (mode === 'dselect') {
           for (var j = 0; j < selected_shapes.length; j++) {
             if (selected_shapes[j].get('points')) {
@@ -84,7 +82,6 @@ define([
             }
           }
         }
-        console.log('toAdd, toRemove', toAdd, toRemove);
         this.removeSelectedShape(toRemove);
         this.addSelectedShape(toAdd);
       }
@@ -96,16 +93,15 @@ define([
 
       var selected_shapes = this.get('selected_shapes');
       for (var i = selected_shapes.length - 1; i >= 0; i--) {
-        selected_shapes[i].set('selected', false);
-        selected_shapes[i].deselectSegments();
+       selected_shapes[i].set('selected', false);
         selected_shapes[i].setSelectionForInheritors(false);
       }
-      this.set('selected_shapes', []);
+      selected_shapes.length=0;
     },
 
-    addSelectedShape: function(data, mode, modifier) {
+    addSelectedShape: function(data) {
       if (data instanceof Array) {
-        for (var i = 0; i < data.length; i++) {
+        for(var i=0;i<data.length;i++){
           this.addSingleShape(data[i]);
         }
       } else {
@@ -125,9 +121,18 @@ define([
 
     removeSelectedShape: function(data) {
       if (data instanceof Array) {
+        console.log('num of shapes to remove',data.length,data);
         for (var i = 0; i < data.length; i++) {
-          this.removeSingleShape(data[i]);
-        }
+          console.log('attempting to remove shape at',i);
+           var shape = data[i];
+            shape.set('selected', false);
+            shape.setSelectionForInheritors(false);
+        }      
+        var selected_shapes = this.get('selected_shapes');
+        var newShapes = selected_shapes.filter(function(item){
+          return !_.contains(data,item);
+        });
+        this.set('selected_shapes',newShapes);
       } else {
         this.removeSingleShape(data);
       }
@@ -137,8 +142,11 @@ define([
       shape.set('selected', false);
       shape.setSelectionForInheritors(false);
       var selected_shapes = this.get('selected_shapes');
-      var index = $.inArray(shape, selected_shapes);
-      selected_shapes.splice(shape, 1);
+      if(_.contains(selected_shapes,shape)){
+        var index = _.indexOf(selected_shapes,shape);
+        console.log('removing shape',shape,index);
+        selected_shapes.splice(index, 1);
+      }
     },
 
     // EXPERIMENTAL
@@ -201,7 +209,6 @@ define([
       var selectedShapes = this.get('selected_shapes');
       for (var i = 0; i < selectedShapes.length; i++) {
         var instance = selectedShapes[i];
-        console.log('selected_shape', instance, instance.nodeParent);
         instance.nodeParent.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
       }
       this.trigger('geometryModified');
@@ -260,7 +267,7 @@ define([
 
         modifier = event.modifiers.command;
 
-        this.addSelectedShape(instance, this.get('tool-mode'), this.get('tool-modifier'));
+        this.addSelectedShape(instance);
       }
 
       this.trigger('geometrySelected', instance, null, modifier);
@@ -282,7 +289,6 @@ define([
       if (hitResult) {
         var path = hitResult.item;
         instance = path.data.instance;
-        console.log('hitResult', hitResult.type);
         if (hitResult.type == 'segment') {
           hitResult.segment.fullySelected = true;
           segments.push({
@@ -322,9 +328,6 @@ define([
 
     },
 
-    triggerChange: function() {
-      this.trigger('geometrySelected', literal.data.instance);
-    },
 
 
     //mouse drag event
@@ -400,7 +403,6 @@ define([
     scaleDrag: function(event) {
       var selectedShapes = this.get('selected_shapes');
       var scaleDelta = selectedShapes[0].accessProperty('scaling_delta');
-      console.log('scaleDelta', scaleDelta);
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 
