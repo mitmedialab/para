@@ -30,7 +30,8 @@ define([
       arrow: null,
       proxy: null,  
       ref_handle: null,
-      rel_handle: null, 
+      rel_handle: null,
+      commit_box: null, 
       
       // derived state
       constraintFuncs: null
@@ -54,6 +55,7 @@ define([
         this.set('ref_type', type);
 
         // create proxy with important logic // TODO: maybe class it?
+        var constraint = this;
         var relatives = this.get('relatives');
         var references = this.get('references');
         var rel_geom = relatives.get('geom');
@@ -63,17 +65,19 @@ define([
         proxy.bringToFront();
         proxy.visible = false;
         proxy.show = function() { 
-          relatives.set('visible', false);  
+          relatives.set('visible', false);
+          relatives.get('geom').visible = false; // REALLY HACKY  
           proxy.visible = true; 
         }
         proxy.hide = function() { 
           relatives.set('visible', true);
+          relatives.get('geom').visible = true; // REALLY HACKY
           proxy.visible = false; 
         }
         proxy.reset = function() {
           this.scaling = 1; 
-          this.position = rel_geom.position;
           this.rotation = rel_geom.rotation;
+          this.position = rel_geom.position;
           paper.view.draw();
         }
         proxy.matchProperty = function( ref_prop, rel_prop ) {
@@ -86,13 +90,13 @@ define([
             if ( side == 'rel' ) { geom = proxy; } 
             switch ( prop ) {
               case 'scale_x':
-                propValue = geom.bounds.width;
+                propValue = geom.scaling.x;
                 break;
               case 'scale_y':
-                propValue = geom.bounds.height;
+                propValue = geom.scaling.y;
                 break;
               case 'scale_xy':
-                propValue = {x: geom.bounds.width, y: geom.bounds.height};
+                propValue = {x: geom.scaling.x, y: geom.scaling.y}; 
                 break;
               case 'position_x':
                 propValue = geom.position.x;
@@ -107,13 +111,14 @@ define([
                 propValue = geom.rotation;
                 break;
             }
+            return propValue;
           }
           refPropValue = propSwitch( ref_prop, 'ref' );
           relPropValue = propSwitch( rel_prop, 'rel' );
-                    
+
           ref_prop_strip = ref_prop.split('_')[0];
           rel_prop_strip = rel_prop.split('_')[0];
-          var convert_factor = propConvMap[ref_prop_strip + ':' + rel_prop_strip];
+          var convertFactor = propConvMap[ref_prop_strip + ':' + rel_prop_strip];
           var conversion, offset;
 
           if ( ref_prop_doub && rel_prop_doub ) {
@@ -124,17 +129,19 @@ define([
             offset = {x: relPropValue - conversion};
           } else if ( rel_prop_doub ) {
             conversion = {x: refPropValue * convertFactor, y: refPropValue * convertFactor};
-            offset = {x: relPropValue.x - conversion, y: relPropValue.y - conversion};
+            offset = {x: relPropValue.x - conversion.x, y: relPropValue.y - conversion.y};
           } else {
             conversion = refPropValue * convertFactor;
             offset = {x: relPropValue - conversion};
           }
          
-          var exp_scale = 'y = ' + convert_factor.toString() + ' * ' + 'x';
-          var exp_object;
+          var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x';
+          var exp_object = {};
           for (var axis in offset) {
-            exp_object[axis] = exp_scale + offset[axis].toString();
+            exp_object[axis] = exp_scale + ' + ' + offset[axis].toString();
           }
+          console.log('expression object', exp_object);
+          constraint.set('expression', exp_object);
         }
 
         this.set('proxy', proxy);
@@ -160,14 +167,16 @@ define([
       var relative = this.get('relatives');
       var expression = this.get('expression');
 
-      var refPropAccess = reference.accessProperty( constraintPropMap[ref_prop[0]] );
-      var relPropAccess = relative.accessProperty( constraintPropMap[rel_prop[0]] );
+      var refPropAccess = reference.get( constraintPropMap[ref_prop[0]] );
+      var relPropAccess = relative.get( constraintPropMap[rel_prop[0]] );
+      console.log('refPropAccess', refPropAccess);
+      console.log('relPropAccess', relPropAccess);
 
       if ( ref_doub && !rel_doub ) {
         var constraintF = function() {
           var refPropValue = refPropAccess.getValue();
           var x = refPropValue.x + refPropValue.y;
-          var y;
+          var y, relPropObject;
           eval( expression['x'] );
           if ( rel_prop[0] == 'rotation' ) { 
             relPropAccess.setValue( y );
@@ -185,18 +194,21 @@ define([
           var evalObj = {};
           for (var axis in expression) {
             var x = refPropAccess[axis].getValue();
+            console.log('x-val', x);
             var y;
             eval(expression[axis]);
+            console.log('y-val', y);
             evalObj[axis] = y;
           }
+          console.log('evalObj', evalObj);
           relPropAccess.setValue(evalObj);
           return evalObj;
         }
       } else if ( !ref_doub && rel_doub ) {
         var constraintF = function() {
           var evalObj = {};
+          var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
           for (var axis in expression) {
-            var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
             var y;
             eval( expression[axis] );
             evalObj[axis] = y;
@@ -207,7 +219,7 @@ define([
       } else {
         var constraintF = function() {
           var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
-          var y;
+          var y, relPropObj;
           eval( expression['x'] );
           if ( rel_prop[0] == 'rotation' ) {
             relPropAccess.setValue( y );
