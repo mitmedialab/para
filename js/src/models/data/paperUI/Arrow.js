@@ -92,8 +92,15 @@ define([
 
     onMouseUp: function( event ) {
 
-    }
+    },
 
+    remove: function( event ) {
+      var geometry = this.get('geometry');
+      if ( geometry ) {
+        geometry.remove();
+        geometry = null;
+      } 
+    }
   });
 
   return Arrow;

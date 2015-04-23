@@ -109,8 +109,14 @@ define([
           break;
       }
       if ( event.modifiers.capsLock ) { 
-        this.get('currentConstraint').get('proxy').hide();
-        this.get('currentConstraint').create(); 
+        var constraint = this.get('currentConstraint');      
+        constraint.get('proxy').hide();
+        constraint.clearUI();
+        constraint.create();
+        var constraintMap = this.get('constraints');
+        constraintMap[constraint.get('id')] = constraint;
+        this.set('currentConstraint', new Constraint());
+        this.set('mode', 'create');
       }
     },
 
@@ -266,10 +272,14 @@ define([
      * just been selected, or is not selected at all, and removes all UI
      * elements associated with it.
      */
-    clearState: function() {
+    reset: function() {
 
-      this.set('current_constraint', null);
-      this.set('constraints', {});
+      var constraint = this.get('currentConstraint');
+      if ( constraint.get('references') && constraint.get('relatives') ) {
+        constraint.clearUI();
+      }
+      this.set('currentConstraint', new Constraint());
+      this.set('mode', 'create');
     }, 
  
 

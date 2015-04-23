@@ -247,6 +247,14 @@ define([
         target.strokeColor = '#ff0000';
         target.fillColor = '#ff0000';
       }
+    },
+
+    remove: function( event ) {
+      var geometry = this.get('geometry');
+      if ( geometry ) {
+        geometry.remove();
+        geometry = null;
+      }
     }
   });
 

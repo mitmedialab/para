@@ -16,6 +16,8 @@ define([
   var Constraint = Backbone.Model.extend({
 
     defaults: {
+      id: null,
+
       // properties
       references: null,
       relatives: null,
@@ -47,6 +49,14 @@ define([
     setSelection: function( instance, type ) {
       if ( this.get('references') && this.get('relatives') ) {
         console.log('[ERROR] References and relatives already set.');
+      }
+      if ( instance.length == 0 ) { 
+        if ( this.get('relatives') ) {
+          this.set('relatives', null);
+          return false;
+        } else {
+          return false;
+        }
       }
       instance = instance[0];
       instance.set('selected', false);
@@ -145,6 +155,7 @@ define([
         }
 
         this.set('proxy', proxy);
+        this.set('id', (references.get('id') + ':' + relatives.get('id')));
         return true;
       }
       this.set('relatives', instance);
@@ -176,17 +187,14 @@ define([
         var constraintF = function() {
           var refPropValue = refPropAccess.getValue();
           var x = refPropValue.x + refPropValue.y;
-          var y, relPropObject;
+          var y;
           eval( expression['x'] );
           if ( rel_prop[0] == 'rotation' ) { 
             relPropAccess.setValue( y );
-            relPropObj = y; 
           } else {
-            relPropObj = relPropAccess.getValue();
-            relPropObj[rel_prop[1]] = y;
-            relPropAccess.setValue( relPropObj );
+            relPropAccess[rel_prop[1]].setValue( y );
           }
-          return relPropObj;
+          return y;
         }
       }
       else if ( ref_doub && rel_doub ) {
@@ -225,15 +233,28 @@ define([
             relPropAccess.setValue( y );
             relPropObj = y;
           } else {
-            relPropObj = relPropAccess.getValue();
-            relPropObj[rel_prop[1]] = y;
-            relPropAccess.setValue( relPropObj );
+            relPropAccess[rel_prop[1]].setValue( y );
           }
-          return relPropObj;
+          return y;
         }
       }
-      relPropAccess.setConstraint( constraintF );
+      if ( rel_doub ) {
+        relPropAccess.setConstraint( constraintF );
+      } else {
+        relPropAccess[rel_prop[1]].setConstraint( constraintF );
+      }
       this.set('constraintFunc', constraintF );
+    },
+
+    clearUI: function() {
+      this.get('proxy').remove();
+      this.get('arrow').remove();
+      this.get('ref_handle').remove();
+      this.get('rel_handle').remove();
+      this.set('proxy', null);
+      this.set('arrow', null);
+      this.set('ref_handle', null);
+      this.set('rel_handle', null);
     },
 
     remove: function() {

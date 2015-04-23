@@ -76,9 +76,8 @@ define([
       console.log('set state', this.get('state'));
       console.log('current tool', this.get('tool_collection').get(state));
 
-      this.clearIrrelevantState();
-
-      this.get('tool_collection').get(state).reset();
+      this.get('tool_collection').get(this.get('state')).reset();
+      //this.get('tool_collection').get(state).reset();
       this.set('state', state);
       if (mode) {
         var currentTool = this.get('tool_collection').get(this.get('state'));
@@ -96,26 +95,6 @@ define([
       this.get('selectTool').changeModeForSelection();
       this.trigger('compileRequest');
     },
-
-    /*
-     * Tell the tool to advance its state.
-     */
-    advanceTool: function() {
-      var tool = this.get('tool_collection').get(this.get('state'));
-      tool.advance();
-    },
-
-    clearIrrelevantState: function() {
-      var state = this.get('state');
-      switch (state) {
-        case 'constraintTool':
-          this.get('tool_collection').get('constraintTool').clearState();
-          break;
-        default:
-      }
-      this.trigger('compileRequest');
-    },
-
 
     resetTools: function() {
       this.get('tool_collection').get(this.get('state')).reset();
@@ -238,28 +217,6 @@ define([
       this.get('tool_collection').get('selectTool').deselectAll();
     },
 
-
-
-    // TESTING
-    setConstraintProperty: function(data) {
-      var result = this.get('tool_collection').get('constraintTool').setConstraintProperty(data);
-      this.trigger('toolViewUpdate', 'constraint', result);
-    },
-
-    setConstraintType: function(data) {
-      var result = this.get('tool_collection').get('constraintTool').setConstraintType(data);
-      this.trigger('toolViewUpdate', 'constraint', result);
-    },
-
-    setConstraintExpression: function(data) {
-      var result = this.get('tool_collection').get('constraintTool').setConstraintExpression(data);
-      this.trigger('toolViewUpdate', 'constraint', result);
-    },
-
-    toolViewUpdate: function(view, data) {
-
-    },
-    // END TESTING
     //triggered by paper tool on a mouse down event
     toolMouseDown: function(event, pan) {
       if (!event.modifiers.space && Utils.validateEvent(event)) {
