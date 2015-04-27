@@ -25,6 +25,7 @@ define([
       this.members = [];
       this.set('member_count', new PFloat(0));
       this.get('translation_delta').setNull(false);
+      
 
     },
 
@@ -425,6 +426,17 @@ define([
         return bbox;
       }
     },
+
+    toJSON: function() {
+      var data = Instance.prototype.toJSON.call(this, arguments);
+      var memberIds = [];
+      _.each(this.members, function(item) {
+        memberIds.push(item.get('id'));
+      });
+      data.members = memberIds;
+      
+      return data;
+    }
 
   });
 

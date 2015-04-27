@@ -509,17 +509,26 @@ define([
 
 
 		toJSON: function() {
+
+			
+			//loop through defaults to export and call toJSON
+		
+
 			var data = {};
 			var target = this;
 			_.each(exporting_properties, function(property) {
 				if (_.contains(constraints, property)) {
 					data[property] = target.get(property).toJSON();
 
-				} else {
+				}
+				else {
+
 					data[property] = target.get(property);
 				}
 			});
 			return data;
+
+
 		},
 
 		parseJSON: function(data) {

@@ -8,8 +8,9 @@ define([
 	'models/data/functions/FunctionNode',
 	'utils/PConstraint',
 	'utils/Utils',
+	'models/data/Instance'
 
-], function(_, Backbone, FunctionNode, PConstraint, Utils) {
+], function(_, Backbone, FunctionNode, PConstraint, Utils, Instance) {
 	//datastructure to store path functions
 
 	var functioncount = 0;
@@ -63,6 +64,14 @@ define([
 			if (this.cf && this.get('called')) {
 				this.cf.call(this);
 			}
+		},
+
+		toJSON: function() {
+			// adds argument property id
+			var data = Instance.prototype.toJSON.call(this, arguments);
+			// data.argument = this.get('f_argument').get('id');
+			data.param_name = this.get('param_name');
+			return data;
 		}
 
 	};
