@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"stroke",
+				"stroke_width"
+			],
+			[
+				"ro",
+				"rotation_delta"
+			],
+			[
+				"roation",
+				"rotation_origin"
+			],
+			[
 				"followPath",
 				"followPathBehavior"
 			],
@@ -363,7 +375,7 @@
 			"file": "js/src/models/tools/SelectToolModel.js",
 			"settings":
 			{
-				"buffer_size": 10636,
+				"buffer_size": 10666,
 				"line_ending": "Unix"
 			}
 		},
@@ -371,7 +383,7 @@
 			"file": "js/src/models/data/PolygonNode.js",
 			"settings":
 			{
-				"buffer_size": 1581,
+				"buffer_size": 1703,
 				"line_ending": "Unix"
 			}
 		},
@@ -379,7 +391,23 @@
 			"file": "js/src/models/data/RectNode.js",
 			"settings":
 			{
-				"buffer_size": 2007,
+				"buffer_size": 2066,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/PFloat.js",
+			"settings":
+			{
+				"buffer_size": 2927,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/PPoint.js",
+			"settings":
+			{
+				"buffer_size": 4961,
 				"line_ending": "Unix"
 			}
 		},
@@ -387,7 +415,74 @@
 			"file": "js/src/models/data/Instance.js",
 			"settings":
 			{
-				"buffer_size": 22259,
+				"buffer_size": 28336,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/PColor.js",
+			"settings":
+			{
+				"buffer_size": 4312,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/PathNode.js",
+			"settings":
+			{
+				"buffer_size": 7863,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/ListNode.js",
+			"settings":
+			{
+				"buffer_size": 12393,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/ListSampler.js",
+			"settings":
+			{
+				"buffer_size": 1051,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "/*Visitor.js\n * external tree visitor base implementation\n * used to traverse parse tree and build scenegraph of\n * instances for display to user\n */\n\ndefine([\n	'underscore',\n	'backbone',\n	'models/data/Instance',\n	'models/data/functions/FunctionNode'\n\n\n], function(_, Backbone, Instance, FunctionNode) {\n	//datastructure to store path functions\n	//TODO: make linked list eventually\n\n	//stores para lists\n	var lists;\n	var renderQueue = [];\n	var store = 0;\n	var compile = 1;\n	var render = 2;\n	var visit = 3;\n\n\n	var rootNode, currentNode;\n	var Visitor = Backbone.Model.extend({\n		defaults: {},\n\n		initialize: function() {\n			//setup root node\n			rootNode = new FunctionNode();\n			rootNode.open();\n			lists = rootNode.lists;\n			rootNode.set('name', 'root');\n			this.listenTo(rootNode, 'parseJSON', this.parseJSON);\n			currentNode = rootNode;\n		},\n\n\n		/*resetPrototypes\n		 * resets the prototypes recursively.\n		 * Called before visiting the root node\n		 */\n		resetPrototypes: function() {\n\n			//for (var i = 0; i < renderQueue.length; i++) {\n			//renderQueue[i].reset();\n			//}\n			renderQueue = [];\n		},\n\n		/* getPrototypeById \n		 * returns prototype by id\n		 */\n		getPrototypeById: function(root, id) {\n			var match = null;\n			this.visitBfs(root, function(node) {\n				if (node.get('type') === 'root') {\n					return; // do not process roots\n				}\n				var pId = node.get('id');\n				if (pId === id) {\n					match = node;\n					return node;\n				}\n			});\n			return match;\n		},\n\n		/* computeLists\n		 * method to begin rendering process of lists\n		 * following rendering of all non-list items in the tree\n		 * (calls visit on each member of listsToCompile array with render argument set\n		 * to true\n		 */\n\n		compileLists: function() {\n			var state_data = {\n				list: compile\n			};\n			for (var i = 0; i < lists.length; i++) {\n				this.visit(lists[i], null, state_data);\n			}\n		},\n\n		compileFunctions: function() {\n			var state_data = {\n				func: compile,\n				instance: compile\n			};\n			var functions = this.functionManager.functions;\n			for (var i = 0; i < functions.length; i++) {\n				this.visit(functions[i], null, state_data);\n			}\n		},\n\n		compileInstances: function() {\n\n			var state_data = {\n				list: store,\n				instance: compile,\n				func: compile,\n			};\n\n			this.visit(currentNode, null, state_data);\n\n		},\n\n		render: function(root) {\n			for (var i = 0; i < renderQueue.length; i++) {\n\n				renderQueue[i].render();\n\n			}\n		},\n\n\n\n		removeInstance: function(node, departureNode, target) {\n			if (!node) {\n				node = currentNode;\n			}\n			if (node === target) {\n\n\n				node.deleteSelf();\n				for (var j = 0; j < lists.length; j++) {\n					if (lists[j] === node) {\n						lists.splice(j, 1);\n						lists = lists.concat(node.getListMembers());\n						node.removeAllMembers();\n						break;\n					}\n				}\n				if (departureNode) {\n					departureNode.removeChildNode(node);\n				}\n\n			} else {\n				for (var i = 0; i < node.children.length; i++) {\n					node.children[i].visit(this, 'removeInstance', node, target);\n				}\n			}\n		},\n\n		/*visit\n		 * visitor method to walk the tree and compute and render each\n		 * node on the screen according to type;\n		 */\n		visit: function(node, departureNode, state_data) {\n\n			node.set({\n				visited: true\n			});\n			switch (node.get('type')) {\n				case 'list':\n				case 'sampler':\n					this.visitList(node, departureNode, state_data);\n					break;\n				case 'function':\n					this.visitFunction(node, departureNode, state_data);\n					break;\n				default:\n					this.visitInstance(node, departureNode, state_data);\n					break;\n			}\n\n		},\n\n		/*visitList- THIS IS SLOW- SPEED IT UP\n		 * visitor method for computing lists\n		 * if render then computes the list's dimensions based on its members\n		 * and draws it on the screen.\n		 * otherwise, stashes the list in an array for rendering on a second pass.\n		 * filters the array to ensure that it only contains lists with no parent list\n		 */\n		visitList: function(node, departureNode, state_data) {\n			var member;\n			var state = state_data.list;\n			if (state === store) {\n				for (var k = 0; k < node.children.length; k++) {\n					node.children[k].visit(this, 'visit', node, state_data);\n				}\n			} else if (state === compile) {\n				node.reset();\n				node.compile();\n				renderQueue.push(node);\n				var s_d = {\n					list: visit\n				};\n				for (var i = 0; i < node.members.length; i++) {\n					member = node.members[i];\n					if (member.get('type') === 'list' || member.get('type') === 'sampler') {\n						member.visit(this, 'visit', node, s_d);\n					}\n				}\n			} else if (state == visit) {\n				renderQueue.push(node);\n				for (var j = 0; j < node.members.length; j++) {\n					member = node.members[j];\n					if (member.get('type') === 'list' || member.get('type') === 'sampler') {\n						member.visit(this, 'visit', node, state_data);\n					}\n				}\n			}\n\n			return;\n\n		},\n\n		/* visitFunction\n		 * called for visit to function node\n		 */\n		visitFunction: function(node, departureNode, state_data) {\n			var state = state_data.func;\n			switch (state) {\n				case compile:\n					node.reset();\n					node.compile();\n					renderQueue.push(node);\n\n					var children = node.children;\n					for (var i = 0; i < children.length; i++) {\n						if (!node.get('open') && node.get('called')) {\n							if (children[i].isReturned) {\n								children[i].visit(this, 'visit', node, state_data);\n							}\n						} else if (node.get('open')) {\n							children[i].visit(this, 'visit', node, state_data);\n						}\n					}\n\n					break;\n			}\n		},\n		/* visitInstance\n		 * called for visit to instance node\n		 */\n		visitInstance: function(node, departureNode, state_data) {\n			var state = state_data.instance;\n			var children = node.children;\n\n			switch (state) {\n				case compile:\n					node.reset();\n					node.compile();\n					renderQueue.push(node);\n					for (var i = 0; i < children.length; i++) {\n						children[i].visit(this, 'visit', node, state_data);\n					}\n					break;\n			}\n\n\n		},\n\n\n		//=======function managment methods==========//\n		//need to put something in here where you can't have an item in a function that is also in an opened list?\n		addFunction: function(selected_shapes) {\n			lists = lists.filter(function(item) {\n				console.log('removing list from current list tracker');\n				return selected_shapes.indexOf(item) === -1;\n			});\n			this.functionManager.createFunction('my_function', selected_shapes);\n		},\n\n		createParams: function(selected_shapes) {\n			for (var i = 0; i < selected_shapes.length; i++) {\n				this.functionManager.addParamToFunction(currentNode, selected_shapes[i]);\n			}\n		},\n\n		addShape: function(instance, parent) {\n			if (instance) {\n				if (parent) {\n					parent.addChildNode(instance);\n				} else {\n					currentNode.addChildNode(instance);\n				}\n				this.addToOpenLists(instance);\n			}\n		},\n\n\n		//=======list heirarchy managment methods==========//\n\n		/*addList\n		 *adds a list to the closedlist array and removes any items\n		 * on the array which are members of the added list\n		 */\n		addList: function(list) {\n			\n			if (!this.addToOpenLists(list)) {\n				for (var i = lists.length - 1; i >= 0; i--) {\n					if (list.hasMember(lists[i], true)) {\n						lists.splice(i, 1);\n					}\n				}\n				lists.push(list);\n			}\n			for (var j = lists.length - 1; j >= 0; j--) {\n				lists[j].printMembers();\n			}\n\n		},\n\n		/* addToOpenLists\n		 * attempts to add a newly created instance to any open lists\n		 */\n		addToOpenLists: function(instance) {\n			var addedToList = false;\n			for (var i = 0; i < lists.length; i++) {\n				addedToList = addedToList ? true : lists[i].addMemberToOpen(instance);\n			}\n			return addedToList;\n		},\n\n\n\n		/*removeList\n		 *removes list item recursively checking sublists\n		 */\n		removeList: function(list) {\n			for (var i = 0; i < lists.length; i++) {\n				lists[i].recRemoveMember(list);\n\n			}\n		},\n\n		/* filterSelection\n		 * returns array of selected objects based on selected instances\n		 * and state of lists which contain those objects(open vs closed)\n		 */\n		filterSelection: function(lInstance) {\n			var sInstances = [];\n			var itemFound = false;\n			for (var i = 0; i < lists.length; i++) {\n				var item = lists[i].getMember(lInstance);\n\n				if (item) {\n					sInstances.push(item);\n					itemFound = true;\n				}\n			}\n			//add in originally selected index if no lists have been added\n			if (!itemFound) {\n				sInstances.push(lInstance);\n			}\n			return sInstances;\n		},\n\n		/* toggleItems\n		 * toggles item funcitonality according to item type\n		 */\n		toggleItems: function(items) {\n			var lastSelected = items[items.length - 1];\n			switch (lastSelected.get('type')) {\n				case 'function':\n					this.functionManager.callFunction(lastSelected);\n					break;\n				default:\n					break;\n			}\n		},\n\n		/* toggleOpen\n		 * returns children of opened function or members of opened lists\n		 */\n		toggleOpen: function(items) {\n			var functions = items.filter(function(item) {\n				return item.get('type') === 'function';\n			});\n			if (functions.length > 0) {\n				this.closeAllLists();\n				var data = this.functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);\n				lists = data.lists;\n				currentNode = data.currentNode;\n				return data.toSelect;\n			} else {\n				return this.toggleOpenLists(items);\n			}\n		},\n\n		/* toggleClosed\n		 * closes open functions or selected open lists\n		 */\n		toggleClosed: function(items) {\n			//TODO: fix this so it closes selected open lists first...\n			var lists = items.filter(function(item) {\n				return (item.get('type') === 'list' || item.get('type') === 'sampler');\n			});\n			if (lists.length > 0) {\n				return this.toggleClosedLists(items);\n			} else {\n				this.closeAllLists();\n				var data = this.functionManager.toggleClosedFunctions(currentNode, rootNode);\n				currentNode = data.currentNode;\n				lists = currentNode.lists;\n				return data.toSelect;\n			}\n		},\n\n		/* toggleClosedLists\n		 * closes selected open lists\n		 */\n		toggleClosedLists: function(items) {\n			var toggledLists = [];\n			var returnedLists = [];\n			for (var j = 0; j < items.length; j++) {\n				var item = items[j];\n				for (var i = 0; i < lists.length; i++) {\n					if ($.inArray(lists[i], toggledLists) === -1) {\n						var r = lists[i].toggleClosed(item);\n						if (r) {\n							returnedLists = returnedLists.concat(r);\n							toggledLists.push(lists[i]);\n						}\n					}\n				}\n			}\n			return returnedLists;\n		},\n\n		closeAllLists: function() {\n			for (var i = 0; i < lists.length; i++) {\n				lists[i].closeAllMembers();\n				lists[i].set('open', false);\n			}\n		},\n\n\n		toggleOpenLists: function(items) {\n\n			var openedLists = [];\n			var openedItems = [];\n			var members = [];\n			for (var j = 0; j < items.length; j++) {\n				var item = items[j];\n				for (var i = 0; i < lists.length; i++) {\n					if ($.inArray(lists[i], openedLists) === -1) {\n						var r = lists[i].toggleOpen(item);\n						if (r) {\n							openedItems = openedItems.concat(r);\n							openedLists.push(lists[i]);\n						}\n\n					}\n				}\n			}\n			for (var k = 0; k < openedItems.length; k++) {\n				members = members.concat(openedLists[k].members);\n\n			}\n			return members;\n		},\n\n\n\n	});\n\n	return Visitor;\n\n\n});",
+			"file": "js/src/models/data/Visitor.js",
+			"file_size": 11052,
+			"file_write_time": 1427825031000000,
+			"settings":
+			{
+				"buffer_size": 11055,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/StateManagerModel.js",
+			"settings":
+			{
+				"buffer_size": 25403,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/functions/FunctionNode.js",
+			"settings":
+			{
+				"buffer_size": 6114,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/functions/FunctionManager.js",
+			"settings":
+			{
+				"buffer_size": 4975,
 				"line_ending": "Unix"
 			}
 		}
@@ -432,6 +527,14 @@
 	},
 	"file_history":
 	[
+		"/Users/Julia/Documents/para/js/src/models/data/functions/FunctionManager.js",
+		"/Users/Julia/Documents/6.813/PS2/src/board.js",
+		"/Users/Julia/Documents/6.813/PS2/src/boardEvent.js",
+		"/Users/Julia/Documents/6.813/PS2/src/checker.js",
+		"/Users/Julia/Documents/6.813/PS2/src/index.html",
+		"/Users/Julia/Documents/6.813/PS2/src/mainLayout.css",
+		"/Users/Julia/Documents/6.813/PS2/src/rules.js",
+		"/Users/Julia/Documents/para/js/src/models/data/Instance.js",
 		"/Users/Julia/Documents/para/js/src/models/behaviors/FollowPathBehavior.js",
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js",
 		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/RootManager.js",
@@ -496,6 +599,7 @@
 		"height": 0.0,
 		"where_history":
 		[
+			"/Users/Julia/Documents/para/js/src",
 			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
 			"",
 			"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src",
@@ -507,6 +611,35 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"member",
+			"tojson",
+			"toJSON:",
+			"toJSON",
+			"_.each",
+			"inheritproperty",
+			"accessproperty",
+			"tojson",
+			"inheritproperty",
+			"tojson",
+			"accessproperty",
+			"json",
+			"constrain_map",
+			"tojson",
+			"getvalue",
+			"getselfcons",
+			"getvalue",
+			"inheritproperty",
+			"accessproperty",
+			"inheritors",
+			"constrain_m",
+			"tojson",
+			"defaults",
+			"attributes",
+			"attribu",
+			"translation_delta",
+			"defaults",
+			"tojson",
+			"property",
 			"scale",
 			"startpoint",
 			"startdist",
@@ -605,36 +738,7 @@
 			"'+",
 			"BehaviorManagerModel",
 			"\"",
-			"boolB",
-			"boolA",
-			"PathNode",
-			"TrigFunc",
-			"createInstance",
-			";\n",
-			"push",
-			"currentRender",
-			"'currentRender'",
-			"shiftClick",
-			"0.75",
-			"console.log(",
-			"console.log",
-			"\"",
-			"currentRender",
-			".render(",
-			"\"",
-			"DistributeBehavior",
-			".proto",
-			".prototye",
-			"menuY",
-			"open",
-			"openMenu",
-			"behaviorManage",
-			"//selects or deselects all path instances\n    selectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = true;\n      }\n\n    },\n\n    deselectAll: function() {\n      for (var i = 0; i < this.instance_literals.length; i++) {\n        this.instance_literals[i].selected = false;\n      }\n        for (var i = 0; i < this.instances_.length; i++) {\n        this.instances[i].selected = false;\n      }\n\n    },",
-			"deselectAll",
-			".selected=",
-			".setSelection",
-			"\"",
-			".clear"
+			"boolB"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -680,7 +784,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 13,
 			"sheets":
 			[
 				{
@@ -688,15 +792,15 @@
 					"file": "js/src/models/tools/SelectToolModel.js",
 					"settings":
 					{
-						"buffer_size": 10636,
+						"buffer_size": 10666,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9462,
-								9022
+								0,
+								0
 							]
 						],
 						"settings":
@@ -706,7 +810,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2087.0,
+						"translation.y": 5161.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -716,7 +820,227 @@
 					"file": "js/src/models/data/PolygonNode.js",
 					"settings":
 					{
-						"buffer_size": 1581,
+						"buffer_size": 1703,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 211.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/src/models/data/RectNode.js",
+					"settings":
+					{
+						"buffer_size": 2066,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 421.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/src/utils/PFloat.js",
+					"settings":
+					{
+						"buffer_size": 2927,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2896,
+								2896
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1462.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "js/src/utils/PPoint.js",
+					"settings":
+					{
+						"buffer_size": 4961,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4669,
+								4669
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "js/src/models/data/Instance.js",
+					"settings":
+					{
+						"buffer_size": 28336,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11905,
+								11911
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 7025.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "js/src/utils/PColor.js",
+					"settings":
+					{
+						"buffer_size": 4312,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4274,
+								4274
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "js/src/models/data/PathNode.js",
+					"settings":
+					{
+						"buffer_size": 7863,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3064,
+								3064
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 95.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "js/src/models/data/ListNode.js",
+					"settings":
+					{
+						"buffer_size": 12393,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								189,
+								189
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "js/src/models/data/ListSampler.js",
+					"settings":
+					{
+						"buffer_size": 1051,
 						"regions":
 						{
 						},
@@ -740,19 +1064,46 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "js/src/models/data/RectNode.js",
+					"buffer": 10,
+					"file": "js/src/models/data/Visitor.js",
 					"settings":
 					{
-						"buffer_size": 2007,
+						"buffer_size": 11055,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1647,
-								1647
+								6972,
+								6972
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 4083.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "js/src/models/StateManagerModel.js",
+					"settings":
+					{
+						"buffer_size": 25403,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8441,
+								8441
 							]
 						],
 						"settings":
@@ -762,25 +1113,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 3633.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "js/src/models/data/Instance.js",
+					"buffer": 12,
+					"file": "js/src/models/data/functions/FunctionNode.js",
 					"settings":
 					{
-						"buffer_size": 22259,
+						"buffer_size": 6114,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3568,
-								3568
+								5879,
+								5879
 							]
 						],
 						"settings":
@@ -789,7 +1140,34 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1654.0,
+						"translation.y": 2752.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "js/src/models/data/functions/FunctionManager.js",
+					"settings":
+					{
+						"buffer_size": 4975,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4801,
+								4801
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2632.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -857,6 +1235,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 247.0,
+	"side_bar_width": 231.0,
 	"status_bar_visible": true
 }

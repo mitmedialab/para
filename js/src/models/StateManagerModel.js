@@ -271,6 +271,7 @@ define(['jquery',
           visitor.addList(list);
           selectTool.deselectAll();
           selectTool.addSelectedShape(list);
+          console.log('group list ', list.toJSON());
         }
       }
       this.compile();

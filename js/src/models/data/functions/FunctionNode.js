@@ -65,7 +65,6 @@ define([
 				});
 				this.pcount = 1;
 				this.selectedParam = null;
-
 			},
 
 
@@ -78,6 +77,7 @@ define([
 					this.addChildNode(param);
 				}
 				this.trigger('change:f_parameters');
+				console.log('params toJSON: ',this.toJSON());
 			},
 
 			removeParameter: function(param) {
@@ -218,6 +218,19 @@ define([
 					ui.visible = false;
 				}
 
+			},
+
+			toJSON: function() {
+				// // call prototype
+				// // creates params, adds list of all params toJSON
+				var data = Instance.prototype.toJSON.call(this, arguments);
+				var functionParams = this.get('f_parameters');
+				var paramsList = [];
+				_.each(functionParams, function(param) {
+        			paramsList.push(param.toJSON());
+      			});
+      			data['params'] = paramsList;
+      			return data;
 			}
 
 		});

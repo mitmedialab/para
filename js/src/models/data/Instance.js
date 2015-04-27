@@ -478,75 +478,19 @@ define([
 
 		toJSON: function() {
 			
+			//loop through defaults to export and call toJSON
 		
-
-			// var testList1 = {'thing1': 1, 'thing2': 2, 'thing3': 3, 'thing4': 4}
-			// var properties = ['thing2', 'thing4'];
-
-			// position: null,
-			// translation_delta: null,
-			// scaling_origin: null,
-			// scaling_delta: null,
-			// rotation_origin: null,
-			// rotation_delta: null,
-			// stroke_color: null,
-			// fill_color: null,
-			// stroke_width: null,
-			// path_altered: null,
-			// val: null,
-
-			// name: 'instance',
-			// type: 'instance',
-			// visible: true,
-			// closed: false,
-			// order: 0,
-
-
-
-
 			var data = {};
 			var target = this;
 			_.each(exporting_properties, function(property) {
 				if (_.contains(constraints, property)) {
 					data[property] = target.get(property).toJSON();
-
 				}
 				else {
 					data[property] = target.get(property);
 				}
 			});
 			return data;
-
-			// _.each(testList1, function(property) {
-			// 	if (_.contains(properties, property)) {
-			// 		console.log(property);
-			// 	}
-			// })
-			// _.each(this.attributes, function(default_property){
-				
-			// 	exporting_properties[default_property]:default_property.toJSON();
-				
-			// })
-			// return exporting_properties;
-
-			// var dummy = [1, 2, 3];
-
-			// var data = {};
-
-
-			// _.mapObject(exporting_properties, function(val, key){
-			// 	return key.toJSON();
-			// });
-
-			// _.map(dummy, function(num){
-			// 	return num+1;
-			// })
-
-
-			//loop through defaults to export and call toJSON
-			/*for defaults:
-				data[default[k]]:default[k].toJSON();
-			}*/
 
 		},
 
