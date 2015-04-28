@@ -108,6 +108,16 @@ define([
           this.relMouseDown(event);
           break;
       }
+      if ( event.modifiers.capsLock ) { 
+        var constraint = this.get('currentConstraint');      
+        constraint.get('proxy').hide();
+        constraint.clearUI();
+        constraint.create();
+        var constraintMap = this.get('constraints');
+        constraintMap[constraint.get('id')] = constraint;
+        this.set('currentConstraint', new Constraint());
+        this.set('mode', 'create');
+      }
     },
 
     modeSwitch: function() {
@@ -222,41 +232,54 @@ define([
         }
 
         constraint.get('rel_handle').redraw();
-        // check handle being dragged
-        // if scale_x
-        //   proxy.scaling.x = Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width
-        // if scale_y
-        //   proxy.scaling.y = Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height
-        // if scale_xy
-        //   proxy.scaling.x = Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width
-        //   proxy.scaling.y = Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height
-        // if position_x
-        //   proxy.position.x = event.point.x
-        // if position_y
-        //   proxy.position.y = event.point.y
-        // if position_xy
-        //   proxy.position.x = event.point.x
-        //   proxy.position.y = event.point.y
-        //   arrow.changeTail(proxy.position)
-        // if rotation
-        //   proxy.rotation = blablabla
-        // rel_handle.redraw()
       }
     },
 
     mouseUp: function(event) {
+      switch ( this.get('mode') ) {
+        case 'create':
+          this.createMouseUp(event);
+          break;
+        case 'ref':
+          this.refMouseUp(event);
+          break;
+        case 'rel':
+          this.relMouseUp(event);
+          break;
+      }
     },
 
+    createMouseUp: function(event) {
+      
+    },
+
+    refMouseUp: function(event) {
+
+    },
+
+    relMouseUp: function(event) {
+      if ( this.draggingHandle ) {
+        var constraint = this.get('currentConstraint');
+        var proxy = constraint.get('proxy');
+        proxy.matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );
+        this.draggingHandle = false;
+        console.log('rel mouse up logged');
+      }
+    },
 
     /*
      * Resets the state of the constraint tool so that it is as if it has
      * just been selected, or is not selected at all, and removes all UI
      * elements associated with it.
      */
-    clearState: function() {
+    reset: function() {
 
-      this.set('current_constraint', null);
-      this.set('constraints', {});
+      var constraint = this.get('currentConstraint');
+      if ( constraint.get('references') && constraint.get('relatives') ) {
+        constraint.clearUI();
+      }
+      this.set('currentConstraint', new Constraint());
+      this.set('mode', 'create');
     }, 
  
 

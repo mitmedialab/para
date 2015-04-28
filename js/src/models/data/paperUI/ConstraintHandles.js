@@ -199,12 +199,14 @@ define([
         applyClick( rel_target, rel_geom, 'rel' );
         constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
-        //proxy.matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );  
+        constraint.get('arrow').redrawTail(constraint.get('proxy'));
+        constraint.get('proxy').matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );  
       } else {
         applyClick( rel_target, rel_geom, 'rel' );
         constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
-        //proxy.matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );  
+        constraint.get('arrow').redrawTail(constraint.get('proxy'));
+        constraint.get('proxy').matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );  
       }
 
     },
@@ -244,6 +246,14 @@ define([
       } else {
         target.strokeColor = '#ff0000';
         target.fillColor = '#ff0000';
+      }
+    },
+
+    remove: function( event ) {
+      var geometry = this.get('geometry');
+      if ( geometry ) {
+        geometry.remove();
+        geometry = null;
       }
     }
   });

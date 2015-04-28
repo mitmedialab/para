@@ -10,9 +10,14 @@ define([
   'models/data/paperUI/RotationDelimiter',
 ], function(_, paper, Backbone, Arrow, ConstraintWheel, ConstraintHandles, PositionDelimiter, ScaleDelimiter, RotationDelimiter) {
 
+  var propConvMap = {'position:scale': 0.01, 'position:position': 1, 'position:rotation': 1, 'scale:position': 100, 'scale:scale': 1, 'scale:rotation': 100, 'rotation:position': 1, 'rotation:scale': 0.01, 'rotation:rotation': 1};
+  var constraintPropMap = {'position': 'translation_delta', 'scale': 'scaling_delta', 'rotation': 'rotation_delta'}; 
+  
   var Constraint = Backbone.Model.extend({
 
     defaults: {
+      id: null,
+
       // properties
       references: null,
       relatives: null,
@@ -27,7 +32,8 @@ define([
       arrow: null,
       proxy: null,  
       ref_handle: null,
-      rel_handle: null, 
+      rel_handle: null,
+      commit_box: null, 
       
       // derived state
       constraintFuncs: null
@@ -44,6 +50,14 @@ define([
       if ( this.get('references') && this.get('relatives') ) {
         console.log('[ERROR] References and relatives already set.');
       }
+      if ( instance.length == 0 ) { 
+        if ( this.get('relatives') ) {
+          this.set('relatives', null);
+          return false;
+        } else {
+          return false;
+        }
+      }
       instance = instance[0];
       instance.set('selected', false);
       if ( this.get('relatives') ) {
@@ -51,6 +65,7 @@ define([
         this.set('ref_type', type);
 
         // create proxy with important logic // TODO: maybe class it?
+        var constraint = this;
         var relatives = this.get('relatives');
         var references = this.get('references');
         var rel_geom = relatives.get('geom');
@@ -60,17 +75,19 @@ define([
         proxy.bringToFront();
         proxy.visible = false;
         proxy.show = function() { 
-          relatives.set('visible', false);  
+          relatives.set('visible', false);
+          relatives.get('geom').visible = false; // REALLY HACKY  
           proxy.visible = true; 
         }
         proxy.hide = function() { 
           relatives.set('visible', true);
+          relatives.get('geom').visible = true; // REALLY HACKY
           proxy.visible = false; 
         }
         proxy.reset = function() {
           this.scaling = 1; 
-          this.position = rel_geom.position;
           this.rotation = rel_geom.rotation;
+          this.position = rel_geom.position;
           paper.view.draw();
         }
         proxy.matchProperty = function( ref_prop, rel_prop ) {
@@ -83,13 +100,13 @@ define([
             if ( side == 'rel' ) { geom = proxy; } 
             switch ( prop ) {
               case 'scale_x':
-                propValue = geom.bounds.width;
+                propValue = geom.scaling.x;
                 break;
               case 'scale_y':
-                propValue = geom.bounds.height;
+                propValue = geom.scaling.y;
                 break;
               case 'scale_xy':
-                propValue = {x: geom.bounds.width, y: geom.bounds.height};
+                propValue = {x: geom.scaling.x, y: geom.scaling.y}; 
                 break;
               case 'position_x':
                 propValue = geom.position.x;
@@ -104,14 +121,14 @@ define([
                 propValue = geom.rotation;
                 break;
             }
+            return propValue;
           }
           refPropValue = propSwitch( ref_prop, 'ref' );
           relPropValue = propSwitch( rel_prop, 'rel' );
 
-          /*          
           ref_prop_strip = ref_prop.split('_')[0];
           rel_prop_strip = rel_prop.split('_')[0];
-          var convert_factor = propConvMap[ref_prop_strip + ':' + rel_prop_strip];
+          var convertFactor = propConvMap[ref_prop_strip + ':' + rel_prop_strip];
           var conversion, offset;
 
           if ( ref_prop_doub && rel_prop_doub ) {
@@ -119,21 +136,26 @@ define([
             offset = {x: relPropValue.x - conversion.x, y: relPropValue.y - conversion.y};    
           } else if ( ref_prop_doub ) {
             conversion = refPropValue.x * convertFactor + refPropValue.y * convertFactor;
-            offset = relPropValue - conversion;
+            offset = {x: relPropValue - conversion};
           } else if ( rel_prop_doub ) {
             conversion = {x: refPropValue * convertFactor, y: refPropValue * convertFactor};
-            offset = {x: relPropValue.x - conversion, y: relPropValue.y - conversion};
+            offset = {x: relPropValue.x - conversion.x, y: relPropValue.y - conversion.y};
           } else {
             conversion = refPropValue * convertFactor;
-            offset = relPropValue - convertFactor;
+            offset = {x: relPropValue - conversion};
           }
-          */
-
-
-          // set expression
+         
+          var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x';
+          var exp_object = {};
+          for (var axis in offset) {
+            exp_object[axis] = exp_scale + ' + ' + offset[axis].toString();
+          }
+          console.log('expression object', exp_object);
+          constraint.set('expression', exp_object);
         }
 
         this.set('proxy', proxy);
+        this.set('id', (references.get('id') + ':' + relatives.get('id')));
         return true;
       }
       this.set('relatives', instance);
@@ -141,193 +163,99 @@ define([
       return false;
     },
 
-    relativesChange: function() {
-      if ( !this.get('ref_wheel') || !this.get('rel_wheel') ) {
-        this.createWheels();
-      }
-    },
-
     createArrow: function() {
       var arrow = new Arrow( {constraint: this} );
       this.set('arrow', arrow);
     },
 
-    createWheels: function() {
-      var ref_wheel = new ConstraintWheel( {side: 'ref', constraint: this} );
-      var rel_wheel = new ConstraintWheel( {side: 'rel', constraint: this} );
-      this.set('ref_wheel', ref_wheel);
-      this.set('rel_wheel', rel_wheel);
-      this.trigger('wheelsDrawn');
-    },
-
-    createDelimiters: function() {
-      var ref_prop = this.get('ref_prop');
-      var rel_prop = this.get('rel_prop');
-
-      if (!ref_prop || !rel_prop) {
-        console.log('[ERROR] Reference property or relative property not defined for delimiters.');
-      }
-
-      var drawDelimitersForSide = function( side ) {
-        var axes = ['x', 'y'];
-        var prop = ( side == 'ref' ? ref_prop : rel_prop );
-        switch ( prop ) {
-          case 'position':
-            for ( var i = 0; i < axes.length; i++ ) {
-              var pos_delimiter = new PositionDelimiter( {side: side, axis: axes[i], constraint: this} );
-              this.get(side + '_delimiters').push(pos_delimiter);
-            }
-            break;
-          case 'scale':
-            for ( var i = 0; i < axes.length; i++ ) {
-              var scale_delimiter = new ScaleDelimiter( {side: side, axis: axes[i], constraint: this} );
-              this.get(side + '_delimiters').push(scale_delimiter);
-            }
-            break;
-          case 'rotation':
-            rot_delimiter = new RotationDelimiter( {side: side, constraint: this} );
-            this.get(side + '_delimiters').push(rot_delimiter);
-            break;
-          case 'weight':
-            // TODO: make weight delimiter
-            break;
-          case 'fill':
-            // TODO: make fill delimiter
-            break;
-          case 'stroke':
-            // TODO: make stroke delimiter
-            break;
-        }
-      }
-
-      drawDelimitersForSide = drawDelimitersForSide.bind(this);
-      drawDelimitersForSide( 'ref' );
-
-      if ( ref_prop != rel_prop ) {
-        drawDelimitersForSide( 'rel' );
-      }
-
-      this.trigger('delimitersDrawn');     
-    },
-
-    clearDelimiters: function() {
-      var ref_delimiters = this.get('ref_delimiters');
-      var rel_delimiters = this.get('rel_delimiters');
-      for ( var i = 0; i < ref_delimiters.length; i++ ) {
-        ref_delimiters[i].remove();
-      }
-      for ( var i = 0; i < rel_delimiters.length; i++ ) {
-        rel_delimiters[i].remove();
-      }
-      this.set('ref_delimiters', []);
-      this.set('rel_delimiters', []);
-    },
-
     create: function() {
-      var ref_prop = this.get('ref_prop');
-      var rel_prop = this.get('rel_prop');
-      var references = this.get('references');
-      var relatives = this.get('relatives');
+      var ref_prop = this.get('ref_prop').split('_');
+      var rel_prop = this.get('rel_prop').split('_');
+      var ref_doub = (ref_prop[1] && ref_prop[1] == 'xy');
+      var rel_doub = (rel_prop[1] && rel_prop[1] == 'xy');
+
+      var reference = this.get('references');
+      var relative = this.get('relatives');
       var expression = this.get('expression');
-      expression = expression.split(';');
 
-      if (!ref_prop || !rel_prop || !references || !relatives || !expression) {
-        console.log('[ERROR] All fields not defined for constraint creation.');
-        return;
+      var refPropAccess = reference.get( constraintPropMap[ref_prop[0]] );
+      var relPropAccess = relative.get( constraintPropMap[rel_prop[0]] );
+      console.log('refPropAccess', refPropAccess);
+      console.log('relPropAccess', relPropAccess);
+
+      if ( ref_doub && !rel_doub ) {
+        var constraintF = function() {
+          var refPropValue = refPropAccess.getValue();
+          var x = refPropValue.x + refPropValue.y;
+          var y;
+          eval( expression['x'] );
+          if ( rel_prop[0] == 'rotation' ) { 
+            relPropAccess.setValue( y );
+          } else {
+            relPropAccess[rel_prop[1]].setValue( y );
+          }
+          return y;
+        }
       }
-
-      var refPropAccess = Utils.getPropConstraintFromList( references, ref_prop );
-      var relPropAccess = Utils.getPropConstraintFromList( relatives, rel_prop );
-  
-      if ( rel_prop == 'position' || rel_prop == 'scale' ) {
-        var constraintF_x = function() {
-          var x = refPropAccess.x.getValue();
-          var y = refPropAccess.y.getValue();
-
-          var evaluation = eval( expression[0] );
-          rel_prop.x.setValue( evaluation );
-          return evaluation;
+      else if ( ref_doub && rel_doub ) {
+        var constraintF = function() {
+          var evalObj = {};
+          for (var axis in expression) {
+            var x = refPropAccess[axis].getValue();
+            console.log('x-val', x);
+            var y;
+            eval(expression[axis]);
+            console.log('y-val', y);
+            evalObj[axis] = y;
+          }
+          console.log('evalObj', evalObj);
+          relPropAccess.setValue(evalObj);
+          return evalObj;
         }
-
-        var constraintF_y = function() {
-          var x = refPropAccess.x.getValue();
-          var y = refPropAccess.y.getValue();
-
-          var evaluation = eval( expression[1] );
-          rel_prop.y.setValue( evaluation );
-          return evaluation;
+      } else if ( !ref_doub && rel_doub ) {
+        var constraintF = function() {
+          var evalObj = {};
+          var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
+          for (var axis in expression) {
+            var y;
+            eval( expression[axis] );
+            evalObj[axis] = y;
+          }
+          relPropAccess.setValue(evalObj);
+          return evalObj;
         }
-
-        rel_prop.x.setConstraint(constraintF_x);
-        rel_prop.y.setConstraint(constraintF_y);
-        constraintFuncs.push(constraintF_x);
-        constraintFuncs.push(constraintF_y);
       } else {
         var constraintF = function() {
-          var x = refPropAccess.getValue();
-
-          var evaluation = eval( expression[0] );
-          rel_prop.setValue( evaluation );
-          return evaluation;
+          var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
+          var y, relPropObj;
+          eval( expression['x'] );
+          if ( rel_prop[0] == 'rotation' ) {
+            relPropAccess.setValue( y );
+            relPropObj = y;
+          } else {
+            relPropAccess[rel_prop[1]].setValue( y );
+          }
+          return y;
         }
-        rel_prop.setConstraint(constraintF);
-        constraintFuncs.push(constraintF);
       }
-    },
-
-    update: function() {
-      constraintFuncs = [];
-      create();
-    },
-
-    updateExpression: function( side, axis, change, addOrRemove ) {
-      var ref_prop = this.get('ref_prop');
-      var rel_prop = this.get('rel_prop');
-      var expr = this.get('expression').split(';');
-      var axis_expr_map = {'x': 0, 'y': 1};
-
-      if ( ref_prop == rel_prop ) {
-        if ( ref_prop == 'position' ) {
-          var changeString = ( change == 0 ? '' : (' + ' + change.toString()) );
-          var new_delim_exp = ('(' + axis + changeString + ')');
-          expr[axis_expr_map[axis]] = new_delim_exp;             
-        }
-        else if ( ref_prop == 'scale' ) {
-          var changeString = ( change == 1 ? '' : (' * ' + change.toString()) );
-          var new_delim_exp = ('(' + axis + changeString + ')');
-          expr[axis_expr_map[axis]] = new_delim_exp;
-        }
-        else if ( ref_prop == 'rotation' ) { 
-          var changeString = ( change == 0 ? '' : (' + ' + change.toString()) );
-          var new_delim_exp = ('(' + 'x' + changeString + ')');
-          expr[0] = new_delim_exp;
-        }
+      if ( rel_doub ) {
+        relPropAccess.setConstraint( constraintF );
       } else {
-        
+        relPropAccess[rel_prop[1]].setConstraint( constraintF );
       }
-      var new_expr = this.mergeExprSplit( expr );
-      this.setExpression( new_expr );
+      this.set('constraintFunc', constraintF );
     },
 
-    mergeExprSplit: function( exprSplit ) {
-      var exprString = '';
-      for ( var i = 0; i < (exprSplit.length - 1); i++ ) {
-        exprString += (exprSplit[i] + ';');
-      }
-      exprString += exprSplit[exprSplit.length - 1];
-      return exprString;
+    clearUI: function() {
+      this.get('proxy').remove();
+      this.get('arrow').remove();
+      this.get('ref_handle').remove();
+      this.get('rel_handle').remove();
+      this.set('proxy', null);
+      this.set('arrow', null);
+      this.set('ref_handle', null);
+      this.set('rel_handle', null);
     },
-
-    setExpression: function( expression ) {
-      /*
-      if ( delimiterExprMatch( expression, this.get('ref_prop'), this.get('rel_prop') ) {
-        // show delimiters and select if not already
-      } else {
-        // turn off delimiters
-      }*/
-      console.log( 'Expression set: ', expression );
-      this.set('expression', expression);
-    }, 
 
     remove: function() {
       // remove all paper UI elements
