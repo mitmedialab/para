@@ -16,11 +16,9 @@ define([
 
       currentPaperObjects: null, //stores literal paperjs objects created / selected by tool
       matrix: null,
-      style: {
-        fill_color: '#ffffff',
-        stroke_color: '#000000',
-        stroke_width: 1
-      },
+      fill_color: '#ffffff',
+      stroke_color: '#000000',
+      stroke_width: 1,
       'tool-mode': 'standard',
       'tool-modifier': 'none',
 
@@ -39,7 +37,7 @@ define([
 
      modeChanged: function(mode,modifier) {
       this.set('tool-mode',mode);
-      this.set('tool-modifier',modfier);
+      this.set('tool-modifier',modifier);
     },
 
 

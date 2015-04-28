@@ -104,15 +104,13 @@ define([
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
         data = { fill_color: -1};
-        this.model.styleModified(data);
-        this.model.setToolStyle(data);
+        this.model.modifyStyle(data);
 
       } else {
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
         data = { stroke_color: -1};
-        this.model.styleModified(data);
-        this.model.setToolStyle(data);
+        this.model.modifyStyle(data);
       }
     },
 
@@ -135,8 +133,7 @@ define([
       }
       var data = {};
       data[(id + "_color")] = color;
-      this.model.styleModified(data);
-      this.model.setToolStyle(data);
+      this.model.modifyStyle(data);
 
     },
 
@@ -148,8 +145,7 @@ define([
         $('#fillColorBlock').css('background-color', color);
         $('#fill').val(color);
         data = { fill_color: color};
-        this.model.styleModified(data);
-        this.model.setToolStyle(data);
+        this.model.modifyStyle(data);
 
 
 
@@ -158,8 +154,7 @@ define([
         $('#strokeColorBlock').css('background-color', color);
         $('#stroke').val(color);
         data = {stroke_color: color};
-        this.model.styleModified(data);
-         this.model.setToolStyle(data);
+        this.model.modifyStyle(data);
 
       }
 
@@ -252,8 +247,7 @@ define([
     strokeChange: function(event) {
       var value = parseInt($(event.target).val(), 10);
       var data = {stroke_width: {val:value, operator:'set'}};
-      this.model.styleModified(data);
-      this.model.setToolStyle(data);
+      this.model.modifyStyle(data);
     },
 
     // TESTING

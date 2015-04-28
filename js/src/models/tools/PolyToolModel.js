@@ -59,15 +59,15 @@ define([
         if (this.get('mode') !== 'pen') {
           polyPath.selected = true;
         }
-        polyPath.strokeWidth = this.get('style').stroke_width;
-        polyPath.strokeColor = this.get('style').stroke_color;
-        polyPath.fillColor = this.get('style').fill_color;
+        polyPath.strokeWidth = this.get('stroke_width');
+        polyPath.strokeColor = this.get('stroke_color');
+        polyPath.fillColor = this.get('fill_color');
 
-        if (this.get('style').fillColor === -1) {
+        if (this.get('fillColor') === -1) {
           polyPath.style.fillColor = null;
 
         }
-        if (this.get('style').stroke_color === -1) {
+        if (this.get('stroke_color') === -1) {
           polyPath.style.strokeColor = null;
 
         }
@@ -241,15 +241,15 @@ define([
         }
 
         polyPath.selected = true;
-        polyPath.strokeWidth = this.get('style').stroke_width;
-        polyPath.strokeColor = this.get('style').stroke_color;
-        polyPath.fillColor = this.get('style').fill_color;
+        polyPath.strokeWidth = this.get('stroke_width');
+        polyPath.strokeColor = this.get('stroke_color');
+        polyPath.fillColor = this.get('fill_color');
 
-        if (this.get('style').fillColor === -1) {
+        if (this.get('fillColor') === -1) {
           polyPath.style.fillColor = null;
 
         }
-        if (this.get('style').stroke_color === -1) {
+        if (this.get('stroke_color') === -1) {
           polyPath.style.strokeColor = null;
 
         }

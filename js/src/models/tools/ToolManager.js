@@ -18,8 +18,9 @@ define([
 ], function($, _, Backbone, paper, BaseToolModel, SelectToolModel, PolyToolModel, ConstraintToolModel, Utils,PaperUIHelper) {
 
   var toolNameMap;
-  var ToolManager = Backbone.Model.extend({
+  var toolCollection;
 
+  var ToolManager = Backbone.Model.extend({
 
     defaults: {
       state: 'polyTool',
@@ -45,7 +46,7 @@ define([
       });
 
       constraintTool.sm = this;
-      var toolCollection = new Backbone.Collection({});
+      toolCollection = new Backbone.Collection({});
       this.set('tool_collection', toolCollection);
       this.listenTo(toolCollection, 'geometryAdded', this.geometryAdded);
       this.listenTo(toolCollection, 'geometrySelected', this.geometrySelected);
@@ -85,7 +86,6 @@ define([
       }
       this.trigger('compileRequest');
     },
-
 
     modeChanged: function() {
       var models = this.get('models');
@@ -196,9 +196,21 @@ define([
         var instance = selectedShapes[i];
         instance.modifyProperty(style_data, this.tool_mode, this.tool_modifer);
       }
+      this.setToolStyle(style_data);
       this.trigger('compileRequest');
     },
 
+    setToolStyle: function(style_data){
+      if(style_data.stroke_width){
+          style_data.stroke_width = style_data.stroke_width.val;
+        }
+              console.log('style_data',style_data);
+
+      toolCollection.forEach(function(model, index) {
+
+          model.set(style_data);
+      });
+    },
 
     openSelected: function() {
       var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
@@ -280,8 +292,6 @@ define([
         return oldZoom / factor;
       }
     },
-
-
 
     canvasMouseWheel: function(event, pan, modify) {
       var delta = event.originalEvent.wheelDelta; //paper.view.center

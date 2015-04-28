@@ -41,6 +41,7 @@ define([
       /* event listener registers */
       toolManager.listenTo(visitor, 'selectionFiltered', toolManager.selectionFiltered);
 
+
       visitor.listenTo(toolManager, 'compileRequest', visitor.compile);
       visitor.listenTo(toolManager, 'addShape', visitor.addShape);
       visitor.listenTo(toolManager, 'removeShape', visitor.removeShape);
@@ -68,7 +69,7 @@ define([
 
       var propertyView = new PropertyView({
         el: '#prop-menu',
-        model:  propertiesManager
+        model: toolManager
       });
       var contextView = new ContextView({
         el: '#context-menu',
