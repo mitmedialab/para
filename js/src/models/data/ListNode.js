@@ -8,7 +8,7 @@ define([
   'paper',
   'models/data/Instance',
   'utils/PFloat',
-  'utils/PConstraint'
+  'utils/PConstraint',
 
 ], function($, _, paper, Instance, PFloat, PConstraint) {
 
@@ -233,7 +233,7 @@ define([
         memberList = [];
       }
       for (var i = 0; i < this.members.length; i++) {
-        if (this.members[i].get('type') !== 'list' || this.members[i].get('type') !== 'sampler') {
+        if (this.members[i].get('type') !== 'list') {
           memberList.push(this.members[i]);
         } else {
           this.members[i].getInstanceMembers(memberList);
@@ -313,25 +313,30 @@ define([
     compile: function() {
       for (var i = 0; i < this.members.length; i++) {
         var i_matricies = this.compileTransforms();
-        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+        if (this.members[i].get('type') === 'list') {
           this.members[i].reset();
         }
-        this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
-        this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
-        this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
-        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
-          this.members[i].compile();
-        }
-
+        //this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
+        //this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
+        //this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
       }
     },
 
+/*
+    checkConstraintConflicts: function(index, property){
+        var delta = this.inheritProperty(property);
+        var member = this.members[index];
+        var member_delta = member.inheritProperty(property);
+        var member_constrained = member_delta.isSelfConstrained();
+        var constrained = delta.isSelfConstrained();
+        var member_constraint_map = 
+        var property_constraint_map
+    }*/
 
     compileMemberAt: function(index, propname, l_matrix) {
       var delta = this.inheritProperty(propname);
       if (delta) {
         var member = this.members[index];
-        member.bringToFront();
         var member_property = member.inheritProperty(propname);
         var matrixMap = this.get('matrix_map');
         var matrix_props = matrixMap[propname].properties;

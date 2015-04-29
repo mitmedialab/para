@@ -106,7 +106,6 @@ define([
 				switch (childList[i].get('type')) {
 
 					case 'list':
-					case 'sampler':
 						console.log('adding list to function');
 						f.lists.push(childList[i]);
 						var members = childList[i].getInstanceMembers();

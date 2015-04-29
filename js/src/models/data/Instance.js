@@ -591,7 +591,6 @@ define([
 							}
 						}
 
-						this.set(p, property);
 						this.trigger('change:' + p);
 
 					}

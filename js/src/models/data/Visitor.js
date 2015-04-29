@@ -10,11 +10,11 @@ define([
 	'models/data/Instance',
 	'models/data/functions/FunctionNode',
 	'models/data/functions/FunctionManager',
-	'models/data/ListSampler', //TODO: create list manager
+	'models/data/ConstrainableList', //TODO: create list manager
 	'views/drawing/LayersView',
 
 
-], function(_, Backbone, Instance, FunctionNode, FunctionManager, ListSampler, LayersView) {
+], function(_, Backbone, Instance, FunctionNode, FunctionManager, ConstrainableList, LayersView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -210,7 +210,6 @@ define([
 			});
 			switch (node.get('type')) {
 				case 'list':
-				case 'sampler':
 					return this.visitList(node, departureNode, state_data);
 
 				case 'function':
@@ -250,7 +249,7 @@ define([
 					};
 					for (var i = 0; i < node.members.length; i++) {
 						member = node.members[i];
-						if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+						if (member.get('type') === 'list') {
 							member.visit(this, 'visit', node, s_d);
 						}
 					}
@@ -259,7 +258,7 @@ define([
 					renderQueue.push(node);
 					for (var j = 0; j < node.members.length; j++) {
 						member = node.members[j];
-						if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+						if (member.get('type') === 'list') {
 							member.visit(this, 'visit', node, state_data);
 						}
 					}
@@ -272,7 +271,7 @@ define([
 					} else {
 						for (var l = 0; l < node.members.length; l++) {
 							member = node.members[j];
-							if (member.get('type') === 'list' || member.get('type') === 'sampler') {
+							if (member.get('type') === 'list') {
 								var match = node.members[l].visit(this, 'visit', node, state_data);
 								if (match) {
 									return match;
@@ -534,7 +533,7 @@ define([
 		 * on the array which are members of the added list
 		 */
 		addList: function(selectedShapes) {
-			var list = new ListSampler();
+			var list = new ConstrainableList();
 			list.addMember(selectedShapes);
 			if (!this.addToOpenLists(list)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
@@ -600,7 +599,7 @@ define([
 			//TODO: fix this so it closes selected open lists first...
 			var data;
 			var lists = items.filter(function(item) {
-				return (item.get('type') === 'list' || item.get('type') === 'sampler');
+				return (item.get('type') === 'list');
 			});
 			if (lists.length > 0) {
 				data = this.toggleClosedLists(items);

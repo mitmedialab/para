@@ -210,7 +210,6 @@ define([
 
     //mouse drag event - brokem
     penMouseDrag: function(event) {
-
       if (mode == 'move' && type == 'point') {
         segment.point = event.point;
       } else if (mode != 'close') {
@@ -228,7 +227,6 @@ define([
     regularMouseDrag: function(event) {
       if (polyPath) {
         drag = true;
-
         var deltaX = event.point.x - startPosition.x;
         var deltaY = event.point.y - startPosition.y;
 
@@ -239,7 +237,6 @@ define([
         } else {
           polyPath = new paper.Path.Ellipse(rectangle);
         }
-
         polyPath.selected = true;
         polyPath.strokeWidth = this.get('stroke_width');
         polyPath.strokeColor = this.get('stroke_color');

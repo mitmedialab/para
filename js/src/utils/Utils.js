@@ -56,10 +56,6 @@ define([
     getPropConstraintFromList: function( instanceList, propertySplit ) {
       return instanceList.map( function( instance ) {
         console.log('property constraint name', instance.get('name'));
-        if(instance.get('name')==='path_sampler'){
-          console.log('found path sampler');
-          return instance;
-        }
         var property = instance.inheritProperty( propertySplit[0] );
         if(!property       ){
           property = instance.activateProperty(propertySplit[0]);

@@ -14,6 +14,67 @@ define([
 
 		var TrigFunc = Toolbox.Base.extend({
 
+			horner: function(array, x_scale, y_scale) {
+				function recur(x, i, array) {
+					if (i === 0) {
+						return array[0];
+					} else {
+						return array[i] + x * recur(x, --i, array);
+					}
+				}
+				return function(x) {
+					return recur(x * x_scale, array.length - 1, array) * y_scale;
+				};
+			},
+
+			// initialize array
+			zeros: function(n) {
+				var array = new Array(n);
+				for (var i = n; i--;) {
+					array[i] = 0;
+				}
+				return array;
+			},
+
+			denominator: function(i, points) {
+				var result = 1;
+				var x_i = points[i].x;
+				for (var j = points.length; j--;) {
+					if (i != j) {
+						result *= x_i - points[j].x;
+					}
+				}
+				console.log(result);
+				return result;
+			},
+
+			// calculate coefficients for Li polynomial
+			interpolation_polynomial: function(i, points) {
+				var coefficients = this.zeros(points.length);
+				// alert("Denominator " + i + ": " + denominator(i,points));
+				coefficients[0] = 1 / this.denominator(i, points);
+				console.log(coefficients[0]);
+				//new Array(points.length);
+				/*for (var s=points.length; s--;) {
+				   coefficients[s] = 1/denominator(i,points);
+				}*/
+				var new_coefficients;
+
+				for (var k = 0; k < points.length; k++) {
+					if (k == i) {
+						continue;
+					}
+					new_coefficients = this.zeros(points.length);
+					for (var j = (k < i) ? k + 1 : k; j--;) {
+						new_coefficients[j + 1] += coefficients[j];
+						new_coefficients[j] -= points[k].x * coefficients[j];
+					}
+					coefficients = new_coefficients;
+				}
+				console.log(coefficients);
+				return coefficients;
+			},
+
 
 		});
 
@@ -198,6 +259,22 @@ define([
 				}
 				return d3;
 			}
+		};
+
+
+		// calculate coefficients of polynomial
+		TrigFunc.Lagrange = function(points) {
+			var polynomial = this.zeros(points.length);
+			var coefficients;
+			for (var i = 0; i < points.length; ++i) {
+				coefficients = this.interpolation_polynomial(i, points);
+				//console.log(coefficients);
+				for (var k = 0; k < points.length; ++k) {
+					// console.log(points[k].y*coefficients[k]);
+					polynomial[k] += points[i].y * coefficients[k];
+				}
+			}
+			return polynomial;
 		};
 
 

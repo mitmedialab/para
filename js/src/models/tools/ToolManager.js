@@ -6,16 +6,16 @@ define([
   'jquery',
   'underscore',
   'backbone',
-    'paper',
+  'paper',
 
   'models/tools/BaseToolModel',
   'models/tools/SelectToolModel',
   'models/tools/PolyToolModel',
   'models/tools/ConstraintToolModel',
-  'utils/Utils',  
+  'utils/Utils',
   'utils/PaperUIHelper',
 
-], function($, _, Backbone, paper, BaseToolModel, SelectToolModel, PolyToolModel, ConstraintToolModel, Utils,PaperUIHelper) {
+], function($, _, Backbone, paper, BaseToolModel, SelectToolModel, PolyToolModel, ConstraintToolModel, Utils, PaperUIHelper) {
 
   var toolNameMap;
   var toolCollection;
@@ -65,10 +65,10 @@ define([
         'constraint': constraintTool
       };
 
- // setup helpers and factories
+      // setup helpers and factories
       PaperUIHelper.setup(this);
 
-        //setup default zeros for zoom and pan
+      //setup default zeros for zoom and pan
       this.zeroedZoom = paper.view.zoom;
       this.zeroedPan = paper.view.center.clone();
     },
@@ -162,7 +162,7 @@ define([
 
     selectionFiltered: function(newSelection, toRemove) {
       var selectTool = this.get('tool_collection').get('selectTool');
-      console.log('new selection, to remove',newSelection, toRemove);
+      console.log('new selection, to remove', newSelection, toRemove);
       selectTool.removeSelectedShape(toRemove);
       selectTool.addSelectedShape(newSelection);
       this.trigger('compileRequest');
@@ -200,15 +200,15 @@ define([
       this.trigger('compileRequest');
     },
 
-    setToolStyle: function(style_data){
-      if(style_data.stroke_width){
-          style_data.stroke_width = style_data.stroke_width.val;
-        }
-              console.log('style_data',style_data);
+    setToolStyle: function(style_data) {
+      if (style_data.stroke_width) {
+        style_data.stroke_width = style_data.stroke_width.val;
+      }
+      console.log('style_data', style_data);
 
       toolCollection.forEach(function(model, index) {
 
-          model.set(style_data);
+        model.set(style_data);
       });
     },
 
@@ -263,7 +263,7 @@ define([
       }
     },
 
-       canvasMouseDrag: function(delta, pan) {
+    canvasMouseDrag: function(delta, pan) {
       if (pan) {
         var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
         paper.view.scrollBy(inverseDelta);
@@ -305,11 +305,11 @@ define([
         paper.view.center = paper.view.center.add(data.o);
         event.preventDefault();
         paper.view.draw();
-      } 
+      }
     },
 
     canvasDblclick: function(event) {
-    
+
     },
 
   });

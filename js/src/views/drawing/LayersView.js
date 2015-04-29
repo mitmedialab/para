@@ -1,5 +1,5 @@
 /* LayersView.js
- * controls updates to the property menu
+ * controls updates to the layers menu
  */
 
 define([
