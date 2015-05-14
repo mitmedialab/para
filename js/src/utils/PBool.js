@@ -7,13 +7,13 @@
 define([
 		'underscore',
 		'utils/PProperty',
-		'utils/PConstraint'
+		'utils/PFloat'
 	],
 
-	function(_, PProperty, PConstraint) {
+	function(_, PProperty, PFloat) {
 
-		var PBool = PConstraint.extend({
-			defaults: _.extend({}, PConstraint.prototype.defaults, {
+		var PBool = PFloat.extend({
+			defaults: _.extend({}, PFloat.prototype.defaults, {
 				name: 'PBool'
 			}),
 			/* constructor
@@ -22,15 +22,16 @@ define([
 			 * operation performed when property is modified
 			 */
 			constructor: function(val, operator) {
-				if (val) {
+				PFloat.apply(this, arguments);
+				if (val === true) {
 					this.val = new PProperty(1);
-				} else if (!val) {
+				} else if (val === false) {
 					this.val = new PProperty(0);
 				}
+				
 				if (operator) {
 					this.set('operator', operator);
 				}
-				PConstraint.apply(this, arguments);
 				this.setNull(false);
 			},
 
@@ -38,9 +39,9 @@ define([
 			 * sets the value of the property
 			 */
 			setValue: function(val) {
-				if (val) {
+				if (val === true) {
 					this.val.setValue(1);
-				} else if (!val) {
+				} else if (val === false) {
 					this.val.setValue(0);
 				}
 			},
@@ -53,10 +54,7 @@ define([
 			getValue: function() {
 				var v;
 				if (!this.isSelfConstrained()) {
-
 					v = this.val.getValue();
-					console.log('bool val=',v);
-					console.trace();
 				} else {
 					v = this.getSelfConstraint().getValue();
 				}
