@@ -12,7 +12,7 @@ define([
 	"text!html/layers_ui.html"
 
 ], function($, _, paper, Backbone, Handlebars, fancytree, ui) {
-	var shapeTree, listTree, shapeRoot, listRoot, source, template, relIcon, refIcon, connector;
+	var shapeTree, listTree, constraintTree, shapeRoot, listRoot, constraintRoot, source, template, relIcon, refIcon, connector;
 	var currentRef, currentRel;
 	var shapeSource = [
 		/*{
@@ -62,7 +62,7 @@ define([
 
 
 	var constraintSource = [
-		/*{
+		{
 				title: 'c1',
 				key: '100',
 				ref: '1',
@@ -80,7 +80,7 @@ define([
 				ref: '7',
 				rel: '8',
 				status: 'pinned'
-			}*/
+			}
 	];
 	var LayersView = Backbone.View.extend({
 
@@ -141,6 +141,7 @@ define([
 			this.$('#constraints').fancytree({
 				source: [],
 				extensions: ["dnd", "edit"],
+				expand: this.treeExpanded,
 				collapse: this.treeCollapsed,
 				dnd: {
 					autoExpandMS: 400,
@@ -162,6 +163,7 @@ define([
 
 			shapeTree = $("#shapes").fancytree("getTree");
 			listTree = $("#lists").fancytree("getTree");
+			constraintTree = $("#constraints").fancytree("getTree");
 			$("#shapes").bind('fancytreeexpand', {
 				view: this
 			}, this.treeExpanded);
@@ -186,6 +188,8 @@ define([
 
 			shapeRoot = $("#shapes").fancytree("getRootNode");
 			listRoot = $("#lists").fancytree("getRootNode");
+			constraintRoot = $("#constraints").fancytree("getRootNode");
+
 			/*shapeRoot.addChildren({
 				title: "Shape 3",
 				key: 5
@@ -361,7 +365,6 @@ define([
 		},
 
 		itemClicked: function(id, activeNode, shape) {
-
 			switch (id) {
 				case 'constraint':
 					break;
@@ -374,7 +377,6 @@ define([
 		},
 
 		toggleVisibility: function(activeNode, shape) {
-
 			console.log('shape', shape);
 			if (shape.get('visible')) {
 				this.hideNode(activeNode);
@@ -477,7 +479,17 @@ define([
 		},
 
 		addConstraint: function(data) {
-			console.log('adding constraint', data);
+		this.deselectAll(shapeRoot);
+			this.deselectAll(listRoot);
+			this.deselectAll(constraintRoot);
+			console.log('constraint', data);
+			var constraintData = {
+				title: data.name,
+				key: data.id
+			};
+			var constraintNode = constraintRoot.addChildren(constraintData);
+			this.selectNode(constraintNode);
+			this.resetConstraintHeight();
 		},
 
 		selectNode: function(node) {

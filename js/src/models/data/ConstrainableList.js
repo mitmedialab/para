@@ -8,12 +8,13 @@ define([
     'utils/PFloat',
     'utils/PBool',
     'paper',
-    'models/data/ListFunction'
+    'utils/PConstraint',
+
   ],
 
-  function(_, ListNode, PFloat, PBool, paper, ListFunction) {
+  function(_, ListNode, PFloat, PBool, paper, PConstraint) {
     var ConstrainableList = ListNode.extend({
-      defaults: _.extend({},ListNode.prototype.defaults, {
+      defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'constrainable_list',
         index: 0,
       }),
@@ -21,7 +22,6 @@ define([
       initialize: function() {
         ListNode.prototype.initialize.apply(this, arguments);
         this.get('translation_delta').setNull(false);
-        this.listFunction = new ListFunction();
         //code for creating list UI
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
         var path = new paper.Path.Rectangle(rectangle);
@@ -82,16 +82,16 @@ define([
 
       },
 
-       getIndex: function() {
+      getIndex: function() {
         return this.get('index');
       },
 
       setIndex: function(value) {
-        this.set('index',value);
+        this.set('index', value);
       },
 
 
-       increment: function() {
+      increment: function() {
         var start = 0;
         var end = this.members.length;
         var index = this.getIndex();
@@ -102,14 +102,59 @@ define([
         }
       },
 
-      compileMemberAt: function(index, propname, l_matrix) {
-        ListNode.prototype.compileMemberAt.call(this, index, propname, l_matrix);
-        this.increment();
-        console.log('index=',index);
-        this.listFunction.getValue(this.get('index'),this.members.length);
+      compile: function() {
+        for (var i = 0; i < this.members.length; i++) {
+          var i_matricies = this.compileTransforms();
+          /*if (this.members[i].get('type') === 'list') {
+            this.members[i].reset();
+          }*/
+          this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
+          this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
+          this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
+          this.increment();
+        }
+      },
+
+      updateMemberTranslation: function(){
+        var deltaConstrained = this.get('translation_delta').isConstrained();
+       // var memberDeltaConstrained = this.get()
       },
 
 
+      compileMemberAt: function(index, propname, l_matrix) {
+        var delta = this.inheritProperty(propname);
+
+        if (delta) {
+          var member = this.members[index];
+          var member_property = member.inheritProperty(propname);
+          var matrixMap = this.get('matrix_map');
+          var matrix_props = matrixMap[propname].properties;
+          var member_matrix = member.get(matrixMap[propname].name);
+          var delta_constrained = delta.isSelfConstrained();
+          var member_property_constrained = member_property.isSelfConstrained();
+
+          for (var p in matrix_props) {
+            if (delta.hasOwnProperty(p)) {
+              var delta_subproperty_constrained = false;
+              var member_subproperty_constrained = false;
+              if (delta[p] instanceof PConstraint) {
+                delta_subproperty_constrained = delta[p].isSelfConstrained();
+                member_subproperty_constrained = member_property[p].isSelfConstrained();
+              }
+              for (var i = 0; i < matrix_props[p].length; i++) {
+                if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
+                  member_matrix[matrix_props[p][i]] = 0;
+                }
+                if (member_subproperty_constrained || member_property_constrained) {
+                  l_matrix[matrix_props[p][i]] = 0;
+                }
+              }
+            }
+          }
+          member_matrix.concatenate(l_matrix);
+        }
+
+      },
 
       //renders the List UI
       render: function() {
@@ -131,7 +176,7 @@ define([
         }
 
         ui.position = new paper.Point(bottomLeft.x + ui.bounds.width / 2, bottomLeft.y + ui.bounds.height / 2);
-        this.startText.content = 'range: ' + 0 + ' - ' + 10;
+        this.startText.content = 'count: '+ String(this.members.length);
 
         //this.renderSelection(geom);
         if (this.get('selected') || this.get('open')) {

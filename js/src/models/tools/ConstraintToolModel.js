@@ -115,6 +115,7 @@ define([
         constraint.create();
         var constraintMap = this.get('constraints');
         constraintMap[constraint.get('id')] = constraint;
+        this.trigger('constraintSet',{name:'constraint',id:constraint.get("id")});
         this.set('currentConstraint', new Constraint());
         this.set('mode', 'create');
       }

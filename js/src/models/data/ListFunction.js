@@ -17,23 +17,33 @@ define([
         name: 'list_function'
       },
 
-      initialize:function(){
-          this.listenTo(this, "change:selected", this.modifySelection);
-          this.scalar = 1;
-          var p1 = new paper.Point(0,1);
-          var h1 = new paper.Point(this.scalar*0.25,1);
-          var p2 = new paper.Point(this.scalar,1);
-          var h2 = new paper.Point(this.scalar*0.75,1);
-          this.curve = new paper.Curve(p1,h1,p2,h2);
+      initialize: function() {
+        this.listenTo(this, "change:selected", this.modifySelection);
+        this.xscalar = 10;
+        this.yscalar = 10;
+        this.points = [];
+        this.points.push({x:0,y:0});
+        this.points.push({x:1,y:0});
       },
+    
+      getValue: function(index,range){
+        var coef = TrigFunc.Lagrange(this.points);
+        console.log('coefficients=',coef);
+       var expr = String(coef[0]);
+        for(var i=1;i<coef.length;i++){
+          var order= 'Math.pow(x,'+String(i)+')*'+String(coef[i])+'+';
+          console.log('order=',order);
+          expr = order.concat(expr);
+        }
+        var val;
+        console.log("expresion=",expr);
+        var x  = index/range;
+        var result = eval(expr)*range;
+        console.log('x', x);
+        console.log('result',result);
+        return result;
+      }
 
-      getValue: function(index,range) {
-        var ratio = index/range;
-        var point = this.curve.getPointAt(ratio*this.scalar);
-        var val = point.y;
-        console.log('value found', val,val/this.scalar*range);
-        return val/this.scalar*range;
-      },
 
     });
 
