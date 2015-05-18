@@ -97,7 +97,7 @@ define([
 
       var hitResult = paper.project.hitTest(event.point, penHitOptions);
 
-      for (i = 0; i < polyPaths.length; i++) { //iterate through all paths (if there are multiple)
+      for (var i = 0; i < polyPaths.length; i++) { //iterate through all paths (if there are multiple)
 
         if (hitResult) {
           if (hitResult.type == 'segment') {
@@ -105,7 +105,7 @@ define([
             hitResult.segment.fullySelected = true;
             var segmentIndex = polyPaths[i].segments.indexOf(segment);
           
-            if (polyPaths[i].segments.length > 1 && segmentIndex == 0) { //close path
+            if (polyPaths[i].segments.length > 1 && segmentIndex === 0) { //close path
               mode = 'close';
               polyPaths[i].closed = true;
               this.reset();
@@ -154,6 +154,7 @@ define([
       }
 
       polyPath = null;
+      polyPaths = [];
 
 
     },
