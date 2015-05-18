@@ -256,7 +256,7 @@ define([
         }
       }
       var hitResult = paper.project.hitTest(event.point, hitOptions);
-
+      console.log('result',hitResult);
       if (hitResult) {
 
         var path = hitResult.item;

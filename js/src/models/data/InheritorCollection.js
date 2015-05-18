@@ -24,9 +24,7 @@ define([
 				this.instance_parent = instance_parent;
 			},
 
-			/* isConstrained
-			 * returns object with booleans for each inheritor based on constraint status
-			 */
+			
 
 			addInheritor: function(inheritor) {
 				this.inheritors.push(inheritor);

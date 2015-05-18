@@ -74,17 +74,18 @@ define([
 			/*==end JSON export===*/
 
 			//map of constrainable properties
-			constrain_map: ['position',
-				'translation_delta',
-				'scaling_origin',
-				'scaling_delta',
-				'rotation_origin',
-				'rotation_delta',
-				'stroke_color',
-				'fill_color',
-				'stroke_width',
-				'inheritors',
-			],
+			constrain_map: {
+				position: ['x', 'y'],
+				translation_delta: ['x', 'y'],
+				scaling_origin: ['x', 'y'],
+				scaling_delta: ['x', 'y'],
+				rotation_origin: ['val'],
+				rotation_delta: ['x', 'y'],
+				stroke_color: ['r', 'g', 'b', 'a'],
+				fill_color: ['r', 'g', 'b', 'a'],
+				stroke_width: ['val'],
+				inheritors: []
+			},
 
 			center: null,
 			rmatrix: null,
@@ -214,8 +215,8 @@ define([
 			//this.on('change:selected',this.checkChange);
 		},
 
-		checkChange:function(){
-			console.log('selection change',this.get('selected'));
+		checkChange: function() {
+			console.log('selection change', this.get('selected'));
 			console.trace();
 		},
 
@@ -239,6 +240,8 @@ define([
 			}
 			this.trigger('delete', this);
 		},
+
+
 
 		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
 		 * evaluation and access functions to assist in managing lists
@@ -273,16 +276,7 @@ define([
 			return false;
 		},
 
-		/* getIndex 
-		 * dummy return to prevent error in constraint tool
-		 */
-		/*getIndex: function() {
-			return 0;
-		},*/
 
-		/*close
-		 * used mainly for closing functions
-		 */
 		close: function() {
 			return this.getParentNode();
 		},
@@ -313,7 +307,7 @@ define([
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
-			
+
 			var g_clone = this.get('geom').clone();
 			g_clone.transform(this.get('ti_matrix'));
 			g_clone.transform(this.get('ri_matrix'));
@@ -378,25 +372,25 @@ define([
 
 		// sets the geom visibility to false
 		hide: function() {
-			this.set('visible',false);
-			this.set('selected',false);
+			this.set('visible', false);
+			this.set('selected', false);
 		},
 
 		show: function() {
-			this.set('visible',true);
-		
+			this.set('visible', true);
+
 		},
 
 		hideChildren: function() {
 			this.hide();
-			
+
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].hideChildren();
 			}
 		},
 
 		showChildren: function() {
-			this.set('visible',true);
+			this.set('visible', true);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].showChildren();
 			}
@@ -510,9 +504,9 @@ define([
 
 		toJSON: function() {
 
-			
+
 			//loop through defaults to export and call toJSON
-		
+
 
 			var data = {};
 			var target = this;
@@ -520,8 +514,7 @@ define([
 				if (_.contains(constraints, property)) {
 					data[property] = target.get(property).toJSON();
 
-				}
-				else {
+				} else {
 
 					data[property] = target.get(property);
 				}
@@ -662,15 +655,35 @@ define([
 		},
 
 		/* getConstraint
-		 * returns true if constraint exists
-		 * false if not
-		 */
-		getConstraint: function() {
+		 * returns a reference to the constraint if it exists
+		 * false if no constraint exists on the property or any of its sub properties
+		 * an object containing all sub properties which are constrained otherwise
+		*/
+		getConstraints: function() {
 			var constrainMap = this.get('constrain_map');
 			var data = {};
 			data.self = this.getSelfConstraint();
-			for (var i = 0; i < constrainMap.length; i++) {
-				data[constrainMap[i]] = this.get(constrainMap[i]).getConstraint();
+			for (var prop in constrainMap) {
+				if (constrainMap.hasOwnProperty(prop)) {
+					var propertyConstrained = this.get(prop).getConstraint();
+					if (!propertyConstrained) {
+						var tempProps = [];
+						for (var i = 0; i < constrainMap[prop].length; i++) {
+							var subPropConstrained = this.get(prop)[constrainMap[prop]].getConstraint();
+							if (subPropConstrained) {
+								var p = {};
+								p[constrainMap[prop]] = subPropConstrained;
+								tempProps.push(p);
+							}
+							if (tempProps.length > 0) {
+								data[prop] = tempProps;
+							} else {
+								data.prop = false;
+							}
+						}
+					}
+					data.prop = propertyConstrained;
+				}
 			}
 			return data;
 		},

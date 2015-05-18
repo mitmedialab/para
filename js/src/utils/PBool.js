@@ -22,12 +22,13 @@ define([
 			 * operation performed when property is modified
 			 */
 			constructor: function(val, operator) {
+				PFloat.apply(this, arguments);
 				if (val === true) {
 					this.val = new PProperty(1);
 				} else if (val === false) {
 					this.val = new PProperty(0);
 				}
-				PFloat.apply(this, arguments);
+				
 				if (operator) {
 					this.set('operator', operator);
 				}

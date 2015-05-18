@@ -8,9 +8,8 @@ define([
   'paper',
   'models/data/Instance',
   'utils/PFloat',
-  'utils/PConstraint',
 
-], function($, _, paper, Instance, PFloat, PConstraint) {
+], function($, _, paper, Instance, PFloat) {
 
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -75,15 +74,6 @@ define([
       };
       this.modifyProperty(md);
 
-    },
-
-    toJSON: function(){
-      var data = Instance.prototype.toJSON.call(this,arguments);
-      data.members = [];
-      for(var i=0;i<this.members.length;i++){
-        data.members.push(this.members[i].get('id'));
-      }
-      return data;
     },
 
     // sets the geom visibility to false
@@ -310,61 +300,7 @@ define([
 
 
 
-    compile: function() {
-      for (var i = 0; i < this.members.length; i++) {
-        var i_matricies = this.compileTransforms();
-        if (this.members[i].get('type') === 'list') {
-          this.members[i].reset();
-        }
-        //this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
-        //this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
-        //this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
-      }
-    },
-
-/*
-    checkConstraintConflicts: function(index, property){
-        var delta = this.inheritProperty(property);
-        var member = this.members[index];
-        var member_delta = member.inheritProperty(property);
-        var member_constrained = member_delta.isSelfConstrained();
-        var constrained = delta.isSelfConstrained();
-        var member_constraint_map = 
-        var property_constraint_map
-    }*/
-
-    compileMemberAt: function(index, propname, l_matrix) {
-      var delta = this.inheritProperty(propname);
-      if (delta) {
-        var member = this.members[index];
-        var member_property = member.inheritProperty(propname);
-        var matrixMap = this.get('matrix_map');
-        var matrix_props = matrixMap[propname].properties;
-        var member_matrix = member.get(matrixMap[propname].name);
-        var delta_constrained = delta.isSelfConstrained();
-        var member_property_constrained = member_property.isSelfConstrained();
-        for (var p in matrix_props) {
-          if (delta.hasOwnProperty(p)) {
-            var delta_subproperty_constrained = false;
-            var member_subproperty_constrained = false;
-            if (delta[p] instanceof PConstraint) {
-              delta_subproperty_constrained = delta[p].isSelfConstrained();
-              member_subproperty_constrained = member_property[p].isSelfConstrained();
-            }
-            for (var i = 0; i < matrix_props[p].length; i++) {
-              if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
-
-                member_matrix[matrix_props[p][i]] = 0;
-              }
-              if (member_subproperty_constrained || member_property_constrained) {
-                l_matrix[matrix_props[p][i]] = 0;
-              }
-            }
-          }
-        }
-        member_matrix.concatenate(l_matrix);
-      }
-    },
+   
 
     compileTransforms: function() {
       var rmatrix = this.get('rmatrix').clone();
