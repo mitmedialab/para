@@ -317,7 +317,7 @@ define([
         }
         this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
         this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
-        this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
+        //this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
           this.members[i].compile();
         }
@@ -328,6 +328,7 @@ define([
 
     compileMemberAt: function(index, propname, l_matrix) {
       var delta = this.inheritProperty(propname);
+      console.log('list inherited delta: ', delta);
       if (delta) {
         var member = this.members[index];
         member.bringToFront();

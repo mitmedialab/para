@@ -380,10 +380,12 @@ define([
 		hide: function() {
 			this.set('visible',false);
 			this.set('selected',false);
+                        this.get('geom').visible = false; // hacky
 		},
 
 		show: function() {
 			this.set('visible',true);
+                        this.get('geom').visible = true;
 		
 		},
 

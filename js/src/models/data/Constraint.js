@@ -2,17 +2,22 @@ define([
   'underscore',
   'paper',
   'backbone',
+  'models/data/ListNode',
   'models/data/paperUI/Arrow',
   'models/data/paperUI/ConstraintWheel',
   'models/data/paperUI/ConstraintHandles',
   'models/data/paperUI/PositionDelimiter',
   'models/data/paperUI/ScaleDelimiter',
   'models/data/paperUI/RotationDelimiter',
-], function(_, paper, Backbone, Arrow, ConstraintWheel, ConstraintHandles, PositionDelimiter, ScaleDelimiter, RotationDelimiter) {
+], function(_, paper, Backbone, ListNode, Arrow, ConstraintWheel, ConstraintHandles, PositionDelimiter, ScaleDelimiter, RotationDelimiter) {
 
   var propConvMap = {'position:scale': 0.01, 'position:position': 1, 'position:rotation': 1, 'scale:position': 100, 'scale:scale': 1, 'scale:rotation': 100, 'rotation:position': 1, 'rotation:scale': 0.01, 'rotation:rotation': 1};
   var constraintPropMap = {'position': 'translation_delta', 'scale': 'scaling_delta', 'rotation': 'rotation_delta'}; 
-  
+
+  var createProxy = function( instance ) {
+    
+  }
+
   var Constraint = Backbone.Model.extend({
 
     defaults: {
@@ -70,24 +75,40 @@ define([
         var references = this.get('references');
         var rel_geom = relatives.get('geom');
         var ref_geom = references.get('geom');
-        var proxy =  rel_geom.clone();
+        var proxy;
+        if ( relatives instanceof ListNode ) {
+          proxy = new paper.Group( relatives.getInstanceMembers().map( function( instance ) { return instance.get('geom').clone(); } ) );
+        } else {
+          proxy = rel_geom.clone();
+        } 
         proxy.name = 'proxy';
         proxy.bringToFront();
         proxy.visible = false;
         proxy.show = function() { 
-          relatives.set('visible', false);
-          relatives.get('geom').visible = false; // REALLY HACKY  
+          //relatives.set('visible', false);
+          //relatives.get('geom').visible = false; // REALLY HACKY  
+          relatives.hide();
           proxy.visible = true; 
         }
         proxy.hide = function() { 
-          relatives.set('visible', true);
-          relatives.get('geom').visible = true; // REALLY HACKY
+          //relatives.set('visible', true);
+          //relatives.get('geom').visible = true; // REALLY HACKY
+          relatives.show();
           proxy.visible = false; 
         }
         proxy.reset = function() {
-          this.scaling = 1; 
-          this.rotation = rel_geom.rotation;
-          this.position = rel_geom.position;
+          if ( this instanceof paper.Group ) {
+            var check_rels = relatives.getInstanceMembers();
+            for ( var i = 0; i < this.children.length; i++ ) { 
+              this.children[i].scaling = 1;
+              this.children[i].rotation = check_rels[i].get('geom').rotation;
+              this.children[i].position = check_rels[i].get('geom').position;
+            }
+          } else {
+            this.scaling = 1; 
+            this.rotation = rel_geom.rotation;
+            this.position = rel_geom.position;
+          }
           paper.view.draw();
         }
         proxy.matchProperty = function( ref_prop, rel_prop ) {
@@ -238,7 +259,7 @@ define([
           return y;
         }
       }
-      if ( rel_doub ) {
+      if ( rel_doub || !rel_prop[1] ) {
         relPropAccess.setConstraint( constraintF );
       } else {
         relPropAccess[rel_prop[1]].setConstraint( constraintF );
@@ -247,6 +268,7 @@ define([
     },
 
     clearUI: function() {
+      this.get('proxy').hide();
       this.get('proxy').remove();
       this.get('arrow').remove();
       this.get('ref_handle').remove();

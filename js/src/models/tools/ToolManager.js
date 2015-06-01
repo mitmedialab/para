@@ -64,7 +64,7 @@ define([
         'constraint': constraintTool
       };
 
- // setup helpers and factories
+      // setup helpers and factories
       PaperUIHelper.setup(this);
 
         //setup default zeros for zoom and pan
@@ -76,8 +76,12 @@ define([
       console.log('set state', this.get('state'));
       console.log('current tool', this.get('tool_collection').get(state));
 
+      // TODO: possibly rename to 'close'
       this.get('tool_collection').get(this.get('state')).reset();
       //this.get('tool_collection').get(state).reset();
+      
+      //this.get('tool_collection').get(state).start();
+      
       this.set('state', state);
       if (mode) {
         var currentTool = this.get('tool_collection').get(this.get('state'));

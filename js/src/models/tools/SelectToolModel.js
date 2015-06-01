@@ -257,7 +257,8 @@ define([
       }
       var hitResult = paper.project.hitTest(event.point, hitOptions);
 
-      if (hitResult) {
+      // make sure that a true instance is selected
+      if (hitResult && hitResult.item.data.instance) {
 
         var path = hitResult.item;
 
