@@ -361,6 +361,7 @@ define([
 			tmatrix.reset();
 		},
 
+		
 		//triggered on change of select property, removes bbox
 		selectionChange: function() {
 			if (!this.get('selected')) {
@@ -645,12 +646,14 @@ define([
 		 * returns object with booleans for each property based on constraint status
 		 */
 		isConstrained: function() {
-			var constrainMap = this.get('constrainMap');
+			var constrainMap = this.get('constrain_map');
 			var data = {};
-			data.self = this.isSelfConstrained();
-			for (var i = 0; i < constrainMap.length; i++) {
-				data[constrainMap[i]] = this.get(constrainMap[i]).isConstrained();
-			}
+			for( var propertyName in constrainMap){
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					var constraints = this.get(propertyName).isConstrained();
+					data[propertyName] = constraints;
+				}
+			}	
 			return data;
 		},
 
@@ -659,32 +662,35 @@ define([
 		 * false if no constraint exists on the property or any of its sub properties
 		 * an object containing all sub properties which are constrained otherwise
 		*/
+
+		/*map of constrainable properties
+			constrain_map: {
+				position: ['x', 'y'],
+				translation_delta: ['x', 'y'],
+				scaling_origin: ['x', 'y'],
+				scaling_delta: ['x', 'y'],
+				rotation_origin: ['val'],
+				rotation_delta: ['x', 'y'],
+				stroke_color: ['r', 'g', 'b', 'a'],
+				fill_color: ['r', 'g', 'b', 'a'],
+				stroke_width: ['val'],
+				inheritors: []
+			},*/
+
+		modifyMatrix: function(matrix_name){
+			var constraints = this.getConstraints();
+			console.log('instance_constraints',this.getConstraints());
+		},
+
 		getConstraints: function() {
 			var constrainMap = this.get('constrain_map');
 			var data = {};
-			data.self = this.getSelfConstraint();
-			for (var prop in constrainMap) {
-				if (constrainMap.hasOwnProperty(prop)) {
-					var propertyConstrained = this.get(prop).getConstraint();
-					if (!propertyConstrained) {
-						var tempProps = [];
-						for (var i = 0; i < constrainMap[prop].length; i++) {
-							var subPropConstrained = this.get(prop)[constrainMap[prop]].getConstraint();
-							if (subPropConstrained) {
-								var p = {};
-								p[constrainMap[prop]] = subPropConstrained;
-								tempProps.push(p);
-							}
-							if (tempProps.length > 0) {
-								data[prop] = tempProps;
-							} else {
-								data.prop = false;
-							}
-						}
-					}
-					data.prop = propertyConstrained;
+			for( var propertyName in constrainMap){
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					var constraints = this.get(propertyName).getConstraints();
+					data[propertyName] = constraints;
 				}
-			}
+			}	
 			return data;
 		},
 

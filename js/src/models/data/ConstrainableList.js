@@ -103,14 +103,14 @@ define([
       },
 
       compile: function() {
+        var constraints = this.getConstraints();
+        console.log('list constraints', constraints);
         for (var i = 0; i < this.members.length; i++) {
           var i_matricies = this.compileTransforms();
           /*if (this.members[i].get('type') === 'list') {
             this.members[i].reset();
           }*/
-          this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
-          this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
-          this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
+          this.compileMemberAt(i, i_matricies, constraints);
           this.increment();
         }
       },
@@ -121,8 +121,12 @@ define([
       },
 
 
-      compileMemberAt: function(index, propname, l_matrix) {
-        var delta = this.inheritProperty(propname);
+      compileMemberAt: function(index, list_constraints) {
+        console.log('list_constraints');
+        var member = this.members[index];
+        member.modifyMatrix('translation_delta');
+      },
+      /*  var delta = this.inheritProperty(propname);
 
         if (delta) {
           var member = this.members[index];
@@ -154,7 +158,7 @@ define([
           member_matrix.concatenate(l_matrix);
         }
 
-      },
+      },*/
 
       //renders the List UI
       render: function() {
