@@ -20,6 +20,13 @@ define([
   var drag = false;
   var segment, mode, type = null;
   var types = ['point', 'handleIn', 'handleOut'];
+  var penHitOptions = {
+    segments: true,
+    curves: true,
+    handles: true, //necessary?
+    tolerance: 5,
+  };
+  var polyPaths = [];
 
 
   var PolyToolModel = BaseToolModel.extend({
@@ -76,33 +83,55 @@ define([
     },
 
     penMouseDown: function(event) {
+
       if (segment) {
         segment.selected = false;
       }
       mode = type = segment = null;
 
+      //initialize new pen path
       if (!polyPath) {
         polyPath = new paper.Path();
+        polyPaths.push(polyPath);
       }
 
-      var result = this.findHandle(event.point);
-      if (result) {
-        segment = result.segment;
-        type = result.type;
-        if (polyPath.segments.length > 1 && result.type === 'point' && result.segment.index === 0) {
-          mode = 'close';
-          polyPath.closed = true;
-          this.reset();
-        }
-      }
+      var hitResult = paper.project.hitTest(event.point, penHitOptions);
 
-      if (mode != 'close') {
-        mode = segment ? 'move' : 'add';
-        if (!segment) {
-          segment = polyPath.add(event.point);
+      for (var i = 0; i < polyPaths.length; i++) { //iterate through all paths (if there are multiple)
+
+        if (hitResult) {
+          if (hitResult.type == 'segment') {
+            segment = hitResult.segment;
+            hitResult.segment.fullySelected = true;
+            var segmentIndex = polyPaths[i].segments.indexOf(segment);
+          
+            if (polyPaths[i].segments.length > 1 && segmentIndex === 0) { //close path
+              mode = 'close';
+              polyPaths[i].closed = true;
+              this.reset();
+            }
+            else if (segmentIndex > 0) { //remove point
+              polyPaths[i].segments.splice(segmentIndex, 1);
+            }
+
+          }
+          else if (hitResult.type == 'curve') {
+            var curve = hitResult.location.curve;
+            var curveOffset = hitResult.location.curveOffset;
+            segment = curve.divide(curveOffset).segment1;
+            segment.selected = true;
+          }
         }
-        segment.selected = true;
+
+        if (mode != 'close') {
+          mode = segment ? 'move' : 'add';
+          if (!hitResult) {
+            segment = polyPaths[i].add(event.point);
+            segment.selected = true;
+          }
+        }
       }
+      
 
     },
 
@@ -125,6 +154,7 @@ define([
       }
 
       polyPath = null;
+      polyPaths = [];
 
 
     },
