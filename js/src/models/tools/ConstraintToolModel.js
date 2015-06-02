@@ -95,6 +95,15 @@ define([
       this.set('currentConstraint', new Constraint());
     },
 
+    start: function() {
+      // visitor: get selected constraint
+      // if selected
+      //  set constraint (thus arrow) active 
+      //  set currentConstraint to selected constraint
+      //  set mode to ref
+      // else
+      //  set mode to create
+    },
 
     mouseDown: function(event) {
       switch ( this.get('mode') ) {
@@ -127,8 +136,15 @@ define([
         case 'create':
           break;
         case 'ref':
+          // for all arrows on rel
+          //  set arrow/constraint visible off
+
+          // for selected constraints
+          //  deselect, set visible on ( arrow visible on )
+
           var arrow = constraint.get('arrow');
           arrow.show();
+          // set arrow to active
 
           var refHandle = constraint.get('ref_handle');
           var relHandle = constraint.get('rel_handle');
@@ -148,7 +164,17 @@ define([
     },
 
 
+    // TODO: possibly switch creation into two modes, 'createRef' and 'createRel'
     createMouseDown: function(event) {
+      // hit test
+      // if hit test type arrow
+      //  set arrow active
+      //  get all constraints for ref-rel pair
+      //  populate constraint selector with prev result
+      //  show constraint selector
+      //  switch mode to selection
+      //  return
+
       this.sm.delegateMethod('select', 'selectDown', event);
       var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
       var type = (event.modifiers.control) ? 'point' : 'shape';
@@ -156,17 +182,35 @@ define([
       if ( flag ) { 
         this.set('mode', 'ref'); 
         this.modeSwitch();
+      } else {
+          // visitor get constraints on instance
+          // unique constraints by ref
+          // set arrow/constraint to visible, non-active for each ref
       }
+    },
+
+    selectMouseDown: function(event) {
+      // hopefully could be here but to get working should be in select view
+      // check which constraint was hit
+      // set this constraint to selected
+      // set current constraint to selected constraint
+      // remove visibility of all other constraints ( maybe save for later )
+      // set mode to ref 
     },
 
     refMouseDown: function(event) {
       var constraint = this.get('currentConstraint');
       var relative = constraint.get('relatives');
-      var hitResult = paper.project.hitTest( event.point, mouseHitOptions );
-      if ( hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id ==  relative.id ) {
+      this.sm.delegateMethod('select', 'selectDown', event);
+      var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
+      selection = ( selection ? selection[0] : null ); // TODO: really shouldn't have to happen...
+      this.sm.delegateMethod('select', 'resetSelections');
+      this.sm.trigger('compileRequest');
+      if ( selection && selection.get('id') == relative.get('id') ) {
         this.set('mode', 'rel');
-        this.modeSwitch();  
+        this.modeSwitch();
       }
+
     },
 
     relMouseDown: function(event) {
@@ -198,37 +242,91 @@ define([
         var proxy = constraint.get('proxy');
         var arrow = constraint.get('arrow');
         var rel_geom = constraint.get('relatives').get('geom');
+        if ( proxy instanceof paper.Group ) {
+          rel_geom = constraint.get('relatives').getInstanceMembers().map( function( instance ) { return instance.get('geom') });
+        }
         switch ( this.draggingHandle ) {
           case 'scale_x':
-            var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
-            proxy.scaling = new paper.Point(x_scale, proxy.scaling.y); 
+            if ( !(proxy instanceof paper.Group) ) {
+              var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
+              proxy.scaling = new paper.Point(x_scale, proxy.scaling.y); 
+            } else {
+              var x_scale = 2 * Math.abs(event.point.x - proxy.children[0].position.x) / rel_geom[0].bounds.width;
+              for ( var i = 0; i < proxy.children.length; i++ ) {
+                var proxy_child = proxy.children[i];
+                var rel_child = rel_geom[i];
+                proxy_child.scaling = new paper.Point(x_scale, proxy_child.scaling.y);
+              }
+            }
             break;
           case 'scale_y':
-            var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
-            proxy.scaling = new paper.Point(proxy.scaling.x, y_scale); 
+            if ( !(proxy instanceof paper.Group) ) {
+              var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
+              proxy.scaling = new paper.Point(proxy.scaling.x, y_scale); 
+            } else {
+              var y_scale = 2 * Math.abs(event.point.y - proxy.children[0].position.y) / rel_geom[0].bounds.height;
+              for ( var i = 0; i < proxy.children.length; i++ ) {
+                var proxy_child = proxy.children[i];
+                var rel_child = rel_geom[i];
+                proxy_child.scaling = new paper.Point(proxy_child.scaling.x, y_scale);
+              }
+            }
             break;
           case 'scale_xy':
-            var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
-            var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
-            proxy.scaling = new paper.Point(x_scale, y_scale);
+            if ( !(proxy instanceof paper.Group) ) {
+              var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
+              var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
+              proxy.scaling = new paper.Point(x_scale, y_scale);
+            } else {
+              var x_scale = 2 * Math.abs(event.point.x - proxy.children[0].position.x) / rel_geom[0].bounds.width;
+              var y_scale = 2 * Math.abs(event.point.y - proxy.children[0].position.y) / rel_geom[0].bounds.height;
+              for ( var i = 0; i < proxy.children.length; i++ ) {
+                var proxy_child = proxy.children[i];
+                var rel_child = rel_geom[i];
+                proxy_child.scaling = new paper.Point(x_scale, y_scale);
+              }
+            }
             break;
           case 'position_x':
-            proxy.position.x = event.point.x;
+            if ( !(proxy instanceof paper.Group) ) {
+              proxy.position.x = event.point.x;
+            } else {
+              var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
+              proxy.position.x = event.point.x - child_pos_delta.x;
+            }
             arrow.redrawTail(proxy);
             break;
           case 'position_y':
-            proxy.position.y = event.point.y;
+            if ( !(proxy instanceof paper.Group) ) {
+              proxy.position.y = event.point.y;
+            } else {
+              var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
+              proxy.position.y = event.point.y - child_pos_delta.y;
+            }
             arrow.redrawTail(proxy);
             break;
           case 'position_xy':
-            proxy.position.x = event.point.x;
-            proxy.position.y = event.point.y;
+            if ( !(proxy instanceof paper.Group) ) {
+              proxy.position.x = event.point.x;
+              proxy.position.y = event.point.y;
+            } else {
+              var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
+              proxy.position.x = event.point.x - child_pos_delta.x;
+              proxy.position.y = event.point.y - child_pos_delta.y;
+            }
             arrow.redrawTail(proxy);
             break;
           case 'rotation':
-            var angle = event.lastPoint.subtract( proxy.position ).angle;
-            var dAngle = event.point.subtract( proxy.position ).angle; 
-            proxy.rotation = (proxy.rotation + (dAngle - angle));
+            var work_geom = (proxy instanceof paper.Group) ? proxy.children[0] : proxy;
+            var angle = event.lastPoint.subtract( work_geom.position ).angle;
+            var dAngle = event.point.subtract( work_geom.position ).angle; 
+            if (!(proxy instanceof paper.Group)) {
+              proxy.rotation = (proxy.rotation + (dAngle - angle));
+            } else {
+              for ( var i = 0; i < proxy.children.length; i++ ) {
+                proxy.children[i].rotation = proxy.children[i].rotation + (dAngle - angle);
+              }    
+            }
             break;
         }
 
@@ -264,7 +362,6 @@ define([
         var proxy = constraint.get('proxy');
         proxy.matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );
         this.draggingHandle = false;
-        console.log('rel mouse up logged');
       }
     },
 

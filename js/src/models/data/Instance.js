@@ -361,7 +361,7 @@ define([
 			tmatrix.reset();
 		},
 
-		
+
 		//triggered on change of select property, removes bbox
 		selectionChange: function() {
 			if (!this.get('selected')) {
@@ -375,10 +375,13 @@ define([
 		hide: function() {
 			this.set('visible', false);
 			this.set('selected', false);
+			this.get('geom').visible = false; // hacky
 		},
 
 		show: function() {
 			this.set('visible', true);
+			this.get('geom').visible = true;
+
 
 		},
 
@@ -648,12 +651,12 @@ define([
 		isConstrained: function() {
 			var constrainMap = this.get('constrain_map');
 			var data = {};
-			for( var propertyName in constrainMap){
+			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
 					var constraints = this.get(propertyName).isConstrained();
 					data[propertyName] = constraints;
 				}
-			}	
+			}
 			return data;
 		},
 
@@ -661,7 +664,7 @@ define([
 		 * returns a reference to the constraint if it exists
 		 * false if no constraint exists on the property or any of its sub properties
 		 * an object containing all sub properties which are constrained otherwise
-		*/
+		 */
 
 		/*map of constrainable properties
 			constrain_map: {
@@ -677,20 +680,20 @@ define([
 				inheritors: []
 			},*/
 
-		modifyMatrix: function(matrix_name){
+		modifyMatrix: function(matrix_name) {
 			var constraints = this.getConstraints();
-			console.log('instance_constraints',this.getConstraints());
+			console.log('instance_constraints', this.getConstraints());
 		},
 
 		getConstraints: function() {
 			var constrainMap = this.get('constrain_map');
 			var data = {};
-			for( var propertyName in constrainMap){
+			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
 					var constraints = this.get(propertyName).getConstraints();
 					data[propertyName] = constraints;
 				}
-			}	
+			}
 			return data;
 		},
 

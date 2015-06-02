@@ -96,12 +96,12 @@ define([
        selected_shapes[i].set('selected', false);
         selected_shapes[i].setSelectionForInheritors(false);
       }
-      selected_shapes.length=0;
+      selected_shapes.length = 0;
     },
 
     addSelectedShape: function(data) {
       if (data instanceof Array) {
-        for(var i=0;i<data.length;i++){
+        for (var i = 0; i < data.length; i++) {
           this.addSingleShape(data[i]);
         }
       } else {
@@ -121,18 +121,18 @@ define([
 
     removeSelectedShape: function(data) {
       if (data instanceof Array) {
-        console.log('num of shapes to remove',data.length,data);
+        console.log('num of shapes to remove', data.length, data);
         for (var i = 0; i < data.length; i++) {
-          console.log('attempting to remove shape at',i);
-           var shape = data[i];
-            shape.set('selected', false);
-            shape.setSelectionForInheritors(false);
-        }      
+          console.log('attempting to remove shape at', i);
+          var shape = data[i];
+          shape.set('selected', false);
+          shape.setSelectionForInheritors(false);
+        }
         var selected_shapes = this.get('selected_shapes');
-        var newShapes = selected_shapes.filter(function(item){
-          return !_.contains(data,item);
+        var newShapes = selected_shapes.filter(function(item) {
+          return !_.contains(data, item);
         });
-        this.set('selected_shapes',newShapes);
+        this.set('selected_shapes', newShapes);
       } else {
         this.removeSingleShape(data);
       }
@@ -142,9 +142,9 @@ define([
       shape.set('selected', false);
       shape.setSelectionForInheritors(false);
       var selected_shapes = this.get('selected_shapes');
-      if(_.contains(selected_shapes,shape)){
-        var index = _.indexOf(selected_shapes,shape);
-        console.log('removing shape',shape,index);
+      if (_.contains(selected_shapes, shape)) {
+        var index = _.indexOf(selected_shapes, shape);
+        console.log('removing shape', shape, index);
         selected_shapes.splice(index, 1);
       }
     },
@@ -256,8 +256,9 @@ define([
         }
       }
       var hitResult = paper.project.hitTest(event.point, hitOptions);
-      console.log('result',hitResult);
-      if (hitResult) {
+
+      // make sure that a true instance is selected
+      if (hitResult && hitResult.item.data.instance) {
 
         var path = hitResult.item;
 

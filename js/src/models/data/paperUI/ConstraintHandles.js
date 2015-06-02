@@ -12,81 +12,131 @@ define([
     },
 
     draw: function() {
+      var createDelimBox = function( bounds ) {
+        // green bounding box
+        var delbox = new paper.Path.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
+        delbox.strokeColor = '#A5FF00';
+        delbox.fillColor = null;
+        delbox.name = 'delbox';
+        return delbox;
+      }
+
+      var createCorners = function( bounds ) {
+        // corners on box, superficial
+        var corners = [];
+        for ( var i = 0; i < 9; i++ ) {
+          var corner = new paper.Path.Circle( bounds.x + (i % 3) / 2.0 * bounds.width, bounds.y + Math.floor(i / 3) / 2.0 * bounds.height, 3, 3 );
+          corner.strokeColor = '#A5FF00';
+          corner.fillColor = 'white';
+          corners.push(corner);
+          corner.name = 'corner';
+        }
+        return corners;
+      }
+
+      var createCross = function( bounds ) {
+        // center cross 
+        var cross_v = new paper.Path.Line({from: [bounds.center.x, bounds.center.y - 15], to: [bounds.center.x, bounds.center.y + 15]});
+        var cross_h = new paper.Path.Line({from: [bounds.center.x - 15, bounds.center.y], to: [bounds.center.x + 15, bounds.center.y]});
+        cross_v.name = 'position_x';
+        cross_h.name = 'position_y';
+        cross_v.strokeColor = cross_h.strokeColor = 'black';
+        cross_v.strokeWidth = cross_h.strokeWidth = 2;
+        cross = [cross_v, cross_h];
+        return cross;
+      }
+
+      var createScaleArrows = function( corners ) {
+        // svg arrows
+        var yarrow = paper.project.importSVG(document.getElementById('yarrow')).children[0];
+        var xarrow = yarrow.clone();
+        xarrow.rotate(90);
+        var xyarrow = yarrow.clone();
+        xyarrow.rotate(-45);
+        yarrow.position = corners[1].bounds.center;
+        xarrow.position = corners[3].bounds.center;
+        xyarrow.position = corners[0].bounds.center;
+        var rotator = paper.project.importSVG(document.getElementById('rotator')).children[0];
+        rotator.position = new paper.Point( corners[8].bounds.x + 10, corners[8].bounds.y + 10 );
+        yarrow.name = 'scale_y';
+        xarrow.name = 'scale_x';
+        xyarrow.name = 'scale_xy';
+        rotator.name = 'rotation';
+        arrows = [yarrow, xarrow, xyarrow, rotator];
+        return arrows;
+      }
+
       var geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('proxy');
 
       if ( !geom ) { 
         console.log('[ERROR] Cannot draw constraint handles without instance.');
         return;
       }
+  
+      var gen_bounds = geom.bounds;
+      var gen_delbox = createDelimBox(gen_bounds);
+      var gen_corners = createCorners(gen_bounds);
+
+      if ( geom instanceof paper.Group ) {
+        hand_geom = geom.children[0];
+        hand_bounds = hand_geom.bounds;
+        hand_delbox = createDelimBox(hand_bounds);
+        hand_delbox.name = 'hand_delbox';
+        hand_corners = createCorners(hand_bounds);
+        for ( var i = 0; i < hand_corners.length; i++ ) { hand_corners[i].name = 'hand_corner'; }
+      } else {
+        hand_bounds = gen_bounds;
+        hand_delbox = gen_delbox;
+        hand_corners = gen_corners;
+      }
+
+      var cross = createCross(hand_bounds);
+      var arrows = createScaleArrows(hand_corners);
+
 
       // TODO: Handles for stroke/fill/weight
 
-      // green bounding box
-      var bounds = geom.bounds;
-      var delbox = new paper.Path.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
-      delbox.strokeColor = '#A5FF00';
-      delbox.fillColor = null;
-      delbox.name = 'delbox';
-
-      // corners on box, superficial
-      var corners = [];
-      for ( var i = 0; i < 9; i++ ) {
-        var corner = new paper.Path.Circle( bounds.x + (i % 3) / 2.0 * bounds.width, bounds.y + Math.floor(i / 3) / 2.0 * bounds.height, 3, 3 );
-        corner.strokeColor = '#A5FF00';
-        corner.fillColor = 'white';
-        corners.push(corner);
-        corner.name = 'corner';
+      var handles;
+      if ( geom instanceof paper.Group ) {
+        handles = new paper.Group([
+          gen_delbox,
+          gen_corners[0], gen_corners[1], gen_corners[2], gen_corners[3], gen_corners[4], gen_corners[5], gen_corners[6], gen_corners[7], gen_corners[8],
+          hand_delbox,
+          hand_corners[0], hand_corners[1], hand_corners[2], hand_corners[3], hand_corners[4], hand_corners[5], hand_corners[6], hand_corners[7], hand_corners[8],
+          cross[0],
+          cross[1],
+          arrows[0],
+          arrows[1],
+          arrows[2],
+          arrows[3]
+        ]);
+      } else {
+        handles = new paper.Group([
+          gen_delbox,
+          gen_corners[0], gen_corners[1], gen_corners[2], gen_corners[3], gen_corners[4], gen_corners[5], gen_corners[6], gen_corners[7], gen_corners[8],
+          cross[0],
+          cross[1],
+          arrows[0],
+          arrows[1],
+          arrows[2],
+          arrows[3]
+        ]);
       }
-
-      // center cross 
-      var cross_v = new paper.Path.Line({from: [bounds.center.x, bounds.center.y - 15], to: [bounds.center.x, bounds.center.y + 15]});
-      var cross_h = new paper.Path.Line({from: [bounds.center.x - 15, bounds.center.y], to: [bounds.center.x + 15, bounds.center.y]});
-      cross_v.name = 'position_x';
-      cross_h.name = 'position_y';
-      cross_v.strokeColor = cross_h.strokeColor = 'black';
-      cross_v.strokeWidth = cross_h.strokeWidth = 2;
-
-      // svg arrows
-      var yarrow = paper.project.importSVG(document.getElementById('yarrow')).children[0];
-      var xarrow = yarrow.clone();
-      xarrow.rotate(90);
-      var xyarrow = yarrow.clone();
-      xyarrow.rotate(-45);
-      yarrow.position = corners[1].bounds.center;
-      xarrow.position = corners[3].bounds.center;
-      xyarrow.position = corners[0].bounds.center;
-      var rotator = paper.project.importSVG(document.getElementById('rotator')).children[0];
-      rotator.position = new paper.Point( corners[8].bounds.x + 10, corners[8].bounds.y + 10 );
-      yarrow.name = 'scale_y';
-      xarrow.name = 'scale_x';
-      xyarrow.name = 'scale_xy';
-      rotator.name = 'rotation';
-
-      var handles = new paper.Group([
-        delbox,
-        corners[0], corners[1], corners[2], corners[3], corners[4], corners[5], corners[6], corners[7], corners[8],
-        cross_v,
-        cross_h,
-        yarrow,
-        xarrow,
-        xyarrow,
-        rotator
-      ]);
 
       for ( var i = 0; i < handles.children.length; i++ ) {
         handles.children[i].originalStroke = handles.children[i].strokeColor;
         handles.children[i].originalFill = handles.children[i].fillColor;
         handles.children[i].active = false;
-        if ( handles.children[i].name != 'delbox' && handles.children[i].name != 'corner' ) { handles.children[i].type = 'handle'; }
+        if ( handles.children[i].name != 'delbox' && handles.children[i].name != 'corner' && handles.children[i].name != 'hand_delbox' && handles.children[i].name != 'hand_corner' ) { handles.children[i].type = 'handle'; }
       }
 
       this.set('geometry', handles);
       
       if ( !this.initial ) {
-        cross_h.strokeColor = 'red';
-        cross_v.strokeColor = 'red';
-        cross_h.active = true;
-        cross_v.active = true;
+        cross[1].strokeColor = 'red';
+        cross[0].strokeColor = 'red';
+        cross[1].active = true;
+        cross[0].active = true;
         this.addListeners();
         this.initial = true;
       }
@@ -115,20 +165,33 @@ define([
       for ( var i = 0; i < 9; i++ ) {
         corners[i].position = new paper.Point(delbox.bounds.x + (i % 3) / 2.0 * delbox.bounds.width, delbox.bounds.y + Math.floor(i / 3) / 2.0 * delbox.bounds.height, 3, 3 );
       }
+      
+      var hand_object_geom = object_geom;
+      var hand_delbox = delbox;
+      var hand_corners = corners;
+      if ( object_geom instanceof paper.Group ) {
+        hand_object_geom = object_geom.children[0];
+        hand_delbox = geometry.children['hand_delbox'];
+        hand_delbox.bounds = hand_object_geom.bounds;
+        hand_corners = geometry.getItems({name: 'hand_corner'});
+        for ( var i = 0; i < 9; i++ ) {
+          hand_corners[i].position = new paper.Point(hand_delbox.bounds.x + (i % 3) / 2.0 * hand_delbox.bounds.width, hand_delbox.bounds.y + Math.floor(i / 3) / 2.0 * hand_delbox.bounds.height, 3, 3);
+        }
+      }
 
       var yarrow = geometry.children['scale_y'];
       var xarrow = geometry.children['scale_x'];
       var xyarrow = geometry.children['scale_xy'];
       var rotator = geometry.children['rotation'];
-      yarrow.position = corners[1].position;
-      xarrow.position = corners[3].position;
-      xyarrow.position = corners[0].position;
-      rotator.position = new paper.Point( corners[8].bounds.x + 10, corners[8].bounds.y + 10 );
+      yarrow.position = hand_corners[1].position;
+      xarrow.position = hand_corners[3].position;
+      xyarrow.position = hand_corners[0].position;
+      rotator.position = new paper.Point( hand_corners[8].bounds.x + 10, hand_corners[8].bounds.y + 10 );
 
       var cross_v = geometry.children['position_x'];
       var cross_h = geometry.children['position_y'];
-      cross_v.position = object_geom.position;
-      cross_h.position = object_geom.position;
+      cross_v.position = hand_object_geom.position;
+      cross_h.position = hand_object_geom.position;
     },
 
     addListeners: function() {
@@ -153,7 +216,7 @@ define([
       var applyClick = function( target, geometry, side ) {
       
         var thisGroup = target.name.split('_')[0];
-        if ( target.name == 'delbox' || target.name == 'corner' ) { return; }
+        if ( target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner' ) { return; }
         if ( (target.name == 'scale_x' || target.name == 'scale_y') && geometry.children['scale_xy'].active ) { return; }
         if ( (target.name == 'scale_x' && geometry.children['scale_y'].active) || (target.name == 'scale_y' && geometry.children['scale_x'].active) ) {
           target = geometry.children['scale_xy'];
@@ -161,7 +224,7 @@ define([
 
         for ( var i = 0; i < geometry.children.length; i++ ) {
           var child = geometry.children[i];
-          if ( child.name == 'delbox' || child.name == 'corner' ) { continue; }
+          if ( child.name == 'delbox' || child.name == 'corner' || child.name == 'hand_delbox' || child.name == 'hand_corner' ) { continue; }
           var childGroup = child.name.split('_')[0];
           if ( childGroup != thisGroup ) { 
             child.active = false;
@@ -223,7 +286,7 @@ define([
       if ( event.modifiers.shift ) { return; }
 
       var target = event.target;
-      if ( target.name == 'delbox' || target.name == 'corner' ) { return; }
+      if ( target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner' ) { return; }
 
       if ( !target.active ) {
         target.strokeColor = '#ff0000';
@@ -238,7 +301,7 @@ define([
       if ( event.modifiers.shift ) { return; }
 
       var target = event.target;
-      if ( target.name == 'delbox' || target.name == 'corner' ) { return; }
+      if ( target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner' ) { return; }
 
       if ( !target.active ) {
         target.strokeColor = target.originalStroke;
