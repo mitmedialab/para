@@ -9,9 +9,10 @@ define([
   'paper',
   'models/data/PaperUI',
   'utils/PPoint',
-  'utils/PFloat'
+  'utils/PFloat',
+  'utils/TrigFunc'
 
-], function(_, paper, PaperUI, PPoint, PFloat) {
+], function(_, paper, PaperUI, PPoint, PFloat, TrigFunc) {
 
   var PaperUIItem = PaperUI.extend({
     
@@ -70,18 +71,15 @@ define([
 
     renderGeom: function() {
       var geom = this.get('geom');
-      var rmatrix = this.get('rmatrix');
-      var smatrix = this.get('smatrix');
-      var tmatrix = this.get('tmatrix');
 
       if (geom) { return; }
       geom = paper.project.activeLayer.importJSON(this.accessProperty('master_path'));
       geom.data.instance = this;
       var position = this.get('position').toPaperPoint();
       geom.position = position;
-      geom.transform(smatrix);
-      geom.transform(rmatrix);
-      geom.transform(tmatrix);
+      geom.transform(this._smatrix);
+      geom.transform(this._rmatrix);
+      geom.transform(this._tmatrix);
       var screen_bounds = geom.bounds;
       //screen_bounds.selected = selected;
       this.set({

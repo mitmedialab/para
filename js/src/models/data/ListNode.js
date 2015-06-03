@@ -302,7 +302,7 @@ define([
 
     compile: function() {
       for (var i = 0; i < this.members.length; i++) {
-        var i_matricies = this.compileTransforms();
+       /* var i_matricies = this.compileTransforms();
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
           this.members[i].reset();
         }
@@ -311,14 +311,14 @@ define([
         //this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
           this.members[i].compile();
-        }
+        }*/
 
       }
     },
 
 
     compileMemberAt: function(index, propname, l_matrix) {
-      var delta = this.inheritProperty(propname);
+      /*var delta = this.inheritProperty(propname);
       console.log('list inherited delta: ', delta);
       if (delta) {
         var member = this.members[index];
@@ -349,12 +349,12 @@ define([
           }
         }
         member_matrix.concatenate(l_matrix);
-      }
+      }*/
     },
 
 
     compileTransforms: function() {
-      var rmatrix = this.get('rmatrix').clone();
+     /* var rmatrix = this.get('rmatrix').clone();
       var smatrix = this.get('smatrix').clone();
       var tmatrix = this.get('tmatrix').clone();
 
@@ -379,7 +379,7 @@ define([
         tmatrix: tmatrix,
         rmatrix: rmatrix,
         smatrix: smatrix
-      }; //Instance.prototype.compileTransforms.call(this, arguments);
+      }; //Instance.prototype.compileTransforms.call(this, arguments);*/
 
     },
     //triggered on change of select property, removes bbox

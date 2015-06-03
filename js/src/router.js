@@ -33,7 +33,6 @@ define([
       var event_bus = _({}).extend(Backbone.Events);
       var toolManager = new ToolManager();
 
-
       //setup visitor and function manager
       var visitor = new Visitor();
 

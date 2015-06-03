@@ -103,7 +103,7 @@ define([
       },
 
       compile: function() {
-        var constraints = this.getConstraints();
+        var constraints = this.getConstraint();
         console.log('list constraints', constraints);
         for (var i = 0; i < this.members.length; i++) {
           var i_matricies = this.compileTransforms();
@@ -124,7 +124,8 @@ define([
       compileMemberAt: function(index, list_constraints) {
         console.log('list_constraints');
         var member = this.members[index];
-        member.modifyMatrix('translation_delta');
+
+        member.modifyAfterCompile('translation_delta');
       },
       /*  var delta = this.inheritProperty(propname);
 

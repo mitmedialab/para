@@ -16,8 +16,9 @@ define([
 	'utils/PBool',
 	'utils/PProperty',
 	'utils/PConstraint',
-	'utils/TrigFunc'
-], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PProperty, PConstraint, TrigFunc) {
+	'utils/TrigFunc',
+	'utils/ColorUtils'
+], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
 	var exporting_properties = ['position', 'translation_delta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
@@ -84,13 +85,9 @@ define([
 				stroke_color: ['r', 'g', 'b', 'a'],
 				fill_color: ['r', 'g', 'b', 'a'],
 				stroke_width: ['val'],
-				inheritors: []
+				//inheritors: []
 			},
 
-			center: null,
-			rmatrix: null,
-			tmatrix: null,
-			smatrix: null,
 			reset: false,
 			geom: null,
 			inheritors: null,
@@ -109,29 +106,6 @@ define([
 			selection_palette: ['#A5FF00', '#0D7C1F', '#FF4D4D', '#33D6FF', '#E698D2'],
 			sel_palette_index: 0,
 
-			//no JSON Export required
-			matrix_map: {
-				translation_delta: {
-					name: 'tmatrix',
-					properties: {
-						x: ['tx'],
-						y: ['ty']
-					}
-				},
-				scaling_delta: {
-					name: 'smatrix',
-					properties: {
-						x: ['a'],
-						y: ['d']
-					}
-				},
-				rotation_delta: {
-					name: 'rmatrix',
-					properties: {
-						val: ['a', 'b', 'c', 'd']
-					}
-				}
-			}
 		}),
 
 		initialize: function() {
@@ -176,16 +150,53 @@ define([
 			var stroke_width = new PFloat(0);
 			stroke_width.setNull(true);
 			this.set('stroke_width', stroke_width);
-
-
-			this.set('tmatrix', new paper.Matrix());
-			this.set('smatrix', new paper.Matrix());
+			this.set('sibling_instances', []);
 			this.set('inheritors', new InheritorCollection(this));
 			this.get('inheritors').setNull(false);
 			this.set('val', new PProperty(0));
 
-			this.set('sibling_instances', []);
-			this.set('rmatrix', new paper.Matrix());
+
+			//============private properties==============//
+
+			//transformation matricies
+			this._tmatrix = new paper.Matrix();
+			this._smatrix = new paper.Matrix();
+			this._rmatrix = new paper.Matrix();
+			this._ti_matrix = undefined;
+			this._si_matrix = undefined;
+			this._ri_matrix = undefined;
+
+			//temporary attributes
+			this._translation_delta = {
+				x: undefined,
+				y: undefined
+			};
+			this._rotation_delta = undefined;
+			this._scaling_delta = {
+				x: undefined,
+				y: undefined
+			};
+			this._fill_color = {
+				r: undefined,
+				g: undefined,
+				b: undefined,
+				a: undefined
+			};
+			this._stroke_color = {
+				r: undefined,
+				g: undefined,
+				b: undefined,
+				a: undefined
+			};
+
+			this._stroke_width = undefined;
+			this._rotation_origin = undefined;
+			this._scaling_origin = undefined;
+			this._position = undefined;
+			this._visible = undefined;
+
+			//============ end private properties==============//
+
 
 			var bounds = new paper.Rectangle(0, 0, 1, 1);
 			this.set('i_bbox', {
@@ -205,14 +216,12 @@ define([
 			this.isReturned = false;
 
 			var parent = this;
-
 			_.each(this.attributes, function(val, key) {
 				if (val instanceof PConstraint) {
 					parent.listenTo(val, 'modified', parent.propertyModified);
 				}
 			});
 
-			//this.on('change:selected',this.checkChange);
 		},
 
 		checkChange: function() {
@@ -291,7 +300,6 @@ define([
 			var instance = new this.constructor();
 			this.set('is_proto', true);
 
-
 			var position = this.get('position');
 			instance.get('position').setValue(position.clone().getValue());
 			instance.get('rotation_origin').setValue(position.clone().getValue());
@@ -307,11 +315,10 @@ define([
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
-
 			var g_clone = this.get('geom').clone();
-			g_clone.transform(this.get('ti_matrix'));
-			g_clone.transform(this.get('ri_matrix'));
-			g_clone.transform(this.get('si_matrix'));
+			g_clone.transform(this._ti_matrix);
+			g_clone.transform(this._ri_matrix);
+			g_clone.transform(this._si_matrix);
 			instance.changeGeomInheritance(g_clone);
 			this.addChildNode(instance);
 		},
@@ -350,15 +357,12 @@ define([
 				this.get('bbox').remove();
 			}
 
-			var rmatrix = this.get('rmatrix');
-			var smatrix = this.get('smatrix');
-			var tmatrix = this.get('tmatrix');
-			this.set('ti_matrix', tmatrix.inverted());
-			this.set('ri_matrix', rmatrix.inverted());
-			this.set('si_matrix', smatrix.inverted());
-			rmatrix.reset();
-			smatrix.reset();
-			tmatrix.reset();
+			this._ti_matrix = this._tmatrix.inverted();
+			this._ri_matrix = this._rmatrix.inverted();
+			this._si_matrix = this._smatrix.inverted();
+			this._rmatrix.reset();
+			this._smatrix.reset();
+			this._tmatrix.reset();
 		},
 
 
@@ -507,11 +511,6 @@ define([
 
 
 		toJSON: function() {
-
-
-			//loop through defaults to export and call toJSON
-
-
 			var data = {};
 			var target = this;
 			_.each(exporting_properties, function(property) {
@@ -524,7 +523,6 @@ define([
 				}
 			});
 			return data;
-
 
 		},
 
@@ -599,6 +597,12 @@ define([
 			this.trigger('modified', this);
 		},
 
+		activateProperty: function(property_name) {
+			this.get(property_name).setNull(false);
+			return this.get(property_name);
+		},
+
+
 		/*inheritProperty
 		 * moves up the prototype chain to find the
 		 * appropriate property reference and returns it
@@ -619,12 +623,6 @@ define([
 			return null;
 		},
 
-		activateProperty: function(property_name) {
-			this.get(property_name).setNull(false);
-			return this.get(property_name);
-		},
-
-
 		/* accessProperty
 		 * returns the actual value for a given property by first
 		 *finding it in the inheritance chain and then checking the constraint
@@ -644,57 +642,85 @@ define([
 
 		},
 
+		_modifyAfterCompile: function(property_name, value) {
+			var constraints = this.getConstraint();
+			if (constraints['self']) {
+				return;
+			} else if (!constraints[property_name]) {
 
-		/* isConstrained
-		 * returns object with booleans for each property based on constraint status
-		 */
-		isConstrained: function() {
-			var constrainMap = this.get('constrain_map');
-			var data = {};
-			for (var propertyName in constrainMap) {
-				if (constrainMap.hasOwnProperty(propertyName)) {
-					var constraints = this.get(propertyName).isConstrained();
-					data[propertyName] = constraints;
-				}
 			}
-			return data;
+
 		},
+
+		/*modifyTranslationAfterCompile: function(x,y){
+			if(!this.isSelfConstrained()){
+			var translation_delta = this.get('translation_delta');
+			var local_constraint = translation_delta.getConstraint();
+			if(local_constraint.self){
+				return false;
+			}
+			else{
+				var translation_matrix = this.get('tmatrix');
+				translation_matrix.reset();
+			 if(local_constraint.x && !local_constraint.y){
+			 	translation_matrix.translate()
+			 }
+
+			}
+				
+				 
+		},*/
+
 
 		/* getConstraint
-		 * returns a reference to the constraint if it exists
-		 * false if no constraint exists on the property or any of its sub properties
-		 * an object containing all sub properties which are constrained otherwise
+		 * returns an object comprised of all existing constraints in one of 3 states:
+		 *
+		 * 1) if entire instance is constrained by a function returns {self: constraint_obj}
+		 *
+		 * 2) if some of the attributes of the instance are constrainted, returns an object with a
+		 * list of the currently constrained attributes of this instance, with references to these
+		 * constraints eg {translation_delta:{x:constraint_obj},rotation_delta:{self:constraint_obj}}
+		 * note: these objects will either contain 1 property "self", meaning that the entire attribute
+		 * is constrained, or several properties reflecting the sub-attribuites of the instance attribute which are constrained
+		 *
+		 * 3) if there are no constraints on the instance, returns undefined
+		 *
 		 */
-
-		/*map of constrainable properties
-			constrain_map: {
-				position: ['x', 'y'],
-				translation_delta: ['x', 'y'],
-				scaling_origin: ['x', 'y'],
-				scaling_delta: ['x', 'y'],
-				rotation_origin: ['val'],
-				rotation_delta: ['x', 'y'],
-				stroke_color: ['r', 'g', 'b', 'a'],
-				fill_color: ['r', 'g', 'b', 'a'],
-				stroke_width: ['val'],
-				inheritors: []
-			},*/
-
-		modifyMatrix: function(matrix_name) {
-			var constraints = this.getConstraints();
-			console.log('instance_constraints', this.getConstraints());
-		},
-
-		getConstraints: function() {
+		getConstraint: function() {
 			var constrainMap = this.get('constrain_map');
 			var data = {};
-			for (var propertyName in constrainMap) {
-				if (constrainMap.hasOwnProperty(propertyName)) {
-					var constraints = this.get(propertyName).getConstraints();
-					data[propertyName] = constraints;
+			var self = this.getSelfConstraint();
+			if (self) {
+				data.self = self;
+			} else {
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						console.log(propertyName);
+
+						var constraints = this.get(propertyName).getConstraint();
+						if (constraints.self) {
+							data[propertyName] = {
+								self: constraints.self
+							};
+						} else {
+							for (var cProp in constraints) {
+								if (constraints.hasOwnProperty(cProp)) {
+									if (!constraints[cProp]) {
+										delete constraints[cProp];
+									}
+								}
+							}
+							if (Object.keys(constraints).length > 0) {
+								data[propertyName] = constraints;
+							}
+						}
+					}
 				}
 			}
-			return data;
+			console.log('constraint data', this.get('id'), data);
+			if (Object.keys(data).length > 0) {
+				return data;
+			}
 		},
 
 		/*setValue
@@ -870,33 +896,28 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
-			this.compileTransforms();
+			this._compileTransformation();
+			this._compileStyle();
 		},
 
-		compileTransforms: function() {
-			var rmatrix = this.get('rmatrix');
-			var smatrix = this.get('smatrix');
-			var tmatrix = this.get('tmatrix');
+		_compileTransformation: function() {
+			this._rotation_origin = this.get('rotation_origin').toPaperPoint();
+			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
+			this._position = this.get('position').toPaperPoint();
 
-			var rotation_origin = this.get('rotation_origin').toPaperPoint();
-			var scaling_origin = this.get('scaling_origin').toPaperPoint();
-
-
-			var scaling_delta = this.accessProperty('scaling_delta');
-			var rotation_delta = this.accessProperty('rotation_delta');
-			var translation_delta = this.inheritProperty('translation_delta');
-
-			if (rotation_delta) {
-				rmatrix.rotate(rotation_delta, rotation_origin);
-			}
-			if (scaling_delta) {
-				smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
-			}
-			if (translation_delta) {
-				tmatrix.translate(translation_delta.toPaperPoint());
-			}
-
+			this._scaling_delta = this.accessProperty('scaling_delta');
+			this._rotation_delta = this.accessProperty('rotation_delta');
+			this._translation_delta = this.accessProperty('translation_delta');
 		},
+
+		_compileStyle: function() {
+			this._fill_color = this.accessProperty('fill_color');
+			this._stroke_color = this.accessProperty('stroke_color');
+			this._stroke_width = this.accessProperty('stroke_width');
+			//TODO: consider changing visible to a constrainable property?
+			this._visible = this.get('visible');
+		},
+
 
 		/*render
 		 * draws instance on canvas
@@ -904,6 +925,7 @@ define([
 		render: function() {
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
+
 					var geom = this.renderGeom();
 					if (geom) {
 						this.renderStyle(geom);
@@ -919,13 +941,14 @@ define([
 
 
 		renderStyle: function(geom) {
-			var fill_color = this.inheritProperty('fill_color').toPaperColor();
-			var stroke_color = this.inheritProperty('stroke_color').toPaperColor();
-			var stroke_width = this.accessProperty('stroke_width');
-			geom.fillColor = fill_color;
-			geom.strokeColor = stroke_color;
-			geom.strokeWidth = stroke_width;
-			geom.visible = this.get('visible');
+			console.log('compiled fill color',this._fill_color, ColorUtils.rgbToHex(this._fill_color));
+
+			geom.fillColor = ColorUtils.rgbToHex(this._fill_color);
+			geom.fillColor.alpha = this._fill_color.a;
+			geom.strokeColor = ColorUtils.rgbToHex(this._stroke_color);
+			geom.strokeColor.alpha = this._stroke_color.a;
+			geom.strokeWidth = this._stroke_width;
+			geom.visible = this._visible;
 		},
 
 		renderBoundingBox: function(geom) {
@@ -1025,23 +1048,24 @@ define([
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 			geom.bringToFront();
-			var rmatrix = this.get('rmatrix');
-			var smatrix = this.get('smatrix');
-			var tmatrix = this.get('tmatrix');
 
 			var path_altered = this.get('path_altered').getValue();
 			if (!path_altered) {
-				geom.transform(this.get('ti_matrix'));
-				geom.transform(this.get('ri_matrix'));
-				geom.transform(this.get('si_matrix'));
+				geom.transform(this._ti_matrix);
+				geom.transform(this._ri_matrix);
+				geom.transform(this._si_matrix);
 				geom.selected = false;
 			}
 
+			this._rmatrix.rotate(this._rotation_delta, this._rotation_origin);
+			this._smatrix.scale(this._scaling_delta.x, this._scaling_delta.y, this._scaling_origin);
+			this._tmatrix.translate(this._translation_delta.x,this._translation_delta.y);
+
 			var position = this.get('position').toPaperPoint();
 			geom.position = position;
-			geom.transform(smatrix);
-			geom.transform(rmatrix);
-			geom.transform(tmatrix);
+			geom.transform(this._smatrix);
+			geom.transform(this._rmatrix);
+			geom.transform(this._tmatrix);
 
 			this.updateScreenBounds(geom);
 			var p_altered = this.get('path_altered');
@@ -1060,9 +1084,6 @@ define([
 			clone.get('center').setValue(this.get('center').getValue());
 			clone.get('scaling_origin').setValue(this.get('scaling_origin').getValue());
 			clone.get('rotation_origin').setValue(this.get('rotation_origin').getValue());
-			clone.set('rmatrix', this.get('rmatrix').clone());
-			clone.set('smatrix', this.get('smatrix').clone());
-			clone.set('tmatrix', this.get('tmatrix').clone());
 			clone.set('bbox', this.get('bbox').clone());
 			return clone;
 		},

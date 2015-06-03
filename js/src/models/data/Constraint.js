@@ -265,6 +265,7 @@ define([
         relPropAccess[rel_prop[1]].setConstraint( constraintF );
       }
       this.set('constraintFunc', constraintF );
+      relative.getConstraint();
     },
 
     clearUI: function() {
