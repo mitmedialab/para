@@ -89,8 +89,6 @@ define([
 
 		ColorUtils.componentToHex = function(c) {
 			var hex = c.toString(16);
-			console.log('color to hex',c,hex);
-
 			return hex.length == 1 ? "0" + hex : hex;
 		};
 

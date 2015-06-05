@@ -158,24 +158,18 @@ define([
 
 			//============private properties==============//
 
-			//transformation matricies
-			this._tmatrix = new paper.Matrix();
-			this._smatrix = new paper.Matrix();
-			this._rmatrix = new paper.Matrix();
+			//inverse transformation matricies
 			this._ti_matrix = undefined;
 			this._si_matrix = undefined;
 			this._ri_matrix = undefined;
 
+			this._itemp_matrix = undefined;
+			this._temp_matrix = new paper.Matrix();
+
 			//temporary attributes
-			this._translation_delta = {
-				x: undefined,
-				y: undefined
-			};
-			this._rotation_delta = undefined;
-			this._scaling_delta = {
-				x: undefined,
-				y: undefined
-			};
+			this._translation_delta = new paper.Matrix();
+			this._rotation_delta = new paper.Matrix();
+			this._scaling_delta = new paper.Matrix();
 			this._fill_color = {
 				r: undefined,
 				g: undefined,
@@ -357,12 +351,14 @@ define([
 				this.get('bbox').remove();
 			}
 
-			this._ti_matrix = this._tmatrix.inverted();
-			this._ri_matrix = this._rmatrix.inverted();
-			this._si_matrix = this._smatrix.inverted();
-			this._rmatrix.reset();
-			this._smatrix.reset();
-			this._tmatrix.reset();
+			this._ti_matrix = this._translation_delta.inverted();
+			this._ri_matrix = this._rotation_delta.inverted();
+			this._si_matrix = this._scaling_delta.inverted();
+			this._itemp_matrix = this._temp_matrix.inverted();
+			this._temp_matrix.reset();
+			this._translation_delta.reset();
+			this._scaling_delta.reset();
+			this._rotation_delta.reset();
 		},
 
 
@@ -464,6 +460,7 @@ define([
 		 * data that is passed in
 		 */
 		_setPropertiesToInstance: function(data, instance) {
+
 			if (data.translation_delta) {
 				this.get('translation_delta').setValue(instance.get('translation_delta').getValue());
 			}
@@ -537,6 +534,7 @@ define([
 		 * new values
 		 * mode: proxy or standard: determines what is being updated (prototype or object)
 		 * modifer: overide or relative: determines how the updates should be implemented
+		 * should only be called by tool classes
 		 */
 		modifyProperty: function(data, mode, modifier) {
 			var proto_incremented = false;
@@ -642,34 +640,165 @@ define([
 
 		},
 
-		_modifyAfterCompile: function(property_name, value) {
-			var constraints = this.getConstraint();
-			if (constraints['self']) {
-				return;
-			} else if (!constraints[property_name]) {
+		_modifyAfterCompile: function(property_name, value, set, origin) {
+			var constraint = this.getConstraint();
+			var internal_property = "_".concat(property_name);
+			var attribute_constraint = constraint[property_name];
+			//entire instance is constrained, no modification allowed
+			if (constraint['self']) {
+				return false;
+			}
+			//attribute is not constrained modification allowed
+			else {
+
+				if (this[internal_property] instanceof paper.Matrix) {
+					return this._modifyMatrixAfterCompile(property_name, this[internal_property], attribute_constraint, value, set,origin);
+				} else if (this[internal_property] instanceof Number) {
+					return this._modifyValueAfterCompile(this[internal_property], attribute_constraint, value, set);
+				} else if (this[internal_property] instanceof Object) {
+					return this._modifyObjectAfterCompile(this[internal_property], attribute_constraint, value, set);
+
+				}
+			}
+			return false;
+		},
+
+		_modifyMatrixAfterCompile: function(property_name, internal_matrix, attribute_constraint, value, set, origin) {
+			//attribute is not constrained, modification allowed
+			console.log('modify matrix', property_name,attribute_constraint);
+
+			//attribute sub properties are constrained, selective modification allowed;
+			
+			switch (property_name) {
+				case 'translation_delta':
+					console.log('modify_translation', property_name, value.translation);
+					if (!attribute_constraint) {
+						if (set) {
+							internal_matrix.tx = (value.translation) ? 0 : internal_matrix.tx;
+							internal_matrix.ty = (value.translation) ? 0 : internal_matrix.ty;
+						}
+						if (value.translation) {
+							internal_matrix.translate(value.translation.x, value.translation.y);
+							return true;
+						}
+						return false;
+
+					} 
+					else if (attribute_constraint && attribute_constraint.x && attribute_constraint.y) {
+						console.log('object is completely constrained');
+						return false;
+					} 
+					else if (attribute_constraint.x && !attribute_constraint.y) {
+						console.log('object is only x constrained');
+
+						if (set) {
+							internal_matrix.ty = (value.translation) ? 0 : internal_matrix.ty;
+						}
+						internal_matrix.translate(0, value.translation.y);
+						return true;
+					} else if (!attribute_constraint.x && attribute_constraint.y) {
+						console.log('object is only y constrained');
+						if (set) {
+							internal_matrix.tx = (value.translation) ? 0 : internal_matrix.tx;
+						}
+						if (value.translation) {
+							internal_matrix.translate(value.translation.x, 0);
+							return true;
+						}
+						return false;
+					}
+					break;
+				case 'scaling_delta':
+					var s_origin = (origin) ? origin : this._scaling_origin;
+					if (!attribute_constraint) {
+						if (set) {
+							internal_matrix.d = (value.scaling) ? 0 : internal_matrix.d;
+							internal_matrix.a = (value.scaling) ? 0 : internal_matrix.a;
+						}
+						if (value.scaling) {
+							internal_matrix.scale(value.scaling.x, value.scaling.y, s_origin);
+							return true;
+						}
+						return false;
+
+					}
+					else if (attribute_constraint  && attribute_constraint.x && attribute_constraint.y) {
+						return false;
+					}  
+					else if (attribute_constraint.x && !attribute_constraint.y) {
+						if (set) {
+							internal_matrix.d = (value.scaling) ? 0 : internal_matrix.d;
+						}
+						if (value.scaling) {
+							internal_matrix.scale(1, value.scaling.y, s_origin);
+							return true;
+						}
+						return false;
+					} else if (!attribute_constraint.x && attribute_constraint.y) {
+						if (set) {
+							internal_matrix.a = (value.scaling) ? 0 : internal_matrix.a;
+						}
+						if (value.scaling) {
+							internal_matrix.scale(value.scaling.x, 1, s_origin);
+							return true;
+						}
+						return false;
+					}
+					break;
+				case 'rotation_delta':
+					var r_origin = (origin) ? origin : this._rotation_origin;
+					console.log('r_origin', r_origin, 'origin', origin, 'rotation_origin', this._rotation_origin);
+					if (attribute_constraint) {
+						return false;
+					} else {
+						if (set) {
+							internal_matrix.a = (value.rotation) ? 0 : internal_matrix.a;
+							internal_matrix.b = (value.rotation) ? 0 : internal_matrix.b;
+							internal_matrix.c = (value.rotation) ? 0 : internal_matrix.c;
+							internal_matrix.d = (value.rotation) ? 0 : internal_matrix.d;
+						}
+						internal_matrix.rotate(value.rotation, r_origin);
+						return true;
+					}
+					break;
+
 
 			}
+
+			return false;
 
 		},
 
-		/*modifyTranslationAfterCompile: function(x,y){
-			if(!this.isSelfConstrained()){
-			var translation_delta = this.get('translation_delta');
-			var local_constraint = translation_delta.getConstraint();
-			if(local_constraint.self){
-				return false;
+		_modifyObjectAfterCompile: function(internal_attribute, attribute_constraint, value, set) {
+			//attribute is not constrained, modification allowed
+			if (!attribute_constraint) {
+				for (var v in value) {
+					if (value.hasOwnProperty(v)) {
+						internal_attribute[v] = value[v];
+					}
+				}
+				return true;
 			}
-			else{
-				var translation_matrix = this.get('tmatrix');
-				translation_matrix.reset();
-			 if(local_constraint.x && !local_constraint.y){
-			 	translation_matrix.translate()
-			 }
+			//attribute sub properties are constrained, selective modification allowed;
+			else {
+				var modified = false;
+				for (var _v in value) {
+					if (value.hasOwnProperty(_v)) {
+						if (!attribute_constraint.hasOwnProperty(_v)) {
+							internal_attribute[_v] = value[_v];
+							modified = true;
+						}
+					}
+				}
+				return modified;
+			}
+			return false;
 
-			}
-				
-				 
-		},*/
+		},
+
+		_modifyValueAfterCompile: function(internal_attribute, value, set) {
+
+		},
 
 
 		/* getConstraint
@@ -683,7 +812,7 @@ define([
 		 * note: these objects will either contain 1 property "self", meaning that the entire attribute
 		 * is constrained, or several properties reflecting the sub-attribuites of the instance attribute which are constrained
 		 *
-		 * 3) if there are no constraints on the instance, returns undefined
+		 * 3) if there are no constraints on the instance, returns an empty object
 		 *
 		 */
 		getConstraint: function() {
@@ -695,8 +824,6 @@ define([
 			} else {
 				for (var propertyName in constrainMap) {
 					if (constrainMap.hasOwnProperty(propertyName)) {
-						console.log(propertyName);
-
 						var constraints = this.get(propertyName).getConstraint();
 						if (constraints.self) {
 							data[propertyName] = {
@@ -717,10 +844,8 @@ define([
 					}
 				}
 			}
-			console.log('constraint data', this.get('id'), data);
-			if (Object.keys(data).length > 0) {
-				return data;
-			}
+			return data;
+
 		},
 
 		/*setValue
@@ -896,21 +1021,33 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
-			this._compileTransformation();
-			this._compileStyle();
+			this.compileTransformation();
+			this.compileStyle();
 		},
 
-		_compileTransformation: function() {
+		compileTransformation: function() {
 			this._rotation_origin = this.get('rotation_origin').toPaperPoint();
 			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
 			this._position = this.get('position').toPaperPoint();
 
-			this._scaling_delta = this.accessProperty('scaling_delta');
-			this._rotation_delta = this.accessProperty('rotation_delta');
-			this._translation_delta = this.accessProperty('translation_delta');
+			if (this.accessProperty('scaling_delta')) {
+				this._scaling_delta.scale(this.accessProperty('scaling_delta').x, this.accessProperty('scaling_delta').y, this._scaling_origin);
+			}
+			if (this.accessProperty('rotation_delta')) {
+				this._rotation_delta.rotate(this.accessProperty('rotation_delta'), this._rotation_origin);
+			}
+			if (this.accessProperty('translation_delta')) {
+				this._translation_delta.translate(this.accessProperty('translation_delta').x, this.accessProperty('translation_delta').y);
+			}
+
+			
+			this._temp_matrix.preConcatenate(this._rotation_delta);
+			this._temp_matrix.preConcatenate(this._scaling_delta);
+			this._temp_matrix.preConcatenate(this._translation_delta);
+			
 		},
 
-		_compileStyle: function() {
+		compileStyle: function() {
 			this._fill_color = this.accessProperty('fill_color');
 			this._stroke_color = this.accessProperty('stroke_color');
 			this._stroke_width = this.accessProperty('stroke_width');
@@ -941,8 +1078,6 @@ define([
 
 
 		renderStyle: function(geom) {
-			console.log('compiled fill color',this._fill_color, ColorUtils.rgbToHex(this._fill_color));
-
 			geom.fillColor = ColorUtils.rgbToHex(this._fill_color);
 			geom.fillColor.alpha = this._fill_color.a;
 			geom.strokeColor = ColorUtils.rgbToHex(this._stroke_color);
@@ -1051,21 +1186,20 @@ define([
 
 			var path_altered = this.get('path_altered').getValue();
 			if (!path_altered) {
+				//geom.transform(this._itemp_matrix);
 				geom.transform(this._ti_matrix);
-				geom.transform(this._ri_matrix);
 				geom.transform(this._si_matrix);
+				geom.transform(this._ri_matrix);
 				geom.selected = false;
 			}
 
-			this._rmatrix.rotate(this._rotation_delta, this._rotation_origin);
-			this._smatrix.scale(this._scaling_delta.x, this._scaling_delta.y, this._scaling_origin);
-			this._tmatrix.translate(this._translation_delta.x,this._translation_delta.y);
 
 			var position = this.get('position').toPaperPoint();
 			geom.position = position;
-			geom.transform(this._smatrix);
-			geom.transform(this._rmatrix);
-			geom.transform(this._tmatrix);
+			geom.transform(this._rotation_delta);
+			geom.transform(this._scaling_delta);
+			geom.transform(this._translation_delta);
+			//geom.transform(this._temp_matrix);
 
 			this.updateScreenBounds(geom);
 			var p_altered = this.get('path_altered');

@@ -23,9 +23,10 @@ define([
     initialize: function() {
       Instance.prototype.initialize.apply(this, arguments);
       this.members = [];
+      this.offsets = [];
       this.set('member_count', new PFloat(0));
       this.get('translation_delta').setNull(false);
-      
+
 
     },
 
@@ -74,11 +75,27 @@ define([
         operator: 'set'
       };
       this.modifyProperty(md);
+      //this.computeCentroid();
+
+    },
+
+    computeCentroid: function(){
+      var sumX = 0;
+      var sumY = 0;
+      this.members.forEach(function(m) {
+       var pos = m._temp_matrix.translation;
+
+      
+       sumX+=pos.x;
+       sumY+=pos.y;
+      });
+
+      return {x:sumX/this.members.length,y:sumY/this.members.length};
 
     },
 
     // sets the geom visibility to false
-    hide: function() {
+      hide: function() {
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].hide();
       }
@@ -133,6 +150,7 @@ define([
     deleteMember: function(target) {
       this.stopListening(target);
       this.removeMember(target);
+      this.computeCentroid();
     },
 
     removeMember: function(data) {
@@ -301,17 +319,23 @@ define([
 
 
     compile: function() {
+      this.compileTransformation();   
       for (var i = 0; i < this.members.length; i++) {
-       /* var i_matricies = this.compileTransforms();
-        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
-          this.members[i].reset();
-        }
-        this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
-        this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
-        //this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
-        if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
-          this.members[i].compile();
-        }*/
+ 
+        this.members[i]._modifyAfterCompile('rotation_delta', this._rotation_delta, false);
+        this.members[i]._modifyAfterCompile('scaling_delta', this._scaling_delta, false);
+        this.members[i]._modifyAfterCompile('translation_delta', this._translation_delta, false);
+
+        /* var i_matricies = this.compileTransforms();
+         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+           this.members[i].reset();
+         }
+         this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
+         this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
+         //this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
+         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+           this.members[i].compile();
+         }*/
 
       }
     },
@@ -354,32 +378,32 @@ define([
 
 
     compileTransforms: function() {
-     /* var rmatrix = this.get('rmatrix').clone();
-      var smatrix = this.get('smatrix').clone();
-      var tmatrix = this.get('tmatrix').clone();
+      /* var rmatrix = this.get('rmatrix').clone();
+       var smatrix = this.get('smatrix').clone();
+       var tmatrix = this.get('tmatrix').clone();
 
-      var rotation_origin = this.get('rotation_origin').toPaperPoint();
-      var scaling_origin = this.get('scaling_origin').toPaperPoint();
+       var rotation_origin = this.get('rotation_origin').toPaperPoint();
+       var scaling_origin = this.get('scaling_origin').toPaperPoint();
 
 
-      var scaling_delta = this.accessProperty('scaling_delta');
-      var rotation_delta = this.accessProperty('rotation_delta');
-      var translation_delta = this.inheritProperty('translation_delta');
+       var scaling_delta = this.accessProperty('scaling_delta');
+       var rotation_delta = this.accessProperty('rotation_delta');
+       var translation_delta = this.inheritProperty('translation_delta');
 
-      if (rotation_delta) {
-        rmatrix.rotate(rotation_delta, rotation_origin);
-      }
-      if (scaling_delta) {
-        smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
-      }
-      if (translation_delta) {
-        tmatrix.translate(translation_delta.toPaperPoint());
-      }
-      return {
-        tmatrix: tmatrix,
-        rmatrix: rmatrix,
-        smatrix: smatrix
-      }; //Instance.prototype.compileTransforms.call(this, arguments);*/
+       if (rotation_delta) {
+         rmatrix.rotate(rotation_delta, rotation_origin);
+       }
+       if (scaling_delta) {
+         smatrix.scale(scaling_delta.x, scaling_delta.y, scaling_origin);
+       }
+       if (translation_delta) {
+         tmatrix.translate(translation_delta.toPaperPoint());
+       }
+       return {
+         tmatrix: tmatrix,
+         rmatrix: rmatrix,
+         smatrix: smatrix
+       }; //Instance.prototype.compileTransforms.call(this, arguments);*/
 
     },
     //triggered on change of select property, removes bbox
@@ -426,7 +450,7 @@ define([
         memberIds.push(item.get('id'));
       });
       data.members = memberIds;
-      
+
       return data;
     }
 

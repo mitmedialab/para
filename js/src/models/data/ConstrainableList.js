@@ -102,18 +102,18 @@ define([
         }
       },
 
-      compile: function() {
+      /*compile: function() {
         var constraints = this.getConstraint();
         console.log('list constraints', constraints);
         for (var i = 0; i < this.members.length; i++) {
           var i_matricies = this.compileTransforms();
-          /*if (this.members[i].get('type') === 'list') {
+         if (this.members[i].get('type') === 'list') {
             this.members[i].reset();
-          }*/
+          }
           this.compileMemberAt(i, i_matricies, constraints);
           this.increment();
         }
-      },
+      },*/
 
       updateMemberTranslation: function(){
         var deltaConstrained = this.get('translation_delta').isConstrained();

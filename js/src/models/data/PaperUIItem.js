@@ -77,9 +77,9 @@ define([
       geom.data.instance = this;
       var position = this.get('position').toPaperPoint();
       geom.position = position;
-      geom.transform(this._smatrix);
-      geom.transform(this._rmatrix);
-      geom.transform(this._tmatrix);
+      geom.transform(this._scale_delta);
+      geom.transform(this._rotation_delta);
+      geom.transform(this._translation_delta);
       var screen_bounds = geom.bounds;
       //screen_bounds.selected = selected;
       this.set({

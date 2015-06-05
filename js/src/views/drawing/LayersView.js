@@ -405,7 +405,6 @@ define([
 			this.deselectAll(listRoot);
 			for (var i = 0; i < selected_shapes.length; i++) {
 				var node;
-				console.log('type', selected_shapes[i].get('type'));
 				switch (selected_shapes[i].get('type')) {
 					case 'list':
 					case 'sampler':
