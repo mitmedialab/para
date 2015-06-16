@@ -26,6 +26,7 @@ define([
       state: 'polyTool',
       'tool_mode': 'standard',
       'tool_modifier': 'none',
+      'constraint_pending': false,
     },
     events: {
       'change:tool-mode': this.modeChanged,
@@ -42,7 +43,7 @@ define([
       });
       var model = this;
       var constraintTool = new ConstraintToolModel({
-        id: 'constraintTool',
+        id: 'constraintTool'
       });
 
       constraintTool.sm = this;
@@ -54,7 +55,8 @@ define([
       this.listenTo(toolCollection, 'geometryModified', this.geometryModified);
       this.listenTo(toolCollection, 'geometrySegmentModified', this.geometrySegmentModified);
       this.listenTo(toolCollection, 'delegateMethod', this.delegateMethod);
-      this.listenTo(toolCollection, 'constraintSet', this.constraintSet);
+      this.listenTo(toolCollection, 'constraintPending', this.constraintPending);
+      this.listenTo(toolCollection, 'constraintReset', this.constraintReset);
 
       this.get('tool_collection').add([selectTool, polyTool, constraintTool]);
       console.log('tool models', this.get('tool_collection').get('polyTool'));
@@ -76,7 +78,7 @@ define([
     setState: function(state, mode) {
       console.log('set state', this.get('state'));
       console.log('current tool', this.get('tool_collection').get(state));
-
+     
       // TODO: possibly rename to 'close'
       this.get('tool_collection').get(this.get('state')).reset();
       //this.get('tool_collection').get(state).reset();
@@ -134,8 +136,20 @@ define([
       this.trigger('addInstance', instance);
     },
 
-    constraintSet: function(constraint_data) {
+    applyConstraint: function(constraint_data) {
+      var constraint_tool = this.get('tool_collection').get('constraintTool');
+      var constraint_data = constraint_tool.applyConstraint();
       this.trigger('addConstraint', constraint_data);
+    },
+
+    constraintReset: function(){
+        this.set('constraint_pending',false);
+    },
+
+    constraintPending: function(){
+      this.set('constraint_pending',true);
+      console.log('constraint_pending',this.get('constraint_pending'));
+
     },
 
     geometrySelected: function(instance, segments, modifier) {

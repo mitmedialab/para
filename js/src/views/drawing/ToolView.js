@@ -17,6 +17,16 @@ define([
     initialize: function() {
       this.polyToolClick();
       this.modeStandardClick();
+      this.model.on('change:state', function(model) {
+        $('#constraintApply').css("visibility", (model.get('state') == 'constraintTool') ? 'visible' : 'hidden');
+      });
+      this.model.on('change:constraint_pending', function(model) {
+        if (model.get('constraint_pending')) {
+          $('#constraintApply').removeAttr('disabled');
+        } else {
+          $('#constraintApply').attr('disabled', true);
+        }
+      });
     },
 
     render: function() {
@@ -39,7 +49,8 @@ define([
       'click #modeProxy': 'modeProxyClick',
       'click #modeStandard': 'modeStandardClick',
       'click #modRelative': 'modRelativeClick',
-      'click #modOverride': 'modOverrideClick'
+      'click #modOverride': 'modOverrideClick',
+      'click #constraintApply' : 'constraintApplyClick',
     },
 
     undoToolClick: function() {
@@ -189,46 +200,49 @@ define([
       });
     },
 
+    constraintApplyClick: function(){
+      console.log('applying constraint');
+      this.model.applyConstraint();
+    },
+
 
     modeProxyClick: function() {
       $('#modeStandard').removeClass('active');
       $('#modeProxy').addClass('active');
-      this.model.set('tool-mode','proxy');
+      this.model.set('tool-mode', 'proxy');
 
     },
 
     modeStandardClick: function() {
       $('#modeStandard').addClass('active');
       $('#modeProxy').removeClass('active');
-      this.model.set('tool-mode','standard');
+      this.model.set('tool-mode', 'standard');
     },
 
     modRelativeClick: function() {
       var button = $('#modRelative');
-      if(button.hasClass('active')){
+      if (button.hasClass('active')) {
         button.removeClass('active');
-        this.model.set('tool-modifier','none');
+        this.model.set('tool-modifier', 'none');
 
-      }
-      else{
+      } else {
         button.addClass('active');
         $('#modOverride').removeClass('active');
-        this.model.set('tool-modifier','relative');
+        this.model.set('tool-modifier', 'relative');
 
 
       }
     },
 
     modOverrideClick: function() {
-    var button = $('#modOverride');
-      if(button.hasClass('active')){
+      var button = $('#modOverride');
+      if (button.hasClass('active')) {
         button.removeClass('active');
-         this.model.set('tool-modifier','none');
-      }
-      else{
+        this.model.set('tool-modifier', 'none');
+      } else {
         button.addClass('active');
         $('#modRelative').removeClass('active');
-         this.model.set('tool-modifier','override');
+        this.model.set('tool-modifier', 'override');
 
       }
     },

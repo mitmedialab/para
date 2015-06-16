@@ -189,10 +189,16 @@ input[type="range"]:active::-webkit-slider-thumb {
     border: none;
     white-space: nowrap;
 }
+
+.btn-default:disabled, .btn-default[disabled], .btn-default:hover:disabled, .btn-default[disabled]:hover{
+    opacity:0.5;
+    background-color: transparent;
+}
+
 .horz-btn{
 }
 
-.btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
+.btn-default:hover:enabled, .btn-default:focus:enabled, .btn-default:active:enabled, .btn-default.active:enabled, .open .dropdown-toggle.btn-default {
     color: #333;
     background-color: #cccccc;
 }
@@ -282,6 +288,16 @@ width:20px;
 height:20px;
 border: solid 1px #B2B2B2;
 }
+#constraintApply{
+  background-image: none;
+  width: 70px;
+  height: 20px;
+  border: 1px solid #B2B2B2;
+  margin-top: 7px;
+  line-height: 10px;
+  color: rgb(118, 120, 123);
+  visibility: hidden;
+}
 
 #rangechaser {
     position: absolute;
@@ -315,6 +331,12 @@ select{
     float:left;
     margin:10px 10px;
 }
+#constraintToolbar{
+    margin-left:10px;
+    width:200px;
+    height:40px;
+    float:left;
+}
 
 input[type="button"]{
     background-color: inherit;
@@ -336,6 +358,8 @@ input[type="button"]{
     background: #34332F;
 
 }
+
+
 
 .container{
     width:100%;

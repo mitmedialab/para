@@ -33,17 +33,17 @@
  */
 
 define([
-    'underscore',
-    'paper',
-    'backbone',
-    'models/tools/BaseToolModel',
-    'utils/PPoint',
-    'models/data/PaperUI',
-    'utils/PaperUIHelper',
-    'utils/PaperUIEvents',
-    'utils/Utils',
-    'models/data/Constraint',
-], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIHelper, PaperUIEvents, Utils, Constraint) { 
+  'underscore',
+  'paper',
+  'backbone',
+  'models/tools/BaseToolModel',
+  'utils/PPoint',
+  'models/data/PaperUI',
+  'utils/PaperUIHelper',
+  'utils/PaperUIEvents',
+  'utils/Utils',
+  'models/data/Constraint',
+], function(_, paper, Backbone, BaseToolModel, PPoint, PaperUI, PaperUIHelper, PaperUIEvents, Utils, Constraint) {
 
 
   // hit testing for clicking Paper UI elements
@@ -84,7 +84,9 @@ define([
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
       currentConstraint: null,
       constraints: {},
-      mode: 'create'
+      mode: 'create',
+      applicable: false,
+
     }),
 
     /*
@@ -93,6 +95,11 @@ define([
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
       this.set('currentConstraint', new Constraint());
+      var self = this;
+      //this.on('ready:currentConstraint',function(){self.set('applicable',true);});
+      this.on('change:currentConstraint', function() {
+        self.set('applicable', false);
+      });
     },
 
     start: function() {
@@ -106,7 +113,7 @@ define([
     },
 
     mouseDown: function(event) {
-      switch ( this.get('mode') ) {
+      switch (this.get('mode')) {
         case 'create':
           this.createMouseDown(event);
           break;
@@ -117,22 +124,41 @@ define([
           this.relMouseDown(event);
           break;
       }
-      if ( event.modifiers.capsLock ) { 
-        var constraint = this.get('currentConstraint');      
-        constraint.get('proxy').hide();
-        constraint.clearUI();
-        constraint.create();
-        var constraintMap = this.get('constraints');
-        constraintMap[constraint.get('id')] = constraint;
-        this.trigger('constraintSet',{name:'constraint',id:constraint.get("id")});
-        this.set('currentConstraint', new Constraint());
-        this.set('mode', 'create');
+      this.checkPending();
+      //code that creates constraint after capslockd
+
+    },
+
+    //checks to see if constraint is currently pending
+    checkPending: function() {
+      var constraint = this.get('currentConstraint');
+      if (constraint) {
+        if (constraint.get('references') && constraint.get('relatives')) {
+          this.trigger('constraintPending');
+        }
       }
+    },
+
+    applyConstraint: function() {
+      var constraint = this.get('currentConstraint');
+      constraint.get('proxy').hide();
+      constraint.clearUI();
+      constraint.create();
+      var constraintMap = this.get('constraints');
+      constraintMap[constraint.get('id')] = constraint;
+    var constraint_data =  {
+        name: 'constraint',
+        id: constraint.get("id")
+      };
+      this.set('currentConstraint', new Constraint());
+      this.reset();
+      return constraint_data;
+
     },
 
     modeSwitch: function() {
       var constraint = this.get('currentConstraint');
-      switch ( this.get('mode') ) {
+      switch (this.get('mode')) {
         case 'create':
           break;
         case 'ref':
@@ -174,18 +200,18 @@ define([
       //  show constraint selector
       //  switch mode to selection
       //  return
-
+      this.set('applicable', true);
       this.sm.delegateMethod('select', 'selectDown', event);
       var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
       var type = (event.modifiers.control) ? 'point' : 'shape';
       var flag = this.get('currentConstraint').setSelection(selection, type);
-      if ( flag ) { 
-        this.set('mode', 'ref'); 
+      if (flag) {
+        this.set('mode', 'ref');
         this.modeSwitch();
       } else {
-          // visitor get constraints on instance
-          // unique constraints by ref
-          // set arrow/constraint to visible, non-active for each ref
+        // visitor get constraints on instance
+        // unique constraints by ref
+        // set arrow/constraint to visible, non-active for each ref
       }
     },
 
@@ -203,10 +229,10 @@ define([
       var relative = constraint.get('relatives');
       this.sm.delegateMethod('select', 'selectDown', event);
       var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
-      selection = ( selection ? selection[0] : null ); // TODO: really shouldn't have to happen...
+      selection = (selection ? selection[0] : null); // TODO: really shouldn't have to happen...
       this.sm.delegateMethod('select', 'resetSelections');
       this.sm.trigger('compileRequest');
-      if ( selection && selection.get('id') == relative.get('id') ) {
+      if (selection && selection.get('id') == relative.get('id')) {
         this.set('mode', 'rel');
         this.modeSwitch();
       }
@@ -216,19 +242,19 @@ define([
     relMouseDown: function(event) {
       var constraint = this.get('currentConstraint');
       var reference = constraint.get('references');
-      var hitResult = paper.project.hitTest( event.point, mouseHitOptions );
-      if ( hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id ) {
+      var hitResult = paper.project.hitTest(event.point, mouseHitOptions);
+      if (hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id) {
         this.set('mode', 'ref');
         this.modeSwitch();
         return;
       }
-      if ( hitResult && hitResult.item.type && hitResult.item.type == 'handle' && hitResult.item.active ) {
+      if (hitResult && hitResult.item.type && hitResult.item.type == 'handle' && hitResult.item.active) {
         this.draggingHandle = constraint.get('rel_prop');
       }
     },
 
     mouseDrag: function(event) {
-      switch( this.get('mode') ) {
+      switch (this.get('mode')) {
         case 'rel':
           this.relMouseDrag(event);
           break;
@@ -237,22 +263,24 @@ define([
 
 
     relMouseDrag: function(event) {
-      if ( event.modifiers.shift && this.draggingHandle ) {
+      if (event.modifiers.shift && this.draggingHandle) {
         var constraint = this.get('currentConstraint');
         var proxy = constraint.get('proxy');
         var arrow = constraint.get('arrow');
         var rel_geom = constraint.get('relatives').get('geom');
-        if ( proxy instanceof paper.Group ) {
-          rel_geom = constraint.get('relatives').getInstanceMembers().map( function( instance ) { return instance.get('geom') });
+        if (proxy instanceof paper.Group) {
+          rel_geom = constraint.get('relatives').getInstanceMembers().map(function(instance) {
+            return instance.get('geom')
+          });
         }
-        switch ( this.draggingHandle ) {
+        switch (this.draggingHandle) {
           case 'scale_x':
-            if ( !(proxy instanceof paper.Group) ) {
+            if (!(proxy instanceof paper.Group)) {
               var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
-              proxy.scaling = new paper.Point(x_scale, proxy.scaling.y); 
+              proxy.scaling = new paper.Point(x_scale, proxy.scaling.y);
             } else {
               var x_scale = 2 * Math.abs(event.point.x - proxy.children[0].position.x) / rel_geom[0].bounds.width;
-              for ( var i = 0; i < proxy.children.length; i++ ) {
+              for (var i = 0; i < proxy.children.length; i++) {
                 var proxy_child = proxy.children[i];
                 var rel_child = rel_geom[i];
                 proxy_child.scaling = new paper.Point(x_scale, proxy_child.scaling.y);
@@ -260,12 +288,12 @@ define([
             }
             break;
           case 'scale_y':
-            if ( !(proxy instanceof paper.Group) ) {
+            if (!(proxy instanceof paper.Group)) {
               var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
-              proxy.scaling = new paper.Point(proxy.scaling.x, y_scale); 
+              proxy.scaling = new paper.Point(proxy.scaling.x, y_scale);
             } else {
               var y_scale = 2 * Math.abs(event.point.y - proxy.children[0].position.y) / rel_geom[0].bounds.height;
-              for ( var i = 0; i < proxy.children.length; i++ ) {
+              for (var i = 0; i < proxy.children.length; i++) {
                 var proxy_child = proxy.children[i];
                 var rel_child = rel_geom[i];
                 proxy_child.scaling = new paper.Point(proxy_child.scaling.x, y_scale);
@@ -273,14 +301,14 @@ define([
             }
             break;
           case 'scale_xy':
-            if ( !(proxy instanceof paper.Group) ) {
+            if (!(proxy instanceof paper.Group)) {
               var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
               var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
               proxy.scaling = new paper.Point(x_scale, y_scale);
             } else {
               var x_scale = 2 * Math.abs(event.point.x - proxy.children[0].position.x) / rel_geom[0].bounds.width;
               var y_scale = 2 * Math.abs(event.point.y - proxy.children[0].position.y) / rel_geom[0].bounds.height;
-              for ( var i = 0; i < proxy.children.length; i++ ) {
+              for (var i = 0; i < proxy.children.length; i++) {
                 var proxy_child = proxy.children[i];
                 var rel_child = rel_geom[i];
                 proxy_child.scaling = new paper.Point(x_scale, y_scale);
@@ -288,7 +316,7 @@ define([
             }
             break;
           case 'position_x':
-            if ( !(proxy instanceof paper.Group) ) {
+            if (!(proxy instanceof paper.Group)) {
               proxy.position.x = event.point.x;
             } else {
               var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
@@ -297,7 +325,7 @@ define([
             arrow.redrawTail(proxy);
             break;
           case 'position_y':
-            if ( !(proxy instanceof paper.Group) ) {
+            if (!(proxy instanceof paper.Group)) {
               proxy.position.y = event.point.y;
             } else {
               var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
@@ -306,7 +334,7 @@ define([
             arrow.redrawTail(proxy);
             break;
           case 'position_xy':
-            if ( !(proxy instanceof paper.Group) ) {
+            if (!(proxy instanceof paper.Group)) {
               proxy.position.x = event.point.x;
               proxy.position.y = event.point.y;
             } else {
@@ -318,14 +346,14 @@ define([
             break;
           case 'rotation':
             var work_geom = (proxy instanceof paper.Group) ? proxy.children[0] : proxy;
-            var angle = event.lastPoint.subtract( work_geom.position ).angle;
-            var dAngle = event.point.subtract( work_geom.position ).angle; 
+            var angle = event.lastPoint.subtract(work_geom.position).angle;
+            var dAngle = event.point.subtract(work_geom.position).angle;
             if (!(proxy instanceof paper.Group)) {
               proxy.rotation = (proxy.rotation + (dAngle - angle));
             } else {
-              for ( var i = 0; i < proxy.children.length; i++ ) {
+              for (var i = 0; i < proxy.children.length; i++) {
                 proxy.children[i].rotation = proxy.children[i].rotation + (dAngle - angle);
-              }    
+              }
             }
             break;
         }
@@ -335,7 +363,7 @@ define([
     },
 
     mouseUp: function(event) {
-      switch ( this.get('mode') ) {
+      switch (this.get('mode')) {
         case 'create':
           this.createMouseUp(event);
           break;
@@ -349,7 +377,7 @@ define([
     },
 
     createMouseUp: function(event) {
-      
+
     },
 
     refMouseUp: function(event) {
@@ -357,10 +385,10 @@ define([
     },
 
     relMouseUp: function(event) {
-      if ( this.draggingHandle ) {
+      if (this.draggingHandle) {
         var constraint = this.get('currentConstraint');
         var proxy = constraint.get('proxy');
-        proxy.matchProperty( constraint.get('ref_prop'), constraint.get('rel_prop') );
+        proxy.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
         this.draggingHandle = false;
       }
     },
@@ -373,13 +401,14 @@ define([
     reset: function() {
 
       var constraint = this.get('currentConstraint');
-      if ( constraint.get('references') && constraint.get('relatives') ) {
+      if (constraint.get('references') && constraint.get('relatives')) {
         constraint.clearUI();
       }
       this.set('currentConstraint', new Constraint());
       this.set('mode', 'create');
-    }, 
- 
+      this.trigger('constraintReset');
+    },
+
 
 
   });

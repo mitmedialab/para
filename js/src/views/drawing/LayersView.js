@@ -202,7 +202,7 @@ define([
 
 			$('#constraint_list').bind("click", {
 				view: this
-			}, this.constraintClicked);
+			}, this.P);
 			relIcon = $('#constraint_rel');
 			refIcon = $('#constraint_ref');
 
