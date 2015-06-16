@@ -9,6 +9,9 @@ define([
 
     initialize: function(data) {
       PaperUI.prototype.initialize.apply(this, arguments);
+       targetLayer = paper.project.layers.filter(function(layer) {
+        return layer.name === 'ui_layer';
+      })[0];
     },
 
     draw: function() {
@@ -36,6 +39,7 @@ define([
       arrowPath.fillColor = null; 
       
       this.set('geometry', arrowPath);
+      targetLayer.addChild(arrowPath);
     },
 
     hide: function() {

@@ -29,8 +29,6 @@ define([
 
     setup: function( sm ) {
       this.sm = sm;
-      this.uilayer = new paper.Layer({});
-      paper.project.activeLayer = paper.project.layers[0];
     },
 
 

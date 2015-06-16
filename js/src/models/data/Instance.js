@@ -1183,7 +1183,7 @@ define([
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 			geom.bringToFront();
-
+			console.log('geom layer',geom.layer);
 			var path_altered = this.get('path_altered').getValue();
 			if (!path_altered) {
 				//geom.transform(this._itemp_matrix);
@@ -1219,6 +1219,12 @@ define([
 			clone.get('scaling_origin').setValue(this.get('scaling_origin').getValue());
 			clone.get('rotation_origin').setValue(this.get('rotation_origin').getValue());
 			clone.set('bbox', this.get('bbox').clone());
+			return clone;
+		},
+
+		/*returns a clone of the paper js shape*/
+		getShapeClone: function(){
+			var clone = this.get('geom').clone();
 			return clone;
 		},
 

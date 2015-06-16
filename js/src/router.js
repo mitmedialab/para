@@ -27,6 +27,14 @@ define([
     app_router.on('route:defaultAction', function(actions) {
       var canvas = $('canvas').get(0);
       paper.setup(canvas);
+     
+      var geometry_layer = new paper.Layer();
+      geometry_layer.name = 'geometry_layer';
+      var ui_layer = new paper.Layer();
+      ui_layer.name = 'ui_layer';
+      geometry_layer.activate();
+      console.log('paper project', paper.project);
+      console.log('layers:',paper.project.layers);
 
       var propertiesManager = new PropertiesManager();
       //event bus for passing events between views

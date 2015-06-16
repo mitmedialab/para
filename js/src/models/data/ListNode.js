@@ -452,7 +452,15 @@ define([
       data.members = memberIds;
 
       return data;
+    },
+
+    getShapeClone: function(){
+     var clone = new paper.Group(this.members.map(function(instance) {
+            return instance.getShapeClone();
+          }));
+     return clone;
     }
+      
 
   });
 

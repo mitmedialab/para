@@ -28,9 +28,6 @@ define([
     'rotation': 'rotation_delta'
   };
 
-  var createProxy = function(instance) {
-
-  }
 
   var Constraint = Backbone.Model.extend({
 
@@ -99,26 +96,14 @@ define([
         var ref_geom = references.get('geom');
 
         //start of the proxy code: try to remove this //
-        var proxy;
-        if (relatives instanceof ListNode) {
-          proxy = new paper.Group(relatives.getInstanceMembers().map(function(instance) {
-            return instance.get('geom').clone();
-          }));
-        } else {
-          proxy = rel_geom.clone();
-        }
+        var proxy = relatives.getShapeClone();
         proxy.name = 'proxy';
-        proxy.bringToFront();
         proxy.visible = false;
-        proxy.show = function() {
-          //relatives.set('visible', false);
-          //relatives.get('geom').visible = false; // REALLY HACKY  
+        proxy.show = function() {      
           relatives.hide();
           proxy.visible = true;
         }
         proxy.hide = function() {
-          //relatives.set('visible', true);
-          //relatives.get('geom').visible = true; // REALLY HACKY
           relatives.show();
           proxy.visible = false;
         }
