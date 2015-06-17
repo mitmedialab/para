@@ -40,14 +40,59 @@ define([
       };
 
       var createColorUI = function(corners) {
-        var fill_black = paper.project.importSVG(document.getElementById('f_b'));
-        var fill_red = paper.project.importSVG(document.getElementById('f_r'));
-        var stroke_black = paper.project.importSVG(document.getElementById('st_b'));
-        var stroke_red = paper.project.importSVG(document.getElementById('st_r'));
-        fill_black.position = fill_red.position =  new paper.Point(corners[2].bounds.center.x-stroke_black.bounds.width/2 ,corners[2].bounds.center.y);
-        stroke_black.position=stroke_red.position = new paper.Point(corners[2].bounds.center.x,corners[2].bounds.center.y+stroke_black.bounds.height/2);
-        stroke_red.visible=fill_red.visible = false;
-        return new paper.Group(fill_black, fill_red);
+
+        var stroke_black = paper.project.importSVG(document.getElementById('st_b')).children[0];
+        var stroke_tab_black = stroke_black.children[1];
+        var stroke_red = paper.project.importSVG(document.getElementById('st_r')).children[0];
+        var stroke_tab_red = stroke_red.children[1];
+
+        var fill_black = paper.project.importSVG(document.getElementById('f_b')).children[0];
+        var fill_tab_black = fill_black.children[1];
+        var fill_red = paper.project.importSVG(document.getElementById('f_r')).children[0];
+        var fill_tab_red = fill_red.children[1];
+
+        var hue_red = paper.project.importSVG(document.getElementById('h_r')).children[0];
+        var hue_black = paper.project.importSVG(document.getElementById('h_b')).children[0];
+        var sat_red = paper.project.importSVG(document.getElementById('s_r')).children[0];
+        var sat_black = paper.project.importSVG(document.getElementById('s_b')).children[0];
+        var bright_red = paper.project.importSVG(document.getElementById('b_r')).children[0];
+        var bright_black = paper.project.importSVG(document.getElementById('b_b')).children[0];
+        var hue_group = new paper.Group(hue_black, hue_red);
+
+        var sat_group = new paper.Group(sat_black, sat_red);
+        var bright_group = new paper.Group(bright_black, bright_red);
+        sat_group.position = new paper.Point(hue_group.position.x + hue_group.bounds.width + 2, hue_group.position.y);
+        bright_group.position = new paper.Point(sat_group.position.x + sat_group.bounds.width + 2, sat_group.position.y);
+        var hsb_group = new paper.Group(hue_group, sat_group, bright_group);
+
+        fill_black.position = fill_red.position = new paper.Point(corners[2].bounds.center.x - stroke_black.bounds.width / 2, corners[2].bounds.center.y);
+        stroke_black.position = stroke_red.position = new paper.Point(corners[2].bounds.center.x, corners[2].bounds.center.y + stroke_black.bounds.height / 2);
+        stroke_red.visible = fill_red.visible = hue_red.visible = sat_red.visible = bright_red.visible = false;
+        hsb_group.position = new paper.Point(corners[2].bounds.center.x + fill_black.bounds.width + 5, corners[2].bounds.center.y);
+        hsb_group.visible = false;
+
+        fill_black.name = fill_black.children[0].name = 'fill_black';
+        stroke_black.name = stroke_black.children[0].name = 'stroke_black';
+        fill_red.name = fill_red.children[0].name = 'fill_red';
+        stroke_red.name = stroke_red.children[0].name = 'stroke_red';
+        stroke_tab_black.name = 'stroke_tab_black';
+        stroke_tab_red.name = 'stroke_tab_red';
+        fill_tab_red.name = 'fill_tab_red';
+        fill_tab_black.name = 'fill_tab_black';
+        hue_red.name = 'hue_red';
+        hue_black.name = 'hue_black';
+        sat_red.name = 'sat_red';
+        sat_black.name = 'sat_black';
+        bright_red.name = 'bright_red';
+        bright_black.name = 'bright_black';
+        hsb_group.name = 'hsb_group';
+        hue_group.name = 'hue_group';
+        sat_group.name = 'sat_group';
+        bright_group.name = 'bright_group';
+
+
+
+        return [stroke_red, stroke_black, fill_red, fill_black, hsb_group];
       };
 
       var createCross = function(bounds) {
@@ -134,6 +179,7 @@ define([
           arrows[2],
           arrows[3]
         ]);
+        handles.addChildren(color_ui);
       } else {
         handles = new paper.Group([
           gen_delbox,
@@ -145,6 +191,7 @@ define([
           arrows[2],
           arrows[3]
         ]);
+        handles.addChildren(color_ui);
       }
 
       for (var k = 0; k < handles.children.length; k++) {
@@ -159,10 +206,10 @@ define([
       this.set('geometry', handles);
 
       if (!this.initial) {
-        cross[1].strokeColor = 'red';
+        /*cross[1].strokeColor = 'red';
         cross[0].strokeColor = 'red';
         cross[1].active = true;
-        cross[0].active = true;
+        cross[0].active = true;*/
         this.addListeners();
         this.initial = true;
       }
@@ -227,11 +274,15 @@ define([
 
     addListeners: function() {
       var geometry = this.get('geometry');
-      geometry.onMouseEnter = this.onMouseEnter.bind(this);
-      geometry.onMouseLeave = this.onMouseLeave.bind(this);
-      geometry.onMouseDown = this.onMouseDown.bind(this);
-      geometry.onMouseUp = this.onMouseUp.bind(this);
-      geometry.onClick = this.onClick.bind(this);
+      for (var i = 0; i < geometry.children.length; i++) {
+        var child = geometry.children[i];
+        console.log('adding listener to child', child.name);
+        child.onMouseEnter = this.onMouseEnter.bind(this);
+        child.onMouseLeave = this.onMouseLeave.bind(this);
+        child.onMouseDown = this.onMouseDown.bind(this);
+        child.onMouseUp = this.onMouseUp.bind(this);
+        child.onClick = this.onClick.bind(this);
+      }
     },
 
     //******** DEFAULT LISTENERS *********//
@@ -239,12 +290,19 @@ define([
       if (event.modifiers.shift) {
         return;
       }
+      this.setProperties(event.target.name);
 
+    },
+
+
+    setProperties: function(name) {
+      console.log('set properties',name);
+      console.trace();
       var constraint = this.get('constraint');
       var ref_geom = constraint.get('ref_handle').get('geometry');
       var rel_geom = constraint.get('rel_handle').get('geometry');
-      var ref_target = ref_geom.children[event.target.name];
-      var rel_target = rel_geom.children[event.target.name];
+      var ref_target = ref_geom.children[name];
+      var rel_target = rel_geom.children[name];
 
       var applyClick = function(target, geometry, side) {
 
@@ -332,7 +390,12 @@ define([
       }
 
       var target = event.target;
+
+      console.log('target', target, target.name);
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
+        return;
+      } else if (target.name == 'fill_black' || target.name == 'fill_red' || target.name == 'stroke_red' || target.name == 'stroke_black') {
+        target.opacity = 0.5;
         return;
       }
       if (target.strokeColor) {
@@ -341,18 +404,24 @@ define([
       if (target.fillColor) {
         target.fillColor.saturation = target.fillColor.brightness = 0.5;
       }
-     
+
     },
 
     onMouseLeave: function(event) {
       if (event.modifiers.shift) {
         return;
       }
-
       var target = event.target;
+
+      console.log('target', target, target.name);
+
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
         return;
+      } else if (target.name == 'fill_black' || target.name == 'fill_red' || target.name == 'stroke_red' || target.name == 'stroke_black') {
+        target.opacity = 1;
+        return;
       }
+
       if (target.active) {
         if (target.strokeColor) {
           target.strokeColor.saturation = target.strokeColor.brightness = 1;

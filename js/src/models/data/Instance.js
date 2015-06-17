@@ -1183,7 +1183,6 @@ define([
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 			geom.bringToFront();
-			console.log('geom layer',geom.layer);
 			var path_altered = this.get('path_altered').getValue();
 			if (!path_altered) {
 				//geom.transform(this._itemp_matrix);

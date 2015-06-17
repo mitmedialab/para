@@ -133,7 +133,7 @@ define([
     checkPending: function() {
       var constraint = this.get('currentConstraint');
       if (constraint) {
-        if (constraint.get('references') && constraint.get('relatives')) {
+        if (constraint.get('references') && constraint.get('relatives') && constraint.get('expression')) {
           this.trigger('constraintPending');
         }
       }
