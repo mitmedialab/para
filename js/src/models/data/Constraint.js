@@ -120,6 +120,11 @@ define([
         };
         proxy.matchProperty = function(ref_prop, rel_prop) {
           var refPropValue, relPropValue;
+
+          var ref_prop_state;
+          var rel_prop_state;
+
+
           var ref_prop_doub = (ref_prop.split('_')[1] && ref_prop.split('_')[1] == 'xy');
           var rel_prop_doub = (rel_prop.split('_')[1] && rel_prop.split('_')[1] == 'xy');
           var propSwitch = function(prop, side) {
@@ -155,6 +160,40 @@ define([
                   y: geom.position.y
                 };
                 break;
+              case 'fill_x':
+                propValue = geom.fillColor.hue;
+                break;
+              case 'fill_y':
+                propValue = geom.fillColor.saturation;
+                break;
+              case 'fill_z':
+                propValue = geom.fillColor.brightness;
+                break;
+              case 'fill_xy':
+                propValue = {
+                  x: geom.fillColor.hue,
+                  y: geom.fillColor.saturation
+                };
+                break;
+              case 'fill_yz':
+                propValue = {
+                  y: geom.fillColor.saturation,
+                  z: geom.fillColor.brightness
+                };
+                break;
+              case 'fill_xz':
+                propValue = {
+                  x: geom.fillColor.hue,
+                  z: geom.fillColor.brightness,
+                };
+                break;
+              case 'fill_xyz':
+                propValue = {
+                  x: geom.fillColor.hue,
+                  y: geom.fillColor.saturation,
+                  z: geom.fillColor.brightness,
+                };
+                break;
               case 'rotation':
                 propValue = geom.rotation;
                 break;
@@ -164,8 +203,8 @@ define([
           refPropValue = propSwitch(ref_prop, 'ref');
           relPropValue = propSwitch(rel_prop, 'rel');
 
-          ref_prop_strip = ref_prop.split('_')[0];
-          rel_prop_strip = rel_prop.split('_')[0];
+          var ref_prop_strip = ref_prop.split('_')[0];
+          var rel_prop_strip = rel_prop.split('_')[0];
           var convertFactor = propConvMap[ref_prop_strip + ':' + rel_prop_strip];
           var conversion, offset;
 
@@ -179,7 +218,8 @@ define([
               y: relPropValue.y - conversion.y
             };
           } else if (ref_prop_doub) {
-            conversion = refPropValue.x * convertFactor + refPropValue.y * convertFactor;
+            var keys = Object.keys(refPropValue);
+            conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
             offset = {
               x: relPropValue - conversion
             };
@@ -227,10 +267,7 @@ define([
     },
 
 
-    /*constraint creation function
-     * if trying to constraining x property
-     * to x and y right now uses offest from x and y
-     */
+    
     create: function() {
       console.log('rel_prop', this.get('rel_prop'));
       console.log('ref_prop', this.get('ref_prop'));
@@ -249,11 +286,14 @@ define([
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
       console.log('refPropAccess', refPropAccess);
       console.log('relPropAccess', relPropAccess);
-
+      var constraintF;
       if (ref_doub && !rel_doub) {
-        var constraintF = function() {
+        constraintF = function() {
           var refPropValue = refPropAccess.getValue();
-          var x = refPropValue.x + refPropValue.y;
+          console.log('rel prop value',rel_prop[1]);
+           var keys = Object.keys(refPropAccess.getValue());
+          var x = (rel_prop[0] == 'rotation') ? refPropAccess.getValue()[keys[0]] : refPropAccess[rel_prop[1]].getValue();
+           console.log('keys',keys,'value',refPropAccess.getValue(),'x:',x);
           var y;
           eval(expression['x']);
           if (rel_prop[0] == 'rotation') {
@@ -264,7 +304,7 @@ define([
           return y;
         };
       } else if (ref_doub && rel_doub) {
-        var constraintF = function() {
+        constraintF = function() {
           var evalObj = {};
           for (var axis in expression) {
             var x = refPropAccess[axis].getValue();
@@ -279,7 +319,7 @@ define([
           return evalObj;
         };
       } else if (!ref_doub && rel_doub) {
-        var constraintF = function() {
+       constraintF = function() {
           var evalObj = {};
           var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
           for (var axis in expression) {
@@ -291,7 +331,7 @@ define([
           return evalObj;
         };
       } else {
-        var constraintF = function() {
+        constraintF = function() {
           var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
           var y, relPropObj;
           eval(expression['x']);
@@ -302,7 +342,7 @@ define([
             relPropAccess[rel_prop[1]].setValue(y);
           }
           return y;
-        }
+        };
       }
       if (rel_doub || !rel_prop[1]) {
         relPropAccess.setConstraint(constraintF);
