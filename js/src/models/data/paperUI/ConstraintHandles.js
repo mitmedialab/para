@@ -39,6 +39,17 @@ define([
         return corners;
       };
 
+      var createColorUI = function(corners) {
+        var fill_black = paper.project.importSVG(document.getElementById('f_b'));
+        var fill_red = paper.project.importSVG(document.getElementById('f_r'));
+        var stroke_black = paper.project.importSVG(document.getElementById('st_b'));
+        var stroke_red = paper.project.importSVG(document.getElementById('st_r'));
+        fill_black.position = fill_red.position =  new paper.Point(corners[2].bounds.center.x-stroke_black.bounds.width/2 ,corners[2].bounds.center.y);
+        stroke_black.position=stroke_red.position = new paper.Point(corners[2].bounds.center.x,corners[2].bounds.center.y+stroke_black.bounds.height/2);
+        stroke_red.visible=fill_red.visible = false;
+        return new paper.Group(fill_black, fill_red);
+      };
+
       var createCross = function(bounds) {
         // center cross 
         var cross_v = new paper.Path.Line({
@@ -87,7 +98,7 @@ define([
       var gen_bounds = geom.bounds;
       var gen_delbox = createDelimBox(gen_bounds);
       var gen_corners = createCorners(gen_bounds);
-
+      var hand_geom, hand_bounds, hand_delbox, hand_corners;
       if (geom instanceof paper.Group) {
         hand_geom = geom.children[0];
         hand_bounds = hand_geom.bounds;
@@ -105,7 +116,7 @@ define([
 
       var cross = createCross(hand_bounds);
       var arrows = createScaleArrows(hand_corners);
-
+      var color_ui = createColorUI(hand_corners);
 
       // TODO: Handles for stroke/fill/weight
 
@@ -136,12 +147,12 @@ define([
         ]);
       }
 
-      for (var i = 0; i < handles.children.length; i++) {
-        handles.children[i].originalStroke = handles.children[i].strokeColor;
-        handles.children[i].originalFill = handles.children[i].fillColor;
-        handles.children[i].active = false;
-        if (handles.children[i].name != 'delbox' && handles.children[i].name != 'corner' && handles.children[i].name != 'hand_delbox' && handles.children[i].name != 'hand_corner') {
-          handles.children[i].type = 'handle';
+      for (var k = 0; k < handles.children.length; k++) {
+        handles.children[k].originalStroke = handles.children[k].strokeColor;
+        handles.children[k].originalFill = handles.children[k].fillColor;
+        handles.children[k].active = false;
+        if (handles.children[k].name != 'delbox' && handles.children[k].name != 'corner' && handles.children[k].name != 'hand_delbox' && handles.children[k].name != 'hand_corner') {
+          handles.children[k].type = 'handle';
         }
       }
       targetLayer.addChild(handles);
@@ -169,7 +180,7 @@ define([
         return;
       }
       geometry.visible = true;
-      console.log('handle layer=',geometry.layer);
+      console.log('handle layer=', geometry.layer);
     },
 
     redraw: function() {
@@ -194,8 +205,8 @@ define([
         hand_corners = geometry.getItems({
           name: 'hand_corner'
         });
-        for (var i = 0; i < 9; i++) {
-          hand_corners[i].position = new paper.Point(hand_delbox.bounds.x + (i % 3) / 2.0 * hand_delbox.bounds.width, hand_delbox.bounds.y + Math.floor(i / 3) / 2.0 * hand_delbox.bounds.height, 3, 3);
+        for (var j = 0; j < 9; j++) {
+          hand_corners[j].position = new paper.Point(hand_delbox.bounds.x + (j % 3) / 2.0 * hand_delbox.bounds.width, hand_delbox.bounds.y + Math.floor(j / 3) / 2.0 * hand_delbox.bounds.height, 3, 3);
         }
       }
 
@@ -266,9 +277,9 @@ define([
         }
 
         target.active = !target.active;
-
+        var property;
         if (target.active) {
-          var property = target.name;
+          property = target.name;
           target.strokeColor = '#ff0000';
           target.fillColor = '#ff0000';
           if (geometry.children['position_x'].active && geometry.children['position_y'].active) {
@@ -277,6 +288,9 @@ define([
           constraint.set(side + '_prop', property);
           return;
         } else {
+          property = target.name;
+          target.strokeColor = '#000000';
+          target.fillColor = '#000000';
           for (var j = 0; j < geometry.children.length; j++) {
             if (geometry.children[j].active) {
               constraint.set(side + '_prop', geometry.children[j].name);
@@ -285,7 +299,7 @@ define([
           }
           constraint.set(side + '_prop', null);
         }
-      }
+      };
 
       if (this.get('side') == 'ref') {
         applyClick(ref_target, ref_geom, 'ref');
@@ -321,14 +335,13 @@ define([
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
         return;
       }
-
-      if (!target.active) {
-        target.strokeColor = '#ff0000';
-        target.fillColor = '#ff0000';
-      } else {
-        target.strokeColor = target.originalStroke;
-        target.fillColor = target.originalFill;
+      if (target.strokeColor) {
+        target.strokeColor.saturation = target.strokeColor.brightness = 0.5;
       }
+      if (target.fillColor) {
+        target.fillColor.saturation = target.fillColor.brightness = 0.5;
+      }
+     
     },
 
     onMouseLeave: function(event) {
@@ -340,13 +353,20 @@ define([
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
         return;
       }
-
-      if (!target.active) {
-        target.strokeColor = target.originalStroke;
-        target.fillColor = target.originalFill;
+      if (target.active) {
+        if (target.strokeColor) {
+          target.strokeColor.saturation = target.strokeColor.brightness = 1;
+        }
+        if (target.fillColor) {
+          target.fillColor.saturation = target.fillColor.brightness = 1;
+        }
       } else {
-        target.strokeColor = '#ff0000';
-        target.fillColor = '#ff0000';
+        if (target.strokeColor) {
+          target.strokeColor.saturation = target.strokeColor.brightness = 0;
+        }
+        if (target.fillColor) {
+          target.fillColor.saturation = target.fillColor.brightness = 0;
+        }
       }
     },
 
