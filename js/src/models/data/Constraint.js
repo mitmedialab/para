@@ -124,7 +124,7 @@ define([
 
           var ref_dimensions = ref_prop.split('_').length > 1 ? ref_prop.split('_')[1] : [];
           var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : [];
-          console.log('ref_dimensions',ref_dimensions,ref_dimensions.length,'rel_dimensions',rel_dimensions,rel_dimensions.length);
+          console.log('ref_dimensions', ref_dimensions, ref_dimensions.length, 'rel_dimensions', rel_dimensions, rel_dimensions.length);
 
           // var ref_prop_doub = (ref_prop.split('_')[1] && ref_prop.split('_')[1] == 'xy');
           // var rel_prop_doub = (rel_prop.split('_')[1] && rel_prop.split('_')[1] == 'xy');
@@ -214,7 +214,7 @@ define([
 
           if (ref_dimensions.length === rel_dimensions.length) {
             console.log('dimensions are equal');
-            if (ref_dimensions.length <2) {
+            if (ref_dimensions.length < 2) {
               conversion = refPropValue * convertFactor;
               offset = {
                 x: relPropValue - conversion
@@ -224,14 +224,14 @@ define([
 
               for (var i = 0; i < rel_dimensions.length; i++) {
                 conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
-                console.log('refPropValue',refPropValue,ref_dimensions[i],refPropValue[ref_dimensions[i]],'convert factor:',convertFactor);
+                console.log('refPropValue', refPropValue, ref_dimensions[i], refPropValue[ref_dimensions[i]], 'convert factor:', convertFactor);
                 offset[rel_dimensions[i]] = relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]];
               }
             }
 
           } else if (ref_dimensions.length > rel_dimensions.length) {
-            keys = Object.keys(refPropValue);
-            if (rel_dimensions.length === 0) {
+            if (rel_dimensions.length < 2) {
+              keys = Object.keys(refPropValue);
               conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
               offset = {
                 x: relPropValue - conversion
@@ -243,7 +243,7 @@ define([
               }
             }
           } else if (ref_dimensions.length < rel_dimensions.length) {
-            if (ref_dimensions.length === 0) {
+            if (ref_dimensions.length < 2) {
               for (var k = 0; k < rel_dimensions.length; k++) {
                 conversion[rel_dimensions[k]] = refPropValue * convertFactor;
                 offset[rel_dimensions[k]] = relPropValue[rel_dimensions[k]] - conversion[rel_dimensions[k]];
@@ -252,13 +252,13 @@ define([
               keys = Object.keys(refPropValue);
 
               for (var m = 0; m < rel_dimensions.length; m++) {
-                conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]] * convertFactor : (m<keys.length)? refPropValue[keys[m]] * convertFactor: refPropValue[keys[keys.length-1]];
+                conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]] * convertFactor : (m < keys.length) ? refPropValue[keys[m]] * convertFactor : refPropValue[keys[keys.length - 1]];
                 offset[rel_dimensions[m]] = relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]];
               }
             }
-          } 
+          }
 
-          console.log('offset',offset,'conversion',conversion);
+          console.log('offset', offset, 'conversion', conversion);
           var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x';
           var exp_object = {};
           for (var axis in offset) {
@@ -294,8 +294,9 @@ define([
 
       var ref_prop = this.get('ref_prop').split('_');
       var rel_prop = this.get('rel_prop').split('_');
-      var ref_doub = (ref_prop[1] && ref_prop[1] == 'xy');
-      var rel_doub = (rel_prop[1] && rel_prop[1] == 'xy');
+      var ref_dimensions = this.get('ref_prop').split('_').length > 1 ? this.get('ref_prop').split('_')[1] : [];
+
+      var rel_dimensions = this.get('rel_prop').split('_').length > 1 ? this.get('rel_prop').split('_')[1] : [];
 
       var reference = this.get('references');
       var relative = this.get('relatives');
@@ -307,66 +308,105 @@ define([
       console.log('refPropAccess', refPropAccess);
       console.log('relPropAccess', relPropAccess);
       var constraintF;
-      if (ref_doub && !rel_doub) {
-        constraintF = function() {
-          var refPropValue = refPropAccess.getValue();
-          console.log('rel prop value', rel_prop[1]);
-          var keys = Object.keys(refPropAccess.getValue());
-          var x = (rel_prop[0] == 'rotation') ? refPropAccess.getValue()[keys[0]] : refPropAccess[rel_prop[1]].getValue();
-          console.log('keys', keys, 'value', refPropAccess.getValue(), 'x:', x);
-          var y;
-          eval(expression['x']);
-          if (rel_prop[0] == 'rotation') {
-            relPropAccess.setValue(y);
-          } else {
-            relPropAccess[rel_prop[1]].setValue(y);
-          }
-          return y;
-        };
-      } else if (ref_doub && rel_doub) {
-        constraintF = function() {
-          var evalObj = {};
-          for (var axis in expression) {
-            var x = refPropAccess[axis].getValue();
-            console.log('x-val', x);
+      if (ref_dimensions.length === rel_dimensions.length) {
+        if (ref_dimensions.length > 1) {
+          constraintF = function() {
+            var evalObj = {};
+            for (var axis in expression) {
+              var x = refPropAccess[axis].getValue();
+              console.log('x-val', x);
+              var y;
+              eval(expression[axis]);
+              console.log('y-val', y);
+              evalObj[axis] = y;
+            }
+            console.log('evalObj', evalObj);
+            relPropAccess.setValue(evalObj);
+            return evalObj;
+          };
+        } else {
+          constraintF = function() {
+            var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
+            var y, relPropObj;
+            eval(expression['x']);
+            if (rel_prop[0] == 'rotation') {
+              relPropAccess.setValue(y);
+              relPropObj = y;
+            } else {
+              relPropAccess[rel_prop[1]].setValue(y);
+            }
+            return y;
+          };
+        }
+      } else if (ref_dimensions.length > rel_dimensions.length) {
+        if (rel_dimensions.length < 2) {
+          constraintF = function() {
+            var refPropValue = refPropAccess.getValue();
+            console.log('rel prop value', rel_prop[1]);
+            var keys = Object.keys(refPropAccess.getValue());
+            var x = (rel_prop[0] == 'rotation') ? refPropAccess.getValue()[keys[0]] : refPropAccess[rel_prop[1]].getValue();
+            console.log('keys', keys, 'value', refPropAccess.getValue(), 'x:', x);
             var y;
-            eval(expression[axis]);
-            console.log('y-val', y);
-            evalObj[axis] = y;
-          }
-          console.log('evalObj', evalObj);
-          relPropAccess.setValue(evalObj);
-          return evalObj;
-        };
-      } else if (!ref_doub && rel_doub) {
-        constraintF = function() {
-          var evalObj = {};
-          var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
-          for (var axis in expression) {
-            var y;
-            eval(expression[axis]);
-            evalObj[axis] = y;
-          }
-          relPropAccess.setValue(evalObj);
-          return evalObj;
-        };
-      } else {
-        constraintF = function() {
-          var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
-          var y, relPropObj;
-          eval(expression['x']);
-          if (rel_prop[0] == 'rotation') {
-            relPropAccess.setValue(y);
-            relPropObj = y;
-          } else {
-            relPropAccess[rel_prop[1]].setValue(y);
-          }
-          return y;
-        };
+            eval(expression['x']);
+            if (rel_prop[0] == 'rotation') {
+              relPropAccess.setValue(y);
+            } else {
+              relPropAccess[rel_prop[1]].setValue(y);
+            }
+            return y;
+          };
+        } else {
+          constraintF = function() {
+            var evalObj = {};
+            for (var axis in expression) {
+              var x = refPropAccess[axis].getValue();
+              console.log('x-val', x);
+              var y;
+              eval(expression[axis]);
+              console.log('y-val', y);
+              evalObj[axis] = y;
+            }
+            console.log('evalObj', evalObj);
+            relPropAccess.setValue(evalObj);
+            return evalObj;
+          };
+        }
+
+      } else if (ref_dimensions.length < rel_dimensions.length) {
+        if (ref_dimensions.length < 2) {
+          constraintF = function() {
+            var evalObj = {};
+            var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
+            for (var axis in expression) {
+              var y;
+              eval(expression[axis]);
+              evalObj[axis] = y;
+            }
+            relPropAccess.setValue(evalObj);
+            return evalObj;
+          };
+        } else {
+          constraintF = function() {
+            var evalObj = {};
+            for (var axis in expression) {
+              var x = refPropAccess[axis].getValue();
+              console.log('x-val', x);
+              var y;
+              eval(expression[axis]);
+              console.log('y-val', y);
+              evalObj[axis] = y;
+            }
+            console.log('evalObj', evalObj);
+            relPropAccess.setValue(evalObj);
+            return evalObj;
+          };
+        }
       }
-      if (rel_doub || !rel_prop[1]) {
+      if (rel_dimensions.length > 1 || !rel_prop[1]) {
         relPropAccess.setConstraint(constraintF);
+        console.log('setting constraint on relPropAccess',relPropAccess);
       } else {
+        console.log('setting constraint on relProp1',relPropAccess[rel_prop[1]],rel_prop[1]);
         relPropAccess[rel_prop[1]].setConstraint(constraintF);
       }
 
