@@ -8,7 +8,7 @@
  */
 
 define([
-
+		'underscore',
 		'paper',
 		'cjs',
 		'utils/PFloat',
@@ -16,7 +16,7 @@ define([
 		'utils/ColorUtils'
 	],
 
-	function(paper, cjs, PFloat, PConstraint, ColorUtils) {
+	function(_, paper, cjs, PFloat, PConstraint, ColorUtils) {
 
 		var PColor = PConstraint.extend({
 
@@ -34,6 +34,15 @@ define([
 				this.g = new PFloat(g);
 				this.b = new PFloat(b);
 				this.a = new PFloat(a);
+				var hsl = ColorUtils.rgbToHsl({
+					r: r,
+					g: g,
+					b: b
+				});
+				this.h = new PFloat(hsl[0]);
+				this.s = new PFloat(hsl[1]);
+				this.l = new PFloat(hsl[2]);
+				this.setMode = 'hsb';
 				PConstraint.apply(this, arguments);
 
 				if (operator) {
@@ -53,6 +62,9 @@ define([
 				data.r = this.r.isConstrained().self;
 				data.g = this.g.isConstrained().self;
 				data.b = this.r.isConstrained().self;
+				data.h = this.h.isConstrained().self;
+				data.s = this.s.isConstrained().self;
+				data.l = this.l.isConstrained().self;
 				data.a = this.g.isConstrained().self;
 				return data;
 			},
@@ -66,23 +78,67 @@ define([
 				data.r = this.r.getConstraint().self;
 				data.g = this.g.getConstraint().self;
 				data.b = this.r.getConstraint().self;
+				data.h = this.h.getConstraint().self;
+				data.s = this.s.getConstraint().self;
+				data.l = this.l.getConstraint().self;
 				data.a = this.g.getConstraint().self;
+
 				return data;
 			},
 
 
 			/* setValue
-			 * sets rgb values
+			 * defaults to setting via HSB, need to figure out a flag for mo
 			 */
-			setValue: function(r, g, b, a) {
-				this.setR(r);
-				this.setG(g);
-				this.setB(b);
-				if (a) {
-					this.setA(a);
+			 setValue: function(color){
+			 		if (color.a) {
+					this.setA(color.a);
 				}
+				if(this.setMode === 'hsb'){
+					this.setValueHSB(color);
+				}
+				else{
+					this.setValueRGB(color);
+				}
+			 },
+
+			setValueRGB: function(color) {
+			
+				var isConstrained = this.isConstrained();
+				if (isConstrained.h || isConstrained.s || isConstrained.l) {
+					return;
+				}
+				this.setR(color.r,true);
+				this.setG(color.g,true);
+				this.setB(color.b,true);
+				var hsl = ColorUtils.rgbToHsl({
+					r: this.getR(),
+					g: this.getG(),
+					b: this.getB()
+				});
+				this.setH(hsl[0],true);
+				this.setS(hsl[1],true);
+				this.setL(hsl[2],true);
+
 
 			},
+
+			setValueHSB: function(color) {
+				
+				console.trace();
+				var isConstrained = this.isConstrained();
+				if (isConstrained.r || isConstrained.g || isConstrained.b) {
+					return;
+				}
+				this.setH(color.h,true);
+				this.setS(color.s,true);
+				this.setL(color.l,true);
+				var rgb = ColorUtils.hslToRgb(this.getH(), this.getS(), this.getL());
+				this.setR(rgb[0],true);
+				this.setB(rgb[1],true);
+				this.setG(rgb[2],true);
+			},
+
 			/* getValue
 			 * returns an object with current rgba values as properties
 			 */
@@ -92,6 +148,9 @@ define([
 						r: this.getR(),
 						g: this.getG(),
 						b: this.getB(),
+						h: this.getH(),
+						s: this.getS(),
+						l: this.getL(),
 						a: this.getA()
 					};
 				} else {
@@ -124,6 +183,30 @@ define([
 				}
 			},
 
+			getH: function() {
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().h;
+				} else {
+					return this.h.getValue();
+				}
+			},
+
+			getS: function() {
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().s;
+				} else {
+					return this.s.getValue();
+				}
+			},
+
+			getL: function() {
+				if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().l;
+				} else {
+					return this.l.getValue();
+				}
+			},
+
 			getA: function() {
 				if (this.isSelfConstrained()) {
 					return this.getSelfConstraint().getValue().a;
@@ -132,18 +215,69 @@ define([
 				}
 			},
 
-			setR: function(r) {
+			setR: function(r, checkConstraint) {
+				if (checkConstraint) {
+					var isConstrained = this.isConstrained();
+					if (isConstrained.h || isConstrained.s || isConstrained.l) {
+						return;
+					}
+				}
 				this.r.setValue(r);
 				this.setNull(false);
 			},
 
-			setG: function(g) {
+			setG: function(g, checkConstraint) {
+				if (checkConstraint) {
+					var isConstrained = this.isConstrained();
+					if (isConstrained.h || isConstrained.s || isConstrained.l) {
+						return;
+					}
+				}
 				this.g.setValue(g);
 				this.setNull(false);
 			},
 
-			setB: function(b) {
+			setB: function(b, checkConstraint) {
+				if (checkConstraint) {
+					var isConstrained = this.isConstrained();
+					if (isConstrained.h || isConstrained.s || isConstrained.l) {
+						return;
+					}
+				}
 				this.b.setValue(b);
+				this.setNull(false);
+			},
+
+			setH: function(h, checkConstraint) {
+				if (checkConstraint) {
+					var isConstrained = this.isConstrained();
+					if (isConstrained.r || isConstrained.g || isConstrained.b) {
+						return;
+					}
+				}
+				this.h.setValue(h);
+				this.setNull(false);
+			},
+
+			setS: function(s, checkConstraint) {
+				if (checkConstraint) {
+					var isConstrained = this.isConstrained();
+					if (isConstrained.r || isConstrained.g || isConstrained.b) {
+						return;
+					}
+				}
+				this.s.setValue(s);
+				this.setNull(false);
+			},
+
+			setL: function(l, checkConstraint) {
+				if (checkConstraint) {
+					var isConstrained = this.isConstrained();
+					if (isConstrained.r || isConstrained.g || isConstrained.b) {
+						return;
+					}
+				}
+				this.l.setValue(l);
 				this.setNull(false);
 			},
 
@@ -174,11 +308,18 @@ define([
 			 * calls super modify following this conversion
 			 */
 			modifyProperty: function(style_data) {
+				var r = ColorUtils.hexToR(style_data);
+				var g = ColorUtils.hexToG(style_data);
+				var b = ColorUtils.hexToB(style_data);
+				var hsl = ColorUtils.rgbToHsl({r:r,g:g,b:b});
 				var data = {
 					operator: 'set',
-					r: ColorUtils.hexToR(style_data),
-					g: ColorUtils.hexToG(style_data),
-					b: ColorUtils.hexToB(style_data)
+					r:r,
+					g:g,
+					b:b,
+					h: hsl[0],
+					s: hsl[1],
+					l: hsl[2]
 				};
 				PConstraint.prototype.modifyProperty.call(this, data);
 			},

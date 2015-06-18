@@ -41,58 +41,48 @@ define([
 
       var createColorUI = function(corners) {
 
-        var stroke_black = paper.project.importSVG(document.getElementById('st_b')).children[0];
-        var stroke_tab_black = stroke_black.children[1];
-        var stroke_red = paper.project.importSVG(document.getElementById('st_r')).children[0];
-        var stroke_tab_red = stroke_red.children[1];
+        var stroke = paper.project.importSVG(document.getElementById('st_b')).children[0];
+        var stroke_tab = stroke.children[1];
 
-        var fill_black = paper.project.importSVG(document.getElementById('f_b')).children[0];
-        var fill_tab_black = fill_black.children[1];
-        var fill_red = paper.project.importSVG(document.getElementById('f_r')).children[0];
-        var fill_tab_red = fill_red.children[1];
-
-        var hue_red = paper.project.importSVG(document.getElementById('h_r')).children[0];
-        var hue_black = paper.project.importSVG(document.getElementById('h_b')).children[0];
-        var sat_red = paper.project.importSVG(document.getElementById('s_r')).children[0];
-        var sat_black = paper.project.importSVG(document.getElementById('s_b')).children[0];
-        var bright_red = paper.project.importSVG(document.getElementById('b_r')).children[0];
-        var bright_black = paper.project.importSVG(document.getElementById('b_b')).children[0];
-        var hue_group = new paper.Group(hue_black, hue_red);
-
-        var sat_group = new paper.Group(sat_black, sat_red);
-        var bright_group = new paper.Group(bright_black, bright_red);
-        sat_group.position = new paper.Point(hue_group.position.x + hue_group.bounds.width + 2, hue_group.position.y);
-        bright_group.position = new paper.Point(sat_group.position.x + sat_group.bounds.width + 2, sat_group.position.y);
-        var hsb_group = new paper.Group(hue_group, sat_group, bright_group);
-
-        fill_black.position = fill_red.position = new paper.Point(corners[2].bounds.center.x - stroke_black.bounds.width / 2, corners[2].bounds.center.y);
-        stroke_black.position = stroke_red.position = new paper.Point(corners[2].bounds.center.x, corners[2].bounds.center.y + stroke_black.bounds.height / 2);
-        stroke_red.visible = fill_red.visible = hue_red.visible = sat_red.visible = bright_red.visible = false;
-        hsb_group.position = new paper.Point(corners[2].bounds.center.x + fill_black.bounds.width + 5, corners[2].bounds.center.y);
-        hsb_group.visible = false;
-
-        fill_black.name = fill_black.children[0].name = 'fill_black';
-        stroke_black.name = stroke_black.children[0].name = 'stroke_black';
-        fill_red.name = fill_red.children[0].name = 'fill_red';
-        stroke_red.name = stroke_red.children[0].name = 'stroke_red';
-        stroke_tab_black.name = 'stroke_tab_black';
-        stroke_tab_red.name = 'stroke_tab_red';
-        fill_tab_red.name = 'fill_tab_red';
-        fill_tab_black.name = 'fill_tab_black';
-        hue_red.name = 'hue_red';
-        hue_black.name = 'hue_black';
-        sat_red.name = 'sat_red';
-        sat_black.name = 'sat_black';
-        bright_red.name = 'bright_red';
-        bright_black.name = 'bright_black';
-        hsb_group.name = 'hsb_group';
-        hue_group.name = 'hue_group';
-        sat_group.name = 'sat_group';
-        bright_group.name = 'bright_group';
+        var fill = paper.project.importSVG(document.getElementById('f_b')).children[0];
+        fill.children[0].name = stroke.children[0].name = 'box';
+        var fill_tab = fill.children[1];
 
 
+        var fill_h = paper.project.importSVG(document.getElementById('h_b')).children[0];
+        var fill_s = paper.project.importSVG(document.getElementById('s_b')).children[0];
+        var fill_l = paper.project.importSVG(document.getElementById('b_b')).children[0];
 
-        return [stroke_red, stroke_black, fill_red, fill_black, hsb_group];
+        fill_s.position = new paper.Point(fill_h.position.x + fill_h.bounds.width + 2, fill_h.position.y);
+        fill_l.position = new paper.Point(fill_s.position.x + fill_s.bounds.width + 2, fill_l.position.y);
+
+        var stroke_h = fill_h.clone();
+        var stroke_s = fill_s.clone();
+        var stroke_l = fill_l.clone();
+
+        fill_h.children[0].name = fill_s.children[0].name = fill_l.children[0].name = stroke_h.children[0].name = stroke_s.children[0].name = stroke_l.children[0].name = 'box';
+        fill_h.children[1].name = fill_s.children[1].name = fill_l.children[1].name = stroke_h.children[1].name = stroke_s.children[1].name = stroke_l.children[1].name = 'letter';
+
+        var fill_group = new paper.Group(fill_h, fill_s, fill_l);
+        var stroke_group = new paper.Group(stroke_h, stroke_s, stroke_l);
+
+        fill.position = new paper.Point(corners[2].bounds.center.x - fill.bounds.width / 2, corners[2].bounds.center.y);
+        stroke.position = new paper.Point(corners[2].bounds.center.x, corners[2].bounds.center.y + stroke.bounds.height / 2);
+
+        fill_group.position = new paper.Point(corners[2].bounds.center.x + fill.bounds.width + 5, corners[2].bounds.center.y - 8);
+        stroke_group.position = new paper.Point(corners[2].bounds.center.x + stroke.bounds.width + 5, corners[2].bounds.center.y + stroke.bounds.height / 2);
+
+        fill.name = 'fill_hsl';
+        stroke.name = 'stroke_hsl';
+        stroke_tab.name = fill_tab.name = 'options';
+        fill_h.name = 'fill_h';
+        fill_s.name = 'fill_s';
+        fill_l.name = 'fill_l';
+        stroke_h.name = 'stroke_h';
+        stroke_s.name = 'stroke_s';
+        stroke_l.name = 'stroke_l';
+
+        return [stroke, fill, fill_h, fill_s, fill_l, stroke_h, stroke_s, stroke_l];
       };
 
       var createCross = function(bounds) {
@@ -290,13 +280,18 @@ define([
       if (event.modifiers.shift) {
         return;
       }
-      this.setProperties(event.target.name);
+      var target = event.target;
+      if (event.target.name == 'box' || event.target.name == 'letter') {
+        target = target.parent;
+      }
+      console.log('target name', target.name, target);
+      this.setProperties(target.name);
 
     },
 
 
     setProperties: function(name) {
-      console.log('set properties',name);
+      console.log('set properties', name);
       console.trace();
       var constraint = this.get('constraint');
       var ref_geom = constraint.get('ref_handle').get('geometry');
@@ -313,6 +308,7 @@ define([
         if ((target.name == 'scale_x' || target.name == 'scale_y') && geometry.children['scale_xy'].active) {
           return;
         }
+
         if ((target.name == 'scale_x' && geometry.children['scale_y'].active) || (target.name == 'scale_y' && geometry.children['scale_x'].active)) {
           target = geometry.children['scale_xy'];
         }
@@ -325,12 +321,25 @@ define([
           var childGroup = child.name.split('_')[0];
           if (childGroup != thisGroup) {
             child.active = false;
-            child.strokeColor = child.originalStroke;
-            child.fillColor = child.originalFill;
+            if (child.name == 'fill_hsb') {
+              //TODO: change to match fill/stroke color of original object 
+              child.children[0].strokeColor = 'black';
+              child.children[0].fillColor = 'white';
+            } else if (child.name == 'stroke_hsb') {
+              child.children[0].strokeColor = 'white';
+              child.children[0].fillColor = 'black';
+            } else if (child.name.split('fill')[1] || child.name.split('stroke')[1]) {
+              child.children[0].strokeColor = 'black';
+              child.children[0].fillColor = 'white';
+              child.children[1].fillColor = 'black';
+            } else {
+              child.strokeColor = child.originalStroke;
+              child.fillColor = 'black';
+            }
           } else if ((child.name == 'scale_x' || child.name == 'scale_y') && target.name == 'scale_xy') {
             child.active = false;
-            child.strokeColor = child.originalStroke;
-            child.fillColor = child.originalFill;
+            child.strokeColor = 'black';
+            child.fillColor = 'black';
           }
         }
 
@@ -338,8 +347,27 @@ define([
         var property;
         if (target.active) {
           property = target.name;
-          target.strokeColor = '#ff0000';
-          target.fillColor = '#ff0000';
+
+
+          if (target.name == 'fill_hsb') {
+            //TODO: change to match fill/stroke color of original object 
+            target.children[0].strokeColor = 'red';
+            console.log('setting fill active');
+          } else if (target.name == 'stroke_hsb') {
+            target.children[0].strokeColor = 'red';
+            console.log('setting stroke active');
+
+          } else if (target.name.split('fill')[1] || target.name.split('stroke')[1]) {
+            target.children[0].strokeColor = 'red';
+            target.children[1].fillColor = 'red';
+            console.log('setting sub prop active');
+
+          } else {
+            target.strokeColor = '#ff0000';
+            target.fillColor = '#ff0000';
+          }
+
+
           if (geometry.children['position_x'].active && geometry.children['position_y'].active) {
             property = 'position_xy';
           }
@@ -394,8 +422,12 @@ define([
       console.log('target', target, target.name);
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
         return;
-      } else if (target.name == 'fill_black' || target.name == 'fill_red' || target.name == 'stroke_red' || target.name == 'stroke_black') {
-        target.opacity = 0.5;
+      } else if (target.name == 'fill' || target.name == 'stroke' || target.name == 'options' || target.name == 'box' || target.name == 'letter') {
+        if (target.name == 'box' || target.name == 'letter') {
+          target.parent.opacity = 0.5;
+        } else {
+          target.opacity = 0.5;
+        }
         return;
       }
       if (target.strokeColor) {
@@ -417,8 +449,12 @@ define([
 
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
         return;
-      } else if (target.name == 'fill_black' || target.name == 'fill_red' || target.name == 'stroke_red' || target.name == 'stroke_black') {
-        target.opacity = 1;
+      } else if (target.name == 'fill' || target.name == 'stroke' || target.name == 'options' || target.name == 'box' || target.name == 'letter') {
+        if (target.name == 'box' || target.name == 'letter') {
+          target.parent.opacity = 1;
+        } else {
+          target.opacity = 1;
+        }
         return;
       }
 

@@ -119,6 +119,8 @@ define([
 
 
       this.modifyProperty(data);
+      console.log('color value',this.get('fill_color').getValue());
+
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
       this.setPathAltered();

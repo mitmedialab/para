@@ -1048,6 +1048,8 @@ define([
 		},
 
 		compileStyle: function() {
+			var fill_color = this.accessProperty('fill_color');
+			console.log('fill_color=',fill_color);
 			this._fill_color = this.accessProperty('fill_color');
 			this._stroke_color = this.accessProperty('stroke_color');
 			this._stroke_width = this.accessProperty('stroke_width');
@@ -1078,10 +1080,17 @@ define([
 
 
 		renderStyle: function(geom) {
-			geom.fillColor = ColorUtils.rgbToHex(this._fill_color);
+			geom.fillColor.hue = this._fill_color.h;
+			geom.fillColor.saturation = this._fill_color.s;
+			geom.fillColor.lightness = this._fill_color.l;
 			geom.fillColor.alpha = this._fill_color.a;
-			geom.strokeColor = ColorUtils.rgbToHex(this._stroke_color);
+
+			geom.strokeColor.hue = this._stroke_color.h;
+			geom.strokeColor.saturation = this._stroke_color.s;
+			geom.strokeColor.lightness = this._stroke_color.l;
 			geom.strokeColor.alpha = this._stroke_color.a;
+			geom.strokeColor.alpha = this._stroke_color.a;
+			
 			geom.strokeWidth = this._stroke_width;
 			geom.visible = this._visible;
 		},
