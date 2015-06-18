@@ -321,11 +321,11 @@ define([
           var childGroup = child.name.split('_')[0];
           if (childGroup != thisGroup) {
             child.active = false;
-            if (child.name == 'fill_hsb') {
+            if (child.name == 'fill_hsl') {
               //TODO: change to match fill/stroke color of original object 
               child.children[0].strokeColor = 'black';
               child.children[0].fillColor = 'white';
-            } else if (child.name == 'stroke_hsb') {
+            } else if (child.name == 'stroke_hsl') {
               child.children[0].strokeColor = 'white';
               child.children[0].fillColor = 'black';
             } else if (child.name.split('fill')[1] || child.name.split('stroke')[1]) {
@@ -347,20 +347,30 @@ define([
         var property;
         if (target.active) {
           property = target.name;
-
-
-          if (target.name == 'fill_hsb') {
+          if (target.name == 'fill_hsl') {
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'red';
             console.log('setting fill active');
-          } else if (target.name == 'stroke_hsb') {
+          } else if (target.name == 'stroke_hsl') {
             target.children[0].strokeColor = 'red';
             console.log('setting stroke active');
 
           } else if (target.name.split('fill')[1] || target.name.split('stroke')[1]) {
             target.children[0].strokeColor = 'red';
             target.children[1].fillColor = 'red';
-            console.log('setting sub prop active');
+            var prop = target.name.split('fill')[1] ? 'fill' : 'stroke';
+            var dimensions = '';
+            for (var k = 0; k < geometry.children.length; k++) {
+              var child_prop = geometry.children[k].name.split('_');
+              console.log("testing child", child_prop, geometry.children[k].active);
+              if (child_prop[0] === prop && child_prop[1] && geometry.children[k].active) {
+                dimensions += child_prop[1];
+                console.log('dimensions append:', dimensions);
+              }
+            }
+            property = prop + '_' + dimensions;
+            console.log('append prop:', property);
+
 
           } else {
             target.strokeColor = '#ff0000';
@@ -375,8 +385,21 @@ define([
           return;
         } else {
           property = target.name;
-          target.strokeColor = '#000000';
-          target.fillColor = '#000000';
+          if (target.name == 'fill_hsl') {
+            //TODO: change to match fill/stroke color of original object 
+            target.children[0].strokeColor = 'black';
+            target.children[0].fillColor = 'white';
+          } else if (target.name == 'stroke_hsl') {
+            target.children[0].strokeColor = 'white';
+            target.children[0].fillColor = 'black';
+          } else if (target.name.split('fill')[1] || target.name.split('stroke')[1]) {
+            target.children[0].strokeColor = 'black';
+            target.children[0].fillColor = 'white';
+            target.children[1].fillColor = 'black';
+          } else {
+            target.strokeColor = target.originalStroke;
+            target.fillColor = 'black';
+          }
           for (var j = 0; j < geometry.children.length; j++) {
             if (geometry.children[j].active) {
               constraint.set(side + '_prop', geometry.children[j].name);
@@ -444,6 +467,7 @@ define([
         return;
       }
       var target = event.target;
+      console.log('name',target.name);
 
       console.log('target', target, target.name);
 
@@ -456,21 +480,22 @@ define([
           target.opacity = 1;
         }
         return;
-      }
-
-      if (target.active) {
-        if (target.strokeColor) {
-          target.strokeColor.saturation = target.strokeColor.brightness = 1;
-        }
-        if (target.fillColor) {
-          target.fillColor.saturation = target.fillColor.brightness = 1;
-        }
       } else {
-        if (target.strokeColor) {
-          target.strokeColor.saturation = target.strokeColor.brightness = 0;
-        }
-        if (target.fillColor) {
-          target.fillColor.saturation = target.fillColor.brightness = 0;
+
+        if (target.active) {
+          if (target.strokeColor) {
+            target.strokeColor.saturation = target.strokeColor.brightness = 1;
+          }
+          if (target.fillColor) {
+            target.fillColor.saturation = target.fillColor.brightness = 1;
+          }
+        } else {
+          if (target.strokeColor) {
+            target.strokeColor.saturation = target.strokeColor.brightness = 0;
+          }
+          if (target.fillColor) {
+            target.fillColor.saturation = target.fillColor.brightness = 0;
+          }
         }
       }
     },
