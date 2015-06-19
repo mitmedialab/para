@@ -16,7 +16,8 @@ define([
 
 		var PFloat = PConstraint.extend({
 			defaults: _.extend({}, PConstraint.prototype.defaults, {
-				name: 'PFloat'
+				name: 'PFloat',
+				dimension_num: 1
 			}),
 			/* constructor
 			 * val: initial value of the float

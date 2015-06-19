@@ -17,7 +17,8 @@
 				isNull: true,
 				myArray: null,
 				name: 'PConstraint',
-				type: 'PConstraint'
+				type: 'PConstraint',
+				dimension_num: 1
 
 			},
 

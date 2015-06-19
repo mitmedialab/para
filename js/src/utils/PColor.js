@@ -21,7 +21,8 @@ define([
 		var PColor = PConstraint.extend({
 
 			defaults: _.extend({}, PConstraint.prototype.defaults, {
-				name: 'PColor'
+				name: 'PColor',
+				dimension_num: 3
 			}),
 			/* constructor
 			 * r,g,b,a: initial color values

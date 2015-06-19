@@ -6,18 +6,19 @@
  */
 
 define([
-
+		'underscore',
 		'paper',
 		'utils/PFloat',
 		'utils/PConstraint'
 	],
 
-	function(paper,  PFloat, PConstraint) {
+	function( _, paper,  PFloat, PConstraint) {
 
 		var PPoint = PConstraint.extend({
 
 			defaults: _.extend({}, PConstraint.prototype.defaults, {
-				name: 'PPoint'
+				name: 'PPoint',
+				dimension_num: 2
 			}),
 			/* constructor
 			 * x, y: initial x and y coordinates

@@ -14,7 +14,8 @@ define([
 
 		var PBool = PFloat.extend({
 			defaults: _.extend({}, PFloat.prototype.defaults, {
-				name: 'PBool'
+				name: 'PBool',
+				dimension_num: 1
 			}),
 			/* constructor
 			 * val: initial value of the float
