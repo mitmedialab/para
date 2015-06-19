@@ -6,6 +6,7 @@ define([
 ], function(_, paper, Backbone, PaperUI) {
 
   var targetLayer;
+  var prop_map = ['h', 's', 'l'];
   var ConstraintHandles = PaperUI.extend({
 
     initialize: function(data) {
@@ -308,9 +309,29 @@ define([
         if ((target.name == 'scale_x' || target.name == 'scale_y') && geometry.children['scale_xy'].active) {
           return;
         }
+         if ((target.name == thisGroup+'_h' || target.name == thisGroup+'_s' || target.name == thisGroup+'_l') && geometry.children[thisGroup +'_hsl'].active) {
+          return;
+        }
+
 
         if ((target.name == 'scale_x' && geometry.children['scale_y'].active) || (target.name == 'scale_y' && geometry.children['scale_x'].active)) {
           target = geometry.children['scale_xy'];
+        }
+
+        if (((target.name.split('fill')[1]) && target.name != 'fill_hsl') || ((target.name.split('stroke')[1]) && target.name != 'stroke_hsl')){
+          var count = 0;
+          for (var m = 0; m < prop_map.length; m++) {
+            if (geometry.children[thisGroup + '_' + prop_map[m]].active) {
+              count++;
+            }
+          }
+          if (count == 2) {
+            for (var g = 0; g < prop_map.length; g++) {
+              geometry.children[thisGroup + '_' + prop_map[g]].active = false;
+            }
+            target = geometry.children[thisGroup + '_hsl'];
+          }
+
         }
 
         for (var i = 0; i < geometry.children.length; i++) {
@@ -340,7 +361,13 @@ define([
             child.active = false;
             child.strokeColor = 'black';
             child.fillColor = 'black';
+          } else if (((child.name == 'fill_h' || child.name == 'fill_s' || child.name == 'fill_l') && target.name == 'fill_hsl') || ((child.name == 'stroke_h' || child.name == 'stroke_s' || child.name == 'stroke_l') && target.name == 'stroke_hsl')) {
+            child.active = false;
+            child.children[0].strokeColor = 'black';
+            child.children[0].fillColor = 'white';
+            child.children[1].fillColor = 'black';
           }
+
         }
 
         target.active = !target.active;
@@ -467,7 +494,7 @@ define([
         return;
       }
       var target = event.target;
-      console.log('name',target.name);
+      console.log('name', target.name);
 
       console.log('target', target, target.name);
 
