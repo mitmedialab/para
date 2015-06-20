@@ -283,9 +283,8 @@ define([
             console.log('dimensions are equal');
             if (ref_dimensions.length == 1) {
               conversion = refPropValue * convertFactor;
-              offset = {
-                x: relPropValue - conversion
-              };
+              offset[rel_dimensions[0]]=relPropValue - conversion;
+        
               console.log('refPropValue', refPropValue, 'conversion', conversion);
             } else {
 
@@ -295,15 +294,13 @@ define([
                 conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
                 offset[rel_dimensions[i]] = relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]];
               }
-            }
 
+          }
           } else if (ref_dimensions.length > rel_dimensions.length) {
             if (rel_dimensions.length == 1) {
               keys = Object.keys(refPropValue);
               conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
-              offset = {
-                x: relPropValue - conversion
-              };
+              offset[rel_dimensions[0]] = relPropValue - conversion;
             } else {
               for (var j = 0; j < rel_dimensions.length; j++) {
                 conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]] * convertFactor : refPropValue[keys[j]] * convertFactor;
