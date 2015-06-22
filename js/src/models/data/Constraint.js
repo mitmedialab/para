@@ -155,25 +155,24 @@ define([
 
           var propSwitch = function(prop, side) {
             console.log('prop value', prop, side);
-            var propValue, geom;
+            var propValue, geom, instance;
             if (side == 'ref') {
               geom = ref_geom;
+              instance = references;
             }
             if (side == 'rel') {
               geom = proxy;
+               instance = relatives;
             }
             switch (prop) {
               case 'scale_x':
-                propValue = geom.scaling.x;
+                propValue = instance.accessProperty('scaling_delta').x;
                 break;
               case 'scale_y':
-                propValue = geom.scaling.y;
+                propValue =instance.accessProperty('scaling_delta').y;
                 break;
               case 'scale_xy':
-                propValue = {
-                  x: geom.scaling.x,
-                  y: geom.scaling.y
-                };
+                propValue = instance.accessProperty('scaling_delta');
                 break;
               case 'position_x':
                 propValue = geom.position.x;
@@ -256,7 +255,7 @@ define([
                 };
                 break;
               case 'rotation':
-                propValue = geom.rotation;
+                propValue = instance.accessProperty('rotation_delta');
                 break;
             }
             return propValue;
@@ -501,8 +500,8 @@ define([
             console.log('y-val', y);
             evalObj[axis] = y;
           }
-          console.log('evalObj', evalObj);
-          if (relPropAccess.dimension_num > 1) {
+          console.log('evalObj', evalObj, 'd-num',relPropAccess.get('dimension_num'));
+          if (relPropAccess.get('dimension_num') > 1) {
             console.log('setting value as object');
             relPropAccess.setValue(evalObj);
             return evalObj;
