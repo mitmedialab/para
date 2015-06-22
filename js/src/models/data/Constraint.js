@@ -350,6 +350,7 @@ define([
       console.log('ref_prop', this.get('ref_prop'));
 
       var ref_prop = this.get('ref_prop').split('_');
+      var ref_available_props = ref_prop[1];
       var rel_prop = this.get('rel_prop').split('_');
 
       //TODO: refactor- this addition is a little hacky, it's so it recognizes rotation as having the same num of properties..
@@ -452,10 +453,13 @@ define([
       } */
       if(expression_dimension_num < relPropAccess.get('dimension_num')){
         var constraintFunctions = [];
-         for (var axis in expression) {
-        var cf = (function(d){
+        var a_keys = Object.keys(expression);
+         for (var i=0;i<a_keys.length;i++) {
+          var axis = a_keys[i];
+          var ap = ref_available_props[i] ? ref_available_props[i]: ref_available_props[ref_available_props.length-1];
+        var cf = (function(d,a){
           return function() {
-          var x = refPropAccess[d].getValue();
+          var x = refPropAccess[a].getValue();
           console.log('x-val', x, d);
           var y;
           eval(expression[d]);
@@ -463,7 +467,7 @@ define([
           relPropAccess[d].setValue(y); 
          return y;
        };
-        })(axis);
+        })(axis,ap);
             
        relPropAccess[axis].setConstraint(cf);
        constraintFunctions.push(cf);
