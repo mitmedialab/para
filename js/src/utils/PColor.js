@@ -43,6 +43,11 @@ define([
 				this.h = new PFloat(hsl[0]);
 				this.s = new PFloat(hsl[1]);
 				this.l = new PFloat(hsl[2]);
+				var h = this.h;
+				this.listenTo(this.h,'change',function(val){
+					console.log('setting value for color', val, h.isConstrained(), h.getValue());
+
+				});
 				this.setMode = 'hsb';
 				PConstraint.apply(this, arguments);
 
@@ -91,53 +96,52 @@ define([
 			/* setValue
 			 * defaults to setting via HSB, need to figure out a flag for mo
 			 */
-			 setValue: function(color){
-			 		if (color.a) {
+			setValue: function(color) {
+				if (color.a) {
 					this.setA(color.a);
 				}
-				if(this.setMode === 'hsb'){
+				if (this.setMode === 'hsb') {
 					this.setValueHSB(color);
-				}
-				else{
+				} else {
 					this.setValueRGB(color);
 				}
-			 },
+			},
 
 			setValueRGB: function(color) {
-			
+
 				var isConstrained = this.isConstrained();
 				if (isConstrained.h || isConstrained.s || isConstrained.l) {
 					return;
 				}
-				this.setR(color.r,true);
-				this.setG(color.g,true);
-				this.setB(color.b,true);
+				this.setR(color.r, true);
+				this.setG(color.g, true);
+				this.setB(color.b, true);
 				var hsl = ColorUtils.rgbToHsl({
 					r: this.getR(),
 					g: this.getG(),
 					b: this.getB()
 				});
-				this.setH(hsl[0],true);
-				this.setS(hsl[1],true);
-				this.setL(hsl[2],true);
+				this.setH(hsl[0], true);
+				this.setS(hsl[1], true);
+				this.setL(hsl[2], true);
 
 
 			},
 
 			setValueHSB: function(color) {
-				
+
 				console.trace();
 				var isConstrained = this.isConstrained();
 				if (isConstrained.r || isConstrained.g || isConstrained.b) {
 					return;
 				}
-				this.setH(color.h,true);
-				this.setS(color.s,true);
-				this.setL(color.l,true);
+				this.setH(color.h, true);
+				this.setS(color.s, true);
+				this.setL(color.l, true);
 				var rgb = ColorUtils.hslToRgb(this.getH(), this.getS(), this.getL());
-				this.setR(rgb[0],true);
-				this.setB(rgb[1],true);
-				this.setG(rgb[2],true);
+				this.setR(rgb[0], true);
+				this.setB(rgb[1], true);
+				this.setG(rgb[2], true);
 			},
 
 			/* getValue
@@ -312,12 +316,16 @@ define([
 				var r = ColorUtils.hexToR(style_data);
 				var g = ColorUtils.hexToG(style_data);
 				var b = ColorUtils.hexToB(style_data);
-				var hsl = ColorUtils.rgbToHsl({r:r,g:g,b:b});
+				var hsl = ColorUtils.rgbToHsl({
+					r: r,
+					g: g,
+					b: b
+				});
 				var data = {
 					operator: 'set',
-					r:r,
-					g:g,
-					b:b,
+					r: r,
+					g: g,
+					b: b,
 					h: hsl[0],
 					s: hsl[1],
 					l: hsl[2]

@@ -57,7 +57,7 @@ define([
 			 */
 			setValue: function(val) {
 				this.val.setValue(val);
-				this.trigger('change' + val);
+				this.trigger('change',val);
 			},
 
 			/*

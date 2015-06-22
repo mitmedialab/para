@@ -1049,6 +1049,9 @@ define([
 
 		compileStyle: function() {
 			var fill_color = this.accessProperty('fill_color');
+			var fill_prop = this.inheritProperty('fill_color');
+			console.log('getting color value for:',this.get('id'),'h:',fill_prop.h.isConstrained(),'s:',fill_prop.s.isConstrained(),'l:',fill_prop.l.isConstrained());
+
 			console.log('fill_color=',fill_color);
 			this._fill_color = this.accessProperty('fill_color');
 			this._stroke_color = this.accessProperty('stroke_color');

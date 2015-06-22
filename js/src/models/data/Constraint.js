@@ -153,8 +153,6 @@ define([
           var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : ['v'];
           console.log('ref_dimensions', ref_dimensions, ref_dimensions.length, 'rel_dimensions', rel_dimensions, rel_dimensions.length);
 
-          // var ref_prop_doub = (ref_prop.split('_')[1] && ref_prop.split('_')[1] == 'xy');
-          // var rel_prop_doub = (rel_prop.split('_')[1] && rel_prop.split('_')[1] == 'xy');
           var propSwitch = function(prop, side) {
             console.log('prop value', prop, side);
             var propValue, geom;
@@ -272,12 +270,7 @@ define([
           var conversion = {};
           var offset = {};
           var keys;
-          ///  var reference = constraint.get('references');
-          //var relative = constraint.get('relatives');
-
-          // var refPropAccess = reference.get(constraintPropMap[ref_prop_strip]);
-          // var relPropAccess = relative.get(constraintPropMap[rel_prop_strip]);
-          //console.log('relative,reference,refprop,relprop', relative, reference, refPropAccess, relPropAccess);
+        
 
           if (ref_dimensions.length === rel_dimensions.length) {
             console.log('dimensions are equal');
@@ -374,7 +367,6 @@ define([
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
       console.log('refPropAccess', refPropAccess);
       console.log('relPropAccess', relPropAccess);
-      var constraintF;
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
       /* if (ref_dimensions.length === rel_dimensions.length && ref_dimensions.length < refPropAccess.get('dimension_num')) {
               constraintF = function() {
@@ -461,27 +453,30 @@ define([
       if(expression_dimension_num < relPropAccess.get('dimension_num')){
         var constraintFunctions = [];
          for (var axis in expression) {
-         constraintF = function() {
-          var x = refPropAccess[axis].getValue();
-          console.log('x-val', x, axis);
+        var cf = (function(d){
+          return function() {
+          var x = refPropAccess[d].getValue();
+          console.log('x-val', x, d);
           var y;
-          eval(expression[axis]);
-          console.log('y-val', y);
-          relPropAccess[axis].setValue(y); 
+          eval(expression[d]);
+          console.log('y-val', y, d);
+          relPropAccess[d].setValue(y); 
          return y;
-        };
-      
-       relPropAccess[axis].setConstraint(constraintF);
-       constraintFunctions.push(constraintF);
-        console.log('setting constraint on',axis, relPropAccess[axis],constraintF);
+       };
+        })(axis);
+            
+       relPropAccess[axis].setConstraint(cf);
+       constraintFunctions.push(cf);
+        console.log('setting constraint on',axis, relPropAccess[axis],cf);
         relPropAccess[axis].getConstraint();
       }
      
         this.set('constraintFunc', constraintFunctions);
+        console.log('constraintFunctions',constraintFunctions);
     }
 
       else {
-        constraintF = function() {
+       var constraintF = function() {
           var evalObj = {};
           for (var axis in expression) {
             var x = refPropAccess[axis].getValue();
