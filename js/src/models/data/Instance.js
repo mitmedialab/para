@@ -40,6 +40,7 @@ define([
 			inheritor_selected: false,
 			ancestor_selected: false,
 			selected_indexes: null,
+			constraint_selected: null,
 
 			//bounding box defaults
 			bbox: null,
@@ -90,6 +91,7 @@ define([
 
 			reset: false,
 			geom: null,
+			selection_clone: null,
 			inheritors: null,
 			sibling_instances: null,
 			is_proto: false,
@@ -101,6 +103,8 @@ define([
 			inheritance_selection_color: '#0D7C1F',
 			proxy_selection_color: '#10B0FF',
 			primary_selection_color: '#A5FF00',
+			reference_selected_color: '#fc9917',
+			relative_selected_color: '#9717fc',
 
 			// EXPERIMENTAL
 			selection_palette: ['#A5FF00', '#0D7C1F', '#FF4D4D', '#33D6FF', '#E698D2'],
@@ -404,6 +408,7 @@ define([
 			var geom = this.get('geom');
 			if (geom) {
 				geom.bringToFront();
+				this.get('selection_clone').bringToFront();
 			}
 		},
 
@@ -652,7 +657,7 @@ define([
 			else {
 
 				if (this[internal_property] instanceof paper.Matrix) {
-					return this._modifyMatrixAfterCompile(property_name, this[internal_property], attribute_constraint, value, set,origin);
+					return this._modifyMatrixAfterCompile(property_name, this[internal_property], attribute_constraint, value, set, origin);
 				} else if (this[internal_property] instanceof Number) {
 					return this._modifyValueAfterCompile(this[internal_property], attribute_constraint, value, set);
 				} else if (this[internal_property] instanceof Object) {
@@ -665,10 +670,10 @@ define([
 
 		_modifyMatrixAfterCompile: function(property_name, internal_matrix, attribute_constraint, value, set, origin) {
 			//attribute is not constrained, modification allowed
-			console.log('modify matrix', property_name,attribute_constraint);
+			console.log('modify matrix', property_name, attribute_constraint);
 
 			//attribute sub properties are constrained, selective modification allowed;
-			
+
 			switch (property_name) {
 				case 'translation_delta':
 					console.log('modify_translation', property_name, value.translation);
@@ -683,12 +688,10 @@ define([
 						}
 						return false;
 
-					} 
-					else if (attribute_constraint && attribute_constraint.x && attribute_constraint.y) {
+					} else if (attribute_constraint && attribute_constraint.x && attribute_constraint.y) {
 						console.log('object is completely constrained');
 						return false;
-					} 
-					else if (attribute_constraint.x && !attribute_constraint.y) {
+					} else if (attribute_constraint.x && !attribute_constraint.y) {
 						console.log('object is only x constrained');
 
 						if (set) {
@@ -721,11 +724,9 @@ define([
 						}
 						return false;
 
-					}
-					else if (attribute_constraint  && attribute_constraint.x && attribute_constraint.y) {
+					} else if (attribute_constraint && attribute_constraint.x && attribute_constraint.y) {
 						return false;
-					}  
-					else if (attribute_constraint.x && !attribute_constraint.y) {
+					} else if (attribute_constraint.x && !attribute_constraint.y) {
 						if (set) {
 							internal_matrix.d = (value.scaling) ? 0 : internal_matrix.d;
 						}
@@ -1040,19 +1041,19 @@ define([
 				this._translation_delta.translate(this.accessProperty('translation_delta').x, this.accessProperty('translation_delta').y);
 			}
 
-			
+
 			this._temp_matrix.preConcatenate(this._rotation_delta);
 			this._temp_matrix.preConcatenate(this._scaling_delta);
 			this._temp_matrix.preConcatenate(this._translation_delta);
-			
+
 		},
 
 		compileStyle: function() {
 			var fill_color = this.accessProperty('fill_color');
 			var fill_prop = this.inheritProperty('fill_color');
-			console.log('getting color value for:',this.get('id'),'h:',fill_prop.h.isConstrained(),'s:',fill_prop.s.isConstrained(),'l:',fill_prop.l.isConstrained());
+			console.log('getting color value for:', this.get('id'), 'h:', fill_prop.h.isConstrained(), 's:', fill_prop.s.isConstrained(), 'l:', fill_prop.l.isConstrained());
 
-			console.log('fill_color=',fill_color);
+			console.log('fill_color=', fill_color);
 			this._fill_color = this.accessProperty('fill_color');
 			this._stroke_color = this.accessProperty('stroke_color');
 			this._stroke_width = this.accessProperty('stroke_width');
@@ -1093,7 +1094,7 @@ define([
 			geom.strokeColor.lightness = this._stroke_color.l;
 			geom.strokeColor.alpha = this._stroke_color.a;
 			geom.strokeColor.alpha = this._stroke_color.a;
-			
+
 			geom.strokeWidth = this._stroke_width;
 			geom.visible = this._visible;
 		},
@@ -1137,11 +1138,23 @@ define([
 
 		renderSelection: function(geom) {
 			var selected = this.get('selected');
+
 			var proto_selected = this.get('proto_selected');
 			var inheritor_selected = this.get('inheritor_selected');
+			var constraint_selected = this.get('constraint_selected');
 			var bbox, inheritor_bbox;
 			//if (selected_indexes.length === 0) {
 			geom.selected = selected;
+			var selection_clone = this.get('selection_clone');
+			console.log('constraint_selected', constraint_selected);
+			if (constraint_selected) {
+				selection_clone.visible = true;
+				selection_clone.strokeColor = this.get(constraint_selected + '_color');
+				console.log('setting constraint selection visible', selection_clone);
+
+			} else {
+				selection_clone.visible = false;
+			}
 
 			if (selected) {
 				// EXPERIMENTAL
@@ -1201,7 +1214,19 @@ define([
 				geom.transform(this._ti_matrix);
 				geom.transform(this._si_matrix);
 				geom.transform(this._ri_matrix);
+				this.get('selection_clone').transform(this._ti_matrix);
+				this.get('selection_clone').transform(this._si_matrix);
+				this.get('selection_clone').transform(this._ri_matrix);
 				geom.selected = false;
+			} else {
+				if (this.get('selection_clone')) {
+					this.get('selection_clone').remove();
+				}
+				this.set('selection_clone', this.getShapeClone());
+				this.get('selection_clone').data.instance = this;
+				this.get('selection_clone').fillColor = null;
+				this.get('selection_clone').strokeWidth = 3;
+
 			}
 
 
@@ -1210,12 +1235,14 @@ define([
 			geom.transform(this._rotation_delta);
 			geom.transform(this._scaling_delta);
 			geom.transform(this._translation_delta);
+			this.get('selection_clone').transform(this._rotation_delta);
+			this.get('selection_clone').transform(this._scaling_delta);
+			this.get('selection_clone').transform(this._translation_delta);
 			//geom.transform(this._temp_matrix);
 
 			this.updateScreenBounds(geom);
-			var p_altered = this.get('path_altered');
-			p_altered.setValue(false);
-			this.get('path_altered').setValue(p_altered);
+
+			this.get('path_altered').setValue(false);
 			geom.visible = visible;
 			return geom;
 		},
@@ -1234,7 +1261,7 @@ define([
 		},
 
 		/*returns a clone of the paper js shape*/
-		getShapeClone: function(){
+		getShapeClone: function() {
 			var clone = this.get('geom').clone();
 			return clone;
 		},

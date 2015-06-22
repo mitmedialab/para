@@ -47,9 +47,12 @@ define([
       });
 
       constraintTool.sm = this;
+      var self = this;
+
       toolCollection = new Backbone.Collection({});
       this.set('tool_collection', toolCollection);
       this.listenTo(toolCollection, 'geometryAdded', this.geometryAdded);
+      this.listenTo(toolCollection, 'compileRequest', function(){self.trigger('compileRequest');});
       this.listenTo(toolCollection, 'geometrySelected', this.geometrySelected);
       this.listenTo(toolCollection, 'geometeryDSelected', this.geometeryDSelected);
       this.listenTo(toolCollection, 'geometryModified', this.geometryModified);
@@ -136,7 +139,7 @@ define([
       this.trigger('addInstance', instance);
     },
 
-    applyConstraint: function(constraint_data) {
+    applyConstraint: function() {
       var constraint_tool = this.get('tool_collection').get('constraintTool');
       var constraint_data = constraint_tool.applyConstraint();
       this.trigger('addConstraint', constraint_data);
@@ -186,6 +189,7 @@ define([
       this.trigger('compileRequest');
 
     },
+
 
     createList: function() {
       var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');

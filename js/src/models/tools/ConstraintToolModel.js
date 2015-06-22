@@ -105,7 +105,6 @@ define([
     start: function() {
       // visitor: get selected constraint
       // if selected
-      //  set constraint (thus arrow) active 
       //  set currentConstraint to selected constraint
       //  set mode to ref
       // else
@@ -162,16 +161,8 @@ define([
         case 'create':
           break;
         case 'ref':
-          // for all arrows on rel
-          //  set arrow/constraint visible off
-
           // for selected constraints
-          //  deselect, set visible on ( arrow visible on )
-
-          var arrow = constraint.get('arrow');
-          arrow.show();
-          // set arrow to active
-
+          //  deselect, set visible on
           var refHandle = constraint.get('ref_handle');
           var relHandle = constraint.get('rel_handle');
           refHandle.show();
@@ -193,8 +184,6 @@ define([
     // TODO: possibly switch creation into two modes, 'createRef' and 'createRel'
     createMouseDown: function(event) {
       // hit test
-      // if hit test type arrow
-      //  set arrow active
       //  get all constraints for ref-rel pair
       //  populate constraint selector with prev result
       //  show constraint selector
@@ -208,10 +197,10 @@ define([
       if (flag) {
         this.set('mode', 'ref');
         this.modeSwitch();
+        this.trigger('compileRequest');
       } else {
         // visitor get constraints on instance
         // unique constraints by ref
-        // set arrow/constraint to visible, non-active for each ref
       }
     },
 
@@ -266,7 +255,6 @@ define([
       if (event.modifiers.shift && this.draggingHandle) {
         var constraint = this.get('currentConstraint');
         var proxy = constraint.get('proxy');
-        var arrow = constraint.get('arrow');
         var rel_geom = constraint.get('relatives').get('geom');
         if (proxy instanceof paper.Group) {
           rel_geom = constraint.get('relatives').getInstanceMembers().map(function(instance) {
@@ -322,7 +310,6 @@ define([
               var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
               proxy.position.x = event.point.x - child_pos_delta.x;
             }
-            arrow.redrawTail(proxy);
             break;
           case 'position_y':
             if (!(proxy instanceof paper.Group)) {
@@ -331,7 +318,6 @@ define([
               var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
               proxy.position.y = event.point.y - child_pos_delta.y;
             }
-            arrow.redrawTail(proxy);
             break;
           case 'position_xy':
             if (!(proxy instanceof paper.Group)) {
@@ -342,7 +328,6 @@ define([
               proxy.position.x = event.point.x - child_pos_delta.x;
               proxy.position.y = event.point.y - child_pos_delta.y;
             }
-            arrow.redrawTail(proxy);
             break;
           case 'rotation':
             var work_geom = (proxy instanceof paper.Group) ? proxy.children[0] : proxy;

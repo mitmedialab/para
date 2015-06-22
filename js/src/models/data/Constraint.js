@@ -68,7 +68,6 @@ define([
       type: '=',
 
       // UI
-      arrow: null,
       proxy: null,
       ref_handle: null,
       rel_handle: null,
@@ -79,17 +78,17 @@ define([
     },
 
     initialize: function() {
-      this.set('arrow', new Arrow({
-        constraint: this
-      }));
+
       this.set('proxy', new paper.Path());
       this.set('ref_handle', new ConstraintHandles({
         constraint: this,
-        side: 'ref'
+        side: 'ref',
+        color: '#fc9917'
       }));
       this.set('rel_handle', new ConstraintHandles({
         constraint: this,
-        side: 'rel'
+        side: 'rel',
+        color: '#9717fc'
       }));
     },
 
@@ -108,7 +107,14 @@ define([
       instance = instance[0];
       instance.set('selected', false);
       if (this.get('relatives')) {
+        if(this.get('references')){
+           this.get('references').set('constraint_selected',undefined);
+
+        }
         this.set('references', instance);
+        instance.set('constraint_selected','reference_selected');
+        console.log('constraint-constraint_selected',instance.get('constraint_selected'));
+
         this.set('ref_type', type);
 
         // create proxy with important logic // TODO: maybe class it?
@@ -329,18 +335,15 @@ define([
         this.set('id', (references.get('id') + ':' + relatives.get('id')));
         return true;
       }
+      if(this.get('relatives')){
+           this.get('relatives').set('constraint_selected',undefined);
+
+        }
       this.set('relatives', instance);
+      instance.set('constraint_selected','relative_selected');
       this.set('rel_type', type);
       return false;
     },
-
-    createArrow: function() {
-      var arrow = new Arrow({
-        constraint: this
-      });
-      this.set('arrow', arrow);
-    },
-
 
 
     create: function() {
@@ -525,11 +528,9 @@ define([
     clearUI: function() {
       this.get('proxy').hide();
       this.get('proxy').remove();
-      this.get('arrow').remove();
       this.get('ref_handle').remove();
       this.get('rel_handle').remove();
       this.set('proxy', null);
-      this.set('arrow', null);
       this.set('ref_handle', null);
       this.set('rel_handle', null);
     },
@@ -540,9 +541,15 @@ define([
     },
 
     reset: function() {
-      var arrow = this.get('arrow');
+      if(this.get('references')){
+           this.get('references').set('constraint_selected',undefined);
+
+        }
+        if(this.get('relatives')){
+           this.get('relatives').set('constraint_selected',undefined);
+
+        }
       this.clear().set(this.defaults);
-      this.set('arrow', arrow);
     }
 
   });
