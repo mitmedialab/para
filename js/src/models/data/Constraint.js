@@ -533,6 +533,14 @@ define([
       this.set('proxy', null);
       this.set('ref_handle', null);
       this.set('rel_handle', null);
+       if(this.get('references')){
+           this.get('references').set('constraint_selected',undefined);
+
+        }
+        if(this.get('relatives')){
+           this.get('relatives').set('constraint_selected',undefined);
+
+        }
     },
 
     remove: function() {
@@ -541,14 +549,7 @@ define([
     },
 
     reset: function() {
-      if(this.get('references')){
-           this.get('references').set('constraint_selected',undefined);
-
-        }
-        if(this.get('relatives')){
-           this.get('relatives').set('constraint_selected',undefined);
-
-        }
+     
       this.clear().set(this.defaults);
     }
 

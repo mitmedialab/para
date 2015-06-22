@@ -17,10 +17,11 @@ define([
     },
 
     draw: function() {
+      var self = this;
       var createDelimBox = function(bounds) {
         // green bounding box
         var delbox = new paper.Path.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
-        delbox.strokeColor = '#A5FF00';
+        delbox.strokeColor = self.get('color');
         delbox.fillColor = null;
         delbox.name = 'delbox';
         return delbox;
@@ -31,7 +32,7 @@ define([
         var corners = [];
         for (var i = 0; i < 9; i++) {
           var corner = new paper.Path.Circle(bounds.x + (i % 3) / 2.0 * bounds.width, bounds.y + Math.floor(i / 3) / 2.0 * bounds.height, 3, 3);
-          corner.strokeColor = '#A5FF00';
+          corner.strokeColor = self.get('color');
           corner.fillColor = 'white';
           corners.push(corner);
           corner.name = 'corner';
@@ -442,13 +443,11 @@ define([
         applyClick(rel_target, rel_geom, 'rel');
         constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
-        constraint.get('arrow').redrawTail(constraint.get('proxy'));
         constraint.get('proxy').matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
       } else {
         applyClick(rel_target, rel_geom, 'rel');
         constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
-        constraint.get('arrow').redrawTail(constraint.get('proxy'));
         constraint.get('proxy').matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
       }
 

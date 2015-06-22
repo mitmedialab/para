@@ -151,6 +151,7 @@ define([
       };
       this.set('currentConstraint', new Constraint());
       this.reset();
+      this.trigger('compileRequest');
       return constraint_data;
 
     },
@@ -194,10 +195,11 @@ define([
       var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
       var type = (event.modifiers.control) ? 'point' : 'shape';
       var flag = this.get('currentConstraint').setSelection(selection, type);
+      this.trigger('compileRequest');
+
       if (flag) {
         this.set('mode', 'ref');
         this.modeSwitch();
-        this.trigger('compileRequest');
       } else {
         // visitor get constraints on instance
         // unique constraints by ref
@@ -234,6 +236,8 @@ define([
       var hitResult = paper.project.hitTest(event.point, mouseHitOptions);
       if (hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id) {
         this.set('mode', 'ref');
+        this.sm.trigger('compileRequest');
+
         this.modeSwitch();
         return;
       }
