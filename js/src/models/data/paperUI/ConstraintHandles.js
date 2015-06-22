@@ -309,7 +309,7 @@ define([
         if ((target.name == 'scale_x' || target.name == 'scale_y') && geometry.children['scale_xy'].active) {
           return;
         }
-         if ((target.name == thisGroup+'_h' || target.name == thisGroup+'_s' || target.name == thisGroup+'_l') && geometry.children[thisGroup +'_hsl'].active) {
+         if ((target.name == thisGroup+'_h' || target.name == thisGroup+'_s' || target.name == thisGroup+'_l') && geometry.children[thisGroup+'_hsl'].active) {
           return;
         }
 
