@@ -187,6 +187,7 @@ define([
         var selectedPoint = selectedPoints[i];
         console.log('found selectedPoint', selectedPoint, selectedPoint.get('selected'));
         var geomS = geom.segments[selectedPoint.get('index')];
+       var selection_clone = this.get('selection_clone').segments[selectedPoint.get('index')];
         indicies.push({
           index: selectedPoint.get('index'),
           type: selectedPoint.get('selection_type')
@@ -198,6 +199,8 @@ define([
             p.add(delta.point);
             geomS.point.x += data.translation_delta.x;
             geomS.point.y += data.translation_delta.y;
+                selection_clone.point.x +=  data.translation_delta.x;
+            selection_clone.point.y +=  data.translation_delta.x;
             console.log('setting position of point');
 
             break;
@@ -206,6 +209,8 @@ define([
             hi.add(delta.point);
             geomS.handleIn.x += data.translation_delta.x;
             geomS.handleIn.y += data.translation_delta.y;
+                selection_clone.handleIn.x += data.translation_delta.x;
+            selection_clone.handleIn.y += data.translation_delta.x;
             break;
 
           case 'handle-out':
@@ -213,6 +218,8 @@ define([
             ho.add(delta.point);
             geomS.handleOut.x += data.translation_delta.x;
             geomS.handleOut.y += data.translation_delta.y;
+                selection_clone.handleOut.x +=  data.translation_delta.x;
+            selection_clone.handleOut.y += data.translation_delta.x;
             break;
         }
 
@@ -241,26 +248,35 @@ define([
      */
     modifyPointsByIndex: function(point, indicies) {
       var geom = this.get('geom');
+      
       geom.transform(this.get('ti_matrix'));
       geom.transform(this.get('ri_matrix'));
       geom.transform(this.get('si_matrix'));
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
+        var selection_clone = this.get('selection_clone').segments[indicies[i].index];
         switch (indicies[i].type) {
           case 'segment':
           case 'curve':
-            geomS.point.x += point.x;
-            geomS.point.y += point.y;
+          geomS.point.x += point.x;
+          geomS. point.y += point.y;
+           selection_clone.point.x += point.x;
+           selection_clone.point.y += point.y;
 
             break;
           case 'handle-in':
             geomS.handleIn.x += point.x;
             geomS.handleIn.y += point.y;
+            selection_clone.handleIn.x += point.x;
+            selection_clone.handleIn.y += point.y;
+            
             break;
 
           case 'handle-out':
             geomS.handleOut.x += point.x;
             geomS.handleOut.y += point.y;
+                selection_clone.handleOut.x += point.x;
+            selection_clone.handleOut.y += point.y;
             break;
         }
       }

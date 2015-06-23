@@ -533,7 +533,11 @@ define([
       this.set('proxy', null);
       this.set('ref_handle', null);
       this.set('rel_handle', null);
-       if(this.get('references')){
+
+    },
+
+    clearSelection:function(){
+         if(this.get('references')){
            this.get('references').set('constraint_selected',undefined);
 
         }
@@ -541,7 +545,7 @@ define([
            this.get('relatives').set('constraint_selected',undefined);
 
         }
-    },
+      },
 
     remove: function() {
       // remove all paper UI elements

@@ -8,8 +8,9 @@ define([
   'backbone',
   'handlebars',
   'iris-color-picker',
-  'paper'
-], function($, _, Backbone, Handlebars, IrisColorPicker, paper) {
+  'paper',
+  'utils/ColorUtils'
+], function($, _, Backbone, Handlebars, IrisColorPicker, paper, ColorUtils) {
 
   var template, source;
   var constraintTypeMap = {};
@@ -27,7 +28,7 @@ define([
       this.listenTo(this.model, 'removeItem', this.removeItem);
       this.listenTo(this.model, 'disableSave', this.disableSave);
 
-      this.listenTo(this.model, 'geometrySelected', this.geometrySelected);
+      this.listenTo(this.model, 'selectionChanged', this.geometrySelected);
       this.listenTo(this.model, 'geometryDeselected', this.geometryDeselected);
 
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
@@ -197,27 +198,31 @@ define([
       }
     },
 
-    geometrySelected: function(data,params,id) {
+    geometrySelected: function(selected_shapes) {
       this.undelegateEvents();
-      if (data.fill_color) {
-        $('#fillColorBlock').css('background-color', data.fill_color);
-        $('#fill').val(data.fill_color);
+      var selected_shape = selected_shapes[0];
+      var fill_color = selected_shapes[0].accessProperty('fill_color');
+      var stroke_color = selected_shapes[0].accessProperty('stroke_color');
+      var stroke_width = selected_shapes[0].accessProperty('stroke_width');
+      if (fill_color) {
+        $('#fillColorBlock').css('background-color',ColorUtils.rgbToHex(fill_color));
+        $('#fill').val(ColorUtils.rgbToHex(fill_color));
         if ($('#fillColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', data.fill_color);
+          $('#color-window').iris('color', ColorUtils.rgbToHex(fill_color));
         }
       }
-      if (data.stroke_color) {
-        $('#strokeColorBlock').css('background-color', data.stroke_color);
-        $('#stroke').val(data.stroke_color);
+      if (stroke_color) {
+        $('#strokeColorBlock').css('background-color', ColorUtils.rgbToHex(stroke_color));
+        $('#stroke').val(ColorUtils.rgbToHex(stroke_color));
         if ($('#strokeColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', data.stroke_color);
+          $('#color-window').iris('color', ColorUtils.rgbToHex(stroke_color));
         }
       }
-      if (data.stroke_width) {
-        $('#strokeSlider').val(data.stroke_width);
+      if (stroke_width) {
+        $('#strokeSlider').val(stroke_width);
       }
 
-      this.setParams(params,id);
+      //this.setParams(params,id);
       this.delegateEvents();  
     },
 
@@ -255,7 +260,7 @@ define([
       var element = $(event.target);
       var elementId = element.attr('id');
       console.log('Registered click from: ' + elementId);
-      this.model.setConstraintProperty(constraintPropMap[elementId]);
+     // this.model.setConstraintProperty(constraintPropMap[elementId]);
     },
 
     setConstraintType: function(event) {

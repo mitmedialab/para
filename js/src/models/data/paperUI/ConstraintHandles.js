@@ -72,7 +72,7 @@ define([
         stroke.position = new paper.Point(corners[2].bounds.center.x, corners[2].bounds.center.y + stroke.bounds.height / 2);
 
         fill_group.position = new paper.Point(corners[2].bounds.center.x + fill.bounds.width + 5, corners[2].bounds.center.y - 8);
-        stroke_group.position = new paper.Point(corners[2].bounds.center.x + stroke.bounds.width + 5, corners[2].bounds.center.y + stroke.bounds.height / 2);
+        stroke_group.position = new paper.Point(corners[2].bounds.center.x + stroke.bounds.width + 15, corners[2].bounds.center.y + stroke.bounds.height / 2);
 
         fill.name = 'fill_hsl';
         stroke.name = 'stroke_hsl';
@@ -310,7 +310,7 @@ define([
         if ((target.name == 'scale_x' || target.name == 'scale_y') && geometry.children['scale_xy'].active) {
           return;
         }
-         if ((target.name == thisGroup+'_h' || target.name == thisGroup+'_s' || target.name == thisGroup+'_l') && geometry.children[thisGroup+'_hsl'].active) {
+        if ((target.name == thisGroup + '_h' || target.name == thisGroup + '_s' || target.name == thisGroup + '_l') && geometry.children[thisGroup + '_hsl'].active) {
           return;
         }
 
@@ -319,7 +319,7 @@ define([
           target = geometry.children['scale_xy'];
         }
 
-        if (((target.name.split('fill')[1]) && target.name != 'fill_hsl') || ((target.name.split('stroke')[1]) && target.name != 'stroke_hsl')){
+        if (((target.name.split('fill')[1]) && target.name != 'fill_hsl') || ((target.name.split('stroke')[1]) && target.name != 'stroke_hsl')) {
           var count = 0;
           for (var m = 0; m < prop_map.length; m++) {
             if (geometry.children[thisGroup + '_' + prop_map[m]].active) {
@@ -376,10 +376,12 @@ define([
         if (target.active) {
           property = target.name;
           if (target.name == 'fill_hsl') {
+              target.bringToFront();
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'red';
             console.log('setting fill active');
           } else if (target.name == 'stroke_hsl') {
+             target.bringToFront();
             target.children[0].strokeColor = 'red';
             console.log('setting stroke active');
 
@@ -414,10 +416,12 @@ define([
         } else {
           property = target.name;
           if (target.name == 'fill_hsl') {
+          
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'black';
             target.children[0].fillColor = 'white';
           } else if (target.name == 'stroke_hsl') {
+           
             target.children[0].strokeColor = 'white';
             target.children[0].fillColor = 'black';
           } else if (target.name.split('fill')[1] || target.name.split('stroke')[1]) {

@@ -262,7 +262,7 @@ define([
         var rel_geom = constraint.get('relatives').get('geom');
         if (proxy instanceof paper.Group) {
           rel_geom = constraint.get('relatives').getInstanceMembers().map(function(instance) {
-            return instance.get('geom')
+            return instance.get('geom');
           });
         }
         switch (this.draggingHandle) {
@@ -390,6 +390,7 @@ define([
     reset: function() {
 
       var constraint = this.get('currentConstraint');
+      constraint.clearSelection();
       if (constraint.get('references') && constraint.get('relatives')) {
         constraint.clearUI();
       }
