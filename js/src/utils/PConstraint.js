@@ -39,6 +39,10 @@
 				this.set('isNull', val);
 			},
 
+			deleteSelf: function(){
+				//TODO: write cleanup delete code here.
+			},
+
 			/* checks to see if property is null
 			 * used for prototpical inheritance functionality
 			 */

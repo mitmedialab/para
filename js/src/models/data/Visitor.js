@@ -181,6 +181,7 @@ define([
 			}
 			if (node === target) {
 				node.deleteSelf();
+				layersView.removeShape(node.get('id'));
 				for (var j = 0; j < lists.length; j++) {
 					if (lists[j] === node) {
 						lists.splice(j, 1);
@@ -190,7 +191,9 @@ define([
 					}
 				}
 				if (departureNode) {
+					departureNode.removeInheritor(node);
 					departureNode.removeChildNode(node);
+
 				}
 
 			} else {

@@ -77,6 +77,7 @@ define([
         fill.name = 'fill_hsl';
         stroke.name = 'stroke_hsl';
         stroke_tab.name = fill_tab.name = 'options';
+        stroke_tab.visible=fill_tab.visible = false;
         fill_h.name = 'fill_h';
         fill_s.name = 'fill_s';
         fill_l.name = 'fill_l';

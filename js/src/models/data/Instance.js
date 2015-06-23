@@ -237,17 +237,20 @@ define([
 			if (geom) {
 				geom.remove();
 			}
+			
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].deleteSelf();
 				//this.children[i].destroy();
 			}
+			var inheritorCollection = this.get('inheritors');
+			inheritorCollection.deleteSelf();
+
 			var parent = this.getParentNode();
 			if (parent) {
 				parent.removeChildNode(this);
 			}
 			this.trigger('delete', this);
 		},
-
 
 
 		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
@@ -321,6 +324,13 @@ define([
 			instance.createSelectionClone();
 			this.addChildNode(instance);
 		},
+
+		removeInheritor: function(instance){
+			var inheritorCollection = this.get('inheritors');
+			return inheritorCollection.removeInheritor(instance);	
+		},
+
+	
 
 		createSelectionClone: function() {
 			if (this.get('selection_clone')) {

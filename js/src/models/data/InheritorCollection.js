@@ -24,6 +24,11 @@ define([
 				this.instance_parent = instance_parent;
 			},
 
+
+			deleteSelf: function(){
+				this.removeAllInheritors();
+				PConstraint.prototype.deleteSelf.call(this, arguments);
+			},
 			
 
 			addInheritor: function(inheritor) {
@@ -33,10 +38,24 @@ define([
 			},
 
 			removeInheritor: function(inheritor) {
-				inheritor.deleteSelf();
+			
 				var index = _.indexOf(this.inheritors, inheritor);
-				this.inheritors.splice(index, 1);
+				if(index>-1){
+					inheritor.deleteSelf();
+					this.inheritors.splice(index, 1);
+					return true;
+				}
+				else{
+					return false;
+				}
 
+			},
+
+			removeAllInheritors: function(){
+				for(var i=0;i<this.inheritors.length;i++){
+					this.inheritors[i].deleteSelf();
+				}
+				this.inheritors = [];
 			},
 
 			propertyModified: function(event) {

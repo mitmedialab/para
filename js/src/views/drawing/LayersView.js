@@ -448,6 +448,17 @@ define([
 
 		},
 
+		removeShape: function(pId){
+			var node = shapeTree.getNodeByKey(pId);
+			if(node){
+				node.remove();
+				this.resetConstraintHeight();
+			}
+			else{
+				console.error('could not find node to remove');
+			}
+		},
+
 		addInstance: function(shape, pId) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
