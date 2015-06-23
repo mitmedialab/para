@@ -395,10 +395,12 @@ define([
 
 		//called when creating an instance which inherits from existing shape
 		addInstance: function(parent) {
+			console.log('visitor add instance');
 			var newInstance = parent.create();
 			parent.set('selected', false);
 			newInstance.set('selected', true);
 			layersView.addInstance(newInstance.toJSON(), parent.get('id'));
+			this.selectShape(newInstance);
 			return newInstance;
 		},
 
@@ -494,7 +496,16 @@ define([
 				this.compile();
 			}
 
-			layersView.updateSelection(selected_shapes);
+			var layer_shapes = selected_shapes.map(function(item){
+				if(item.get('name')==='point'){
+					return item.nodeParent;
+				}
+				else{
+					return item;
+				}
+			});
+			
+			layersView.updateSelection(layer_shapes);
 
 
 		},

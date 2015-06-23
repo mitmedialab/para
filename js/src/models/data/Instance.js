@@ -318,7 +318,25 @@ define([
 			g_clone.transform(this._ri_matrix);
 			g_clone.transform(this._si_matrix);
 			instance.changeGeomInheritance(g_clone);
+			instance.createSelectionClone();
 			this.addChildNode(instance);
+		},
+
+		createSelectionClone: function() {
+			if (this.get('selection_clone')) {
+				this.get('selection_clone').remove();
+				this.set('selection_clone', null);
+			}
+			var selection_clone = this.getShapeClone();
+			var targetLayer = paper.project.layers.filter(function(layer) {
+				return layer.name === 'ui_layer';
+			})[0];
+			targetLayer.addChild(selection_clone);
+			selection_clone.data.instance = this;
+			selection_clone.fillColor = null;
+			selection_clone.strokeWidth = 3;
+			selection_clone.selected = false;
+			this.set('selection_clone',selection_clone);
 		},
 
 		changeGeomInheritance: function(geom) {
@@ -1209,40 +1227,34 @@ define([
 			var geom = this.get('geom');
 			geom.bringToFront();
 			var path_altered = this.get('path_altered').getValue();
+			var selection_clone = this.get('selection_clone');
+
 			if (!path_altered) {
 				//geom.transform(this._itemp_matrix);
 				geom.transform(this._ti_matrix);
 				geom.transform(this._si_matrix);
 				geom.transform(this._ri_matrix);
-				this.get('selection_clone').transform(this._ti_matrix);
-				this.get('selection_clone').transform(this._si_matrix);
-				this.get('selection_clone').transform(this._ri_matrix);
+				selection_clone.transform(this._ti_matrix);
+				selection_clone.transform(this._si_matrix);
+				selection_clone.transform(this._ri_matrix);
 				geom.selected = false;
 			} else {
-				if (this.get('selection_clone')) {
-					this.get('selection_clone').remove();
-					this.set('selection_clone', null);
+				if(!selection_clone){
+					this.createSelectionClone();
+					selection_clone = this.get('selection_clone');
 				}
-				this.set('selection_clone', this.getShapeClone());
-				var targetLayer = paper.project.layers.filter(function(layer) {
-        		return layer.name === 'ui_layer';
-     			 })[0];
-				targetLayer.addChild(this.get('selection_clone'));
-				this.get('selection_clone').data.instance = this;
-				this.get('selection_clone').fillColor = null;
-				this.get('selection_clone').strokeWidth = 3;
-
 			}
 
 
 			var position = this.get('position').toPaperPoint();
 			geom.position = position;
+			selection_clone.position = position;
 			geom.transform(this._rotation_delta);
 			geom.transform(this._scaling_delta);
 			geom.transform(this._translation_delta);
-			this.get('selection_clone').transform(this._rotation_delta);
-			this.get('selection_clone').transform(this._scaling_delta);
-			this.get('selection_clone').transform(this._translation_delta);
+			selection_clone.transform(this._rotation_delta);
+			selection_clone.transform(this._scaling_delta);
+			selection_clone.transform(this._translation_delta);
 			//geom.transform(this._temp_matrix);
 
 			this.updateScreenBounds(geom);

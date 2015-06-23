@@ -60,6 +60,7 @@ define([
       this.listenTo(toolCollection, 'delegateMethod', this.delegateMethod);
       this.listenTo(toolCollection, 'constraintPending', this.constraintPending);
       this.listenTo(toolCollection, 'constraintReset', this.constraintReset);
+      this.listenTo(toolCollection, 'addInstance', this.addInstance);
 
       this.get('tool_collection').add([selectTool, polyTool, constraintTool]);
       console.log('tool models', this.get('tool_collection').get('polyTool'));
@@ -84,9 +85,7 @@ define([
      
       // TODO: possibly rename to 'close'
       this.get('tool_collection').get(this.get('state')).reset();
-      //this.get('tool_collection').get(state).reset();
-      
-      //this.get('tool_collection').get(state).start();
+    
       
       this.set('state', state);
       if (mode) {
@@ -135,8 +134,12 @@ define([
       this.trigger('addShape', instance);
     },
 
-    instanceAdded: function(instance) {
-      this.trigger('addInstance', instance);
+    addInstance: function(instance) {
+      console.log('tool collection add instance');
+      var selectTool = this.get('tool_collection').get('selectTool');
+      var selected_shapes = selectTool.get('selected_shapes');
+      this.trigger('addInstance', selected_shapes[selected_shapes.length-1]);
+      selectTool.removeSelectedShape(selected_shapes[selected_shapes.length-1]);
     },
 
     applyConstraint: function() {
@@ -157,7 +160,10 @@ define([
 
     geometrySelected: function(instance, segments, modifier) {
       var selectTool = this.get('tool_collection').get('selectTool');
-      this.trigger('selectionChanged', selectTool.get('selected_shapes'), instance, segments);
+      var selected_shapes = selectTool.get('selected_shapes');
+      console.log('selected_shapes',selected_shapes);
+      this.trigger('selectionChanged',selected_shapes, instance, segments);
+
     },
 
     geometryModified: function(data, modifiers) {

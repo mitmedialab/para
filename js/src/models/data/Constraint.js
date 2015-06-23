@@ -98,6 +98,7 @@ define([
       }
       if (instance.length === 0) {
         if (this.get('relatives')) {
+          this.clearSelection();
           this.set('relatives', null);
           return false;
         } else {

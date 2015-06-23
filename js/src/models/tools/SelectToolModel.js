@@ -354,13 +354,10 @@ define([
 
     selectDrag: function(event) {
       if (event.modifiers.option && copyReset) {
+        console.log('select add instance');
         copyReset = false;
         copyInitialized = true;
-        var currentShape = this.getLastSelected();
-        var instance = currentShape.create();
-        this.removeSelectedShape(currentShape);
-        this.addSelectedShape(instance);
-        this.trigger('addInstance', instance);
+        this.trigger('addInstance');
       }
 
       var data = {};

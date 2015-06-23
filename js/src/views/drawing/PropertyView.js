@@ -199,6 +199,7 @@ define([
     },
 
     geometrySelected: function(selected_shapes) {
+      if(selected_shapes.length>1){
       this.undelegateEvents();
       var selected_shape = selected_shapes[0];
       var fill_color = selected_shapes[0].accessProperty('fill_color');
@@ -224,11 +225,15 @@ define([
 
       //this.setParams(params,id);
       this.delegateEvents();  
+      }
+      else{
+        this.geometryDeselected();
+      }
     },
 
    geometryDeselected: function(data,params,id) {
       this.undelegateEvents();
-      this.clearParams(params,id);
+     // this.clearParams(params,id);
       this.delegateEvents();  
     },
 
