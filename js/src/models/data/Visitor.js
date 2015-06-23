@@ -21,13 +21,20 @@ define([
 	//stores para lists
 	var lists;
 	var renderQueue = [];
+	var constraints = [];
 	var store = 0;
 	var compile = 1;
 	var render = 2;
 	var visit = 3;
 	var search = 4;
 
-
+var constraintPropMap = {
+    'position': 'translation_delta',
+    'scale': 'scaling_delta',
+    'rotation': 'rotation_delta',
+    'fill': 'fill_color',
+    'stroke': 'stroke_color'
+  };
 	var rootNode, currentNode, layersView, functionManager;
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
@@ -45,6 +52,8 @@ define([
 				el: '#layers-constraints-container',
 				model: this
 			});
+			this.listenTo(layersView,'deleteConstraint',this.removeConstraint);
+
 		},
 		setSelectTool: function(st) {
 			functionManager.selectTool = st;
@@ -408,8 +417,29 @@ define([
 		},
 
 
-		addConstraint: function(constraint_data) {
-			layersView.addConstraint(constraint_data);
+		addConstraint: function(constraint){
+			constraints.push(constraint);
+			layersView.addConstraint(constraint);
+
+		},
+
+		removeConstraint: function(id){
+			var constraint = constraints.filter(function(constraint){
+				return constraint.id === id;
+			})[0];
+			if(constraint){
+				console.log('constraint found, trying to remove', constraint);
+				var reference = this.getPrototypeById(constraint.reference);
+				if(!reference){
+					reference = this.getListByID(constraint.reference);
+				}
+				var relative = this.getPrototypeById(constraint.relative);
+				if(!relative){
+					relative = this.getListByID(constraint.relative);
+				}
+				relative.get(constraint.rel_prop_key).removeConstraint(constraint.rel_prop_dimensions);
+				layersView.removeConstraint(constraint.id);
+			}
 		},
 
 		reorderShapes: function(movedId, relativeId, mode) {

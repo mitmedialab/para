@@ -108,13 +108,13 @@ define([
       instance = instance[0];
       instance.set('selected', false);
       if (this.get('relatives')) {
-        if(this.get('references')){
-           this.get('references').set('constraint_selected',undefined);
+        if (this.get('references')) {
+          this.get('references').set('constraint_selected', undefined);
 
         }
         this.set('references', instance);
-        instance.set('constraint_selected','reference_selected');
-        console.log('constraint-constraint_selected',instance.get('constraint_selected'));
+        instance.set('constraint_selected', 'reference_selected');
+        console.log('constraint-constraint_selected', instance.get('constraint_selected'));
 
         this.set('ref_type', type);
 
@@ -169,14 +169,14 @@ define([
             }
             if (side == 'rel') {
               geom = proxy;
-               instance = relatives;
+              instance = relatives;
             }
             switch (prop) {
               case 'scale_x':
                 propValue = instance.accessProperty('scaling_delta').x;
                 break;
               case 'scale_y':
-                propValue =instance.accessProperty('scaling_delta').y;
+                propValue = instance.accessProperty('scaling_delta').y;
                 break;
               case 'scale_xy':
                 propValue = instance.accessProperty('scaling_delta');
@@ -333,15 +333,15 @@ define([
         };
 
         this.set('proxy', proxy);
-        this.set('id', (references.get('id') + ':' + relatives.get('id')));
+        this.set('id',new Date().getTime().toString());
         return true;
       }
-      if(this.get('relatives')){
-           this.get('relatives').set('constraint_selected',undefined);
+      if (this.get('relatives')) {
+        this.get('relatives').set('constraint_selected', undefined);
 
-        }
+      }
       this.set('relatives', instance);
-      instance.set('constraint_selected','relative_selected');
+      instance.set('constraint_selected', 'relative_selected');
       this.set('rel_type', type);
       return false;
     },
@@ -368,97 +368,18 @@ define([
 
       var refPropAccess = reference.get(constraintPropMap[ref_prop[0]]);
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
-      console.log('refPropAccess', refPropAccess);
-      console.log('relPropAccess', relPropAccess);
+      this.set('ref_prop_key', constraintPropMap[ref_prop[0]]);
+      this.set('rel_prop_key', constraintPropMap[ref_prop[0]]);
+      this.set('rel_prop_dimensions', rel_prop[1]);
+      this.set('ref_prop_dimensions', ref_prop[1]);
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
-      /* if (ref_dimensions.length === rel_dimensions.length && ref_dimensions.length < refPropAccess.get('dimension_num')) {
-              constraintF = function() {
-                var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
-                var y, relPropObj;
-                eval(expression['x']);
-                if (rel_prop[0] == 'rotation') {
-                  relPropAccess.setValue(y);
-                  relPropObj = y;
-                } else {
-                  relPropAccess[rel_prop[1]].setValue(y);
-                }
-                return y;
-              };
 
-            }
-          
-
-          if (ref_dimensions.length === rel_dimensions.length && ref_dimensions.length < refPropAccess.get('dimension_num')) {
-              var value = refPropAccess.getValue();
-              constraintF = function() {
-              for (var prop in value) {
-               
-                if(expression[prop]){
-                  var x = refPropAccess[axis].getValue();
-                  console.log('x-val', x, axis);
-                  var y;
-                  eval(expression[axis]);
-                  console.log('y-val', y);
-                  evalObj[prop] = y;
-                }
-                else{
-                  evalObj[prop] = value[]
-                }
-              }
-                console.log('evalObj', evalObj);
-                relPropAccess.setValue(evalObj);
-                return evalObj;
-
-
-                var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
-                var y, relPropObj;
-                eval(expression['x']);
-                if (rel_prop[0] == 'rotation') {
-                  relPropAccess.setValue(y);
-                  relPropObj = y;
-                } else {
-                  relPropAccess[rel_prop[1]].setValue(y);
-                }
-                return y;
-              };
-
-            }*/
-      /*if (ref_dimensions.length > rel_dimensions.length && rel_dimensions.length < relPropAccess.get('dimension_num')) {
-
-        constraintF = function() {
-          var refPropValue = refPropAccess.getValue();
-          console.log('rel prop value', rel_prop[1]);
-          var keys = Object.keys(refPropAccess.getValue());
-          var x = (rel_prop[0] == 'rotation') ? refPropAccess.getValue()[keys[0]] : refPropAccess[rel_prop[1]].getValue();
-          console.log('keys', keys, 'value', refPropAccess.getValue(), 'x:', x);
-          var y;
-          eval(expression['x']);
-          if (rel_prop[0] == 'rotation') {
-            relPropAccess.setValue(y);
-          } else {
-            relPropAccess[rel_prop[1]].setValue(y);
-          }
-          return y;
-        };
-      } else if (ref_dimensions.length < rel_dimensions.length && refPropAccess.get('dimension_num') < 2) {
-        constraintF = function() {
-          var evalObj = {};
-          var x = (ref_prop[0] == 'rotation') ? refPropAccess.getValue() : refPropAccess[ref_prop[1]].getValue();
-          for (var axis in expression) {
-            var y;
-            eval(expression[axis]);
-            evalObj[axis] = y;
-          }
-          relPropAccess.setValue(evalObj);
-          return evalObj;
-        };
-      } */
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
         var constraintFunctions = [];
         var a_keys = Object.keys(expression);
         for (var i = 0; i < a_keys.length; i++) {
           var axis = a_keys[i];
-          var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined: ref_available_props[ref_available_props.length - 1];
+          var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
           var cf = (function(d, a) {
             return function() {
               var x = (a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
@@ -496,7 +417,7 @@ define([
           var a_keys = Object.keys(expression);
           for (var i = 0; i < a_keys.length; i++) {
             var axis = a_keys[i];
-            var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined: ref_available_props[ref_available_props.length - 1];
+            var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
             var x = (ap === 'v' || !ap) ? refPropAccess.getValue() : refPropAccess[ap].getValue();
             console.log('x-val', x, axis);
             var y;
@@ -504,20 +425,20 @@ define([
             console.log('y-val', y);
             evalObj[axis] = y;
           }
-          console.log('evalObj', evalObj, 'd-num',relPropAccess.get('dimension_num'));
+          console.log('evalObj', evalObj, 'd-num', relPropAccess.get('dimension_num'));
           if (relPropAccess.get('dimension_num') > 1) {
             console.log('setting value as object');
             relPropAccess.setValue(evalObj);
             return evalObj;
           } else {
-            console.log('setting value as value',evalObj['v']);
+            console.log('setting value as value', evalObj['v']);
             relPropAccess.setValue(evalObj['v']);
 
-            console.log('getting value=',relPropAccess.getValue());
+            console.log('getting value=', relPropAccess.getValue());
             return evalObj['v'];
           }
 
-          
+
         };
         relPropAccess.setConstraint(constraintF);
         console.log('setting constraint on entire object');
@@ -537,16 +458,16 @@ define([
 
     },
 
-    clearSelection:function(){
-         if(this.get('references')){
-           this.get('references').set('constraint_selected',undefined);
+    clearSelection: function() {
+      if (this.get('references')) {
+        this.get('references').set('constraint_selected', undefined);
 
-        }
-        if(this.get('relatives')){
-           this.get('relatives').set('constraint_selected',undefined);
+      }
+      if (this.get('relatives')) {
+        this.get('relatives').set('constraint_selected', undefined);
 
-        }
-      },
+      }
+    },
 
     remove: function() {
       // remove all paper UI elements
@@ -554,7 +475,7 @@ define([
     },
 
     reset: function() {
-     
+
       this.clear().set(this.defaults);
     }
 

@@ -61,27 +61,25 @@ define([
 	];
 
 
-	var constraintSource = [
-		{
-				title: 'c1',
-				key: '100',
-				ref: '1',
-				rel: '10',
-				status: 'closed'
-			}, {
-				title: 'c2',
-				key: '200',
-				ref: '3',
-				rel: '5',
-				status: 'closed'
-			}, {
-				title: 'c3',
-				key: '300',
-				ref: '7',
-				rel: '8',
-				status: 'pinned'
-			}
-	];
+	var constraintSource = [{
+		title: 'c1',
+		key: '100',
+		ref: '1',
+		rel: '10',
+		status: 'closed'
+	}, {
+		title: 'c2',
+		key: '200',
+		ref: '3',
+		rel: '5',
+		status: 'closed'
+	}, {
+		title: 'c3',
+		key: '300',
+		ref: '7',
+		rel: '8',
+		status: 'pinned'
+	}];
 	var LayersView = Backbone.View.extend({
 
 		events: {
@@ -185,6 +183,15 @@ define([
 				view: this
 			}, this.listClicked);
 
+			$("#constraints").bind("click", {
+				view: this
+			}, this.constraintClicked);
+
+
+			var self = this;
+			$('html').keyup(function(e) {
+				self.deleteActive();
+			});
 
 			shapeRoot = $("#shapes").fancytree("getRootNode");
 			listRoot = $("#lists").fancytree("getRootNode");
@@ -325,9 +332,9 @@ define([
 		},
 
 		constraintClicked: function(event) {
-			var id = event.target.id;
+			var id = event.target.key;
 			console.log('clicked constraint', id);
-			var constraint = constraintSource.filter(function(item) {
+			/*var constraint = constraintSource.filter(function(item) {
 				console.log(item);
 				item.status = 'closed';
 				return item.key == id;
@@ -339,10 +346,21 @@ define([
 			var html = template({
 				constraint: constraintSource
 			});
-			$('#constraint_list').html(html);
-			console.log(event.data.view);
-			event.data.view.positionConstraintIcons();
+			$('#constraint_list').html(html);*/
+			event.data.view.deselectAllNodes('shapes');
+			event.data.view.deselectAllNodes('lists');
+			//event.data.view.positionConstraintIcons();
 
+		},
+
+		//TODO: currently only works on constraints, should work on all objects
+		deleteActive: function() {
+			var active = constraintTree.getActiveNode();
+			console.log('attempting to delete constraint', active);
+
+			if (active) {
+				this.trigger('deleteConstraint', active.key);
+			}
 		},
 
 		dropCompleted: function(nodeA, nodeB, hitMode) {
@@ -354,6 +372,8 @@ define([
 			var id = event.target.id;
 			var activeNode = shapeTree.getActiveNode();
 			var shape = event.data.view.model.getPrototypeById(activeNode.key);
+			event.data.view.deselectAllNodes('constraints');
+			event.data.view.deselectAllNodes('lists');
 			event.data.view.itemClicked(id, activeNode, shape);
 		},
 
@@ -361,10 +381,34 @@ define([
 			var id = event.target.id;
 			var activeNode = listTree.getActiveNode();
 			var shape = event.data.view.model.getListById(activeNode.key);
+			event.data.view.deselectAllNodes('constraints');
+			event.data.view.deselectAllNodes('shapes');
 			event.data.view.itemClicked(id, activeNode, shape);
 		},
 
+		deselectAllNodes: function(tree) {
+			var s_tree;
+			switch (tree) {
+				case 'lists':
+					s_tree = listTree;
+					break;
+				case 'constraints':
+					s_tree = constraintTree;
+					break;
+				case 'shapes':
+					s_tree = shapeTree;
+					break;
+			}
+			console.log('deselect nodes', tree, active);
+			var active = s_tree.getActiveNode();
+			if (active) {
+				active.setActive(false);
+			}
+
+		},
+
 		itemClicked: function(id, activeNode, shape) {
+			console.log('itemClicked');
 			switch (id) {
 				case 'constraint':
 					break;
@@ -448,13 +492,12 @@ define([
 
 		},
 
-		removeShape: function(pId){
+		removeShape: function(pId) {
 			var node = shapeTree.getNodeByKey(pId);
-			if(node){
+			if (node) {
 				node.remove();
 				this.resetConstraintHeight();
-			}
-			else{
+			} else {
 				console.error('could not find node to remove');
 			}
 		},
@@ -489,7 +532,7 @@ define([
 		},
 
 		addConstraint: function(data) {
-		this.deselectAll(shapeRoot);
+			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			this.deselectAll(constraintRoot);
 			console.log('constraint', data);
@@ -500,6 +543,16 @@ define([
 			var constraintNode = constraintRoot.addChildren(constraintData);
 			this.selectNode(constraintNode);
 			this.resetConstraintHeight();
+		},
+
+		removeConstraint: function(pId) {
+			var node = constraintTree.getNodeByKey(pId);
+			if (node) {
+				node.remove();
+				this.resetConstraintHeight();
+			} else {
+				console.error('could not find node to remove');
+			}
 		},
 
 		selectNode: function(node) {

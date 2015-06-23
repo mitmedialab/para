@@ -142,13 +142,23 @@ define([
       var constraint = this.get('currentConstraint');
       constraint.get('proxy').hide();
       constraint.clearUI();
+      constraint.clearSelection();
       constraint.create();
       var constraintMap = this.get('constraints');
       constraintMap[constraint.get('id')] = constraint;
     var constraint_data =  {
         name: 'constraint',
-        id: constraint.get("id")
+        id: constraint.get('id'),
+        relative: constraint.get('relatives').get('id'),
+        reference: constraint.get('references').get('id'),
+        ref_prop: constraint.get('ref_prop'),
+        rel_prop: constraint.get('rel_prop'),
+        ref_prop_key: constraint.get('rel_prop_key'),
+        rel_prop_key: constraint.get('rel_prop_key'),
+        ref_prop_dimensions: constraint.get('ref_prop_dimensions'),
+        rel_prop_dimensions: constraint.get('rel_prop_dimensions'),
       };
+
       this.set('currentConstraint', new Constraint());
       this.reset();
       this.trigger('compileRequest');

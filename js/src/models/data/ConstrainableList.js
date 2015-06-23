@@ -15,7 +15,7 @@ define([
   function(_, ListNode, PFloat, PBool, paper, PConstraint) {
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
-        name: 'constrainable_list',
+        name: 'list',
         index: 0,
       }),
 

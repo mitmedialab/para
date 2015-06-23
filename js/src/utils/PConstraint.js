@@ -39,7 +39,7 @@
 				this.set('isNull', val);
 			},
 
-			deleteSelf: function(){
+			deleteSelf: function() {
 				//TODO: write cleanup delete code here.
 			},
 
@@ -73,12 +73,20 @@
 			/* removeConstraint
 			 * removes the constraint of this property
 			 */
-			removeConstraint: function(axis) {
-				if (this.isSelfConstrained()) {
-					this.constraint.setValue(null);
-					delete this.constraint;
-				}
+			removeConstraint: function(dimensions) {
+				if (dimensions.length === this.get('dimension_num')) {
+					if (this.isSelfConstrained()) {
+						var value = this.getValue();
+						this.constraint = null;
+						this.setValue(value);
+					}
+				} else {
+					for (var i = 0; i < dimensions.length; i++) {
+						var dimension = dimensions[i];
+						this[dimension].removeConstraint([dimensions[i]]);
+					}
 
+				}
 			},
 
 			/* isSelfConstrained
@@ -132,7 +140,7 @@
 			},
 
 			//invalidate all constrainable properties
-			invalidate: function(){
+			invalidate: function() {
 				for (var p in this) {
 					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
 						this[p].invalidate();
