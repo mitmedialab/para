@@ -94,6 +94,15 @@ var constraintPropMap = {
 			return match;
 		},
 
+		getConstraintById: function(id){
+				var constraint = constraints.filter(function(constraint){
+				return constraint.id === id;
+			})[0];
+			console.log('getting constraint by id',constraint);
+			return constraint;
+		},
+
+
 		/* getPrototypeById 
 		 * returns prototype by id
 		 */
@@ -424,9 +433,7 @@ var constraintPropMap = {
 		},
 
 		removeConstraint: function(id){
-			var constraint = constraints.filter(function(constraint){
-				return constraint.id === id;
-			})[0];
+			var constraint = this.getConstraintById(id);
 			if(constraint){
 				console.log('constraint found, trying to remove', constraint);
 				var reference = this.getPrototypeById(constraint.reference);

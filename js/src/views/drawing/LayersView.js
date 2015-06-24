@@ -14,51 +14,6 @@ define([
 ], function($, _, paper, Backbone, Handlebars, fancytree, ui) {
 	var shapeTree, listTree, constraintTree, shapeRoot, listRoot, constraintRoot, source, template, relIcon, refIcon, connector;
 	var currentRef, currentRel;
-	var shapeSource = [
-		/*{
-				title: "Shape 1",
-				key: "1"
-			}, {
-				title: "Shape 5",
-				key: "7"
-			}, {
-				title: "Shape 6",
-				key: "8"
-			}, {
-				title: "Shape 2",
-				key: "2",
-				folder: true,
-				children: [{
-					title: "Inheritor 1",
-					key: "3"
-				}, {
-					title: "Inheritor 2",
-					key: "4"
-				}]
-			}*/
-	];
-
-	var listSource = [
-		/*{
-				title: "List 1",
-				key: "10",
-				data: {
-					list: true
-				}
-			}, {
-				title: "List 2",
-				key: "11",
-				data: {
-					list: true
-				}
-			}, {
-				title: "List 3",
-				key: "12",
-				data: {
-					list: true
-				}
-			}, */
-	];
 
 
 	var constraintSource = [{
@@ -190,7 +145,9 @@ define([
 
 			var self = this;
 			$('html').keyup(function(e) {
-				self.deleteActive();
+				if(e.keyCode == 46){
+					self.deleteActive();
+				}
 			});
 
 			shapeRoot = $("#shapes").fancytree("getRootNode");
@@ -283,15 +240,19 @@ define([
 			var p2 = $(ref.span).offset();
 			var bc1 = $(rel.span).css('backgroundColor');
 			var bc2 = $(ref.span).css('backgroundColor');
+			var bp = p1.top>p2.top ? -175:  -245;
 			console.log("shapeRoot, listRoot", p1.top, p2.top);
 			$('#constraint_rel').css({
 				top: Math.floor(p1.top) - 1,
 				backgroundColor: bc1,
+				backgroundPositionX: -1,
 				visibility: 'visible'
 			});
 			$('#constraint_ref').css({
 				top: Math.floor(p2.top) - 1,
 				backgroundColor: bc2,
+				backgroundPositionY: bp,
+				backgroundPositionX: -1,
 				visibility: 'visible'
 			});
 			var length = Math.abs(p1.top - p2.top);
@@ -332,25 +293,21 @@ define([
 		},
 
 		constraintClicked: function(event) {
-			var id = event.target.key;
-			console.log('clicked constraint', id);
-			/*var constraint = constraintSource.filter(function(item) {
-				console.log(item);
-				item.status = 'closed';
-				return item.key == id;
-			})[0];
-			constraint.status = 'opened';
-			currentRef = constraint.ref;
-			currentRel = constraint.rel;
+			event.data.view.visualizeConstraint();
+		},
 
-			var html = template({
-				constraint: constraintSource
-			});
-			$('#constraint_list').html(html);*/
-			event.data.view.deselectAllNodes('shapes');
-			event.data.view.deselectAllNodes('lists');
-			//event.data.view.positionConstraintIcons();
+		visualizeConstraint: function(){
+			this.deselectAllNodes('shapes');
+			this.deselectAllNodes('lists');
+			var activeNode = constraintTree.getActiveNode();
+			var constraint = this.model.getConstraintById(activeNode.key);
 
+			currentRef  = constraint.reference;
+			currentRel = constraint.relative;
+
+			console.log('clicked constraint', activeNode.key, constraint,currentRef,currentRel);
+			activeNode.status = 'opened';
+			this.positionConstraintIcons();
 		},
 
 		//TODO: currently only works on constraints, should work on all objects
@@ -359,7 +316,7 @@ define([
 			console.log('attempting to delete constraint', active);
 
 			if (active) {
-				this.trigger('deleteConstraint', active.key);
+				this.model.removeConstraint(active.key);
 			}
 		},
 
@@ -529,27 +486,36 @@ define([
 			var listNode = listRoot.addChildren(listData);
 			this.selectNode(listNode);
 			this.resetConstraintHeight();
+			this.visualizeConstraint();
 		},
 
 		addConstraint: function(data) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			this.deselectAll(constraintRoot);
-			console.log('constraint', data);
+			//console.log('constraint', data);
 			var constraintData = {
 				title: data.name,
-				key: data.id
+				key: data.id,
+				rel: data.relative,
+				ref: data.reference
 			};
+			console.log('constraint-data', constraintData);
 			var constraintNode = constraintRoot.addChildren(constraintData);
 			this.selectNode(constraintNode);
+			constraintNode.setActive(true);
 			this.resetConstraintHeight();
+			this.visualizeConstraint();
 		},
 
 		removeConstraint: function(pId) {
 			var node = constraintTree.getNodeByKey(pId);
 			if (node) {
 				node.remove();
+				currentRef = null;
+				currentRel = null;
 				this.resetConstraintHeight();
+				this.positionConstraintIcons();
 			} else {
 				console.error('could not find node to remove');
 			}

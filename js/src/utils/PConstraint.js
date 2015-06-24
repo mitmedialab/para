@@ -65,7 +65,6 @@
 					console.log('setting reference to', r);
 					this.reference = r;
 				}
-				//this.trigger('constraint_set');
 			},
 
 
