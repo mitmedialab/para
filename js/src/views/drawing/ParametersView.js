@@ -33,13 +33,6 @@ define([
 			this.listenTo(this.model, "change:showLayers", this.showLayers);
 			this.listenTo(this.model, "change:translation_delta", this.setPosition);
 			this.listenTo(this.model, 'change:f_parameters', this.updateParameters);
-			
-			//this.tool = new paper.Tool();
-			//this.tool.parent = this;
-			//this.tool.name = 'layer_tool';
-			//this.tool.attach('mouseup', this.mouseUp);
-			//$('body').bind('mouseup', this.mouseUp);
-
 		},
 
 		createFunctionPalette: function(instance) {
@@ -86,22 +79,7 @@ define([
 			if(this.model.requestArgument(paramId)){
 				$(event.target).attr('id','active');
 			}
-			//console.log('argument clicked',this.activeParam);
-			//this.tool.activate();
 		},
-
-		/*mouseUp: function(event) {
-			console.log('mouse up',this.parent.activeParam);
-
-			if (this.parent.activeParam!==null) {
-				console.log('layer mouse up');
-				var mainTool = paper.tools.filter(function(item) {
-					return item.name === 'canvas_tool';
-				})[0];
-				mainTool.activate();
-				this.parent.activeParam = null;
-			}
-		},*/
 
 		setPosition: function() {
 

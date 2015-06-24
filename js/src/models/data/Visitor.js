@@ -196,7 +196,7 @@ define([
 			};
 			var functions = functionManager.functions;
 			for (var i = 0; i < functions.length; i++) {
-				this.visit(functions[i], null, state_data);
+				this.visit(functions[i], null, ate_data);
 			}
 		},
 
@@ -481,6 +481,7 @@ define([
 					relative = this.getListByID(constraint.relative);
 				}
 				relative.get(constraint.rel_prop_key).removeConstraint(constraint.rel_prop_dimensions);
+				this.visualizeConstraint();
 				layersView.removeConstraint(constraint.id);
 			}
 		},

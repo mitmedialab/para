@@ -7,13 +7,11 @@ define([
   'views/drawing/CanvasView',
   'views/drawing/ToolView',
   'views/drawing/PropertyView',
-  'views/drawing/ContextView',
-  'views/drawing/ProtoView',
   'models/data/PropertiesManager',
   'models/tools/ToolManager',
   'models/data/Visitor',
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ContextView, ProtoView, PropertiesManager, ToolManager, Visitor) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView,PropertiesManager, ToolManager, Visitor) {
 
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
@@ -78,10 +76,6 @@ define([
       var propertyView = new PropertyView({
         el: '#prop-menu',
         model: toolManager
-      });
-      var contextView = new ContextView({
-        el: '#context-menu',
-        model: toolManager.get('tool_collection').get('constraintTool'),
       });
 
       propertyView.render();

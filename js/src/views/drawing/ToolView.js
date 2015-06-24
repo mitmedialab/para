@@ -25,6 +25,7 @@ define([
           $('#constraintApply').removeAttr('disabled');
         } else {
           $('#constraintApply').attr('disabled', true);
+          $('#constraintApply').removeClass('active');
         }
       });
     },
@@ -203,6 +204,7 @@ define([
     constraintApplyClick: function(){
       console.log('applying constraint');
       this.model.applyConstraint();
+
     },
 
 
