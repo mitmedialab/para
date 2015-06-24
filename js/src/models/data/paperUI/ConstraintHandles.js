@@ -327,7 +327,7 @@ define([
               count++;
             }
           }
-          if (count == 2) {
+          if (count == 2 && !target.active) {
             for (var g = 0; g < prop_map.length; g++) {
               geometry.children[thisGroup + '_' + prop_map[g]].active = false;
             }
