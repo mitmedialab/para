@@ -301,6 +301,7 @@ define([
 			var shape = event.data.view.model.getPrototypeById(activeNode.key);
 			event.data.view.deselectAllNodes('lists');
 			event.data.view.itemClicked(id, activeNode, shape);
+			event.data.view.positionConstraintIcons();
 		},
 
 		listClicked: function(event) {
@@ -309,6 +310,7 @@ define([
 			var shape = event.data.view.model.getListById(activeNode.key);
 			event.data.view.deselectAllNodes('shapes');
 			event.data.view.itemClicked(id, activeNode, shape);
+			event.data.view.positionConstraintIcons();
 		},
 
 		deselectAllNodes: function(tree) {
