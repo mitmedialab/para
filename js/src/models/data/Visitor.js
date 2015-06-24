@@ -28,13 +28,13 @@ define([
 	var visit = 3;
 	var search = 4;
 
-var constraintPropMap = {
-    'position': 'translation_delta',
-    'scale': 'scaling_delta',
-    'rotation': 'rotation_delta',
-    'fill': 'fill_color',
-    'stroke': 'stroke_color'
-  };
+	var constraintPropMap = {
+		'position': 'translation_delta',
+		'scale': 'scaling_delta',
+		'rotation': 'rotation_delta',
+		'fill': 'fill_color',
+		'stroke': 'stroke_color'
+	};
 	var rootNode, currentNode, layersView, functionManager;
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
@@ -52,7 +52,6 @@ var constraintPropMap = {
 				el: '#layers-constraints-container',
 				model: this
 			});
-			this.listenTo(layersView,'deleteConstraint',this.removeConstraint);
 
 		},
 		setSelectTool: function(st) {
@@ -71,9 +70,19 @@ var constraintPropMap = {
 			renderQueue = [];
 		},
 
+
+		getById: function(id) {
+			var s = this.getPrototypeById(id);
+			if (!s) {
+				s = this.getListById(id);
+			}
+			return s;
+		},
+
 		/* getPrototypeById 
 		 * returns prototype by id
 		 */
+
 		getPrototypeById: function(id, start) {
 			var state_data = {
 				list: search,
@@ -94,12 +103,39 @@ var constraintPropMap = {
 			return match;
 		},
 
-		getConstraintById: function(id){
-				var constraint = constraints.filter(function(constraint){
+		getConstraintById: function(id) {
+			var constraint = constraints.filter(function(constraint) {
 				return constraint.id === id;
 			})[0];
-			console.log('getting constraint by id',constraint);
+			console.log('getting constraint by id', constraint);
 			return constraint;
+		},
+
+		visualizeConstraint: function(ref, rel, pref, prel) {
+			var ref_i, rel_i;
+			if (pref && prel) {
+				var pref_i = this.getById(pref);
+				var prel_i = this.getById(prel);
+				pref_i.set('constraint_selected', null);
+				prel_i.set('constraint_selected', null);
+			}
+			if (ref && rel) {
+				ref_i = this.getById(ref);
+				rel_i = this.getById(rel);
+				ref_i.set('constraint_selected', 'reference_selected');
+				rel_i.set('constraint_selected', 'relative_selected');
+			} else {
+				ref_i = this.getById(layersView.getCurrentRef());
+				rel_i = this.getById(layersView.getCurrentRel());
+				if (ref_i) {
+					ref_i.set('constraint_selected', null);
+				}
+				if (rel_i) {
+					rel_i.set('constraint_selected', null);
+				}
+				layersView.deactivateConstraint();
+			}
+			this.compile();
 		},
 
 
@@ -107,17 +143,17 @@ var constraintPropMap = {
 		 * returns prototype by id
 		 */
 		getListById: function(id) {
-		
+
 			var state_data = {
 				list: search,
 				instance: search,
 				func: search,
 				data: id
 			};
-			console.log('getListByID',state_data.list,state_data);
+			console.log('getListByID', state_data.list, state_data);
 			var match = false;
 			for (var i = 0; i < lists.length; i++) {
-				console.log('checking list at ',i,lists[i]);
+				console.log('checking list at ', i, lists[i]);
 				match = this.visitList(lists[i], null, state_data);
 				if (match) {
 					return match;
@@ -254,7 +290,7 @@ var constraintPropMap = {
 		visitList: function(node, departureNode, state_data) {
 			var member;
 			var state = state_data.list;
-			console.log('visiting list',state_data.list,state_data);
+			console.log('visiting list', state_data.list, state_data);
 			switch (state) {
 				case store:
 					for (var k = 0; k < node.children.length; k++) {
@@ -285,7 +321,7 @@ var constraintPropMap = {
 					}
 					break;
 				case search:
-					console.log('searching list',state_data.data,node.get('id'),state_data.data===node.get('id'));
+					console.log('searching list', state_data.data, node.get('id'), state_data.data === node.get('id'));
 					if (node.get('id') === state_data.data) {
 						console.log('match found');
 						return node;
@@ -426,22 +462,22 @@ var constraintPropMap = {
 		},
 
 
-		addConstraint: function(constraint){
+		addConstraint: function(constraint) {
 			constraints.push(constraint);
 			layersView.addConstraint(constraint);
 
 		},
 
-		removeConstraint: function(id){
+		removeConstraint: function(id) {
 			var constraint = this.getConstraintById(id);
-			if(constraint){
+			if (constraint) {
 				console.log('constraint found, trying to remove', constraint);
 				var reference = this.getPrototypeById(constraint.reference);
-				if(!reference){
+				if (!reference) {
 					reference = this.getListByID(constraint.reference);
 				}
 				var relative = this.getPrototypeById(constraint.relative);
-				if(!relative){
+				if (!relative) {
 					relative = this.getListByID(constraint.relative);
 				}
 				relative.get(constraint.rel_prop_key).removeConstraint(constraint.rel_prop_dimensions);
@@ -477,46 +513,42 @@ var constraintPropMap = {
 		},
 
 		selectShape: function(shape) {
-			if(typeof shape === 'string'){
+			if (typeof shape === 'string') {
 				var selected = this.getPrototypeById(shape);
 				this.trigger('selectionFiltered', selected, []);
-			}
-			else{
-			this.trigger('selectionFiltered', shape, []);
+			} else {
+				this.trigger('selectionFiltered', shape, []);
 
 			}
-			
+
 
 		},
 
 		deselectShape: function(shape) {
-			if(typeof shape === 'string'){
+			if (typeof shape === 'string') {
 				var selected = this.getPrototypeById(shape);
 				this.trigger('selectionFiltered', [], selected);
-			}
-			else{
+			} else {
 				this.trigger('selectionFiltered', [], shape);
 			}
 		},
 
 		hideShape: function(shape) {
-			if(typeof shape === 'string'){
+			if (typeof shape === 'string') {
 				var selected = this.getPrototypeById(shape);
 				selected.hide();
 				this.trigger('selectionFiltered', [], selected);
-			}
-			else{
+			} else {
 				shape.hide();
 				this.trigger('selectionFiltered', [], shape);
 			}
 		},
 
 		showShape: function(shape) {
-			if(typeof shape === 'string'){
+			if (typeof shape === 'string') {
 				var selected = this.getPrototypeById(shape);
 				selected.show();
-			}
-			else{
+			} else {
 				shape.show();
 				this.trigger('selectionFiltered', [], shape);
 			}
@@ -536,15 +568,14 @@ var constraintPropMap = {
 				this.compile();
 			}
 
-			var layer_shapes = selected_shapes.map(function(item){
-				if(item.get('name')==='point'){
+			var layer_shapes = selected_shapes.map(function(item) {
+				if (item.get('name') === 'point') {
 					return item.nodeParent;
-				}
-				else{
+				} else {
 					return item;
 				}
 			});
-			
+
 			layersView.updateSelection(layer_shapes);
 
 
@@ -575,7 +606,7 @@ var constraintPropMap = {
 
 		},
 
-	
+
 
 		//=======list heirarchy managment methods==========//
 

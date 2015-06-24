@@ -54,6 +54,7 @@ define([
       visitor.listenTo(toolManager, 'removeShape', visitor.removeShape);
       visitor.listenTo(toolManager, 'addInstance', visitor.addInstance);
       visitor.listenTo(toolManager, 'addConstraint', visitor.addConstraint);
+      visitor.listenTo(toolManager, 'visualizeConstraint', visitor.visualizeConstraint);
       visitor.listenTo(toolManager, 'selectionChanged', visitor.selectionChanged);
       visitor.listenTo(toolManager, 'addList', visitor.addList);
       visitor.listenTo(toolManager, 'addFunction', visitor.addFunction);

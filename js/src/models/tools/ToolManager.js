@@ -92,7 +92,12 @@ define([
         var currentTool = this.get('tool_collection').get(this.get('state'));
         currentTool.set('mode', mode);
       }
-      this.trigger('compileRequest');
+      if(state == 'constraintTool'){
+        this.trigger('visualizeConstraint');
+      }
+      else{
+       this.trigger('compileRequest');
+     }
     },
 
     modeChanged: function() {

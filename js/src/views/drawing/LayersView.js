@@ -15,26 +15,6 @@ define([
 	var shapeTree, listTree, constraintTree, shapeRoot, listRoot, constraintRoot, source, template, relIcon, refIcon, connector;
 	var currentRef, currentRel;
 
-
-	var constraintSource = [{
-		title: 'c1',
-		key: '100',
-		ref: '1',
-		rel: '10',
-		status: 'closed'
-	}, {
-		title: 'c2',
-		key: '200',
-		ref: '3',
-		rel: '5',
-		status: 'closed'
-	}, {
-		title: 'c3',
-		key: '300',
-		ref: '7',
-		rel: '8',
-		status: 'pinned'
-	}];
 	var LayersView = Backbone.View.extend({
 
 		events: {
@@ -153,16 +133,6 @@ define([
 			shapeRoot = $("#shapes").fancytree("getRootNode");
 			listRoot = $("#lists").fancytree("getRootNode");
 			constraintRoot = $("#constraints").fancytree("getRootNode");
-
-			/*shapeRoot.addChildren({
-				title: "Shape 3",
-				key: 5
-			});*/
-
-
-			var data = {
-				constraint: constraintSource
-			};
 
 			$('#constraint_list').bind("click", {
 				view: this
@@ -297,17 +267,17 @@ define([
 		},
 
 		visualizeConstraint: function(){
-			this.deselectAllNodes('shapes');
-			this.deselectAllNodes('lists');
 			var activeNode = constraintTree.getActiveNode();
 			var constraint = this.model.getConstraintById(activeNode.key);
-
+			var pRef = currentRef;
+			var pRel = currentRel;
 			currentRef  = constraint.reference;
 			currentRel = constraint.relative;
 
 			console.log('clicked constraint', activeNode.key, constraint,currentRef,currentRel);
 			activeNode.status = 'opened';
 			this.positionConstraintIcons();
+			this.model.visualizeConstraint(currentRef,currentRel,pRef,pRel);
 		},
 
 		//TODO: currently only works on constraints, should work on all objects
@@ -329,7 +299,6 @@ define([
 			var id = event.target.id;
 			var activeNode = shapeTree.getActiveNode();
 			var shape = event.data.view.model.getPrototypeById(activeNode.key);
-			event.data.view.deselectAllNodes('constraints');
 			event.data.view.deselectAllNodes('lists');
 			event.data.view.itemClicked(id, activeNode, shape);
 		},
@@ -338,7 +307,6 @@ define([
 			var id = event.target.id;
 			var activeNode = listTree.getActiveNode();
 			var shape = event.data.view.model.getListById(activeNode.key);
-			event.data.view.deselectAllNodes('constraints');
 			event.data.view.deselectAllNodes('shapes');
 			event.data.view.itemClicked(id, activeNode, shape);
 		},
@@ -521,6 +489,16 @@ define([
 			}
 		},
 
+		deactivateConstraint: function(){
+			currentRef = null;
+			currentRel = null;
+			var active = constraintTree.getActiveNode();
+			if(active){
+				active.setActive(false);
+			}
+			this.positionConstraintIcons();
+		},
+
 		selectNode: function(node) {
 			var b = $(node.li).find('#select_button');
 			$(b[0]).addClass('selected');
@@ -540,6 +518,14 @@ define([
 			var b = $(node.li).find('#visible');
 			$(b[0]).removeClass('hidden');
 		},
+
+		getCurrentRef: function(){
+			return currentRef;
+		},
+
+		getCurrentRel: function(){
+			return currentRel;
+		}
 
 
 
