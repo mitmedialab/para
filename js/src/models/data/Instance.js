@@ -408,12 +408,15 @@ define([
 			this.set('visible', false);
 			this.set('selected', false);
 			this.get('geom').visible = false; // hacky
+			this.get('selection_clone').visible = false;
 		},
 
 		show: function() {
 			this.set('visible', true);
 			this.get('geom').visible = true;
-
+			if(this.get('constraint_selected')){
+				this.get('selection_clone').visible = true;
+			}
 
 		},
 

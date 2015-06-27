@@ -125,7 +125,8 @@ define([
 
 			var self = this;
 			$('html').keyup(function(e) {
-				if(e.keyCode == 46){
+				console.log(e.keyCode);
+				if(e.keyCode == 46 || e.keyCode == 8){
 					self.deleteActive();
 				}
 			});
@@ -210,18 +211,18 @@ define([
 			var p2 = $(ref.span).offset();
 			var bc1 = $(rel.span).css('backgroundColor');
 			var bc2 = $(ref.span).css('backgroundColor');
-			var bp = p1.top>p2.top ? -175:  -245;
+			var bp = p1.top<p2.top ? -175:  -245;
 			console.log("shapeRoot, listRoot", p1.top, p2.top);
 			$('#constraint_rel').css({
 				top: Math.floor(p1.top) - 1,
 				backgroundColor: bc1,
+				backgroundPositionY: bp,
 				backgroundPositionX: -1,
 				visibility: 'visible'
 			});
 			$('#constraint_ref').css({
 				top: Math.floor(p2.top) - 1,
 				backgroundColor: bc2,
-				backgroundPositionY: bp,
 				backgroundPositionX: -1,
 				visibility: 'visible'
 			});

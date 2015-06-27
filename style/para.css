@@ -198,7 +198,7 @@ input[type="range"]:active::-webkit-slider-thumb {
 .horz-btn{
 }
 
-.btn-default:hover:enabled, .btn-default:focus:enabled, .btn-default:active:enabled, .btn-default.active:enabled, .open .dropdown-toggle.btn-default {
+.btn-default:hover:enabled, .btn-default:focus:enabled, .btn-default.active:enabled, .open .dropdown-toggle.btn-default {
     color: #333;
     background-color: #cccccc;
 }

@@ -25,7 +25,7 @@ define([
           $('#constraintApply').removeAttr('disabled');
         } else {
           $('#constraintApply').attr('disabled', true);
-          $('#constraintApply').removeClass('active');
+          
         }
       });
     },
