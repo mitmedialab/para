@@ -12,7 +12,7 @@ define([
   var lastSelected;
   var eventType = 'toolChange';
   var ToolView = Backbone.View.extend({
-    //
+
 
     initialize: function() {
       this.polyToolClick();
@@ -30,9 +30,6 @@ define([
       });
     },
 
-    render: function() {
-
-    },
 
     events: {
       'click #selectTool': 'selectToolClick',

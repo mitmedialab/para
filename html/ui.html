@@ -6,101 +6,7 @@
 
 </div>  <!--/canvas-wrapper-->
 
-<!--======================= CONTEXT MENU =======================-->
-<div id="context-menu" class="section_background">
-  <div id = "constraint-menu">
-    <svg
-       version="1.1"
-       viewbox="0 0 150 150"
-       id="constraint-wheel-box">
-    <g
-       transform="translate(0,-902.36218)"
-       id="constraint-wheel">
-       <g id="stroke">
-        <path
-           d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
-           transform="matrix(2.0759837,0,0,2.0759837,-69.69715,831.60712)"
-           id="stroke-outer"
-           class="constraint-prop"
-           fill="#000000"
-           fill-opacity="1"
-           stroke="#000000"
-           stroke-opacity="1" />
-        <path
-           d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
-           transform="matrix(1.7991328,0,0,1.7991328,-50.400494,851.04148)"
-           id="stroke-inner"
-           class="constraint-prop"
-           fill="#000000"
-           fill-opacity="1"
-           stroke="#000000"
-           stroke-opacity="1" />
-        </g>
-    <path
-       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
-       transform="matrix(2.0166584,0,0,2.0166584,-65.562149,835.77162)"
-       id="weight"
-       class="constraint-prop focus"
-       fill="#6e6e6e"
-       fill-opacity="1"
-       stroke="#6e6e6e"
-       stroke-opacity="1" />
-    <path
-       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
-       transform="matrix(1.7200326,0,0,1.7200326,-44.887172,856.59416)"
-       id="fill"
-       class="constraint-prop"
-       fill="#a0a0a0"
-       fill-opacity="1"
-       stroke="#a0a0a0"
-       stroke-opacity="1" />
-    <g
-    id="rotation">
-       <path
-          d="m 71.139552,1027.072 -3.758424,-17.5321 15.237744,17.4412 -14.2755,16.3396 z"
-          id="orient1"
-          class="constraint-prop"
-          fill="#808080"
-          stroke="#000000"
-          stroke-width="0.91121644px"
-          stroke-linecap="butt"
-          stroke-linejoin="miter"
-          stroke-opacity="1" />
-       <path
-          d="m 78.860448,927.90477 3.758424,17.5321 -15.237744,-17.44117 14.2755,-16.33947 z"
-          id="orient2"
-          class="constraint-prop"
-          fill="#808080"
-          stroke="#000000"
-          stroke-width="0.91121644px"
-          stroke-linecap="butt"
-          stroke-linejoin="miter"
-          stroke-opacity="1" />
-    </g>
-    <path
-       d="m 22.442435,1030.0255 105.115125,-105.11501 -0.26212,-0.26213 0,0 0,0 0,0"
-       id="scale"
-       class="constraint-prop"
-       fill="none"
-       stroke="#000000"
-       stroke-width="2.07598352px"
-       stroke-linecap="butt"
-       stroke-linejoin="miter"
-       stroke-opacity="1" />
-    <path
-       d="m 95.711952,70.197952 a 26.011429,26.011429 0 1 1 -52.022857,0 26.011429,26.011429 0 1 1 52.022857,0 z"
-       transform="matrix(0.46443275,0,0,0.46443275,42.628794,944.73468)"
-       id="position"
-       class="constraint-prop focus"
-       fill="#bebebe"
-       fill-opacity="1"
-       stroke="#000000"
-       stroke-opacity="1" />
-    </g>
-    </svg>
 
-  </div>
-</div>
 
 <!--======================= SUB_CANVAS=======================-->
 
@@ -322,18 +228,26 @@
 <!--======================= MENU BAR =======================-->
 <div class="menubar-wrapper">
   <div class="menubar-container">
-   <div id ="horz-toolbar" class="toolbar-container" style="display: block;">
+   <div class="horz-toolbar toolbar-container" style="display: block;">
     <!--<header></header>-->
+      <div id="toolModeToolbar" class = "horz-toolbar-section">
     <span>tool-mode:</span>
    <button class="btn btn-default btn-tool btn-tool-horz" id="modeStandard" title="standard tool mode"></button>
     <button  class="btn btn-default btn-tool btn-tool-horz btn-tool-horz-last" id="modeProxy" title="proxy tool mode"></button>
     <span>modifer:</span>
-    <div id='modToolbar'>
+    <div id="modToolbar">
      <button  class="btn btn-default btn-tool btn-tool-horz" id="modRelative" title="relative transform"></button>
      <button class="btn btn-default btn-tool btn-tool-horz" id="modOverride" title="override transform"></button>
    </div>
-   <div id='constraintToolbar'>
+ </div>
+   <div id="constraintToolbar" class = "horz-toolbar-section">
        <button  class="btn btn-default btn-tool btn-tool-horz" id="constraintApply" title="apply" disabled>apply</button>
+   </div>
+     <div id="collectionToolbar" class = "horz-toolbar-section">
+       <div class='button-heading'> <button  class="btn btn-default btn-tool btn-tool-horz" id="group" title="group" disabled></button><span>group</span></div>
+        <div class='button-heading'> <button  class="btn btn-default btn-tool btn-tool-horz" id="list" title="list" disabled></button><span>list</span></div>
+       <div class='button-heading'> <button  class="btn btn-default btn-tool btn-tool-horz" id="duplicate" title="duplicate" disabled></button><span>duplicate</span></div>
+        <div class='button-heading'> <button  class="btn btn-default btn-tool btn-tool-horz" id="ungroup" title="ungroup" disabled></button><span>ungroup</span></div>
    </div>
  </div>
 </div>

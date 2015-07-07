@@ -71,9 +71,9 @@ input[type="text"] {
 }
 
 input[type="text"].filename{
-     height:30px;
-    margin-top: 5px;
-    border:1px solid #aaa;
+   height:30px;
+   margin-top: 5px;
+   border:1px solid #aaa;
 }
 
 input[type="range"] {
@@ -122,12 +122,12 @@ input[type="range"]:active::-webkit-slider-thumb {
     left: 0px;
 }
 .sub-canvas-container{
-     display: none;
-    width: 260px;
-    height:300px;
-    border:1px solid #000;
-        overflow: hidden;
-     box-shadow:  2px 2px 10px rgba(0, 0, 0, 0.25)
+   display: none;
+   width: 260px;
+   height:300px;
+   border:1px solid #000;
+   overflow: hidden;
+   box-shadow:  2px 2px 10px rgba(0, 0, 0, 0.25)
 
 }
 .menubar-wrapper {
@@ -135,12 +135,12 @@ input[type="range"]:active::-webkit-slider-thumb {
     top: 0px;
     right: 0px;
     left: 0px;
-    height: 36px;
     overflow: hidden;
     border-bottom: solid 1px #B2B2B2;
-    background: rgba(250,250,250,0.95);
 }
 .menubar-container{
+    height: 77px;
+
 }
 
 .toolbar-wrapper, .properties-wrapper, .proto-wrapper {
@@ -149,7 +149,7 @@ input[type="range"]:active::-webkit-slider-thumb {
     float: right;
     position: relative;
     max-height: 100%;
-    padding: 36px 0px 0px 0px;
+    padding: 77px 0px 0px 0px;
     z-index:100;
 }
 
@@ -158,7 +158,7 @@ input[type="range"]:active::-webkit-slider-thumb {
 }
 .proto-wrapper, .sub-canvas-wrapper{
     float: left;
-   padding: 36px 0px 0px 0px;
+    padding: 36px 0px 0px 0px;
 
 }
 
@@ -219,7 +219,7 @@ input[type="range"]:active::-webkit-slider-thumb {
 .btn-tool-horz{
     float:left;
     border-bottom: none;
-    border-left: solid 1px #B2B2B2;
+    border: solid 1px #B2B2B2;
 }
 .btn-tool-horz-last{
     border-right:solid 1px #B2B2B2;
@@ -268,25 +268,25 @@ input[type="range"]:active::-webkit-slider-thumb {
     background-position-y: -522px;
 }
 #modeStandard{
- background-position-y: -432px;
+   background-position-y: -432px;
 }
 #modeProxy{
- background-position-y: -468px;
+   background-position-y: -468px;
 }
 #modRelative{
- background-position-y: -504px;
- background-position-x: -18px;
- width:20px;
- height:20px;
- border: solid 1px #B2B2B2;
- border-right:none;
+   background-position-y: -504px;
+   background-position-x: -18px;
+   width:20px;
+   height:20px;
+   border: solid 1px #B2B2B2;
+   border-right:none;
 
 }
 #modOverride{
-background-position-y: -504px;
-width:20px;
-height:20px;
-border: solid 1px #B2B2B2;
+    background-position-y: -504px;
+    width:20px;
+    height:20px;
+    border: solid 1px #B2B2B2;
 }
 #constraintApply{
   background-image: none;
@@ -297,6 +297,44 @@ border: solid 1px #B2B2B2;
   line-height: 10px;
   color: rgb(118, 120, 123);
   visibility: hidden;
+}
+
+#collectionToolbar .btn-tool-horz{
+    background-image: url(../images/horz_buttons.svg);
+    background-size: 54px 216px;
+    height: 54px;
+    width: 54px;
+    border: none;
+    margin: 0 3px;
+}
+
+.button-heading {
+  height: 100%;
+  font-size: 10px;
+  width: 60px;
+  text-align: center;
+  margin: 0;
+  float: left;
+}
+
+
+
+#collectionToolbar #group{
+}
+
+#collectionToolbar #list{
+    background-position-y: -54px;
+
+}
+
+#collectionToolbar #duplicate{
+    background-position-y: -108px;
+
+}
+
+#collectionToolbar #ungroup{
+    background-position-y: -162px;
+
 }
 
 #rangechaser {
@@ -325,18 +363,37 @@ select{
     float:left;
     margin: 7px 0 0 0;
 }
-#horz-toolbar{
-  }
-#horz-toolbar span{
+.horz-toolbar{
+    height: 100%;
+}
+.horz-toolbar span{
     float:left;
     margin:10px 10px;
 }
-#constraintToolbar{
+.horz-toolbar-section{
     margin-left:10px;
-    width:200px;
-    height:40px;
+    width:300px;
+    height:36px;
     float:left;
+    margin-top: 20px;
 }
+
+#collectionToolbar{
+    margin-top: 2px;
+    width: 240px;
+    height: 70px;
+}
+
+#constraintToolbar{
+    width: 70px;
+}
+
+.button-heading span {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
 
 input[type="button"]{
     background-color: inherit;
@@ -469,7 +526,7 @@ input[type=text]#expression {
     stroke: #FF0000;
     fill: #FF0000;
 }
-    
+
 
 #constraint-type-box {
     width: 70%;
@@ -572,12 +629,12 @@ header button, .sub-header button {
     height:33px
 }
 
-#horz-toolbar header {
-        background-color: rgba(200, 200, 200, 0.88);
-        width:20px;
-        height:36px;
-        float: left;
-    }
+.horz-toolbar header {
+    background-color: rgba(200, 200, 200, 0.88);
+    width:20px;
+    height:36px;
+    float: left;
+}
 
 .clearfix {
     clear: both;
@@ -679,10 +736,10 @@ span:focus{
 .layers-menu div.visible, .layers-menu div.filled {
     width:20px;
     background-image: url(../images/layer_icons.svg);
-      background-position-x: 0px;
- background-size: 20px 80px;
-  background-repeat: no-repeat;
-  
+    background-position-x: 0px;
+    background-size: 20px 80px;
+    background-repeat: no-repeat;
+
 }
 .layers-menu div.visible{
     background-position-y: 0px;
@@ -911,15 +968,15 @@ span:focus{
 }
 
 .constraint-menu{
-width: 30px;
-float: left;
-margin:0;
-min-height: 10px;
+    width: 30px;
+    float: left;
+    margin:0;
+    min-height: 10px;
 
 }
 .constraint-menu ul {
   list-style-type: none;
-    margin: 0px;
+  margin: 0px;
   padding: 0px;
   
 }
@@ -927,10 +984,10 @@ min-height: 10px;
   height: 40px;
   padding:10px;
   background-color: #666666;
-    padding: 10px; 
+  padding: 10px; 
   border-radius: 5px 0 0 5px;
-    border-bottom: solid 1px #34332F;
-    color: #ccc;
+  border-bottom: solid 1px #34332F;
+  color: #ccc;
 }
 
 .constraint-menu ul li.opened {
@@ -945,7 +1002,7 @@ div.constraint_selector {
   float: left;
   background-color: rgba(250,250,250,.95);
   margin:0;
-   border-radius: 2px 0 0 2px;
+  border-radius: 2px 0 0 2px;
 }
 div#connector_line {
     border-left: 2px solid #76787b;
@@ -972,7 +1029,7 @@ div#connector_line {
 
 #layers{
     overflow-y: scroll;
-      max-height: 500px;
+    max-height: 500px;
 }
 #layers-container{
   width: 270px; 
@@ -1047,27 +1104,27 @@ div.constraint_icon {
   margin-left:5px;
   border: solid 1px #999;
   border-right:none;
-border-radius: 20px 0 0 20px;
- background-position-y: -123px;
- position:absolute;
+  border-radius: 20px 0 0 20px;
+  background-position-y: -123px;
+  position:absolute;
 
 }
 
 
 span.fancytree-icon.hidden{
-        background-position-y: 0px;
+    background-position-y: 0px;
 
 }
 
 span.fancytree-expander{
-       background-position-y: -225px; 
+ background-position-y: -225px; 
 }
 
 span.fancytree-expanded span.fancytree-expander{
-       background-position-y: -250px; 
+ background-position-y: -250px; 
 }
 span.fancytree-constraint{
-       background-position-y: -150px; 
+ background-position-y: -150px; 
 }
 span.fancytree-select-button{
   background-position-y: -300px;
@@ -1090,13 +1147,13 @@ span.fancytree-select-button.selected{
 }
 
 .fancytree-container.fancytree-treefocus span.fancytree-node.fancytree-selected span.fancytree-title {
-background-color: inherit;
+    background-color: inherit;
 
 }
 span.fancytree-node.fancytree-selected span.fancytree-constraint{
-      background-position-y: 25px; 
+  background-position-y: 25px; 
 }
 span.sampler{
-       background-position-y: -100px; 
+ background-position-y: -100px; 
 }
 

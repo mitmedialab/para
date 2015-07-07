@@ -10,11 +10,12 @@ define([
 	'models/data/Instance',
 	'models/data/functions/FunctionNode',
 	'models/data/functions/FunctionManager',
-	'models/data/ConstrainableList', //TODO: create list manager
-	'views/drawing/LayersView',
+	'models/data/ConstrainableList',
+	'models/data/CollectionManager',
+	'views/LayersView',
 
 
-], function(_, Backbone, Instance, FunctionNode, FunctionManager, ConstrainableList, LayersView) {
+], function(_, Backbone, Instance, FunctionNode, FunctionManager, ConstrainableList, CollectionManager, LayersView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -27,6 +28,7 @@ define([
 	var render = 2;
 	var visit = 3;
 	var search = 4;
+	var rootNode, currentNode, layersView, functionManager, collectionManager;
 
 	var constraintPropMap = {
 		'position': 'translation_delta',
@@ -35,7 +37,7 @@ define([
 		'fill': 'fill_color',
 		'stroke': 'stroke_color'
 	};
-	var rootNode, currentNode, layersView, functionManager;
+
 	var Visitor = Backbone.Model.extend({
 		defaults: {},
 
@@ -48,6 +50,7 @@ define([
 			this.listenTo(rootNode, 'parseJSON', this.parseJSON);
 			currentNode = rootNode;
 			functionManager = new FunctionManager();
+			collectionManager = new CollectionManager();
 			layersView = new LayersView({
 				el: '#layers-constraints-container',
 				model: this
@@ -196,7 +199,7 @@ define([
 			};
 			var functions = functionManager.functions;
 			for (var i = 0; i < functions.length; i++) {
-				this.visit(functions[i], null, ate_data);
+				this.visit(functions[i], null, state_data);
 			}
 		},
 

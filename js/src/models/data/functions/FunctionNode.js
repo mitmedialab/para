@@ -8,7 +8,7 @@ define([
 		'paper',
 		'models/data/Instance',
 		'utils/PConstraint',
-		'views/drawing/ParametersView',
+		'views/ParametersView',
 
 	],
 
