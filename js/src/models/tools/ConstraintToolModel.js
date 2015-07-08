@@ -146,7 +146,7 @@ define([
       constraint.create();
       var constraintMap = this.get('constraints');
       constraintMap[constraint.get('id')] = constraint;
-    var constraint_data =  {
+      var constraint_data = {
         name: 'constraint',
         id: constraint.get('id'),
         relative: constraint.get('relatives').get('id'),
@@ -201,10 +201,11 @@ define([
       //  switch mode to selection
       //  return
       this.set('applicable', true);
-      this.sm.delegateMethod('select', 'selectDown', event);
-      var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
+      this.trigger('delegateMethod', 'select', 'selectDown', event);
+      this.trigger('selectionRequest',this);
+      console.log('selection request result',this.selected);
       var type = (event.modifiers.control) ? 'point' : 'shape';
-      var flag = this.get('currentConstraint').setSelection(selection, type);
+      var flag = this.get('currentConstraint').setSelection(this.selected, type);
       this.trigger('compileRequest');
 
       if (flag) {
@@ -228,13 +229,12 @@ define([
     refMouseDown: function(event) {
       var constraint = this.get('currentConstraint');
       var relative = constraint.get('relatives');
-      this.sm.delegateMethod('select', 'selectDown', event);
-      //START HERE TOMORROW- above should not need a reference, use a listener instead!
-      var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
-      selection = (selection ? selection[0] : null); // TODO: really shouldn't have to happen...
-      this.sm.delegateMethod('select', 'resetSelections');
-      this.sm.trigger('compileRequest');
-      if (selection && selection.get('id') == relative.get('id')) {
+      this.trigger('delegateMethod', 'select', 'selectDown', event);
+      this.trigger('selectionRequest',this);
+      console.log('selection request result',this.selected);
+      var selected = (this.selected ? this.selected[0] : null); // TODO: really shouldn't have to happen...
+      this.trigger('compileRequest');
+      if (selected && selected.get('id') == relative.get('id')) {
         this.set('mode', 'rel');
         this.modeSwitch();
       }
@@ -244,6 +244,8 @@ define([
     relMouseDown: function(event) {
       var constraint = this.get('currentConstraint');
       var reference = constraint.get('references');
+     // this.trigger('delegateMethod', 'select', 'selectDown', event);
+
       var hitResult = paper.project.hitTest(event.point, mouseHitOptions);
       if (hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id) {
         this.set('mode', 'ref');

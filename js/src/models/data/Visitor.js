@@ -523,14 +523,17 @@ define([
 		selectShape: function(data) {
 			if (data instanceof Array) {
 				for (var i = 0; i < data.length; i++) {
-					this._(data[i]);
+					this._selectSingleShape(data[i]);
 				}
 			} else {
 				this._selectSingleShape(data);
 			}
-			this.selectionChanged(selected, data);
+			this.updateLayers();
+			this.compile();
 
 		},
+
+
 
 		_selectSingleShape: function(instance) {
 			if (!_.contains(selected, instance)) {
@@ -538,6 +541,9 @@ define([
 				instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
 				instance.set('sel_palette_index', this.get('current_sel_index'));
 				selected.push(instance);
+				if(instance.get('name')!= 'point'){
+					this.filterSelection(instance);
+				}
 			}
 		},
 
@@ -562,8 +568,8 @@ define([
 			} else {
 				this._deselectSingleShape(data);
 			}
-
-			this.selectionChanged(selected);
+			this.updateLayers();
+			this.compile();
 
 
 		},
@@ -588,12 +594,15 @@ define([
 				selected[i].setSelectionForInheritors(false);
 			}
 			selected.length = 0;
+			this.updateLayers();
 			this.compile();
-			this.selectionChanged(selected);
+			
 		},
 
 		//returns currently selected objects
-		getCurrentSelection: function() {
+		getCurrentSelection: function(reference) {
+			console.log('get current selection',reference);
+			reference.selected = selected; 
 			return selected;
 		},
 
@@ -611,21 +620,8 @@ define([
 		},
 
 
-		selectionChanged: function(selected_shapes, added_shape) {
-			var filtered = false;
-			if (selected_shapes.length > 0) {
-				if (added_shape) {
-					if (added_shape.get('name') != 'point') {
-						filtered = this.filterSelection(added_shape);
-					}
-				}
-			}
-
-			if (!filtered) {
-				this.compile();
-			}
-
-			var layer_shapes = selected_shapes.map(function(item) {
+		updateLayers: function() {
+			var layer_shapes = selected.map(function(item) {
 				if (item.get('name') === 'point') {
 					return item.nodeParent;
 				} else {
@@ -634,8 +630,6 @@ define([
 			});
 
 			layersView.updateSelection(layer_shapes);
-
-
 		},
 
 		/* filterSelection
@@ -645,19 +639,18 @@ define([
 		filterSelection: function(lInstance) {
 			var sInstances = [];
 			var itemFound = false;
-			console.log('total num lists', lists.length);
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
 				console.log('item', i, lInstance.get('id'), lInstance.get('name'), lists[i].toJSON().members);
-				if (item) {
+				if (item && item!=lInstance) {
 					sInstances.push(item);
 					itemFound = true;
 				}
 			}
 			//add in originally selected index if no lists have been added
 			if (itemFound) {
-				this.deselectShape(sInstances);
-				this.selectShape(lInstance);
+				this.deselectShape(lInstance);
+				this.selectShape(sInstances);
 				return true;
 			}
 			return false;
@@ -690,7 +683,6 @@ define([
 		},
 
 		modifyGeometry: function(data, modifiers) {
-			console.log('modify geometry', selected, data, modifiers);
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
@@ -797,10 +789,45 @@ define([
 				data = this.toggleOpenLists();
 			}
 			console.log('toggleOpen', data.toSelect, data.toRemove);
-			this.deselectShape(data.toRemove);
-			this.selectShape(data.toSelect);
 
+			if(data.toRemove && data.toRemove.length>0){
+				this.deselectShape(data.toRemove);
+			}
+			if(data.toSelect && data.toSelect.length>0){
+				this.selectShape(data.toSelect);
+			}
 		},
+
+
+		toggleOpenLists: function() {
+
+			var openedLists = [];
+			var openedItems = [];
+			var members = [];
+			for (var j = 0; j < selected.length; j++) {
+				var item = selected[j];
+				for (var i = 0; i < lists.length; i++) {
+					if ($.inArray(lists[i], openedLists) === -1) {
+						var r = lists[i].toggleOpen(item);
+						if (r) {
+							openedItems = openedItems.concat(r);
+							openedLists.push(lists[i]);
+						}
+
+					}
+				}
+			}
+			for (var k = 0; k < openedItems.length; k++) {
+				members = members.concat(openedLists[k].members);
+
+			}
+			return {
+				toSelect: members,
+				toRemove: openedLists
+			};
+		},
+
+
 
 		/* toggleClosed
 		 * closes open functions or selected open lists
@@ -852,35 +879,6 @@ define([
 				lists[i].closeAllMembers();
 				lists[i].set('open', false);
 			}
-		},
-
-
-		toggleOpenLists: function() {
-
-			var openedLists = [];
-			var openedItems = [];
-			var members = [];
-			for (var j = 0; j < selected.length; j++) {
-				var item = selected[j];
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], openedLists) === -1) {
-						var r = lists[i].toggleOpen(item);
-						if (r) {
-							openedItems = openedItems.concat(r);
-							openedLists.push(lists[i]);
-						}
-
-					}
-				}
-			}
-			for (var k = 0; k < openedItems.length; k++) {
-				members = members.concat(openedLists[k].members);
-
-			}
-			return {
-				toSelect: members,
-				toRemove: openedLists
-			};
 		},
 
 

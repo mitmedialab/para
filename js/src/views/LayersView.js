@@ -126,7 +126,7 @@ define([
 			var self = this;
 			$('html').keyup(function(e) {
 				console.log(e.keyCode);
-				if(e.keyCode == 46 || e.keyCode == 8){
+				if (e.keyCode == 46 || e.keyCode == 8) {
 					self.deleteActive();
 				}
 			});
@@ -211,7 +211,7 @@ define([
 			var p2 = $(ref.span).offset();
 			var bc1 = $(rel.span).css('backgroundColor');
 			var bc2 = $(ref.span).css('backgroundColor');
-			var bp = p1.top<p2.top ? -175:  -245;
+			var bp = p1.top < p2.top ? -175 : -245;
 			console.log("shapeRoot, listRoot", p1.top, p2.top);
 			$('#constraint_rel').css({
 				top: Math.floor(p1.top) - 1,
@@ -267,18 +267,20 @@ define([
 			event.data.view.visualizeConstraint();
 		},
 
-		visualizeConstraint: function(){
+		visualizeConstraint: function() {
 			var activeNode = constraintTree.getActiveNode();
-			var constraint = this.model.getConstraintById(activeNode.key);
-			var pRef = currentRef;
-			var pRel = currentRel;
-			currentRef  = constraint.reference;
-			currentRel = constraint.relative;
+			if (activeNode) {
+				var constraint = this.model.getConstraintById(activeNode.key);
+				var pRef = currentRef;
+				var pRel = currentRel;
+				currentRef = constraint.reference;
+				currentRel = constraint.relative;
 
-			console.log('clicked constraint', activeNode.key, constraint,currentRef,currentRel);
-			activeNode.status = 'opened';
-			this.positionConstraintIcons();
-			this.model.visualizeConstraint(currentRef,currentRel,pRef,pRel);
+				console.log('clicked constraint', activeNode.key, constraint, currentRef, currentRel);
+				activeNode.status = 'opened';
+				this.positionConstraintIcons();
+				this.model.visualizeConstraint(currentRef, currentRel, pRef, pRel);
+			}
 		},
 
 		//TODO: currently only works on constraints, should work on all objects
@@ -492,11 +494,11 @@ define([
 			}
 		},
 
-		deactivateConstraint: function(){
+		deactivateConstraint: function() {
 			currentRef = null;
 			currentRel = null;
 			var active = constraintTree.getActiveNode();
-			if(active){
+			if (active) {
 				active.setActive(false);
 			}
 			this.positionConstraintIcons();
@@ -522,11 +524,11 @@ define([
 			$(b[0]).removeClass('hidden');
 		},
 
-		getCurrentRef: function(){
+		getCurrentRef: function() {
 			return currentRef;
 		},
 
-		getCurrentRel: function(){
+		getCurrentRel: function() {
 			return currentRel;
 		}
 

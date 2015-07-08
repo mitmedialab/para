@@ -62,14 +62,13 @@ define([
       this.listenTo(toolCollection, 'deselectAll', function() {
         self.trigger('deselectAll');
       });
-      this.listenTo(toolCollection, 'geometrySegmentModified', this.geometrySegmentModified);
       this.listenTo(toolCollection, 'delegateMethod', this.delegateMethod);
       this.listenTo(toolCollection, 'constraintPending', this.constraintPending);
       this.listenTo(toolCollection, 'constraintReset', this.constraintReset);
       this.listenTo(toolCollection, 'addInstance', this.addInstance);
+      this.listenTo(toolCollection, 'selectionRequest', this.selectionRequest);
 
       this.get('tool_collection').add([selectTool, polyTool, constraintTool]);
-      console.log('tool models', this.get('tool_collection').get('polyTool'));
       //setup user tool managers
       toolNameMap = {
         'select': selectTool,
@@ -86,13 +85,8 @@ define([
     },  
 
     setState: function(state, mode) {
-      console.log('set state', this.get('state'));
-      console.log('current tool', this.get('tool_collection').get(state));
-
       // TODO: possibly rename to 'close'
       this.get('tool_collection').get(this.get('state')).reset();
-
-
       this.set('state', state);
       if (mode) {
         var currentTool = this.get('tool_collection').get(this.get('state'));
@@ -136,13 +130,11 @@ define([
     },
 
     geometryAdded: function(instance) {
-      console.log('tool collection geometryAdded');
       this.trigger('deselectAll');
       this.trigger('addShape', instance);
     },
 
     addInstance: function(instance) {
-      console.log('tool collection add instance');
       this.trigger('addInstance');
     },
 
@@ -158,8 +150,6 @@ define([
 
     constraintPending: function() {
       this.set('constraint_pending', true);
-      console.log('constraint_pending', this.get('constraint_pending'));
-
     },
 
     geometrySelected: function(instance, segments, modifier) {
@@ -169,6 +159,10 @@ define([
         this.trigger('selectShape', instance);
       }
 
+    },
+
+    selectionRequest: function(reference){
+      this.trigger('selectionRequest',reference);
     },
 
     geometryModified: function(data, modifiers) {
@@ -214,10 +208,7 @@ define([
       if (style_data.stroke_width) {
         style_data.stroke_width = style_data.stroke_width.val;
       }
-      console.log('style_data', style_data);
-
       toolCollection.forEach(function(model, index) {
-
         model.set(style_data);
       });
     },

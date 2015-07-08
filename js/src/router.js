@@ -69,6 +69,7 @@ define([
       visitor.listenTo(toolManager, 'modifyStyle', visitor.modifyStyle);
 
       visitor.listenTo(toolManager, 'changeModeForSelection', visitor.changeModeForSelection);
+      visitor.listenTo(toolManager, 'selectionRequest', visitor.getCurrentSelection);
 
 
       var toolView = new ToolView({

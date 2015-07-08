@@ -120,8 +120,8 @@ define([
       var hitResult = paper.project.hitTest(event.point, dHitOptions);
       var instance, points;
       if (hitResult) {
-        var path = hitResult.item;
-        instance = path.data.instance;
+        literal = hitResult.item;
+        instance = literal.data.instance;
         if (instance) {
           if (hitResult.type == 'segment') {
             hitResult.segment.fullySelected = true;
@@ -145,9 +145,9 @@ define([
               type: hitResult.type
             });
           } else if (hitResult.type == 'fill') {
-            for (var i = 0; i < path.segments.length; i++) {
+            for (var i = 0; i < literal.segments.length; i++) {
               segments.push({
-                index: path.segments[i].index,
+                index: literal.segments[i].index,
                 type: 'segment'
               });
             }
@@ -155,8 +155,7 @@ define([
           if (!instance.get('proto_node')) {
             points = instance.setSelectedSegments(segments);
           }
-
-          this.trigger('geometrySelected', instance, points);
+          this.trigger('geometrySelected', instance, points, null);
         }
 
       }
@@ -188,7 +187,6 @@ define([
 
     selectDrag: function(event) {
       if (event.modifiers.option && copyReset) {
-        console.log('select add instance');
         copyReset = false;
         copyInitialized = true;
         this.trigger('addInstance');
@@ -201,8 +199,6 @@ define([
         y: event.delta.y
       };
       this.trigger('geometryModified', data, event.modifiers);
-
-
     },
 
     dSelectDrag: function(event) {
@@ -213,7 +209,6 @@ define([
         y: event.delta.y
       };
       this.trigger('segmentModified', data, handle, event.modifiers);
-
     },
 
     rotateDrag: function(event) {
@@ -229,7 +224,6 @@ define([
         this.trigger('geometryModified', data, event.modifiers);
 
       }
-
     },
 
     scaleDrag: function(event) {
