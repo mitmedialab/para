@@ -52,10 +52,16 @@ define([
       toolCollection = new Backbone.Collection({});
       this.set('tool_collection', toolCollection);
       this.listenTo(toolCollection, 'geometryAdded', this.geometryAdded);
-      this.listenTo(toolCollection, 'compileRequest', function(){self.trigger('compileRequest');});
+      this.listenTo(toolCollection, 'compileRequest', function() {
+        self.trigger('compileRequest');
+      });
       this.listenTo(toolCollection, 'geometrySelected', this.geometrySelected);
-      this.listenTo(toolCollection, 'geometeryDSelected', this.geometeryDSelected);
+      this.listenTo(toolCollection, 'geometryDSelected', this.geometeryDSelected);
       this.listenTo(toolCollection, 'geometryModified', this.geometryModified);
+      this.listenTo(toolCollection, 'segmentModified', this.segmentModified);
+      this.listenTo(toolCollection, 'deselectAll', function() {
+        self.trigger('deselectAll');
+      });
       this.listenTo(toolCollection, 'geometrySegmentModified', this.geometrySegmentModified);
       this.listenTo(toolCollection, 'delegateMethod', this.delegateMethod);
       this.listenTo(toolCollection, 'constraintPending', this.constraintPending);
@@ -77,27 +83,26 @@ define([
       //setup default zeros for zoom and pan
       this.zeroedZoom = paper.view.zoom;
       this.zeroedPan = paper.view.center.clone();
-    },
+    },  
 
     setState: function(state, mode) {
       console.log('set state', this.get('state'));
       console.log('current tool', this.get('tool_collection').get(state));
-     
+
       // TODO: possibly rename to 'close'
       this.get('tool_collection').get(this.get('state')).reset();
-    
-      
+
+
       this.set('state', state);
       if (mode) {
         var currentTool = this.get('tool_collection').get(this.get('state'));
         currentTool.set('mode', mode);
       }
-      if(state == 'constraintTool'){
+      if (state == 'constraintTool') {
         this.trigger('visualizeConstraint');
+      } else {
+        this.trigger('compileRequest');
       }
-      else{
-       this.trigger('compileRequest');
-     }
     },
 
     modeChanged: function() {
@@ -105,8 +110,8 @@ define([
       _.each(models, function(model) {
         model.changeMode(this.tool_mode, this.tool_modifer);
       });
-      this.get('selectTool').changeModeForSelection();
-      this.trigger('compileRequest');
+      this.trigger('changeModeForSelection');
+
     },
 
     resetTools: function() {
@@ -132,19 +137,13 @@ define([
 
     geometryAdded: function(instance) {
       console.log('tool collection geometryAdded');
-      var selectTool = this.get('tool_collection').get('selectTool');
-
-      selectTool.deselectAll();
-      selectTool.addSelectedShape(instance);
+      this.trigger('deselectAll');
       this.trigger('addShape', instance);
     },
 
     addInstance: function(instance) {
       console.log('tool collection add instance');
-      var selectTool = this.get('tool_collection').get('selectTool');
-      var selected_shapes = selectTool.get('selected_shapes');
-      this.trigger('addInstance', selected_shapes[selected_shapes.length-1]);
-      selectTool.removeSelectedShape(selected_shapes[selected_shapes.length-1]);
+      this.trigger('addInstance');
     },
 
     applyConstraint: function() {
@@ -153,84 +152,62 @@ define([
       this.trigger('addConstraint', constraint_data);
     },
 
-    constraintReset: function(){
-        this.set('constraint_pending',false);
+    constraintReset: function() {
+      this.set('constraint_pending', false);
     },
 
-    constraintPending: function(){
-      this.set('constraint_pending',true);
-      console.log('constraint_pending',this.get('constraint_pending'));
+    constraintPending: function() {
+      this.set('constraint_pending', true);
+      console.log('constraint_pending', this.get('constraint_pending'));
 
     },
 
     geometrySelected: function(instance, segments, modifier) {
-      var selectTool = this.get('tool_collection').get('selectTool');
-      var selected_shapes = selectTool.get('selected_shapes');
-      console.log('selected_shapes',selected_shapes);
-      this.trigger('selectionChanged',selected_shapes, instance, segments);
+      if (segments) {
+        this.trigger('selectShape', segments);
+      } else {
+        this.trigger('selectShape', instance);
+      }
 
     },
 
     geometryModified: function(data, modifiers) {
-      this.trigger('compileRequest');
+      this.trigger('geometryModified',data,modifiers);
+    },
+
+    segmentModified: function(data, modifiers) {
+      this.trigger('segmentModified',data,modifiers);
     },
 
 
     geometryParamsModified: function(data) {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
-        selectedShapes[i].updateParams(data);
-      }
-      this.trigger('compileRequest');
+      this.trigger('modifyParams', data);
     },
 
     /*geometryDeleted
      * triggers a delete action on the visitor
      */
     deleteInstance: function() {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      this.trigger('removeShape', selectedShapes);
-    },
-
-    selectionFiltered: function(newSelection, toRemove) {
-      var selectTool = this.get('tool_collection').get('selectTool');
-      console.log('new selection, to remove', newSelection, toRemove);
-      selectTool.removeSelectedShape(toRemove);
-      selectTool.addSelectedShape(newSelection);
-      this.trigger('compileRequest');
-
+      this.trigger('removeShape');
     },
 
 
     createList: function() {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      if (selectedShapes.length > 0) {
-        this.trigger('addList', selectedShapes);
-      }
+      this.trigger('addList');
     },
 
     createFunction: function() {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      if (selectedShapes.length > 0) {
-        this.trigger('addFunction', selectedShapes);
-      }
+      this.trigger('addFunction');
+
     },
 
     createParams: function() {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      if (selectedShapes.length > 0) {
-        this.trigger('addParams', selectedShapes);
-      }
+      this.trigger('addParams');
     },
 
     modifyStyle: function(style_data) {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
-        var instance = selectedShapes[i];
-        instance.modifyProperty(style_data, this.tool_mode, this.tool_modifer);
-      }
+      this.trigger('modifyStyle', style_data);
       this.setToolStyle(style_data);
-      this.trigger('compileRequest');
     },
 
     setToolStyle: function(style_data) {
@@ -246,9 +223,7 @@ define([
     },
 
     openSelected: function() {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      this.trigger('toggleOpen', selectedShapes);
-      this.get('tool_collection').get('selectTool').deselectAll();
+      this.trigger('toggleOpen');
 
     },
 
@@ -257,9 +232,8 @@ define([
      * and updates selection accordingly
      */
     closeSelected: function() {
-      var selectedShapes = this.get('tool_collection').get('selectTool').get('selected_shapes');
-      this.trigger('toggleClosed', selectedShapes);
-      this.get('tool_collection').get('selectTool').deselectAll();
+      this.trigger('toggleClosed');
+      this.trigger('deselectAll');
     },
 
     //triggered by paper tool on a mouse down event

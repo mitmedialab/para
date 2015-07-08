@@ -20,7 +20,7 @@ define([
 	//TODO: make linked list eventually
 
 	//stores para lists
-	var lists;
+
 	var renderQueue = [];
 	var constraints = [];
 	var store = 0;
@@ -28,7 +28,7 @@ define([
 	var render = 2;
 	var visit = 3;
 	var search = 4;
-	var rootNode, currentNode, layersView, functionManager, collectionManager;
+	var rootNode, currentNode, layersView, functionManager, collectionManager, lists, selected, currentSelectionIndex;
 
 	var constraintPropMap = {
 		'position': 'translation_delta',
@@ -46,19 +46,18 @@ define([
 			rootNode = new FunctionNode();
 			rootNode.open();
 			lists = rootNode.lists;
+			selected = rootNode.selected;
 			rootNode.set('name', 'root');
 			this.listenTo(rootNode, 'parseJSON', this.parseJSON);
 			currentNode = rootNode;
 			functionManager = new FunctionManager();
+			functionManager.selected = selected;
 			collectionManager = new CollectionManager();
 			layersView = new LayersView({
 				el: '#layers-constraints-container',
 				model: this
 			});
 
-		},
-		setSelectTool: function(st) {
-			functionManager.selectTool = st;
 		},
 
 		/*resetPrototypes
@@ -226,9 +225,9 @@ define([
 		},
 
 
-		removeShape: function(selected_shapes) {
-			for (var i = 0; i < selected_shapes.length; i++) {
-				this.removeInstance(null, null, selected_shapes[i]);
+		removeShape: function() {
+			for (var i = 0; i < selected.length; i++) {
+				this.removeInstance(null, null, selected[i]);
 			}
 		},
 
@@ -425,18 +424,18 @@ define([
 
 		//=======function managment methods==========//
 		//need to put something in here where you can't have an item in a function that is also in an opened list?
-		addFunction: function(selected_shapes) {
+		addFunction: function() {
 			lists = lists.filter(function(item) {
 				console.log('removing list from current list tracker');
-				return selected_shapes.indexOf(item) === -1;
+				return selected.indexOf(item) === -1;
 			});
-			functionManager.createFunction('my_function', selected_shapes);
+			functionManager.createFunction('my_function', selected);
 			this.compile();
 		},
 
-		createParams: function(selected_shapes) {
-			for (var i = 0; i < selected_shapes.length; i++) {
-				functionManager.addParamToFunction(currentNode, selected_shapes[i]);
+		createParams: function() {
+			for (var i = 0; i < selected.length; i++) {
+				functionManager.addParamToFunction(currentNode, selected[i]);
 			}
 			this.compile();
 		},
@@ -450,18 +449,23 @@ define([
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				layersView.addShape(shape.toJSON());
 			}
-			this.compile();
+			this.selectShape(shape);
 		},
 
 		//called when creating an instance which inherits from existing shape
-		addInstance: function(parent) {
-			console.log('visitor add instance');
-			var newInstance = parent.create();
-			parent.set('selected', false);
-			newInstance.set('selected', true);
-			layersView.addInstance(newInstance.toJSON(), parent.get('id'));
-			this.selectShape(newInstance);
-			return newInstance;
+		addInstance: function() {
+			var parent = this.getLastSelected();
+
+			if (parent) {
+				this.deselectShape(parent);
+				console.log('visitor add instance');
+				var newInstance = parent.create();
+				parent.set('selected', false);
+				newInstance.set('selected', true);
+				layersView.addInstance(newInstance.toJSON(), parent.get('id'));
+				this.selectShape(newInstance);
+				return newInstance;
+			}
 		},
 
 
@@ -516,47 +520,96 @@ define([
 			this.compile();
 		},
 
-		selectShape: function(shape) {
-			if (typeof shape === 'string') {
-				var selected = this.getPrototypeById(shape);
-				this.trigger('selectionFiltered', selected, []);
+		selectShape: function(data) {
+			if (data instanceof Array) {
+				for (var i = 0; i < data.length; i++) {
+					this._(data[i]);
+				}
 			} else {
-				this.trigger('selectionFiltered', shape, []);
-
+				this._selectSingleShape(data);
 			}
+			this.selectionChanged(selected, data);
+
+		},
+
+		_selectSingleShape: function(instance) {
+			if (!_.contains(selected, instance)) {
+				instance.set('selected', true);
+				instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
+				instance.set('sel_palette_index', this.get('current_sel_index'));
+				selected.push(instance);
+			}
+		},
+
+		deselectShape: function(data) {
+			if (typeof data === 'string') {
+				var s = this.getPrototypeById(data);
+				this._deselectSingleShape(s);
+			} else if (data instanceof Array) {
+				console.log('num of shapes to remove', data.length, data);
+				for (var i = 0; i < data.length; i++) {
+					console.log('attempting to remove shape at', i);
+					var shape = data[i];
+					shape.set('selected', false);
+					shape.setSelectionForInheritors(false);
+				}
+
+				var newShapes = selected.filter(function(item) {
+					return !_.contains(data, item);
+				});
+				selected = newShapes;
+				functionManager.selected = newShapes;
+			} else {
+				this._deselectSingleShape(data);
+			}
+
+			this.selectionChanged(selected);
 
 
 		},
 
-		deselectShape: function(shape) {
-			if (typeof shape === 'string') {
-				var selected = this.getPrototypeById(shape);
-				this.trigger('selectionFiltered', [], selected);
-			} else {
-				this.trigger('selectionFiltered', [], shape);
+
+		_deselectSingleShape: function(shape) {
+			shape.set('selected', false);
+			shape.setSelectionForInheritors(false);
+
+			if (_.contains(selected, shape)) {
+				var index = _.indexOf(selected, shape);
+				console.log('removing shape', shape, index);
+				selected.splice(index, 1);
 			}
 		},
 
-		hideShape: function(shape) {
-			if (typeof shape === 'string') {
-				var selected = this.getPrototypeById(shape);
-				selected.hide();
-				this.trigger('selectionFiltered', [], selected);
-			} else {
-				shape.hide();
-				this.trigger('selectionFiltered', [], shape);
+
+		deselectAllShapes: function() {
+			// TODO: do this across all selections
+			for (var i = selected.length - 1; i >= 0; i--) {
+				selected[i].set('selected', false);
+				selected[i].setSelectionForInheritors(false);
+			}
+			selected.length = 0;
+			this.compile();
+			this.selectionChanged(selected);
+		},
+
+		//returns currently selected objects
+		getCurrentSelection: function() {
+			return selected;
+		},
+
+		getLastSelected: function() {
+			if (selected.length > 0) {
+				return selected[selected.length - 1];
 			}
 		},
 
-		showShape: function(shape) {
-			if (typeof shape === 'string') {
-				var selected = this.getPrototypeById(shape);
-				selected.show();
-			} else {
-				shape.show();
-				this.trigger('selectionFiltered', [], shape);
+		//modifies the visibility of objects that are selected
+		changeModeForSelection: function(mode, modifier) {
+			for (var i = 0; i < selected.length; i++) {
+				selected[i].setSelectionForInheritors(true, mode, modifier, 1);
 			}
 		},
+
 
 		selectionChanged: function(selected_shapes, added_shape) {
 			var filtered = false;
@@ -603,12 +656,81 @@ define([
 			}
 			//add in originally selected index if no lists have been added
 			if (itemFound) {
-				this.trigger('selectionFiltered', sInstances, lInstance);
+				this.deselectShape(sInstances);
+				this.selectShape(lInstance);
 				return true;
 			}
 			return false;
 
 		},
+
+
+		hideShape: function(shape) {
+			if (typeof shape === 'string') {
+				var selected = this.getPrototypeById(shape);
+				selected.hide();
+				this.deselectShape(selected);
+			} else {
+				shape.hide();
+				this.deselectShape(shape);
+
+			}
+		},
+
+		showShape: function(shape) {
+			if (typeof shape === 'string') {
+				var selected = this.getPrototypeById(shape);
+				selected.show();
+				this.selectShape(selected);
+
+			} else {
+				shape.show();
+				this.selectShape(shape);
+			}
+		},
+
+		modifyGeometry: function(data, modifiers) {
+			console.log('modify geometry', selected, data, modifiers);
+			if (selected.length > 0) {
+				for (var i = 0; i < selected.length; i++) {
+					var instance = selected[i];
+					instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+				}
+				this.compile();
+			}
+		},
+
+
+		modifySegment: function(data, handle, modifiers) {
+			if (selected.length > 0) {
+				for (var i = 0; i < selected.length; i++) {
+					var instance = selected[i];
+					instance.nodeParent.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
+				}
+				this.compile();
+			}
+		},
+
+		modifyParams: function(data) {
+			if (selected.length > 0) {
+				for (var i = 0; i < selected.length; i++) {
+					selected[i].updateParams(data);
+				}
+				this.compile();
+			}
+		},
+
+		modifyStyle: function(style_data) {
+			if (selected.length > 0) {
+				for (var i = 0; i < selected.length; i++) {
+					var instance = selected[i];
+					instance.modifyProperty(style_data, this.tool_mode, this.tool_modifer);
+				}
+				this.compile();
+			}
+		},
+
+
 
 
 
@@ -618,9 +740,9 @@ define([
 		 *adds a list to the closedlist array and removes any items
 		 * on the array which are members of the added list
 		 */
-		addList: function(selectedShapes) {
+		addList: function() {
 			var list = new ConstrainableList();
-			list.addMember(selectedShapes);
+			list.addMember(selected);
 			if (!this.addToOpenLists(list)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
 					if (list.hasMember(lists[i], true)) {
@@ -631,7 +753,8 @@ define([
 			}
 
 			layersView.addList(list.toJSON());
-			this.trigger('selectionFiltered', list, selectedShapes);
+			this.deselectAllShapes();
+			this.selectShape(list);
 		},
 
 		/* addToOpenLists
@@ -660,9 +783,9 @@ define([
 		/* toggleOpen
 		 * returns children of opened function or members of opened lists
 		 */
-		toggleOpen: function(items) {
+		toggleOpen: function() {
 			var data;
-			var functions = items.filter(function(item) {
+			var functions = selected.filter(function(item) {
 				return item.get('type') === 'function';
 			});
 			if (functions.length > 0) {
@@ -671,42 +794,43 @@ define([
 				lists = data.lists;
 				currentNode = data.currentNode;
 			} else {
-				data = this.toggleOpenLists(items);
+				data = this.toggleOpenLists();
 			}
 			console.log('toggleOpen', data.toSelect, data.toRemove);
-			this.trigger('selectionFiltered', data.toSelect, data.toRemove);
+			this.deselectShape(data.toRemove);
+			this.selectShape(data.toSelect);
 
 		},
 
 		/* toggleClosed
 		 * closes open functions or selected open lists
 		 */
-		toggleClosed: function(items) {
+		toggleClosed: function() {
 			//TODO: fix this so it closes selected open lists first...
 			var data;
-			var lists = items.filter(function(item) {
+			var lists = selected.filter(function(item) {
 				return (item.get('type') === 'list');
 			});
 			if (lists.length > 0) {
-				data = this.toggleClosedLists(items);
+				data = this.toggleClosedLists(selected);
 			} else {
 				this.closeAllLists();
 				data = functionManager.toggleClosedFunctions(currentNode, rootNode);
 				currentNode = data.currentNode;
 				lists = currentNode.lists;
 			}
-			this.trigger('selectionFiltered', data.toSelect, data.toRemove);
-
+			this.deselectShape(data.toRemove);
+			this.selectShape(data.toSelect);
 		},
 
 		/* toggleClosedLists
 		 * closes selected open lists
 		 */
-		toggleClosedLists: function(items) {
+		toggleClosedLists: function() {
 			var toggledLists = [];
 			var returnedLists = [];
-			for (var j = 0; j < items.length; j++) {
-				var item = items[j];
+			for (var j = 0; j < selected.length; j++) {
+				var item = selected[j];
 				for (var i = 0; i < lists.length; i++) {
 					if ($.inArray(lists[i], toggledLists) === -1) {
 						var r = lists[i].toggleClosed(item);
@@ -719,7 +843,7 @@ define([
 			}
 			return {
 				toSelect: returnedLists,
-				toRemove: items
+				toRemove: selected
 			};
 		},
 
@@ -731,13 +855,13 @@ define([
 		},
 
 
-		toggleOpenLists: function(items) {
+		toggleOpenLists: function() {
 
 			var openedLists = [];
 			var openedItems = [];
 			var members = [];
-			for (var j = 0; j < items.length; j++) {
-				var item = items[j];
+			for (var j = 0; j < selected.length; j++) {
+				var item = selected[j];
 				for (var i = 0; i < lists.length; i++) {
 					if ($.inArray(lists[i], openedLists) === -1) {
 						var r = lists[i].toggleOpen(item);

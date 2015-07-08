@@ -58,6 +58,7 @@ define([
 				this.nameText.data.instance = ui.data.instance = path.data.instance = eye.data.instance = this;
 				this.set('ui', ui);
 				this.lists = [];
+				this.selected = [];
 				this.functions = [];
 				this.layerView = new ParametersView({
 					el: 'body',

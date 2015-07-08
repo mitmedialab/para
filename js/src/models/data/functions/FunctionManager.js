@@ -14,7 +14,6 @@ define([
 	//datastructure to store path functions
 
 	var functioncount = 0;
-	var SelectTool;
 	var ParameterNode = {
 
 		setName: function(name) {
@@ -213,8 +212,7 @@ define([
 		},
 
 		sendSelectedInstances: function(func) {
-			var selected = this.selectTool.get('selected_shapes')[0];
-			func.setArgument(selected);
+			func.setArgument(this.selected);
 		}
 
 

@@ -229,6 +229,7 @@ define([
       var constraint = this.get('currentConstraint');
       var relative = constraint.get('relatives');
       this.sm.delegateMethod('select', 'selectDown', event);
+      //START HERE TOMORROW- above should not need a reference, use a listener instead!
       var selection = this.sm.delegateMethod('select', 'getCurrentSelection');
       selection = (selection ? selection[0] : null); // TODO: really shouldn't have to happen...
       this.sm.delegateMethod('select', 'resetSelections');

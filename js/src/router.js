@@ -11,7 +11,7 @@ define([
   'models/tools/ToolManager',
   'models/data/Visitor',
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView,PropertiesManager, ToolManager, Visitor) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, PropertiesManager, ToolManager, Visitor) {
 
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
@@ -25,14 +25,14 @@ define([
     app_router.on('route:defaultAction', function(actions) {
       var canvas = $('canvas').get(0);
       paper.setup(canvas);
-     
+
       var geometry_layer = new paper.Layer();
       geometry_layer.name = 'geometry_layer';
       var ui_layer = new paper.Layer();
       ui_layer.name = 'ui_layer';
       geometry_layer.activate();
       console.log('paper project', paper.project);
-      console.log('layers:',paper.project.layers);
+      console.log('layers:', paper.project.layers);
 
       var propertiesManager = new PropertiesManager();
       //event bus for passing events between views
@@ -44,7 +44,6 @@ define([
 
 
       /* event listener registers */
-      toolManager.listenTo(visitor, 'selectionFiltered', toolManager.selectionFiltered);
 
 
       visitor.listenTo(toolManager, 'compileRequest', visitor.compile);
@@ -60,6 +59,16 @@ define([
       visitor.listenTo(toolManager, 'toggleOpen', visitor.toggleOpen);
       visitor.listenTo(toolManager, 'toggleClosed', visitor.toggleClosed);
 
+
+      visitor.listenTo(toolManager, 'deselectAll', visitor.deselectAllShapes);
+      visitor.listenTo(toolManager, 'selectShape', visitor.selectShape);
+      visitor.listenTo(toolManager, 'deselectShape', visitor.selectShape);
+      visitor.listenTo(toolManager, 'geometryModified', visitor.modifyGeometry);
+      visitor.listenTo(toolManager, 'segmentModified', visitor.modifySegment);
+      visitor.listenTo(toolManager, 'modifyParams', visitor.modifyParams);
+      visitor.listenTo(toolManager, 'modifyStyle', visitor.modifyStyle);
+
+      visitor.listenTo(toolManager, 'changeModeForSelection', visitor.changeModeForSelection);
 
 
       var toolView = new ToolView({

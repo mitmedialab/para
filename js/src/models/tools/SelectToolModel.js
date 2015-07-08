@@ -38,181 +38,13 @@ define([
 
   var SelectToolModel = BaseToolModel.extend({
     defaults: _.extend({}, BaseToolModel.prototype.defaults, {
-      selected_shapes: null,
-      selections: null,
-      current_sel_index: 0,
       mode: 'select'
     }),
 
     initialize: function() {
       BaseToolModel.prototype.initialize.apply(this, arguments);
-      this.set('selected_shapes', []);
-      this.set('selections', []);
-      //this.on('change:mode', this.convertSelection);
     },
 
-    convertSelection: function() {
-      var selected_shapes = this.get('selected_shapes');
-      if (selected_shapes.length > 0) {
-        var toAdd = [];
-        var toRemove = [];
-        var mode = this.get('mode');
-        if (mode === 'dselect') {
-          for (var j = 0; j < selected_shapes.length; j++) {
-            if (selected_shapes[j].get('points')) {
-              toRemove.push(selected_shapes[j]);
-              var points = selected_shapes[j].get('points');
-              for (var k = 0; k < points.length; k++) {
-                var point = points[k];
-                if (!_.contains(toAdd, point)) {
-                  toAdd.push(point);
-                }
-              }
-            }
-          }
-
-        } else {
-          for (var i = 0; i < selected_shapes.length; i++) {
-            if (selected_shapes[i].get('name') === 'point') {
-              toRemove.push(selected_shapes[i]);
-              var parent = selected_shapes[i].nodeParent;
-              if (!_.contains(toAdd, parent)) {
-                toAdd.push(parent);
-              }
-            }
-          }
-        }
-        this.removeSelectedShape(toRemove);
-        this.addSelectedShape(toAdd);
-      }
-
-    },
-
-    deselectAll: function() {
-      // TODO: do this across all selections
-
-      var selected_shapes = this.get('selected_shapes');
-      for (var i = selected_shapes.length - 1; i >= 0; i--) {
-       selected_shapes[i].set('selected', false);
-        selected_shapes[i].setSelectionForInheritors(false);
-      }
-      selected_shapes.length = 0;
-    },
-
-    addSelectedShape: function(data) {
-      if (data instanceof Array) {
-        for (var i = 0; i < data.length; i++) {
-          this.addSingleShape(data[i]);
-        }
-      } else {
-        this.addSingleShape(data);
-      }
-    },
-
-    addSingleShape: function(instance) {
-      var selected_shapes = this.get('selected_shapes');
-      if (!_.contains(selected_shapes, instance)) {
-        instance.set('selected', true);
-        instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-        instance.set('sel_palette_index', this.get('current_sel_index'));
-        selected_shapes.push(instance);
-      }
-    },
-
-    removeSelectedShape: function(data) {
-      if (data instanceof Array) {
-        console.log('num of shapes to remove', data.length, data);
-        for (var i = 0; i < data.length; i++) {
-          console.log('attempting to remove shape at', i);
-          var shape = data[i];
-          shape.set('selected', false);
-          shape.setSelectionForInheritors(false);
-        }
-        var selected_shapes = this.get('selected_shapes');
-        var newShapes = selected_shapes.filter(function(item) {
-          return !_.contains(data, item);
-        });
-        this.set('selected_shapes', newShapes);
-      } else {
-        this.removeSingleShape(data);
-      }
-    },
-
-    removeSingleShape: function(shape) {
-      shape.set('selected', false);
-      shape.setSelectionForInheritors(false);
-      var selected_shapes = this.get('selected_shapes');
-      if (_.contains(selected_shapes, shape)) {
-        var index = _.indexOf(selected_shapes, shape);
-        console.log('removing shape', shape, index);
-        selected_shapes.splice(index, 1);
-      }
-    },
-
-    // EXPERIMENTAL
-    saveSelection: function() {
-      var selections = this.get('selections');
-      selections.push(this.get('selected_shapes'));
-      this.set('selected_shapes', []);
-      this.set('selections', selections);
-      var current_sel_index = this.get('current_sel_index');
-      current_sel_index += 1;
-      this.set('current_sel_index', current_sel_index);
-    },
-
-    changeModeForSelection: function(mode, modifier) {
-      var selectedShapes = this.get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
-        selectedShapes[i].setSelectionForInheritors(true, mode, modifier, 1);
-      }
-    },
-
-    resetSelections: function() {
-      this.deselectAll();
-      var selections = this.get('selections');
-      for (var i = 0; i < selections.length; i++) {
-        this.set('selected_shapes', selections[i]);
-        this.deselectAll();
-      }
-      this.set('selections', []);
-      this.set('current_sel_index', 0);
-    },
-
-    getCurrentSelection: function() {
-      var selections = this.get('selected_shapes');
-      return selections;
-    },
-    // END EXPERIMENTAL
-
-
-    getLastSelected: function() {
-      var selected_shapes = this.get('selected_shapes');
-      if (selected_shapes.length > 0) {
-        return selected_shapes[selected_shapes.length - 1];
-      }
-      return null;
-    },
-
-    modifyGeometry: function(data, modifiers) {
-      var selectedShapes = this.get('selected_shapes');
-      if (selectedShapes.length > 0) {
-        for (var i = 0; i < selectedShapes.length; i++) {
-          var instance = selectedShapes[i];
-          instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
-        }
-        this.trigger('geometryModified');
-      }
-    },
-
-
-    modifySegment: function(data, handle, modifiers) {
-      var selectedShapes = this.get('selected_shapes');
-      for (var i = 0; i < selectedShapes.length; i++) {
-        var instance = selectedShapes[i];
-        instance.nodeParent.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
-      }
-      this.trigger('geometryModified');
-    },
 
 
     /*mousedown event
@@ -252,7 +84,7 @@ define([
       var modifier = null;
       if (!event.modifiers.shift) {
         if (!noDeselect) {
-          this.deselectAll();
+          this.trigger('deselectAll');
         }
       }
       var hitResult = paper.project.hitTest(event.point, hitOptions);
@@ -267,11 +99,11 @@ define([
 
 
         modifier = event.modifiers.command;
+        this.trigger('geometrySelected', instance, null, modifier);
 
-        this.addSelectedShape(instance);
+
       }
 
-      this.trigger('geometrySelected', instance, null, modifier);
 
 
     },
@@ -281,7 +113,7 @@ define([
       //automaticall deselect all on mousedown if shift modifier is not enabled
       if (!event.modifiers.shift) {
         if (!noDeselect) {
-          this.deselectAll();
+          this.trigger('deselectAll');
         }
       }
 
@@ -290,41 +122,44 @@ define([
       if (hitResult) {
         var path = hitResult.item;
         instance = path.data.instance;
-        if (hitResult.type == 'segment') {
-          hitResult.segment.fullySelected = true;
-          segments.push({
-            index: hitResult.segment.index,
-            type: hitResult.type
-          });
-        } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
-          handle = hitResult.type;
-          segments.push({
-            index: hitResult.segment.index,
-            type: hitResult.type
-          });
-        } else if (hitResult.type == 'curve') {
-          segments.push({
-            index: hitResult.location._segment1.index,
-            type: hitResult.type
-          });
-          segments.push({
-            index: hitResult.location._segment2.index,
-            type: hitResult.type
-          });
-        } else if (hitResult.type == 'fill') {
-          for (var i = 0; i < path.segments.length; i++) {
+        if (instance) {
+          if (hitResult.type == 'segment') {
+            hitResult.segment.fullySelected = true;
             segments.push({
-              index: path.segments[i].index,
-              type: 'segment'
+              index: hitResult.segment.index,
+              type: hitResult.type
             });
+          } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {
+            handle = hitResult.type;
+            segments.push({
+              index: hitResult.segment.index,
+              type: hitResult.type
+            });
+          } else if (hitResult.type == 'curve') {
+            segments.push({
+              index: hitResult.location._segment1.index,
+              type: hitResult.type
+            });
+            segments.push({
+              index: hitResult.location._segment2.index,
+              type: hitResult.type
+            });
+          } else if (hitResult.type == 'fill') {
+            for (var i = 0; i < path.segments.length; i++) {
+              segments.push({
+                index: path.segments[i].index,
+                type: 'segment'
+              });
+            }
           }
+          if (!instance.get('proto_node')) {
+            points = instance.setSelectedSegments(segments);
+          }
+
+          this.trigger('geometrySelected', instance, points);
         }
-        if (!instance.get('proto_node')) {
-          points = instance.setSelectedSegments(segments);
-          this.addSelectedShape(points);
-        }
+
       }
-      this.trigger('geometrySelected', instance, points);
 
 
     },
@@ -333,8 +168,7 @@ define([
 
     //mouse drag event
     mouseDrag: function(event) {
-      var selectedShapes = this.get('selected_shapes');
-      if (selectedShapes.length > 0) {
+      if (literal && literal.data.instance) {
         switch (this.get('mode')) {
           case 'select':
             this.selectDrag(event);
@@ -366,7 +200,7 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
-      this.modifyGeometry(data, event.modifiers);
+      this.trigger('geometryModified', data, event.modifiers);
 
 
     },
@@ -378,7 +212,7 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
-      this.modifySegment(data, handle, event.modifiers);
+      this.trigger('segmentModified', data, handle, event.modifiers);
 
     },
 
@@ -392,15 +226,14 @@ define([
           val: dAngle - angle,
           operator: 'add'
         };
-        this.modifyGeometry(data, event.modifiers);
+        this.trigger('geometryModified', data, event.modifiers);
 
       }
 
     },
 
     scaleDrag: function(event) {
-      var selectedShapes = this.get('selected_shapes');
-      var scaleDelta = selectedShapes[0].accessProperty('scaling_delta');
+      var scaleDelta = literal.data.instance.accessProperty('scaling_delta');
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 
@@ -440,7 +273,7 @@ define([
           y: scaleY,
           operator: 'set'
         };
-        this.modifyGeometry(data, event.modifiers);
+        this.trigger('geometryModified', data, event.modifiers);
       }
     },
 
@@ -464,13 +297,11 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-      var selected_shapes = this.get('selected_shapes');
-      for (var i = 0; i < selected_shapes.length; i++) {
 
-        if (copyInitialized) {
-          copyInitialized = false;
-        }
+      if (copyInitialized) {
+        copyInitialized = false;
       }
+
       literal = null;
       segments = [];
       handle = null;

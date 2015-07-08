@@ -16,7 +16,7 @@ define([
 	//stores para lists
 	var lists;
 	var collectionView;
-	
+
 	var CollectionManager = Backbone.Model.extend({
 		defaults: {},
 
