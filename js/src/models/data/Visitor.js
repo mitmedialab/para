@@ -25,10 +25,10 @@ define([
 	var constraints = [];
 	var store = 0;
 	var compile = 1;
-	var render = 2;
+	var remove = 2;
 	var visit = 3;
 	var search = 4;
-	var rootNode, currentNode, layersView, functionManager, collectionManager, lists, selected, currentSelectionIndex;
+	var rootNode, currentNode, layersView, functionManager, collectionManager, selected, currentSelectionIndex;
 
 	var constraintPropMap = {
 		'position': 'translation_delta',
@@ -45,7 +45,6 @@ define([
 			//setup root node
 			rootNode = new FunctionNode();
 			rootNode.open();
-			lists = rootNode.lists;
 			selected = rootNode.selected;
 			rootNode.set('name', 'root');
 			this.listenTo(rootNode, 'parseJSON', this.parseJSON);
@@ -53,10 +52,13 @@ define([
 			functionManager = new FunctionManager();
 			functionManager.selected = selected;
 			collectionManager = new CollectionManager();
+			collectionManager.setLists(rootNode.lists);
 			layersView = new LayersView({
 				el: '#layers-constraints-container',
 				model: this
 			});
+
+			this.listenTo(collectionManager, 'addToRender', this.addToRenderQueue);
 
 		},
 
@@ -64,28 +66,31 @@ define([
 		 * resets the prototypes recursively.
 		 * Called before visiting the root node
 		 */
-		resetPrototypes: function() {
 
-			//for (var i = 0; i < renderQueue.length; i++) {
-			//renderQueue[i].reset();
-			//}
-			renderQueue = [];
-		},
 
 
 		getById: function(id) {
-			var s = this.getPrototypeById(id);
-			if (!s) {
-				s = this.getListById(id);
+			var prefix = id.slice('_')[0];
+			console.log('prefix', prefix);
+			var obj;
+			switch (prefix) {
+				case 'collection':
+					obj = collectionManager.getCollectionById(id);
+					break;
+				case 'constraint':
+					obj = this.getConstraintById(id);
+					break;
+				default:
+					obj = this._getGeomById(id);
+					break;
 			}
-			return s;
+			return obj;
 		},
 
-		/* getPrototypeById 
+		/* getGeomById 
 		 * returns prototype by id
 		 */
-
-		getPrototypeById: function(id, start) {
+		_getGeomById: function(id, start) {
 			var state_data = {
 				list: search,
 				instance: search,
@@ -98,21 +103,19 @@ define([
 			if (start) {
 				startNode = start;
 			}
-
-
 			match = this.visit(startNode, null, state_data);
-
 			return match;
 		},
 
+		//TODO: move to constraint manager
 		getConstraintById: function(id) {
 			var constraint = constraints.filter(function(constraint) {
 				return constraint.id === id;
 			})[0];
-			console.log('getting constraint by id', constraint);
 			return constraint;
 		},
 
+		//TODO: move to constraint manager
 		visualizeConstraint: function(ref, rel, pref, prel) {
 			var ref_i, rel_i;
 			if (pref && prel) {
@@ -140,57 +143,17 @@ define([
 			this.compile();
 		},
 
-
-		/* getPrototypeById 
-		 * returns prototype by id
-		 */
-		getListById: function(id) {
-
-			var state_data = {
-				list: search,
-				instance: search,
-				func: search,
-				data: id
-			};
-			console.log('getListByID', state_data.list, state_data);
-			var match = false;
-			for (var i = 0; i < lists.length; i++) {
-				console.log('checking list at ', i, lists[i]);
-				match = this.visitList(lists[i], null, state_data);
-				if (match) {
-					return match;
-				}
-			}
-			return false;
-		},
-
-
-
 		compile: function() {
 
-			this.resetPrototypes();
+			renderQueue = [];
 			this.compileFunctions();
 			this.compileInstances();
-			this.compileLists();
+			collectionManager.compileCollections();
 			this.render();
 
 		},
-		/* computeLists
-		 * method to begin rendering process of lists
-		 * following rendering of all non-list items in the tree
-		 * (calls visit on each member of listsToCompile array with render argument set
-		 * to true
-		 */
 
-		compileLists: function() {
-			var state_data = {
-				list: compile
-			};
-			for (var i = 0; i < lists.length; i++) {
-				this.visit(lists[i], null, state_data);
-			}
-		},
-
+		//TODO: move to function manager
 		compileFunctions: function() {
 			var state_data = {
 				func: compile,
@@ -202,8 +165,8 @@ define([
 			}
 		},
 
+		//TODO: move to Geom manager
 		compileInstances: function() {
-
 			var state_data = {
 				list: store,
 				instance: compile,
@@ -212,6 +175,10 @@ define([
 
 			this.visit(currentNode, null, state_data);
 
+		},
+
+		addToRenderQueue: function(obj) {
+			renderQueue.push(obj);
 		},
 
 		render: function(root) {
@@ -224,38 +191,56 @@ define([
 			}
 		},
 
+		addObject: function(object, geom) {
+			switch (object) {
+				case 'geometry':
+					this.addShape(geom);
+					break;
+				case 'instance':
+					this.addInstance();
+					break;
+				case 'function':
+					this.addFunction(collectionManager.getLists());
+					break;
+				case 'param':
+					this.createParams();
+					break;
+				case 'list':
+					var list = collectionManager.addList(selected);
+					layersView.addList(list.toJSON());
+					this.deselectAllShapes();
+					this.selectShape(list);
+					break;
+			}
 
-		removeShape: function() {
+		},
+
+		removeObject: function() {
 			for (var i = 0; i < selected.length; i++) {
-				this.removeInstance(null, null, selected[i]);
+				collectionManager.removeObjectFromLists(selected[i]);
+				switch (selected[i].get('type')) {
+					case 'geometry':
+						layersView.removeShape(selected[i]);
+						this.removeGeometry(selected[i]);
+
+						break;
+					case 'function':
+						//functionManager.removeFunction(selected[i]);
+						break;
+					case 'collection':
+						layersView.removeCollection(selected[i]);
+						collectionManager.removeCollection(selected[i]);
+						break;
+				}
 			}
 		},
 
-		removeInstance: function(node, departureNode, target) {
-			if (!node) {
-				node = currentNode;
-			}
-			if (node === target) {
-				node.deleteSelf();
-				layersView.removeShape(node.get('id'));
-				for (var j = 0; j < lists.length; j++) {
-					if (lists[j] === node) {
-						lists.splice(j, 1);
-						lists = lists.concat(node.getListMembers());
-						node.removeAllMembers();
-						break;
-					}
-				}
-				if (departureNode) {
-					departureNode.removeInheritor(node);
-					departureNode.removeChildNode(node);
-
-				}
-
-			} else {
-				for (var i = 0; i < node.children.length; i++) {
-					node.children[i].visit(this, 'removeInstance', node, target);
-				}
+		removeGeometry: function(target) {
+			target.deleteSelf();
+			var parent = target.getParentNode();
+			if (parent) {
+				parent.removeInheritor(target);
+				parent.removeChildNode(target);
 			}
 		},
 
@@ -268,9 +253,6 @@ define([
 				visited: true
 			});
 			switch (node.get('type')) {
-				case 'list':
-					return this.visitList(node, departureNode, state_data);
-
 				case 'function':
 					return this.visitFunction(node, departureNode, state_data);
 
@@ -282,72 +264,10 @@ define([
 		},
 
 
-		/*visitList- THIS IS SLOW- SPEED IT UP
-		 * visitor method for computing lists
-		 * if render then computes the list's dimensions based on its members
-		 * and draws it on the screen.
-		 * otherwise, stashes the list in an array for rendering on a second pass.
-		 * filters the array to ensure that it only contains lists with no parent list
-		 */
-		visitList: function(node, departureNode, state_data) {
-			var member;
-			var state = state_data.list;
-			console.log('visiting list', state_data.list, state_data);
-			switch (state) {
-				case store:
-					for (var k = 0; k < node.children.length; k++) {
-						node.children[k].visit(this, 'visit', node, state_data);
-					}
-					break;
-				case compile:
-					node.reset();
-					node.compile();
-					renderQueue.push(node);
-					var s_d = {
-						list: visit
-					};
-					for (var i = 0; i < node.members.length; i++) {
-						member = node.members[i];
-						if (member.get('type') === 'list') {
-							member.visit(this, 'visit', node, s_d);
-						}
-					}
-					break;
-				case visit:
-					renderQueue.push(node);
-					for (var j = 0; j < node.members.length; j++) {
-						member = node.members[j];
-						if (member.get('type') === 'list') {
-							member.visit(this, 'visit', node, state_data);
-						}
-					}
-					break;
-				case search:
-					console.log('searching list', state_data.data, node.get('id'), state_data.data === node.get('id'));
-					if (node.get('id') === state_data.data) {
-						console.log('match found');
-						return node;
-					} else {
-						for (var l = 0; l < node.members.length; l++) {
-							member = node.members[j];
-							if (member.get('type') === 'list') {
-								var match = node.members[l].visit(this, 'visit', node, state_data);
-								if (match) {
-									return match;
-								}
-							}
-						}
-					}
-					break;
 
-			}
-
-			return;
-
-		},
 
 		/* visitFunction
-		 * called for visit to function node
+		 * called for visit to function node- TODO: move to function manager
 		 */
 		visitFunction: function(node, departureNode, state_data) {
 			var state = state_data.func;
@@ -385,7 +305,7 @@ define([
 			}
 		},
 		/* visitInstance
-		 * called for visit to instance node
+		 * called for visit to instance node TODO: move to geometry Manager
 		 */
 		visitInstance: function(node, departureNode, state_data) {
 			var state = state_data.instance;
@@ -405,8 +325,6 @@ define([
 					}
 					break;
 				case search:
-					console.log('searching instance', state_data.data);
-
 					if (node.get('id') === state_data.data) {
 						return node;
 					} else {
@@ -424,9 +342,9 @@ define([
 
 		//=======function managment methods==========//
 		//need to put something in here where you can't have an item in a function that is also in an opened list?
-		addFunction: function() {
+		//TODO: MOVE TO FUNCTION MANAGER
+		addFunction: function(lists) {
 			lists = lists.filter(function(item) {
-				console.log('removing list from current list tracker');
 				return selected.indexOf(item) === -1;
 			});
 			functionManager.createFunction('my_function', selected);
@@ -445,7 +363,7 @@ define([
 			if (!shape.parentNode) {
 				currentNode.addChildNode(shape);
 			}
-			this.addToOpenLists(shape);
+			collectionManager.addToOpenLists(shape);
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				layersView.addShape(shape.toJSON());
 			}
@@ -458,7 +376,6 @@ define([
 
 			if (parent) {
 				this.deselectShape(parent);
-				console.log('visitor add instance');
 				var newInstance = parent.create();
 				parent.set('selected', false);
 				newInstance.set('selected', true);
@@ -478,15 +395,10 @@ define([
 		removeConstraint: function(id) {
 			var constraint = this.getConstraintById(id);
 			if (constraint) {
-				console.log('constraint found, trying to remove', constraint);
-				var reference = this.getPrototypeById(constraint.reference);
-				if (!reference) {
-					reference = this.getListByID(constraint.reference);
-				}
-				var relative = this.getPrototypeById(constraint.relative);
-				if (!relative) {
-					relative = this.getListByID(constraint.relative);
-				}
+				var reference = this.getById(constraint.reference);
+
+				var relative = this.getById(constraint.relative);
+
 				relative.get(constraint.rel_prop_key).removeConstraint(constraint.rel_prop_dimensions);
 				this.visualizeConstraint();
 				layersView.removeConstraint(constraint.id);
@@ -494,10 +406,8 @@ define([
 		},
 
 		reorderShapes: function(movedId, relativeId, mode) {
-			console.log('reorder shapes', movedId, relativeId, mode);
-			var movedShape = this.getPrototypeById(movedId);
-			var relativeShape = this.getPrototypeById(relativeId);
-			console.log('shape=', movedShape, relativeShape);
+			var movedShape = this.getById(movedId);
+			var relativeShape = this.getById(relativeId);
 			if (movedShape && relativeShape) {
 				switch (mode) {
 					case 'over':
@@ -539,22 +449,23 @@ define([
 			if (!_.contains(selected, instance)) {
 				instance.set('selected', true);
 				instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
-				instance.set('sel_palette_index', this.get('current_sel_index'));
 				selected.push(instance);
-				if(instance.get('name')!= 'point'){
-					this.filterSelection(instance);
+				if (instance.get('name') != 'point') {
+					var data = collectionManager.filterSelection(instance);
+					if (data) {
+						this.deselectShape(data.toRemove);
+						this.selectShape(data.toAdd);
+					}
 				}
 			}
 		},
 
 		deselectShape: function(data) {
 			if (typeof data === 'string') {
-				var s = this.getPrototypeById(data);
+				var s = this.getById(data);
 				this._deselectSingleShape(s);
 			} else if (data instanceof Array) {
-				console.log('num of shapes to remove', data.length, data);
 				for (var i = 0; i < data.length; i++) {
-					console.log('attempting to remove shape at', i);
 					var shape = data[i];
 					shape.set('selected', false);
 					shape.setSelectionForInheritors(false);
@@ -581,7 +492,6 @@ define([
 
 			if (_.contains(selected, shape)) {
 				var index = _.indexOf(selected, shape);
-				console.log('removing shape', shape, index);
 				selected.splice(index, 1);
 			}
 		},
@@ -596,13 +506,12 @@ define([
 			selected.length = 0;
 			this.updateLayers();
 			this.compile();
-			
+
 		},
 
 		//returns currently selected objects
 		getCurrentSelection: function(reference) {
-			console.log('get current selection',reference);
-			reference.selected = selected; 
+			reference.selected = selected;
 			return selected;
 		},
 
@@ -632,35 +541,11 @@ define([
 			layersView.updateSelection(layer_shapes);
 		},
 
-		/* filterSelection
-		 * returns array of selected objects based on selected instances
-		 * and state of lists which contain those objects(open vs closed)
-		 */
-		filterSelection: function(lInstance) {
-			var sInstances = [];
-			var itemFound = false;
-			for (var i = 0; i < lists.length; i++) {
-				var item = lists[i].getMember(lInstance);
-				console.log('item', i, lInstance.get('id'), lInstance.get('name'), lists[i].toJSON().members);
-				if (item && item!=lInstance) {
-					sInstances.push(item);
-					itemFound = true;
-				}
-			}
-			//add in originally selected index if no lists have been added
-			if (itemFound) {
-				this.deselectShape(lInstance);
-				this.selectShape(sInstances);
-				return true;
-			}
-			return false;
-
-		},
 
 
 		hideShape: function(shape) {
 			if (typeof shape === 'string') {
-				var selected = this.getPrototypeById(shape);
+				var selected = this.getById(shape);
 				selected.hide();
 				this.deselectShape(selected);
 			} else {
@@ -672,7 +557,7 @@ define([
 
 		showShape: function(shape) {
 			if (typeof shape === 'string') {
-				var selected = this.getPrototypeById(shape);
+				var selected = this.getById(shape);
 				selected.show();
 				this.selectShape(selected);
 
@@ -723,55 +608,6 @@ define([
 		},
 
 
-
-
-
-		//=======list heirarchy managment methods==========//
-
-		/*addList
-		 *adds a list to the closedlist array and removes any items
-		 * on the array which are members of the added list
-		 */
-		addList: function() {
-			var list = new ConstrainableList();
-			list.addMember(selected);
-			if (!this.addToOpenLists(list)) {
-				for (var i = lists.length - 1; i >= 0; i--) {
-					if (list.hasMember(lists[i], true)) {
-						lists.splice(i, 1);
-					}
-				}
-				lists.push(list);
-			}
-
-			layersView.addList(list.toJSON());
-			this.deselectAllShapes();
-			this.selectShape(list);
-		},
-
-		/* addToOpenLists
-		 * attempts to add a newly created instance to any open lists
-		 */
-		addToOpenLists: function(instance) {
-			var addedToList = false;
-			for (var i = 0; i < lists.length; i++) {
-				addedToList = addedToList ? true : lists[i].addMemberToOpen(instance);
-			}
-			return addedToList;
-		},
-
-		/*removeList
-		 *removes list item recursively checking sublists
-		 */
-		removeList: function(list) {
-			for (var i = 0; i < lists.length; i++) {
-				lists[i].recRemoveMember(list);
-
-			}
-		},
-
-
-
 		/* toggleOpen
 		 * returns children of opened function or members of opened lists
 		 */
@@ -781,105 +617,49 @@ define([
 				return item.get('type') === 'function';
 			});
 			if (functions.length > 0) {
-				this.closeAllLists();
+				collectionManager.closeAllLists();
+				currentNode.lists = collectionManager.getLists();
 				data = functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
-				lists = data.lists;
+				collectionManager.setLists(data.lists);
 				currentNode = data.currentNode;
 			} else {
-				data = this.toggleOpenLists();
+				data = collectionManager.toggleOpenLists(selected);
 			}
 			console.log('toggleOpen', data.toSelect, data.toRemove);
 
-			if(data.toRemove && data.toRemove.length>0){
+			if (data.toRemove && data.toRemove.length > 0) {
 				this.deselectShape(data.toRemove);
 			}
-			if(data.toSelect && data.toSelect.length>0){
+			if (data.toSelect && data.toSelect.length > 0) {
 				this.selectShape(data.toSelect);
 			}
 		},
-
-
-		toggleOpenLists: function() {
-
-			var openedLists = [];
-			var openedItems = [];
-			var members = [];
-			for (var j = 0; j < selected.length; j++) {
-				var item = selected[j];
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], openedLists) === -1) {
-						var r = lists[i].toggleOpen(item);
-						if (r) {
-							openedItems = openedItems.concat(r);
-							openedLists.push(lists[i]);
-						}
-
-					}
-				}
-			}
-			for (var k = 0; k < openedItems.length; k++) {
-				members = members.concat(openedLists[k].members);
-
-			}
-			return {
-				toSelect: members,
-				toRemove: openedLists
-			};
-		},
-
-
 
 		/* toggleClosed
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function() {
-			//TODO: fix this so it closes selected open lists first...
-			var data;
-			var lists = selected.filter(function(item) {
-				return (item.get('type') === 'list');
-			});
-			if (lists.length > 0) {
-				data = this.toggleClosedLists(selected);
-			} else {
-				this.closeAllLists();
+			var data = collectionManager.toggleClosedLists(selected);
+
+			if (data.toSelect.length < 1) {
+				collectionManager.closeAllLists();
 				data = functionManager.toggleClosedFunctions(currentNode, rootNode);
 				currentNode = data.currentNode;
 				lists = currentNode.lists;
 			}
-			this.deselectShape(data.toRemove);
-			this.selectShape(data.toSelect);
-		},
+			console.log('to remove', data.toRemove, 'to select', data.toSelect);
 
-		/* toggleClosedLists
-		 * closes selected open lists
-		 */
-		toggleClosedLists: function() {
-			var toggledLists = [];
-			var returnedLists = [];
-			for (var j = 0; j < selected.length; j++) {
-				var item = selected[j];
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], toggledLists) === -1) {
-						var r = lists[i].toggleClosed(item);
-						if (r) {
-							returnedLists = returnedLists.concat(r);
-							toggledLists.push(lists[i]);
-						}
-					}
-				}
+			if (data.toRemove && data.toRemove.length > 0) {
+				this.deselectShape(data.toRemove);
 			}
-			return {
-				toSelect: returnedLists,
-				toRemove: selected
-			};
-		},
-
-		closeAllLists: function() {
-			for (var i = 0; i < lists.length; i++) {
-				lists[i].closeAllMembers();
-				lists[i].set('open', false);
+			if (data.toSelect && data.toSelect.length > 0) {
+				this.selectShape(data.toSelect);
+				console.log('selecting shapes',data.toSelect);
+				//TODO: some issue here with correctly selecting shapes when list is toggled closed.
 			}
 		},
+
+
 
 
 

@@ -206,7 +206,7 @@ define([
 			path_altered.setNull(true);
 			this.set('path_altered', path_altered);
 
-			this.set('id', new Date().getTime().toString());
+			this.set('id', this.get('type')+'_'+new Date().getTime().toString());
 
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
@@ -1174,10 +1174,8 @@ define([
 			var inheritor_selected = this.get('inheritor_selected');
 			var constraint_selected = this.get('constraint_selected');
 			var bbox, inheritor_bbox;
-			//if (selected_indexes.length === 0) {
 			geom.selected = selected;
 			var selection_clone = this.get('selection_clone');
-			console.log('constraint_selected', constraint_selected);
 			if (constraint_selected) {
 				selection_clone.visible = true;
 				selection_clone.strokeColor = this.get(constraint_selected + '_color');

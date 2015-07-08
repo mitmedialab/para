@@ -104,7 +104,7 @@ define([
 				centers.y += center.y;
 				switch (childList[i].get('type')) {
 
-					case 'list':
+					case 'collection':
 						console.log('adding list to function');
 						f.lists.push(childList[i]);
 						var members = childList[i].getInstanceMembers();

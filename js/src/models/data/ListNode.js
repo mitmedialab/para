@@ -15,7 +15,7 @@ define([
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
       name: 'list',
-      type: 'list',
+      type: 'collection',
       member_count: null,
       open: false, //indicates whether list is open or not;
     }),
@@ -34,7 +34,7 @@ define([
       var ids = [];
       for (var i = 0; i < this.members.length; i++) {
 
-        if (this.members[i].get('type') === 'list') {
+        if (this.members[i].get('type') === 'collection') {
           this.members[i].printMembers();
         }
         ids = ids.concat(this.members[i].get('id'));
@@ -79,23 +79,26 @@ define([
 
     },
 
-    computeCentroid: function(){
+    computeCentroid: function() {
       var sumX = 0;
       var sumY = 0;
       this.members.forEach(function(m) {
-       var pos = m._temp_matrix.translation;
+        var pos = m._temp_matrix.translation;
 
-      
-       sumX+=pos.x;
-       sumY+=pos.y;
+
+        sumX += pos.x;
+        sumY += pos.y;
       });
 
-      return {x:sumX/this.members.length,y:sumY/this.members.length};
+      return {
+        x: sumX / this.members.length,
+        y: sumY / this.members.length
+      };
 
     },
 
     // sets the geom visibility to false
-      hide: function() {
+    hide: function() {
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].hide();
       }
@@ -121,7 +124,7 @@ define([
           addedToList = addedToList ? true : this.members[i].addMemberToOpen(data);
         }
         if (addedToList) {
-          if (data.get('type') === 'list') {
+          if (data.get('type') === 'collection') {
             for (var j = 0; j < data.members.length; j++) {
               var removed = this.removeMember(data.members[j]);
             }
@@ -162,36 +165,40 @@ define([
         member.modifyProperty({
           'translation_delta': this.accessProperty('translation_delta')
         });
-
-        return true;
+        var md = {};
+        md.member_count = {
+          val: this.members.length,
+          operator: 'set'
+        };
+        this.modifyProperty(md);
+        return member;
       }
 
-      var md = {};
-      md.member_count = {
-        val: this.members.length,
-        operator: 'set'
-      };
-      this.modifyProperty(md);
+
 
     },
 
     /*recRemoveMember
      * attempts to remove an item recursively
-     * returns true if item is removed,
-     * false if item is not found
+     * returns item if item is removed,
      */
     recRemoveMember: function(data) {
-      if (this.removeMember(data)) {
-        return true;
+      var removedItems = [];
+      var selfRemoved = this.removeMember(data);
+      if (selfRemoved) {
+        removedItems.push(selfRemoved);
       } else {
         for (var i = 0; i < this.members.length; i++) {
           var removed = this.members[i].recRemoveMember(data);
           if (removed) {
-            return true;
+            removedItems = removedItems.comcat(removed);
           }
         }
       }
-      return false;
+      if(removedItems.length>1){
+        return removedItems;
+      }
+     
     },
 
     /* hasMember, getMember
@@ -232,7 +239,7 @@ define([
      */
     getListMembers: function() {
       return this.members.filter(function(member) {
-        return member.get('type') === 'list';
+        return member.get('type') === 'collection';
       });
     },
 
@@ -242,7 +249,7 @@ define([
         memberList = [];
       }
       for (var i = 0; i < this.members.length; i++) {
-        if (this.members[i].get('type') !== 'list') {
+        if (this.members[i].get('type') !== 'collection') {
           memberList.push(this.members[i]);
         } else {
           this.members[i].getInstanceMembers(memberList);
@@ -270,7 +277,7 @@ define([
      */
     closeAllMembers: function() {
       for (var i = 0; i < this.members.length; i++) {
-        if (this.members[i].get('type') === 'list') {
+        if (this.members[i].get('type') === 'collection') {
           this.members[i].closeAllMembers();
           this.members[i].set('open', false);
         }
@@ -319,21 +326,21 @@ define([
 
 
     compile: function() {
-      this.compileTransformation();   
+      this.compileTransformation();
       for (var i = 0; i < this.members.length; i++) {
- 
+
         this.members[i]._modifyAfterCompile('rotation_delta', this._rotation_delta, false);
         this.members[i]._modifyAfterCompile('scaling_delta', this._scaling_delta, false);
         this.members[i]._modifyAfterCompile('translation_delta', this._translation_delta, false);
 
         /* var i_matricies = this.compileTransforms();
-         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+         if (this.members[i].get('type') === 'collection' || this.members[i].get('type') === 'sampler') {
            this.members[i].reset();
          }
          this.compileMemberAt(i, 'translation_delta', i_matricies.tmatrix);
          this.compileMemberAt(i, 'rotation_delta', i_matricies.rmatrix);
          //this.compileMemberAt(i, 'scaling_delta', i_matricies.smatrix);
-         if (this.members[i].get('type') === 'list' || this.members[i].get('type') === 'sampler') {
+         if (this.members[i].get('type') === 'collection' || this.members[i].get('type') === 'sampler') {
            this.members[i].compile();
          }*/
 
@@ -454,13 +461,13 @@ define([
       return data;
     },
 
-    getShapeClone: function(){
-     var clone = new paper.Group(this.members.map(function(instance) {
-            return instance.getShapeClone();
-          }));
-     return clone;
+    getShapeClone: function() {
+      var clone = new paper.Group(this.members.map(function(instance) {
+        return instance.getShapeClone();
+      }));
+      return clone;
     }
-      
+
 
   });
 

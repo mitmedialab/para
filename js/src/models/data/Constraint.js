@@ -74,7 +74,9 @@ define([
       commit_box: null,
 
       // derived state
-      constraintFuncs: null
+      constraintFuncs: null,
+      name:'constraint',
+      type:'constraint'
     },
 
     initialize: function() {
@@ -90,6 +92,7 @@ define([
         side: 'rel',
         color: '#9717fc'
       }));
+      this.set('id', this.get('type')+'_'+new Date().getTime().toString());
     },
 
     setSelection: function(instance, type) {
@@ -333,7 +336,7 @@ define([
         };
 
         this.set('proxy', proxy);
-        this.set('id',new Date().getTime().toString());
+      
         return true;
       }
       if (this.get('relatives')) {

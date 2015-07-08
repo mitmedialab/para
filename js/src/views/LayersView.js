@@ -301,7 +301,7 @@ define([
 		shapeClicked: function(event) {
 			var id = event.target.id;
 			var activeNode = shapeTree.getActiveNode();
-			var shape = event.data.view.model.getPrototypeById(activeNode.key);
+			var shape = event.data.view.model.getById(activeNode.key);
 			event.data.view.deselectAllNodes('lists');
 			event.data.view.itemClicked(id, activeNode, shape);
 			event.data.view.positionConstraintIcons();
@@ -380,7 +380,7 @@ define([
 			for (var i = 0; i < selected_shapes.length; i++) {
 				var node;
 				switch (selected_shapes[i].get('type')) {
-					case 'list':
+					case 'collection':
 					case 'sampler':
 						node = listTree.getNodeByKey(selected_shapes[i].get('id'));
 						break;

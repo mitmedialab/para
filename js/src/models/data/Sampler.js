@@ -148,7 +148,7 @@ define([
 
       //places a constraint on the end and start values
       constrainRange: function(list) {
-        if (list.get('type') === 'list' || list.get('type') === 'sampler') {
+        if (list.get('type') === 'collection' || list.get('type') === 'sampler') {
           var endIndex = this.inheritProperty('end_index');
           var constraintF = function() {
             var num = list.getMemberNumber();

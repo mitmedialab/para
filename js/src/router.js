@@ -47,15 +47,12 @@ define([
 
 
       visitor.listenTo(toolManager, 'compileRequest', visitor.compile);
-      visitor.listenTo(toolManager, 'addShape', visitor.addShape);
-      visitor.listenTo(toolManager, 'removeShape', visitor.removeShape);
-      visitor.listenTo(toolManager, 'addInstance', visitor.addInstance);
+      visitor.listenTo(toolManager, 'removeShape', visitor.removeObject);
+      visitor.listenTo(toolManager, 'addObject', visitor.addObject);
+      
       visitor.listenTo(toolManager, 'addConstraint', visitor.addConstraint);
       visitor.listenTo(toolManager, 'visualizeConstraint', visitor.visualizeConstraint);
       visitor.listenTo(toolManager, 'selectionChanged', visitor.selectionChanged);
-      visitor.listenTo(toolManager, 'addList', visitor.addList);
-      visitor.listenTo(toolManager, 'addFunction', visitor.addFunction);
-      visitor.listenTo(toolManager, 'addParams', visitor.addParams);
       visitor.listenTo(toolManager, 'toggleOpen', visitor.toggleOpen);
       visitor.listenTo(toolManager, 'toggleClosed', visitor.toggleClosed);
 

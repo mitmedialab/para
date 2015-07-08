@@ -129,13 +129,13 @@ define([
       return result;
     },
 
-    geometryAdded: function(instance) {
+    geometryAdded: function(geom) {
       this.trigger('deselectAll');
-      this.trigger('addShape', instance);
+      this.trigger('addObject', 'geometry', geom);
     },
 
     addInstance: function(instance) {
-      this.trigger('addInstance');
+      this.trigger('addObject','instance');
     },
 
     applyConstraint: function() {
@@ -187,16 +187,16 @@ define([
 
 
     createList: function() {
-      this.trigger('addList');
+      this.trigger('addObject','list');
     },
 
     createFunction: function() {
-      this.trigger('addFunction');
+      this.trigger('addObject','function');
 
     },
 
     createParams: function() {
-      this.trigger('addParams');
+      this.trigger('addObject','param');
     },
 
     modifyStyle: function(style_data) {
