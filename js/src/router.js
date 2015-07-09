@@ -9,9 +9,9 @@ define([
   'views/PropertyView',
   'models/data/PropertiesManager',
   'models/tools/ToolManager',
-  'models/data/Visitor',
+  'models/data/MasterManager',
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, PropertiesManager, ToolManager, Visitor) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, PropertiesManager, ToolManager, MasterManager) {
 
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
@@ -39,34 +39,34 @@ define([
       var event_bus = _({}).extend(Backbone.Events);
       var toolManager = new ToolManager();
 
-      //setup visitor and function manager
-      var visitor = new Visitor();
+      //setup masterManager and function manager
+      var masterManager = new MasterManager();
 
 
       /* event listener registers */
 
 
-      visitor.listenTo(toolManager, 'compileRequest', visitor.compile);
-      visitor.listenTo(toolManager, 'removeShape', visitor.removeObject);
-      visitor.listenTo(toolManager, 'addObject', visitor.addObject);
-      
-      visitor.listenTo(toolManager, 'addConstraint', visitor.addConstraint);
-      visitor.listenTo(toolManager, 'visualizeConstraint', visitor.visualizeConstraint);
-      visitor.listenTo(toolManager, 'selectionChanged', visitor.selectionChanged);
-      visitor.listenTo(toolManager, 'toggleOpen', visitor.toggleOpen);
-      visitor.listenTo(toolManager, 'toggleClosed', visitor.toggleClosed);
+      masterManager.listenTo(toolManager, 'compileRequest', masterManager.compile);
+      masterManager.listenTo(toolManager, 'removeShape', masterManager.removeObject);
+      masterManager.listenTo(toolManager, 'addObject', masterManager.addObject);
+
+      masterManager.listenTo(toolManager, 'addConstraint', masterManager.addConstraint);
+      masterManager.listenTo(toolManager, 'visualizeConstraint', masterManager.visualizeConstraint);
+      masterManager.listenTo(toolManager, 'selectionChanged', masterManager.selectionChanged);
+      masterManager.listenTo(toolManager, 'toggleOpen', masterManager.toggleOpen);
+      masterManager.listenTo(toolManager, 'toggleClosed', masterManager.toggleClosed);
 
 
-      visitor.listenTo(toolManager, 'deselectAll', visitor.deselectAllShapes);
-      visitor.listenTo(toolManager, 'selectShape', visitor.selectShape);
-      visitor.listenTo(toolManager, 'deselectShape', visitor.selectShape);
-      visitor.listenTo(toolManager, 'geometryModified', visitor.modifyGeometry);
-      visitor.listenTo(toolManager, 'segmentModified', visitor.modifySegment);
-      visitor.listenTo(toolManager, 'modifyParams', visitor.modifyParams);
-      visitor.listenTo(toolManager, 'modifyStyle', visitor.modifyStyle);
+      masterManager.listenTo(toolManager, 'deselectAll', masterManager.deselectAllShapes);
+      masterManager.listenTo(toolManager, 'selectShape', masterManager.selectShape);
+      masterManager.listenTo(toolManager, 'deselectShape', masterManager.selectShape);
+      masterManager.listenTo(toolManager, 'geometryModified', masterManager.modifyGeometry);
+      masterManager.listenTo(toolManager, 'segmentModified', masterManager.modifySegment);
+      masterManager.listenTo(toolManager, 'modifyParams', masterManager.modifyParams);
+      masterManager.listenTo(toolManager, 'modifyStyle', masterManager.modifyStyle);
 
-      visitor.listenTo(toolManager, 'changeModeForSelection', visitor.changeModeForSelection);
-      visitor.listenTo(toolManager, 'selectionRequest', visitor.getCurrentSelection);
+      masterManager.listenTo(toolManager, 'changeModeForSelection', masterManager.changeModeForSelection);
+      masterManager.listenTo(toolManager, 'selectionRequest', masterManager.getCurrentSelection);
 
 
       var toolView = new ToolView({

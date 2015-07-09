@@ -179,7 +179,7 @@ define([
     },
 
     /*geometryDeleted
-     * triggers a delete action on the visitor
+     * triggers a delete action on the master manager
      */
     deleteInstance: function() {
       this.trigger('removeShape');

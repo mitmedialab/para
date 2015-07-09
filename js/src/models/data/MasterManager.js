@@ -1,7 +1,6 @@
-/*Visitor.js
- * external tree visitor base implementation
- * used to traverse parse tree and build scenegraph of
- * instances for display to user
+/*MasterManager.js
+ * manager for all subtype managers (FunctionManager, ListManager, ConstraintManager)
+ * stores and manages selected objects
  */
 
 define([
@@ -10,12 +9,11 @@ define([
 	'models/data/Instance',
 	'models/data/functions/FunctionNode',
 	'models/data/functions/FunctionManager',
-	'models/data/ConstrainableList',
-	'models/data/CollectionManager',
+	'models/data/collections/CollectionManager',
 	'views/LayersView',
 
 
-], function(_, Backbone, Instance, FunctionNode, FunctionManager, ConstrainableList, CollectionManager, LayersView) {
+], function(_, Backbone, Instance, FunctionNode, FunctionManager, CollectionManager, LayersView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -38,7 +36,7 @@ define([
 		'stroke': 'stroke_color'
 	};
 
-	var Visitor = Backbone.Model.extend({
+	var MasterManager = Backbone.Model.extend({
 		defaults: {},
 
 		initialize: function() {
@@ -641,11 +639,12 @@ define([
 		toggleClosed: function() {
 			var data = collectionManager.toggleClosedLists(selected);
 
-			if (data.toSelect.length < 1) {
+			if (data.toSelect.length < 1) {	
 				collectionManager.closeAllLists();
+				currentNode.list = collectionManager.getLists();
 				data = functionManager.toggleClosedFunctions(currentNode, rootNode);
 				currentNode = data.currentNode;
-				lists = currentNode.lists;
+				collectionManager.setLists(currentNode.lists);
 			}
 			console.log('to remove', data.toRemove, 'to select', data.toSelect);
 
@@ -654,7 +653,7 @@ define([
 			}
 			if (data.toSelect && data.toSelect.length > 0) {
 				this.selectShape(data.toSelect);
-				console.log('selecting shapes',data.toSelect);
+				console.log('selecting shapes', data.toSelect);
 				//TODO: some issue here with correctly selecting shapes when list is toggled closed.
 			}
 		},
@@ -665,7 +664,7 @@ define([
 
 	});
 
-	return Visitor;
+	return MasterManager;
 
 
 });

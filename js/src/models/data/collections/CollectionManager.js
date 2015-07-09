@@ -6,7 +6,7 @@
 define([
 	'underscore',
 	'backbone',
-	'models/data/ConstrainableList',
+	'models/data/collections/ConstrainableList',
 	'views/CollectionView',
 
 
@@ -108,6 +108,7 @@ define([
 			}
 		},
 
+		/* visit funciton for lists */
 		visit: function(node, departure_node, state_data) {
 			var member;
 			var state = state_data.state;
@@ -243,7 +244,7 @@ define([
 		 * closes selected open lists
 		 */
 		toggleClosedLists: function(selected) {
-			console.log('selected',selected);
+			console.log('selected', selected);
 			var toggledLists = [];
 			var returnedLists = [];
 			for (var j = 0; j < selected.length; j++) {

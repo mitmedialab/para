@@ -2,10 +2,9 @@ define([
   'underscore',
   'paper',
   'backbone',
-  'models/data/ListNode',
   'models/data/paperUI/Arrow',
   'models/data/paperUI/ConstraintHandles',
-], function(_, paper, Backbone, ListNode, Arrow, ConstraintHandles) {
+], function(_, paper, Backbone, Arrow, ConstraintHandles) {
 
   var propConvMap = {
     'position:scale': 0.01,

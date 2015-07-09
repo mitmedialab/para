@@ -4,7 +4,7 @@
 
 define([
     'underscore',
-    'models/data/ListNode',
+    'models/data/collections/ListNode',
     'utils/PFloat',
     'utils/PBool',
     'paper',
