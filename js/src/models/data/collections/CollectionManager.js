@@ -39,8 +39,7 @@ define([
 		getLists: function() {
 			return lists;
 		},
-		/* 
-		 */
+		
 
 		/* getListByID
 		 * returns list by id
@@ -51,6 +50,7 @@ define([
 				state: search,
 				id: id
 			};
+			this.compile();
 
 			var match = false;
 			for (var i = 0; i < lists.length; i++) {
@@ -63,11 +63,11 @@ define([
 		},
 
 
-		/*removeObjectFromList
+		/*removeObjectFromLists
 		 * called when object is being deletetd
 		 * ensures a reference of it is no longer stored in the lists
 		 */
-		removeObjectFromList: function(obj) {
+		removeObjectFromLists: function(obj) {
 			for (var j = 0; j < lists.length; j++) {
 				lists[j].recRemoveMember(obj);
 			}

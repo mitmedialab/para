@@ -6,8 +6,8 @@
 define([
   'underscore',
   'paper',
-  'models/data/PolygonNode',
-  'models/data/PathNode',
+  'models/data/geometry/PolygonNode',
+  'models/data/geometry/PathNode',
 
 
 ], function(_, paper, PolygonNode, PathNode) {

@@ -121,24 +121,31 @@ define([
 				var prel_i = this.getById(prel);
 				pref_i.set('constraint_selected', null);
 				prel_i.set('constraint_selected', null);
+				this.compile();
+
 			}
 			if (ref && rel) {
 				ref_i = this.getById(ref);
 				rel_i = this.getById(rel);
 				ref_i.set('constraint_selected', 'reference_selected');
 				rel_i.set('constraint_selected', 'relative_selected');
+				this.compile();
+
 			} else {
-				ref_i = this.getById(layersView.getCurrentRef());
-				rel_i = this.getById(layersView.getCurrentRel());
-				if (ref_i) {
-					ref_i.set('constraint_selected', null);
+				if (layersView.getCurrentRef() && layersView.getCurrentRel()) {
+					ref_i = this.getById(layersView.getCurrentRef());
+					rel_i = this.getById(layersView.getCurrentRel());
+					if (ref_i) {
+						ref_i.set('constraint_selected', null);
+					}
+					if (rel_i) {
+						rel_i.set('constraint_selected', null);
+					}
+					layersView.deactivateConstraint();
+					this.compile();
+
 				}
-				if (rel_i) {
-					rel_i.set('constraint_selected', null);
-				}
-				layersView.deactivateConstraint();
 			}
-			this.compile();
 		},
 
 		compile: function() {
@@ -218,7 +225,7 @@ define([
 				collectionManager.removeObjectFromLists(selected[i]);
 				switch (selected[i].get('type')) {
 					case 'geometry':
-						layersView.removeShape(selected[i]);
+						layersView.removeShape(selected[i].get('id'));
 						this.removeGeometry(selected[i]);
 
 						break;
@@ -639,7 +646,7 @@ define([
 		toggleClosed: function() {
 			var data = collectionManager.toggleClosedLists(selected);
 
-			if (data.toSelect.length < 1) {	
+			if (data.toSelect.length < 1) {
 				collectionManager.closeAllLists();
 				currentNode.list = collectionManager.getLists();
 				data = functionManager.toggleClosedFunctions(currentNode, rootNode);

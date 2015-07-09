@@ -7,10 +7,10 @@ define([
   'paper',
   'backbone',
   'models/tools/BaseToolModel',
-  'models/data/PolygonNode',
-  'models/data/PathNode',
-  'models/data/RectNode',
-  'models/data/EllipseNode'
+  'models/data/geometry/PolygonNode',
+  'models/data/geometry/PathNode',
+  'models/data/geometry/RectNode',
+  'models/data/geometry/EllipseNode'
 ], function(_, paper, Backbone, BaseToolModel, PolygonNode,PathNode,RectNode,EllipseNode) {
 
   var sideNum = 6;

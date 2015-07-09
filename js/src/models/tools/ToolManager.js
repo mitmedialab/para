@@ -82,7 +82,7 @@ define([
       //setup default zeros for zoom and pan
       this.zeroedZoom = paper.view.zoom;
       this.zeroedPan = paper.view.center.clone();
-    },  
+    },
 
     setState: function(state, mode) {
       // TODO: possibly rename to 'close'
@@ -161,16 +161,16 @@ define([
 
     },
 
-    selectionRequest: function(reference){
-      this.trigger('selectionRequest',reference);
+    selectionRequest: function(reference) {
+      this.trigger('selectionRequest', reference);
     },
 
     geometryModified: function(data, modifiers) {
-      this.trigger('geometryModified',data,modifiers);
+      this.trigger('geometryModified', data, modifiers);
     },
 
     segmentModified: function(data, modifiers) {
-      this.trigger('segmentModified',data,modifiers);
+      this.trigger('segmentModified', data, modifiers);
     },
 
 
@@ -187,16 +187,16 @@ define([
 
 
     createList: function() {
-      this.trigger('addObject','list');
+      this.trigger('addObject', 'list');
     },
 
     createFunction: function() {
-      this.trigger('addObject','function');
+      this.trigger('addObject', 'function');
 
     },
 
     createParams: function() {
-      this.trigger('addObject','param');
+      this.trigger('addObject', 'param');
     },
 
     modifyStyle: function(style_data) {

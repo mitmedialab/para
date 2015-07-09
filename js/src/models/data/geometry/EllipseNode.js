@@ -6,7 +6,7 @@
 define([
   'underscore',
   'paper',
-  'models/data/RectNode',
+  'models/data/geometry/RectNode',
 
 
 ], function(_, paper, RectNode) {

@@ -7,16 +7,16 @@
 
 define([
   'underscore',
-  'models/data/Instance',
+  'models/data/geometry/GeometryNode',
   'utils/TrigFunc',
   'utils/PPoint',
   'paper'
 
-], function(_, Instance,TrigFunc, PPoint, paper) {
+], function(_,GeometryNode,TrigFunc, PPoint, paper) {
   //drawable paper.js path object that is stored in the pathnode
-  var PointNode = Instance.extend({
+  var PointNode =GeometryNode.extend({
    
-    defaults: _.extend({}, Instance.prototype.defaults, {
+    defaults: _.extend({}, GeometryNode.prototype.defaults, {
      
       name: 'point',
       type: 'geometry',
@@ -27,7 +27,7 @@ define([
 
 
     initialize: function(data) {
-      Instance.prototype.initialize.apply(this, arguments);
+     GeometryNode.prototype.initialize.apply(this, arguments);
       var handleIn = new PPoint(0,0,0);
       handleIn.setNull(true);
       var handleOut = new PPoint(0,0,0);

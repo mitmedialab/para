@@ -7,8 +7,8 @@
 
 define([
   'underscore',
-  'models/data/Instance',
-  'models/data/PointNode',
+  'models/data/geometry/GeometryNode',
+  'models/data/geometry/PointNode',
   'utils/TrigFunc',
   'utils/PPoint',
   'paper',
@@ -16,11 +16,11 @@ define([
   'utils/PColor'
 
 
-], function(_, Instance, PointNode, TrigFunc, PPoint, paper, PFloat, PColor) {
+], function(_,GeometryNode, PointNode, TrigFunc, PPoint, paper, PFloat, PColor) {
   //drawable paper.js path object that is stored in the pathnode
-  var PathNode = Instance.extend({
+  var PathNode =GeometryNode.extend({
 
-    defaults: _.extend({}, Instance.prototype.defaults, {
+    defaults: _.extend({}, GeometryNode.prototype.defaults, {
 
       name: 'path',
       type: 'geometry',
@@ -29,7 +29,7 @@ define([
 
 
     initialize: function(data) {
-      Instance.prototype.initialize.apply(this, arguments);
+      GeometryNode.prototype.initialize.apply(this, arguments);
       this.set('points', []);
     },
 
@@ -293,7 +293,7 @@ define([
 
 
     renderSelection: function(geom) {
-      Instance.prototype.renderSelection.call(this, geom);
+      GeometryNode.prototype.renderSelection.call(this, geom);
 
       var pointSelected = false;
       var points = this.get('points');
