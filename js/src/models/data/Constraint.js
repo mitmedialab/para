@@ -64,7 +64,6 @@ define([
       ref_prop: 'position_xy',
       rel_prop: 'position_xy',
       expression: '',
-      type: '=',
 
       // UI
       proxy: null,
@@ -94,11 +93,11 @@ define([
       this.set('id', this.get('type')+'_'+new Date().getTime().toString());
     },
 
-    setSelection: function(instance, type) {
+    setSelection: function(selected, type) {
       if (this.get('references') && this.get('relatives')) {
         console.log('[ERROR] References and relatives already set.');
       }
-      if (instance.length === 0) {
+      if (selected.length === 0) {
         if (this.get('relatives')) {
           this.clearSelection();
           this.set('relatives', null);
@@ -107,7 +106,8 @@ define([
           return false;
         }
       }
-      instance = instance[0];
+      var instance = selected[0];
+      console.log('set selection',instance.get('type'),instance.get('name'),instance);
       instance.set('selected', false);
       if (this.get('relatives')) {
         if (this.get('references')) {
@@ -129,6 +129,7 @@ define([
 
         //start of the proxy code: try to remove this //
         var proxy = relatives.getShapeClone();
+        console.log('proxy created',proxy);
         proxy.name = 'proxy';
         proxy.visible = false;
         proxy.show = function() {

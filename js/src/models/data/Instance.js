@@ -231,7 +231,10 @@ define([
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
+				this.get('selection_clone').remove();
+
 			}
+			this.clearBoundingBoxes();
 
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].deleteSelf();
@@ -374,9 +377,7 @@ define([
 				this.get('inheritor_bbox').remove();
 			}
 
-			if (this.get('bbox')) {
-				this.get('bbox').remove();
-			}
+			
 
 			this._ti_matrix = this._translation_delta.inverted();
 			this._ri_matrix = this._rotation_delta.inverted();
@@ -393,7 +394,7 @@ define([
 		selectionChange: function() {
 			if (!this.get('selected')) {
 				if (this.get('bbox')) {
-					this.get('bbox').remove();
+		//			this.get('bbox').visible = false;
 				}
 			}
 		},
@@ -1094,6 +1095,7 @@ define([
 					}
 
 					this.set('rendered', true);
+				
 
 				}
 				return 'root';
@@ -1117,16 +1119,6 @@ define([
 			geom.visible = this._visible;
 		},
 
-		renderBoundingBox: function(geom) {
-
-			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
-			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
-			bbox.data.instance = this;
-			this.set('bbox', bbox);
-			bbox.sendToBack();
-			return bbox;
-		},
-
 		renderInheritorBoundingBox: function(geom) {
 			if (this.get('inheritor_bbox')) {
 				this.get('inheritor_bbox').remove();
@@ -1148,9 +1140,12 @@ define([
 		clearBoundingBoxes: function() {
 			if (this.get('bbox')) {
 				this.get('bbox').remove();
+				this.set('bbox', null);
 			}
 			if (this.get('inheritor_bbox')) {
 				this.get('inheritor_bbox').remove();
+				this.set('inheritor_bbox', null);
+
 			}
 		},
 
@@ -1164,6 +1159,10 @@ define([
 			geom.selected = selected;
 			var selection_clone = this.get('selection_clone');
 			if (constraint_selected) {
+				if (!selection_clone) {
+					this.createSelectionClone();
+					selection_clone = this.get('selection_clone');
+				}
 				selection_clone.visible = true;
 				selection_clone.strokeColor = this.get(constraint_selected + '_color');
 
@@ -1172,17 +1171,15 @@ define([
 			}
 
 			if (selected) {
-				// EXPERIMENTAL
-				// geom.selectedColor = this.get('primary_selection_color');
-				geom.selectedColor = this.getSelectionColor();
-
-				// g_bbox.selectedColor = this.get('primary_selection_color');
-				bbox = this.renderBoundingBox(geom);
+	
+				geom.selectedColor =  this.getSelectionColor();
+				bbox = this.get('bbox');
 				bbox.selectedColor = this.getSelectionColor();
 				bbox.selected = true;
-
-
+				bbox.visible = true;
 				inheritor_bbox = this.renderInheritorBoundingBox();
+				console.log('selected bbox',bbox);
+
 				if (inheritor_bbox) {
 					inheritor_bbox.selectedColor = this.get('inheritance_selection_color');
 					inheritor_bbox.selected = true;
@@ -1195,7 +1192,6 @@ define([
 			if (inheritor_selected) {
 				geom.selectedColor = this.get('proxy_selection_color');
 				geom.selected = inheritor_selected;
-				bbox = this.renderBoundingBox(geom);
 				bbox.selectedColor = this.get('proxy_selection_color');
 				bbox.selected = true;
 				if (inheritor_selected === 'proxy') {
@@ -1209,13 +1205,7 @@ define([
 				}
 
 			}
-			/*}else {
-				for (var i = 0; i < selected_indexes.length; i++) {
-					geom.segments[selected_indexes[i]].selected = true;
-				}
-			}*/
-
-
+		
 		},
 
 
@@ -1225,6 +1215,7 @@ define([
 			geom.bringToFront();
 			var path_altered = this.get('path_altered').getValue();
 			var selection_clone = this.get('selection_clone');
+			var bbox = this.get('bbox');
 
 			if (!path_altered) {
 				//geom.transform(this._itemp_matrix);
@@ -1234,25 +1225,47 @@ define([
 				selection_clone.transform(this._ti_matrix);
 				selection_clone.transform(this._si_matrix);
 				selection_clone.transform(this._ri_matrix);
+				bbox.transform(this._ti_matrix);
+				bbox.transform(this._si_matrix);
+				bbox.transform(this._ri_matrix);
 				geom.selected = false;
+				bbox.selected = false;
+
 			} else {
 				if (!selection_clone) {
 					this.createSelectionClone();
 					selection_clone = this.get('selection_clone');
 				}
-			}
 
+
+				if (!bbox) {
+					var size = new paper.Size(geom.bounds.width, geom.bounds.height);
+
+					bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
+					bbox.data.instance = this;
+					this.set('bbox', bbox);
+					var targetLayer = paper.project.layers.filter(function(layer) {
+						return layer.name === 'ui_layer';
+					})[0];
+					targetLayer.addChild(bbox);
+				}
+			}
 
 			var position = this.get('position').toPaperPoint();
 			geom.position = position;
+			bbox.position = position;
 			selection_clone.position = position;
 			geom.transform(this._rotation_delta);
 			geom.transform(this._scaling_delta);
 			geom.transform(this._translation_delta);
+
 			selection_clone.transform(this._rotation_delta);
 			selection_clone.transform(this._scaling_delta);
 			selection_clone.transform(this._translation_delta);
-			//geom.transform(this._temp_matrix);
+
+			bbox.transform(this._rotation_delta);
+			bbox.transform(this._scaling_delta);
+			bbox.transform(this._translation_delta);
 
 			this.updateScreenBounds(geom);
 

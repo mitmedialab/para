@@ -46,8 +46,11 @@ define([
         this.indexNumbers = [];
         //for storing offsets to be added to constraints to preserve member state
         this.offsets = [];
-        this.get('scaling_delta').setValue({x:1,y:1});
-        console.log('list scale:',this.accessProperty('scaling_delta'));
+        this.get('scaling_delta').setValue({
+          x: 1,
+          y: 1
+        });
+        console.log('list scale:', this.accessProperty('scaling_delta'));
 
       },
 
@@ -92,7 +95,7 @@ define([
       },
 
       removeMember: function(data) {
-        data.set('merged',undefined);
+        data.set('merged', undefined);
         ListNode.prototype.removeMember.call(this, data);
         var diff = this.indexNumbers.length - this.members.length;
         console.log('diff', diff);
@@ -147,6 +150,8 @@ define([
         member.modifyPriorToCompile(data);
       },
 
+
+
       //renders the List UI
       render: function() {
         ListNode.prototype.render.call(this, arguments);
@@ -169,14 +174,37 @@ define([
         ui.position = new paper.Point(bottomLeft.x + ui.bounds.width / 2, bottomLeft.y + ui.bounds.height / 2);
         this.startText.content = 'count: ' + String(this.members.length);
 
-        //this.renderSelection(geom);
-        if (this.get('selected') || this.get('open')) {
+        this.renderSelection(ui);
+
+      },
+
+      renderSelection: function(ui) {
+        var selected = this.get('selected');
+        var constraint_selected = this.get('constraint_selected');
+        var selection_clone = this.get('selection_clone');
+
+        if (constraint_selected) {
+          if (!selection_clone) {
+            this.createSelectionClone();
+            selection_clone = this.get('selection_clone');
+          }
+          selection_clone.visible = true;
+          selection_clone.strokeColor = this.get(constraint_selected + '_color');
+
+        } else {
+          if (selection_clone) {
+            selection_clone.visible = false;
+          }
+        }
+        if (selected || this.get('open')) {
           ui.visible = true;
         } else {
           ui.visible = false;
         }
 
-      },
+
+      }
+
     });
     return ConstrainableList;
 

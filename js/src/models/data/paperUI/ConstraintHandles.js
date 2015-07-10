@@ -137,7 +137,7 @@ define([
       var gen_delbox = createDelimBox(gen_bounds);
       var gen_corners = createCorners(gen_bounds);
       var hand_geom, hand_bounds, hand_delbox, hand_corners;
-      if (geom instanceof paper.Group) {
+      /*if (geom instanceof paper.Group) {
         hand_geom = geom.children[0];
         hand_bounds = hand_geom.bounds;
         hand_delbox = createDelimBox(hand_bounds);
@@ -146,11 +146,11 @@ define([
         for (var i = 0; i < hand_corners.length; i++) {
           hand_corners[i].name = 'hand_corner';
         }
-      } else {
+      } else {*/
         hand_bounds = gen_bounds;
         hand_delbox = gen_delbox;
         hand_corners = gen_corners;
-      }
+      //}
 
       var cross = createCross(hand_bounds);
       var arrows = createScaleArrows(hand_corners);

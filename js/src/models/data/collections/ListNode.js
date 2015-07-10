@@ -19,6 +19,7 @@ define([
       type: 'collection',
       member_count: null,
       open: false, //indicates whether list is open or not;
+      bbox_dimensions: null,
     }),
 
     initialize: function() {
@@ -32,6 +33,7 @@ define([
       this.get('fill_color').setNull(false);
       this.get('stroke_color').setNull(false);
       this.get('stroke_width').setNull(false);
+      
     },
 
     /*modifyProperty
@@ -344,11 +346,11 @@ define([
 
 
     compile: function() {
- 
+
     },
 
 
-    
+
     //triggered on change of select property, removes bbox
     selectionChange: function() {
       Instance.prototype.selectionChange.call(this, arguments);
@@ -358,32 +360,86 @@ define([
     },
 
     render: function() {
-      var bbox = this.renderBoundingBox();
+      this.renderBoundingBox();
+      var bbox = this.get('bbox');
       bbox.selectedColor = this.getSelectionColor();
       bbox.selected = this.get('selected');
+      bbox.visible = this.get('selected');
       this.set('geom', null);
       this.set('geom', bbox);
       if (this.get('open')) {
         bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
         bbox.strokeWidth = 1;
+        bbox.visible = true;
       }
     },
 
     renderBoundingBox: function() {
+     this.set('bbox_dimensions', {
+        topLeft: null,
+        bottomRight: null,
+      });
+
       for (var k = 0; k < this.members.length; k++) {
-        this.updateBoundingBox(this.members[k]);
+        this.calculateBoundingBox(this.members[k]);
       }
 
-      var i_bbox = this.get('i_bbox');
-      if (i_bbox.bottomRight) {
-        var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
-        var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
-        var bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
-        this.set('bbox', bbox);
-        bbox.sendToBack();
+      var bbox_dimensions = this.get('bbox_dimensions');
+      if (bbox_dimensions.bottomRight) {
+        console.log('creating bbox');
+        var width = bbox_dimensions.bottomRight.x - bbox_dimensions.topLeft.x;
+        var height = bbox_dimensions.bottomRight.y - bbox_dimensions.topLeft.y;
+        var x = bbox_dimensions.topLeft.x + width / 2;
+        var y = bbox_dimensions.topLeft.y + height / 2;
+
+        var bbox = this.get('bbox');
+        if (!bbox) {
+
+          bbox = new paper.Path.Rectangle(bbox_dimensions.topLeft, new paper.Size(width, height));
+          this.set('bbox', bbox);
+          bbox.sendToBack();
+
+
+        } else {
+          bbox.scale(width / bbox.bounds.width, height / bbox.bounds.height);
+          bbox.position.x = x;
+          bbox.position.y = y;
+        }
+
         this.updateScreenBounds(bbox);
-        return bbox;
       }
+
+    },
+
+    calculateBoundingBox: function(member) {
+      if (member.get('screen_top_left') && member.get('screen_bottom_right')) {
+        var bbox_dimensions = this.get('bbox_dimensions');
+        var i_topLeft = member.get('screen_top_left').getValue();
+        var i_bottomRight = member.get('screen_bottom_right').getValue();
+
+        if (!bbox_dimensions.topLeft) {
+          bbox_dimensions.topLeft = i_topLeft;
+        } else {
+          if (i_topLeft.x < bbox_dimensions.topLeft.x) {
+            bbox_dimensions.topLeft.x = i_topLeft.x;
+          }
+          if (i_topLeft.y < bbox_dimensions.topLeft.y) {
+            bbox_dimensions.topLeft.y = i_topLeft.y;
+          }
+        }
+
+        if (!bbox_dimensions.bottomRight) {
+          bbox_dimensions.bottomRight = i_bottomRight;
+        } else {
+          if (i_bottomRight.x > bbox_dimensions.bottomRight.x) {
+            bbox_dimensions.bottomRight.x = i_bottomRight.x;
+          }
+          if (i_bottomRight.y > bbox_dimensions.bottomRight.y) {
+            bbox_dimensions.bottomRight.y = i_bottomRight.y;
+          }
+        }
+      }
+
     },
 
     toJSON: function() {
@@ -402,7 +458,24 @@ define([
         return instance.getShapeClone();
       }));
       return clone;
-    }
+    },
+
+    createSelectionClone: function() {
+      if (this.get('selection_clone')) {
+        this.get('selection_clone').remove();
+        this.set('selection_clone', null);
+      }
+      var selection_clone = this.get('bbox').clone();
+      var targetLayer = paper.project.layers.filter(function(layer) {
+        return layer.name === 'ui_layer';
+      })[0];
+      targetLayer.addChild(selection_clone);
+      selection_clone.data.instance = this;
+      selection_clone.fillColor = null;
+      selection_clone.strokeWidth = 3;
+      selection_clone.selected = false;
+      this.set('selection_clone', selection_clone);
+    },
 
 
   });
