@@ -12,7 +12,7 @@ define([
 		'utils/PConstraint'
 	],
 
-	function( _, paper,  PFloat, PConstraint) {
+	function(_, paper, PFloat, PConstraint) {
 
 		var PPoint = PConstraint.extend({
 
@@ -36,36 +36,50 @@ define([
 			},
 
 			/* isConstrained
-			* returns object with booleans for each property based on constraint status
-			*/
+			 * returns object with booleans for each property based on constraint status
+			 */
 			isConstrained: function() {
 				var data = {};
 				data.self = this.isSelfConstrained();
-				data.x = this.x.isConstrained().self;
-				data.y = this.y.isConstrained().self;
+				data.x = this.x.isConstrained();
+				data.y = this.y.isConstrained();
 				return data;
 			},
 
 			/* getConstraint
-			* returns true if constraint exists
-			* false if not
-			*/
+			 * returns object if constraint exists
+			 * null otherwise
+			 */
 			getConstraint: function() {
 				var data = {};
-				data.self = this.getSelfConstraint();
-				data.x = this.x.getConstraint().self;
-				data.y = this.y.getConstraint().self;
-				return data;
+				var self = this.getSelfConstraint();
+				if (self) {
+					return self;
+				} else {
+					var x = this.x.getConstraint();
+					var y = this.y.getConstraint();
+
+					if (x) {
+						data.x = x;
+					}
+					if (y) {
+						data.y = y;
+					}
+					if (x || y) {
+						return data;
+					}
+				}
+
 			},
 
 			/* setValue
 			 * accepts an object with x,y properties as an argument
 			 */
 			setValue: function(point) {
-				if(point.x){
+				if (point.x) {
 					this.setX(point.x);
 				}
-				if(point.y){
+				if (point.y) {
 					this.setY(point.y);
 				}
 			},
@@ -125,7 +139,7 @@ define([
 			 * values of this object
 			 */
 			toPaperPoint: function() {
-				
+
 				return new paper.Point(this.getX(), this.getY());
 			},
 
@@ -208,7 +222,7 @@ define([
 			},
 
 
-			toJSON: function(){
+			toJSON: function() {
 				var data = this.getValue();
 				data.type = 'PPoint';
 				data.isNull = this.isNull();

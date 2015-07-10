@@ -8,9 +8,10 @@ define([
   'paper',
   'models/data/Instance',
   'utils/PFloat',
-  'utils/PConstraint'
+  'utils/PConstraint',
+  'utils/TrigFunc'
 
-], function($, _, paper, Instance, PFloat, PConstraint) {
+], function($, _, paper, Instance, PFloat, PConstraint, TrigFunc) {
 
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -26,9 +27,28 @@ define([
       this.offsets = [];
       this.set('member_count', new PFloat(0));
       this.get('translation_delta').setNull(false);
-
-
+      this.get('scaling_delta').setNull(false);
+      this.get('rotation_delta').setNull(false);
+      this.get('fill_color').setNull(false);
+      this.get('stroke_color').setNull(false);
+      this.get('stroke_width').setNull(false);
     },
+
+    /*modifyProperty
+    passes modifications onto members
+     */
+    modifyProperty: function(data, mode, modifier) {
+
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].modifyProperty(data, mode, modifier);
+      }
+      for (var p in data) {
+        if (data.hasOwnProperty(p)) {
+          this.trigger('change:' + p);
+        }
+      }
+    },
+
 
     printMembers: function() {
       var ids = [];
@@ -174,8 +194,6 @@ define([
         return member;
       }
 
-
-
     },
 
     /*recRemoveMember
@@ -195,10 +213,10 @@ define([
           }
         }
       }
-      if(removedItems.length>1){
+      if (removedItems.length > 1) {
         return removedItems;
       }
-     
+
     },
 
     /* hasMember, getMember
@@ -326,12 +344,12 @@ define([
 
 
     compile: function() {
-      this.compileTransformation();
-      for (var i = 0; i < this.members.length; i++) {
+      //this.compileTransformation();
+      //for (var i = 0; i < this.members.length; i++) {
 
-        this.members[i]._modifyAfterCompile('rotation_delta', this._rotation_delta, false);
-        this.members[i]._modifyAfterCompile('scaling_delta', this._scaling_delta, false);
-        this.members[i]._modifyAfterCompile('translation_delta', this._translation_delta, false);
+        //this.members[i]._modifyAfterCompile('rotation_delta', this._rotation_delta, false);
+        // this.members[i]._modifyAfterCompile('scaling_delta', this._scaling_delta, false);
+        //this.members[i]._modifyAfterCompile('translation_delta', this._translation_delta, false);
 
         /* var i_matricies = this.compileTransforms();
          if (this.members[i].get('type') === 'collection' || this.members[i].get('type') === 'sampler') {
@@ -344,11 +362,11 @@ define([
            this.members[i].compile();
          }*/
 
-      }
+     // }
     },
 
 
-    compileMemberAt: function(index, propname, l_matrix) {
+    //compileMemberAt: function(index, propname, l_matrix) {
       /*var delta = this.inheritProperty(propname);
       console.log('list inherited delta: ', delta);
       if (delta) {
@@ -381,10 +399,10 @@ define([
         }
         member_matrix.concatenate(l_matrix);
       }*/
-    },
+    //},
 
 
-    compileTransforms: function() {
+    //compileTransforms: function() {
       /* var rmatrix = this.get('rmatrix').clone();
        var smatrix = this.get('smatrix').clone();
        var tmatrix = this.get('tmatrix').clone();
@@ -412,7 +430,7 @@ define([
          smatrix: smatrix
        }; //Instance.prototype.compileTransforms.call(this, arguments);*/
 
-    },
+   // },
     //triggered on change of select property, removes bbox
     selectionChange: function() {
       Instance.prototype.selectionChange.call(this, arguments);

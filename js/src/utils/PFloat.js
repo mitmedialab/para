@@ -40,17 +40,21 @@ define([
 			 */
 			isConstrained: function() {
 				var data = {};
-				data.self = this.isSelfConstrained();
+				data = this.isSelfConstrained();
 				return data;
 			},
 
 			/* getConstraint
-			 * returns constraint if it exists
+			 * returns object if constraint exists
+			 * null otherwise
 			 */
 			getConstraint: function() {
-				var data = {};
-				data.self = this.getSelfConstraint();
-				return data;
+				var data;
+				var self = this.getSelfConstraint();
+				if(self){
+					data = this.getSelfConstraint();
+					return data;
+				}
 			},
 			/* setValue
 			 * sets the value of the property

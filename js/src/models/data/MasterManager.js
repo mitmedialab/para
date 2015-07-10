@@ -60,15 +60,8 @@ define([
 
 		},
 
-		/*resetPrototypes
-		 * resets the prototypes recursively.
-		 * Called before visiting the root node
-		 */
-
-
-
 		getById: function(id) {
-			var prefix = id.slice('_')[0];
+			var prefix = id.split('_')[0];
 			console.log('prefix', prefix);
 			var obj;
 			switch (prefix) {
@@ -125,6 +118,7 @@ define([
 
 			}
 			if (ref && rel) {
+				console.log('rel id =', rel);
 				ref_i = this.getById(ref);
 				rel_i = this.getById(rel);
 				ref_i.set('constraint_selected', 'reference_selected');
@@ -149,13 +143,12 @@ define([
 		},
 
 		compile: function() {
-
 			renderQueue = [];
+			collectionManager.resetRenderQueue();
 			this.compileFunctions();
-			this.compileInstances();
 			collectionManager.compileCollections();
+			this.compileInstances();
 			this.render();
-
 		},
 
 		//TODO: move to function manager
@@ -179,7 +172,6 @@ define([
 			};
 
 			this.visit(currentNode, null, state_data);
-
 		},
 
 		addToRenderQueue: function(obj) {
@@ -194,6 +186,7 @@ define([
 				renderQueue[i].render();
 
 			}
+			collectionManager.render();
 		},
 
 		addObject: function(object, geom) {
@@ -267,8 +260,6 @@ define([
 			}
 
 		},
-
-
 
 
 		/* visitFunction

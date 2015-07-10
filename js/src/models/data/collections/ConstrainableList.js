@@ -9,10 +9,11 @@ define([
     'utils/PBool',
     'paper',
     'utils/PConstraint',
+    'utils/TrigFunc'
 
   ],
 
-  function(_, ListNode, PFloat, PBool, paper, PConstraint) {
+  function(_, ListNode, PFloat, PBool, paper, PConstraint, TrigFunc) {
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'list',
@@ -44,6 +45,24 @@ define([
         this.set('ui', geom);
         this.indexNumbers = [];
       },
+
+      /*modifyProperty
+    passes modifications onto members, stripped of any properties that are constrained on the list
+     */
+    modifyProperty: function(data, mode, modifier) {
+        var constrained_props = this.getConstraintValues();
+        var stripped_data = TrigFunc.strip(data, constrained_props);
+        for (var i = 0; i < this.members.length; i++) {
+          console.log('modifying member',i,stripped_data);
+          this.members[i].modifyProperty(stripped_data, mode, modifier);
+        }
+        for (var p in stripped_data) {
+          if (stripped_data.hasOwnProperty(p)) {
+            this.trigger('change:' + p);
+          }
+        }
+      },
+
 
       //overrides ListNode addMember and removeMember functions
       addMember: function(data) {
@@ -102,64 +121,20 @@ define([
         }
       },
 
-      /*compile: function() {
-        var constraints = this.getConstraint();
-        console.log('list constraints', constraints);
-        for (var i = 0; i < this.members.length; i++) {
-          var i_matricies = this.compileTransforms();
-         if (this.members[i].get('type') === 'collection') {
-            this.members[i].reset();
-          }
-          this.compileMemberAt(i, i_matricies, constraints);
+      compile: function() {     
+        for(var i=0;i<this.members.length;i++){
+           var constraint_values = this.getConstraintValues();
+           console.log('list compiled value',constraint_values);
+          this.compileMemberAt(i,constraint_values);
           this.increment();
         }
-      },*/
-
-      updateMemberTranslation: function(){
-        var deltaConstrained = this.get('translation_delta').isConstrained();
-       // var memberDeltaConstrained = this.get()
       },
 
 
-      compileMemberAt: function(index, list_constraints) {
-        console.log('list_constraints');
+      compileMemberAt: function(index, data) {
         var member = this.members[index];
-
-        member.modifyAfterCompile('translation_delta');
+        member.modifyPriorToCompile(data);
       },
-      /*  var delta = this.inheritProperty(propname);
-
-        if (delta) {
-          var member = this.members[index];
-          var member_property = member.inheritProperty(propname);
-          var matrixMap = this.get('matrix_map');
-          var matrix_props = matrixMap[propname].properties;
-          var member_matrix = member.get(matrixMap[propname].name);
-          var delta_constrained = delta.isSelfConstrained();
-          var member_property_constrained = member_property.isSelfConstrained();
-
-          for (var p in matrix_props) {
-            if (delta.hasOwnProperty(p)) {
-              var delta_subproperty_constrained = false;
-              var member_subproperty_constrained = false;
-              if (delta[p] instanceof PConstraint) {
-                delta_subproperty_constrained = delta[p].isSelfConstrained();
-                member_subproperty_constrained = member_property[p].isSelfConstrained();
-              }
-              for (var i = 0; i < matrix_props[p].length; i++) {
-                if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {
-                  member_matrix[matrix_props[p][i]] = 0;
-                }
-                if (member_subproperty_constrained || member_property_constrained) {
-                  l_matrix[matrix_props[p][i]] = 0;
-                }
-              }
-            }
-          }
-          member_matrix.concatenate(l_matrix);
-        }
-
-      },*/
 
       //renders the List UI
       render: function() {
@@ -181,7 +156,7 @@ define([
         }
 
         ui.position = new paper.Point(bottomLeft.x + ui.bounds.width / 2, bottomLeft.y + ui.bounds.height / 2);
-        this.startText.content = 'count: '+ String(this.members.length);
+        this.startText.content = 'count: ' + String(this.members.length);
 
         //this.renderSelection(geom);
         if (this.get('selected') || this.get('open')) {

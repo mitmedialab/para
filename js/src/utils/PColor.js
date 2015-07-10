@@ -44,7 +44,7 @@ define([
 				this.s = new PFloat(hsl[1]);
 				this.l = new PFloat(hsl[2]);
 				var h = this.h;
-				this.listenTo(this.h,'change',function(val){
+				this.listenTo(this.h, 'change', function(val) {
 					console.log('setting value for color', val, h.isConstrained(), h.getValue());
 
 				});
@@ -65,13 +65,13 @@ define([
 			isConstrained: function() {
 				var data = {};
 				data.self = this.isSelfConstrained();
-				data.r = this.r.isConstrained().self;
-				data.g = this.g.isConstrained().self;
-				data.b = this.r.isConstrained().self;
-				data.h = this.h.isConstrained().self;
-				data.s = this.s.isConstrained().self;
-				data.l = this.l.isConstrained().self;
-				data.a = this.g.isConstrained().self;
+				data.r = this.r.isConstrained();
+				data.g = this.g.isConstrained();
+				data.b = this.r.isConstrained();
+				data.h = this.h.isConstrained();
+				data.s = this.s.isConstrained();
+				data.l = this.l.isConstrained();
+				data.a = this.g.isConstrained();
 				return data;
 			},
 
@@ -79,17 +79,44 @@ define([
 			 * returns object containing all constraints
 			 */
 			getConstraint: function() {
-				var data = {};
-				data.self = this.getSelfConstraint();
-				data.r = this.r.getConstraint().self;
-				data.g = this.g.getConstraint().self;
-				data.b = this.r.getConstraint().self;
-				data.h = this.h.getConstraint().self;
-				data.s = this.s.getConstraint().self;
-				data.l = this.l.getConstraint().self;
-				data.a = this.g.getConstraint().self;
+				var self = this.getSelfConstraint();
+				if (self) {
+					return self;
+				} else {
+					var data = {};
 
-				return data;
+					var r = this.r.getConstraint();
+					var g = this.g.getConstraint();
+					var b = this.r.getConstraint();
+					var h = this.h.getConstraint();
+					var s = this.s.getConstraint();
+					var l = this.l.getConstraint();
+					var a = this.g.getConstraint();
+					if (r) {
+						data.r = r;
+					}
+					if (g) {
+						data.g = g;
+					}
+					if (b) {
+						data.b = b;
+					}
+					if (h) {
+						data.h = h;
+					}
+					if (s) {
+						data.s = s;
+					}
+					if (l) {
+						data.l = l;
+					}
+					if (a) {
+						data.a = a;
+					}
+					if (r || g || b || h || s || l || a) {
+						return data;
+					}
+				}
 			},
 
 

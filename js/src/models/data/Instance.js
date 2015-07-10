@@ -206,7 +206,7 @@ define([
 			path_altered.setNull(true);
 			this.set('path_altered', path_altered);
 
-			this.set('id', this.get('type')+'_'+new Date().getTime().toString());
+			this.set('id', this.get('type') + '_' + new Date().getTime().toString());
 
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
@@ -222,11 +222,6 @@ define([
 
 		},
 
-		checkChange: function() {
-			console.log('selection change', this.get('selected'));
-			console.trace();
-		},
-
 		/* deleteSelf
 		 * function called before instance is removed from
 		 * scene graph
@@ -237,7 +232,7 @@ define([
 			if (geom) {
 				geom.remove();
 			}
-			
+
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].deleteSelf();
 				//this.children[i].destroy();
@@ -325,12 +320,12 @@ define([
 			this.addChildNode(instance);
 		},
 
-		removeInheritor: function(instance){
+		removeInheritor: function(instance) {
 			var inheritorCollection = this.get('inheritors');
-			return inheritorCollection.removeInheritor(instance);	
+			return inheritorCollection.removeInheritor(instance);
 		},
 
-	
+
 
 		createSelectionClone: function() {
 			if (this.get('selection_clone')) {
@@ -346,7 +341,7 @@ define([
 			selection_clone.fillColor = null;
 			selection_clone.strokeWidth = 3;
 			selection_clone.selected = false;
-			this.set('selection_clone',selection_clone);
+			this.set('selection_clone', selection_clone);
 		},
 
 		changeGeomInheritance: function(geom) {
@@ -414,7 +409,7 @@ define([
 		show: function() {
 			this.set('visible', true);
 			this.get('geom').visible = true;
-			if(this.get('constraint_selected')){
+			if (this.get('constraint_selected')) {
 				this.get('selection_clone').visible = true;
 			}
 
@@ -597,7 +592,8 @@ define([
 				}
 			}
 
-			var constrained_props = this.getValue();
+			var constrained_props = this.getConstraintValues();
+			console.log('constrained props', constrained_props);
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
@@ -605,7 +601,7 @@ define([
 
 						var property = this.get(p);
 						property.setNull(false);
-
+						console.log('modifying property',p,data_property,data[p],data);
 						property.modifyProperty(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
@@ -676,30 +672,16 @@ define([
 
 		},
 
-		_modifyAfterCompile: function(property_name, value, set, origin) {
-			var constraint = this.getConstraint();
-			var internal_property = "_".concat(property_name);
-			var attribute_constraint = constraint[property_name];
-			//entire instance is constrained, no modification allowed
-			if (constraint['self']) {
-				return false;
-			}
-			//attribute is not constrained modification allowed
-			else {
+		modifyPriorToCompile: function(data) {
+			var value = this.getValue();
+			var merged = TrigFunc.merge(value, data);
 
-				if (this[internal_property] instanceof paper.Matrix) {
-					return this._modifyMatrixAfterCompile(property_name, this[internal_property], attribute_constraint, value, set, origin);
-				} else if (this[internal_property] instanceof Number) {
-					return this._modifyValueAfterCompile(this[internal_property], attribute_constraint, value, set);
-				} else if (this[internal_property] instanceof Object) {
-					return this._modifyObjectAfterCompile(this[internal_property], attribute_constraint, value, set);
-
-				}
-			}
-			return false;
+			console.log('merged-value', merged);
+			this.set('merged', merged);
 		},
 
-		_modifyMatrixAfterCompile: function(property_name, internal_matrix, attribute_constraint, value, set, origin) {
+
+		_modifyMatrixAfterCompile: function(property_name, internal_matrix, attribute_constraint, value, set) {
 			//attribute is not constrained, modification allowed
 			console.log('modify matrix', property_name, attribute_constraint);
 
@@ -743,7 +725,7 @@ define([
 					}
 					break;
 				case 'scaling_delta':
-					var s_origin = (origin) ? origin : this._scaling_origin;
+					var s_origin = this._scaling_origin;
 					if (!attribute_constraint) {
 						if (set) {
 							internal_matrix.d = (value.scaling) ? 0 : internal_matrix.d;
@@ -778,8 +760,7 @@ define([
 					}
 					break;
 				case 'rotation_delta':
-					var r_origin = (origin) ? origin : this._rotation_origin;
-					console.log('r_origin', r_origin, 'origin', origin, 'rotation_origin', this._rotation_origin);
+					var r_origin = this._rotation_origin;
 					if (attribute_constraint) {
 						return false;
 					} else {
@@ -853,30 +834,23 @@ define([
 			var self = this.getSelfConstraint();
 			if (self) {
 				data.self = self;
+				return data;
 			} else {
+				var constraintFound = false;
 				for (var propertyName in constrainMap) {
 					if (constrainMap.hasOwnProperty(propertyName)) {
-						var constraints = this.get(propertyName).getConstraint();
-						if (constraints.self) {
-							data[propertyName] = {
-								self: constraints.self
-							};
-						} else {
-							for (var cProp in constraints) {
-								if (constraints.hasOwnProperty(cProp)) {
-									if (!constraints[cProp]) {
-										delete constraints[cProp];
-									}
-								}
-							}
-							if (Object.keys(constraints).length > 0) {
-								data[propertyName] = constraints;
-							}
+						var constraint = this.get(propertyName).getConstraint();
+						if (constraint) {
+							data[propertyName] = constraint;
 						}
+						constraintFound = true;
 					}
 				}
+				if (constraintFound) {
+					return data;
+				}
 			}
-			return data;
+
 
 		},
 
@@ -902,47 +876,51 @@ define([
 		},
 
 
+
 		/* getValue
-		 * returns an object containing all constrained properties of
-		 * this instance
+		 * returns an object containing all of the values of constrainable properties
+		 * TODO: Make recursive (will not work for objects with 3+ leves of heirarchy)
 		 */
+
 		getValue: function() {
 			var constrainMap = this.get('constrain_map');
-			var data = {};
-			var isSelfConstrained = this.isSelfConstrained();
-			var constraintCalled = false;
-			if (this.reference) {
-				constraintCalled = this.reference.get('called');
+			var value = {};
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					value[propertyName] = this.accessProperty(propertyName);
+				}
 			}
-			if (isSelfConstrained && constraintCalled) {
-				var constraint = this.getSelfConstraint().getValue();
-				return constraint;
+			return value;
+		},
 
-			} else {
-				for (var i = 0; i < constrainMap.length; i++) {
-					var prop = this.inheritProperty(constrainMap[i]);
-					if (prop) {
-						var c = prop.getConstraint();
-						if (c.self) {
-							data[constrainMap[i]] = c.self.getValue();
-						} else {
-							data[constrainMap[i]] = {};
-							for (var p in c) {
-								if (p !== 'self' && c[p]) {
-									data[constrainMap[i]][p] = c[p].getValue();
-								}
-							}
-							if (_.isEmpty(data[constrainMap[i]])) {
-								delete(data[constrainMap[i]]);
+		/* getConstraintValues
+		 * returns an object containing all constrained properties of
+		 * this instance with their values;
+		 * TODO: Make recursive (will not work for objects with 3+ leves of heirarchy)
+		 */
+
+		getConstraintValues: function() {
+			var constraints = this.getConstraint();
+			console.log('constraints', constraints);
+			var value = {};
+			for (var c in constraints) {
+				if (constraints.hasOwnProperty(c)) {
+					console.log('constraints:', c, constraints[c]);
+					if (constraints[c].getValue) {
+						value[c] = constraints[c].getValue();
+					} else {
+						value[c] = {};
+						for (var v in constraints[c]) {
+							if (constraints[c].hasOwnProperty(v)) {
+								value[c][v] = constraints[c][v].getValue();
 							}
 						}
 					}
-
 				}
-				return data;
 			}
-
+			return value;
 		},
+
 
 
 		getCenter: function() {
@@ -1058,20 +1036,26 @@ define([
 		},
 
 		compileTransformation: function() {
+			var scaling_delta, rotation_delta, translation_delta;
+			var merged = this.get('merged');
+			if (!merged) {
+				scaling_delta = this.accessProperty('scaling_delta');
+				rotation_delta = this.accessProperty('rotation_delta');
+				translation_delta = this.accessProperty('translation_delta');
+			} else {
+				scaling_delta = merged.scaling_delta;
+				rotation_delta = merged.rotation_delta;
+				translation_delta = merged.translation_delta;
+			}
+
 			this._rotation_origin = this.get('rotation_origin').toPaperPoint();
 			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
 			this._position = this.get('position').toPaperPoint();
 
-			if (this.accessProperty('scaling_delta')) {
-				this._scaling_delta.scale(this.accessProperty('scaling_delta').x, this.accessProperty('scaling_delta').y, this._scaling_origin);
-			}
-			if (this.accessProperty('rotation_delta')) {
-				this._rotation_delta.rotate(this.accessProperty('rotation_delta'), this._rotation_origin);
-			}
-			if (this.accessProperty('translation_delta')) {
-				this._translation_delta.translate(this.accessProperty('translation_delta').x, this.accessProperty('translation_delta').y);
-			}
 
+			this._scaling_delta.scale(scaling_delta.x, scaling_delta.y, this._scaling_origin);
+			this._rotation_delta.rotate(rotation_delta, this._rotation_origin);
+			this._translation_delta.translate(translation_delta.x, translation_delta.y);
 
 			this._temp_matrix.preConcatenate(this._rotation_delta);
 			this._temp_matrix.preConcatenate(this._scaling_delta);
@@ -1082,16 +1066,12 @@ define([
 		compileStyle: function() {
 			var fill_color = this.accessProperty('fill_color');
 			var fill_prop = this.inheritProperty('fill_color');
-			console.log('getting color value for:', this.get('id'), 'h:', fill_prop.h.isConstrained(), 's:', fill_prop.s.isConstrained(), 'l:', fill_prop.l.isConstrained());
-
-			console.log('fill_color=', fill_color);
 			this._fill_color = this.accessProperty('fill_color');
 			this._stroke_color = this.accessProperty('stroke_color');
 			this._stroke_width = this.accessProperty('stroke_width');
 			//TODO: consider changing visible to a constrainable property?
 			this._visible = this.get('visible');
 		},
-
 
 		/*render
 		 * draws instance on canvas
@@ -1179,7 +1159,6 @@ define([
 			if (constraint_selected) {
 				selection_clone.visible = true;
 				selection_clone.strokeColor = this.get(constraint_selected + '_color');
-				console.log('setting constraint selection visible', selection_clone);
 
 			} else {
 				selection_clone.visible = false;
@@ -1250,7 +1229,7 @@ define([
 				selection_clone.transform(this._ri_matrix);
 				geom.selected = false;
 			} else {
-				if(!selection_clone){
+				if (!selection_clone) {
 					this.createSelectionClone();
 					selection_clone = this.get('selection_clone');
 				}

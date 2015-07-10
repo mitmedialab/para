@@ -372,6 +372,7 @@ define([
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
       this.set('ref_prop_key', constraintPropMap[ref_prop[0]]);
       this.set('rel_prop_key', constraintPropMap[ref_prop[0]]);
+      if(rel_prop)
       this.set('rel_prop_dimensions', rel_prop[1]);
       this.set('ref_prop_dimensions', ref_prop[1]);
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);

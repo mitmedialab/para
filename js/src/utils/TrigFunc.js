@@ -200,6 +200,27 @@ define([
 			}
 		};
 
+		TrigFunc.strip = function(target, reference) {
+			if (!_.isObject(reference)) {
+				return null;
+			} else {
+				var stripped = {};
+				for (var p in target) {
+					if (target.hasOwnProperty(p)) {
+						if (!reference.hasOwnProperty(p)) {
+							stripped[p] = target[p];
+						} else {
+							var val = TrigFunc.strip(target[p], reference[p]);
+							if(val){
+								stripped[p] = val;
+							}
+						}
+					}
+				}
+				return stripped;
+			}
+		};
+
 
 		// initialize array
 		TrigFunc._zeros = function(n) {
@@ -211,53 +232,53 @@ define([
 		};
 
 		TrigFunc._denominator = function(i, points) {
-				var result = 1;
-				var x_i = points[i].x;
-				for (var j = points.length; j--;) {
-					if (i != j) {
-						result *= x_i - points[j].x;
-					}
+			var result = 1;
+			var x_i = points[i].x;
+			for (var j = points.length; j--;) {
+				if (i != j) {
+					result *= x_i - points[j].x;
 				}
-				console.log(result);
-				return result;
-			};
+			}
+			console.log(result);
+			return result;
+		};
 
-			// calculate coefficients for Li polynomial
-			TrigFunc._interpolation_polynomial = function(i, points) {
-				var coefficients = this._zeros(points.length);
-				coefficients[0] = 1 / this._denominator(i, points);
-				console.log(coefficients[0]);
-				var new_coefficients;
+		// calculate coefficients for Li polynomial
+		TrigFunc._interpolation_polynomial = function(i, points) {
+			var coefficients = this._zeros(points.length);
+			coefficients[0] = 1 / this._denominator(i, points);
+			console.log(coefficients[0]);
+			var new_coefficients;
 
-				for (var k = 0; k < points.length; k++) {
-					if (k == i) {
-						continue;
-					}
-					new_coefficients = this._zeros(points.length);
-					for (var j = (k < i) ? k + 1 : k; j--;) {
-						new_coefficients[j + 1] += coefficients[j];
-						new_coefficients[j] -= points[k].x * coefficients[j];
-					}
-					coefficients = new_coefficients;
+			for (var k = 0; k < points.length; k++) {
+				if (k == i) {
+					continue;
 				}
-				console.log(coefficients);
-				return coefficients;
-			};
-
-			// calculate coefficients of polynomial
-			TrigFunc.Lagrange = function(points) {
-				var polynomial = this._zeros(points.length);
-				var coefficients;
-				for (var i = 0; i < points.length; ++i) {
-					coefficients = this._interpolation_polynomial(i, points);
-					//console.log(coefficients);
-					for (var k = 0; k < points.length; ++k) {
-						// console.log(points[k].y*coefficients[k]);
-						polynomial[k] += points[i].y * coefficients[k];
-					}
+				new_coefficients = this._zeros(points.length);
+				for (var j = (k < i) ? k + 1 : k; j--;) {
+					new_coefficients[j + 1] += coefficients[j];
+					new_coefficients[j] -= points[k].x * coefficients[j];
 				}
-				return polynomial;
-			};
+				coefficients = new_coefficients;
+			}
+			console.log(coefficients);
+			return coefficients;
+		};
+
+		// calculate coefficients of polynomial
+		TrigFunc.Lagrange = function(points) {
+			var polynomial = this._zeros(points.length);
+			var coefficients;
+			for (var i = 0; i < points.length; ++i) {
+				coefficients = this._interpolation_polynomial(i, points);
+				//console.log(coefficients);
+				for (var k = 0; k < points.length; ++k) {
+					// console.log(points[k].y*coefficients[k]);
+					polynomial[k] += points[i].y * coefficients[k];
+				}
+			}
+			return polynomial;
+		};
 
 
 

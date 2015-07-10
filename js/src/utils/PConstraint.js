@@ -56,6 +56,7 @@
 			 * expects paramter to be a function
 			 */
 			setConstraint: function(func, r) {
+				this.setNull(false);
 				if (!this.isSelfConstrained()) {
 					this.constraint = new PProperty(func);
 				} else {
@@ -73,7 +74,7 @@
 			 * removes the constraint of this property
 			 */
 			removeConstraint: function(dimensions) {
-				if (dimensions.length === this.get('dimension_num')) {
+				if (!dimensions || dimensions.length === this.get('dimension_num')) {
 					if (this.isSelfConstrained()) {
 						var value = this.getValue();
 						this.constraint = null;

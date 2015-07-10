@@ -14,7 +14,7 @@ define([
 
 
 	//stores para lists
-	var lists;
+	var lists,renderQueue;
 	var collectionView;
 	var compile = 1;
 	var remove = 2;
@@ -40,7 +40,16 @@ define([
 			return lists;
 		},
 		
+		resetRenderQueue: function(){
+			renderQueue = []
+		},
 
+		render: function(root) {
+			for (var i = 0; i < renderQueue.length; i++) {
+				renderQueue[i].render();
+
+			}
+		},
 		/* getListByID
 		 * returns list by id
 		 */
@@ -50,7 +59,6 @@ define([
 				state: search,
 				id: id
 			};
-			this.compile();
 
 			var match = false;
 			for (var i = 0; i < lists.length; i++) {
@@ -116,7 +124,7 @@ define([
 				case compile:
 					node.reset();
 					node.compile();
-					this.trigger('addToRender', node);
+					renderQueue.push(node);
 					for (var i = 0; i < node.members.length; i++) {
 						member = node.members[i];
 						if (member.get('type') === 'collection') {

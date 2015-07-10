@@ -269,7 +269,6 @@ define([
       var geometry = this.get('geometry');
       for (var i = 0; i < geometry.children.length; i++) {
         var child = geometry.children[i];
-        console.log('adding listener to child', child.name);
         child.onMouseEnter = this.onMouseEnter.bind(this);
         child.onMouseLeave = this.onMouseLeave.bind(this);
         child.onMouseDown = this.onMouseDown.bind(this);
