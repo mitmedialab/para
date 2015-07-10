@@ -601,7 +601,7 @@ define([
 
 						var property = this.get(p);
 						property.setNull(false);
-						console.log('modifying property',p,data_property,data[p],data);
+						console.log('modifying property', p, data_property, data[p], data);
 						property.modifyProperty(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
@@ -1064,11 +1064,18 @@ define([
 		},
 
 		compileStyle: function() {
-			var fill_color = this.accessProperty('fill_color');
-			var fill_prop = this.inheritProperty('fill_color');
-			this._fill_color = this.accessProperty('fill_color');
-			this._stroke_color = this.accessProperty('stroke_color');
-			this._stroke_width = this.accessProperty('stroke_width');
+
+			var merged = this.get('merged');
+			if (merged) {
+				this._fill_color = merged.fill_color;
+				this._stroke_color = merged.stroke_color;
+				this._stroke_width = merged.stroke_width;
+			} else {
+				this._fill_color = this.accessProperty('fill_color');
+				this._stroke_color = this.accessProperty('stroke_color');
+				this._stroke_width = this.accessProperty('stroke_width');
+			}
+
 			//TODO: consider changing visible to a constrainable property?
 			this._visible = this.get('visible');
 		},

@@ -44,16 +44,21 @@ define([
 
         this.set('ui', geom);
         this.indexNumbers = [];
+        //for storing offsets to be added to constraints to preserve member state
+        this.offsets = [];
+        this.get('scaling_delta').setValue({x:1,y:1});
+        console.log('list scale:',this.accessProperty('scaling_delta'));
+
       },
 
       /*modifyProperty
     passes modifications onto members, stripped of any properties that are constrained on the list
      */
-    modifyProperty: function(data, mode, modifier) {
+      modifyProperty: function(data, mode, modifier) {
         var constrained_props = this.getConstraintValues();
         var stripped_data = TrigFunc.strip(data, constrained_props);
         for (var i = 0; i < this.members.length; i++) {
-          console.log('modifying member',i,stripped_data);
+          console.log('modifying member', i, stripped_data);
           this.members[i].modifyProperty(stripped_data, mode, modifier);
         }
         for (var p in stripped_data) {
@@ -66,6 +71,10 @@ define([
 
       //overrides ListNode addMember and removeMember functions
       addMember: function(data) {
+        var index = $.inArray(data, this.members);
+        if (index > -1 && index < this.offsets.length) {
+          this.offsets.splice(index, 1);
+        }
         ListNode.prototype.addMember.call(this, data);
         var diff = this.members.length - this.indexNumbers.length;
         for (var i = 0; i < diff; i++) {
@@ -79,9 +88,11 @@ define([
           });
           this.indexNumbers.push(numText);
         }
+        this.offsets.push({});
       },
 
       removeMember: function(data) {
+        data.set('merged',undefined);
         ListNode.prototype.removeMember.call(this, data);
         var diff = this.indexNumbers.length - this.members.length;
         console.log('diff', diff);
@@ -121,11 +132,11 @@ define([
         }
       },
 
-      compile: function() {     
-        for(var i=0;i<this.members.length;i++){
-           var constraint_values = this.getConstraintValues();
-           console.log('list compiled value',constraint_values);
-          this.compileMemberAt(i,constraint_values);
+      compile: function() {
+        for (var i = 0; i < this.members.length; i++) {
+          var constraint_values = this.getConstraintValues();
+          console.log('list compiled value', constraint_values);
+          this.compileMemberAt(i, constraint_values);
           this.increment();
         }
       },

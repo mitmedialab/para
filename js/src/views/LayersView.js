@@ -142,6 +142,11 @@ define([
 			refIcon = $('#constraint_ref');
 
 			connector = $('#connector_line');
+
+			
+			this.$('#layers').bind('scroll',function() {
+				self.positionConstraintIcons();
+			});
 			this.hideConstraintIcons();
 			this.resetConstraintHeight();
 		},
@@ -214,14 +219,14 @@ define([
 			var bp = p1.top < p2.top ? -175 : -245;
 			console.log("shapeRoot, listRoot", p1.top, p2.top);
 			$('#constraint_rel').css({
-				top: Math.floor(p1.top) - 1,
+				top: Math.floor(p1.top)  -111,
 				backgroundColor: bc1,
 				backgroundPositionY: bp,
 				backgroundPositionX: -1,
 				visibility: 'visible'
 			});
 			$('#constraint_ref').css({
-				top: Math.floor(p2.top) - 1,
+				top: Math.floor(p2.top) - 111,
 				backgroundColor: bc2,
 				backgroundPositionX: -1,
 				visibility: 'visible'
@@ -230,7 +235,7 @@ define([
 			var connectorTop = p1.top < p2.top ? p1.top : p2.top;
 			$('#connector_line').css({
 				height: length,
-				top: connectorTop + 15,
+				top: connectorTop + 15-111,
 				visibility: 'visible'
 			});
 		},

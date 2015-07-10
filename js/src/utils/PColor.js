@@ -340,24 +340,29 @@ define([
 			 * calls super modify following this conversion
 			 */
 			modifyProperty: function(style_data) {
-				var r = ColorUtils.hexToR(style_data);
-				var g = ColorUtils.hexToG(style_data);
-				var b = ColorUtils.hexToB(style_data);
-				var hsl = ColorUtils.rgbToHsl({
-					r: r,
-					g: g,
-					b: b
-				});
-				var data = {
-					operator: 'set',
-					r: r,
-					g: g,
-					b: b,
-					h: hsl[0],
-					s: hsl[1],
-					l: hsl[2]
-				};
-				PConstraint.prototype.modifyProperty.call(this, data);
+				if (style_data instanceof Object) {
+					PConstraint.prototype.modifyProperty.call(this, style_data);
+
+				} else {
+					var r = ColorUtils.hexToR(style_data);
+					var g = ColorUtils.hexToG(style_data);
+					var b = ColorUtils.hexToB(style_data);
+					var hsl = ColorUtils.rgbToHsl({
+						r: r,
+						g: g,
+						b: b
+					});
+					var data = {
+						operator: 'set',
+						r: r,
+						g: g,
+						b: b,
+						h: hsl[0],
+						s: hsl[1],
+						l: hsl[2]
+					};
+					PConstraint.prototype.modifyProperty.call(this, data);
+				}
 			},
 
 			toJSON: function() {

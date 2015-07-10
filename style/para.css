@@ -929,7 +929,7 @@ span:focus{
     border-color: #B2B2B2 !important;
     background-color: inherit !important;
 }
-
+    
 .iris-picker .iris-square-handle {
     border: 2px solid #ccc !important;
     border-color: #34332F !important;
@@ -959,13 +959,11 @@ span:focus{
 .constraint-container{
     float:left;
     width:30px;
+    position:relative;
+    margin-top:33px;
+  overflow: hidden;
 }
-.constraint-container header {
-  height: 33px;
-  line-height: 20pt;
-  padding-left: 10px;
-  background-color: inherit;
-}
+
 
 .constraint-menu{
     width: 30px;
