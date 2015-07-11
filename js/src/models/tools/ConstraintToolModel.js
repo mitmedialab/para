@@ -202,8 +202,8 @@ define([
       //  return
       this.set('applicable', true);
       this.trigger('delegateMethod', 'select', 'selectDown', event);
-      this.trigger('selectionRequest',this);
-      console.log('selection request result',this.selected);
+      this.trigger('selectionRequest', this);
+      console.log('selection request result', this.selected);
       var type = (event.modifiers.control) ? 'point' : 'shape';
       var flag = this.get('currentConstraint').setSelection(this.selected, type);
       this.trigger('compileRequest');
@@ -230,8 +230,8 @@ define([
       var constraint = this.get('currentConstraint');
       var relative = constraint.get('relatives');
       this.trigger('delegateMethod', 'select', 'selectDown', event);
-      this.trigger('selectionRequest',this);
-      console.log('selection request result',this.selected);
+      this.trigger('selectionRequest', this);
+      console.log('selection request result', this.selected);
       var selected = (this.selected ? this.selected[0] : null); // TODO: really shouldn't have to happen...
       this.trigger('compileRequest');
       if (selected && selected.get('id') == relative.get('id')) {
@@ -244,15 +244,25 @@ define([
     relMouseDown: function(event) {
       var constraint = this.get('currentConstraint');
       var reference = constraint.get('references');
-     // this.trigger('delegateMethod', 'select', 'selectDown', event);
+      // this.trigger('delegateMethod', 'select', 'selectDown', event);
 
       var hitResult = paper.project.hitTest(event.point, mouseHitOptions);
-      if (hitResult && hitResult.item.data.instance && hitResult.item.data.instance.id == reference.id) {
-        this.set('mode', 'ref');
-        this.sm.trigger('compileRequest');
+      if (hitResult && hitResult.item.data.instance) {
+        if (reference.get('type') === 'collection') {
+          if (reference.hasMember(hitResult.item.data.instance, true) ||hitResult.item.data.instance.id == reference.id ) {
+            this.set('mode', 'ref');
+            this.sm.trigger('compileRequest');
 
-        this.modeSwitch();
-        return;
+            this.modeSwitch();
+            return;
+          }
+        } else if (hitResult.item.data.instance.id == reference.id) {
+          this.set('mode', 'ref');
+          this.sm.trigger('compileRequest');
+
+          this.modeSwitch();
+          return;
+        }
       }
       if (hitResult && hitResult.item.type && hitResult.item.type == 'handle' && hitResult.item.active) {
         this.draggingHandle = constraint.get('rel_prop');

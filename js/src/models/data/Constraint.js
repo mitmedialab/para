@@ -94,6 +94,7 @@ define([
     },
 
     setSelection: function(selected, type) {
+      console.log('setting selection',selected,type);
       if (this.get('references') && this.get('relatives')) {
         console.log('[ERROR] References and relatives already set.');
       }

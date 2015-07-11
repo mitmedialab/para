@@ -182,25 +182,34 @@ define([
         var selected = this.get('selected');
         var constraint_selected = this.get('constraint_selected');
         var selection_clone = this.get('selection_clone');
-
+        var bbox = this.get('bbox');
+        
         if (constraint_selected) {
-          if (!selection_clone) {
-            this.createSelectionClone();
-            selection_clone = this.get('selection_clone');
-          }
+          
           selection_clone.visible = true;
           selection_clone.strokeColor = this.get(constraint_selected + '_color');
+          bbox.selected = false;
 
         } else {
           if (selection_clone) {
             selection_clone.visible = false;
           }
+          if (selected || this.get('open')) {
+            ui.visible = true;
+          } else {
+            ui.visible = false;
+          }
+      
+          bbox.selectedColor = this.getSelectionColor();
+          bbox.selected = this.get('selected');
+          bbox.visible = this.get('selected');
+          if (this.get('open')) {
+            bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
+            bbox.strokeWidth = 1;
+            bbox.visible = true;
+          }
         }
-        if (selected || this.get('open')) {
-          ui.visible = true;
-        } else {
-          ui.visible = false;
-        }
+
 
 
       }

@@ -238,7 +238,7 @@ define([
       var hand_object_geom = object_geom;
       var hand_delbox = delbox;
       var hand_corners = corners;
-      if (object_geom instanceof paper.Group) {
+      /*if (object_geom instanceof paper.Group) {
         hand_object_geom = object_geom.children[0];
         hand_delbox = geometry.children['hand_delbox'];
         hand_delbox.bounds = hand_object_geom.bounds;
@@ -248,7 +248,7 @@ define([
         for (var j = 0; j < 9; j++) {
           hand_corners[j].position = new paper.Point(hand_delbox.bounds.x + (j % 3) / 2.0 * hand_delbox.bounds.width, hand_delbox.bounds.y + Math.floor(j / 3) / 2.0 * hand_delbox.bounds.height, 3, 3);
         }
-      }
+      }*/
 
       var yarrow = geometry.children['scale_y'];
       var xarrow = geometry.children['scale_x'];

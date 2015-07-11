@@ -361,17 +361,7 @@ define([
 
     render: function() {
       this.renderBoundingBox();
-      var bbox = this.get('bbox');
-      bbox.selectedColor = this.getSelectionColor();
-      bbox.selected = this.get('selected');
-      bbox.visible = this.get('selected');
-      this.set('geom', null);
-      this.set('geom', bbox);
-      if (this.get('open')) {
-        bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
-        bbox.strokeWidth = 1;
-        bbox.visible = true;
-      }
+    
     },
 
     renderBoundingBox: function() {
@@ -396,7 +386,9 @@ define([
         if (!bbox) {
 
           bbox = new paper.Path.Rectangle(bbox_dimensions.topLeft, new paper.Size(width, height));
+          bbox.data.instance = this;
           this.set('bbox', bbox);
+          this.set('geom', bbox);
           bbox.sendToBack();
 
 
@@ -404,7 +396,21 @@ define([
           bbox.scale(width / bbox.bounds.width, height / bbox.bounds.height);
           bbox.position.x = x;
           bbox.position.y = y;
+         
+          
+
         }
+          var selection_clone = this.get('selection_clone');
+
+         if (!selection_clone) {
+            this.createSelectionClone();
+            selection_clone = this.get('selection_clone');
+          }
+          else{
+           selection_clone.scale(width / selection_clone.bounds.width, height / selection_clone.bounds.height);
+           selection_clone.position.x = x;
+           selection_clone.position.y = y;
+          }
 
         this.updateScreenBounds(bbox);
       }
@@ -457,6 +463,7 @@ define([
       var clone = new paper.Group(this.members.map(function(instance) {
         return instance.getShapeClone();
       }));
+      clone.data.instance = this;
       return clone;
     },
 
