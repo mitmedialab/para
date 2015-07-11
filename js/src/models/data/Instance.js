@@ -1156,9 +1156,12 @@ define([
 			var inheritor_selected = this.get('inheritor_selected');
 			var constraint_selected = this.get('constraint_selected');
 			var bbox, inheritor_bbox;
-			geom.selected = selected;
+			
 			var selection_clone = this.get('selection_clone');
+			console.log('rendering selection',this.get('id'));
+
 			if (constraint_selected) {
+			console.log('rendering selection clone',this.get('id'));
 				if (!selection_clone) {
 					this.createSelectionClone();
 					selection_clone = this.get('selection_clone');
@@ -1168,6 +1171,8 @@ define([
 
 			} else {
 				selection_clone.visible = false;
+			console.log('hiding selection clone',this.get('id'));
+
 			}
 
 			if (selected) {
@@ -1175,8 +1180,9 @@ define([
 				geom.selectedColor =  this.getSelectionColor();
 				bbox = this.get('bbox');
 				bbox.selectedColor = this.getSelectionColor();
-				bbox.selected = true;
-				bbox.visible = true;
+				bbox.selected = (constraint_selected)? false:true;
+				bbox.visible = (constraint_selected)? false:true;
+				geom.selected = (constraint_selected)? false:true;
 				inheritor_bbox = this.renderInheritorBoundingBox();
 				console.log('selected bbox',bbox);
 

@@ -130,6 +130,10 @@ define([
 
         //start of the proxy code: try to remove this //
         var proxy = relatives.getShapeClone();
+         var targetLayer = paper.project.layers.filter(function(layer) {
+        return layer.name === 'geometry_layer';
+      })[0];
+      targetLayer.addChild(proxy);
         console.log('proxy created',proxy);
         proxy.name = 'proxy';
         proxy.visible = false;

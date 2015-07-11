@@ -183,9 +183,11 @@ define([
         var constraint_selected = this.get('constraint_selected');
         var selection_clone = this.get('selection_clone');
         var bbox = this.get('bbox');
-        
         if (constraint_selected) {
-          
+          if (!selection_clone) {
+            this.createSelectionClone();
+            selection_clone = this.get('selection_clone');
+          }
           selection_clone.visible = true;
           selection_clone.strokeColor = this.get(constraint_selected + '_color');
           bbox.selected = false;
