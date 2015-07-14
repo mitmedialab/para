@@ -12,7 +12,7 @@ define([
   'models/data/MasterManager',
 
 ], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, PropertiesManager, ToolManager, MasterManager) {
-
+  var masterScope;
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
       '*actions': 'defaultAction'
@@ -25,7 +25,6 @@ define([
     app_router.on('route:defaultAction', function(actions) {
       var canvas = $('canvas').get(0);
       paper.setup(canvas);
-
       var geometry_layer = new paper.Layer();
       geometry_layer.name = 'geometry_layer';
       var ui_layer = new paper.Layer();

@@ -7,10 +7,9 @@ define([
 	'underscore',
 	'backbone',
 	'models/data/collections/ConstrainableList',
-	'views/CollectionView',
 
 
-], function(_, Backbone, ConstrainableList, CollectionView) {
+], function(_, Backbone, ConstrainableList) {
 
 
 	//stores para lists
@@ -24,10 +23,6 @@ define([
 		defaults: {},
 
 		initialize: function() {
-			var collectionView = new CollectionView({
-				el: '#collectionToolbar',
-				model: this
-			});
 		},
 
 		/* setters and getters for current lists
@@ -41,7 +36,7 @@ define([
 		},
 		
 		resetRenderQueue: function(){
-			renderQueue = []
+			renderQueue = [];
 		},
 
 		render: function(root) {
@@ -86,19 +81,28 @@ define([
 		 * without deleting its members
 		 */
 		removeCollection: function(collection) {
+			console.log('removing collection');
+			var removedLists,members; 
 			for (var j = 0; j < lists.length; j++) {
 				if (lists[j] === collection) {
 					lists.splice(j, 1);
 					lists = lists.concat(collection.getListMembers());
-					collection.removeAllMembers();
+					members = collection.removeAllMembers();
+					
+					
 					break;
 				} else {
-					var removedItems = lists[j].recRemoveMember(collection);
-					if (removedItems) {
-						lists.push.apply(lists, removedItems);
-					}
+				 	members = lists[j].recRemoveMember(collection);
+						
 				}
 			}
+			removedLists = members.filter(function(item){
+						return item.get('type')=='collection';
+			});
+			
+			lists.push.apply(lists, removedLists);
+			collection.deleteSelf();
+			return members;
 		},
 
 		/* compileCollections

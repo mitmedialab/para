@@ -164,9 +164,11 @@ define([
      * removes all members from this list
      */
     removeAllMembers: function() {
+      var removed = [];
       for (var i = this.members.length - 1; i >= 0; i--) {
-        this.removeMember(this.members[i]);
+        removed.push(this.removeMember(this.members[i]));
       }
+      return removed;
     },
 
     /* deleteMember
@@ -180,9 +182,7 @@ define([
 
     removeMember: function(data) {
       var index = $.inArray(data, this.members);
-      if (index === -1) {
-        return false;
-      } else {
+      if (index >-1) {
         var member = this.members.splice(index, 1)[0];
         member.modifyProperty({
           'translation_delta': this.accessProperty('translation_delta')
@@ -193,6 +193,7 @@ define([
           operator: 'set'
         };
         this.modifyProperty(md);
+        console.log('removing member at ',member,index);
         return member;
       }
 
@@ -463,7 +464,6 @@ define([
       var clone = new paper.Group(this.members.map(function(instance) {
         return instance.getShapeClone();
       }));
-      clone.data.instance = this;
       return clone;
     },
 

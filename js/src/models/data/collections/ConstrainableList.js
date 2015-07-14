@@ -96,13 +96,14 @@ define([
 
       removeMember: function(data) {
         data.set('merged', undefined);
-        ListNode.prototype.removeMember.call(this, data);
+       var member = ListNode.prototype.removeMember.call(this, data);
         var diff = this.indexNumbers.length - this.members.length;
         console.log('diff', diff);
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
           numText.remove();
         }
+        return member;
       },
 
 
@@ -112,6 +113,21 @@ define([
         var ui = this.get('ui');
         ui.position.x = 0;
         ui.position.y = 0;
+
+      },
+
+      deleteSelf: function(){
+        var bbox = this.get('bbox');
+        if(bbox){
+          bbox.remove();
+          bbox = null;
+        }
+        var ui = this.get('ui');
+        ui.remove();
+        ui = null;
+       this.members.length = 0;
+       this.members = null;
+
 
       },
 

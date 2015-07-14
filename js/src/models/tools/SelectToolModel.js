@@ -80,6 +80,7 @@ define([
 
     selectDown: function(event, noDeselect) {
       //automaticall deselect all on mousedown if shift modifier is not enabled
+      console.log(event.point);
       var instance = null;
       var modifier = null;
       if (!event.modifiers.shift) {

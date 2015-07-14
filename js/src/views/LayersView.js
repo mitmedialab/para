@@ -453,6 +453,8 @@ define([
 			}
 		},
 
+
+
 		addList: function(list) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
@@ -465,6 +467,16 @@ define([
 			this.selectNode(listNode);
 			this.resetConstraintHeight();
 			this.visualizeConstraint();
+		},
+
+		removeCollection: function(pId) {
+			var node = listTree.getNodeByKey(pId);
+			if (node) {
+				node.remove();
+				this.resetConstraintHeight();
+			} else {
+				console.error('could not find node to remove');
+			}
 		},
 
 		addConstraint: function(data) {

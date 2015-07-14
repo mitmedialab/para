@@ -11,9 +11,11 @@ define([
 	'models/data/functions/FunctionManager',
 	'models/data/collections/CollectionManager',
 	'views/LayersView',
+	'views/CollectionView',
+	'views/MapView'
 
 
-], function(_, Backbone, Instance, FunctionNode, FunctionManager, CollectionManager, LayersView) {
+], function(_, Backbone, Instance, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView,MapView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -26,7 +28,7 @@ define([
 	var remove = 2;
 	var visit = 3;
 	var search = 4;
-	var rootNode, currentNode, layersView, functionManager, collectionManager, selected, currentSelectionIndex;
+	var rootNode, currentNode, layersView, collectionView, mapView, functionManager, collectionManager, selected, currentSelectionIndex;
 
 	var constraintPropMap = {
 		'position': 'translation_delta',
@@ -51,9 +53,16 @@ define([
 			functionManager.selected = selected;
 			collectionManager = new CollectionManager();
 			collectionManager.setLists(rootNode.lists);
+			collectionView = new CollectionView({
+				el: '#collectionToolbar',
+				model: this
+			});
 			layersView = new LayersView({
 				el: '#layers-constraints-container',
 				model: this
+			});
+			mapView = new MapView({
+				model:this
 			});
 
 			this.listenTo(collectionManager, 'addToRender', this.addToRenderQueue);
@@ -190,6 +199,7 @@ define([
 		},
 
 		addObject: function(object, geom) {
+			console.log('add object',object);
 			switch (object) {
 				case 'geometry':
 					this.addShape(geom);
@@ -209,8 +219,45 @@ define([
 					this.deselectAllShapes();
 					this.selectShape(list);
 					break;
+				case 'group':
+
+					break;
+
+				case 'duplicator':
+
+					break;
 			}
 
+		},
+
+		unGroup: function() {
+			console.log('ungroup',selected);
+			for (var i = 0; i < selected.length; i++) {
+				switch (selected[i].get('type')) {
+					case 'geometry':
+						if (selected[i].get('name') == 'group') {
+							var members = selected[i].deleteSelf();
+							var parent = selected[i].getParentNode();
+							if (parent) {
+								parent.removeInheritor(selected[i]);
+								parent.removeChildNode(selected[i]);
+								parent.addChildNode(members);
+							} else {
+								currentNode.addChildNode(members);
+							}
+							this.deselectAllShapes();
+							this.selectShape(members);
+						}
+						break;
+					case 'collection':
+						layersView.removeCollection(selected[i].get('id'));
+						var removedItems = collectionManager.removeCollection(selected[i]);
+						console.log('removed items =',removedItems);
+						this.deselectAllShapes();
+						this.selectShape(removedItems);
+						break;
+				}
+			}
 		},
 
 		removeObject: function() {
@@ -220,14 +267,16 @@ define([
 					case 'geometry':
 						layersView.removeShape(selected[i].get('id'));
 						this.removeGeometry(selected[i]);
-
 						break;
 					case 'function':
 						//functionManager.removeFunction(selected[i]);
 						break;
+						//TODO: this replicates functionality in the ungroup function, should this function differently?
 					case 'collection':
-						layersView.removeCollection(selected[i]);
-						collectionManager.removeCollection(selected[i]);
+						layersView.removeCollection(selected[i].get('id'));
+						var removedItems = collectionManager.removeCollection(selected[i]);
+						this.deselectAllShapes();
+						this.selectShape(removedItems);
 						break;
 				}
 			}
@@ -435,6 +484,7 @@ define([
 				this._selectSingleShape(data);
 			}
 			this.updateLayers();
+			collectionView.toggleCollectionButtons(selected);
 			this.compile();
 
 		},
@@ -476,6 +526,7 @@ define([
 				this._deselectSingleShape(data);
 			}
 			this.updateLayers();
+			collectionView.toggleCollectionButtons(selected);
 			this.compile();
 
 
@@ -501,6 +552,7 @@ define([
 			}
 			selected.length = 0;
 			this.updateLayers();
+			collectionView.toggleCollectionButtons(selected);
 			this.compile();
 
 		},

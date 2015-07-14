@@ -184,7 +184,7 @@ define([
           var proxy = constraint.get('proxy');
           var refHandle = constraint.get('ref_handle');
           var relHandle = constraint.get('rel_handle');
-         // proxy.show();
+          proxy.show();
           refHandle.hide();
           relHandle.show();
           break;
