@@ -329,7 +329,7 @@ define([
           }
 
           console.log('offset', offset, 'conversion', conversion);
-          var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x';
+          var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x' + '*' + 'i';
           var exp_object = {};
           for (var axis in offset) {
             if (offset.hasOwnProperty(axis)) {
@@ -378,11 +378,11 @@ define([
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
       this.set('ref_prop_key', constraintPropMap[ref_prop[0]]);
       this.set('rel_prop_key', constraintPropMap[ref_prop[0]]);
-      if(rel_prop)
-      this.set('rel_prop_dimensions', rel_prop[1]);
+      if(rel_prop){
+        this.set('rel_prop_dimensions', rel_prop[1]); 
+      }
       this.set('ref_prop_dimensions', ref_prop[1]);
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
-
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
         var constraintFunctions = [];
         var a_keys = Object.keys(expression);
@@ -392,6 +392,8 @@ define([
           var cf = (function(d, a) {
             return function() {
               var x = (a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
+              var i = relative.getMultiplier();
+
               console.log('x-val', x, d);
               var y;
               eval(expression[d]);
@@ -424,11 +426,11 @@ define([
         var constraintF = function() {
           var evalObj = {};
           var a_keys = Object.keys(expression);
-          for (var i = 0; i < a_keys.length; i++) {
-            var axis = a_keys[i];
-            var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
+          for (var m = 0; m < a_keys.length; m++) {
+            var axis = a_keys[m];
+            var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
             var x = (ap === 'v' || !ap) ? refPropAccess.getValue() : refPropAccess[ap].getValue();
-            console.log('x-val', x, axis);
+            var i = relative.getMultiplier();
             var y;
             eval(expression[axis]);
             console.log('y-val', y);

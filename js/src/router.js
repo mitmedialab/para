@@ -37,6 +37,11 @@ define([
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
       var toolManager = new ToolManager();
+      //setup the canvas view
+      var canvasView = new CanvasView({
+        el: '#canvas-container',
+        model: toolManager
+      }, event_bus);
 
       //setup masterManager and function manager
       var masterManager = new MasterManager();
@@ -72,12 +77,7 @@ define([
         el: '#tool-elements',
         model: toolManager
       });
-      //setup the canvas view
-      var canvasView = new CanvasView({
-        el: '#canvas-container',
-        model: toolManager
-      }, event_bus);
-
+     
 
       var propertyView = new PropertyView({
         el: '#prop-menu',

@@ -146,7 +146,7 @@ define([
       constraint.create();
       var constraintMap = this.get('constraints');
       constraintMap[constraint.get('id')] = constraint;
-      var constraint_data = {
+      /*var constraint_data = {
         name: 'constraint',
         id: constraint.get('id'),
         relative: constraint.get('relatives').get('id'),
@@ -157,12 +157,13 @@ define([
         rel_prop_key: constraint.get('rel_prop_key'),
         ref_prop_dimensions: constraint.get('ref_prop_dimensions'),
         rel_prop_dimensions: constraint.get('rel_prop_dimensions'),
-      };
+        constraint: constraint;
+      };*/
 
       this.set('currentConstraint', new Constraint());
       this.reset();
       this.trigger('compileRequest');
-      return constraint_data;
+      return constraint;
 
     },
 

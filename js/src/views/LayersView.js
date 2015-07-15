@@ -278,8 +278,8 @@ define([
 				var constraint = this.model.getConstraintById(activeNode.key);
 				var pRef = currentRef;
 				var pRel = currentRel;
-				currentRef = constraint.reference;
-				currentRel = constraint.relative;
+				currentRef = constraint.get('references').get('id');
+				currentRel = constraint.get('relatives').get('id');
 
 				console.log('clicked constraint', activeNode.key, constraint, currentRef, currentRel);
 				activeNode.status = 'opened';
@@ -485,10 +485,10 @@ define([
 			this.deselectAll(constraintRoot);
 			//console.log('constraint', data);
 			var constraintData = {
-				title: data.name,
-				key: data.id,
-				rel: data.relative,
-				ref: data.reference
+				title: data.get('name'),
+				key: data.get('id'),
+				rel: data.get('relatives').get('id'),
+				ref: data.get('references').get('id')
 			};
 			console.log('constraint-data', constraintData);
 			var constraintNode = constraintRoot.addChildren(constraintData);
@@ -496,6 +496,13 @@ define([
 			constraintNode.setActive(true);
 			this.resetConstraintHeight();
 			this.visualizeConstraint();
+		},
+
+		getActiveConstraint: function(){
+			var node = constraintTree.getActiveNode();
+			if(node){
+				return node.key;
+			}
 		},
 
 		removeConstraint: function(pId) {

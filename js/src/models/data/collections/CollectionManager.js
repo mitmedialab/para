@@ -286,8 +286,11 @@ define([
 			}
 		},
 
-
-
+		/*updateMapping: function(selected,values){
+			if(selected.length==1 &&selected[0].get('type')==='collection'){
+				selected[0].setMultipliers(values);
+			}
+		},*/
 
 
 

@@ -269,6 +269,11 @@ define([
 			return null;
 		},
 
+		/*getMultiplier: function used to modify constraints- since instance is not a list, returns 1 by default*/
+		getMultiplier: function(){
+			return 1;
+		},
+
 		toggleOpen: function(item) {
 			return null;
 		},

@@ -66,6 +66,7 @@ define([
 			});
 
 			this.listenTo(collectionManager, 'addToRender', this.addToRenderQueue);
+			this.listenTo(mapView, 'mappingChanged', this.updateMapping);
 
 		},
 
@@ -110,7 +111,7 @@ define([
 		//TODO: move to constraint manager
 		getConstraintById: function(id) {
 			var constraint = constraints.filter(function(constraint) {
-				return constraint.id === id;
+				return constraint.get('id') === id;
 			})[0];
 			return constraint;
 		},
@@ -440,13 +441,13 @@ define([
 		removeConstraint: function(id) {
 			var constraint = this.getConstraintById(id);
 			if (constraint) {
-				var reference = this.getById(constraint.reference);
+				var reference = constraint.get('references');
 
-				var relative = this.getById(constraint.relative);
+				var relative = constraint.get('relatives');
 
-				relative.get(constraint.rel_prop_key).removeConstraint(constraint.rel_prop_dimensions);
+				relative.get(constraint.get('rel_prop_key')).removeConstraint(constraint.rel_prop_dimensions);
 				this.visualizeConstraint();
-				layersView.removeConstraint(constraint.id);
+				layersView.removeConstraint(constraint.get('id'));
 			}
 		},
 
@@ -482,6 +483,9 @@ define([
 				}
 			} else {
 				this._selectSingleShape(data);
+			}
+			if(selected.length==1 &&selected[0].get('type')==='collection'){
+				mapView.setRange(selected[0].members.length);
 			}
 			this.updateLayers();
 			collectionView.toggleCollectionButtons(selected);
@@ -587,6 +591,16 @@ define([
 			});
 
 			layersView.updateSelection(layer_shapes);
+		},
+
+		//event handler called when mapping is changed
+		updateMapping: function(values){
+			var cId = layersView.getActiveConstraint();
+			if(cId){
+				var constraint = this.getConstraintById(cId);
+				constraint.updateMapping(values);
+				this.compile();
+			}
 		},
 
 

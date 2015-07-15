@@ -46,6 +46,8 @@ define([
         this.indexNumbers = [];
         //for storing offsets to be added to constraints to preserve member state
         this.offsets = [];
+        this.multipliers = [];
+
         this.get('scaling_delta').setValue({
           x: 1,
           y: 1
@@ -74,10 +76,6 @@ define([
 
       //overrides ListNode addMember and removeMember functions
       addMember: function(data) {
-        var index = $.inArray(data, this.members);
-        if (index > -1 && index < this.offsets.length) {
-          this.offsets.splice(index, 1);
-        }
         ListNode.prototype.addMember.call(this, data);
         var diff = this.members.length - this.indexNumbers.length;
         for (var i = 0; i < diff; i++) {
@@ -91,11 +89,27 @@ define([
           });
           this.indexNumbers.push(numText);
         }
-        this.offsets.push({});
+        if (data instanceof Array) {
+        for (var j = 0; j < data.length; j++) {
+            this.offsets.push({});
+            this.multipliers.push(1);
+          
+          }
+        }else{
+            this.offsets.push({});
+            this.multipliers.push(1);
+          
+        }
+
       },
 
       removeMember: function(data) {
         data.set('merged', undefined);
+        var memberIndex = _.indexOf(this.members,data);
+        if(memberIndex>-1){
+          this.offsets.splice(memberIndex,1);
+          this.multipliers.splice(memberIndex,1);
+        }
        var member = ListNode.prototype.removeMember.call(this, data);
         var diff = this.indexNumbers.length - this.members.length;
         console.log('diff', diff);
@@ -151,10 +165,28 @@ define([
         }
       },
 
+      /*getMultiplier: 
+      function used to modify constraints- returns value of multiplier at current index of list*/
+      getMultiplier: function(){
+        console.log('index=',this.getIndex(),'multipliers',this.multipliers);
+        return this.multipliers[this.getIndex()];
+      },
+
+      /*setMultipliers
+      sets the values of the multipliers*/
+      setMultipliers: function(values){
+        if(this.multipliers.length!=values.length){
+          console.log('multiplier value mismatch');
+        }
+        for (var i=0;i<values.length;i++){
+          this.multipliers[i] = values[i];
+        }
+      },
+
       compile: function() {
         for (var i = 0; i < this.members.length; i++) {
           var constraint_values = this.getConstraintValues();
-          console.log('list compiled value', constraint_values);
+          console.log('list compiled value', this.getMultiplier());
           this.compileMemberAt(i, constraint_values);
           this.increment();
         }
