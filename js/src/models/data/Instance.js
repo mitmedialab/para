@@ -66,6 +66,7 @@ define([
 			stroke_width: null,
 			path_altered: null,
 			val: null,
+			index: null,
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
@@ -206,6 +207,10 @@ define([
 			path_altered.setNull(true);
 			this.set('path_altered', path_altered);
 
+			var index = new PFloat(0);
+			index.setNull(false);
+			this.set('index',index);
+
 			this.set('id', this.get('type') + '_' + new Date().getTime().toString());
 
 			this.extend(PConstraint);
@@ -269,10 +274,10 @@ define([
 			return null;
 		},
 
-		/*getMultiplier: function used to modify constraints- since instance is not a list, returns 1 by default*/
-		getMultiplier: function(){
-			return 1;
-		},
+		/* getRange: function used to modify constraints mappings for lists*/
+		getRange: function(){
+      		return 1;
+    	},
 
 		toggleOpen: function(item) {
 			return null;
@@ -289,9 +294,7 @@ define([
 			return false;
 		},
 
-		getRange: function(){
-      		return 0;
-    	},
+		
 
 
 		close: function() {

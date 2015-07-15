@@ -89,6 +89,7 @@ define([
 			this.setMin(constraint.getMin());
 			this.setMax(constraint.getMax());
 			this.setRange(constraint.getRange());
+
 		},
 
 		setFunctionPath: function(path){
@@ -100,6 +101,7 @@ define([
 			start = functionPath.segments[0];
 			end = functionPath.segments[functionPath.segments.length-1];
 			paper.project.layers[0].addChild(functionPath);
+			mapView.draw();
 			this.resetMasterView();
 		},
 
@@ -226,7 +228,9 @@ define([
 			if(activePoint.point.y<0){activePoint.point.y=0;}
 			if(activePoint.point.x>width){activePoint.point.x=width;}
 			if(activePoint.point.y>height){activePoint.point.y=height;}
+			self.resetMasterView();
 			self.trigger('mappingChanged',self.calculateValueSet());
+			self.setCollectionView();
 			}
 
 

@@ -364,7 +364,7 @@ define([
 					if (departureNode) {
 						dIndex = departureNode.get('order');
 					}
-					node.set('order', dIndex + node.getIndex());
+					node.set('order', dIndex + node.getChildIndex());
 					renderQueue.push(node);
 					for (var i = 0; i < children.length; i++) {
 						children[i].visit(this, 'visit', node, state_data);
@@ -598,7 +598,7 @@ define([
 			var cId = layersView.getActiveConstraint();
 			if(cId){
 				var constraint = this.getConstraintById(cId);
-				constraint.updateMapping(values);
+				constraint.setMultipliers(values);
 				this.compile();
 			}
 		},

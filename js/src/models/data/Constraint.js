@@ -4,7 +4,8 @@ define([
   'backbone',
   'models/data/paperUI/Arrow',
   'models/data/paperUI/ConstraintHandles',
-], function(_, paper, Backbone, Arrow, ConstraintHandles) {
+  'utils/PFloat'
+], function(_, paper, Backbone, Arrow, ConstraintHandles, PFloat) {
 
   var propConvMap = {
     'position:scale': 0.01,
@@ -79,6 +80,7 @@ define([
       min: -1.5,
       max: 1.5,
       functionPath: null,
+      multiplier: null,
     },
 
     initialize: function() {
@@ -98,10 +100,10 @@ define([
 
       this.set('multipliers', []);
 
-      var start = new paper.Segment(new paper.Point(0, 175));
-      var end = new paper.Segment(new paper.Point(175, 0));
+      var start = new paper.Segment(new paper.Point(0, 175/2));
+      var end = new paper.Segment(new paper.Point(175, 175/2));
       var functionPath = new paper.Path();
-      
+
       functionPath.add(start);
       functionPath.add(end);
       functionPath.strokeColor = new paper.Color(0, 0, 0);
@@ -109,6 +111,21 @@ define([
       functionPath.name = 'functionPath';
       functionPath.remove();
       this.set('functionPath',functionPath);
+      var multiplier = new PFloat(1);
+      multiplier.setNull(false);
+
+      var self = this;
+      var multiplierF = function() {
+        console.log('checking multiplier value');
+        if(self.get('relatives')){
+          var value = self.getMultiplierValue(self.get('relatives').get('index').getValue());
+          multiplier.setValue(value);
+          return value;
+        }
+        return multiplier.getValue();
+      };
+      multiplier.setConstraint(multiplierF);
+      this.set('multiplier',multiplier);
 
     },
 
@@ -404,17 +421,18 @@ define([
       }
       this.set('ref_prop_dimensions', ref_prop[1]);
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
+      var self = this;
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
         var constraintFunctions = [];
         var a_keys = Object.keys(expression);
+      
         for (var i = 0; i < a_keys.length; i++) {
           var axis = a_keys[i];
           var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
           var cf = (function(d, a) {
             return function() {
               var x = (a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
-              var i = relative.getMultiplier();
-
+              var i = self.get('multiplier').getValue();
               console.log('x-val', x, d);
               var y;
               eval(expression[d]);
@@ -451,7 +469,7 @@ define([
             var axis = a_keys[m];
             var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
             var x = (ap === 'v' || !ap) ? refPropAccess.getValue() : refPropAccess[ap].getValue();
-            var i = relative.getMultiplier();
+            var i = self.get('multiplier').getValue();
             var y;
             eval(expression[axis]);
             console.log('y-val', y);
@@ -528,9 +546,14 @@ define([
       return this.get('max');
     },
 
+    getMultiplierValue: function(index){
+      return this.get('multipliers')[index];
+    },
+
     setMultipliers: function(values) {
       this.set('multipliers',values);
       console.log('constraint multipliers',this.get('multipliers'));
+      this.get('multiplier').invalidate();
 
     },
 

@@ -164,7 +164,7 @@ define([
         },
         //returns other nodes with the same parent
         getSiblings: function() {
-            var index = this.getIndex();
+            var index = this.getChildIndex();
             var siblings = this.nodeParent.getChildren();
             var cut = siblings.splice(index, 1);
 
@@ -181,29 +181,29 @@ define([
         setChildBefore: function(child, sibling) {
             if (child.isSibling(sibling)) {
 
-                var childIndex = child.getIndex();
+                var childIndex = child.getChildIndex();
                 console.log('child_index', childIndex);
                 this.children.splice(childIndex, 1);
-                var siblingIndex = sibling.getIndex();
+                var siblingIndex = sibling.getChildIndex();
                 this.children.splice(siblingIndex, 0, child);
-                console.log('child_index', child.getIndex());
+                console.log('child_index', child.getChildIndex());
             }
         },
 
         setChildAfter: function(child, sibling) {
             if (child.isSibling(sibling)) {
                 console.log('num of children',this.children.length);
-                var childIndex = child.getIndex();
+                var childIndex = child.getChildIndex();
                 console.log('child_index', childIndex);
                 this.children.splice(childIndex, 1);
-                var siblingIndex = sibling.getIndex();
+                var siblingIndex = sibling.getChildIndex();
                 this.children.splice(siblingIndex + 1, 0, child);
-                console.log('child_index', child.getIndex());
+                console.log('child_index', child.getChildIndex());
 
             }
         },
 
-        getIndex: function() {
+        getChildIndex: function() {
           return _.indexOf(this.getParentNode().children,this);
         },
 

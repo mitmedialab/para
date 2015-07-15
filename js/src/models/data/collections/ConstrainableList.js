@@ -17,7 +17,6 @@ define([
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'list',
-        index: 0,
       }),
 
       initialize: function() {
@@ -44,9 +43,6 @@ define([
 
         this.set('ui', geom);
         this.indexNumbers = [];
-        //for storing offsets to be added to constraints to preserve member state
-        this.offsets = [];
-        this.multipliers = [];
 
         this.get('scaling_delta').setValue({
           x: 1,
@@ -89,27 +85,12 @@ define([
           });
           this.indexNumbers.push(numText);
         }
-        if (data instanceof Array) {
-        for (var j = 0; j < data.length; j++) {
-            this.offsets.push({});
-            this.multipliers.push(1);
-          
-          }
-        }else{
-            this.offsets.push({});
-            this.multipliers.push(1);
-          
-        }
 
       },
 
       removeMember: function(data) {
         data.set('merged', undefined);
         var memberIndex = _.indexOf(this.members,data);
-        if(memberIndex>-1){
-          this.offsets.splice(memberIndex,1);
-          this.multipliers.splice(memberIndex,1);
-        }
        var member = ListNode.prototype.removeMember.call(this, data);
         var diff = this.indexNumbers.length - this.members.length;
         console.log('diff', diff);
@@ -123,7 +104,7 @@ define([
 
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
-        this.setIndex(0);
+         this.get('index').setValue(0);
         var ui = this.get('ui');
         ui.position.x = 0;
         ui.position.y = 0;
@@ -141,52 +122,24 @@ define([
         ui = null;
        this.members.length = 0;
        this.members = null;
-
-
-      },
-
-      getIndex: function() {
-        return this.get('index');
-      },
-
-      setIndex: function(value) {
-        this.set('index', value);
       },
 
 
       increment: function() {
         var start = 0;
         var end = this.members.length;
-        var index = this.getIndex();
+        var value = this.get('index').getValue();
 
-        if (index < end) {
-          var newIndex = index + 1;
-          this.setIndex(newIndex);
+        if ( value < end) {
+          var newIndex =  value  + 1;
+         this.get('index').setValue(newIndex);
         }
       },
 
-      /*getMultiplier: 
-      function used to modify constraints- returns value of multiplier at current index of list*/
-      getMultiplier: function(){
-        console.log('index=',this.getIndex(),'multipliers',this.multipliers);
-        return this.multipliers[this.getIndex()];
-      },
-
-      /*setMultipliers
-      sets the values of the multipliers*/
-      setMultipliers: function(values){
-        if(this.multipliers.length!=values.length){
-          console.log('multiplier value mismatch');
-        }
-        for (var i=0;i<values.length;i++){
-          this.multipliers[i] = values[i];
-        }
-      },
-
+    
       compile: function() {
         for (var i = 0; i < this.members.length; i++) {
           var constraint_values = this.getConstraintValues();
-          console.log('list compiled value', this.getMultiplier());
           this.compileMemberAt(i, constraint_values);
           this.increment();
         }
