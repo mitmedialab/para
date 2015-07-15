@@ -603,6 +603,10 @@ define([
 			}
 		},
 
+		updateMapView: function(id){
+			var constraint = this.getConstraintById(id);
+			mapView.setConstraint(constraint);
+		},
 
 
 		hideShape: function(shape) {

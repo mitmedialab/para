@@ -40,25 +40,16 @@ define([
 
 			paper.setup($('#collection-canvas')[0]);
 			mapView = paper.View._viewsById['collection-canvas'];
-
-			start = new paper.Segment(new paper.Point(0, height));
-			end = new paper.Segment(new paper.Point(width, 0));
-			functionPath = new paper.Path();
-			functionPath.add(start);
-			functionPath.add(end);
 			intersectionPath = new paper.Path.Line(new paper.Point(width / 2, 0), new paper.Point(width / 2, height));
 			intersectionPath.name = 'intersectionPath';
 
-			functionPath.strokeColor = new paper.Color(0, 0, 0);
-			functionPath.strokeWidth = 2;
-			functionPath.name = 'functionPath';
-			startPoint = new paper.Path.Circle(start.point, 4);
-			startPoint.name = 'start_point';
-			endPoint = new paper.Path.Circle(end.point, 4);
-			endPoint.name = 'end_point';
-			startPoint.fillColor = endPoint.fillColor = new paper.Color(0, 0, 0);
-			startPoint.visible = endPoint.visible = false;
-			functionPath.bringToFront();
+		
+			//startPoint = new paper.Path.Circle(start.point, 4);
+			//startPoint.name = 'start_point';
+			//endPoint = new paper.Path.Circle(end.point, 4);
+			//endPoint.name = 'end_point';
+			//startPoint.fillColor = endPoint.fillColor = new paper.Color(0, 0, 0);
+			//startPoint.visible = endPoint.visible = false;
 			mapView.draw();
 
 			master_tool = paper.tools[0];
@@ -81,13 +72,34 @@ define([
 
 		setToDefault: function() {
 			this.setCollectionView();
-			start.point.x = 0;
-			start.point.y = height / 2;
-			end.point.x = width;
-			end.point.y = height / 2;
+			//start.point.x = 0;
+			//start.point.y = height / 2;
+			//end.point.x = width;
+			//end.point.y = height / 2;
+			if(startPoint){
 			startPoint.position = start.point;
 			endPoint.position = end.point;
+			}
 			mapView.draw();
+			this.resetMasterView();
+		},
+
+		setConstraint:function(constraint){
+			this.setFunctionPath(constraint.getFunctionPath());
+			this.setMin(constraint.getMin());
+			this.setMax(constraint.getMax());
+			this.setRange(constraint.getRange());
+		},
+
+		setFunctionPath: function(path){
+			this.setCollectionView();
+			if(functionPath){
+				functionPath.remove();
+			}
+			functionPath = path;
+			start = functionPath.segments[0];
+			end = functionPath.segments[functionPath.segments.length-1];
+			paper.project.layers[0].addChild(functionPath);
 			this.resetMasterView();
 		},
 
@@ -167,7 +179,7 @@ define([
 
 		mouseEnter: function() {
 			this.setCollectionView();
-			functionPath.fullySelected = true;
+			//functionPath.fullySelected = true;
 
 		},
 

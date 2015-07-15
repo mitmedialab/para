@@ -275,12 +275,12 @@ define([
 		visualizeConstraint: function() {
 			var activeNode = constraintTree.getActiveNode();
 			if (activeNode) {
+				this.model.updateMapView(activeNode.key);
 				var constraint = this.model.getConstraintById(activeNode.key);
 				var pRef = currentRef;
 				var pRel = currentRel;
 				currentRef = constraint.get('references').get('id');
 				currentRel = constraint.get('relatives').get('id');
-
 				console.log('clicked constraint', activeNode.key, constraint, currentRef, currentRel);
 				activeNode.status = 'opened';
 				this.positionConstraintIcons();

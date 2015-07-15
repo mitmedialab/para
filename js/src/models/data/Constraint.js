@@ -73,8 +73,12 @@ define([
 
       // derived state
       constraintFuncs: null,
-      name:'constraint',
-      type:'constraint'
+      name: 'constraint',
+      type: 'constraint',
+      multipliers: null,
+      min: -1.5,
+      max: 1.5,
+      functionPath: null,
     },
 
     initialize: function() {
@@ -90,11 +94,26 @@ define([
         side: 'rel',
         color: '#9717fc'
       }));
-      this.set('id', this.get('type')+'_'+new Date().getTime().toString());
+      this.set('id', this.get('type') + '_' + new Date().getTime().toString());
+
+      this.set('multipliers', []);
+
+      var start = new paper.Segment(new paper.Point(0, 175));
+      var end = new paper.Segment(new paper.Point(175, 0));
+      var functionPath = new paper.Path();
+      
+      functionPath.add(start);
+      functionPath.add(end);
+      functionPath.strokeColor = new paper.Color(0, 0, 0);
+      functionPath.strokeWidth = 2;
+      functionPath.name = 'functionPath';
+      functionPath.remove();
+      this.set('functionPath',functionPath);
+
     },
 
     setSelection: function(selected, type) {
-      console.log('setting selection',selected,type);
+      console.log('setting selection', selected, type);
       if (this.get('references') && this.get('relatives')) {
         console.log('[ERROR] References and relatives already set.');
       }
@@ -108,7 +127,7 @@ define([
         }
       }
       var instance = selected[0];
-      console.log('set selection',instance.get('type'),instance.get('name'),instance);
+      console.log('set selection', instance.get('type'), instance.get('name'), instance);
       instance.set('selected', false);
       if (this.get('relatives')) {
         if (this.get('references')) {
@@ -130,11 +149,11 @@ define([
 
         //start of the proxy code: try to remove this //
         var proxy = relatives.getShapeClone();
-         var targetLayer = paper.project.layers.filter(function(layer) {
-        return layer.name === 'geometry_layer';
-      })[0];
-      targetLayer.addChild(proxy);
-        console.log('proxy created',proxy);
+        var targetLayer = paper.project.layers.filter(function(layer) {
+          return layer.name === 'geometry_layer';
+        })[0];
+        targetLayer.addChild(proxy);
+        console.log('proxy created', proxy);
         proxy.name = 'proxy';
         proxy.visible = false;
         proxy.show = function() {
@@ -341,14 +360,16 @@ define([
         };
 
         this.set('proxy', proxy);
-      
+
         return true;
       }
       if (this.get('relatives')) {
         this.get('relatives').set('constraint_selected', undefined);
+        
 
       }
       this.set('relatives', instance);
+      this.setMultiplierLength();
       instance.set('constraint_selected', 'relative_selected');
       this.set('rel_type', type);
       return false;
@@ -378,8 +399,8 @@ define([
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
       this.set('ref_prop_key', constraintPropMap[ref_prop[0]]);
       this.set('rel_prop_key', constraintPropMap[ref_prop[0]]);
-      if(rel_prop){
-        this.set('rel_prop_dimensions', rel_prop[1]); 
+      if (rel_prop) {
+        this.set('rel_prop_dimensions', rel_prop[1]);
       }
       this.set('ref_prop_dimensions', ref_prop[1]);
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
@@ -488,6 +509,57 @@ define([
     reset: function() {
 
       this.clear().set(this.defaults);
+    },
+
+
+    /* functions for getting and setting info related to mapping */
+    setMin: function(val) {
+      this.set('min', val);
+    },
+    setMax: function(val) {
+      this.set('max', val);
+    },
+
+    getMin: function() {
+      return this.get('min');
+    },
+
+    getMax: function() {
+      return this.get('max');
+    },
+
+    setMultipliers: function(values) {
+      this.set('multipliers',values);
+      console.log('constraint multipliers',this.get('multipliers'));
+
+    },
+
+    setMultiplierLength:function(){
+      var multipliers = this.get('multipliers');
+      if(multipliers.length===0){
+       multipliers.push(1);
+      }
+       var diff = multipliers.length-this.get('relatives').getRange();
+      if(diff>0){
+         for (var i = 0; i < diff; i++) {
+          multipliers.pop();
+          
+        }
+      }
+      else if(diff<0){
+        for (var j = 0; j < -diff; j++) {
+          var last = multipliers[multipliers.length-1];
+          multipliers.push(last);
+        }
+      }
+    },
+
+    getRange: function() {
+      return this.get('multipliers').length;
+    },
+
+    getFunctionPath: function(){
+      return this.get('functionPath');
     }
 
   });

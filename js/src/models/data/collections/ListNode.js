@@ -484,6 +484,10 @@ define([
       this.set('selection_clone', selection_clone);
     },
 
+    getRange: function(){
+      return this.members.length;
+    }
+
 
   });
 

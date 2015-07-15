@@ -289,6 +289,10 @@ define([
 			return false;
 		},
 
+		getRange: function(){
+      		return 0;
+    	},
+
 
 		close: function() {
 			return this.getParentNode();
