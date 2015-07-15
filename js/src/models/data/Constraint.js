@@ -206,7 +206,7 @@ define([
           var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : ['v'];
           console.log('ref_dimensions', ref_dimensions, ref_dimensions.length, 'rel_dimensions', rel_dimensions, rel_dimensions.length);
 
-          var propSwitch = function(prop, side) {
+          var propSwitch = function(prop, side, index) {
             console.log('prop value', prop, side);
             var propValue, geom, instance;
             if (side == 'ref') {
@@ -215,7 +215,12 @@ define([
             }
             if (side == 'rel') {
               geom = proxy;
-              instance = relatives;
+              if (relatives.members) {
+                instance = relatives.members[index];
+              } else {
+                instance = relatives;
+              }
+
             }
             switch (prop) {
               case 'scale_x':
@@ -228,83 +233,80 @@ define([
                 propValue = instance.accessProperty('scaling_delta');
                 break;
               case 'position_x':
-                propValue = geom.position.x;
+                propValue = instance.accessProperty('translation_delta').x;
                 break;
               case 'position_y':
-                propValue = geom.position.y;
+                propValue = instance.accessProperty('translation_delta').y;
                 break;
               case 'position_xy':
-                propValue = {
-                  x: geom.position.x,
-                  y: geom.position.y
-                };
+                propValue = instance.accessProperty('translation_delta');
                 break;
               case 'fill_h':
-                propValue = geom.fillColor.hue;
+                propValue = instance.accessProperty('fill_color').h;
                 break;
               case 'fill_s':
-                propValue = geom.fillColor.saturation;
+                propValue = instance.accessProperty('fill_color').s;
                 break;
               case 'fill_l':
-                propValue = geom.fillColor.brightness;
+                propValue = instance.accessProperty('fill_color').l;
                 break;
               case 'fill_hs':
                 propValue = {
-                  h: geom.fillColor.hue,
-                  s: geom.fillColor.saturation
+                  h: instance.accessProperty('fill_color').h,
+                  s: instance.accessProperty('fill_color').s
                 };
                 break;
               case 'fill_sl':
                 propValue = {
-                  s: geom.fillColor.saturation,
-                  l: geom.fillColor.brightness
+                  s: instance.accessProperty('fill_color').s,
+                  l: instance.accessProperty('fill_color').l
                 };
                 break;
               case 'fill_hl':
                 propValue = {
-                  h: geom.fillColor.hue,
-                  l: geom.fillColor.brightness,
+                  h: instance.accessProperty('fill_color').h,
+                  l: instance.accessProperty('fill_color').l
                 };
                 break;
               case 'fill_hsl':
                 propValue = {
-                  h: geom.fillColor.hue,
-                  s: geom.fillColor.saturation,
-                  l: geom.fillColor.brightness,
+                  h: instance.accessProperty('fill_color').h,
+                  s: instance.accessProperty('fill_color').s,
+                  l: instance.accessProperty('fill_color').l
                 };
                 break;
               case 'stroke_h':
-                propValue = geom.fillColor.hue;
+                propValue = instance.accessProperty('stroke_color').h;
                 break;
               case 'stroke_s':
-                propValue = geom.fillColor.saturation;
+                propValue =instance.accessProperty('stroke_color').s;
                 break;
               case 'stroke_l':
-                propValue = geom.fillColor.brightness;
+                propValue = instance.accessProperty('stroke_color').l;
                 break;
               case 'stroke_hs':
                 propValue = {
-                  h: geom.fillColor.hue,
-                  s: geom.fillColor.saturation
+                  h: instance.accessProperty('stroke_color').h,
+                  s: instance.accessProperty('stroke_color').s
                 };
                 break;
               case 'stroke_sl':
                 propValue = {
-                  s: geom.fillColor.saturation,
-                  l: geom.fillColor.brightness
+                  s: instance.accessProperty('stroke_color').s,
+                  l: instance.accessProperty('stroke_color').l
                 };
                 break;
               case 'stroke_hl':
                 propValue = {
-                  h: geom.fillColor.hue,
-                  l: geom.fillColor.brightness,
+                  h: instance.accessProperty('stroke_color').h,
+                  l: instance.accessProperty('stroke_color').l
                 };
                 break;
               case 'stroke_hsl':
                 propValue = {
-                  h: geom.fillColor.hue,
-                  s: geom.fillColor.saturation,
-                  l: geom.fillColor.brightness,
+                  h: instance.accessProperty('stroke_color').h,
+                  s: instance.accessProperty('stroke_color').s,
+                  l: instance.accessProperty('stroke_color').l
                 };
                 break;
               case 'rotation':
@@ -314,7 +316,7 @@ define([
             return propValue;
           };
           refPropValue = propSwitch(ref_prop, 'ref');
-          relPropValue = propSwitch(rel_prop, 'rel');
+          // relPropValue = propSwitch(rel_prop, 'rel');
 
           var ref_prop_strip = ref_prop.split('_')[0];
           var rel_prop_strip = rel_prop.split('_')[0];
@@ -323,12 +325,13 @@ define([
           var offset = {};
           var keys;
           var relativeRange = relatives.getRange();
-
           if (ref_dimensions.length === rel_dimensions.length) {
             console.log('dimensions are equal');
             if (ref_dimensions.length == 1) {
               offset[rel_dimensions[0]] = [];
               for (var n = 0; n < relativeRange; n++) {
+                relPropValue = propSwitch(rel_prop, 'rel', n);
+
                 conversion = refPropValue * convertFactor;
                 offset[rel_dimensions[0]].push(relPropValue - conversion);
                 console.log('refPropValue', refPropValue, 'conversion', conversion);
@@ -338,6 +341,7 @@ define([
               for (var i = 0; i < rel_dimensions.length; i++) {
                 offset[rel_dimensions[i]] = [];
                 for (var p = 0; p < relativeRange; p++) {
+                  relPropValue = propSwitch(rel_prop, 'rel', p);
                   console.log('refPropValue', refPropValue, ref_dimensions[i],
                     'convert factor:', convertFactor);
                   conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
@@ -352,13 +356,18 @@ define([
               keys = Object.keys(refPropValue);
               offset[rel_dimensions[0]] = [];
               for (var q = 0; q < relativeRange; q++) {
+                relPropValue = propSwitch(rel_prop, 'rel', q);
                 conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
                 offset[rel_dimensions[0]].push(relPropValue - conversion);
               }
             } else {
               for (var j = 0; j < rel_dimensions.length; j++) {
-                conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]] * convertFactor : refPropValue[keys[j]] * convertFactor;
-                offset[rel_dimensions[j]] = relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]];
+                offset[rel_dimensions[j]] = [];
+                for (var t = 0; t < relativeRange; t++) {
+                  relPropValue = propSwitch(rel_prop, 'rel', t);
+                  conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]] * convertFactor : refPropValue[keys[j]] * convertFactor;
+                  offset[rel_dimensions[j]].push(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
+                }
               }
             }
           } else if (ref_dimensions.length < rel_dimensions.length) {
@@ -366,6 +375,7 @@ define([
               for (var k = 0; k < rel_dimensions.length; k++) {
                 offset[rel_dimensions[k]] = [];
                 for (var r = 0; r < relativeRange; r++) {
+                  relPropValue = propSwitch(rel_prop, 'rel', r);
                   conversion[rel_dimensions[k]] = refPropValue * convertFactor;
                   offset[rel_dimensions[k]].push(relPropValue[rel_dimensions[k]] - conversion[rel_dimensions[k]]);
                 }
@@ -384,13 +394,13 @@ define([
 
 
           console.log('offset', offset, 'conversion', conversion);
-          self.set('offset',offset);
+          self.set('offset', offset);
 
           var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x' + '*' + 'i';
           var exp_object = {};
           for (var axis in offset) {
             if (offset.hasOwnProperty(axis)) {
-              exp_object[axis] = exp_scale + ' + ' + 'offsetValue';//offset[axis].toString()';
+              exp_object[axis] = exp_scale + ' + ' + 'offsetValue'; //offset[axis].toString()';
             }
           }
           console.log('expression object', exp_object);
@@ -403,9 +413,8 @@ define([
       }
       if (this.get('relatives')) {
         this.get('relatives').set('constraint_selected', undefined);
-
-
       }
+
       this.set('relatives', instance);
       this.setMultiplierLength();
       instance.set('constraint_selected', 'relative_selected');
@@ -444,7 +453,7 @@ define([
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
       var self = this;
       var offset = this.get('offset');
-      console.log('offset = ',offset);
+      console.log('offset = ', offset);
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
         var constraintFunctions = [];
         var a_keys = Object.keys(expression);
