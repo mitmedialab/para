@@ -81,6 +81,7 @@ define([
       max: 1.5,
       functionPath: null,
       multiplier: null,
+      offset: null,
     },
 
     initialize: function() {
@@ -100,8 +101,8 @@ define([
 
       this.set('multipliers', []);
 
-      var start = new paper.Segment(new paper.Point(0, 175/2));
-      var end = new paper.Segment(new paper.Point(175, 175/2));
+      var start = new paper.Segment(new paper.Point(0, 175 / 2));
+      var end = new paper.Segment(new paper.Point(175, 175 / 2));
       var functionPath = new paper.Path();
 
       functionPath.add(start);
@@ -110,14 +111,14 @@ define([
       functionPath.strokeWidth = 2;
       functionPath.name = 'functionPath';
       functionPath.remove();
-      this.set('functionPath',functionPath);
+      this.set('functionPath', functionPath);
       var multiplier = new PFloat(1);
       multiplier.setNull(false);
 
       var self = this;
       var multiplierF = function() {
         console.log('checking multiplier value');
-        if(self.get('relatives')){
+        if (self.get('relatives')) {
           var value = self.getMultiplierValue(self.get('relatives').get('index').getValue());
           multiplier.setValue(value);
           return value;
@@ -125,7 +126,7 @@ define([
         return multiplier.getValue();
       };
       multiplier.setConstraint(multiplierF);
-      this.set('multiplier',multiplier);
+      this.set('multiplier', multiplier);
 
     },
 
@@ -173,6 +174,7 @@ define([
         console.log('proxy created', proxy);
         proxy.name = 'proxy';
         proxy.visible = false;
+        var self = this;
         proxy.show = function() {
           relatives.hide();
           proxy.visible = true;
@@ -320,29 +322,39 @@ define([
           var conversion = {};
           var offset = {};
           var keys;
+          var relativeRange = relatives.getRange();
 
           if (ref_dimensions.length === rel_dimensions.length) {
             console.log('dimensions are equal');
             if (ref_dimensions.length == 1) {
-              conversion = refPropValue * convertFactor;
-              offset[rel_dimensions[0]] = relPropValue - conversion;
-
-              console.log('refPropValue', refPropValue, 'conversion', conversion);
+              offset[rel_dimensions[0]] = [];
+              for (var n = 0; n < relativeRange; n++) {
+                conversion = refPropValue * convertFactor;
+                offset[rel_dimensions[0]].push(relPropValue - conversion);
+                console.log('refPropValue', refPropValue, 'conversion', conversion);
+              }
             } else {
 
               for (var i = 0; i < rel_dimensions.length; i++) {
-                console.log('refPropValue', refPropValue, ref_dimensions[i],
-                  'convert factor:', convertFactor);
-                conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
-                offset[rel_dimensions[i]] = relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]];
+                offset[rel_dimensions[i]] = [];
+                for (var p = 0; p < relativeRange; p++) {
+                  console.log('refPropValue', refPropValue, ref_dimensions[i],
+                    'convert factor:', convertFactor);
+                  conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
+                  offset[rel_dimensions[i]].push(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
+                }
               }
 
             }
           } else if (ref_dimensions.length > rel_dimensions.length) {
             if (rel_dimensions.length == 1) {
+
               keys = Object.keys(refPropValue);
-              conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
-              offset[rel_dimensions[0]] = relPropValue - conversion;
+              offset[rel_dimensions[0]] = [];
+              for (var q = 0; q < relativeRange; q++) {
+                conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
+                offset[rel_dimensions[0]].push(relPropValue - conversion);
+              }
             } else {
               for (var j = 0; j < rel_dimensions.length; j++) {
                 conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]] * convertFactor : refPropValue[keys[j]] * convertFactor;
@@ -352,24 +364,33 @@ define([
           } else if (ref_dimensions.length < rel_dimensions.length) {
             if (ref_dimensions.length == 1) {
               for (var k = 0; k < rel_dimensions.length; k++) {
-                conversion[rel_dimensions[k]] = refPropValue * convertFactor;
-                offset[rel_dimensions[k]] = relPropValue[rel_dimensions[k]] - conversion[rel_dimensions[k]];
+                offset[rel_dimensions[k]] = [];
+                for (var r = 0; r < relativeRange; r++) {
+                  conversion[rel_dimensions[k]] = refPropValue * convertFactor;
+                  offset[rel_dimensions[k]].push(relPropValue[rel_dimensions[k]] - conversion[rel_dimensions[k]]);
+                }
               }
             } else {
               keys = Object.keys(refPropValue);
               for (var m = 0; m < rel_dimensions.length; m++) {
-                conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]] * convertFactor : (m < keys.length) ? refPropValue[keys[m]] * convertFactor : refPropValue[keys[keys.length - 1]];
-                offset[rel_dimensions[m]] = relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]];
+                offset[rel_dimensions[m]] = [];
+                for (var s = 0; s < relativeRange; s++) {
+                  conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]] * convertFactor : (m < keys.length) ? refPropValue[keys[m]] * convertFactor : refPropValue[keys[keys.length - 1]];
+                  offset[rel_dimensions[m]].push(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
+                }
               }
             }
           }
 
+
           console.log('offset', offset, 'conversion', conversion);
+          self.set('offset',offset);
+
           var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x' + '*' + 'i';
           var exp_object = {};
           for (var axis in offset) {
             if (offset.hasOwnProperty(axis)) {
-              exp_object[axis] = exp_scale + ' + ' + offset[axis].toString();
+              exp_object[axis] = exp_scale + ' + ' + 'offsetValue';//offset[axis].toString()';
             }
           }
           console.log('expression object', exp_object);
@@ -382,7 +403,7 @@ define([
       }
       if (this.get('relatives')) {
         this.get('relatives').set('constraint_selected', undefined);
-        
+
 
       }
       this.set('relatives', instance);
@@ -422,16 +443,19 @@ define([
       this.set('ref_prop_dimensions', ref_prop[1]);
       console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
       var self = this;
+      var offset = this.get('offset');
+      console.log('offset = ',offset);
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
         var constraintFunctions = [];
         var a_keys = Object.keys(expression);
-      
+
         for (var i = 0; i < a_keys.length; i++) {
           var axis = a_keys[i];
           var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
           var cf = (function(d, a) {
             return function() {
               var x = (a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
+              var offsetValue = offset[axis][relative.get('index').getValue()];
               var i = self.get('multiplier').getValue();
               console.log('x-val', x, d);
               var y;
@@ -469,6 +493,7 @@ define([
             var axis = a_keys[m];
             var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
             var x = (ap === 'v' || !ap) ? refPropAccess.getValue() : refPropAccess[ap].getValue();
+            var offsetValue = offset[axis][relative.get('index').getValue()];
             var i = self.get('multiplier').getValue();
             var y;
             eval(expression[axis]);
@@ -546,32 +571,31 @@ define([
       return this.get('max');
     },
 
-    getMultiplierValue: function(index){
+    getMultiplierValue: function(index) {
       return this.get('multipliers')[index];
     },
 
     setMultipliers: function(values) {
-      this.set('multipliers',values);
-      console.log('constraint multipliers',this.get('multipliers'));
+      this.set('multipliers', values);
+      console.log('constraint multipliers', this.get('multipliers'));
       this.get('multiplier').invalidate();
 
     },
 
-    setMultiplierLength:function(){
+    setMultiplierLength: function() {
       var multipliers = this.get('multipliers');
-      if(multipliers.length===0){
-       multipliers.push(1);
+      if (multipliers.length === 0) {
+        multipliers.push(1);
       }
-       var diff = multipliers.length-this.get('relatives').getRange();
-      if(diff>0){
-         for (var i = 0; i < diff; i++) {
+      var diff = multipliers.length - this.get('relatives').getRange();
+      if (diff > 0) {
+        for (var i = 0; i < diff; i++) {
           multipliers.pop();
-          
+
         }
-      }
-      else if(diff<0){
+      } else if (diff < 0) {
         for (var j = 0; j < -diff; j++) {
-          var last = multipliers[multipliers.length-1];
+          var last = multipliers[multipliers.length - 1];
           multipliers.push(last);
         }
       }
@@ -581,7 +605,7 @@ define([
       return this.get('multipliers').length;
     },
 
-    getFunctionPath: function(){
+    getFunctionPath: function() {
       return this.get('functionPath');
     }
 
