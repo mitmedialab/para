@@ -208,7 +208,11 @@ define([
 		addToOpenLists: function(instance) {
 			var addedToList = false;
 			for (var i = 0; i < lists.length; i++) {
-				addedToList = addedToList ? true : lists[i].addMemberToOpen(instance);
+				var added = lists[i].addMemberToOpen(instance);
+				if(added){
+					this.trigger('listLengthChange',lists[i]);
+				}
+				addedToList = addedToList ? true : added;
 			}
 			return addedToList;
 		},

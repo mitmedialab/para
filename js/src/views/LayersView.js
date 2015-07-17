@@ -275,7 +275,7 @@ define([
 		visualizeConstraint: function() {
 			var activeNode = constraintTree.getActiveNode();
 			if (activeNode) {
-				this.model.updateMapView(activeNode.key);
+				//this.model.updateMapView(activeNode.key);
 				var constraint = this.model.getConstraintById(activeNode.key);
 				var pRef = currentRef;
 				var pRel = currentRel;

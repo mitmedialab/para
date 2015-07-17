@@ -209,7 +209,7 @@ define([
 
 			var index = new PFloat(0);
 			index.setNull(false);
-			this.set('index',index);
+			this.set('index', index);
 
 			this.set('id', this.get('type') + '_' + new Date().getTime().toString());
 
@@ -275,9 +275,9 @@ define([
 		},
 
 		/* getRange: function used to modify constraints mappings for lists*/
-		getRange: function(){
-      		return 1;
-    	},
+		getRange: function() {
+			return 1;
+		},
 
 		toggleOpen: function(item) {
 			return null;
@@ -294,7 +294,7 @@ define([
 			return false;
 		},
 
-		
+
 
 
 		close: function() {
@@ -388,7 +388,7 @@ define([
 				this.get('inheritor_bbox').remove();
 			}
 
-			
+
 
 			this._ti_matrix = this._translation_delta.inverted();
 			this._ri_matrix = this._rotation_delta.inverted();
@@ -405,7 +405,7 @@ define([
 		selectionChange: function() {
 			if (!this.get('selected')) {
 				if (this.get('bbox')) {
-		//			this.get('bbox').visible = false;
+					//			this.get('bbox').visible = false;
 				}
 			}
 		},
@@ -687,8 +687,6 @@ define([
 		modifyPriorToCompile: function(data) {
 			var value = this.getValue();
 			var merged = TrigFunc.merge(value, data);
-
-			console.log('merged-value', merged);
 			this.set('merged', merged);
 		},
 
@@ -1055,6 +1053,7 @@ define([
 				rotation_delta = this.accessProperty('rotation_delta');
 				translation_delta = this.accessProperty('translation_delta');
 			} else {
+
 				scaling_delta = merged.scaling_delta;
 				rotation_delta = merged.rotation_delta;
 				translation_delta = merged.translation_delta;
@@ -1106,7 +1105,7 @@ define([
 					}
 
 					this.set('rendered', true);
-				
+
 
 				}
 				return 'root';
@@ -1115,19 +1114,33 @@ define([
 
 
 		renderStyle: function(geom) {
-			geom.fillColor.hue = this._fill_color.h;
-			geom.fillColor.saturation = this._fill_color.s;
-			geom.fillColor.lightness = this._fill_color.l;
-			geom.fillColor.alpha = this._fill_color.a;
-
-			geom.strokeColor.hue = this._stroke_color.h;
-			geom.strokeColor.saturation = this._stroke_color.s;
-			geom.strokeColor.lightness = this._stroke_color.l;
-			geom.strokeColor.alpha = this._stroke_color.a;
-			geom.strokeColor.alpha = this._stroke_color.a;
+			if (!this._fill_color.noColor) {
+				if(!geom.fillColor){
+					geom.fillColor = new paper.Color(0,0,0);
+				}
+				geom.fillColor.hue = this._fill_color.h;
+				geom.fillColor.saturation = this._fill_color.s;
+				geom.fillColor.lightness = this._fill_color.l;
+				geom.fillColor.alpha = this._fill_color.a;
+			} else {
+				geom.fillColor = undefined;
+			}
+			if (!this._stroke_color.noColor) {
+				if(!geom.fillColor){
+					geom.strokeColor = new paper.Color(0,0,0);
+				}
+				geom.strokeColor.hue = this._stroke_color.h;
+				geom.strokeColor.saturation = this._stroke_color.s;
+				geom.strokeColor.lightness = this._stroke_color.l;
+				geom.strokeColor.alpha = this._stroke_color.a;
+				geom.strokeColor.alpha = this._stroke_color.a;
+			} else {
+				geom.strokeColor = undefined;
+			}
 
 			geom.strokeWidth = this._stroke_width;
 			geom.visible = this._visible;
+
 		},
 
 		renderInheritorBoundingBox: function(geom) {
@@ -1167,12 +1180,12 @@ define([
 			var inheritor_selected = this.get('inheritor_selected');
 			var constraint_selected = this.get('constraint_selected');
 			var bbox, inheritor_bbox;
-			
+
 			var selection_clone = this.get('selection_clone');
-			console.log('rendering selection',this.get('id'));
+			console.log('rendering selection', this.get('id'));
 
 			if (constraint_selected) {
-			console.log('rendering selection clone',this.get('id'));
+				console.log('rendering selection clone', this.get('id'));
 				if (!selection_clone) {
 					this.createSelectionClone();
 					selection_clone = this.get('selection_clone');
@@ -1182,20 +1195,20 @@ define([
 
 			} else {
 				selection_clone.visible = false;
-			console.log('hiding selection clone',this.get('id'));
+				console.log('hiding selection clone', this.get('id'));
 
 			}
 
 			if (selected) {
-	
-				geom.selectedColor =  this.getSelectionColor();
+
+				geom.selectedColor = this.getSelectionColor();
 				bbox = this.get('bbox');
 				bbox.selectedColor = this.getSelectionColor();
-				bbox.selected = (constraint_selected)? false:true;
-				bbox.visible = (constraint_selected)? false:true;
-				geom.selected = (constraint_selected)? false:true;
+				bbox.selected = (constraint_selected) ? false : true;
+				bbox.visible = (constraint_selected) ? false : true;
+				geom.selected = (constraint_selected) ? false : true;
 				inheritor_bbox = this.renderInheritorBoundingBox();
-				console.log('selected bbox',bbox);
+				console.log('selected bbox', bbox);
 
 				if (inheritor_bbox) {
 					inheritor_bbox.selectedColor = this.get('inheritance_selection_color');
@@ -1209,8 +1222,8 @@ define([
 			if (inheritor_selected) {
 				geom.selectedColor = this.get('proxy_selection_color');
 				geom.selected = inheritor_selected;
-				bbox.selectedColor = this.get('proxy_selection_color');
-				bbox.selected = true;
+				//bbox.selectedColor = this.get('proxy_selection_color');
+				//	bbox.selected = true;
 				if (inheritor_selected === 'proxy') {
 					if (!inheritor_bbox) {
 						inheritor_bbox = this.renderInheritorBoundingBox();
@@ -1222,7 +1235,7 @@ define([
 				}
 
 			}
-		
+
 		},
 
 
@@ -1234,6 +1247,17 @@ define([
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
 
+			if (!bbox) {
+					var size = new paper.Size(geom.bounds.width, geom.bounds.height);
+
+					bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
+					bbox.data.instance = this;
+					this.set('bbox', bbox);
+					var targetLayer = paper.project.layers.filter(function(layer) {
+						return layer.name === 'ui_layer';
+					})[0];
+					targetLayer.addChild(bbox);
+				}
 			if (!path_altered) {
 				//geom.transform(this._itemp_matrix);
 				geom.transform(this._ti_matrix);
@@ -1255,17 +1279,6 @@ define([
 				}
 
 
-				if (!bbox) {
-					var size = new paper.Size(geom.bounds.width, geom.bounds.height);
-
-					bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
-					bbox.data.instance = this;
-					this.set('bbox', bbox);
-					var targetLayer = paper.project.layers.filter(function(layer) {
-						return layer.name === 'ui_layer';
-					})[0];
-					targetLayer.addChild(bbox);
-				}
 			}
 
 			var position = this.get('position').toPaperPoint();

@@ -447,12 +447,12 @@ define([
         applyClick(rel_target, rel_geom, 'rel');
         constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
-        constraint.get('proxy').matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
+        //constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
       } else {
         applyClick(rel_target, rel_geom, 'rel');
         constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
-        constraint.get('proxy').matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
+        //constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
       }
 
     },

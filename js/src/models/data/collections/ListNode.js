@@ -68,25 +68,14 @@ define([
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
     addMember: function(data) {
-      var translation_delta = this.accessProperty('translation_delta');
-      var neg_delta = {
-        x: -translation_delta.x,
-        y: -translation_delta.y
-      };
+  
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
 
-          data[i].modifyProperty({
-            'translation_delta': neg_delta
-          });
           this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
         }
       } else {
-
-        data.modifyProperty({
-          'translation_delta': neg_delta
-        });
         this.listenTo(data, 'delete', this.deleteMember);
         this.members.push(data);
       }
@@ -184,9 +173,6 @@ define([
       var index = $.inArray(data, this.members);
       if (index >-1) {
         var member = this.members.splice(index, 1)[0];
-        member.modifyProperty({
-          'translation_delta': this.accessProperty('translation_delta')
-        });
         var md = {};
         md.member_count = {
           val: this.members.length,

@@ -21,7 +21,6 @@ define([
 
       initialize: function() {
         ListNode.prototype.initialize.apply(this, arguments);
-        this.get('translation_delta').setNull(false);
         //code for creating list UI
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
         var path = new paper.Path.Rectangle(rectangle);
@@ -34,6 +33,7 @@ define([
           fontSize: 12,
           fontFamily: 'Source Sans Pro',
           fillColor: this.get('primary_selection_color')
+
         });
 
         var geom = new paper.Group();
@@ -49,6 +49,7 @@ define([
           y: 1
         });
         console.log('list scale:', this.accessProperty('scaling_delta'));
+       console.log('translation_delta_list',this.accessProperty('translation_delta'));
 
       },
 
@@ -90,8 +91,8 @@ define([
 
       removeMember: function(data) {
         data.set('merged', undefined);
-        var memberIndex = _.indexOf(this.members,data);
-       var member = ListNode.prototype.removeMember.call(this, data);
+        var memberIndex = _.indexOf(this.members, data);
+        var member = ListNode.prototype.removeMember.call(this, data);
         var diff = this.indexNumbers.length - this.members.length;
         console.log('diff', diff);
         for (var i = 0; i < diff; i++) {
@@ -104,24 +105,24 @@ define([
 
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
-         this.get('index').setValue(0);
+        this.get('index').setValue(0);
         var ui = this.get('ui');
         ui.position.x = 0;
         ui.position.y = 0;
 
       },
 
-      deleteSelf: function(){
+      deleteSelf: function() {
         var bbox = this.get('bbox');
-        if(bbox){
+        if (bbox) {
           bbox.remove();
           bbox = null;
         }
         var ui = this.get('ui');
         ui.remove();
         ui = null;
-       this.members.length = 0;
-       this.members = null;
+        this.members.length = 0;
+        this.members = null;
       },
 
 
@@ -130,28 +131,30 @@ define([
         var end = this.members.length;
         var value = this.get('index').getValue();
 
-        if ( value < end) {
-          var newIndex =  value  + 1;
-         this.get('index').setValue(newIndex);
+        if (value < end) {
+          var newIndex = value + 1;
+          this.get('index').setValue(newIndex);
         }
       },
 
-    
+
       compile: function() {
         for (var i = 0; i < this.members.length; i++) {
-          var constraint_values = this.getConstraintValues();
+          var constraint_values = this.get('merged') ? this.get('merged') : this.getConstraintValues();
           this.compileMemberAt(i, constraint_values);
           this.increment();
         }
       },
 
+      modifyPriorToCompile: function(data) {
+        var value = this.getConstraintValues();
+        var merged = TrigFunc.merge(value,data);
+      },
 
       compileMemberAt: function(index, data) {
         var member = this.members[index];
         member.modifyPriorToCompile(data);
       },
-
-
 
       //renders the List UI
       render: function() {
@@ -202,7 +205,7 @@ define([
           } else {
             ui.visible = false;
           }
-      
+
           bbox.selectedColor = this.getSelectionColor();
           bbox.selected = this.get('selected');
           bbox.visible = this.get('selected');

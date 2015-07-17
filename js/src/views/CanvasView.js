@@ -178,7 +178,7 @@ define([
       }*/
 
       if (event.keyCode == functionKey) {
-        this.model.createFunction();
+        //this.model.createFunction();
       }
       if (event.keyCode == paramKey) {
         this.model.createParams();

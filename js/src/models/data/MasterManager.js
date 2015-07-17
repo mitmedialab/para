@@ -62,11 +62,12 @@ define([
 				model: this
 			});
 			mapView = new MapView({
-				model:this
+				model: this
 			});
 
 			this.listenTo(collectionManager, 'addToRender', this.addToRenderQueue);
-			this.listenTo(mapView, 'mappingChanged', this.updateMapping);
+			this.listenTo(collectionManager, 'listLengthChange', this.updateListConstraints);
+
 
 		},
 
@@ -115,6 +116,21 @@ define([
 			})[0];
 			return constraint;
 		},
+
+		getConstraintsByRelative: function(relative) {
+			var rel_constraints = constraints.filter(function(constraint) {
+				return constraint.get('relatives') === relative;
+			});
+			return rel_constraints;
+		},
+
+		getConstraintsByReference: function(reference) {
+			var ref_constraints = constraints.filter(function(constraint) {
+				return constraint.get('references') === reference;
+			});
+			return ref_constraints;
+		},
+
 
 		//TODO: move to constraint manager
 		visualizeConstraint: function(ref, rel, pref, prel) {
@@ -200,7 +216,6 @@ define([
 		},
 
 		addObject: function(object, geom) {
-			console.log('add object',object);
 			switch (object) {
 				case 'geometry':
 					this.addShape(geom);
@@ -232,7 +247,7 @@ define([
 		},
 
 		unGroup: function() {
-			console.log('ungroup',selected);
+			console.log('ungroup', selected);
 			for (var i = 0; i < selected.length; i++) {
 				switch (selected[i].get('type')) {
 					case 'geometry':
@@ -253,7 +268,7 @@ define([
 					case 'collection':
 						layersView.removeCollection(selected[i].get('id'));
 						var removedItems = collectionManager.removeCollection(selected[i]);
-						console.log('removed items =',removedItems);
+						console.log('removed items =', removedItems);
 						this.deselectAllShapes();
 						this.selectShape(removedItems);
 						break;
@@ -281,6 +296,7 @@ define([
 						break;
 				}
 			}
+			this.compile();
 		},
 
 		removeGeometry: function(target) {
@@ -435,6 +451,7 @@ define([
 		addConstraint: function(constraint) {
 			constraints.push(constraint);
 			layersView.addConstraint(constraint);
+			this.updateMapView(constraint.get('id'));
 
 		},
 
@@ -483,9 +500,6 @@ define([
 				}
 			} else {
 				this._selectSingleShape(data);
-			}
-			if(selected.length==1 &&selected[0].get('type')==='collection'){
-				mapView.setRange(selected[0].members.length);
 			}
 			this.updateLayers();
 			collectionView.toggleCollectionButtons(selected);
@@ -596,14 +610,45 @@ define([
 		//event handler called when mapping is changed
 		updateMapping: function(values){
 			var cId = layersView.getActiveConstraint();
-			if(cId){
+			if (cId) {
 				var constraint = this.getConstraintById(cId);
 				constraint.setMultipliers(values);
 				this.compile();
 			}
 		},
 
-		updateMapView: function(id){
+		updateMinMax: function(min, max, values) {
+			var cId = layersView.getActiveConstraint();
+			if (cId) {
+				var constraint = this.getConstraintById(cId);
+				constraint.setMin(min);
+				constraint.setMax(max);
+				constraint.setMultipliers(values);
+				this.compile();
+			}
+
+		},
+
+		updateListConstraints: function(list) {
+			var constraints = this.getConstraintsByRelative(list);
+			var cId = layersView.getActiveConstraint();
+			if (constraints.length > 0) {
+				for (var i = 0; i < constraints.length; i++) {
+					var constraint = constraints[i];
+					constraint.setMultiplierLength();
+					constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
+					var values = mapView.calculateValueSet(constraint);
+					console.log('updated values', values, constraint.getRange());
+					constraint.setMultipliers(values);
+					if (cId && cId === constraint.get('id')) {
+						this.updateMapView(constraint.get('id'));
+					}
+
+				}
+			}
+		},
+
+		updateMapView: function(id) {
 			var constraint = this.getConstraintById(id);
 			mapView.setConstraint(constraint);
 		},

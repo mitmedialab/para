@@ -12,7 +12,7 @@ define([
 	"text!html/map_ui.html"
 
 ], function($, _, paper, Backbone, Handlebars, TrigFunc, ui) {
-	var mapView, functionPath, intersectionPath, start, end, startPoint, endPoint, tool, master_tool, activePoint, self;
+	var mapPaperView, functionPath, intersectionPath, start, end, startPoint, endPoint, tool, master_tool, activePoint, self;
 	var width = 175;
 	var height = 175;
 	var min = -1.5;
@@ -30,7 +30,9 @@ define([
 
 		events: {
 			'mouseenter': 'mouseEnter',
-			'mouseleave': 'mouseLeave'
+			'mouseleave': 'mouseLeave',
+			'change #min': 'minChange',
+			'change #max': 'maxChange'
 		},
 
 		initialize: function(obj) {
@@ -39,18 +41,18 @@ define([
 			this.setElement($('#collection-mapper'));
 
 			paper.setup($('#collection-canvas')[0]);
-			mapView = paper.View._viewsById['collection-canvas'];
+			mapPaperView = paper.View._viewsById['collection-canvas'];
 			intersectionPath = new paper.Path.Line(new paper.Point(width / 2, 0), new paper.Point(width / 2, height));
 			intersectionPath.name = 'intersectionPath';
 
-		
+
 			//startPoint = new paper.Path.Circle(start.point, 4);
 			//startPoint.name = 'start_point';
 			//endPoint = new paper.Path.Circle(end.point, 4);
 			//endPoint.name = 'end_point';
 			//startPoint.fillColor = endPoint.fillColor = new paper.Color(0, 0, 0);
 			//startPoint.visible = endPoint.visible = false;
-			mapView.draw();
+			mapPaperView.draw();
 
 			master_tool = paper.tools[0];
 			tool = new paper.Tool();
@@ -76,15 +78,15 @@ define([
 			//start.point.y = height / 2;
 			//end.point.x = width;
 			//end.point.y = height / 2;
-			if(startPoint){
-			startPoint.position = start.point;
-			endPoint.position = end.point;
+			if (startPoint) {
+				startPoint.position = start.point;
+				endPoint.position = end.point;
 			}
-			mapView.draw();
+			mapPaperView.draw();
 			this.resetMasterView();
 		},
 
-		setConstraint:function(constraint){
+		setConstraint: function(constraint) {
 			this.setFunctionPath(constraint.getFunctionPath());
 			this.setMin(constraint.getMin());
 			this.setMax(constraint.getMax());
@@ -92,42 +94,54 @@ define([
 
 		},
 
-		setFunctionPath: function(path){
+		setFunctionPath: function(path) {
 			this.setCollectionView();
-			if(functionPath){
+			if (functionPath) {
 				functionPath.remove();
 			}
 			functionPath = path;
 			start = functionPath.segments[0];
-			end = functionPath.segments[functionPath.segments.length-1];
+			end = functionPath.segments[functionPath.segments.length - 1];
 			paper.project.layers[0].addChild(functionPath);
-			mapView.draw();
+			mapPaperView.draw();
 			this.resetMasterView();
 		},
 
-		calculateValue: function(index) {
-			if (index > range - 1) {
+		calculateValue: function(_index, _range, _min, _max, _function) {
+			if (_index > _range - 1) {
 				console.log('! ERROR: index is outside of range !');
 				return;
 			}
-			var xval = (index / range) * width;
+			var xval = (_index / _range) * width;
 			intersectionPath.firstSegment.point.x = xval;
 			intersectionPath.lastSegment.point.x = xval;
-			var intersections = intersectionPath.getIntersections(functionPath);
+			var intersections = intersectionPath.getIntersections(_function);
 			if (intersections.length > 0) {
 				if (intersections.length > 1) {
 					console.log('! MORE THAN ONE INTERSECTION DETECTED !');
 				}
 				var intersection = intersections[0].point;
-				var value = TrigFunc.map(intersection.y, height, 0, min, max);
+				var value = TrigFunc.map(intersection.y, height, 0, _min, _max);
 				return value;
 			}
 		},
 
-		calculateValueSet: function() {
+		calculateValueSet: function(constraint) {
 			var values = [];
-			for (var i = 0; i < range; i++) {
-				values.push(this.calculateValue(i));
+			var c_range, c_function, c_min, c_max;
+			if (constraint) {
+				c_range = constraint.getRange();
+				c_function = constraint.getFunctionPath();
+				c_min = constraint.getMin();
+				c_max = constraint.getMax();
+			} else {
+				c_range = range;
+				c_function = functionPath;
+				c_min = min;
+				c_max = max;
+			}
+			for (var i = 0; i < c_range; i++) {
+				values.push(this.calculateValue(i, c_range, c_min, c_max, c_function));
 			}
 			return values;
 		},
@@ -140,6 +154,36 @@ define([
 		setMax: function(val) {
 			max = val;
 			$('#max').val(max);
+		},
+
+		minChange: function(event) {
+			var minVal = $('#min').val();
+			var maxVal = $('#max').val();
+			var value = this.verifyNumeric(minVal);
+			if (value) {
+				min = +minVal;
+				this.model.updateMinMax(+minVal, +maxVal, this.calculateValueSet());
+			} else {
+				alert('please enter a number');
+				$('#min').val(min);
+			}
+		},
+
+		maxChange: function(event) {
+			var minVal = $('#min').val();
+			var maxVal = $('#max').val();
+			var value = this.verifyNumeric(maxVal);
+			if (value) {
+				max = +maxVal;
+				this.model.updateMinMax(+minVal, +maxVal, this.calculateValueSet());
+			} else {
+				alert('please enter a number');
+				$('#max').val(max);
+			}
+		},
+
+		verifyNumeric: function(value) {
+			return !isNaN(value);
 		},
 
 		setRange: function(val) {
@@ -158,7 +202,7 @@ define([
 			var items = [];
 			$('#xaxis-list').empty();
 			for (var i = 0; i < mod_range; i++) {
-				items.push('<li>' + (i * multiplier) + '</li>');
+				items.push('<li>' + (Math.round((i + 1) * multiplier)) + '</li>');
 			}
 			$('#xaxis-list').append(items.join(''));
 		},
@@ -176,7 +220,7 @@ define([
 
 		setCollectionView: function() {
 			tool.activate();
-			mapView._project.activate();
+			mapPaperView._project.activate();
 		},
 
 		mouseEnter: function() {
@@ -217,20 +261,28 @@ define([
 		},
 
 		toolMouseDrag: function(event) {
-		
+
 			if (activePoint) {
 				activePoint.point.y = activePoint.point.y + event.delta.y;
 
-				if(activePoint!==start && activePoint!==end){
+				if (activePoint !== start && activePoint !== end) {
 					activePoint.point.x = activePoint.point.x + event.delta.x;
 				}
-				if(activePoint.point.x<0){activePoint.point.x=0;}
-			if(activePoint.point.y<0){activePoint.point.y=0;}
-			if(activePoint.point.x>width){activePoint.point.x=width;}
-			if(activePoint.point.y>height){activePoint.point.y=height;}
-			self.resetMasterView();
-			self.trigger('mappingChanged',self.calculateValueSet());
-			self.setCollectionView();
+				if (activePoint.point.x < 0) {
+					activePoint.point.x = 0;
+				}
+				if (activePoint.point.y < 0) {
+					activePoint.point.y = 0;
+				}
+				if (activePoint.point.x > width) {
+					activePoint.point.x = width;
+				}
+				if (activePoint.point.y > height) {
+					activePoint.point.y = height;
+				}
+				self.resetMasterView();
+				self.model.updateMapping(self.calculateValueSet());
+				self.setCollectionView();
 			}
 
 

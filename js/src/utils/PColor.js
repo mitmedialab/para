@@ -13,10 +13,11 @@ define([
 		'cjs',
 		'utils/PFloat',
 		'utils/PConstraint',
+		'utils/PBool',
 		'utils/ColorUtils'
 	],
 
-	function(_, paper, cjs, PFloat, PConstraint, ColorUtils) {
+	function(_, paper, cjs, PFloat, PConstraint, PBool, ColorUtils) {
 
 		var PColor = PConstraint.extend({
 
@@ -43,11 +44,7 @@ define([
 				this.h = new PFloat(hsl[0]);
 				this.s = new PFloat(hsl[1]);
 				this.l = new PFloat(hsl[2]);
-				var h = this.h;
-				this.listenTo(this.h, 'change', function(val) {
-					console.log('setting value for color', val, h.isConstrained(), h.getValue());
-
-				});
+				this.noColor = new PBool(false);
 				this.setMode = 'hsb';
 				PConstraint.apply(this, arguments);
 
@@ -127,6 +124,9 @@ define([
 				if (color.a) {
 					this.setA(color.a);
 				}
+				if(color.noColor){
+					this.setNoColor(color.noColor);
+				}
 				if (this.setMode === 'hsb') {
 					this.setValueHSB(color);
 				} else {
@@ -156,8 +156,6 @@ define([
 			},
 
 			setValueHSB: function(color) {
-
-				console.trace();
 				var isConstrained = this.isConstrained();
 				if (isConstrained.r || isConstrained.g || isConstrained.b) {
 					return;
@@ -183,7 +181,8 @@ define([
 						h: this.getH(),
 						s: this.getS(),
 						l: this.getL(),
-						a: this.getA()
+						a: this.getA(),
+						noColor:this.getNoColor()
 					};
 				} else {
 					return this.getSelfConstraint().getValue();
@@ -244,6 +243,14 @@ define([
 					return this.getSelfConstraint().getValue().a;
 				} else {
 					return this.a.getValue();
+				}
+			},
+
+			getNoColor: function(){
+					if (this.isSelfConstrained()) {
+					return this.getSelfConstraint().getValue().noColor;
+				} else {
+					return this.noColor.getValue();
 				}
 			},
 
@@ -318,6 +325,11 @@ define([
 				this.setNull(false);
 			},
 
+			setNoColor: function(nc) {
+				this.noColor.setValue(nc);
+				this.setNull(false);
+			},
+
 
 			/*clone
 			 * returns a static clone based on the current values of the point
@@ -344,24 +356,30 @@ define([
 					PConstraint.prototype.modifyProperty.call(this, style_data);
 
 				} else {
-					var r = ColorUtils.hexToR(style_data);
-					var g = ColorUtils.hexToG(style_data);
-					var b = ColorUtils.hexToB(style_data);
-					var hsl = ColorUtils.rgbToHsl({
-						r: r,
-						g: g,
-						b: b
-					});
-					var data = {
-						operator: 'set',
-						r: r,
-						g: g,
-						b: b,
-						h: hsl[0],
-						s: hsl[1],
-						l: hsl[2]
-					};
-					PConstraint.prototype.modifyProperty.call(this, data);
+					if (style_data === -1) {
+						this.setNoColor(true);
+					} else {
+
+						this.setNoColor(false);
+						var r = ColorUtils.hexToR(style_data);
+						var g = ColorUtils.hexToG(style_data);
+						var b = ColorUtils.hexToB(style_data);
+						var hsl = ColorUtils.rgbToHsl({
+							r: r,
+							g: g,
+							b: b
+						});
+						var data = {
+							operator: 'set',
+							r: r,
+							g: g,
+							b: b,
+							h: hsl[0],
+							s: hsl[1],
+							l: hsl[2]
+						};
+						PConstraint.prototype.modifyProperty.call(this, data);
+					}
 				}
 			},
 

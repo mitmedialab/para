@@ -132,7 +132,7 @@ define([
     checkPending: function() {
       var constraint = this.get('currentConstraint');
       if (constraint) {
-        if (constraint.get('references') && constraint.get('relatives') && constraint.get('expression')) {
+        if (constraint.get('references') && constraint.get('relatives') && constraint.get('ref_prop')&&constraint.get('rel_prop')) {
           this.trigger('constraintPending');
         }
       }
@@ -140,6 +140,7 @@ define([
 
     applyConstraint: function() {
       var constraint = this.get('currentConstraint');
+      constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
       constraint.get('proxy').hide();
       constraint.clearUI();
       constraint.clearSelection();
@@ -401,7 +402,7 @@ define([
       if (this.draggingHandle) {
         var constraint = this.get('currentConstraint');
         var proxy = constraint.get('proxy');
-        proxy.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
+        //constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
         this.draggingHandle = false;
       }
     },
