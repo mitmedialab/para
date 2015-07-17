@@ -72,7 +72,12 @@ define([
 		 */
 		removeObjectFromLists: function(obj) {
 			for (var j = 0; j < lists.length; j++) {
-				lists[j].recRemoveMember(obj);
+				var r = lists[j].recRemoveMember(obj);
+				if(r){
+					for(var i=0;i<r.modified.length;i++){
+						this.trigger('listLengthChange',r.modified[i]);
+					}
+				}
 			}
 		},
 

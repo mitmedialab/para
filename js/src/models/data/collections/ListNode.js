@@ -191,19 +191,22 @@ define([
      */
     recRemoveMember: function(data) {
       var removedItems = [];
+      var modified = [];
       var selfRemoved = this.removeMember(data);
       if (selfRemoved) {
         removedItems.push(selfRemoved);
+        modified.push(this);
       } else {
         for (var i = 0; i < this.members.length; i++) {
-          var removed = this.members[i].recRemoveMember(data);
-          if (removed) {
-            removedItems = removedItems.comcat(removed);
+          var r = this.members[i].recRemoveMember(data);
+          if (r) {
+            removedItems = removedItems.comcat(r.removed);
+            modified = modified.comcat(r.modified);
           }
         }
       }
-      if (removedItems.length > 1) {
-        return removedItems;
+      if (removedItems.length > 0) {
+        return {removed:removedItems,modified:modified};
       }
 
     },
