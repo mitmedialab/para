@@ -67,6 +67,8 @@ define([
 			path_altered: null,
 			val: null,
 			index: null,
+			member_count: null,
+
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
@@ -211,6 +213,10 @@ define([
 			index.setNull(false);
 			this.set('index', index);
 
+			var member_count = new PFloat(1);
+			member_count.setNull(false);
+			this.set('member_count', member_count);
+
 			this.set('id', this.get('type') + '_' + new Date().getTime().toString());
 
 			this.extend(PConstraint);
@@ -276,7 +282,7 @@ define([
 
 		/* getRange: function used to modify constraints mappings for lists*/
 		getRange: function() {
-			return 1;
+			return 1;//this.get('member_count').getValue();
 		},
 
 		toggleOpen: function(item) {
@@ -325,10 +331,7 @@ define([
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
-			var g_clone = this.get('geom').clone();
-			g_clone.transform(this._ti_matrix);
-			g_clone.transform(this._ri_matrix);
-			g_clone.transform(this._si_matrix);
+			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
 			instance.createSelectionClone();
 			this.addChildNode(instance);
@@ -340,6 +343,17 @@ define([
 		},
 
 
+		setPrototype: function(prototype) {
+			prototype.addInheritor(this);
+			this.set('proto_node', prototype);
+			var clone = prototype.getShapeClone(true);
+			this.changeGeomInheritance(clone);
+
+		},
+
+		removePrototype: function() {
+			this.set('proto_node', null);
+		},
 
 		createSelectionClone: function() {
 			if (this.get('selection_clone')) {
@@ -362,6 +376,15 @@ define([
 			if (this.get('geom')) {
 				this.get('geom').remove();
 			}
+			if (this.get('selection_clone')) {
+				this.get('selection_clone').remove();
+				this.set('selection_clone', null);
+			}
+			if (this.get('bbox')) {
+				this.get('bbox').remove();
+				this.set('bbox', null);
+			}
+
 			geom.data.instance = this;
 			geom.data.geom = true;
 			geom.data.nodetype = this.get('name');
@@ -374,6 +397,12 @@ define([
 				}
 
 			}
+			this.setPathAltered();
+		},
+
+		setPathAltered: function() {
+			var path_altered = this.get('path_altered');
+			path_altered.setValue(true);
 		},
 
 		reset: function() {
@@ -1115,8 +1144,8 @@ define([
 
 		renderStyle: function(geom) {
 			if (!this._fill_color.noColor) {
-				if(!geom.fillColor){
-					geom.fillColor = new paper.Color(0,0,0);
+				if (!geom.fillColor) {
+					geom.fillColor = new paper.Color(0, 0, 0);
 				}
 				geom.fillColor.hue = this._fill_color.h;
 				geom.fillColor.saturation = this._fill_color.s;
@@ -1126,8 +1155,8 @@ define([
 				geom.fillColor = undefined;
 			}
 			if (!this._stroke_color.noColor) {
-				if(!geom.fillColor){
-					geom.strokeColor = new paper.Color(0,0,0);
+				if (!geom.fillColor) {
+					geom.strokeColor = new paper.Color(0, 0, 0);
 				}
 				geom.strokeColor.hue = this._stroke_color.h;
 				geom.strokeColor.saturation = this._stroke_color.s;
@@ -1248,16 +1277,16 @@ define([
 			var bbox = this.get('bbox');
 
 			if (!bbox) {
-					var size = new paper.Size(geom.bounds.width, geom.bounds.height);
+				var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 
-					bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
-					bbox.data.instance = this;
-					this.set('bbox', bbox);
-					var targetLayer = paper.project.layers.filter(function(layer) {
-						return layer.name === 'ui_layer';
-					})[0];
-					targetLayer.addChild(bbox);
-				}
+				bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
+				bbox.data.instance = this;
+				this.set('bbox', bbox);
+				var targetLayer = paper.project.layers.filter(function(layer) {
+					return layer.name === 'ui_layer';
+				})[0];
+				targetLayer.addChild(bbox);
+			}
 			if (!path_altered) {
 				//geom.transform(this._itemp_matrix);
 				geom.transform(this._ti_matrix);
@@ -1318,8 +1347,13 @@ define([
 		},
 
 		/*returns a clone of the paper js shape*/
-		getShapeClone: function() {
+		getShapeClone: function(relative) {
 			var clone = this.get('geom').clone();
+			if (relative) {
+				clone.transform(this._ti_matrix);
+				clone.transform(this._ri_matrix);
+				clone.transform(this._si_matrix);
+			}
 			return clone;
 		},
 

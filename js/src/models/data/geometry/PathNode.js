@@ -16,9 +16,9 @@ define([
   'utils/PColor'
 
 
-], function(_,GeometryNode, PointNode, TrigFunc, PPoint, paper, PFloat, PColor) {
+], function(_, GeometryNode, PointNode, TrigFunc, PPoint, paper, PFloat, PColor) {
   //drawable paper.js path object that is stored in the pathnode
-  var PathNode =GeometryNode.extend({
+  var PathNode = GeometryNode.extend({
 
     defaults: _.extend({}, GeometryNode.prototype.defaults, {
 
@@ -31,6 +31,29 @@ define([
     initialize: function(data) {
       GeometryNode.prototype.initialize.apply(this, arguments);
       this.set('points', []);
+    },
+
+    removePrototype: function() {
+      GeometryNode.prototype.removePrototype.apply(this, arguments);
+      this.setPathAltered();
+      var geom = this.get('geom');
+      var bbox = this.get('bbox');
+      var selection_clone = this.get('selection_clone');
+
+      geom.transform(this._ti_matrix);
+      geom.transform(this._si_matrix);
+      geom.transform(this._ri_matrix);
+      selection_clone.transform(this._ti_matrix);
+      selection_clone.transform(this._si_matrix);
+      selection_clone.transform(this._ri_matrix);
+      bbox.transform(this._ti_matrix);
+      bbox.transform(this._si_matrix);
+      bbox.transform(this._ri_matrix);
+      geom.selected = false;
+      bbox.selected = false;
+
+      this.generatePoints(geom);
+
     },
 
     /*normalizeGeometry
@@ -97,18 +120,7 @@ define([
       this.set('width', path.bounds.width);
       this.set('height', path.bounds.height);
 
-
-      var points = this.get('points');
-      if (path.segments) {
-        var segments = path.segments;
-        for (var j = 0; j < segments.length; j++) {
-          var pointNode = new PointNode();
-          pointNode.normalizeGeometry(segments[j]);
-          this.addChildNode(pointNode);
-          points.push(pointNode);
-
-        }
-      }
+      this.generatePoints(path);
 
       path.visible = false;
       path.selected = false;
@@ -128,15 +140,19 @@ define([
       return data;
     },
 
-    setPathAltered: function() {
-      var path_altered = this.get('path_altered');
-      path_altered.setValue(true);
-      var inheritors = this.get('inheritors').accessProperty();
-      for (var i = 0; i < inheritors.length; i++) {
-        inheritors[i].setPathAltered();
+   generatePoints: function(path) {
+      var points = this.get('points');
+      if (path.segments) {
+        var segments = path.segments;
+        for (var j = 0; j < segments.length; j++) {
+          var pointNode = new PointNode();
+          pointNode.normalizeGeometry(segments[j]);
+          this.addChildNode(pointNode);
+          points.push(pointNode);
+
+        }
       }
     },
-
 
     //sets selection for segments
     setSelectedSegments: function(segments) {
@@ -171,8 +187,9 @@ define([
       }
       var points = this.get('points');
       var delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
-      delta.transform(this.get('ri_matrix'));
-      delta.transform(this.get('si_matrix'));
+      var origin = new paper.Point(0,0);
+      delta.transform(this._ri_matrix);
+      delta.transform(this._si_matrix);
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
       var startWidth = geom.bounds.width;
@@ -250,42 +267,49 @@ define([
     modifyPointsByIndex: function(point, indicies) {
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
-      geom.transform(this.get('ti_matrix'));
-      geom.transform(this.get('ri_matrix'));
-      geom.transform(this.get('si_matrix'));
-      selection_clone.transform(this.get('ti_matrix'));
-      selection_clone.transform(this.get('ri_matrix'));
-      selection_clone.transform(this.get('si_matrix'));
-      for (var i = 0; i < indicies.length; i++) {
-        var geomS = geom.segments[indicies[i].index];
-        var selectionS = selection_clone.segments[indicies[i].index];
-        switch (indicies[i].type) {
-          case 'segment':
-          case 'curve':
-            geomS.point.x += point.x;
-            geomS.point.y += point.y;
-            selectionS.point.x += point.x;
-            selectionS.point.y += point.y;
+      var bbox = this.get('bbox');
+      if(!this.get('path_altered').getValue()){
+        geom.transform(this._ti_matrix);
+        geom.transform(this._si_matrix);
+        geom.transform(this._ri_matrix);
+        selection_clone.transform(this._ti_matrix);
+        selection_clone.transform(this._si_matrix);
+        selection_clone.transform(this._ri_matrix);
+        bbox.transform(this._ti_matrix);
+        bbox.transform(this._si_matrix);
+        bbox.transform(this._ri_matrix);
+        this.setPathAltered();
 
-            break;
-          case 'handle-in':
-            geomS.handleIn.x += point.x;
-            geomS.handleIn.y += point.y;
-            selectionS.handleIn.x += point.x;
-            selectionS.handleIn.y += point.y;
-
-            break;
-
-          case 'handle-out':
-            geomS.handleOut.x += point.x;
-            geomS.handleOut.y += point.y;
-            selectionS.handleOut.x += point.x;
-            selectionS.handleOut.y += point.y;
-            break;
-        }
       }
-      this.setPathAltered();
-      var inheritors = this.get('inheritors');
+     for (var i = 0; i < indicies.length; i++) {
+         var geomS = geom.segments[indicies[i].index];
+         var selectionS = selection_clone.segments[indicies[i].index];
+         switch (indicies[i].type) {
+           case 'segment':
+           case 'curve':
+             geomS.point.x += point.x;
+             geomS.point.y += point.y;
+             selectionS.point.x += point.x;
+             selectionS.point.y += point.y;
+
+             break;
+           case 'handle-in':
+             geomS.handleIn.x += point.x;
+             geomS.handleIn.y += point.y;
+             selectionS.handleIn.x += point.x;
+             selectionS.handleIn.y += point.y;
+
+             break;
+
+           case 'handle-out':
+             geomS.handleOut.x += point.x;
+             geomS.handleOut.y += point.y;
+             selectionS.handleOut.x += point.x;
+             selectionS.handleOut.y += point.y;
+             break;
+         }
+       }
+      var inheritors = this.get('inheritors').accessProperty();
       for (var j = 0; j < inheritors.length; j++) {
         inheritors[j].modifyPointsByIndex(point, indicies);
       }

@@ -59,7 +59,6 @@ define([
 			},
 
 			propertyModified: function(event) {
-				console.log('triggering inheritor modified');
 				this.trigger('modified', this);
 			},
 

@@ -15,7 +15,7 @@ define([
 	'views/MapView'
 
 
-], function(_, Backbone, Instance, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView,MapView) {
+], function(_, Backbone, Instance, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -67,6 +67,8 @@ define([
 
 			this.listenTo(collectionManager, 'addToRender', this.addToRenderQueue);
 			this.listenTo(collectionManager, 'listLengthChange', this.updateListConstraints);
+			this.listenTo(collectionManager, 'duplicatorCountModified', this.duplicatorCountModified);
+
 
 
 		},
@@ -240,7 +242,10 @@ define([
 					break;
 
 				case 'duplicator':
-
+					var duplicator = collectionManager.addDuplicator(selected);
+					layersView.addList(duplicator.toJSON());
+					this.deselectAllShapes();
+					this.selectShape(duplicator);
 					break;
 			}
 
@@ -441,10 +446,26 @@ define([
 				var newInstance = parent.create();
 				parent.set('selected', false);
 				newInstance.set('selected', true);
+				collectionManager.addToOpenLists(newInstance);
 				layersView.addInstance(newInstance.toJSON(), parent.get('id'));
 				this.selectShape(newInstance);
 				return newInstance;
 			}
+		},
+
+		duplicatorCountModified: function(data) {
+			if (data.toRemove) {
+				for (var i = 0; i < data.toRemove.length; i++) {
+					layersView.removeShape(data.toRemove[i].get('id'));
+
+				}
+			}
+			if (data.toAdd) {
+				for (var j = 0; j < data.toAdd.length; j++) {
+					layersView.addInstance(data.toAdd[j].toJSON(),data.toAdd[j].get('proto_node').get('id'));
+				}
+			}
+			this.compile();
 		},
 
 
@@ -608,7 +629,7 @@ define([
 		},
 
 		//event handler called when mapping is changed
-		updateMapping: function(values){
+		updateMapping: function(values) {
 			var cId = layersView.getActiveConstraint();
 			if (cId) {
 				var constraint = this.getConstraintById(cId);

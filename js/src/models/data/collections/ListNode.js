@@ -17,7 +17,6 @@ define([
     defaults: _.extend({}, Instance.prototype.defaults, {
       name: 'list',
       type: 'collection',
-      member_count: null,
       open: false, //indicates whether list is open or not;
       bbox_dimensions: null,
     }),
@@ -26,7 +25,11 @@ define([
       Instance.prototype.initialize.apply(this, arguments);
       this.members = [];
       this.offsets = [];
-      this.set('member_count', new PFloat(0));
+      
+      var member_count = new PFloat(0);
+      member_count.setNull(false);
+      this.set('member_count', member_count);
+
       this.get('translation_delta').setNull(false);
       this.get('scaling_delta').setNull(false);
       this.get('rotation_delta').setNull(false);

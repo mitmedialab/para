@@ -275,7 +275,7 @@ define([
 		visualizeConstraint: function() {
 			var activeNode = constraintTree.getActiveNode();
 			if (activeNode) {
-				//this.model.updateMapView(activeNode.key);
+				this.model.updateMapView(activeNode.key);
 				var constraint = this.model.getConstraintById(activeNode.key);
 				var pRef = currentRef;
 				var pRel = currentRel;
@@ -306,10 +306,12 @@ define([
 		shapeClicked: function(event) {
 			var id = event.target.id;
 			var activeNode = shapeTree.getActiveNode();
-			var shape = event.data.view.model.getById(activeNode.key);
-			event.data.view.deselectAllNodes('lists');
-			event.data.view.itemClicked(id, activeNode, shape);
-			event.data.view.positionConstraintIcons();
+			if(activeNode){
+				var shape = event.data.view.model.getById(activeNode.key);
+				event.data.view.deselectAllNodes('lists');
+				event.data.view.itemClicked(id, activeNode, shape);
+				event.data.view.positionConstraintIcons();
+			}
 		},
 
 		listClicked: function(event) {

@@ -7,13 +7,14 @@ define([
 	'underscore',
 	'backbone',
 	'models/data/collections/ConstrainableList',
+	'models/data/collections/Duplicator',
 
 
-], function(_, Backbone, ConstrainableList) {
+], function(_, Backbone, ConstrainableList, Duplicator) {
 
 
 	//stores para lists
-	var lists,renderQueue;
+	var lists,renderQueue,duplicators;
 	var collectionView;
 	var compile = 1;
 	var remove = 2;
@@ -207,6 +208,26 @@ define([
 			return list;
 		},
 
+
+		addDuplicator: function(selected) {
+			var duplicator = new Duplicator();
+			
+			duplicator.setTarget(selected[0]);
+			var data = duplicator.setCount(5);
+			this.trigger('duplicatorCountModified',data);
+			if (!this.addToOpenLists(duplicator)) {
+				for (var i = lists.length - 1; i >= 0; i--) {
+					if (duplicator.hasMember(lists[i], true)) {
+						lists.splice(i, 1);
+					}
+				}
+				lists.push(duplicator);
+			}
+
+			return duplicator;
+		},
+
+
 		/* addToOpenLists
 		 * attempts to add a newly created instance to any open lists
 		 */
@@ -286,6 +307,8 @@ define([
 			};
 		},
 
+
+		
 
 
 		closeAllLists: function() {
