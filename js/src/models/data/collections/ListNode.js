@@ -25,7 +25,7 @@ define([
       Instance.prototype.initialize.apply(this, arguments);
       this.members = [];
       this.offsets = [];
-      
+
       var member_count = new PFloat(0);
       member_count.setNull(false);
       this.set('member_count', member_count);
@@ -75,11 +75,11 @@ define([
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
 
-          this.listenTo(data[i], 'delete', this.deleteMember);
+         // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
         }
       } else {
-        this.listenTo(data, 'delete', this.deleteMember);
+        //this.listenTo(data, 'delete', this.deleteMember);
         this.members.push(data);
       }
 

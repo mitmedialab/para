@@ -258,7 +258,7 @@ define([
 			if (parent) {
 				parent.removeChildNode(this);
 			}
-			this.trigger('delete', this);
+			//this.trigger('delete', this);
 		},
 
 
@@ -340,6 +340,7 @@ define([
 		removeInheritor: function(instance) {
 			var inheritorCollection = this.get('inheritors');
 			return inheritorCollection.removeInheritor(instance);
+			this.get('inheritor_bbox').width=this.get('inheritor_bbox').height=0.1;
 		},
 
 

@@ -214,7 +214,7 @@ define([
 			
 			duplicator.setTarget(selected[0]);
 			var data = duplicator.setCount(5);
-			this.trigger('duplicatorCountModified',data);
+			this.trigger('duplicatorCountModified',data,duplicator);
 			if (!this.addToOpenLists(duplicator)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
 					if (duplicator.hasMember(lists[i], true)) {

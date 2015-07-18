@@ -60,6 +60,17 @@ define([
             },
 
 
+            deleteMember: function(data) {
+                this.removeMember(data);
+                data.deleteSelf();
+                var parent = data.getParentNode();
+                if (parent) {
+                    parent.removeInheritor(data);
+                    parent.removeChildNode(data);
+                }
+                return data;
+            },
+
             removeMember: function(data) {
                 var target = this.get('target');
                 if (data != target) {
@@ -96,7 +107,8 @@ define([
             },
 
             removeCloneByIndex: function(index) {
-                var clone = this.clones.splice(index, 1);
+                var clone = this.clones.splice(index, 1)[0];
+                console.log('removing clone', clone);
                 var member = ConstrainableList.prototype.removeMember.call(this, clone);
                 this.get('clone_count').setValue(this.clones.length);
                 return member;
@@ -130,6 +142,7 @@ define([
                 var count = this.get('count').getValue();
                 var range = this.get('clone_count').getValue() + 1;
                 var diff = count - range;
+                console.log('update count standard', count, range, diff);
                 var target = this.get('target');
 
                 var toRemove = [];
@@ -141,15 +154,18 @@ define([
                         toAdd.push(clone);
 
                     }
-                } else if (diff > 0) {
+                } else if (diff < 0) {
                     for (var j = 0; j < 0 - diff; j++) {
-                        var member = this.removeMember(this.clones[this.clones.length - 1]);
+                        var member = this.deleteMember(this.clones[this.clones.length - 1]);
                         if (member) {
                             toRemove.push(member);
                         }
                     }
                 }
-                return {toAdd:toAdd,toRemove:toRemove};
+                return {
+                    toAdd: toAdd,
+                    toRemove: toRemove
+                };
             },
 
             setTarget: function(target) {

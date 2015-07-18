@@ -90,6 +90,7 @@ define([
       },
 
       removeMember: function(data) {
+        console.log('data to remove',data);
         data.set('merged', undefined);
         var memberIndex = _.indexOf(this.members, data);
         var member = ListNode.prototype.removeMember.call(this, data);

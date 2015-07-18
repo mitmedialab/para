@@ -11,85 +11,101 @@ define([
 
 ], function($, _, Backbone, analytics) {
 
-
+	var countVal;
 	var CollectionView = Backbone.View.extend({
 
 
 		initialize: function() {
-				this.disable('group');
-				this.disable('list');
-				this.disable('duplicator');
-				this.disable('ungroup');
-				this.disable('count');
-				console.log('model',this.model);
+			this.disable('group');
+			this.disable('list');
+			this.disable('duplicator');
+			this.disable('ungroup');
+			this.disable('count');
+			console.log('model', this.model);
 		},
 
 
 		events: {
-			'click': 'clickEvent'
+			'click': 'clickEvent',
+			'change #count': 'countChange'
 		},
 
 		enable: function(type) {
-			if($('#' + type).is(':disabled')){
-			$('#' + type).removeAttr('disabled');
-			var bg = $('#' + type).css('backgroundPosition').split(" ")[1];
-			var bgpos = parseInt(bg.replace("px", ""));
-			console.log('background position=', bgpos);
-			$('#' + type).css({
-				backgroundPositionY: bgpos + 54
+			if ($('#' + type).is(':disabled')) {
+				$('#' + type).removeAttr('disabled');
+				var bg = $('#' + type).css('backgroundPosition').split(" ")[1];
+				var bgpos = parseInt(bg.replace("px", ""));
+				console.log('background position=', bgpos);
+				$('#' + type).css({
+					backgroundPositionY: bgpos + 54
 
-			});
+				});
 			}
 
 		},
 
 		disable: function(type) {
-			if(!$('#' + type).is(':disabled')){
-			document.getElementById(type).disabled = true;
-			var bg = $('#' + type).css('backgroundPosition').split(" ")[1];
-			var bgpos = parseInt(bg.replace("px", ""));
-			console.log('background position=', bgpos);
-			$('#' + type).css({
-				backgroundPositionY: bgpos - 54
+			if (!$('#' + type).is(':disabled')) {
+				document.getElementById(type).disabled = true;
+				var bg = $('#' + type).css('backgroundPosition').split(" ")[1];
+				var bgpos = parseInt(bg.replace("px", ""));
+				console.log('background position=', bgpos);
+				$('#' + type).css({
+					backgroundPositionY: bgpos - 54
 
-			});
-}
-
+				});
+			}
 		},
 
 		clickEvent: function(event) {
 			console.log('click event on target', event.target.id);
-			switch(event.target.id){
+			switch (event.target.id) {
 				case 'ungroup':
 					this.model.unGroup();
-				break;
-				default: 
+					break;
+				default:
 					this.model.addObject(event.target.id);
-				break;
+					break;
 			}
 		},
 
-		setCount: function(item){
-			if(!item){
-				$('#count').val("");
+		countChange: function(event) {
+		
+			var cval = $('#count').val();
+			var value = this.verifyNumeric(cval);
+			if (value) {
+				countVal = +cval;
+				this.model.setDuplicatorCount(+cval);
+			} else {
+				alert('please enter a number');
+				$('#count').val(countVal);
 			}
-			else{
+		},
 
-				if(item instanceof Array){
+		verifyNumeric: function(value) {
+			return !isNaN(value);
+		},
+
+		setCount: function(item) {
+			if (!item) {
+				$('#count').val("");
+			} else {
+
+				if (item instanceof Array) {
 					var count = item[0].getRange();
 					var same = true;
-					for(var i=1;i<item.length;i++){
-						if (item[i].getRange() !==count){
+					for (var i = 1; i < item.length; i++) {
+						if (item[i].getRange() !== count) {
 							same = false;
 							break;
 						}
 					}
-					$('#count').val(same?count:"");
-				}
-				else{
-				$('#count').val(item.getRange());
+					$('#count').val(same ? count : "");
+				} else {
+					$('#count').val(item.getRange());
 				}
 			}
+			countVal = +$('#count').val();
 		},
 
 		toggleCollectionButtons: function(selected) {
@@ -105,22 +121,21 @@ define([
 				var collections = selected.filter(function(item) {
 					return (item.get('type') == 'collection' || item.get('name') == 'group');
 				});
-				var duplicators = collections.filter(function(item){
+				var duplicators = collections.filter(function(item) {
 					return (item.get('name') == 'duplicator');
 				});
 				if (collections.length == selected.length) {
 					this.enable('ungroup');
 					this.setCount(selected);
-					
+
 				} else {
 					this.disable('ungroup');
 					this.setCount();
 				}
-				if(duplicators.length == selected.length){
+				if (duplicators.length == selected.length) {
 					this.enable('count');
-					
-				}
-				else{
+
+				} else {
 					this.disable('count');
 				}
 				if (selected.length > 1) {

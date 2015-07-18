@@ -453,9 +453,10 @@ define([
 			}
 		},
 
-		duplicatorCountModified: function(data) {
+		duplicatorCountModified: function(data,duplicator) {
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
+				//	collectionManager.removeObjectFromLists(data.toRemove[i]);
 					layersView.removeShape(data.toRemove[i].get('id'));
 
 				}
@@ -465,9 +466,17 @@ define([
 					layersView.addInstance(data.toAdd[j].toJSON(),data.toAdd[j].get('proto_node').get('id'));
 				}
 			}
+			this.updateListConstraints(duplicator);
+
 			this.compile();
 		},
 
+		setDuplicatorCount: function(value){
+			for(var i=0;i<selected.length;i++){
+				var data = selected[i].setCount(value);
+				this.duplicatorCountModified(data,selected[i]);
+			}
+		},
 
 		addConstraint: function(constraint) {
 			constraints.push(constraint);
