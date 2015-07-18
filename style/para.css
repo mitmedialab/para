@@ -53,7 +53,6 @@ button {
 
 label {
     letter-spacing: 0;
-    margin-right: 10px;   
 }
 
 input {
@@ -316,7 +315,13 @@ input[type="range"]:active::-webkit-slider-thumb {
   float: left;
 }
 
-
+.toolbar-input {
+  width: 50px;
+  float: left;
+  height: 70px;
+  text-align: center;
+  padding-top: 10px;
+}
 
 #collectionToolbar #group{
 }
@@ -456,7 +461,7 @@ input[type=text].range-text {
 
 #collectionToolbar{
     margin-top: 2px;
-    width: 240px;
+    width: 300px;
     height: 70px;
 }
 

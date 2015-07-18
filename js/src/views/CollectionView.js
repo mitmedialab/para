@@ -20,6 +20,7 @@ define([
 				this.disable('list');
 				this.disable('duplicator');
 				this.disable('ungroup');
+				this.disable('count');
 				console.log('model',this.model);
 		},
 
@@ -68,21 +69,59 @@ define([
 			}
 		},
 
+		setCount: function(item){
+			if(!item){
+				$('#count').val("");
+			}
+			else{
+
+				if(item instanceof Array){
+					var count = item[0].getRange();
+					var same = true;
+					for(var i=1;i<item.length;i++){
+						if (item[i].getRange() !==count){
+							same = false;
+							break;
+						}
+					}
+					$('#count').val(same?count:"");
+				}
+				else{
+				$('#count').val(item.getRange());
+				}
+			}
+		},
+
 		toggleCollectionButtons: function(selected) {
 			console.log('toggle collections buttons', selected);
 			if (selected.length < 1) {
 				this.disable('group');
 				this.disable('list');
 				this.disable('duplicator');
+				this.disable('count');
 				this.disable('ungroup');
+				this.setCount();
 			} else {
 				var collections = selected.filter(function(item) {
 					return (item.get('type') == 'collection' || item.get('name') == 'group');
 				});
+				var duplicators = collections.filter(function(item){
+					return (item.get('name') == 'duplicator');
+				});
 				if (collections.length == selected.length) {
 					this.enable('ungroup');
+					this.setCount(selected);
+					
 				} else {
 					this.disable('ungroup');
+					this.setCount();
+				}
+				if(duplicators.length == selected.length){
+					this.enable('count');
+					
+				}
+				else{
+					this.disable('count');
 				}
 				if (selected.length > 1) {
 					console.log('enabling buttons');
