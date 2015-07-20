@@ -19,6 +19,7 @@ define([
 
 		events: {
 			'mousedown.filled': 'argumentClicked',
+			'click #delete': 'deleteActive'
 		},
 
 		initialize: function(obj) {
@@ -127,7 +128,7 @@ define([
 			$('html').keyup(function(e) {
 				console.log(e.keyCode);
 				if (e.keyCode == 46 || e.keyCode == 8) {
-					self.deleteActive();
+					//self.deleteActive();
 				}
 			});
 
@@ -143,8 +144,8 @@ define([
 
 			connector = $('#connector_line');
 
-			
-			this.$('#layers').bind('scroll',function() {
+
+			this.$('#layers').bind('scroll', function() {
 				self.positionConstraintIcons();
 			});
 			this.hideConstraintIcons();
@@ -219,7 +220,7 @@ define([
 			var bp = p1.top < p2.top ? -175 : -245;
 			console.log("shapeRoot, listRoot", p1.top, p2.top);
 			$('#constraint_rel').css({
-				top: Math.floor(p1.top)  -111,
+				top: Math.floor(p1.top) - 111,
 				backgroundColor: bc1,
 				backgroundPositionY: bp,
 				backgroundPositionX: -1,
@@ -235,7 +236,7 @@ define([
 			var connectorTop = p1.top < p2.top ? p1.top : p2.top;
 			$('#connector_line').css({
 				height: length,
-				top: connectorTop + 15-111,
+				top: connectorTop + 15 - 111,
 				visibility: 'visible'
 			});
 		},
@@ -269,7 +270,10 @@ define([
 		},
 
 		constraintClicked: function(event) {
+			shapeTree.activateKey(false);
+			listTree.activateKey(false);
 			event.data.view.visualizeConstraint();
+			
 		},
 
 		visualizeConstraint: function() {
@@ -291,11 +295,17 @@ define([
 		//TODO: currently only works on constraints, should work on all objects
 		deleteActive: function() {
 			var active = constraintTree.getActiveNode();
-			console.log('attempting to delete constraint', active);
 
-			if (active) {
-				this.model.removeConstraint(active.key);
+			if (!active) {
+				active = shapeTree.getActiveNode();
 			}
+			if (!active) {
+				active = listTree.getActiveNode;
+			}
+			if (active) {
+				this.model.removeObjectById(active.key);
+			}
+
 		},
 
 		dropCompleted: function(nodeA, nodeB, hitMode) {
@@ -306,7 +316,10 @@ define([
 		shapeClicked: function(event) {
 			var id = event.target.id;
 			var activeNode = shapeTree.getActiveNode();
-			if(activeNode){
+			constraintTree.activateKey(false);
+			event.data.view.model.visualizeConstraint();
+			listTree.activateKey(false);
+			if (activeNode) {
 				var shape = event.data.view.model.getById(activeNode.key);
 				event.data.view.deselectAllNodes('lists');
 				event.data.view.itemClicked(id, activeNode, shape);
@@ -317,7 +330,10 @@ define([
 		listClicked: function(event) {
 			var id = event.target.id;
 			var activeNode = listTree.getActiveNode();
-			var shape = event.data.view.model.getListById(activeNode.key);
+			constraintTree.activateKey(false);
+			event.data.view.model.visualizeConstraint();
+			shapeTree.activateKey(false);
+			var shape = event.data.view.model.getById(activeNode.key);
 			event.data.view.deselectAllNodes('shapes');
 			event.data.view.itemClicked(id, activeNode, shape);
 			event.data.view.positionConstraintIcons();
@@ -496,13 +512,15 @@ define([
 			var constraintNode = constraintRoot.addChildren(constraintData);
 			this.selectNode(constraintNode);
 			constraintNode.setActive(true);
+			shapeTree.activateKey(false);
+			listTree.activateKey(false);
 			this.resetConstraintHeight();
 			this.visualizeConstraint();
 		},
 
-		getActiveConstraint: function(){
+		getActiveConstraint: function() {
 			var node = constraintTree.getActiveNode();
-			if(node){
+			if (node) {
 				return node.key;
 			}
 		},

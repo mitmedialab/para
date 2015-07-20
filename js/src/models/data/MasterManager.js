@@ -164,6 +164,7 @@ define([
 						rel_i.set('constraint_selected', null);
 					}
 					layersView.deactivateConstraint();
+					mapView.deactivate();
 					this.compile();
 
 				}
@@ -279,6 +280,29 @@ define([
 						break;
 				}
 			}
+		},
+
+
+		removeObjectById: function(id){
+			var object = this.getById(id);
+			switch (object.get('type')) {
+					case 'geometry':
+						layersView.removeShape(id);
+						this.removeGeometry(object);
+						break;
+					case 'function':
+						//functionManager.removeFunction(selected[i]);
+						break;
+						//TODO: this replicates functionality in the ungroup function, should this function differently?
+					case 'collection':
+						layersView.removeCollection(id);
+						var removedItems = collectionManager.removeCollection(object);
+						this.selectShape(removedItems);
+						break;
+					case 'constraint':
+						this.removeConstraint(id);
+					break;
+				}
 		},
 
 		removeObject: function() {
@@ -456,7 +480,7 @@ define([
 		duplicatorCountModified: function(data,duplicator) {
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
-				//	collectionManager.removeObjectFromLists(data.toRemove[i]);
+					collectionManager.removeObjectFromLists(data.toRemove[i]);
 					layersView.removeShape(data.toRemove[i].get('id'));
 
 				}

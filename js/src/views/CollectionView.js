@@ -140,7 +140,7 @@ define([
 				}
 				if (selected.length > 1) {
 					console.log('enabling buttons');
-					this.enable('group');
+					//this.enable('group');
 					this.disable('duplicator');
 					this.enable('list');
 				} else {

@@ -15,8 +15,8 @@ define([
 	var mapPaperView, functionPath, intersectionPath, start, end, startPoint, endPoint, tool, master_tool, activePoint, self;
 	var width = 175;
 	var height = 175;
-	var min = -1.5;
-	var max = 1.5;
+	var min = 1;
+	var max = 10;
 	var range = 10;
 	var hitOptions = {
 		segments: true,
@@ -26,6 +26,7 @@ define([
 		fill: true,
 		tolerance: 4
 	};
+	var lagrange_pts = [];
 	var MapView = Backbone.View.extend({
 
 		events: {
@@ -65,10 +66,12 @@ define([
 
 
 			this.resetMasterView();
-			this.setMin(min);
-			this.setMax(max);
-			this.setRange(range);
+			this.setMin();
+			this.setMax();
+			this.setRange();
 			this.setToDefault();
+			lagrange_pts.push(new paper.Point(0, 0));
+			lagrange_pts.push(new paper.Point(width, height));
 
 		},
 
@@ -94,15 +97,27 @@ define([
 
 		},
 
+		deactivate: function() {
+			this.setFunctionPath();
+			this.setMin();
+			this.setMax();
+			this.setRange();
+
+		},
+
 		setFunctionPath: function(path) {
 			this.setCollectionView();
 			if (functionPath) {
 				functionPath.remove();
 			}
-			functionPath = path;
-			start = functionPath.segments[0];
-			end = functionPath.segments[functionPath.segments.length - 1];
-			paper.project.layers[0].addChild(functionPath);
+			if (path) {
+				functionPath = path;
+				var poly = TrigFunc.Lagrange(lagrange_pts);
+				console.log('poly', poly);
+				start = functionPath.segments[0];
+				end = functionPath.segments[functionPath.segments.length - 1];
+				paper.project.layers[0].addChild(functionPath);
+			}
 			mapPaperView.draw();
 			this.resetMasterView();
 		},
@@ -147,14 +162,43 @@ define([
 		},
 
 		setMin: function(val) {
-			min = val;
-			$('#min').val(min);
+			if (val) {
+				min = val;
+				$('#min').val(min);
+				this.enable('min');
+			} else {
+				$('#min').val("");
+				this.disable('min');
+
+			}
 		},
 
 		setMax: function(val) {
-			max = val;
-			$('#max').val(max);
+			if (val) {
+				max = val;
+				$('#max').val(max);
+				this.enable('max');
+			} else {
+				$('#max').val("");
+				this.disable('max');
+
+			}
 		},
+
+		disable: function(type) {
+			if (!$('#' + type).is(':disabled')) {
+				document.getElementById(type).disabled = true;
+			}
+		},
+
+		enable: function(type) {
+			if ($('#' + type).is(':disabled')) {
+				$('#' + type).removeAttr('disabled');
+			}
+
+		},
+
+
 
 		minChange: function(event) {
 			var minVal = $('#min').val();
@@ -187,24 +231,27 @@ define([
 		},
 
 		setRange: function(val) {
-			range = val;
-			var mod_range, multiplier;
-			if (range > 15 && range < 150) {
-				mod_range = 10;
-				multiplier = range / mod_range;
-			} else if (range > 150) {
-				mod_range = 5;
-				multiplier = range / mod_range;
-			} else {
-				mod_range = range;
-				multiplier = 1;
-			}
-			var items = [];
 			$('#xaxis-list').empty();
-			for (var i = 0; i < mod_range; i++) {
-				items.push('<li>' + (Math.round((i + 1) * multiplier)) + '</li>');
+			if (val) {
+				range = val;
+				var mod_range, multiplier;
+				if (range > 15 && range < 150) {
+					mod_range = 10;
+					multiplier = range / mod_range;
+				} else if (range > 150) {
+					mod_range = 5;
+					multiplier = range / mod_range;
+				} else {
+					mod_range = range;
+					multiplier = 1;
+				}
+				var items = [];
+				$('#xaxis-list').empty();
+				for (var i = 0; i < mod_range; i++) {
+					items.push('<li>' + (Math.round((i + 1) * multiplier)) + '</li>');
+				}
+				$('#xaxis-list').append(items.join(''));
 			}
-			$('#xaxis-list').append(items.join(''));
 		},
 
 
@@ -251,6 +298,9 @@ define([
 						console.log('hit segment');
 						break;
 					case 'curve':
+						//console.log('hit detected',event.point);
+						//lagrange_pts.push(event.point);
+						//this.setFunctionPath(functionPath);
 						/*var curve = hitResult.location.curve;
 						var curveOffset = hitResult.location.curveOffset;
 						activePoint = curve.divide(curveOffset).segment1;

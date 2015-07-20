@@ -77,11 +77,13 @@ define([
       name: 'constraint',
       type: 'constraint',
       multipliers: null,
-      min: -1.5,
-      max: 1.5,
+      min: 1,
+      max: 10,
       functionPath: null,
       multiplier: null,
       offset: null,
+      map_operand: null,
+      operators: null,
     },
 
     initialize: function() {
@@ -127,6 +129,22 @@ define([
       };
       multiplier.setConstraint(multiplierF);
       this.set('multiplier', multiplier);
+
+      this.set('map_operand', '+');
+      this.set('operators', {
+        '+': function(a, b) {
+          return a + b;
+        },
+        '-': function(a, b) {
+          return a - b;
+        },
+        '*': function(a, b) {
+          return a * b;
+        },
+        '/': function(a, b) {
+          return a / b;
+        }
+      });
 
     },
 
@@ -227,16 +245,16 @@ define([
       var refPropValue = this.propSwitch(ref_prop, 'ref');
       var relPropValue;
       var conversion = {};
-      var offset = this.get('offset')? this.get('offset'): {};
+      var offset = this.get('offset') ? this.get('offset') : {};
       var keys;
-      var offsetLength = offset[rel_dimensions[0]]? offset[rel_dimensions[0]].length:0;
-      var relativeRange = this.get('relatives').getRange()-offsetLength;
-      console.log('offset length=',offset, offsetLength,relativeRange);
+      var offsetLength = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]].length : 0;
+      var relativeRange = this.get('relatives').getRange() - offsetLength;
+      console.log('offset length=', offset, offsetLength, relativeRange);
 
       if (ref_dimensions.length === rel_dimensions.length) {
         console.log('dimensions are equal');
         if (ref_dimensions.length == 1) {
-          offset[rel_dimensions[0]] = offset[rel_dimensions[0]]? offset[rel_dimensions[0]]:[];
+          offset[rel_dimensions[0]] = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]] : [];
           for (var n = 0; n < relativeRange; n++) {
             relPropValue = this.propSwitch(rel_prop, 'rel', n);
 
@@ -247,7 +265,7 @@ define([
         } else {
 
           for (var i = 0; i < rel_dimensions.length; i++) {
-            offset[rel_dimensions[i]] = offset[rel_dimensions[i]]? offset[rel_dimensions[i]]:[];
+            offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
             for (var p = 0; p < relativeRange; p++) {
               relPropValue = this.propSwitch(rel_prop, 'rel', p);
               console.log('refPropValue', refPropValue, ref_dimensions[i],
@@ -262,7 +280,7 @@ define([
         if (rel_dimensions.length == 1) {
 
           keys = Object.keys(refPropValue);
-          offset[rel_dimensions[0]] = offset[rel_dimensions[0]]? offset[rel_dimensions[0]]:[];
+          offset[rel_dimensions[0]] = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]] : [];
           for (var q = 0; q < relativeRange; q++) {
             relPropValue = this.propSwitch(rel_prop, 'rel', q);
             conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
@@ -270,7 +288,7 @@ define([
           }
         } else {
           for (var j = 0; j < rel_dimensions.length; j++) {
-            offset[rel_dimensions[j]] = offset[rel_dimensions[j]]? offset[rel_dimensions[j]]:[];
+            offset[rel_dimensions[j]] = offset[rel_dimensions[j]] ? offset[rel_dimensions[j]] : [];
             for (var t = 0; t < relativeRange; t++) {
               relPropValue = this.propSwitch(rel_prop, 'rel', t);
               conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]] * convertFactor : refPropValue[keys[j]] * convertFactor;
@@ -281,7 +299,7 @@ define([
       } else if (ref_dimensions.length < rel_dimensions.length) {
         if (ref_dimensions.length == 1) {
           for (var k = 0; k < rel_dimensions.length; k++) {
-            offset[rel_dimensions[k]] = offset[rel_dimensions[k]]? offset[rel_dimensions[k]]:[];
+            offset[rel_dimensions[k]] = offset[rel_dimensions[k]] ? offset[rel_dimensions[k]] : [];
             for (var r = 0; r < relativeRange; r++) {
               relPropValue = this.propSwitch(rel_prop, 'rel', r);
               conversion[rel_dimensions[k]] = refPropValue * convertFactor;
@@ -291,7 +309,7 @@ define([
         } else {
           keys = Object.keys(refPropValue);
           for (var m = 0; m < rel_dimensions.length; m++) {
-            offset[rel_dimensions[m]] = offset[rel_dimensions[m]]? offset[rel_dimensions[m]]:[];
+            offset[rel_dimensions[m]] = offset[rel_dimensions[m]] ? offset[rel_dimensions[m]] : [];
             for (var s = 0; s < relativeRange; s++) {
               conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]] * convertFactor : (m < keys.length) ? refPropValue[keys[m]] * convertFactor : refPropValue[keys[keys.length - 1]];
               offset[rel_dimensions[m]].push(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
@@ -302,26 +320,26 @@ define([
 
 
       console.log('offset', offset, 'conversion', conversion);
-      if(relativeRange<0){
-        for(var v=0;v<0-relativeRange;v++){
-          for (var prop in offset){
-            if(offset.hasOwnProperty(prop)){
+      if (relativeRange < 0) {
+        for (var v = 0; v < 0 - relativeRange; v++) {
+          for (var prop in offset) {
+            if (offset.hasOwnProperty(prop)) {
               offset[prop].pop();
             }
+          }
         }
-      }
       }
       this.set('offset', offset);
       return convertFactor;
     },
 
- matchProperty: function(ref_prop, rel_prop){
-     
-  
+    matchProperty: function(ref_prop, rel_prop) {
 
-      var convertFactor = this.setOffset(ref_prop,rel_prop);
+
+
+      var convertFactor = this.setOffset(ref_prop, rel_prop);
       var offset = this.get('offset');
-      var exp_scale = 'y = ' + convertFactor.toString() + ' * ' + 'x' + '*' + 'i';
+      var exp_scale = 'y = operators[mapOperand](' + convertFactor.toString() + ' * ' + 'x' + ',' + 'i)';
       var exp_object = {};
       for (var axis in offset) {
         if (offset.hasOwnProperty(axis)) {
@@ -481,6 +499,8 @@ define([
             return function() {
               var x = (a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
               var offset = self.get('offset');
+              var operators = self.get('operators');
+              var mapOperand = self.get('map_operand');
               var offsetValue = offset[axis][relative.get('index').getValue()];
               var i = self.get('multiplier').getValue();
               console.log('x-val', x, d);
@@ -518,6 +538,8 @@ define([
           for (var m = 0; m < a_keys.length; m++) {
             var axis = a_keys[m];
             var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
+            var operators = self.get('operators');
+            var mapOperand = self.get('map_operand');
             var x = (ap === 'v' || !ap) ? refPropAccess.getValue() : refPropAccess[ap].getValue();
             var offset = self.get('offset');
             var offsetValue = offset[axis][relative.get('index').getValue()];
