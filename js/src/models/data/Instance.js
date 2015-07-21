@@ -340,7 +340,6 @@ define([
 		removeInheritor: function(instance) {
 			var inheritorCollection = this.get('inheritors');
 			return inheritorCollection.removeInheritor(instance);
-			this.get('inheritor_bbox').width=this.get('inheritor_bbox').height=0.1;
 		},
 
 
@@ -1205,12 +1204,8 @@ define([
 
 		renderSelection: function(geom) {
 			var selected = this.get('selected');
-
-			var proto_selected = this.get('proto_selected');
-			var inheritor_selected = this.get('inheritor_selected');
 			var constraint_selected = this.get('constraint_selected');
-			var bbox, inheritor_bbox;
-
+			var bbox; 
 			var selection_clone = this.get('selection_clone');
 			console.log('rendering selection', this.get('id'));
 
@@ -1230,42 +1225,14 @@ define([
 			}
 
 			if (selected) {
-
 				geom.selectedColor = this.getSelectionColor();
 				bbox = this.get('bbox');
 				bbox.selectedColor = this.getSelectionColor();
 				bbox.selected = (constraint_selected) ? false : true;
 				bbox.visible = (constraint_selected) ? false : true;
 				geom.selected = (constraint_selected) ? false : true;
-				inheritor_bbox = this.renderInheritorBoundingBox();
 				console.log('selected bbox', bbox);
-
-				if (inheritor_bbox) {
-					inheritor_bbox.selectedColor = this.get('inheritance_selection_color');
-					inheritor_bbox.selected = true;
-				}
-
-			} else if (proto_selected) {
-				geom.selectedColor = this.get('inheritance_selection_color');
-				geom.selected = proto_selected;
 			}
-			if (inheritor_selected) {
-				geom.selectedColor = this.get('proxy_selection_color');
-				geom.selected = inheritor_selected;
-				//bbox.selectedColor = this.get('proxy_selection_color');
-				//	bbox.selected = true;
-				if (inheritor_selected === 'proxy') {
-					if (!inheritor_bbox) {
-						inheritor_bbox = this.renderInheritorBoundingBox();
-					}
-					if (inheritor_bbox) {
-						inheritor_bbox.selectedColor = this.get('inheritance_selection_color');
-						inheritor_bbox.selected = true;
-					}
-				}
-
-			}
-
 		},
 
 

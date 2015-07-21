@@ -23,8 +23,11 @@ define([
       this.model.on('change:constraint_pending', function(model) {
         if (model.get('constraint_pending')) {
           $('#constraintApply').removeAttr('disabled');
+         $('#constraintApply').addClass('active');
         } else {
           $('#constraintApply').attr('disabled', true);
+             $('#constraintApply').removeAttr('disabled');
+         $('#constraintApply').removeClass('active');
           
         }
       });

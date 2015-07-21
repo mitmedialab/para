@@ -287,23 +287,45 @@ input[type="range"]:active::-webkit-slider-thumb {
     border: solid 1px #B2B2B2;
 }
 #constraintApply{
-  background-image: none;
-  width: 70px;
-  height: 20px;
-  border: 1px solid #B2B2B2;
-  margin-top: 7px;
-  line-height: 10px;
-  color: rgb(118, 120, 123);
   visibility: hidden;
+   background-position-y: -489px;
+   margin-top: 10px
 }
 
-#collectionToolbar .btn-tool-horz{
+#constraintApply.active {
+   background-position-y:  -435px;
+   background-color: #cccccc;
+    -webkit-animation-name: example; /* Chrome, Safari, Opera */
+    -webkit-animation-duration: 1s; /* Chrome, Safari, Opera */
+    animation-name: example;
+    animation-duration: 1s;
+    animation-iteration-count:infinite;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes example {
+    25%   {background-color: #cccccc;}
+    50%  {background-color: white;}
+    25%   {background-color: #cccccc;}
+}
+
+/* Standard syntax */
+@keyframes example {
+   25%   {background-color: #cccccc;}
+   50%  {background-color: white;}
+   25%   {background-color: #cccccc;}
+}
+
+#collectionToolbar .btn-tool-horz, #constraintToolbar .btn-tool-horz{
     background-image: url(../images/horz_buttons.svg);
-    background-size: 54px 433px;
+    background-size: 54px 542px;
     height: 54px;
     width: 54px;
     border: none;
-    margin: 0 3px;
+   
+}
+#collectionToolbar .btn-tool-horz{
+  margin: 0 3px;
 }
 
 .button-heading {
@@ -459,7 +481,7 @@ input[type=text].range-text {
     margin-top: 20px;
 }
 
-#collectionToolbar{
+#collectionToolbar, #constraintToolbar{
     margin-top: 2px;
     width: 300px;
     height: 70px;

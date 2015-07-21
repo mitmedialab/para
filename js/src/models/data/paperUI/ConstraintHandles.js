@@ -5,7 +5,7 @@ define([
   'models/data/PaperUI'
 ], function(_, paper, Backbone, PaperUI) {
 
-  var targetLayer;
+  var targetLayer, self;
   var prop_map = ['h', 's', 'l'];
   var ConstraintHandles = PaperUI.extend({
 
@@ -14,6 +14,47 @@ define([
       targetLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'ui_layer';
       })[0];
+      var text = new paper.PointText({
+        point: new paper.Point(5, 13),
+        content: '',
+        justification: 'left',
+        fontSize: 12,
+        fontFamily: 'Source Sans Pro',
+        fillColor: 'black',
+
+      });
+      text.name = 'text';
+      var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
+      var path = new paper.Path.Rectangle(rectangle);
+      path.fillColor = 'white';
+      path.name = 'back';
+      this.tipText = new paper.Group();
+      this.tipText.addChild(path);
+      this.tipText.addChild(text);
+      this.tipText.visible = false;
+      targetLayer.addChild(this.tipText);
+      self = this;
+
+
+    },
+
+    setText: function(content, position) {
+
+      this.tipText.children[1].content = content;
+      var scaleAmount = (this.tipText.children[1].bounds.width + 10) / this.tipText.children[0].bounds.width;
+      this.tipText.children[0].scale(scaleAmount, 1);
+      this.tipText.children[0].position.x = this.tipText.children[0].position.y = 0;
+      this.tipText.children[1].position.x = this.tipText.children[1].position.y = 0;
+      this.tipText.position = position;
+      this.tipText.position.x = this.tipText.position.x + this.tipText.bounds.width / 2 + 10;
+      this.tipText.position.y = this.tipText.position.y + this.tipText.bounds.height / 2 + 10;
+      this.tipText.visible = true;
+      this.tipText.bringToFront();
+    },
+
+    hideText: function() {
+      this.tipText.visible = false;
+
     },
 
     draw: function() {
@@ -26,6 +67,8 @@ define([
         delbox.name = 'delbox';
         return delbox;
       };
+
+
 
       var createCorners = function(bounds) {
         // corners on box, superficial
@@ -77,7 +120,7 @@ define([
         fill.name = 'fill_hsl';
         stroke.name = 'stroke_hsl';
         stroke_tab.name = fill_tab.name = 'options';
-        stroke_tab.visible=fill_tab.visible = false;
+        stroke_tab.visible = fill_tab.visible = false;
         fill_h.name = 'fill_h';
         fill_s.name = 'fill_s';
         fill_l.name = 'fill_l';
@@ -98,8 +141,8 @@ define([
           from: [bounds.center.x - 15, bounds.center.y],
           to: [bounds.center.x + 15, bounds.center.y]
         });
-        cross_v.name = 'position_x';
-        cross_h.name = 'position_y';
+        cross_v.name = 'position_y';
+        cross_h.name = 'position_x';
         cross_v.strokeColor = cross_h.strokeColor = 'black';
         cross_v.strokeWidth = cross_h.strokeWidth = 2;
         cross = [cross_v, cross_h];
@@ -147,9 +190,9 @@ define([
           hand_corners[i].name = 'hand_corner';
         }
       } else {*/
-        hand_bounds = gen_bounds;
-        hand_delbox = gen_delbox;
-        hand_corners = gen_corners;
+      hand_bounds = gen_bounds;
+      hand_delbox = gen_delbox;
+      hand_corners = gen_corners;
       //}
 
       var cross = createCross(hand_bounds);
@@ -259,8 +302,8 @@ define([
       xyarrow.position = hand_corners[0].position;
       rotator.position = new paper.Point(hand_corners[8].bounds.x + 10, hand_corners[8].bounds.y + 10);
 
-      var cross_v = geometry.children['position_x'];
-      var cross_h = geometry.children['position_y'];
+      var cross_v = geometry.children['position_y'];
+      var cross_h = geometry.children['position_x'];
       cross_v.position = hand_object_geom.position;
       cross_h.position = hand_object_geom.position;
     },
@@ -286,7 +329,8 @@ define([
       if (event.target.name == 'box' || event.target.name == 'letter') {
         target = target.parent;
       }
-      console.log('target name', target.name, target);
+
+      console.log('target name', target.name, target.position);
       this.setProperties(target.name);
 
     },
@@ -376,12 +420,12 @@ define([
         if (target.active) {
           property = target.name;
           if (target.name == 'fill_hsl') {
-              target.bringToFront();
+            target.bringToFront();
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'red';
             console.log('setting fill active');
           } else if (target.name == 'stroke_hsl') {
-             target.bringToFront();
+            target.bringToFront();
             target.children[0].strokeColor = 'red';
             console.log('setting stroke active');
 
@@ -416,12 +460,12 @@ define([
         } else {
           property = target.name;
           if (target.name == 'fill_hsl') {
-          
+
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'black';
             target.children[0].fillColor = 'white';
           } else if (target.name == 'stroke_hsl') {
-           
+
             target.children[0].strokeColor = 'white';
             target.children[0].fillColor = 'black';
           } else if (target.name.split('fill')[1] || target.name.split('stroke')[1]) {
@@ -469,13 +513,28 @@ define([
       if (event.modifiers.shift) {
         return;
       }
-
       var target = event.target;
-
-      console.log('target', target, target.name);
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
         return;
-      } else if (target.name == 'fill' || target.name == 'stroke' || target.name == 'options' || target.name == 'box' || target.name == 'letter') {
+      }
+
+      
+      var tooltip_target;
+      if (!target.name) {
+        tooltip_target = target.parent;
+        console.log('target name was undefined');
+      } else {
+        tooltip_target = target;
+      }
+      if (tooltip_target.name === 'box' || tooltip_target.name === 'letter') {
+        tooltip_target = tooltip_target.parent;
+        console.log('changing target name');
+      }
+
+      self.setText(tooltip_target.name, tooltip_target.position);
+
+      console.log('target', target, target.name);
+      if (target.name == 'fill' || target.name == 'stroke' || target.name == 'options' || target.name == 'box' || target.name == 'letter') {
         if (target.name == 'box' || target.name == 'letter') {
           target.parent.opacity = 0.5;
         } else {
@@ -528,6 +587,8 @@ define([
           }
         }
       }
+      self.hideText();
+
     },
 
     remove: function(event) {

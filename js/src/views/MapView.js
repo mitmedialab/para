@@ -21,7 +21,6 @@ define([
 	var hitOptions = {
 		segments: true,
 		curves: true,
-		handles: true, //necessary?
 		center: true,
 		fill: true,
 		tolerance: 4
@@ -47,12 +46,12 @@ define([
 			intersectionPath.name = 'intersectionPath';
 
 
-			//startPoint = new paper.Path.Circle(start.point, 4);
-			//startPoint.name = 'start_point';
-			//endPoint = new paper.Path.Circle(end.point, 4);
-			//endPoint.name = 'end_point';
-			//startPoint.fillColor = endPoint.fillColor = new paper.Color(0, 0, 0);
-			//startPoint.visible = endPoint.visible = false;
+			startPoint = new paper.Path.Circle(new paper.Point(0, 0), 4);
+			startPoint.name = 'start_point';
+			endPoint = new paper.Path.Circle(new paper.Point(0, 0), 4);
+			endPoint.name = 'end_point';
+			startPoint.fillColor = endPoint.fillColor = new paper.Color(0, 0, 0);
+			startPoint.visible = endPoint.visible = false;
 			mapPaperView.draw();
 
 			master_tool = paper.tools[0];
@@ -81,10 +80,6 @@ define([
 			//start.point.y = height / 2;
 			//end.point.x = width;
 			//end.point.y = height / 2;
-			if (startPoint) {
-				startPoint.position = start.point;
-				endPoint.position = end.point;
-			}
 			mapPaperView.draw();
 			this.resetMasterView();
 		},
@@ -109,6 +104,7 @@ define([
 			this.setCollectionView();
 			if (functionPath) {
 				functionPath.remove();
+				startPoint.visible = endPoint.visible = false;
 			}
 			if (path) {
 				functionPath = path;
@@ -116,7 +112,11 @@ define([
 				console.log('poly', poly);
 				start = functionPath.segments[0];
 				end = functionPath.segments[functionPath.segments.length - 1];
+				startPoint.visible = endPoint.visible = true;
+				startPoint.position = functionPath.getPointAt(3);
+				endPoint.position = functionPath.getPointAt(functionPath.length - 3);
 				paper.project.layers[0].addChild(functionPath);
+				functionPath.sendToBack();
 			}
 			mapPaperView.draw();
 			this.resetMasterView();
@@ -290,24 +290,34 @@ define([
 		toolMouseDown: function(event) {
 			var hitResult = paper.project.hitTest(event.point, hitOptions);
 			if (hitResult) {
-				switch (hitResult.type) {
-					case 'segment':
-					case 'handle-in':
-					case 'handle-out':
-						activePoint = hitResult.segment;
-						console.log('hit segment');
-						break;
-					case 'curve':
-						//console.log('hit detected',event.point);
-						//lagrange_pts.push(event.point);
-						//this.setFunctionPath(functionPath);
-						/*var curve = hitResult.location.curve;
-						var curveOffset = hitResult.location.curveOffset;
-						activePoint = curve.divide(curveOffset).segment1;
-						console.log('hit curve');*/
-						break;
+				console.log('hit result',hitResult);
+				if (hitResult.item === endPoint) {
+					console.log('hit endpoint');
+					activePoint = end;
+				} else if (hitResult.item === startPoint) {
+					console.log('hit startpoint');
+					activePoint = start;
+				} else {
+					switch (hitResult.type) {
+						case 'segment':
+						case 'handle-in':
+						case 'handle-out':
+							activePoint = hitResult.segment;
+							console.log('hit segment');
+							break;
+						case 'curve':
+							//console.log('hit detected',event.point);
+							//lagrange_pts.push(event.point);
+							//this.setFunctionPath(functionPath);
+							/*var curve = hitResult.location.curve;
+							var curveOffset = hitResult.location.curveOffset;
+							activePoint = curve.divide(curveOffset).segment1;
+							console.log('hit curve');*/
+							break;
+					}
 				}
 			}
+
 		},
 
 		toolMouseDrag: function(event) {
@@ -330,6 +340,8 @@ define([
 				if (activePoint.point.y > height) {
 					activePoint.point.y = height;
 				}
+				startPoint.position = functionPath.getPointAt(3);
+				endPoint.position = functionPath.getPointAt(functionPath.length - 3);
 				self.resetMasterView();
 				self.model.updateMapping(self.calculateValueSet());
 				self.setCollectionView();

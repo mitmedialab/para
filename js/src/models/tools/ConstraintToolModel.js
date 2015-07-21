@@ -130,6 +130,7 @@ define([
 
     //checks to see if constraint is currently pending
     checkPending: function() {
+      console.log('check pending');
       var constraint = this.get('currentConstraint');
       if (constraint) {
         if (constraint.get('references') && constraint.get('relatives') && constraint.get('ref_prop')&&constraint.get('rel_prop')) {

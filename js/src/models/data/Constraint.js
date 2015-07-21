@@ -62,8 +62,8 @@ define([
       relatives: null,
       ref_type: 'shape',
       rel_type: 'shape',
-      ref_prop: 'position_xy',
-      rel_prop: 'position_xy',
+      ref_prop: null,
+      rel_prop: null,
       expression: '',
 
       // UI
