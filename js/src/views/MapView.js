@@ -109,7 +109,6 @@ define([
 			if (path) {
 				functionPath = path;
 				var poly = TrigFunc.Lagrange(lagrange_pts);
-				console.log('poly', poly);
 				start = functionPath.segments[0];
 				end = functionPath.segments[functionPath.segments.length - 1];
 				startPoint.visible = endPoint.visible = true;
@@ -282,7 +281,6 @@ define([
 		},
 
 		toolMouseUp: function(event) {
-
 			activePoint = null;
 
 		},
@@ -290,12 +288,9 @@ define([
 		toolMouseDown: function(event) {
 			var hitResult = paper.project.hitTest(event.point, hitOptions);
 			if (hitResult) {
-				console.log('hit result',hitResult);
 				if (hitResult.item === endPoint) {
-					console.log('hit endpoint');
 					activePoint = end;
 				} else if (hitResult.item === startPoint) {
-					console.log('hit startpoint');
 					activePoint = start;
 				} else {
 					switch (hitResult.type) {
@@ -303,7 +298,6 @@ define([
 						case 'handle-in':
 						case 'handle-out':
 							activePoint = hitResult.segment;
-							console.log('hit segment');
 							break;
 						case 'curve':
 							//console.log('hit detected',event.point);

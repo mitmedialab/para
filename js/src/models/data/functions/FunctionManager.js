@@ -50,7 +50,6 @@ define([
 			var reference = this;
 			this.cf = function() {
 				var v = reference.getValue();
-				console.log('reference constraint value', v);
 				relative.setValue(v);
 				return v;
 			};
@@ -58,7 +57,6 @@ define([
 		},
 
 		propertyModified: function() {
-			console.log('triggering param modified');
 			this.trigger('modified', this);
 			if (this.cf && this.get('called')) {
 				this.cf.call(this);
@@ -105,18 +103,14 @@ define([
 				switch (childList[i].get('type')) {
 
 					case 'collection':
-						console.log('adding list to function');
 						f.lists.push(childList[i]);
 						var members = childList[i].getInstanceMembers();
-						console.log('list members', members);
 						members.forEach(function(item) {
-							console.log('adding list child to function');
 							f.addChildNode(item);
 							item.hide();
 						});
 						break;
 					case 'function':
-						console.log('adding function to function');
 						f.functions.push(childList[i]);
 						break;
 					default:
@@ -137,7 +131,6 @@ define([
 		},
 
 		callFunction: function(func) {
-			console.log('checking function called', func.get('called'));
 			if (!func.get('called')) {
 				func.call();
 
@@ -163,7 +156,6 @@ define([
 			var parent = currentNode.close();
 			var toSelect = currentNode;
 			if (parent) {
-				console.log('setting current to parent');
 				nCurrent = parent;
 				this.functions = parent.functions;
 			} else {
@@ -185,16 +177,12 @@ define([
 		},
 
 		convert: function(instance) {
-			console.log('converting instance');
 
-			console.log('parameterNode', ParameterNode);
 			for (var k in ParameterNode) {
 				if (ParameterNode.hasOwnProperty(k)) {
-					console.log('converting property', k);
 					instance[k] = ParameterNode[k];
 				}
 			}
-			console.log(instance.propertyModified);
 			var parent = instance;
 			_.each(instance.attributes, function(val, key) {
 				if (val instanceof PConstraint) {

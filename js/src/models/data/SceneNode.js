@@ -97,7 +97,6 @@ define([
          */
         edgesRendered: function() {
             var edges = this.get('edges');
-            //console.log("edges length",edges.length);
             for (var i = 0; i < edges.length; i++) {
                 if (!edges[i].get('x').get('rendered')) {
                     return false;
@@ -182,23 +181,18 @@ define([
             if (child.isSibling(sibling)) {
 
                 var childIndex = child.getChildIndex();
-                console.log('child_index', childIndex);
                 this.children.splice(childIndex, 1);
                 var siblingIndex = sibling.getChildIndex();
                 this.children.splice(siblingIndex, 0, child);
-                console.log('child_index', child.getChildIndex());
             }
         },
 
         setChildAfter: function(child, sibling) {
             if (child.isSibling(sibling)) {
-                console.log('num of children',this.children.length);
                 var childIndex = child.getChildIndex();
-                console.log('child_index', childIndex);
                 this.children.splice(childIndex, 1);
                 var siblingIndex = sibling.getChildIndex();
                 this.children.splice(siblingIndex + 1, 0, child);
-                console.log('child_index', child.getChildIndex());
 
             }
         },
@@ -248,7 +242,6 @@ define([
         //sets parent node. 
         //If node already has a parent, it removes itself from the parent's this.children
         setParentNode: function(node) {
-            ////console.log('parent='+this.nodeParent);
             if (node !== null) {
                 if (this.nodeParent !== null) {
                     this.nodeParent.removeChildNode(this);
@@ -273,7 +266,6 @@ define([
         addChildNode: function(node) {
 
             if (node !== null) {
-                //console.log("adding node",this.name,node.name);
                 node.setParentNode(this);
                 this.children.push(node);
                 node.index = this.children.length - 1;
@@ -286,16 +278,12 @@ define([
         },
         //removes child node from list of this.children- does not delete the removed child!
         removeChildNode: function(node) {
-            //console.log("number of this.children="+this.children.length);
             if (node !== null && this.children.length > 0) {
-                // //console.log("attempting to remove");
                 for (var i = 0; i < this.children.length; i++) {
 
                     if (this.children[i] == node) {
                         this.children[i].removeParentNode();
                         var child = this.children.splice(i, 1)[0];
-                        //console.log("number of this.children="+this.children.length);
-
                         return child;
 
                     }
@@ -315,13 +303,10 @@ define([
 
         //recursively searches all sub this.children for child to remove- depth first. Not very efficient. double check to see if this is actually working correctly...
         recursiveRemoveChildNode: function(node) {
-            ////console.log("starting recurse at node:"+this.name);
             if (node !== null && this.children.length > 0) {
                 for (var i = 0; i < this.children.length; i++) {
-                    // //console.log("-----checking child at:"+i);
                     if (this.children[i] == node) {
                         this.children.splice(i, 1);
-                        // //console.log('found node to remove at parent:' + this.name + ' , index:' + i);
                         return true;
                     } else {
 

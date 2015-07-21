@@ -182,7 +182,6 @@ define([
           operator: 'set'
         };
         this.modifyProperty(md);
-        console.log('removing member at ',member,index);
         return member;
       }
 
@@ -369,7 +368,6 @@ define([
 
       var bbox_dimensions = this.get('bbox_dimensions');
       if (bbox_dimensions.bottomRight) {
-        console.log('creating bbox');
         var width = bbox_dimensions.bottomRight.x - bbox_dimensions.topLeft.x;
         var height = bbox_dimensions.bottomRight.y - bbox_dimensions.topLeft.y;
         var x = bbox_dimensions.topLeft.x + width / 2;

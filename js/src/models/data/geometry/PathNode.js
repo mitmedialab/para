@@ -74,7 +74,6 @@ define([
       data.rotation_delta = {
         val: rotation_delta
       };
-      console.log('normalized_rotation', data.rotation_delta.val, matrix.rotation);
 
       data.scaling_delta = {
         x: matrix.scaling.x,
@@ -131,7 +130,6 @@ define([
 
 
       this.modifyProperty(data);
-      console.log('color value', this.get('fill_color').getValue());
 
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
@@ -156,7 +154,6 @@ define([
 
     //sets selection for segments
     setSelectedSegments: function(segments) {
-      console.log('segments', segments);
       var points = this.get('points');
       var selectedPoints = [];
       for (var i = 0; i < segments.length; i++) {
@@ -180,7 +177,6 @@ define([
      * called when segment in geometry is modified
      */
     modifyPoints: function(data, mode, modifier) {
-      console.log('data', data, this.get('points'));
       var proto_node = this.get('proto_node');
       if (mode === 'proxy' && proto_node) {
         proto_node.modifyPoints(data, mode, modifier);
@@ -203,7 +199,6 @@ define([
       for (var i = 0; i < selectedPoints.length; i++) {
 
         var selectedPoint = selectedPoints[i];
-        console.log('found selectedPoint', selectedPoint, selectedPoint.get('selected'));
         var geomS = geom.segments[selectedPoint.get('index')];
         var selectionS = selection_clone.segments[selectedPoint.get('index')];
         indicies.push({
@@ -219,7 +214,6 @@ define([
             geomS.point.y += data.translation_delta.y;
             selectionS.point.x += data.translation_delta.x;
             selectionS.point.y += data.translation_delta.y;
-            console.log('setting position of point');
 
             break;
           case 'handle-in':

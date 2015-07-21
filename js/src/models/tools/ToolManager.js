@@ -121,7 +121,6 @@ define([
      * Requests a particular tool to call a named method. The results are passed back to the source of the delegation.
      */
     delegateMethod: function(toolName, methodName) {
-      console.log('Delegating method: ' + methodName + ' to tool: ' + toolName);
       var args = Array.prototype.slice.call(arguments, 2); // extract the method arguments
       var tool = this.getToolByName(toolName);
       var method = tool[methodName];

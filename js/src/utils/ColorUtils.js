@@ -39,7 +39,6 @@ define([
 			}
 			else{
 				var rgb = this.hslToRgb(color.h,color.s,color.l);
-				console.log('converted rgb',rgb,color);
 				return this.rgbToHex({r:rgb[0],g:rgb[1],b:rgb[2]});
 			}
 		};

@@ -634,7 +634,6 @@ define([
 			}
 
 			var constrained_props = this.getConstraintValues();
-			console.log('constrained props', constrained_props);
 			for (var p in data) {
 				if (data.hasOwnProperty(p)) {
 					var data_property = data[p];
@@ -642,7 +641,6 @@ define([
 
 						var property = this.get(p);
 						property.setNull(false);
-						console.log('modifying property', p, data_property, data[p], data);
 						property.modifyProperty(data_property);
 						//check to make sure rotation is between 0 and 360
 						if (p == 'rotation_delta') {
@@ -722,13 +720,11 @@ define([
 
 		_modifyMatrixAfterCompile: function(property_name, internal_matrix, attribute_constraint, value, set) {
 			//attribute is not constrained, modification allowed
-			console.log('modify matrix', property_name, attribute_constraint);
 
 			//attribute sub properties are constrained, selective modification allowed;
 
 			switch (property_name) {
 				case 'translation_delta':
-					console.log('modify_translation', property_name, value.translation);
 					if (!attribute_constraint) {
 						if (set) {
 							internal_matrix.tx = (value.translation) ? 0 : internal_matrix.tx;
@@ -741,10 +737,8 @@ define([
 						return false;
 
 					} else if (attribute_constraint && attribute_constraint.x && attribute_constraint.y) {
-						console.log('object is completely constrained');
 						return false;
 					} else if (attribute_constraint.x && !attribute_constraint.y) {
-						console.log('object is only x constrained');
 
 						if (set) {
 							internal_matrix.ty = (value.translation) ? 0 : internal_matrix.ty;
@@ -752,7 +746,6 @@ define([
 						internal_matrix.translate(0, value.translation.y);
 						return true;
 					} else if (!attribute_constraint.x && attribute_constraint.y) {
-						console.log('object is only y constrained');
 						if (set) {
 							internal_matrix.tx = (value.translation) ? 0 : internal_matrix.tx;
 						}
@@ -940,11 +933,9 @@ define([
 
 		getConstraintValues: function() {
 			var constraints = this.getConstraint();
-			console.log('constraints', constraints);
 			var value = {};
 			for (var c in constraints) {
 				if (constraints.hasOwnProperty(c)) {
-					console.log('constraints:', c, constraints[c]);
 					if (constraints[c].getValue) {
 						value[c] = constraints[c].getValue();
 					} else {
@@ -1207,10 +1198,8 @@ define([
 			var constraint_selected = this.get('constraint_selected');
 			var bbox; 
 			var selection_clone = this.get('selection_clone');
-			console.log('rendering selection', this.get('id'));
 
 			if (constraint_selected) {
-				console.log('rendering selection clone', this.get('id'));
 				if (!selection_clone) {
 					this.createSelectionClone();
 					selection_clone = this.get('selection_clone');
@@ -1220,7 +1209,6 @@ define([
 
 			} else {
 				selection_clone.visible = false;
-				console.log('hiding selection clone', this.get('id'));
 
 			}
 
@@ -1231,7 +1219,6 @@ define([
 				bbox.selected = (constraint_selected) ? false : true;
 				bbox.visible = (constraint_selected) ? false : true;
 				geom.selected = (constraint_selected) ? false : true;
-				console.log('selected bbox', bbox);
 			}
 		},
 

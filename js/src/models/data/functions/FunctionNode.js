@@ -78,7 +78,6 @@ define([
 					this.addChildNode(param);
 				}
 				this.trigger('change:f_parameters');
-				console.log('params toJSON: ',this.toJSON());
 			},
 
 			removeParameter: function(param) {
@@ -99,7 +98,6 @@ define([
 			 * a list of currently selected shapes
 			 */
 			requestArgument: function(id) {
-				//console.log('requesting argument');
 				this.selectedParam = this.getParamById(id);
 				this.trigger('request_selected', this);
 			},
@@ -152,12 +150,10 @@ define([
 			call: function() {
 				this.set('called', true);
 				for (var i = 0; i < this.children.length; i++) {
-					console.log('child is returned',this.children[i].isReturned);
 					if(this.children[i].isReturned ){
 						this.children[i].show();
 					}
 					else{
-						console.log('hiding child');
 						this.children[i].hide();
 					}
 				}
@@ -188,14 +184,12 @@ define([
 					}*/
 					this.children.forEach(function(child) {
 						if(!child.isReturned){
-							console.log('setting child to non-visible');
 							child.set('visible', false);
 						}
 					});
 
 				} else if (open) {
 					this.children.forEach(function(child) {
-						//console.log('setting child to visible');
 
 						//child.set('visible', true);
 					});

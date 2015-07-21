@@ -43,7 +43,6 @@ define([
         handle = null;
         this.selectedNodes = [];
         this.trigger('selectionReset');
-        //console.log("setting selected nodes to null");
       }
 
 
@@ -60,7 +59,6 @@ define([
 
         var path = hitResult.item;
         instanceIndex = path.instanceIndex;
-        //console.log(hitResult);
 
 
         //this sets currentNode depending on current selection level in tree

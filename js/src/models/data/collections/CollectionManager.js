@@ -87,7 +87,6 @@ define([
 		 * without deleting its members
 		 */
 		removeCollection: function(collection) {
-			console.log('removing collection');
 			var removedLists,members; 
 			for (var j = 0; j < lists.length; j++) {
 				if (lists[j] === collection) {
@@ -171,7 +170,6 @@ define([
 			var itemFound = false;
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
-				console.log('item', i, lInstance.get('id'), lInstance.get('name'), lists[i].toJSON().members);
 				if (item && item != lInstance) {
 					sInstances.push(item);
 					itemFound = true;
@@ -286,7 +284,6 @@ define([
 		 * closes selected open lists
 		 */
 		toggleClosedLists: function(selected) {
-			console.log('selected', selected);
 			var toggledLists = [];
 			var returnedLists = [];
 			for (var j = 0; j < selected.length; j++) {

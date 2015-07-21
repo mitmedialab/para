@@ -202,7 +202,6 @@ define([
     },
 
     constraintApplyClick: function(){
-      console.log('applying constraint');
       this.model.applyConstraint();
 
     },

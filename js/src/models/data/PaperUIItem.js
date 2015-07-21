@@ -130,9 +130,7 @@ define([
       var pathJSON = path.exportJSON({
         asString: true
       });
-      //console.log('pathJSON', pathJSON);
-      //var geom = paper.project.importJSON(pathJSON);
-      //console.log('importJSON', geom);
+     
       this.set('master_path', new PFloat(pathJSON));
     
       path.remove(); // WARNING: Memory leak??

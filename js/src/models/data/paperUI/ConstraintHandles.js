@@ -263,7 +263,6 @@ define([
         return;
       }
       geometry.visible = true;
-      console.log('handle layer=', geometry.layer);
     },
 
     redraw: function() {
@@ -330,15 +329,12 @@ define([
         target = target.parent;
       }
 
-      console.log('target name', target.name, target.position);
       this.setProperties(target.name);
 
     },
 
 
     setProperties: function(name) {
-      console.log('set properties', name);
-      console.trace();
       var constraint = this.get('constraint');
       var ref_geom = constraint.get('ref_handle').get('geometry');
       var rel_geom = constraint.get('rel_handle').get('geometry');
@@ -423,11 +419,9 @@ define([
             target.bringToFront();
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'red';
-            console.log('setting fill active');
           } else if (target.name == 'stroke_hsl') {
             target.bringToFront();
             target.children[0].strokeColor = 'red';
-            console.log('setting stroke active');
 
           } else if (target.name.split('fill')[1] || target.name.split('stroke')[1]) {
             target.children[0].strokeColor = 'red';
@@ -436,14 +430,11 @@ define([
             var dimensions = '';
             for (var k = 0; k < geometry.children.length; k++) {
               var child_prop = geometry.children[k].name.split('_');
-              console.log("testing child", child_prop, geometry.children[k].active);
               if (child_prop[0] === prop && child_prop[1] && geometry.children[k].active) {
                 dimensions += child_prop[1];
-                console.log('dimensions append:', dimensions);
               }
             }
             property = prop + '_' + dimensions;
-            console.log('append prop:', property);
 
 
           } else {
@@ -522,18 +513,15 @@ define([
       var tooltip_target;
       if (!target.name) {
         tooltip_target = target.parent;
-        console.log('target name was undefined');
       } else {
         tooltip_target = target;
       }
       if (tooltip_target.name === 'box' || tooltip_target.name === 'letter') {
         tooltip_target = tooltip_target.parent;
-        console.log('changing target name');
       }
 
       self.setText(tooltip_target.name, tooltip_target.position);
 
-      console.log('target', target, target.name);
       if (target.name == 'fill' || target.name == 'stroke' || target.name == 'options' || target.name == 'box' || target.name == 'letter') {
         if (target.name == 'box' || target.name == 'letter') {
           target.parent.opacity = 0.5;
@@ -556,9 +544,7 @@ define([
         return;
       }
       var target = event.target;
-      console.log('name', target.name);
 
-      console.log('target', target, target.name);
 
       if (target.name == 'delbox' || target.name == 'corner' || target.name == 'hand_delbox' || target.name == 'hand_corner') {
         return;

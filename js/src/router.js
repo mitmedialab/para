@@ -30,8 +30,6 @@ define([
       var ui_layer = new paper.Layer();
       ui_layer.name = 'ui_layer';
       geometry_layer.activate();
-      console.log('paper project', paper.project);
-      console.log('layers:', paper.project.layers);
 
       var propertiesManager = new PropertiesManager();
       //event bus for passing events between views

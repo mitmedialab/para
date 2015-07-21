@@ -75,7 +75,6 @@ define([
 
 		getById: function(id) {
 			var prefix = id.split('_')[0];
-			console.log('prefix', prefix);
 			var obj;
 			switch (prefix) {
 				case 'collection':
@@ -146,7 +145,6 @@ define([
 
 			}
 			if (ref && rel) {
-				console.log('rel id =', rel);
 				ref_i = this.getById(ref);
 				rel_i = this.getById(rel);
 				ref_i.set('constraint_selected', 'reference_selected');
@@ -253,7 +251,6 @@ define([
 		},
 
 		unGroup: function() {
-			console.log('ungroup', selected);
 			for (var i = 0; i < selected.length; i++) {
 				switch (selected[i].get('type')) {
 					case 'geometry':
@@ -274,7 +271,6 @@ define([
 					case 'collection':
 						layersView.removeCollection(selected[i].get('id'));
 						var removedItems = collectionManager.removeCollection(selected[i]);
-						console.log('removed items =', removedItems);
 						this.deselectAllShapes();
 						this.selectShape(removedItems);
 						break;
@@ -692,7 +688,6 @@ define([
 					constraint.setMultiplierLength();
 					constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
 					var values = mapView.calculateValueSet(constraint);
-					console.log('updated values', values, constraint.getRange());
 					constraint.setMultipliers(values);
 					if (cId && cId === constraint.get('id')) {
 						this.updateMapView(constraint.get('id'));
@@ -790,7 +785,6 @@ define([
 			} else {
 				data = collectionManager.toggleOpenLists(selected);
 			}
-			console.log('toggleOpen', data.toSelect, data.toRemove);
 
 			if (data.toRemove && data.toRemove.length > 0) {
 				this.deselectShape(data.toRemove);
@@ -813,14 +807,12 @@ define([
 				currentNode = data.currentNode;
 				collectionManager.setLists(currentNode.lists);
 			}
-			console.log('to remove', data.toRemove, 'to select', data.toSelect);
 
 			if (data.toRemove && data.toRemove.length > 0) {
 				this.deselectShape(data.toRemove);
 			}
 			if (data.toSelect && data.toSelect.length > 0) {
 				this.selectShape(data.toSelect);
-				console.log('selecting shapes', data.toSelect);
 				//TODO: some issue here with correctly selecting shapes when list is toggled closed.
 			}
 		},

@@ -126,7 +126,6 @@ define([
 
 			var self = this;
 			$('html').keyup(function(e) {
-				console.log(e.keyCode);
 				if (e.keyCode == 46 || e.keyCode == 8) {
 					//self.deleteActive();
 				}
@@ -218,7 +217,6 @@ define([
 			var bc1 = $(rel.span).css('backgroundColor');
 			var bc2 = $(ref.span).css('backgroundColor');
 			var bp = p1.top < p2.top ? -175 : -245;
-			console.log("shapeRoot, listRoot", p1.top, p2.top);
 			$('#constraint_rel').css({
 				top: Math.floor(p1.top) - 111,
 				backgroundColor: bc1,
@@ -252,7 +250,6 @@ define([
 
 		resetConstraintHeight: function() {
 			var height = $('div#layers').outerHeight();
-			console.log('height=', height, $('div#layers'));
 			$('#constraint_viz').height(height);
 
 		},
@@ -285,7 +282,6 @@ define([
 				var pRel = currentRel;
 				currentRef = constraint.get('references').get('id');
 				currentRel = constraint.get('relatives').get('id');
-				console.log('clicked constraint', activeNode.key, constraint, currentRef, currentRel);
 				activeNode.status = 'opened';
 				this.positionConstraintIcons();
 				this.model.visualizeConstraint(currentRef, currentRel, pRef, pRel);
@@ -309,7 +305,6 @@ define([
 		},
 
 		dropCompleted: function(nodeA, nodeB, hitMode) {
-			console.log('dropCompleted', nodeA, nodeB, hitMode);
 			this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
 		},
 
@@ -352,7 +347,6 @@ define([
 					s_tree = shapeTree;
 					break;
 			}
-			console.log('deselect nodes', tree, active);
 			var active = s_tree.getActiveNode();
 			if (active) {
 				active.setActive(false);
@@ -361,7 +355,6 @@ define([
 		},
 
 		itemClicked: function(id, activeNode, shape) {
-			console.log('itemClicked');
 			switch (id) {
 				case 'constraint':
 					break;
@@ -374,7 +367,6 @@ define([
 		},
 
 		toggleVisibility: function(activeNode, shape) {
-			console.log('shape', shape);
 			if (shape.get('visible')) {
 				this.hideNode(activeNode);
 				this.deselectNode(activeNode);
@@ -434,7 +426,6 @@ define([
 		addShape: function(shape) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
-			console.log('shape', shape);
 			var s = {
 				title: shape.name,
 				key: shape.id
@@ -476,7 +467,6 @@ define([
 		addList: function(list) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
-			console.log('list', list);
 			var listData = {
 				title: list.name,
 				key: list.id
@@ -501,14 +491,12 @@ define([
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			this.deselectAll(constraintRoot);
-			//console.log('constraint', data);
 			var constraintData = {
 				title: data.get('name'),
 				key: data.get('id'),
 				rel: data.get('relatives').get('id'),
 				ref: data.get('references').get('id')
 			};
-			console.log('constraint-data', constraintData);
 			var constraintNode = constraintRoot.addChildren(constraintData);
 			this.selectNode(constraintNode);
 			constraintNode.setActive(true);
@@ -574,7 +562,9 @@ define([
 
 		getCurrentRel: function() {
 			return currentRel;
-		}
+		},
+
+
 
 
 

@@ -135,15 +135,13 @@ define([
 
 
 		TrigFunc.distance = function(p1, p2) {
-			////console.log("p1="+p1);
-			////console.log("p2="+p2);
+		
 			var distance = Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
 			return distance;
 		};
 
 		TrigFunc.midpoint = function(p1, p2) {
-			//console.log(p1);
-			//console.log(p2);
+		
 			var x = (p1.getX() + p2.getX()) / 2;
 			var y = (p1.getY() + p2.getY()) / 2;
 
@@ -157,8 +155,6 @@ define([
 		TrigFunc.side = function(pA, pB, pM) {
 
 			var position = (pB.getX() - pA.getX()) * (pM.getY() - pA.getY()) - (pB.getY() - pA.getY()) * (pM.getX() - pA.getX());
-			////console.log("position=");
-			////console.log(position);
 			if (position > 0) {
 				return 1;
 			} else if (position < 0) {
@@ -239,7 +235,6 @@ define([
 					result *= x_i - points[j].x;
 				}
 			}
-			console.log(result);
 			return result;
 		};
 
@@ -247,7 +242,6 @@ define([
 		TrigFunc._interpolation_polynomial = function(i, points) {
 			var coefficients = this._zeros(points.length);
 			coefficients[0] = 1 / this._denominator(i, points);
-			console.log(coefficients[0]);
 			var new_coefficients;
 
 			for (var k = 0; k < points.length; k++) {
@@ -261,7 +255,6 @@ define([
 				}
 				coefficients = new_coefficients;
 			}
-			console.log(coefficients);
 			return coefficients;
 		};
 
@@ -271,9 +264,7 @@ define([
 			var coefficients;
 			for (var i = 0; i < points.length; ++i) {
 				coefficients = this._interpolation_polynomial(i, points);
-				//console.log(coefficients);
 				for (var k = 0; k < points.length; ++k) {
-					// console.log(points[k].y*coefficients[k]);
 					polynomial[k] += points[i].y * coefficients[k];
 				}
 			}

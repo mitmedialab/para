@@ -191,7 +191,6 @@ define([
         }
       }
       if (event.keyCode === deleteKey) {
-        console.log('deleting');
         this.model.deleteInstance();
       }
       if (event.keyCode === panKey) {

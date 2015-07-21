@@ -47,7 +47,6 @@ define([
                 this.clones.push(clone);
                 this.addMember(clone);
                 this.get('clone_count').setValue(this.clones.length);
-                console.log('clone count = num clones:', this.get('clone_count').getValue === this.clones.length);
             },
 
             addException: function(exception) {
@@ -108,7 +107,6 @@ define([
 
             removeCloneByIndex: function(index) {
                 var clone = this.clones.splice(index, 1)[0];
-                console.log('removing clone', clone);
                 var member = ConstrainableList.prototype.removeMember.call(this, clone);
                 this.get('clone_count').setValue(this.clones.length);
                 return member;
@@ -142,7 +140,6 @@ define([
                 var count = this.get('count').getValue();
                 var range = this.get('clone_count').getValue() + 1;
                 var diff = count - range;
-                console.log('update count standard', count, range, diff);
                 var target = this.get('target');
 
                 var toRemove = [];

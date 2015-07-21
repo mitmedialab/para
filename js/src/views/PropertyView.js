@@ -163,7 +163,6 @@ define([
     },
 
     update: function( view, data ) {
-      console.log('Updating view: ' + view + ' with data: ' + data);
       if ( view == "constraint" ) {
         this.updateConstraintMenu( data );
       } 
@@ -171,7 +170,6 @@ define([
 
     updateConstraintMenu: function( data ) {
       for ( var param in data ) {
-        console.log('[INFO] Updating... Parameter: ' + param + ', Value: ' + data[param]);
         if ( param == "property" ) {
           var properties = $('.constraint-prop:not(#' + data[param] + ')');
           properties.attr('class', 'constraint-prop');
@@ -264,14 +262,12 @@ define([
     setConstraintProperty: function(event) {
       var element = $(event.target);
       var elementId = element.attr('id');
-      console.log('Registered click from: ' + elementId);
      // this.model.setConstraintProperty(constraintPropMap[elementId]);
     },
 
     setConstraintType: function(event) {
       var element = $(event.target);
       var elementId = element.attr('id');
-      console.log('Registered click from: ' + elementId);
       this.model.setConstraintType(constraintTypeMap[elementId]);
       // this.model.passEvent(tool, 'setConstraintType');
     },
@@ -279,7 +275,6 @@ define([
     setConstraintExpression: function(event) {
       var element = $(event.target);
       var elementText = element.val();
-      console.log('Registered expression input change: ' + elementText);
       this.model.setConstraintExpression(elementText);
       // this.model.passEvent(tool, 'setConstraintExpression');
     },
@@ -350,7 +345,6 @@ define([
     },
 
     removeItem: function(id) {
-      ////console.log('removing:'+id);
       $('#fileselect option[value=' + id + ']').remove();
     },
 

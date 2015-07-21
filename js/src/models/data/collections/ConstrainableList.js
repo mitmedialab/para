@@ -48,9 +48,6 @@ define([
           x: 1,
           y: 1
         });
-        console.log('list scale:', this.accessProperty('scaling_delta'));
-       console.log('translation_delta_list',this.accessProperty('translation_delta'));
-
       },
 
       /*modifyProperty
@@ -60,7 +57,6 @@ define([
         var constrained_props = this.getConstraintValues();
         var stripped_data = TrigFunc.strip(data, constrained_props);
         for (var i = 0; i < this.members.length; i++) {
-          console.log('modifying member', i, stripped_data);
           this.members[i].modifyProperty(stripped_data, mode, modifier);
         }
         for (var p in stripped_data) {
@@ -90,12 +86,10 @@ define([
       },
 
       removeMember: function(data) {
-        console.log('data to remove',data);
         data.set('merged', undefined);
         var memberIndex = _.indexOf(this.members, data);
         var member = ListNode.prototype.removeMember.call(this, data);
         var diff = this.indexNumbers.length - this.members.length;
-        console.log('diff', diff);
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
           numText.remove();

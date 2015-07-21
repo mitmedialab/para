@@ -23,7 +23,6 @@ define([
 				var file = files[i];
 				if (file.type.match('svg')) {
 					paper.project.importSVG(file, function(item) {
-						//console.log(item);
 					});
 				}
 			}

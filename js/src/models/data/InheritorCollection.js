@@ -87,7 +87,6 @@ define([
 			},
 
 			setValue: function(data) {
-				console.log('calling set value for InheritorCollection for', this.instance_parent.get('id'));
 				var inheritor_data = data.inheritors;
 				for (var i = 0; i < inheritor_data.length; i++) {
 					var inheritor;
@@ -133,7 +132,6 @@ define([
 
 			//overrides PConstraint modifyProperty method
 			modifyProperty: function(data) {
-				console.log('modify property for inheritors', data);
 				if (data.inheritors) {
 					this.setValue(data);
 				}

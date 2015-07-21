@@ -21,7 +21,6 @@ define([
 			this.disable('duplicator');
 			this.disable('ungroup');
 			this.disable('count');
-			console.log('model', this.model);
 		},
 
 
@@ -35,7 +34,6 @@ define([
 				$('#' + type).removeAttr('disabled');
 				var bg = $('#' + type).css('backgroundPosition').split(" ")[1];
 				var bgpos = parseInt(bg.replace("px", ""));
-				console.log('background position=', bgpos);
 				$('#' + type).css({
 					backgroundPositionY: bgpos + 54
 
@@ -49,7 +47,6 @@ define([
 				document.getElementById(type).disabled = true;
 				var bg = $('#' + type).css('backgroundPosition').split(" ")[1];
 				var bgpos = parseInt(bg.replace("px", ""));
-				console.log('background position=', bgpos);
 				$('#' + type).css({
 					backgroundPositionY: bgpos - 54
 
@@ -58,7 +55,6 @@ define([
 		},
 
 		clickEvent: function(event) {
-			console.log('click event on target', event.target.id);
 			switch (event.target.id) {
 				case 'ungroup':
 					this.model.unGroup();
@@ -109,7 +105,6 @@ define([
 		},
 
 		toggleCollectionButtons: function(selected) {
-			console.log('toggle collections buttons', selected);
 			if (selected.length < 1) {
 				this.disable('group');
 				this.disable('list');
@@ -139,7 +134,6 @@ define([
 					this.disable('count');
 				}
 				if (selected.length > 1) {
-					console.log('enabling buttons');
 					//this.enable('group');
 					this.disable('duplicator');
 					this.enable('list');

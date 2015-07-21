@@ -35,9 +35,7 @@ define([
 
 		},
 		getValue: function() {
-			/*if(this.storage instanceof Function){
-				console.log("function storage=",this.storage);
-			}*/
+		
 			return this._val.get();
 		},
 

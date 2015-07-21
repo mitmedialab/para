@@ -77,8 +77,6 @@ define([
 					break;
 					
 					case 'color':
-						//console.log(instance);
-						//console.log(targetVal.type);
 						var color = targetVal.instances[0].strokeColor;
 						if(color === '#000000'){
 							result = true;

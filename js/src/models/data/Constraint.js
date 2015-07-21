@@ -2,10 +2,9 @@ define([
   'underscore',
   'paper',
   'backbone',
-  'models/data/paperUI/Arrow',
   'models/data/paperUI/ConstraintHandles',
   'utils/PFloat'
-], function(_, paper, Backbone, Arrow, ConstraintHandles, PFloat) {
+], function(_, paper, Backbone, ConstraintHandles, PFloat) {
 
   var propConvMap = {
     'position:scale': 0.01,
@@ -119,7 +118,6 @@ define([
 
       var self = this;
       var multiplierF = function() {
-        console.log('checking multiplier value');
         if (self.get('relatives')) {
           var value = self.getMultiplierValue(self.get('relatives').get('index').getValue());
           multiplier.setValue(value);
@@ -149,7 +147,7 @@ define([
     },
 
     setSelection: function(selected, type) {
-      console.log('setting selection', selected, type);
+   
       if (this.get('references') && this.get('relatives')) {
         console.log('[ERROR] References and relatives already set.');
       }
@@ -163,7 +161,6 @@ define([
         }
       }
       var instance = selected[0];
-      console.log('set selection', instance.get('type'), instance.get('name'), instance);
       instance.set('selected', false);
       if (this.get('relatives')) {
         if (this.get('references')) {
@@ -172,8 +169,6 @@ define([
         }
         this.set('references', instance);
         instance.set('constraint_selected', 'reference_selected');
-        console.log('constraint-constraint_selected', instance.get('constraint_selected'));
-
         this.set('ref_type', type);
 
         // create proxy with important logic // TODO: maybe class it?
@@ -189,7 +184,6 @@ define([
           return layer.name === 'geometry_layer';
         })[0];
         targetLayer.addChild(proxy);
-        console.log('proxy created', proxy);
         proxy.name = 'proxy';
         proxy.visible = false;
         proxy.show = function() {
@@ -249,10 +243,8 @@ define([
       var keys;
       var offsetLength = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]].length : 0;
       var relativeRange = this.get('relatives').getRange() - offsetLength;
-      console.log('offset length=', offset, offsetLength, relativeRange);
 
       if (ref_dimensions.length === rel_dimensions.length) {
-        console.log('dimensions are equal');
         if (ref_dimensions.length == 1) {
           offset[rel_dimensions[0]] = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]] : [];
           for (var n = 0; n < relativeRange; n++) {
@@ -260,7 +252,6 @@ define([
 
             conversion = refPropValue * convertFactor;
             offset[rel_dimensions[0]].push(relPropValue - conversion);
-            console.log('refPropValue', refPropValue, 'conversion', conversion);
           }
         } else {
 
@@ -268,8 +259,6 @@ define([
             offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
             for (var p = 0; p < relativeRange; p++) {
               relPropValue = this.propSwitch(rel_prop, 'rel', p);
-              console.log('refPropValue', refPropValue, ref_dimensions[i],
-                'convert factor:', convertFactor);
               conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
               offset[rel_dimensions[i]].push(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
             }
@@ -319,7 +308,6 @@ define([
       }
 
 
-      console.log('offset', offset, 'conversion', conversion);
       if (relativeRange < 0) {
         for (var v = 0; v < 0 - relativeRange; v++) {
           for (var prop in offset) {
@@ -346,7 +334,6 @@ define([
           exp_object[axis] = exp_scale + ' + ' + 'offsetValue'; //offset[axis].toString()';
         }
       }
-      console.log('expression object', exp_object);
       this.set('expression', exp_object);
     },
 
@@ -460,9 +447,7 @@ define([
     },
 
     create: function() {
-      console.log('rel_prop', this.get('rel_prop'));
-      console.log('ref_prop', this.get('ref_prop'));
-
+    
       var ref_prop = this.get('ref_prop').split('_');
       var ref_available_props = ref_prop[1];
       var rel_prop = this.get('rel_prop').split('_');
@@ -476,7 +461,7 @@ define([
       var expression = this.get('expression');
       var expression_dimension_num = Object.keys(expression).length;
 
-      console.log('expression=', expression, expression_dimension_num);
+     
 
       var refPropAccess = reference.get(constraintPropMap[ref_prop[0]]);
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
@@ -486,7 +471,6 @@ define([
         this.set('rel_prop_dimensions', rel_prop[1]);
       }
       this.set('ref_prop_dimensions', ref_prop[1]);
-      console.log('ref_dimensions length', ref_dimensions.length, 'dimension_num', refPropAccess.get('dimension_num'), expression);
       var self = this;
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
         var constraintFunctions = [];
@@ -503,10 +487,8 @@ define([
               var mapOperand = self.get('map_operand');
               var offsetValue = offset[axis][relative.get('index').getValue()];
               var i = self.get('multiplier').getValue();
-              console.log('x-val', x, d);
               var y;
               eval(expression[d]);
-              console.log('y-val', y, d);
               if (d !== 'v') {
                 relPropAccess[d].setValue(y);
               } else {
@@ -517,7 +499,6 @@ define([
           })(axis, ap);
 
           constraintFunctions.push(cf);
-          console.log('setting constraint on', axis, relPropAccess[axis], cf);
           if (axis !== 'v') {
             relPropAccess[axis].setConstraint(cf);
             relPropAccess[axis].getConstraint();
@@ -530,7 +511,6 @@ define([
         }
 
         this.set('constraintFunc', constraintFunctions);
-        console.log('constraintFunctions', constraintFunctions);
       } else {
         var constraintF = function() {
           var evalObj = {};
@@ -546,26 +526,19 @@ define([
             var i = self.get('multiplier').getValue();
             var y;
             eval(expression[axis]);
-            console.log('y-val', y);
             evalObj[axis] = y;
           }
-          console.log('evalObj', evalObj, 'd-num', relPropAccess.get('dimension_num'));
           if (relPropAccess.get('dimension_num') > 1) {
-            console.log('setting value as object');
             relPropAccess.setValue(evalObj);
             return evalObj;
           } else {
-            console.log('setting value as value', evalObj['v']);
             relPropAccess.setValue(evalObj['v']);
-
-            console.log('getting value=', relPropAccess.getValue());
             return evalObj['v'];
           }
 
 
         };
         relPropAccess.setConstraint(constraintF);
-        console.log('setting constraint on entire object');
         this.set('constraintFunc', [constraintF]);
         relative.getConstraint();
       }
@@ -626,7 +599,6 @@ define([
 
     setMultipliers: function(values) {
       this.set('multipliers', values);
-      console.log('constraint multipliers', this.get('multipliers'));
       this.get('multiplier').invalidate();
 
     },

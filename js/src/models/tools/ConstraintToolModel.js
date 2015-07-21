@@ -130,7 +130,6 @@ define([
 
     //checks to see if constraint is currently pending
     checkPending: function() {
-      console.log('check pending');
       var constraint = this.get('currentConstraint');
       if (constraint) {
         if (constraint.get('references') && constraint.get('relatives') && constraint.get('ref_prop')&&constraint.get('rel_prop')) {
@@ -206,7 +205,6 @@ define([
       this.set('applicable', true);
       this.trigger('delegateMethod', 'select', 'selectDown', event);
       this.trigger('selectionRequest', this);
-      console.log('selection request result', this.selected);
       var type = (event.modifiers.control) ? 'point' : 'shape';
       var flag = this.get('currentConstraint').setSelection(this.selected, type);
       this.trigger('compileRequest');
@@ -234,7 +232,6 @@ define([
       var relative = constraint.get('relatives');
       this.trigger('delegateMethod', 'select', 'selectDown', event);
       this.trigger('selectionRequest', this);
-      console.log('selection request result', this.selected);
       var selected = (this.selected ? this.selected[0] : null); // TODO: really shouldn't have to happen...
       this.trigger('compileRequest');
       if (selected && selected.get('id') == relative.get('id')) {
