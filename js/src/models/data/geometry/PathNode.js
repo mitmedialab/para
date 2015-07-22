@@ -167,6 +167,7 @@ define([
     },
 
     deselect: function() {
+       GeometryNode.prototype.deselect.apply(this, arguments);
       this.deselectSegments();
     },
 
@@ -217,18 +218,14 @@ define([
     /* modifyPoints
      * called when segment in geometry is modified
      */
-    modifyPoints: function(data, mode, modifier, exclude, d) {
+    modifyPoints: function(data, mode, modifier, exclude) {
       var proto_node = this.get('proto_node');
       console.log('proto node', proto_node, this.get('id'), 'exclude=', exclude);
-      var delta;
-      if (!exclude) {
-        delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
+      var delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
         var origin = new paper.Point(0, 0);
         delta.transform(this._ri_matrix);
         delta.transform(this._si_matrix);
-      } else {
-        delta = d;
-      }
+      
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
       var startWidth = geom.bounds.width;
@@ -248,11 +245,9 @@ define([
         });
         switch (selectedPoint.get('selection_type')) {
           case 'segment':
-          case 'curve':
-            if (!proto_node) {
-              var p = selectedPoint.get('position');
-              p.add(delta.point);
-            }
+           case 'curve':
+            var p = selectedPoint.get('position');
+            p.add(data.translation_delta);
             geomS.point.x += data.translation_delta.x;
             geomS.point.y += data.translation_delta.y;
             selectionS.point.x += data.translation_delta.x;
@@ -260,21 +255,17 @@ define([
 
             break;
           case 'handle-in':
-            if (!proto_node) {
-              var hi = selectedPoint.get('handle_in');
-              hi.add(delta.point);
-            }
+            var hi = selectedPoint.get('handle_in');
+            hi.add(data.translation_delta); 
             geomS.handleIn.x += data.translation_delta.x;
             geomS.handleIn.y += data.translation_delta.y;
             selectionS.handleIn.x += data.translation_delta.x;
             selectionS.handleIn.y += data.translation_delta.y;
             break;
 
-          case 'handle-out':
-            if (!proto_node) {
-              var ho = selectedPoint.get('handle_out');
-              ho.add(delta.point);
-            }
+          case 'handle-out': 
+            var ho = selectedPoint.get('handle_out');
+            ho.add(data.translation_delta);
             geomS.handleOut.x += data.translation_delta.x;
             geomS.handleOut.y += data.translation_delta.y;
             selectionS.handleOut.x += data.translation_delta.x;
@@ -290,19 +281,11 @@ define([
 
       var inheritors = this.get('inheritors').accessProperty();
       for (var j = 0; j < inheritors.length; j++) {
-        if (!exclude || inheritors[j] != exclude) {
-          inheritors[j].modifyPointsByIndex(delta.point, indicies, exclude);
-        } else if (exclude) {
-          console.log('found excluded at ', j);
-        }
+          inheritors[j].modifyPointsByIndex(delta.point, indicies, exclude);  
       }
-      // sizeDelta.remove();
-      //sizeDelta = null;
-      
-
       if (proto_node) {
         console.log('protonode exists, modifying points');
-        proto_node.modifyPoints(data, mode, modifier, this,delta);
+        proto_node.modifyPointsByIndex(delta.point,indicies, this);
       }
       delta.remove();
       delta = null;
@@ -330,8 +313,8 @@ define([
         bbox.transform(this._si_matrix);
         bbox.transform(this._ri_matrix);
         this.setPathAltered();
-
       }
+
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
         var selectionS = selection_clone.segments[indicies[i].index];

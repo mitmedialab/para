@@ -1263,6 +1263,9 @@ define([
 				bbox.transform(this._ti_matrix);
 				bbox.transform(this._si_matrix);
 				bbox.transform(this._ri_matrix);
+				var widthScale= geom.bounds.width/bbox.bounds.width;
+				var heightScale = geom.bounds.height/bbox.bounds.height;
+				bbox.scale(widthScale,heightScale);
 				geom.selected = false;
 				bbox.selected = false;
 
