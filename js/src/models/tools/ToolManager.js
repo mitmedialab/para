@@ -152,12 +152,7 @@ define([
     },
 
     geometrySelected: function(instance, segments, modifier) {
-      if (segments) {
-        this.trigger('selectShape', segments);
-      } else {
-        this.trigger('selectShape', instance);
-      }
-
+      this.trigger('selectShape', instance,segments);
     },
 
     selectionRequest: function(reference) {

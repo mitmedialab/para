@@ -152,10 +152,8 @@ define([
               });
             }
           }
-          if (!instance.get('proto_node')) {
-            points = instance.setSelectedSegments(segments);
-          }
-          this.trigger('geometrySelected', instance, points, null);
+       
+          this.trigger('geometrySelected', instance, segments, null);
         }
 
       }

@@ -464,8 +464,8 @@ define([
 			if (parent) {
 				this.deselectShape(parent);
 				var newInstance = parent.create();
-				parent.set('selected', false);
-				newInstance.set('selected', true);
+				parent.deselect();
+				newInstance.select();
 				collectionManager.addToOpenLists(newInstance);
 				layersView.addInstance(newInstance.toJSON(), parent.get('id'));
 				this.selectShape(newInstance);
@@ -543,15 +543,16 @@ define([
 			this.compile();
 		},
 
-		selectShape: function(data) {
+		selectShape: function(data,segments) {
 			if (data instanceof Array) {
 				for (var i = 0; i < data.length; i++) {
-					this._selectSingleShape(data[i]);
+					this._selectSingleShape(data[i],segments[i]);
 				}
 			} else {
-				this._selectSingleShape(data);
+				this._selectSingleShape(data,segments);
 			}
 			this.updateLayers();
+			console.log('selected',selected);
 			collectionView.toggleCollectionButtons(selected);
 			this.compile();
 
@@ -559,10 +560,9 @@ define([
 
 
 
-		_selectSingleShape: function(instance) {
+		_selectSingleShape: function(instance,segments) {
 			if (!_.contains(selected, instance)) {
-				instance.set('selected', true);
-				instance.setSelectionForInheritors(true, this.get('tool-mode'), this.get('tool-modifier'), 1);
+				instance.select(segments);
 				selected.push(instance);
 				if (instance.get('name') != 'point') {
 					var data = collectionManager.filterSelection(instance);
@@ -581,8 +581,7 @@ define([
 			} else if (data instanceof Array) {
 				for (var i = 0; i < data.length; i++) {
 					var shape = data[i];
-					shape.set('selected', false);
-					shape.setSelectionForInheritors(false);
+					shape.deselect();
 				}
 
 				var newShapes = selected.filter(function(item) {
@@ -602,8 +601,7 @@ define([
 
 
 		_deselectSingleShape: function(shape) {
-			shape.set('selected', false);
-			shape.setSelectionForInheritors(false);
+			shape.deselect();
 
 			if (_.contains(selected, shape)) {
 				var index = _.indexOf(selected, shape);
@@ -615,8 +613,7 @@ define([
 		deselectAllShapes: function() {
 			// TODO: do this across all selections
 			for (var i = selected.length - 1; i >= 0; i--) {
-				selected[i].set('selected', false);
-				selected[i].setSelectionForInheritors(false);
+				selected[i].deselect();
 			}
 			selected.length = 0;
 			this.updateLayers();
@@ -739,10 +736,13 @@ define([
 
 
 		modifySegment: function(data, handle, modifiers) {
-			if (selected.length > 0) {
-				for (var i = 0; i < selected.length; i++) {
-					var instance = selected[i];
-					instance.nodeParent.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
+			var instances = selected.filter(function(item){
+				return item.get('name')!='point';
+			});
+			if (instances.length > 0) {
+				for (var i = 0; i < instances.length; i++) {
+					var instance = instances[i];
+					instance.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
 				}
 				this.compile();
 			}

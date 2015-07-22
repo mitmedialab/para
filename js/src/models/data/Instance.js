@@ -315,8 +315,6 @@ define([
 		 */
 		create: function() {
 			var instance = new this.constructor();
-			this.set('is_proto', true);
-
 			var position = this.get('position');
 			instance.get('position').setValue(position.clone().getValue());
 			instance.get('rotation_origin').setValue(position.clone().getValue());
@@ -327,8 +325,10 @@ define([
 		},
 
 		addInheritor: function(instance) {
+			this.set('is_proto', true);
 			var inheritorCollection = this.get('inheritors');
 			instance.set('proto_node', this);
+			console.log('instance protonode',instance.get('proto_node'),instance.get('id'));
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
 			var g_clone = this.getShapeClone(true);
@@ -600,7 +600,7 @@ define([
 		},
 
 
-		/*modifyProperty
+		/*©Property
 		 * called to update the property of an instance
 		 * data: defines the property to be modifed, along with the
 		 * new values
@@ -975,6 +975,16 @@ define([
 		},
 
 
+
+		deselect:function(){
+			this.set('selected',false);
+			this.setSelectionForInheritors(false);
+		},
+
+		select:function(segments){
+			this.set('selected',true);
+			this.setSelectionForInheritors(true, null,null, 1);
+		},
 
 		/* setSelectionForInheritors
 		 * toggles selection mode for objects which inherit
