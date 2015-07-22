@@ -5,7 +5,7 @@ define([
   'models/data/PaperUI'
 ], function(_, paper, Backbone, PaperUI) {
 
-  var targetLayer, self;
+  var targetLayer, self, interval;
   var prop_map = ['h', 's', 'l'];
   var ConstraintHandles = PaperUI.extend({
 
@@ -39,7 +39,7 @@ define([
     },
 
     setText: function(content, position) {
-
+      clearInterval(interval);
       this.tipText.children[1].content = content;
       var scaleAmount = (this.tipText.children[1].bounds.width + 10) / this.tipText.children[0].bounds.width;
       this.tipText.children[0].scale(scaleAmount, 1);
@@ -53,8 +53,8 @@ define([
     },
 
     hideText: function() {
-      this.tipText.visible = false;
-
+      self.tipText.visible = false;
+      clearInterval(interval);
     },
 
     draw: function() {
@@ -554,6 +554,8 @@ define([
         } else {
           target.opacity = 1;
         }
+        interval = setInterval(self.hideText,500);
+
         return;
       } else {
 
@@ -572,8 +574,9 @@ define([
             target.fillColor.saturation = target.fillColor.brightness = 0;
           }
         }
+        interval = setInterval(self.hideText,500);
       }
-      self.hideText();
+
 
     },
 
@@ -582,7 +585,11 @@ define([
       if (geometry) {
         geometry.remove();
         geometry = null;
-      }
+      } 
+
+      this.tipText.remove();
+      this.tipText = null;
+      clearInterval(interval);
     }
   });
 
