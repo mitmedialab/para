@@ -236,7 +236,6 @@ define([
       }
       for (var i = 0; i < this.members.length; i++) {
         var member_found = this.members[i].hasMember(member, false, this);
-        console.log('seeking member', member_found);
         if (member_found) {
           return member_found;
         }
@@ -256,6 +255,25 @@ define([
         }
       }
       return null;
+    },
+
+
+    getLastMember: function() {
+      if (this.members.length > 0) {
+        return this.members[this.members.length - 1];
+      }
+    },
+
+    getFirstMember: function() {
+      if (this.members.length > 0) {
+        return this.members[0];
+      }
+    },
+
+    getMemberAt: function(index) {
+      if (this.members.length > index) {
+        return this.members[index];
+      }
     },
 
     /* getListMembers
@@ -294,6 +312,24 @@ define([
 
     getMemberNumber: function() {
       return this.accessProperty('member_count');
+    },
+
+    getMemberIndex: function(member) {
+      return _.indexOf(this.members, member);
+    },
+
+    setIndex: function(index, member) {
+      var old_index = this.getMemberIndex(member);
+      if (index > 0) {
+        var spliced_member = this.members.splice(old_index, 1)[0];
+
+        this.members.splice(index, 0, spliced_member);
+       
+        member.get('proto_node').setChildBefore(member,this.members[index+1]);
+        
+        return true;
+      }
+      return false;
     },
     /*closeMembers
      * recursively closes all members

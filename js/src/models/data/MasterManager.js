@@ -242,7 +242,10 @@ define([
 
 				case 'duplicator':
 					if (selected[0]) {
-						this.addDuplicator(selected[0]);
+						var duplicator = this.addDuplicator(selected[0]);
+						this.deselectAllShapes();
+						this.selectShape(duplicator);
+
 					}
 					break;
 			}
@@ -465,20 +468,22 @@ define([
 			var parent = this.getLastSelected();
 			if (parent) {
 				var duplicator = collectionManager.getDuplicatorThatContains(parent);
-				console.log('duplicator', duplicator);
-				this.deselectShape(parent);
+				
 				var newInstance;
 				if (duplicator) {
 					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
-					//START HERE: set so that duplicator that is added moves from correct spot, and is intserted into correct index
+					newInstance = duplicator.getLastMember();
+					newInstance.get('translation_delta').setValue(parent.get('translation_delta').getValue());
+					duplicator.setIndex(duplicator.getMemberIndex(parent),newInstance);
 				} else {
 					duplicator = this.addDuplicator(parent);
-					this.toggleOpen();
-					this.deselectAllShapes();
+					collectionManager.toggleOpenLists([duplicator]);
+					
 					this.setDuplicatorCount(2, duplicator);
-
+					newInstance = duplicator.getLastMember();
 				}
-				newInstance = duplicator.members[duplicator.getCountValue() - 1];
+				this.deselectShape(parent,true);
+				
 				this.selectShape(newInstance);
 
 			}
@@ -487,8 +492,6 @@ define([
 		addDuplicator: function(object, open) {
 			var duplicator = collectionManager.addDuplicator(object);
 			layersView.addList(duplicator.toJSON());
-			this.deselectAllShapes();
-			this.selectShape(duplicator);
 			return duplicator;
 		},
 
@@ -568,7 +571,7 @@ define([
 			this.compile();
 		},
 
-		selectShape: function(data, segments) {
+		selectShape: function(data, segments, noCompile) {
 			if (data instanceof Array) {
 				for (var i = 0; i < data.length; i++) {
 					this._selectSingleShape(data[i], segments);
@@ -578,7 +581,9 @@ define([
 			}
 			this.updateLayers();
 			collectionView.toggleCollectionButtons(selected);
-			this.compile();
+			if(!noCompile){
+				this.compile();
+			}
 
 		},
 
@@ -587,16 +592,18 @@ define([
 		_selectSingleShape: function(instance, segments) {
 			if (!_.contains(selected, instance)) {
 				selected.push(instance);
-				var data = collectionManager.filterSelection(instance);
-				if (data) {
-					this.deselectShape(data.toRemove);
-					this.selectShape(data.toAdd);
-				}
 			}
 			instance.select(segments);
+
+			var data = collectionManager.filterSelection(instance);
+			if (data) {
+				this.deselectShape(data.toRemove);
+				this.selectShape(data.toAdd);
+			}
+
 		},
 
-		deselectShape: function(data) {
+		deselectShape: function(data,noCompile) {
 			if (typeof data === 'string') {
 				var s = this.getById(data);
 				this._deselectSingleShape(s);
@@ -616,7 +623,9 @@ define([
 			}
 			this.updateLayers();
 			collectionView.toggleCollectionButtons(selected);
-			this.compile();
+			if(!noCompile){
+				this.compile();
+			}
 
 
 		},
