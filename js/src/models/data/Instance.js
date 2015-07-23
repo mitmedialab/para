@@ -266,11 +266,10 @@ define([
 		 * evaluation and access functions to assist in managing lists
 		 */
 
-		hasMember: function(member) {
+		hasMember: function(member,top,last) {
 			if (member === this) {
-				return true;
+				return last;
 			}
-			return false;
 		},
 
 		getMember: function(member) {
@@ -328,7 +327,6 @@ define([
 			this.set('is_proto', true);
 			var inheritorCollection = this.get('inheritors');
 			instance.set('proto_node', this);
-			console.log('instance protonode',instance.get('proto_node'),instance.get('id'));
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
 			var g_clone = this.getShapeClone(true);

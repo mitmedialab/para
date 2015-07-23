@@ -220,7 +220,6 @@ define([
      */
     modifyPoints: function(data, mode, modifier, exclude) {
       var proto_node = this.get('proto_node');
-      console.log('proto node', proto_node, this.get('id'), 'exclude=', exclude);
       var delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
         var origin = new paper.Point(0, 0);
         delta.transform(this._ri_matrix);
@@ -284,7 +283,6 @@ define([
           inheritors[j].modifyPointsByIndex(delta.point, indicies, exclude);  
       }
       if (proto_node) {
-        console.log('protonode exists, modifying points');
         proto_node.modifyPointsByIndex(delta.point,indicies, this);
       }
       delta.remove();

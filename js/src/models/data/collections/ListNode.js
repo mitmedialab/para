@@ -36,7 +36,7 @@ define([
       this.get('fill_color').setNull(false);
       this.get('stroke_color').setNull(false);
       this.get('stroke_width').setNull(false);
-      
+
     },
 
     /*modifyProperty
@@ -71,11 +71,11 @@ define([
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
     addMember: function(data) {
-  
+
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
 
-         // this.listenTo(data[i], 'delete', this.deleteMember);
+          // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
         }
       } else {
@@ -174,7 +174,7 @@ define([
 
     removeMember: function(data) {
       var index = $.inArray(data, this.members);
-      if (index >-1) {
+      if (index > -1) {
         var member = this.members.splice(index, 1)[0];
         var md = {};
         md.member_count = {
@@ -208,7 +208,10 @@ define([
         }
       }
       if (removedItems.length > 0) {
-        return {removed:removedItems,modified:modified};
+        return {
+          removed: removedItems,
+          modified: modified
+        };
       }
 
     },
@@ -217,18 +220,19 @@ define([
      * recursive methods for checking if instance exists in
      * list or sublist and accessing said parent list */
 
-    hasMember: function(member, top) {
+    hasMember: function(member, top, last) {
       if (!top) {
         if (this === member) {
-          return true;
+          return last;
         }
       }
       for (var i = 0; i < this.members.length; i++) {
-        if (this.members[i].hasMember(member)) {
-          return true;
+        var member_found = this.members[i].hasMember(member, false, this);
+        console.log('seeking member',member_found);
+        if (member_found) {
+          return member_found;
         }
       }
-      return false;
     },
 
     getMember: function(member) {
@@ -297,7 +301,7 @@ define([
     },
 
     toggleOpen: function(item) {
-      if (this.hasMember(item)) {
+      if (this.hasMember(item, true) || this === item) {
         if (!this.get('open')) {
           this.set('open', true);
           return [this];
@@ -316,7 +320,7 @@ define([
     },
 
     toggleClosed: function(item) {
-      if (this.hasMember(item)) {
+      if (this.hasMember(item, true) || this === item) {
         var toggledLists = [];
         for (var i = 0; i < this.members.length; i++) {
           var toggled = this.members[i].toggleClosed(item);
@@ -353,11 +357,11 @@ define([
 
     render: function() {
       this.renderBoundingBox();
-    
+
     },
 
     renderBoundingBox: function() {
-     this.set('bbox_dimensions', {
+      this.set('bbox_dimensions', {
         topLeft: null,
         bottomRight: null,
       });
@@ -387,21 +391,20 @@ define([
           bbox.scale(width / bbox.bounds.width, height / bbox.bounds.height);
           bbox.position.x = x;
           bbox.position.y = y;
-         
-          
+
+
 
         }
-          var selection_clone = this.get('selection_clone');
+        var selection_clone = this.get('selection_clone');
 
-         if (!selection_clone) {
-            this.createSelectionClone();
-            selection_clone = this.get('selection_clone');
-          }
-          else{
-           selection_clone.scale(width / selection_clone.bounds.width, height / selection_clone.bounds.height);
-           selection_clone.position.x = x;
-           selection_clone.position.y = y;
-          }
+        if (!selection_clone) {
+          this.createSelectionClone();
+          selection_clone = this.get('selection_clone');
+        } else {
+          selection_clone.scale(width / selection_clone.bounds.width, height / selection_clone.bounds.height);
+          selection_clone.position.x = x;
+          selection_clone.position.y = y;
+        }
 
         this.updateScreenBounds(bbox);
       }
@@ -474,7 +477,7 @@ define([
       this.set('selection_clone', selection_clone);
     },
 
-    getRange: function(){
+    getRange: function() {
       return this.members.length;
     }
 

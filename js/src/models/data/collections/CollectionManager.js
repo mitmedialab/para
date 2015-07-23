@@ -66,6 +66,43 @@ define([
 			return false;
 		},
 
+		getDuplicatorThatContains: function(object){
+			var collections = this.getCollectionThatContains(object);
+			var duplicators = collections.filter(function(item){
+				return item.get('name')=='duplicator';
+			});
+			if(duplicators.length>0){
+				if(duplicators.length>1){
+					console.log('[ALERT]: object in more than one duplicator');
+				}
+				return duplicators[0];
+			}
+		},
+
+		getListsThatContain: function(object){
+			var collections = this.getCollectionThatContains(object);
+			var slists = collections.filter(function(item){
+				return item.get('name')=='list';
+			});
+			if(slists.length>0){
+				return slists;
+			}
+
+		},
+
+		getCollectionThatContains: function(object){
+			var collections = [];
+			for(var i=0;i<lists.length;i++){
+				var contains = lists[i].hasMember(object,true);
+				if(contains){
+					collections.push(contains);
+				}
+			}
+		
+			return collections;
+			
+		},
+
 
 		/*removeObjectFromLists
 		 * called when object is being deletetd

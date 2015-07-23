@@ -279,26 +279,26 @@ define([
 		},
 
 
-		removeObjectById: function(id){
+		removeObjectById: function(id) {
 			var object = this.getById(id);
 			switch (object.get('type')) {
-					case 'geometry':
-						layersView.removeShape(id);
-						this.removeGeometry(object);
-						break;
-					case 'function':
-						//functionManager.removeFunction(selected[i]);
-						break;
-						//TODO: this replicates functionality in the ungroup function, should this function differently?
-					case 'collection':
-						layersView.removeCollection(id);
-						var removedItems = collectionManager.removeCollection(object);
-						this.selectShape(removedItems);
-						break;
-					case 'constraint':
-						this.removeConstraint(id);
+				case 'geometry':
+					layersView.removeShape(id);
+					this.removeGeometry(object);
 					break;
-				}
+				case 'function':
+					//functionManager.removeFunction(selected[i]);
+					break;
+					//TODO: this replicates functionality in the ungroup function, should this function differently?
+				case 'collection':
+					layersView.removeCollection(id);
+					var removedItems = collectionManager.removeCollection(object);
+					this.selectShape(removedItems);
+					break;
+				case 'constraint':
+					this.removeConstraint(id);
+					break;
+			}
 		},
 
 		removeObject: function() {
@@ -460,20 +460,27 @@ define([
 		//called when creating an instance which inherits from existing shape
 		addInstance: function() {
 			var parent = this.getLastSelected();
-
 			if (parent) {
+				var duplicator = collectionManager.getDuplicatorThatContains(parent);
+				console.log('duplicator', duplicator);
 				this.deselectShape(parent);
-				var newInstance = parent.create();
-				parent.deselect();
-				newInstance.select();
-				collectionManager.addToOpenLists(newInstance);
-				layersView.addInstance(newInstance.toJSON(), parent.get('id'));
-				this.selectShape(newInstance);
-				return newInstance;
+				var newInstance;
+				if (duplicator) {
+					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
+					newInstance = duplicator.members[duplicator.getCountValue() - 1];
+					this.selectShape(newInstance);
+				}
+				/*else{
+					newInstance = parent.create();
+					collectionManager.addToOpenLists(newInstance);
+					layersView.addInstance(newInstance.toJSON(), parent.get('id'));
+					
+				}*/
+
 			}
 		},
 
-		duplicatorCountModified: function(data,duplicator) {
+		duplicatorCountModified: function(data, duplicator) {
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
@@ -483,7 +490,7 @@ define([
 			}
 			if (data.toAdd) {
 				for (var j = 0; j < data.toAdd.length; j++) {
-					layersView.addInstance(data.toAdd[j].toJSON(),data.toAdd[j].get('proto_node').get('id'));
+					layersView.addInstance(data.toAdd[j].toJSON(), data.toAdd[j].get('proto_node').get('id'));
 				}
 			}
 			this.updateListConstraints(duplicator);
@@ -491,10 +498,16 @@ define([
 			this.compile();
 		},
 
-		setDuplicatorCount: function(value){
-			for(var i=0;i<selected.length;i++){
-				var data = selected[i].setCount(value);
-				this.duplicatorCountModified(data,selected[i]);
+		setDuplicatorCount: function(value, duplicator) {
+			var data;
+			if (duplicator) {
+				data = duplicator.setCount(value);
+				this.duplicatorCountModified(data, duplicator);
+			} else {
+				for (var i = 0; i < selected.length; i++) {
+					data = selected[i].setCount(value);
+					this.duplicatorCountModified(data, selected[i]);
+				}
 			}
 		},
 
@@ -543,16 +556,15 @@ define([
 			this.compile();
 		},
 
-		selectShape: function(data,segments) {
+		selectShape: function(data, segments) {
 			if (data instanceof Array) {
 				for (var i = 0; i < data.length; i++) {
-					this._selectSingleShape(data[i],segments[i]);
+					this._selectSingleShape(data[i], segments);
 				}
 			} else {
-				this._selectSingleShape(data,segments);
+				this._selectSingleShape(data, segments);
 			}
 			this.updateLayers();
-			console.log('selected',selected);
 			collectionView.toggleCollectionButtons(selected);
 			this.compile();
 
@@ -560,7 +572,7 @@ define([
 
 
 
-		_selectSingleShape: function(instance,segments) {
+		_selectSingleShape: function(instance, segments) {
 			if (!_.contains(selected, instance)) {
 				instance.select(segments);
 				selected.push(instance);
@@ -736,8 +748,8 @@ define([
 
 
 		modifySegment: function(data, handle, modifiers) {
-			var instances = selected.filter(function(item){
-				return item.get('name')!='point';
+			var instances = selected.filter(function(item) {
+				return item.get('name') != 'point';
 			});
 			if (instances.length > 0) {
 				for (var i = 0; i < instances.length; i++) {
