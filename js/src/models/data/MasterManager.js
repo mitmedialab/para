@@ -241,7 +241,7 @@ define([
 					break;
 
 				case 'duplicator':
-					if(selected[0]){
+					if (selected[0]) {
 						this.addDuplicator(selected[0]);
 					}
 					break;
@@ -258,6 +258,7 @@ define([
 							var members = selected[i].deleteSelf();
 							var parent = selected[i].getParentNode();
 							if (parent) {
+								//TODO: this is not going to work...
 								parent.removeInheritor(selected[i]);
 								parent.removeChildNode(selected[i]);
 								parent.addChildNode(members);
@@ -328,7 +329,7 @@ define([
 			}
 		},
 
-		removeCollection:function(target){
+		removeCollection: function(target) {
 			layersView.removeCollection(target.get('id'));
 			var removedItems = collectionManager.removeCollection(target);
 			this.deselectAllShapes();
@@ -468,14 +469,13 @@ define([
 				this.deselectShape(parent);
 				var newInstance;
 				if (duplicator) {
-					this.setDuplicatorCount(duplicator.getCountValue()+1,duplicator);
+					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
 					//START HERE: set so that duplicator that is added moves from correct spot, and is intserted into correct index
-				}
-				else{
+				} else {
 					duplicator = this.addDuplicator(parent);
 					this.toggleOpen();
 					this.deselectAllShapes();
-					this.setDuplicatorCount(2,duplicator);
+					this.setDuplicatorCount(2, duplicator);
 
 				}
 				newInstance = duplicator.members[duplicator.getCountValue() - 1];
@@ -484,7 +484,7 @@ define([
 			}
 		},
 
-		addDuplicator: function(object,open){
+		addDuplicator: function(object, open) {
 			var duplicator = collectionManager.addDuplicator(object);
 			layersView.addList(duplicator.toJSON());
 			this.deselectAllShapes();
@@ -586,16 +586,14 @@ define([
 
 		_selectSingleShape: function(instance, segments) {
 			if (!_.contains(selected, instance)) {
-				instance.select(segments);
 				selected.push(instance);
-				if (instance.get('name') != 'point') {
-					var data = collectionManager.filterSelection(instance);
-					if (data) {
-						this.deselectShape(data.toRemove);
-						this.selectShape(data.toAdd);
-					}
+				var data = collectionManager.filterSelection(instance);
+				if (data) {
+					this.deselectShape(data.toRemove);
+					this.selectShape(data.toAdd);
 				}
 			}
+			instance.select(segments);
 		},
 
 		deselectShape: function(data) {

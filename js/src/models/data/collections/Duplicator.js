@@ -49,7 +49,26 @@ define([
                 this.get('clone_count').setValue(this.clones.length);
             },
 
-            
+            addMemberToOpen: function(data) {
+                if (this.get('open')) {
+                    var addedToList = false;
+                    for (var i = 0; i < this.members.length; i++) {
+                        var added = this.members[i].addMemberToOpen(data);
+                        if (added) {
+                            addedToList = true;
+                        }
+                    }
+                    if (addedToList) {
+                        if (data.get('type') === 'collection') {
+                            for (var j = 0; j < data.members.length; j++) {
+                                var removed = this.removeMember(data.members[j]);
+                            }
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            },
 
 
             addException: function(exception) {
@@ -73,6 +92,13 @@ define([
                 return data;
             },
 
+
+            deleteSelf: function() {
+                ConstrainableList.prototype.deleteSelf.call(this);
+                this.clones.length = 0;
+                this.exceptions.length = 0;
+            },
+
             removeMember: function(data) {
                 var target = this.get('target');
                 if (data != target) {
@@ -82,15 +108,20 @@ define([
                         return this.removeException(data);
                     }
                 } else {
+                    ConstrainableList.prototype.removeMember.call(this, target);
                     this.shiftTarget();
+                    return target;
                 }
             },
 
+
             shiftTarget: function() {
                 if (this.clones.length < 1) {
-                    console.log('target is only member remaining, cannot remove');
+                    console.log('no more clones to shift target to');
+                    this.setTarget();
                     return;
                 }
+
                 ConstrainableList.prototype.removeMember.call(this, this.get('target'));
                 var newTarget = this.clones.splice(0, 1);
                 this.set('target', newTarget);
@@ -112,6 +143,7 @@ define([
                 var clone = this.clones.splice(index, 1)[0];
                 var member = ConstrainableList.prototype.removeMember.call(this, clone);
                 this.get('clone_count').setValue(this.clones.length);
+                member.removePrototype();
                 return member;
             },
 
@@ -169,9 +201,16 @@ define([
             },
 
             setTarget: function(target) {
-                this.set('target', target);
-                this.addMember(target);
+                if (target) {
+                    this.set('target', target);
+                    if (_.indexOf(this.members,target)<0) {
+                        this.addMember(target);
+                    }
+                } else {
+                    this.set('target', null);
+                }
             },
+
 
 
 

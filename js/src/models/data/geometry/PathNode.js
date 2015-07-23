@@ -167,7 +167,7 @@ define([
     },
 
     deselect: function() {
-       GeometryNode.prototype.deselect.apply(this, arguments);
+      GeometryNode.prototype.deselect.apply(this, arguments);
       this.deselectSegments();
     },
 
@@ -221,10 +221,10 @@ define([
     modifyPoints: function(data, mode, modifier, exclude) {
       var proto_node = this.get('proto_node');
       var delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
-        var origin = new paper.Point(0, 0);
-        delta.transform(this._ri_matrix);
-        delta.transform(this._si_matrix);
-      
+      var origin = new paper.Point(0, 0);
+      delta.transform(this._ri_matrix);
+      delta.transform(this._si_matrix);
+
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
       var startWidth = geom.bounds.width;
@@ -244,7 +244,7 @@ define([
         });
         switch (selectedPoint.get('selection_type')) {
           case 'segment':
-           case 'curve':
+          case 'curve':
             var p = selectedPoint.get('position');
             p.add(data.translation_delta);
             geomS.point.x += data.translation_delta.x;
@@ -255,14 +255,14 @@ define([
             break;
           case 'handle-in':
             var hi = selectedPoint.get('handle_in');
-            hi.add(data.translation_delta); 
+            hi.add(data.translation_delta);
             geomS.handleIn.x += data.translation_delta.x;
             geomS.handleIn.y += data.translation_delta.y;
             selectionS.handleIn.x += data.translation_delta.x;
             selectionS.handleIn.y += data.translation_delta.y;
             break;
 
-          case 'handle-out': 
+          case 'handle-out':
             var ho = selectedPoint.get('handle_out');
             ho.add(data.translation_delta);
             geomS.handleOut.x += data.translation_delta.x;
@@ -280,10 +280,10 @@ define([
 
       var inheritors = this.get('inheritors').accessProperty();
       for (var j = 0; j < inheritors.length; j++) {
-          inheritors[j].modifyPointsByIndex(delta.point, indicies, exclude);  
+        inheritors[j].modifyPointsByIndex(delta.point, indicies, exclude);
       }
       if (proto_node) {
-        proto_node.modifyPointsByIndex(delta.point,indicies, this);
+        proto_node.modifyPointsByIndex(delta.point, indicies, this);
       }
       delta.remove();
       delta = null;
@@ -352,9 +352,9 @@ define([
 
     renderSelection: function(geom) {
       GeometryNode.prototype.renderSelection.call(this, geom);
-
+      var proto = this.get('proto_node');
       var pointSelected = false;
-      var points = this.get('points');
+      var points = proto ? proto.get('points') : this.get('points');
       for (var i = 0; i < points.length; i++) {
         var selectedPoint = points[i];
         var geomS = geom.segments[selectedPoint.get('index')];
@@ -363,9 +363,12 @@ define([
           pointSelected = true;
         }
       }
-      if (!this.get('geom').selected && pointSelected) {
+      if (pointSelected) {
         this.get('geom').selected = true;
+        this.get('bbox').selected = false;
+
       }
+
 
 
     }

@@ -41,9 +41,8 @@ define([
 			
 				var index = _.indexOf(this.inheritors, inheritor);
 				if(index>-1){
-					inheritor.deleteSelf();
-					this.inheritors.splice(index, 1);
-					return true;
+					
+					return this.inheritors.splice(index, 1)[0];
 				}
 				else{
 					return false;
@@ -101,7 +100,8 @@ define([
 				//TODO: will need error handling for when inheritors that are constraining other objects are removed
 				var difference = this.inheritors.length - inheritor_data.length;
 				for (var j = 0; j < difference; j++) {
-					this.removeInheritor(this.inheritors[this.inheritors.length - 1]);
+					var inheritor = this.removeInheritor(this.inheritors[this.inheritors.length - 1]);
+					inheritor.deleteSelf();
 				}
 
 			},

@@ -122,10 +122,11 @@
 						var data_property = data[p];
 						if (this.hasOwnProperty(p) && !this.isNull()) {
 
-							if (data.operator === 'set') {
-								this[p].setValue(data_property);
-							} else {
+							if (data.operator === 'add') {
 								this[p].setValue(this[p].getValue() + data_property);
+
+							} else {
+								this[p].setValue(data_property);
 							}
 						}
 					}

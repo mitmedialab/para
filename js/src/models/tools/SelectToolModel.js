@@ -21,9 +21,9 @@ define([
   var startPoint, startDist, startWidth, startHeight = null;
   var dHitOptions = {
     segments: true,
-    curves: true,
+    curves: false,
     handles: true,
-    fill: true,
+    fill: false,
     tolerance: 5,
 
   };

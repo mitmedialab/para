@@ -124,10 +124,10 @@ define([
 		 */
 		removeCollection: function(collection) {
 			var removedLists, members;
+			console.log('lists',lists);
 			for (var j = 0; j < lists.length; j++) {
 				if (lists[j] === collection) {
 					lists.splice(j, 1);
-					lists = lists.concat(collection.getListMembers());
 					members = collection.removeAllMembers();
 					removedLists = members.filter(function(item) {
 						return item.get('type') == 'collection';
@@ -143,6 +143,8 @@ define([
 			}
 
 			collection.deleteSelf();
+			console.log('lists after remove',lists);
+
 			return members;
 		},
 

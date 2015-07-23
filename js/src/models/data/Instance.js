@@ -85,7 +85,7 @@ define([
 				scaling_origin: ['x', 'y'],
 				scaling_delta: ['x', 'y'],
 				rotation_origin: ['val'],
-				rotation_delta: ['x', 'y'],
+				rotation_delta: ['val'],
 				stroke_color: ['r', 'g', 'b', 'a'],
 				fill_color: ['r', 'g', 'b', 'a'],
 				stroke_width: ['val'],
@@ -266,7 +266,7 @@ define([
 		 * evaluation and access functions to assist in managing lists
 		 */
 
-		hasMember: function(member,top,last) {
+		hasMember: function(member, top, last) {
 			if (member === this) {
 				return last;
 			}
@@ -281,7 +281,7 @@ define([
 
 		/* getRange: function used to modify constraints mappings for lists*/
 		getRange: function() {
-			return 1;//this.get('member_count').getValue();
+			return 1; //this.get('member_count').getValue();
 		},
 
 		toggleOpen: function(item) {
@@ -298,7 +298,7 @@ define([
 		recRemoveMember: function(data) {
 			return false;
 		},
-		removeAllMembers: function(){
+		removeAllMembers: function() {
 			return [];
 		},
 
@@ -352,7 +352,21 @@ define([
 		},
 
 		removePrototype: function() {
-			this.set('proto_node', null);
+			var proto_node = this.get('proto_node');
+			if (proto_node) {
+				proto_node.removeInheritor(this);
+				var proto_vals = proto_node.getValue();
+				var constrainMap = this.get('constrain_map');
+				for (var property_name in constrainMap) {
+					if (constrainMap.hasOwnProperty(property_name)) {
+						if (this.get(property_name).isNull()) {
+							this.get(property_name).setNull(false);
+							this.get(property_name).setValue(proto_vals[property_name]);
+						}
+					}
+				}
+				this.set('proto_node', null);
+			}
 		},
 
 		createSelectionClone: function() {
@@ -976,14 +990,14 @@ define([
 
 
 
-		deselect:function(){
-			this.set('selected',false);
+		deselect: function() {
+			this.set('selected', false);
 			this.setSelectionForInheritors(false);
 		},
 
-		select:function(segments){
-			this.set('selected',true);
-			this.setSelectionForInheritors(true, null,null, 1);
+		select: function(segments) {
+			this.set('selected', true);
+			this.setSelectionForInheritors(true, null, null, 1);
 		},
 
 		/* setSelectionForInheritors
@@ -1206,7 +1220,7 @@ define([
 		renderSelection: function(geom) {
 			var selected = this.get('selected');
 			var constraint_selected = this.get('constraint_selected');
-			var bbox; 
+			var bbox;
 			var selection_clone = this.get('selection_clone');
 
 			if (constraint_selected) {
@@ -1263,9 +1277,9 @@ define([
 				bbox.transform(this._ti_matrix);
 				bbox.transform(this._si_matrix);
 				bbox.transform(this._ri_matrix);
-				var widthScale= geom.bounds.width/bbox.bounds.width;
-				var heightScale = geom.bounds.height/bbox.bounds.height;
-				bbox.scale(widthScale,heightScale);
+				var widthScale = geom.bounds.width / bbox.bounds.width;
+				var heightScale = geom.bounds.height / bbox.bounds.height;
+				bbox.scale(widthScale, heightScale);
 				geom.selected = false;
 				bbox.selected = false;
 
