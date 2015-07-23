@@ -241,14 +241,14 @@ define([
 					break;
 
 				case 'duplicator':
-					var duplicator = collectionManager.addDuplicator(selected);
-					layersView.addList(duplicator.toJSON());
-					this.deselectAllShapes();
-					this.selectShape(duplicator);
+					if(selected[0]){
+						this.addDuplicator(selected[0]);
+					}
 					break;
 			}
 
 		},
+
 
 		unGroup: function() {
 			for (var i = 0; i < selected.length; i++) {
@@ -291,9 +291,7 @@ define([
 					break;
 					//TODO: this replicates functionality in the ungroup function, should this function differently?
 				case 'collection':
-					layersView.removeCollection(id);
-					var removedItems = collectionManager.removeCollection(object);
-					this.selectShape(removedItems);
+					this.removeCollection(object);
 					break;
 				case 'constraint':
 					this.removeConstraint(id);
@@ -314,10 +312,7 @@ define([
 						break;
 						//TODO: this replicates functionality in the ungroup function, should this function differently?
 					case 'collection':
-						layersView.removeCollection(selected[i].get('id'));
-						var removedItems = collectionManager.removeCollection(selected[i]);
-						this.deselectAllShapes();
-						this.selectShape(removedItems);
+						this.removeCollection(selected[i]);
 						break;
 				}
 			}
@@ -331,6 +326,13 @@ define([
 				parent.removeInheritor(target);
 				parent.removeChildNode(target);
 			}
+		},
+
+		removeCollection:function(target){
+			layersView.removeCollection(target.get('id'));
+			var removedItems = collectionManager.removeCollection(target);
+			this.deselectAllShapes();
+			this.selectShape(removedItems);
 		},
 
 		/*visit
@@ -466,18 +468,28 @@ define([
 				this.deselectShape(parent);
 				var newInstance;
 				if (duplicator) {
-					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
-					newInstance = duplicator.members[duplicator.getCountValue() - 1];
-					this.selectShape(newInstance);
+					this.setDuplicatorCount(duplicator.getCountValue()+1,duplicator);
+					//START HERE: set so that duplicator that is added moves from correct spot, and is intserted into correct index
 				}
-				/*else{
-					newInstance = parent.create();
-					collectionManager.addToOpenLists(newInstance);
-					layersView.addInstance(newInstance.toJSON(), parent.get('id'));
-					
-				}*/
+				else{
+					duplicator = this.addDuplicator(parent);
+					this.toggleOpen();
+					this.deselectAllShapes();
+					this.setDuplicatorCount(2,duplicator);
+
+				}
+				newInstance = duplicator.members[duplicator.getCountValue() - 1];
+				this.selectShape(newInstance);
 
 			}
+		},
+
+		addDuplicator: function(object,open){
+			var duplicator = collectionManager.addDuplicator(object);
+			layersView.addList(duplicator.toJSON());
+			this.deselectAllShapes();
+			this.selectShape(duplicator);
+			return duplicator;
 		},
 
 		duplicatorCountModified: function(data, duplicator) {

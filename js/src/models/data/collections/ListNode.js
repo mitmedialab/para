@@ -135,7 +135,10 @@ define([
       if (this.get('open')) {
         var addedToList = false;
         for (var i = 0; i < this.members.length; i++) {
-          addedToList = addedToList ? true : this.members[i].addMemberToOpen(data);
+          var added = this.members[i].addMemberToOpen(data);
+          if (added) {
+            addedToList = true;
+          }
         }
         if (addedToList) {
           if (data.get('type') === 'collection') {
@@ -143,9 +146,9 @@ define([
               var removed = this.removeMember(data.members[j]);
             }
           }
-          this.addMember(data);
           return true;
         } else {
+          this.addMember(data);
           return true;
         }
       }
@@ -158,7 +161,10 @@ define([
     removeAllMembers: function() {
       var removed = [];
       for (var i = this.members.length - 1; i >= 0; i--) {
-        removed.push(this.removeMember(this.members[i]));
+        var removedMember = this.removeMember(this.members[i]);
+        if (removedMember) {
+          removed.push(removedMember);
+        }
       }
       return removed;
     },
@@ -194,25 +200,27 @@ define([
     recRemoveMember: function(data) {
       var removedItems = [];
       var modified = [];
+      var orphans = [];
       var selfRemoved = this.removeMember(data);
       if (selfRemoved) {
+        orphans = data.removeAllMembers();
+        console.log('orphans =', orphans);
+        this.addMember(orphans);
         removedItems.push(selfRemoved);
         modified.push(this);
       } else {
         for (var i = 0; i < this.members.length; i++) {
           var r = this.members[i].recRemoveMember(data);
-          if (r) {
-            removedItems = removedItems.comcat(r.removed);
-            modified = modified.comcat(r.modified);
-          }
+          removedItems = removedItems.concat(r.removed);
+          modified = modified.concat(r.modified);
+          orphans = orphans.concat(r.orphans);
         }
       }
-      if (removedItems.length > 0) {
-        return {
-          removed: removedItems,
-          modified: modified
-        };
-      }
+      return {
+        removed: removedItems,
+        modified: modified,
+        orphans: orphans
+      };
 
     },
 
@@ -228,7 +236,7 @@ define([
       }
       for (var i = 0; i < this.members.length; i++) {
         var member_found = this.members[i].hasMember(member, false, this);
-        console.log('seeking member',member_found);
+        console.log('seeking member', member_found);
         if (member_found) {
           return member_found;
         }

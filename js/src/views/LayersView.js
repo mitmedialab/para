@@ -296,7 +296,7 @@ define([
 				active = shapeTree.getActiveNode();
 			}
 			if (!active) {
-				active = listTree.getActiveNode;
+				active = listTree.getActiveNode();
 			}
 			if (active) {
 				this.model.removeObjectById(active.key);

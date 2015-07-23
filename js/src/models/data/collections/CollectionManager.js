@@ -14,7 +14,7 @@ define([
 
 
 	//stores para lists
-	var lists,renderQueue,duplicators;
+	var lists, renderQueue, duplicators;
 	var collectionView;
 	var compile = 1;
 	var remove = 2;
@@ -23,8 +23,7 @@ define([
 	var CollectionManager = Backbone.Model.extend({
 		defaults: {},
 
-		initialize: function() {
-		},
+		initialize: function() {},
 
 		/* setters and getters for current lists
 		 */
@@ -35,8 +34,8 @@ define([
 		getLists: function() {
 			return lists;
 		},
-		
-		resetRenderQueue: function(){
+
+		resetRenderQueue: function() {
 			renderQueue = [];
 		},
 
@@ -66,41 +65,41 @@ define([
 			return false;
 		},
 
-		getDuplicatorThatContains: function(object){
+		getDuplicatorThatContains: function(object) {
 			var collections = this.getCollectionThatContains(object);
-			var duplicators = collections.filter(function(item){
-				return item.get('name')=='duplicator';
+			var duplicators = collections.filter(function(item) {
+				return item.get('name') == 'duplicator';
 			});
-			if(duplicators.length>0){
-				if(duplicators.length>1){
+			if (duplicators.length > 0) {
+				if (duplicators.length > 1) {
 					console.log('[ALERT]: object in more than one duplicator');
 				}
 				return duplicators[0];
 			}
 		},
 
-		getListsThatContain: function(object){
+		getListsThatContain: function(object) {
 			var collections = this.getCollectionThatContains(object);
-			var slists = collections.filter(function(item){
-				return item.get('name')=='list';
+			var slists = collections.filter(function(item) {
+				return item.get('name') == 'list';
 			});
-			if(slists.length>0){
+			if (slists.length > 0) {
 				return slists;
 			}
 
 		},
 
-		getCollectionThatContains: function(object){
+		getCollectionThatContains: function(object) {
 			var collections = [];
-			for(var i=0;i<lists.length;i++){
-				var contains = lists[i].hasMember(object,true);
-				if(contains){
+			for (var i = 0; i < lists.length; i++) {
+				var contains = lists[i].hasMember(object, true);
+				if (contains) {
 					collections.push(contains);
 				}
 			}
-		
+
 			return collections;
-			
+
 		},
 
 
@@ -111,9 +110,9 @@ define([
 		removeObjectFromLists: function(obj) {
 			for (var j = 0; j < lists.length; j++) {
 				var r = lists[j].recRemoveMember(obj);
-				if(r){
-					for(var i=0;i<r.modified.length;i++){
-						this.trigger('listLengthChange',r.modified[i]);
+				if (r) {
+					for (var i = 0; i < r.modified.length; i++) {
+						this.trigger('listLengthChange', r.modified[i]);
 					}
 				}
 			}
@@ -124,25 +123,25 @@ define([
 		 * without deleting its members
 		 */
 		removeCollection: function(collection) {
-			var removedLists,members; 
+			var removedLists, members;
 			for (var j = 0; j < lists.length; j++) {
 				if (lists[j] === collection) {
 					lists.splice(j, 1);
 					lists = lists.concat(collection.getListMembers());
 					members = collection.removeAllMembers();
-					
-					
+					removedLists = members.filter(function(item) {
+						return item.get('type') == 'collection';
+					});
+
+					lists.push.apply(lists, removedLists);
+
 					break;
 				} else {
-				 	members = lists[j].recRemoveMember(collection);
-						
+					var removed_data = lists[j].recRemoveMember(collection);
+					members = removed_data.orphans;
 				}
 			}
-			removedLists = members.filter(function(item){
-						return item.get('type')=='collection';
-			});
-			
-			lists.push.apply(lists, removedLists);
+
 			collection.deleteSelf();
 			return members;
 		},
@@ -169,6 +168,7 @@ define([
 			switch (state) {
 				case compile:
 					node.reset();
+
 					node.compile();
 					renderQueue.push(node);
 					for (var i = 0; i < node.members.length; i++) {
@@ -244,12 +244,12 @@ define([
 		},
 
 
-		addDuplicator: function(selected) {
+		addDuplicator: function(object) {
 			var duplicator = new Duplicator();
-			
-			duplicator.setTarget(selected[0]);
+
+			duplicator.setTarget(object);
 			var data = duplicator.setCount(5);
-			this.trigger('duplicatorCountModified',data,duplicator);
+			this.trigger('duplicatorCountModified', data, duplicator);
 			if (!this.addToOpenLists(duplicator)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
 					if (duplicator.hasMember(lists[i], true)) {
@@ -270,8 +270,8 @@ define([
 			var addedToList = false;
 			for (var i = 0; i < lists.length; i++) {
 				var added = lists[i].addMemberToOpen(instance);
-				if(added){
-					this.trigger('listLengthChange',lists[i]);
+				if (added) {
+					this.trigger('listLengthChange', lists[i]);
 				}
 				addedToList = addedToList ? true : added;
 			}
@@ -342,7 +342,7 @@ define([
 		},
 
 
-		
+
 
 
 		closeAllLists: function() {

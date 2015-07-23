@@ -293,12 +293,14 @@ define([
 		},
 
 		addMemberToOpen: function(data, added_bool) {
-			return [];
+			return false;
 		},
 		recRemoveMember: function(data) {
 			return false;
 		},
-
+		removeAllMembers: function(){
+			return [];
+		},
 
 
 

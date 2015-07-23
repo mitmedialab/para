@@ -49,6 +49,9 @@ define([
                 this.get('clone_count').setValue(this.clones.length);
             },
 
+            
+
+
             addException: function(exception) {
                 this.exceptions.push(exception);
                 if (_.indexOf(this.clones, exception) > -1) {
