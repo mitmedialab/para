@@ -111,10 +111,18 @@ define([
         y: 0,
         operator: 'set'
       };
-
-      data.fill_color = path.fillColor.toCSS(true);
-      data.stroke_color = path.strokeColor.toCSS(true);
-
+      if (path.fillColor) {
+        data.fill_color = path.fillColor.toCSS(true);
+      }
+      else{
+        data.fill_color = -1;
+      }
+      if (path.strokeColor) {
+        data.stroke_color = path.strokeColor.toCSS(true);
+      }
+      else{
+        data.stroke_color=-1;
+      }
       data.stroke_width = {
         val: path.strokeWidth
       };

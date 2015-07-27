@@ -11,7 +11,7 @@ define([
   'models/data/geometry/PathNode',
   'models/data/geometry/RectNode',
   'models/data/geometry/EllipseNode'
-], function(_, paper, Backbone, BaseToolModel, PolygonNode,PathNode,RectNode,EllipseNode) {
+], function(_, paper, Backbone, BaseToolModel, PolygonNode, PathNode, RectNode, EllipseNode) {
 
   var sideNum = 6;
   var rotationAmt = 0;
@@ -67,17 +67,16 @@ define([
           polyPath.selected = true;
         }
         polyPath.strokeWidth = this.get('stroke_width');
-        polyPath.strokeColor = this.get('stroke_color');
-        polyPath.fillColor = this.get('fill_color');
-
-        if (this.get('fillColor') === -1) {
-          polyPath.style.fillColor = null;
-
+        var strokeColor = this.get('stroke_color');
+        if (strokeColor != -1) {
+          polyPath.strokeColor = new paper.Color(strokeColor.r, strokeColor.g, strokeColor.b);
         }
-        if (this.get('stroke_color') === -1) {
-          polyPath.style.strokeColor = null;
-
+        var fillColor = this.get('fill_color');
+        if (fillColor != -1) {
+          polyPath.fillColor = new paper.Color(fillColor.r, fillColor.g, fillColor.b);
         }
+
+
       }
       rotationAmt = 0;
     },
@@ -104,18 +103,16 @@ define([
             segment = hitResult.segment;
             hitResult.segment.fullySelected = true;
             var segmentIndex = polyPaths[i].segments.indexOf(segment);
-          
+
             if (polyPaths[i].segments.length > 1 && segmentIndex === 0) { //close path
               mode = 'close';
               polyPaths[i].closed = true;
               this.reset();
-            }
-            else if (segmentIndex > 0) { //remove point
+            } else if (segmentIndex > 0) { //remove point
               polyPaths[i].segments.splice(segmentIndex, 1);
             }
 
-          }
-          else if (hitResult.type == 'curve') {
+          } else if (hitResult.type == 'curve') {
             var curve = hitResult.location.curve;
             var curveOffset = hitResult.location.curveOffset;
             segment = curve.divide(curveOffset).segment1;
@@ -131,7 +128,7 @@ define([
           }
         }
       }
-      
+
 
     },
 
@@ -181,7 +178,7 @@ define([
 
     },
 
-    createShape: function(path){
+    createShape: function(path) {
 
       var matrix = this.get('matrix');
 
@@ -202,7 +199,7 @@ define([
 
       }
       pathNode.normalizeGeometry(path, matrix);
-      this.trigger('geometryAdded',pathNode);
+      this.trigger('geometryAdded', pathNode);
     },
 
     //mouse drag event
@@ -269,16 +266,13 @@ define([
         }
         polyPath.selected = true;
         polyPath.strokeWidth = this.get('stroke_width');
-        polyPath.strokeColor = this.get('stroke_color');
-        polyPath.fillColor = this.get('fill_color');
-
-        if (this.get('fillColor') === -1) {
-          polyPath.style.fillColor = null;
-
+       var strokeColor = this.get('stroke_color');
+        if (strokeColor != -1) {
+          polyPath.strokeColor = new paper.Color(strokeColor.r, strokeColor.g, strokeColor.b);
         }
-        if (this.get('stroke_color') === -1) {
-          polyPath.style.strokeColor = null;
-
+        var fillColor = this.get('fill_color');
+        if (fillColor != -1) {
+          polyPath.fillColor = new paper.Color(fillColor.r, fillColor.g, fillColor.b);
         }
 
       }

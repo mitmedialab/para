@@ -353,6 +353,7 @@ define([
 			 */
 			modifyProperty: function(style_data) {
 				if (style_data instanceof Object) {
+					this.setNoColor(false);
 					PConstraint.prototype.modifyProperty.call(this, style_data);
 
 				} else {

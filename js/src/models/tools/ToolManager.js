@@ -154,6 +154,7 @@ define([
 
     geometrySelected: function(instance, segments, modifier) {
       this.trigger('selectShape', instance,segments);
+      this.setToolStyle({fill_color:instance.accessProperty('fill_color'),stroke_color:instance.accessProperty('stroke_color')});
     },
 
     selectionRequest: function(reference) {
@@ -200,6 +201,7 @@ define([
     },
 
     setToolStyle: function(style_data) {
+      console.log('style data',style_data);
       if (style_data.stroke_width) {
         style_data.stroke_width = style_data.stroke_width.val;
       }

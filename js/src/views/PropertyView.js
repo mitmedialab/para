@@ -14,13 +14,13 @@ define([
 
   var template, source;
   var constraintTypeMap = {};
-    constraintTypeMap['more-box'] = 'more';
-    constraintTypeMap['more'] = 'more';
-    constraintTypeMap['less-box'] = 'less';
-    constraintTypeMap['less'] = 'less';
-    constraintTypeMap['equal-box'] = 'equal';
-    constraintTypeMap['equal-bottom'] = 'equal';
-    constraintTypeMap['equal-top'] = 'equal';
+  constraintTypeMap['more-box'] = 'more';
+  constraintTypeMap['more'] = 'more';
+  constraintTypeMap['less-box'] = 'less';
+  constraintTypeMap['less'] = 'less';
+  constraintTypeMap['equal-box'] = 'equal';
+  constraintTypeMap['equal-bottom'] = 'equal';
+  constraintTypeMap['equal-top'] = 'equal';
   var PropertyView = Backbone.View.extend({
     //
     initialize: function() {
@@ -28,8 +28,8 @@ define([
       this.listenTo(this.model, 'removeItem', this.removeItem);
       this.listenTo(this.model, 'disableSave', this.disableSave);
 
-      this.listenTo(this.model, 'selectionChanged', this.geometrySelected);
-      this.listenTo(this.model, 'geometryDeselected', this.geometryDeselected);
+      this.listenTo(this.model, 'selectShape', this.geometrySelected);
+      this.listenTo(this.model, 'deselectAll', this.geometryDeselected);
 
       this.listenTo(this.model, 'selectionReset', this.selectionReset);
 
@@ -95,7 +95,7 @@ define([
       this.model.removeBehavior(name);
     },
 
-    setScaffold: function(event){
+    setScaffold: function(event) {
       this.model.setScaffold(event.target.checked);
     },
 
@@ -104,13 +104,17 @@ define([
       if ($('#fillColorBlock').hasClass('color-block-selected')) {
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
-        data = { fill_color: -1};
+        data = {
+          fill_color: -1
+        };
         this.model.modifyStyle(data);
 
       } else {
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
-        data = { stroke_color: -1};
+        data = {
+          stroke_color: -1
+        };
         this.model.modifyStyle(data);
       }
     },
@@ -133,7 +137,7 @@ define([
         }
       }
       var data = {};
-      data[(id + "_color")] = color;
+      data[(id + "_color")] = ColorUtils.hexToRGB(color);
       this.model.modifyStyle(data);
 
     },
@@ -145,7 +149,9 @@ define([
         $('#fillColorBlock').removeClass('remove-color');
         $('#fillColorBlock').css('background-color', color);
         $('#fill').val(color);
-        data = { fill_color: color};
+        data = {
+          fill_color: ColorUtils.hexToRGB(color)
+        };
         this.model.modifyStyle(data);
 
 
@@ -154,7 +160,9 @@ define([
         $('#strokeColorBlock').removeClass('remove-color');
         $('#strokeColorBlock').css('background-color', color);
         $('#stroke').val(color);
-        data = {stroke_color: color};
+        data = {
+          stroke_color: ColorUtils.hexToRGB(color)
+        };
         this.model.modifyStyle(data);
 
       }
@@ -162,26 +170,26 @@ define([
 
     },
 
-    update: function( view, data ) {
-      if ( view == "constraint" ) {
-        this.updateConstraintMenu( data );
-      } 
+    update: function(view, data) {
+      if (view == "constraint") {
+        this.updateConstraintMenu(data);
+      }
     },
 
-    updateConstraintMenu: function( data ) {
-      for ( var param in data ) {
-        if ( param == "property" ) {
+    updateConstraintMenu: function(data) {
+      for (var param in data) {
+        if (param == "property") {
           var properties = $('.constraint-prop:not(#' + data[param] + ')');
           properties.attr('class', 'constraint-prop');
           var prop = $('#' + data[param] + '.constraint-prop');
-          prop.attr('class', 'constraint-prop focus'); 
+          prop.attr('class', 'constraint-prop focus');
         }
-        if ( param == "type" ) {
+        if (param == "type") {
           var types = $('.constraint-type:not(#' + data[param] + '-container)');
           types.attr('class', 'constraint-type');
           $('#' + data[param] + '.constraint-type').attr('class', 'constraint-type focus');
         }
-        if ( param == "expression" ) {
+        if (param == "expression") {
           var result = data[param];
           if (result == "true") {
             $('#expression').removeClass('invalid');
@@ -196,43 +204,53 @@ define([
       }
     },
 
-    geometrySelected: function(selected_shapes) {
-      if(selected_shapes.length>1){
-      this.undelegateEvents();
-      var selected_shape = selected_shapes[0];
-      var fill_color = selected_shapes[0].accessProperty('fill_color');
-      var stroke_color = selected_shapes[0].accessProperty('stroke_color');
-      var stroke_width = selected_shapes[0].accessProperty('stroke_width');
-      if (fill_color) {
-        $('#fillColorBlock').css('background-color',ColorUtils.rgbToHex(fill_color));
-        $('#fill').val(ColorUtils.rgbToHex(fill_color));
-        if ($('#fillColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', ColorUtils.rgbToHex(fill_color));
+    geometrySelected: function(selected_shape) {
+      if (selected_shape) {
+        this.undelegateEvents();
+        var fill_color = selected_shape.accessProperty('fill_color');
+        console.log('geometry selected', fill_color);
+        var stroke_color = selected_shape.accessProperty('stroke_color');
+        var stroke_width = selected_shape.accessProperty('stroke_width');
+        if (fill_color) {
+          if(fill_color.noColor){
+              $('#fillColorBlock').addClass('remove-color');
+          }
+          else{
+          $('#fillColorBlock').removeClass('remove-color');
+          $('#fillColorBlock').css('background-color', ColorUtils.rgbToHex(fill_color));
+          $('#fill').val(ColorUtils.rgbToHex(fill_color));
+          if ($('#fillColorBlock').hasClass('color-block-selected')) {
+            $('#color-window').iris('color', ColorUtils.rgbToHex(fill_color));
+          }
         }
-      }
-      if (stroke_color) {
-        $('#strokeColorBlock').css('background-color', ColorUtils.rgbToHex(stroke_color));
-        $('#stroke').val(ColorUtils.rgbToHex(stroke_color));
-        if ($('#strokeColorBlock').hasClass('color-block-selected')) {
-          $('#color-window').iris('color', ColorUtils.rgbToHex(stroke_color));
         }
-      }
-      if (stroke_width) {
-        $('#strokeSlider').val(stroke_width);
-      }
+        if (stroke_color) {
+             if(stroke_color.noColor){
+              $('#strokeColorBlock').addClass('remove-color');
+          }
+          else{
+          $('#strokeColorBlock').css('background-color', ColorUtils.rgbToHex(stroke_color));
+          $('#stroke').val(ColorUtils.rgbToHex(stroke_color));
+          if ($('#strokeColorBlock').hasClass('color-block-selected')) {
+            $('#color-window').iris('color', ColorUtils.rgbToHex(stroke_color));
+          }
+        }
+        }
+        if (stroke_width) {
+          $('#strokeSlider').val(stroke_width);
+        }
 
-      //this.setParams(params,id);
-      this.delegateEvents();  
-      }
-      else{
+        //this.setParams(params,id);
+        this.delegateEvents();
+      } else {
         this.geometryDeselected();
       }
     },
 
-   geometryDeselected: function(data,params,id) {
+    geometryDeselected: function(data, params, id) {
       this.undelegateEvents();
-     // this.clearParams(params,id);
-      this.delegateEvents();  
+      // this.clearParams(params,id);
+      this.delegateEvents();
     },
 
     toggleFillStroke: function(event) {
@@ -254,7 +272,12 @@ define([
 
     strokeChange: function(event) {
       var value = parseInt($(event.target).val(), 10);
-      var data = {stroke_width: {val:value, operator:'set'}};
+      var data = {
+        stroke_width: {
+          val: value,
+          operator: 'set'
+        }
+      };
       this.model.modifyStyle(data);
     },
 
@@ -262,7 +285,7 @@ define([
     setConstraintProperty: function(event) {
       var element = $(event.target);
       var elementId = element.attr('id');
-     // this.model.setConstraintProperty(constraintPropMap[elementId]);
+      // this.model.setConstraintProperty(constraintPropMap[elementId]);
     },
 
     setConstraintType: function(event) {
@@ -279,12 +302,12 @@ define([
       // this.model.passEvent(tool, 'setConstraintExpression');
     },
     // END TESTING
-    
+
 
     paramChange: function(event) {
       var element = $(event.target);
       var value = +element.val();
-      if(!isNaN(value)){
+      if (!isNaN(value)) {
         var id = element.attr('inst_id');
         var property_name = element.attr('property_name');
         var data = {
@@ -384,14 +407,14 @@ define([
     },
 
 
-    clearParams: function(){
-       var html = template({});
+    clearParams: function() {
+      var html = template({});
       var count = 0;
       $('#parameters').html(html);
     },
 
     //triggered when StateManager finds selection point
-    setParams: function(userParams,id) {
+    setParams: function(userParams, id) {
 
       var paramSliders = [];
       var paramTexts = [];
@@ -400,7 +423,7 @@ define([
 
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
-            userParams[i].id = id;
+          userParams[i].id = id;
           if (userParams[i].type === 'text_box') {
             paramTexts.push(userParams[i]);
           } else {
@@ -421,7 +444,7 @@ define([
       $('#parameterSliders input').each(function() {
         var slider = $(this);
 
-        if(userParams){
+        if (userParams) {
           slider.val(userParams[count].val);
         }
         count++;

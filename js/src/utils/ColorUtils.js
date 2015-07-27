@@ -76,6 +76,13 @@ define([
 			return (h.charAt(0) == '#') ? h.substring(1, 7) : h;
 		};
 
+		ColorUtils.hexToRGB = function(hex){
+			var rgb = {r:this.hexToR(hex),g:this.hexToG(hex),b:this.hexToB(hex)};
+			var hsl = this.rgbToHsl(rgb);
+			var data = {r:rgb.r,g:rgb.g,b:rgb.b,h:hsl[0],s:hsl[1],l:hsl[2],operator:'set'};
+			return data;
+		};
+
 
 		return ColorUtils;
 	});
