@@ -144,7 +144,7 @@ define([
         cross_v.name = 'position_y';
         cross_h.name = 'position_x';
         cross_v.strokeColor = cross_h.strokeColor = 'black';
-        cross_v.strokeWidth = cross_h.strokeWidth = 2;
+        cross_v.strokeWidth = cross_h.strokeWidth = 5;
         cross = [cross_v, cross_h];
         return cross;
       };

@@ -140,7 +140,10 @@ define([
 				} else {
 					this.disable('group');
 					this.disable('list');
-					this.enable('duplicator');
+					//TODO: right now can only create duplicator on geometry
+					if(selected[0].get('type')==='geometry'){
+						this.enable('duplicator');
+					}
 				}
 			}
 		}

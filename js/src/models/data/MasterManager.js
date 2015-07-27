@@ -241,6 +241,7 @@ define([
 					break;
 
 				case 'duplicator':
+	
 					if (selected[0]) {
 						var duplicator = this.addDuplicator(selected[0]);
 						this.deselectAllShapes();
