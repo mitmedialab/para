@@ -53,7 +53,7 @@ define([
       masterManager.listenTo(toolManager, 'addObject', masterManager.addObject);
 
       masterManager.listenTo(toolManager, 'addConstraint', masterManager.addConstraint);
-      masterManager.listenTo(toolManager, 'visualizeConstraint', masterManager.visualizeConstraint);
+      masterManager.listenTo(toolManager, 'constraintModeChanged', masterManager.constraintModeChanged);
       masterManager.listenTo(toolManager, 'selectionChanged', masterManager.selectionChanged);
       masterManager.listenTo(toolManager, 'toggleOpen', masterManager.toggleOpen);
       masterManager.listenTo(toolManager, 'toggleClosed', masterManager.toggleClosed);

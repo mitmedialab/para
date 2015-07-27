@@ -325,8 +325,7 @@ define([
 
         this.members.splice(index, 0, spliced_member);
        
-        member.get('proto_node').setChildBefore(member,this.members[index+1]);
-        
+       //TODO: create something that specifies child order here 
         return true;
       }
       return false;

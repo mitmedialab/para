@@ -66,7 +66,7 @@ define([
 		},
 
 		countChange: function(event) {
-		
+
 			var cval = $('#count').val();
 			var value = this.verifyNumeric(cval);
 			if (value) {
@@ -102,6 +102,14 @@ define([
 				}
 			}
 			countVal = +$('#count').val();
+		},
+
+		disableAll: function() {
+			this.disable('group');
+			this.disable('list');
+			this.disable('duplicator');
+			this.disable('count');
+			this.disable('ungroup');
 		},
 
 		toggleCollectionButtons: function(selected) {
@@ -141,7 +149,7 @@ define([
 					this.disable('group');
 					this.disable('list');
 					//TODO: right now can only create duplicator on geometry
-					if(selected[0].get('type')==='geometry'){
+					if (selected[0].get('type') === 'geometry') {
 						this.enable('duplicator');
 					}
 				}

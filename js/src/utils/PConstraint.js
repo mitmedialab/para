@@ -80,6 +80,7 @@
 						this.setValue(value);
 					}
 				} else {
+
 					for (var i = 0; i < dimensions.length; i++) {
 						var dimension = dimensions[i];
 						this[dimension].removeConstraint([dimensions[i]]);

@@ -25,6 +25,19 @@ define([
 		fill: true,
 		tolerance: 4
 	};
+
+ var prop_map = {
+    position:{min:0,max:1000},
+    scale:{min:0,max:5},
+    rotation:{min:0,max:360},
+    h:{min:0,max:360},
+    s:{min:0,max:1},
+    l:{min:0,max:1},
+    fill:{min:0,max:255},
+    stroke:{min:0,max:255},
+  };
+
+
 	var lagrange_pts = [];
 	var MapView = Backbone.View.extend({
 
@@ -86,10 +99,25 @@ define([
 
 		setConstraint: function(constraint) {
 			this.setFunctionPath(constraint.getFunctionPath());
-			this.setMin(constraint.getMin());
-			this.setMax(constraint.getMax());
+			var cmin = constraint.getMin();
+			var cmax = constraint.getMax();
+			var relProps = constraint.get('rel_prop').split('_');
+			var prop = relProps[0];
+			var subprop = relProps.length>1?relProps[1]:null;
+			if(subprop){
+				if(subprop.length===1&& (subprop=='h'||subprop=='s'||subprop=='b')){
+					prop = subprop;
+				}
+			}
+			if(!cmin){
+				cmin = prop_map[prop].min;
+			}
+			if(!cmax){
+				cmax = prop_map[prop].max;
+			}
 			this.setRange(constraint.getRange());
-
+			this.setMin(cmin);
+			this.setMax(cmax);
 		},
 
 		deactivate: function() {
@@ -161,7 +189,7 @@ define([
 		},
 
 		setMin: function(val) {
-			if (val) {
+			if (val!== undefined) {
 				min = val;
 				$('#min').val(min);
 				this.enable('min');
@@ -173,7 +201,7 @@ define([
 		},
 
 		setMax: function(val) {
-			if (val) {
+			if (val!== undefined) {
 				max = val;
 				$('#max').val(max);
 				this.enable('max');

@@ -93,8 +93,9 @@ define([
         currentTool.set('mode', mode);
       }
       if (state == 'constraintTool') {
-        this.trigger('visualizeConstraint');
+        this.trigger('constraintModeChanged',true);
       } else {
+        this.trigger('constraintModeChanged',false);
         this.trigger('compileRequest');
       }
     },

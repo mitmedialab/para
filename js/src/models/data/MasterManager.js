@@ -29,7 +29,7 @@ define([
 	var visit = 3;
 	var search = 4;
 	var rootNode, currentNode, layersView, collectionView, mapView, functionManager, collectionManager, selected, currentSelectionIndex;
-
+	var constraintMode = false;
 	var constraintPropMap = {
 		'position': 'translation_delta',
 		'scale': 'scaling_delta',
@@ -132,6 +132,16 @@ define([
 			return ref_constraints;
 		},
 
+		constraintModeChanged: function(active){
+			constraintMode = active;
+			if(constraintMode){
+				collectionView.disableAll();
+			}
+			else{
+				collectionView.toggleCollectionButtons(selected);
+			}
+			this.visualizeConstraint();
+		},
 
 		//TODO: move to constraint manager
 		visualizeConstraint: function(ref, rel, pref, prel) {
@@ -540,8 +550,8 @@ define([
 				var reference = constraint.get('references');
 
 				var relative = constraint.get('relatives');
-
-				relative.get(constraint.get('rel_prop_key')).removeConstraint(constraint.rel_prop_dimensions);
+				console.log('rel_prop_key',constraint.get('rel_prop_key'));
+				relative.get(constraint.get('rel_prop_key')).removeConstraint(constraint.get('rel_prop_dimensions'));
 				this.visualizeConstraint();
 				layersView.removeConstraint(constraint.get('id'));
 			}
@@ -581,7 +591,9 @@ define([
 				this._selectSingleShape(data, segments);
 			}
 			this.updateLayers();
-			collectionView.toggleCollectionButtons(selected);
+			if(!constraintMode){
+				collectionView.toggleCollectionButtons(selected);
+			}
 			if(!noCompile){
 				this.compile();
 			}
@@ -623,7 +635,9 @@ define([
 				this._deselectSingleShape(data);
 			}
 			this.updateLayers();
-			collectionView.toggleCollectionButtons(selected);
+			if(!constraintMode){
+				collectionView.toggleCollectionButtons(selected);
+			}
 			if(!noCompile){
 				this.compile();
 			}
