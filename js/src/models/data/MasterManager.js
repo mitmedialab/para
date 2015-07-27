@@ -548,10 +548,8 @@ define([
 			var constraint = this.getConstraintById(id);
 			if (constraint) {
 				var reference = constraint.get('references');
-
 				var relative = constraint.get('relatives');
-				console.log('rel_prop_key',constraint.get('rel_prop_key'));
-				relative.get(constraint.get('rel_prop_key')).removeConstraint(constraint.get('rel_prop_dimensions'));
+				relative.removeConstraint(constraint.get('rel_prop_key'),constraint.get('rel_prop_dimensions'));
 				this.visualizeConstraint();
 				layersView.removeConstraint(constraint.get('id'));
 			}

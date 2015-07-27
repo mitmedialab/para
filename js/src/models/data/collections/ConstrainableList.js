@@ -67,6 +67,20 @@ define([
         }
       },
 
+      removeConstraint: function(prop,dimensions){
+        this.reset();
+        console.log('remove constraint from list',prop,dimensions)
+         for (var i = 0; i < this.members.length; i++) {
+          var constraint_values = this.getConstraintValues();
+          var data = {};
+          data[prop] = constraint_values[prop];
+          console.log('constrained data',data,constraint_values);
+          this.members[i].modifyProperty(data);
+          this.increment();
+        }
+        ListNode.prototype.removeConstraint.call(this,prop,dimensions);
+      },
+
 
       //overrides ListNode addMember and removeMember functions
       addMember: function(data) {

@@ -900,6 +900,10 @@ define([
 
 		},
 
+		removeConstraint: function(prop,dimensions){
+			this.get(prop).removeConstraint(dimensions);
+		},
+
 		/*setValue
 		 * modifies the properties of this instance in accordance with the
 		 * data passed in
