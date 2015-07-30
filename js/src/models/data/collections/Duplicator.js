@@ -203,7 +203,7 @@ define([
             setTarget: function(target) {
                 if (target) {
                     this.set('target', target);
-                    if (_.indexOf(this.members,target)<0) {
+                    if (_.indexOf(this.members, target) < 0) {
                         this.addMember(target);
                     }
                 } else {
@@ -211,7 +211,12 @@ define([
                 }
             },
 
-
+            /*compileMemberAt: function(index, data) {
+                var member = this.members[index];
+                if(member!=this.get('target')){
+                    member.modifyPriorToCompile(data);
+                }
+            },*/
 
 
 

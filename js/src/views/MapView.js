@@ -15,9 +15,13 @@ define([
 	var mapPaperView, functionPath, intersectionPath, start, end, startPoint, endPoint, tool, master_tool, activePoint, self;
 	var width = 175;
 	var height = 175;
+	var graphPoints = [];
+	var graphShapes = [];
 	var min = 1;
 	var max = 10;
 	var range = 10;
+	var active_dimension = null;
+	var dimensions = null;
 	var hitOptions = {
 		segments: true,
 		curves: true,
@@ -38,7 +42,6 @@ define([
   };
 
 
-	var lagrange_pts = [];
 	var MapView = Backbone.View.extend({
 
 		events: {
@@ -58,13 +61,18 @@ define([
 			intersectionPath = new paper.Path.Line(new paper.Point(width / 2, 0), new paper.Point(width / 2, height));
 			intersectionPath.name = 'intersectionPath';
 
-
+			functionPath = new paper.Path();
+    		functionPath.strokeColor = new paper.Color(0, 0, 0);
+      		functionPath.strokeWidth = 2;
+      		functionPath.name = 'functionPath';
+      		functionPath.visible = false;
 			startPoint = new paper.Path.Circle(new paper.Point(0, 0), 4);
 			startPoint.name = 'start_point';
 			endPoint = new paper.Path.Circle(new paper.Point(0, 0), 4);
 			endPoint.name = 'end_point';
 			startPoint.fillColor = endPoint.fillColor = new paper.Color(0, 0, 0);
 			startPoint.visible = endPoint.visible = false;
+
 			mapPaperView.draw();
 
 			master_tool = paper.tools[0];
@@ -82,8 +90,6 @@ define([
 			this.setMax();
 			this.setRange();
 			this.setToDefault();
-			lagrange_pts.push(new paper.Point(0, 0));
-			lagrange_pts.push(new paper.Point(width, height));
 
 		},
 
@@ -98,12 +104,21 @@ define([
 		},
 
 		setConstraint: function(constraint) {
-			this.setFunctionPath(constraint.getFunctionPath());
+		
 			var cmin = constraint.getMin();
 			var cmax = constraint.getMax();
-			var relProps = constraint.get('rel_prop').split('_');
-			var prop = relProps[0];
-			var subprop = relProps.length>1?relProps[1]:null;
+			dimensions = constraint.get('rel_prop').split('_');
+			this.setRange(constraint.getRange());
+			var points = constraint.getMappingPoints();
+			this.setMinMax(cmin,cmax,points[0]);
+			this.setFunctionPath(points[0]);
+			self.model.updateMapping(self.calculateValueSet());
+		},
+
+		setMinMax: function(cmin,cmax,points){
+			
+			var prop = dimensions[0];
+			var subprop = dimensions.length>1?dimensions[1]:null;
 			if(subprop){
 				if(subprop.length===1&& (subprop=='h'||subprop=='s'||subprop=='b')){
 					prop = subprop;
@@ -115,7 +130,16 @@ define([
 			if(!cmax){
 				cmax = prop_map[prop].max;
 			}
-			this.setRange(constraint.getRange());
+
+			for(var i=0;i<points.length;i++){
+				if(points[i].y<cmin){
+					cmin = points[i].y;
+				}
+				if(points[i].y>cmax){
+					cmax = points[i].y;
+				}
+			}
+
 			this.setMin(cmin);
 			this.setMax(cmax);
 		},
@@ -128,9 +152,60 @@ define([
 
 		},
 
-		setFunctionPath: function(path) {
+		setFunctionPath: function(points) {
 			this.setCollectionView();
-			if (functionPath) {
+			if(points){
+			for(var j=0;j<graphShapes.length;j++){
+				graphShapes[j].remove();
+				graphShapes[j] = null;
+			}
+			graphShapes.length =0;
+			graphPoints.length =0;
+
+			console.log('min,max',min,max);
+			for(var i=0;i<points.length;i++){
+				var y= TrigFunc.map(points[i].y, min, max,height,0); 
+				var x = TrigFunc.map(points[i].x,0,points.length-1,0,width);
+				console.log('mapping point from',points[i].x,points[i].y,"to",x,y);
+				var graphPoint = new paper.Path.Circle(new paper.Point(x, y), 4);
+				graphPoint.fillColor= new paper.Color(0, 0, 0);
+				graphShapes.push(graphPoint);
+				graphPoints.push({x:x,y:y});
+			}
+			
+			this.drawFunctionPath();
+		}
+		else{
+			functionPath.removeSegments();
+			functionPath.visible = false;
+		}
+			mapPaperView.draw();
+			this.resetMasterView();
+
+		},
+
+		drawFunctionPath: function(){
+			this.setCollectionView();
+			var polynomial = TrigFunc.Lagrange(graphPoints);
+			functionPath.removeSegments();
+			console.log('polynomial =',polynomial);
+			var expression = polynomial[0];
+			for(var i=1;i<polynomial.length;i++){
+				expression = polynomial[i]+'*Math.pow(x,'+i+")+"+expression;
+			}
+			//var expression = "(Math.pow(x,2))+x+10";
+			console.log('expression',expression);
+			functionPath.removeSegments();
+			for(var j=0;j<51;j++){
+				var x = width/50*j;
+				var y = eval(expression);
+				console.log('on path x,y:',x,y);
+				functionPath.add(new paper.Segment(new paper.Point(x,y)));
+			}
+			functionPath.visible = true;
+			functionPath.simplify();
+			//functionPath.fullySelected = true;
+	/*if (functionPath) {
 				functionPath.remove();
 				startPoint.visible = endPoint.visible = false;
 			}
@@ -144,7 +219,7 @@ define([
 				endPoint.position = functionPath.getPointAt(functionPath.length - 3);
 				paper.project.layers[0].addChild(functionPath);
 				functionPath.sendToBack();
-			}
+			}*/
 			mapPaperView.draw();
 			this.resetMasterView();
 		},
@@ -183,8 +258,10 @@ define([
 				c_max = max;
 			}
 			for (var i = 0; i < c_range; i++) {
-				values.push(this.calculateValue(i, c_range, c_min, c_max, c_function));
+				var val = this.calculateValue(i, c_range, c_min, c_max, c_function);
+				values.push(val);
 			}
+			console.log('function values',values);
 			return values;
 		},
 

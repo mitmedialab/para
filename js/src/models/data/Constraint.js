@@ -34,6 +34,54 @@ define([
     'stroke:position': 100,
 
   };
+
+  var minMaxMap = {
+    translation_delta: {
+      x: {min: 0,
+      max: 1000},
+      y: {min: 0,
+      max: 1000}
+    },
+    scaling_delta: {
+      x: {min: 0,
+      max: 5},
+      y: {min: 0,
+      max: 5}
+    },
+   rotation_delta: {
+      v: {min: 0,
+      max: 360}
+    },
+    fill_color: {
+    h: {
+      min: 0,
+      max: 360
+    },
+    s: {
+      min: 0,
+      max: 1
+    },
+    l: {
+      min: 0,
+      max: 1
+    }
+  },
+   stroke_color: {
+    h: {
+      min: 0,
+      max: 360
+    },
+    s: {
+      min: 0,
+      max: 1
+    },
+    l: {
+      min: 0,
+      max: 1
+    }
+  },
+  };
+
   var constraintPropMap = {
     'position': 'translation_delta',
     'scale': 'scaling_delta',
@@ -147,7 +195,7 @@ define([
     },
 
     setSelection: function(selected, type) {
-   
+
       if (this.get('references') && this.get('relatives')) {
         console.log('[ERROR] References and relatives already set.');
       }
@@ -447,7 +495,7 @@ define([
     },
 
     create: function() {
-    
+
       var ref_prop = this.get('ref_prop').split('_');
       var ref_available_props = ref_prop[1];
       var rel_prop = this.get('rel_prop').split('_');
@@ -461,7 +509,7 @@ define([
       var expression = this.get('expression');
       var expression_dimension_num = Object.keys(expression).length;
 
-     
+
 
       var refPropAccess = reference.get(constraintPropMap[ref_prop[0]]);
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
@@ -628,9 +676,55 @@ define([
 
 
 
+    getMappingPoints: function() {
+      var reference = this.get('references');
+      if (reference) {
+        var ref_prop = this.get('ref_prop_key');
+        var ref_dimensions = this.get('ref_prop_dimensions');
+        var members;
+        if (reference.get('type') == 'collection') {
+          members = reference.members;
+        } else {
+          members = [reference,reference];
+        }
+        var dimension_points = [];
+        for (var j = 0; j < ref_dimensions.length; j++) {
+            var points  = [];
+
+          for (var i = 0; i < members.length; i++) {
+
+            var point;
+
+            if (ref_dimensions[j] === 'v') {
+              point = {
+                x: i,
+                y: members[i].accessProperty(ref_prop)
+              };
+              points.push(point);
+
+            } else {
+              point = {
+                x: i,
+                y: members[i].accessProperty(ref_prop)[ref_dimensions[j]]
+              };
+              points.push(point);
+            }
+
+            dimension_points.push(points);
+          }
+        }
+
+        console.log('ref property', ref_prop, 'dimensions', ref_dimensions, "points:", dimension_points);
+        return dimension_points;
+      }
+
+    },
+
     getFunctionPath: function() {
       return this.get('functionPath');
     }
+
+
 
   });
 

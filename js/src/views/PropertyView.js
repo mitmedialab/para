@@ -212,29 +212,28 @@ define([
         var stroke_color = selected_shape.accessProperty('stroke_color');
         var stroke_width = selected_shape.accessProperty('stroke_width');
         if (fill_color) {
-          if(fill_color.noColor){
-              $('#fillColorBlock').addClass('remove-color');
+          if (fill_color.noColor) {
+            $('#fillColorBlock').addClass('remove-color');
+          } else {
+            $('#fillColorBlock').removeClass('remove-color');
+            $('#fillColorBlock').css('background-color', ColorUtils.rgbToHex(fill_color));
+            $('#fill').val(ColorUtils.rgbToHex(fill_color));
+            if ($('#fillColorBlock').hasClass('color-block-selected')) {
+              $('#color-window').iris('color', ColorUtils.rgbToHex(fill_color));
+            }
           }
-          else{
-          $('#fillColorBlock').removeClass('remove-color');
-          $('#fillColorBlock').css('background-color', ColorUtils.rgbToHex(fill_color));
-          $('#fill').val(ColorUtils.rgbToHex(fill_color));
-          if ($('#fillColorBlock').hasClass('color-block-selected')) {
-            $('#color-window').iris('color', ColorUtils.rgbToHex(fill_color));
-          }
-        }
         }
         if (stroke_color) {
-             if(stroke_color.noColor){
-              $('#strokeColorBlock').addClass('remove-color');
+          if (stroke_color.noColor) {
+            $('#strokeColorBlock').addClass('remove-color');
+          } else {
+            $('#strokeColorBlock').removeClass('remove-color');
+            $('#strokeColorBlock').css('background-color', ColorUtils.rgbToHex(stroke_color));
+            $('#stroke').val(ColorUtils.rgbToHex(stroke_color));
+            if ($('#strokeColorBlock').hasClass('color-block-selected')) {
+              $('#color-window').iris('color', ColorUtils.rgbToHex(stroke_color));
+            }
           }
-          else{
-          $('#strokeColorBlock').css('background-color', ColorUtils.rgbToHex(stroke_color));
-          $('#stroke').val(ColorUtils.rgbToHex(stroke_color));
-          if ($('#strokeColorBlock').hasClass('color-block-selected')) {
-            $('#color-window').iris('color', ColorUtils.rgbToHex(stroke_color));
-          }
-        }
         }
         if (stroke_width) {
           $('#strokeSlider').val(stroke_width);
