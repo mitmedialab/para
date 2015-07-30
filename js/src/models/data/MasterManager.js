@@ -703,7 +703,7 @@ define([
 			var cId = layersView.getActiveConstraint();
 			if (cId) {
 				var constraint = this.getConstraintById(cId);
-				constraint.setMultipliers(values);
+				constraint.calculateReferenceValues();
 				this.compile();
 			}
 		},
@@ -714,7 +714,7 @@ define([
 				var constraint = this.getConstraintById(cId);
 				constraint.setMin(min);
 				constraint.setMax(max);
-				constraint.setMultipliers(values);
+				constraint.calculateReferenceValues();
 				this.compile();
 			}
 
@@ -726,10 +726,10 @@ define([
 			if (constraints.length > 0) {
 				for (var i = 0; i < constraints.length; i++) {
 					var constraint = constraints[i];
-					constraint.setMultiplierLength();
+					constraint.setRefValueLength();
 					constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
 					var values = mapView.calculateValueSet(constraint);
-					constraint.setMultipliers(values);
+					constraint.calculateReferenceValues();
 					if (cId && cId === constraint.get('id')) {
 						this.updateMapView(constraint.get('id'));
 					}

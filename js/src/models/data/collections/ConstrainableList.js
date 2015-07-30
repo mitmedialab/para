@@ -69,7 +69,6 @@ define([
 
       removeConstraint: function(prop,dimensions){
         this.reset();
-        console.log('remove constraint from list',prop,dimensions)
          for (var i = 0; i < this.members.length; i++) {
           var constraint_values = this.getConstraintValues();
           var data = {};
@@ -141,7 +140,7 @@ define([
         var end = this.members.length;
         var value = this.get('index').getValue();
 
-        if (value < end) {
+        if (value < end-1) {
           var newIndex = value + 1;
           this.get('index').setValue(newIndex);
         }

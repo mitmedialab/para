@@ -3,8 +3,9 @@ define([
   'paper',
   'backbone',
   'models/data/paperUI/ConstraintHandles',
-  'utils/PFloat'
-], function(_, paper, Backbone, ConstraintHandles, PFloat) {
+  'utils/PFloat',
+  'utils/TrigFunc',
+], function(_, paper, Backbone, ConstraintHandles, PFloat, TrigFunc) {
 
   var propConvMap = {
     'position:scale': 0.01,
@@ -37,49 +38,59 @@ define([
 
   var minMaxMap = {
     translation_delta: {
-      x: {min: 0,
-      max: 1000},
-      y: {min: 0,
-      max: 1000}
+      x: {
+        min: 0,
+        max: 1000
+      },
+      y: {
+        min: 0,
+        max: 1000
+      }
     },
     scaling_delta: {
-      x: {min: 0,
-      max: 5},
-      y: {min: 0,
-      max: 5}
+      x: {
+        min: 0,
+        max: 5
+      },
+      y: {
+        min: 0,
+        max: 5
+      }
     },
-   rotation_delta: {
-      v: {min: 0,
-      max: 360}
+    rotation_delta: {
+      v: {
+        min: 0,
+        max: 360
+      }
     },
     fill_color: {
-    h: {
-      min: 0,
-      max: 360
+      h: {
+        min: 0,
+        max: 360
+      },
+      s: {
+        min: 0,
+        max: 1
+      },
+      l: {
+        min: 0,
+        max: 1
+      }
     },
-    s: {
-      min: 0,
-      max: 1
+    stroke_color: {
+      h: {
+        min: 0,
+        max: 360
+      },
+      s: {
+        min: 0,
+        max: 1
+      },
+      l: {
+        min: 0,
+        max: 1
+      }
     },
-    l: {
-      min: 0,
-      max: 1
-    }
-  },
-   stroke_color: {
-    h: {
-      min: 0,
-      max: 360
-    },
-    s: {
-      min: 0,
-      max: 1
-    },
-    l: {
-      min: 0,
-      max: 1
-    }
-  },
   };
 
   var constraintPropMap = {
@@ -123,17 +134,19 @@ define([
       constraintFuncs: null,
       name: 'constraint',
       type: 'constraint',
-      multipliers: null,
+      ref_value_list: null,
+      ref_value: null,
       min: null,
       max: null,
       functionPath: null,
-      multiplier: null,
       offset: null,
       map_operand: null,
       operators: null,
+      current_dimension: null,
     },
 
     initialize: function() {
+      var self = this;
 
       this.set('proxy', new paper.Path());
       this.set('ref_handle', new ConstraintHandles({
@@ -148,7 +161,7 @@ define([
       }));
       this.set('id', this.get('type') + '_' + new Date().getTime().toString());
 
-      this.set('multipliers', []);
+
 
       var start = new paper.Segment(new paper.Point(0, 175 / 2));
       var end = new paper.Segment(new paper.Point(175, 175 / 2));
@@ -161,20 +174,24 @@ define([
       functionPath.name = 'functionPath';
       functionPath.remove();
       this.set('functionPath', functionPath);
-      var multiplier = new PFloat(1);
-      multiplier.setNull(false);
 
-      var self = this;
-      var multiplierF = function() {
+      var ref_value = new PFloat(0);
+      ref_value.setNull(false);
+
+      var refF = function() {
         if (self.get('relatives')) {
-          var value = self.getMultiplierValue(self.get('relatives').get('index').getValue());
-          multiplier.setValue(value);
+          var value = self.getReferenceValue(self.get('relatives').get('index').getValue(), self.get('current_dimension'));
+          ref_value.setValue(value);
           return value;
         }
-        return multiplier.getValue();
+        return ref_value.getValue();
       };
-      multiplier.setConstraint(multiplierF);
-      this.set('multiplier', multiplier);
+
+      ref_value.setConstraint(refF);
+      this.set('ref_value', ref_value);
+
+      this.set('ref_value_list', []);
+
 
       this.set('map_operand', '+');
       this.set('operators', {
@@ -267,7 +284,6 @@ define([
       }
 
       this.set('relatives', instance);
-      this.setMultiplierLength();
       instance.set('constraint_selected', 'relative_selected');
       this.set('rel_type', type);
       return false;
@@ -375,7 +391,7 @@ define([
 
       var convertFactor = this.setOffset(ref_prop, rel_prop);
       var offset = this.get('offset');
-      var exp_scale = 'y = operators[mapOperand](' + convertFactor.toString() + ' * ' + 'x' + ',' + 'i)';
+      var exp_scale = 'y =' + convertFactor.toString() + ' * ' + 'x';
       var exp_object = {};
       for (var axis in offset) {
         if (offset.hasOwnProperty(axis)) {
@@ -495,7 +511,6 @@ define([
     },
 
     create: function() {
-
       var ref_prop = this.get('ref_prop').split('_');
       var ref_available_props = ref_prop[1];
       var rel_prop = this.get('rel_prop').split('_');
@@ -520,6 +535,9 @@ define([
       }
       this.set('ref_prop_dimensions', ref_prop[1]);
       var self = this;
+
+      this.calculateReferenceValues();
+
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
         var constraintFunctions = [];
         var a_keys = Object.keys(expression);
@@ -528,13 +546,13 @@ define([
           var axis = a_keys[i];
           var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
           var cf = (function(d, a) {
+            self.set('current_dimension', a);
             return function() {
-              var x = (a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
+              var x = self.get('ref_value').getValue();
               var offset = self.get('offset');
               var operators = self.get('operators');
               var mapOperand = self.get('map_operand');
               var offsetValue = offset[axis][relative.get('index').getValue()];
-              var i = self.get('multiplier').getValue();
               var y;
               eval(expression[d]);
               if (d !== 'v') {
@@ -564,14 +582,15 @@ define([
           var evalObj = {};
           var a_keys = Object.keys(expression);
           for (var m = 0; m < a_keys.length; m++) {
+
             var axis = a_keys[m];
             var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
+            self.set('current_dimension', ap);
             var operators = self.get('operators');
             var mapOperand = self.get('map_operand');
-            var x = (ap === 'v' || !ap) ? refPropAccess.getValue() : refPropAccess[ap].getValue();
+            var x = self.get('ref_value').getValue();
             var offset = self.get('offset');
             var offsetValue = offset[axis][relative.get('index').getValue()];
-            var i = self.get('multiplier').getValue();
             var y;
             eval(expression[axis]);
             evalObj[axis] = y;
@@ -641,42 +660,43 @@ define([
       return this.get('max');
     },
 
-    getMultiplierValue: function(index) {
-      return this.get('multipliers')[index];
+
+
+    getReferenceValue: function(index, dimension) {
+      var ref_values = this.get('ref_value_list');
+      console.log('reference value index,dimension', index, dimension,ref_values,ref_values[dimension][index]);
+
+      return ref_values[dimension][index];
+      //if(a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
     },
 
-    setMultipliers: function(values) {
-      this.set('multipliers', values);
-      this.get('multiplier').invalidate();
-
-    },
-
-    setMultiplierLength: function() {
-      var multipliers = this.get('multipliers');
-      if (multipliers.length === 0) {
-        multipliers.push(1);
+    setRefValueLength: function() {
+      var valueList = this.get('ref_value_list');
+      if (valueList.length === 0) {
+        valueList.push(1);
       }
-      var diff = multipliers.length - this.get('relatives').getRange();
+      var diff = valueList.length - this.get('relatives').getRange();
       if (diff > 0) {
         for (var i = 0; i < diff; i++) {
-          multipliers.pop();
+          valueList.pop();
 
         }
       } else if (diff < 0) {
         for (var j = 0; j < -diff; j++) {
-          var last = multipliers[multipliers.length - 1];
-          multipliers.push(last);
+          var last = valueList[valueList.length - 1];
+          valueList.push(last);
         }
       }
     },
 
     getRange: function() {
-      return this.get('multipliers').length;
+      return this.get('ref_value_list').length;
     },
 
 
+    calculateReferenceValues: function() {
+      this.get('ref_value').invalidate();
 
-    getMappingPoints: function() {
       var reference = this.get('references');
       if (reference) {
         var ref_prop = this.get('ref_prop_key');
@@ -685,12 +705,14 @@ define([
         if (reference.get('type') == 'collection') {
           members = reference.members;
         } else {
-          members = [reference,reference];
+          members = [reference, reference];
         }
-        var dimension_points = [];
+        var reference_points = [];
+        var reference_values = {};
         for (var j = 0; j < ref_dimensions.length; j++) {
-            var points  = [];
-
+          var points = [];
+          reference_values[ref_dimensions[j]] = [];
+          var min,max;
           for (var i = 0; i < members.length; i++) {
 
             var point;
@@ -707,17 +729,47 @@ define([
                 x: i,
                 y: members[i].accessProperty(ref_prop)[ref_dimensions[j]]
               };
+              if(!min && !max){
+                min = y;
+                max = y;
+              }
+              if(y<min){
+                min = y;
+              }
+              if(y>max){
+                max = y;
+              }
               points.push(point);
             }
 
-            dimension_points.push(points);
+            reference_points.push(points);
           }
+          var polynomial = TrigFunc.Lagrange(points);
+          var expression = polynomial[0];
+
+          for (var k = 1; k < polynomial.length; k++) {
+            expression = polynomial[k] + '*Math.pow(x,' + k + ")+" + expression;
+          }
+          console.log('expression', expression, 'min',min,'max',max);
+          var range = this.get('relatives').getRange();
+          
+          for (var m = 0; m < range; m++) {
+            var x = points.length/range*m;
+            var y = eval(expression);
+            console.log('x,y',x,y);
+            reference_values[ref_dimensions[j]].push(y);
+          }
+
         }
-
-        console.log('ref property', ref_prop, 'dimensions', ref_dimensions, "points:", dimension_points);
-        return dimension_points;
+        console.log('ref property', ref_prop, 'dimensions', ref_dimensions, "points:", reference_points, 'reference_values',reference_values);
+        this.set('reference_points', reference_points);
+        this.set('ref_value_list',reference_values);
       }
+    },
 
+
+    getReferencePoints: function() {
+      return (this.get('reference_points'));
     },
 
     getFunctionPath: function() {
