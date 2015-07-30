@@ -191,9 +191,8 @@ define([
       this.set('ref_value', ref_value);
 
       this.set('ref_value_list', []);
-
-
       this.set('map_operand', '+');
+
       this.set('operators', {
         '+': function(a, b) {
           return a + b;
@@ -528,6 +527,9 @@ define([
 
       var refPropAccess = reference.get(constraintPropMap[ref_prop[0]]);
       var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
+     
+      console.log('ref prop target', constraintPropMap[rel_prop[0]], refPropAccess.get('name'));
+
       this.set('ref_prop_key', constraintPropMap[ref_prop[0]]);
       this.set('rel_prop_key', constraintPropMap[ref_prop[0]]);
       if (rel_prop) {
@@ -535,7 +537,8 @@ define([
       }
       this.set('ref_prop_dimensions', ref_prop[1]);
       var self = this;
-
+      refPropAccess.set('name','ref_prop');
+      this.listenTo(refPropAccess,'modified',this.calculateReferenceValues());
       this.calculateReferenceValues();
 
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
@@ -552,7 +555,7 @@ define([
               var offset = self.get('offset');
               var operators = self.get('operators');
               var mapOperand = self.get('map_operand');
-              var offsetValue = offset[axis][relative.get('index').getValue()];
+              var offsetValue = 0;//offset[axis][relative.get('index').getValue()];
               var y;
               eval(expression[d]);
               if (d !== 'v') {
@@ -590,7 +593,7 @@ define([
             var mapOperand = self.get('map_operand');
             var x = self.get('ref_value').getValue();
             var offset = self.get('offset');
-            var offsetValue = offset[axis][relative.get('index').getValue()];
+            var offsetValue = 0;//offset[axis][relative.get('index').getValue()];
             var y;
             eval(expression[axis]);
             evalObj[axis] = y;
@@ -639,7 +642,6 @@ define([
     },
 
     reset: function() {
-
       this.clear().set(this.defaults);
     },
 
@@ -695,8 +697,8 @@ define([
 
 
     calculateReferenceValues: function() {
+      console.log('calculate reference values');
       this.get('ref_value').invalidate();
-
       var reference = this.get('references');
       if (reference) {
         var ref_prop = this.get('ref_prop_key');
@@ -709,6 +711,7 @@ define([
         }
         var reference_points = [];
         var reference_values = {};
+
         for (var j = 0; j < ref_dimensions.length; j++) {
           var points = [];
           reference_values[ref_dimensions[j]] = [];
@@ -754,7 +757,13 @@ define([
           var range = this.get('relatives').getRange();
           
           for (var m = 0; m < range; m++) {
-            var x = points.length/range*m;
+            var x;
+            if(range ==1){
+              x = (points.length-1)/2;
+            }
+            else{
+              x = TrigFunc.map(m,0,range-1,0,points.length-1);
+            }
             var y = eval(expression);
             console.log('x,y',x,y);
             reference_values[ref_dimensions[j]].push(y);

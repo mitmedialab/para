@@ -1,4 +1,4 @@
-/*ConstrainableList.js
+/*Duplicator.js
  * list which can enact iterative constraints on its members
  */
 

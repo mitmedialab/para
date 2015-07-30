@@ -128,6 +128,7 @@
 
 							} else {
 								this[p].setValue(data_property);
+								
 							}
 						}
 					}
@@ -135,7 +136,9 @@
 			},
 			//callback triggered when a subproperty is modified externally 
 			propertyModified: function(event) {
+				console.log('property modified',this.get('name'));
 				this.trigger('modified', this);
+				
 			},
 
 			//invalidate all constrainable properties

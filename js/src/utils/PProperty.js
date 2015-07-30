@@ -41,12 +41,12 @@ define([
 
 		setValue: function(val) {
 			this._val.set(val);
-
+			this.trigger('modified', this);
 		},
 
 		//callback triggered when a subproperty is modified externally 
 		propertyModified: function() {
-			this.trigger('modified', this);
+			
 		},
 
 		//invalidate all constrainable properties

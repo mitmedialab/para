@@ -56,7 +56,6 @@ define([
       modifyProperty: function(data, mode, modifier) {
         var constrained_props = this.getConstraintValues();
         var stripped_data = TrigFunc.strip(data, constrained_props);
-        console.log('constrained_props,stripped_data',constrained_props,stripped_data,data);
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].modifyProperty(stripped_data, mode, modifier);
         }
