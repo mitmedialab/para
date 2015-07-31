@@ -196,6 +196,7 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
+      console.log('select drag data',data);
       this.trigger('geometryModified', data, event.modifiers);
     },
 
@@ -206,6 +207,7 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
+
       this.trigger('segmentModified', data, handle, event.modifiers);
     },
 
@@ -219,6 +221,7 @@ define([
           val: dAngle - angle,
           operator: 'add'
         };
+        console.log('rotate data',data);
         this.trigger('geometryModified', data, event.modifiers);
 
       }
@@ -259,7 +262,6 @@ define([
         // }
 
         var data = {};
-        data.set = true;
         data.scaling_delta = {
           x: scaleX,
           y: scaleY,

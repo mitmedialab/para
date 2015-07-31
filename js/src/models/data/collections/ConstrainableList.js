@@ -50,14 +50,15 @@ define([
         });
       },
 
-      /*modifyProperty
+      /*setValue
     passes modifications onto members, stripped of any properties that are constrained on the list
      */
-      modifyProperty: function(data, mode, modifier) {
+      setValue: function(data) {
         var constrained_props = this.getConstraintValues();
         var stripped_data = TrigFunc.strip(data, constrained_props);
+        console.log('stripped_data',stripped_data);
         for (var i = 0; i < this.members.length; i++) {
-          this.members[i].modifyProperty(stripped_data, mode, modifier);
+          this.members[i].setValue(stripped_data);
         }
         for (var p in stripped_data) {
           if (stripped_data.hasOwnProperty(p)) {
@@ -73,7 +74,7 @@ define([
           var data = {};
           data[prop] = constraint_values[prop];
           console.log('constrained data',data,constraint_values);
-          this.members[i].modifyProperty(data);
+          this.members[i].setValue(data); 
           this.increment();
         }
         ListNode.prototype.removeConstraint.call(this,prop,dimensions);
@@ -152,6 +153,7 @@ define([
           this.compileMemberAt(i, constraint_values);
           this.increment();
         }
+        return true;
       },
 
       modifyPriorToCompile: function(data) {

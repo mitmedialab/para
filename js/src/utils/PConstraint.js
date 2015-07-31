@@ -128,17 +128,28 @@
 
 							} else {
 								this[p].setValue(data_property);
-								
+							
 							}
 						}
 					}
 				}
+				//console.log('on modify, is valid',this.get('name'),this.isValid());
 			},
 			//callback triggered when a subproperty is modified externally 
 			propertyModified: function(event) {
-				console.log('property modified',this.get('name'));
+				//console.log('property modified',this.get('name'));
 				this.trigger('modified', this);
 				
+			},
+
+			isValid: function(){
+				var valid = true;
+				for (var p in this) {
+					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
+						valid = valid ? this[p].isValid():false;
+					}
+				}
+				return valid;
 			},
 
 			//invalidate all constrainable properties

@@ -49,6 +49,10 @@ define([
 			
 		},
 
+		isValid: function(){
+			return this._val.isValid();
+		},
+
 		//invalidate all constrainable properties
 		invalidate: function() {
 			this._val.invalidate();

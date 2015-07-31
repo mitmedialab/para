@@ -668,12 +668,44 @@ define([
 								property.setValue(d);
 							}
 						}
-
+						//console.log('modify property for', this.get('id'), 'property is valid', this.isValidFor(p), 'instance is valid', this.isValid());
 						this.trigger('change:' + p);
 
 					}
 				}
 			}
+		},
+
+		isValid: function() {
+			var constrainMap = this.get('constrain_map');
+			var valid = true;
+			for (var property in constrainMap) {
+				if (constrainMap.hasOwnProperty(property)) {
+					//console.log('property is valid', property, this.isValidFor(property));
+					valid = valid ? this.isValidFor(property) : false;
+				}
+			}
+			return valid;
+		},
+
+		invalidate: function() {
+			var constrainMap = this.get('constrain_map');
+			for (var property_name in constrainMap) {
+				if (constrainMap.hasOwnProperty(property_name)) {
+					var property = this.inheritProperty(property_name);
+					if (property) {
+						property.invalidate();
+					}
+				}
+			}
+		},
+
+		isValidFor: function(property_name) {
+			var property = this.inheritProperty(property_name);
+			if (property) {
+				return property.isValid();
+			}
+			return true;
 		},
 
 		propertyModified: function(event) {
@@ -900,7 +932,7 @@ define([
 
 		},
 
-		removeConstraint: function(prop,dimensions){
+		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);
 		},
 
@@ -919,7 +951,9 @@ define([
 							val: data[prop]
 						};
 					}
-					p.operator = 'set';
+					if(!p.operator){
+						p.operator = 'set';
+					}
 					this.get(prop).modifyProperty(p);
 				}
 			}
@@ -1089,11 +1123,19 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
-			this.compileTransformation();
-			this.compileStyle();
+			//console.log('compiling', this.get('id'), 'isValid:', this.isValid());
+			//if (this.isValid() || this.get('merged')) {
+			//	return false;
+			//} else {
+				this.compileTransformation();
+				this.compileStyle();
+				return true;
+			//}
+			//this.set('merged', null);
 		},
 
 		compileTransformation: function() {
+
 			var scaling_delta, rotation_delta, translation_delta;
 			var merged = this.get('merged');
 			if (!merged) {

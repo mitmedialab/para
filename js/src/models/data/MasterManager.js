@@ -380,9 +380,9 @@ define([
 			switch (state) {
 				case compile:
 					node.reset();
-					node.compile();
+					var changed = node.compile();
 					renderQueue.push(node);
-
+	
 					for (var i = 0; i < children.length; i++) {
 						if (!node.get('open') && node.get('called')) {
 							if (children[i].isReturned) {
@@ -417,13 +417,15 @@ define([
 			switch (state) {
 				case compile:
 					node.reset();
-					node.compile();
+					var changed = node.compile();
 					var dIndex = 0;
 					if (departureNode) {
 						dIndex = departureNode.get('order');
 					}
 					node.set('order', dIndex + node.getChildIndex());
-					renderQueue.push(node);
+					if(changed){
+						renderQueue.push(node);
+					}
 					for (var i = 0; i < children.length; i++) {
 						children[i].visit(this, 'visit', node, state_data);
 					}
@@ -772,7 +774,9 @@ define([
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
+					console.log('data = ',data);
+					instance.setValue(data);
+					//instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
 				}
 				this.compile();
 			}
@@ -805,7 +809,8 @@ define([
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					instance.modifyProperty(style_data, this.tool_mode, this.tool_modifer);
+					instance.setValue(style_data);
+					//instance.modifyProperty(style_data, this.tool_mode, this.tool_modifer);
 				}
 				this.compile();
 			}

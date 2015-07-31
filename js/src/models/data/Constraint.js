@@ -510,6 +510,7 @@ define([
     },
 
     create: function() {
+      var self = this;
       var ref_prop = this.get('ref_prop').split('_');
       var ref_available_props = ref_prop[1];
       var rel_prop = this.get('rel_prop').split('_');
@@ -536,9 +537,6 @@ define([
         this.set('rel_prop_dimensions', rel_prop[1]);
       }
       this.set('ref_prop_dimensions', ref_prop[1]);
-      var self = this;
-      refPropAccess.set('name','ref_prop');
-      this.listenTo(refPropAccess,'modified',this.calculateReferenceValues());
       this.calculateReferenceValues();
 
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
@@ -665,8 +663,13 @@ define([
 
 
     getReferenceValue: function(index, dimension) {
+       var ref_prop = this.get('ref_prop_key');
+      console.log('ref_prop',ref_prop,'reference', this.get('references'),'property',this.get('references').accessProperty(ref_prop));
+      var refPropAccess = this.get('references').inheritProperty(ref_prop);
+
+      console.log('isValid:',refPropAccess.isValid()+this.get('references').get('id'));
       var ref_values = this.get('ref_value_list');
-      console.log('reference value index,dimension', index, dimension,ref_values,ref_values[dimension][index]);
+      //console.log('reference value index,dimension', index, dimension,ref_values,ref_values[dimension][index]);
 
       return ref_values[dimension][index];
       //if(a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();

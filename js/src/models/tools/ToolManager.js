@@ -162,6 +162,7 @@ define([
     },
 
     geometryModified: function(data, modifiers) {
+      console.log('geometry modified',data);
       this.trigger('geometryModified', data, modifiers);
     },
 

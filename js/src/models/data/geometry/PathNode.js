@@ -143,12 +143,11 @@ define([
       this.set('geom', path);
 
 
-      this.modifyProperty(data);
+      this.setValue(data);
 
       var path_altered = this.get('path_altered');
       path_altered.setNull(false);
       this.setPathAltered();
-
       return data;
     },
 

@@ -39,13 +39,13 @@ define([
 
     },
 
-    /*modifyProperty
+    /*setValue
     passes modifications onto members
      */
-    modifyProperty: function(data, mode, modifier) {
+    setValue: function(data, mode, modifier) {
 
       for (var i = 0; i < this.members.length; i++) {
-        this.members[i].modifyProperty(data, mode, modifier);
+        this.members[i].setValue(data, mode, modifier);
       }
       for (var p in data) {
         if (data.hasOwnProperty(p)) {
@@ -83,12 +83,12 @@ define([
         this.members.push(data);
       }
 
-      var md = {};
-      md.member_count = {
+     
+      var member_count = {
         val: this.members.length,
         operator: 'set'
       };
-      this.modifyProperty(md);
+      this.get('member_count').setValue(member_count);
       //this.computeCentroid();
 
     },
@@ -182,12 +182,11 @@ define([
       var index = $.inArray(data, this.members);
       if (index > -1) {
         var member = this.members.splice(index, 1)[0];
-        var md = {};
-        md.member_count = {
+       var member_count = {
           val: this.members.length,
           operator: 'set'
         };
-        this.modifyProperty(md);
+        this.get('member_count').setValue(member_count);
         return member;
       }
 

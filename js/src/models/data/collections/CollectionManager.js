@@ -171,8 +171,10 @@ define([
 				case compile:
 					node.reset();
 
-					node.compile();
-					renderQueue.push(node);
+					var changed = node.compile();
+					if(changed){
+						renderQueue.push(node);
+					}
 					for (var i = 0; i < node.members.length; i++) {
 						member = node.members[i];
 						if (member.get('type') === 'collection') {
