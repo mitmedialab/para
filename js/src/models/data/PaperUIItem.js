@@ -73,7 +73,7 @@ define([
       var geom = this.get('geom');
 
       if (geom) { return; }
-      geom = paper.project.activeLayer.importJSON(this.accessProperty('master_path'));
+      geom = paper.project.activeLayer.importJSON(this.getValueFor('master_path'));
       geom.data.instance = this;
       var position = this.get('position').toPaperPoint();
       geom.position = position;
@@ -170,7 +170,7 @@ define([
               geom.selected = false;
       } else {
               if (!geom) {
-                geom = paper.project.activeLayer.importJSON(this.accessProperty('master_path'));
+                geom = paper.project.activeLayer.importJSON(this.getValueFor('master_path'));
               }
       }
       geom.data.instance = this;

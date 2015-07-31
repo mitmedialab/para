@@ -311,7 +311,7 @@ define([
 
 
     getMemberNumber: function() {
-      return this.accessProperty('member_count');
+      return this.getValueFor('member_count');
     },
 
     getMemberIndex: function(member) {

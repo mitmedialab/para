@@ -24,11 +24,11 @@ define([
 
 		},
 
-		   /*  var delta = this.inheritProperty(propname);
+		   /*  var delta = this.get(propname);
 
         if (delta) {
           var member = this.members[index];
-          var member_property = member.inheritProperty(propname);
+          var member_property = member.get(propname);
           var matrixMap = this.get('matrix_map');
           var matrix_props = matrixMap[propname].properties;
           var member_matrix = member.get(matrixMap[propname].name);

@@ -311,11 +311,9 @@ define([
 		 */
 		create: function() {
 			var instance = new this.constructor();
-			var position = this.get('position');
-			instance.get('position').setValue(position.clone().getValue());
-			instance.get('rotation_origin').setValue(position.clone().getValue());
-			instance.get('scaling_origin').setValue(position.clone().getValue());
-			instance.get('translation_delta').setValue(this.get('translation_delta').getValue());
+			var value = this.getValue();
+			console.log('create value',value);
+			instance.setValue(value);
 			this.addInheritor(instance);
 			return instance;
 		},
@@ -625,7 +623,7 @@ define([
 			var constrainMap = this.get('constrain_map');
 			for (var property_name in constrainMap) {
 				if (constrainMap.hasOwnProperty(property_name)) {
-					var property = this.inheritProperty(property_name);
+					var property = this.get(property_name);
 					if (property) {
 						property.invalidate();
 					}
@@ -634,7 +632,7 @@ define([
 		},
 
 		isValidFor: function(property_name) {
-			var property = this.inheritProperty(property_name);
+			var property = this.get(property_name);
 			if (property) {
 				return property.isValid();
 			}
@@ -647,46 +645,7 @@ define([
 			return this.get(property_name);
 		},
 
-
-		/*inheritProperty
-		 * moves up the prototype chain to find the
-		 * appropriate property reference and returns it
-		 * note: returns a reference, not ACTUAL VALUE.
-		 * To access property value call accessProperty (below)
-		 */
-
-		inheritProperty: function(property_name) {
-			if (!this.get(property_name).isNull()) {
-				var property = this.get(property_name);
-				return property;
-			} else {
-				if (this.has('proto_node')) {
-					if (property_name === 'path_altered') {}
-					return this.get('proto_node').inheritProperty(property_name);
-				}
-			}
-			return null;
-		},
-
-		/* accessProperty
-		 * returns the actual value for a given property by first
-		 *finding it in the inheritance chain and then checking the constraint
-		 * to return the appropriate value
-		 */
-		accessProperty: function(property_name) {
-			if (this.isSelfConstrained()) {
-				this.getValue();
-			}
-			var property = this.inheritProperty(property_name);
-			if (property) {
-				return property.getValue();
-			} else {
-				return null;
-			}
-
-
-		},
-
+		
 		modifyPriorToCompile: function(data) {
 			var value = this.getValue();
 			var merged = TrigFunc.merge(value, data);
@@ -908,11 +867,25 @@ define([
 			var value = {};
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
-					value[propertyName] = this.accessProperty(propertyName);
+					value[propertyName] = this.getValueFor(propertyName);
 				}
 			}
 			return value;
 		},
+
+
+		/* getValueFor
+		 * returns the actual value for a given property
+		 */
+		getValueFor: function(property_name) {
+			var property = this.get(property_name);
+			if (property) {
+				return property.getValue();
+			} else {
+				return null;
+			}
+		},
+
 
 		/* getConstraintValues
 		 * returns an object containing all constrained properties of
@@ -981,7 +954,7 @@ define([
 		 * ancestors.
 		 */
 		setSelectionForInheritors: function(select, mode, modifer, recurse) {
-			var inheritors = this.get('inheritors').accessProperty();
+			var inheritors = this.get('inheritors').inheritors;
 			var alpha;
 			var proto = this.get('proto_node');
 			if (proto) {
@@ -1076,9 +1049,9 @@ define([
 			var scaling_delta, rotation_delta, translation_delta;
 			var merged = this.get('merged');
 			if (!merged) {
-				scaling_delta = this.accessProperty('scaling_delta');
-				rotation_delta = this.accessProperty('rotation_delta');
-				translation_delta = this.accessProperty('translation_delta');
+				scaling_delta = this.getValueFor('scaling_delta');
+				rotation_delta = this.getValueFor('rotation_delta');
+				translation_delta = this.getValueFor('translation_delta');
 			} else {
 
 				scaling_delta = merged.scaling_delta;
@@ -1109,9 +1082,9 @@ define([
 				this._stroke_color = merged.stroke_color;
 				this._stroke_width = merged.stroke_width;
 			} else {
-				this._fill_color = this.accessProperty('fill_color');
-				this._stroke_color = this.accessProperty('stroke_color');
-				this._stroke_width = this.accessProperty('stroke_width');
+				this._fill_color = this.getValueFor('fill_color');
+				this._stroke_color = this.getValueFor('stroke_color');
+				this._stroke_width = this.getValueFor('stroke_width');
 			}
 
 			//TODO: consider changing visible to a constrainable property?
@@ -1174,7 +1147,7 @@ define([
 			if (this.get('inheritor_bbox')) {
 				this.get('inheritor_bbox').remove();
 			}
-			var inheritors = this.get('inheritors').accessProperty();
+			var inheritors = this.get('inheritors').getValueFor();
 			for (var k = 0; k < inheritors.length; k++) {
 				this.updateBoundingBox(inheritors[k]);
 			}
@@ -1323,7 +1296,7 @@ define([
 		},
 
 		animateAlpha: function(levels, property, mode, modifier, curlevel) {
-			var inheritors = this.get('inheritors').accessProperty();
+			var inheritors = this.get('inheritors').getValueFor();
 			var alpha = this.get('alpha');
 			var mod = this.get('mod');
 			if (alpha.getValue() < 0.65) {

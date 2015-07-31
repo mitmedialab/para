@@ -207,10 +207,10 @@ define([
     geometrySelected: function(selected_shape) {
       if (selected_shape) {
         this.undelegateEvents();
-        var fill_color = selected_shape.accessProperty('fill_color');
+        var fill_color = selected_shape.getValueFor('fill_color');
         console.log('geometry selected', fill_color);
-        var stroke_color = selected_shape.accessProperty('stroke_color');
-        var stroke_width = selected_shape.accessProperty('stroke_width');
+        var stroke_color = selected_shape.getValueFor('stroke_color');
+        var stroke_width = selected_shape.getValueFor('stroke_width');
         if (fill_color) {
           if (fill_color.noColor) {
             $('#fillColorBlock').addClass('remove-color');

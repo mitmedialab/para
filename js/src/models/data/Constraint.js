@@ -417,93 +417,93 @@ define([
       }
       switch (prop) {
         case 'scale_x':
-          propValue = instance.accessProperty('scaling_delta').x;
+          propValue = instance.getValueFor('scaling_delta').x;
           break;
         case 'scale_y':
-          propValue = instance.accessProperty('scaling_delta').y;
+          propValue = instance.getValueFor('scaling_delta').y;
           break;
         case 'scale_xy':
-          propValue = instance.accessProperty('scaling_delta');
+          propValue = instance.getValueFor('scaling_delta');
           break;
         case 'position_x':
-          propValue = instance.accessProperty('translation_delta').x;
+          propValue = instance.getValueFor('translation_delta').x;
           break;
         case 'position_y':
-          propValue = instance.accessProperty('translation_delta').y;
+          propValue = instance.getValueFor('translation_delta').y;
           break;
         case 'position_xy':
-          propValue = instance.accessProperty('translation_delta');
+          propValue = instance.getValueFor('translation_delta');
           break;
         case 'fill_h':
-          propValue = instance.accessProperty('fill_color').h;
+          propValue = instance.getValueFor('fill_color').h;
           break;
         case 'fill_s':
-          propValue = instance.accessProperty('fill_color').s;
+          propValue = instance.getValueFor('fill_color').s;
           break;
         case 'fill_l':
-          propValue = instance.accessProperty('fill_color').l;
+          propValue = instance.getValueFor('fill_color').l;
           break;
         case 'fill_hs':
           propValue = {
-            h: instance.accessProperty('fill_color').h,
-            s: instance.accessProperty('fill_color').s
+            h: instance.getValueFor('fill_color').h,
+            s: instance.getValueFor('fill_color').s
           };
           break;
         case 'fill_sl':
           propValue = {
-            s: instance.accessProperty('fill_color').s,
-            l: instance.accessProperty('fill_color').l
+            s: instance.getValueFor('fill_color').s,
+            l: instance.getValueFor('fill_color').l
           };
           break;
         case 'fill_hl':
           propValue = {
-            h: instance.accessProperty('fill_color').h,
-            l: instance.accessProperty('fill_color').l
+            h: instance.getValueFor('fill_color').h,
+            l: instance.getValueFor('fill_color').l
           };
           break;
         case 'fill_hsl':
           propValue = {
-            h: instance.accessProperty('fill_color').h,
-            s: instance.accessProperty('fill_color').s,
-            l: instance.accessProperty('fill_color').l
+            h: instance.getValueFor('fill_color').h,
+            s: instance.getValueFor('fill_color').s,
+            l: instance.getValueFor('fill_color').l
           };
           break;
         case 'stroke_h':
-          propValue = instance.accessProperty('stroke_color').h;
+          propValue = instance.getValueFor('stroke_color').h;
           break;
         case 'stroke_s':
-          propValue = instance.accessProperty('stroke_color').s;
+          propValue = instance.getValueFor('stroke_color').s;
           break;
         case 'stroke_l':
-          propValue = instance.accessProperty('stroke_color').l;
+          propValue = instance.getValueFor('stroke_color').l;
           break;
         case 'stroke_hs':
           propValue = {
-            h: instance.accessProperty('stroke_color').h,
-            s: instance.accessProperty('stroke_color').s
+            h: instance.getValueFor('stroke_color').h,
+            s: instance.getValueFor('stroke_color').s
           };
           break;
         case 'stroke_sl':
           propValue = {
-            s: instance.accessProperty('stroke_color').s,
-            l: instance.accessProperty('stroke_color').l
+            s: instance.getValueFor('stroke_color').s,
+            l: instance.getValueFor('stroke_color').l
           };
           break;
         case 'stroke_hl':
           propValue = {
-            h: instance.accessProperty('stroke_color').h,
-            l: instance.accessProperty('stroke_color').l
+            h: instance.getValueFor('stroke_color').h,
+            l: instance.getValueFor('stroke_color').l
           };
           break;
         case 'stroke_hsl':
           propValue = {
-            h: instance.accessProperty('stroke_color').h,
-            s: instance.accessProperty('stroke_color').s,
-            l: instance.accessProperty('stroke_color').l
+            h: instance.getValueFor('stroke_color').h,
+            s: instance.getValueFor('stroke_color').s,
+            l: instance.getValueFor('stroke_color').l
           };
           break;
         case 'rotation':
-          propValue = instance.accessProperty('rotation_delta');
+          propValue = instance.getValueFor('rotation_delta');
           break;
       }
       return propValue;
@@ -664,8 +664,8 @@ define([
 
     getReferenceValue: function(index, dimension) {
        var ref_prop = this.get('ref_prop_key');
-      console.log('ref_prop',ref_prop,'reference', this.get('references'),'property',this.get('references').accessProperty(ref_prop));
-      var refPropAccess = this.get('references').inheritProperty(ref_prop);
+      console.log('ref_prop',ref_prop,'reference', this.get('references'),'property',this.get('references').getValueFor(ref_prop));
+      var refPropAccess = this.get('references').get(ref_prop);
 
       console.log('isValid:',refPropAccess.isValid()+this.get('references').get('id'));
       var ref_values = this.get('ref_value_list');
@@ -726,14 +726,14 @@ define([
             if (ref_dimensions[j] === 'val') {
               point = {
                 x: i,
-                y: members[i].accessProperty(ref_prop)
+                y: members[i].getValueFor(ref_prop)
               };
               points.push(point);
 
             } else {
               point = {
                 x: i,
-                y: members[i].accessProperty(ref_prop)[ref_dimensions[j]]
+                y: members[i].getValueFor(ref_prop)[ref_dimensions[j]]
               };
               if(!min && !max){
                 min = y;

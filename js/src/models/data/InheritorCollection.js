@@ -115,15 +115,7 @@ define([
 				}
 			},
 
-			//returns actual inheritors themselves rather than constraint values
-			accessProperty: function() {
-				if (!this.isSelfConstrained()) {
-					return this.inheritors;
-
-				} else {
-					return this.getSelfConstraint().accessProperty;
-				}
-			},
+			
 
 
 		});

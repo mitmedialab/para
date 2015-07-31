@@ -285,7 +285,7 @@ define([
       var wDiff = (endWidth - startWidth) / 2;
       var hDiff = (endHeight - startHeight) / 2;
 
-      var inheritors = this.get('inheritors').accessProperty();
+      var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {
         inheritors[j].modifyPointsByIndex(delta.point, indicies, exclude);
       }
@@ -348,7 +348,7 @@ define([
             break;
         }
       }
-      var inheritors = this.get('inheritors').accessProperty();
+      var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {
         if (!exclude || inheritors[j] != exclude) {
           inheritors[j].modifyPointsByIndex(point, indicies);

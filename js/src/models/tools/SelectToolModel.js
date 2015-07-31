@@ -228,7 +228,7 @@ define([
     },
 
     scaleDrag: function(event) {
-      var scaleDelta = literal.data.instance.accessProperty('scaling_delta');
+      var scaleDelta = literal.data.instance.getValueFor('scaling_delta');
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 

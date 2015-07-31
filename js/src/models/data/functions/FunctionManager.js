@@ -91,7 +91,7 @@ define([
 				//f.addParameter(paramList[i]);
 				childList[i].hide();
 				childList[i].set('selected', false);
-				var center = childList[i].accessProperty('center');
+				var center = childList[i].getValueFor('center');
 				centers.x += center.x;
 				centers.y += center.y;
 				switch (childList[i].get('type')) {

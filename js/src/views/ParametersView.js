@@ -83,7 +83,7 @@ define([
 
 		setPosition: function() {
 
-			var position = this.model.accessProperty('translation_delta');
+			var position = this.model.getValueFor('translation_delta');
 			var x = (position.x + 50).toString() + 'px';
 			var y = position.y.toString() + 'px';
 			this.$el.css({

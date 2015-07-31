@@ -30,7 +30,7 @@ define([
      */
     getPropFromList: function( instanceList, propertySplit ) {
       return instanceList.map( function( instance ) {
-        var property = instance.accessProperty( propertySplit[0] );
+        var property = instance.getValueFor( propertySplit[0] );
         if ( propertySplit.length == 1 ) { return property; }
         for ( var i = 1; i < propertySplit.length - 1; i++ ) {
           property = property[propertySplit[i]];
@@ -55,7 +55,7 @@ define([
      */
     getPropConstraintFromList: function( instanceList, propertySplit ) {
       return instanceList.map( function( instance ) {
-        var property = instance.inheritProperty( propertySplit[0] );
+        var property = instance.get( propertySplit[0] );
         if(!property       ){
           property = instance.activateProperty(propertySplit[0]);
         }

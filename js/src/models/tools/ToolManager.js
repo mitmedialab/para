@@ -154,7 +154,7 @@ define([
 
     geometrySelected: function(instance, segments, modifier) {
       this.trigger('selectShape', instance,segments);
-      this.setToolStyle({fill_color:instance.accessProperty('fill_color'),stroke_color:instance.accessProperty('stroke_color')});
+      this.setToolStyle({fill_color:instance.getValueFor('fill_color'),stroke_color:instance.getValueFor('stroke_color')});
     },
 
     selectionRequest: function(reference) {
