@@ -191,7 +191,7 @@ define([
       }
 
       var data = {};
-      data.translation_delta = {
+      data.translationDelta = {
         operator: 'add',
         x: event.delta.x,
         y: event.delta.y
@@ -202,7 +202,7 @@ define([
 
     dSelectDrag: function(event) {
       var data = {};
-      data.translation_delta = {
+      data.translationDelta = {
         operator: 'add',
         x: event.delta.x,
         y: event.delta.y
@@ -217,7 +217,7 @@ define([
         var angle = event.lastPoint.subtract(posPoint).angle;
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
-        data.rotation_delta = {
+        data.rotationDelta = {
           val: dAngle - angle,
           operator: 'add'
         };

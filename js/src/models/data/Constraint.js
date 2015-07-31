@@ -37,7 +37,7 @@ define([
   };
 
   var minMaxMap = {
-    translation_delta: {
+    translationDelta: {
       x: {
         min: 0,
         max: 1000
@@ -57,7 +57,7 @@ define([
         max: 5
       }
     },
-    rotation_delta: {
+    rotationDelta: {
       v: {
         min: 0,
         max: 360
@@ -94,9 +94,9 @@ define([
   };
 
   var constraintPropMap = {
-    'position': 'translation_delta',
+    'position': 'translationDelta',
     'scale': 'scaling_delta',
-    'rotation': 'rotation_delta',
+    'rotation': 'rotationDelta',
     'fill': 'fill_color',
     'stroke': 'stroke_color'
   };
@@ -415,6 +415,7 @@ define([
         }
 
       }
+      var instance_value = instance.getValue();
       switch (prop) {
         case 'scale_x':
           propValue = instance.getValueFor('scaling_delta').x;
@@ -426,13 +427,13 @@ define([
           propValue = instance.getValueFor('scaling_delta');
           break;
         case 'position_x':
-          propValue = instance.getValueFor('translation_delta').x;
+          propValue = instance.getValueFor('translationDelta').x;
           break;
         case 'position_y':
-          propValue = instance.getValueFor('translation_delta').y;
+          propValue = instance.getValueFor('translationDelta').y;
           break;
         case 'position_xy':
-          propValue = instance.getValueFor('translation_delta');
+          propValue = instance.getValueFor('translationDelta');
           break;
         case 'fill_h':
           propValue = instance.getValueFor('fill_color').h;
@@ -503,7 +504,7 @@ define([
           };
           break;
         case 'rotation':
-          propValue = instance.getValueFor('rotation_delta');
+          propValue = instance.getValueFor('rotationDelta');
           break;
       }
       return propValue;
@@ -534,9 +535,9 @@ define([
       this.set('ref_prop_key', constraintPropMap[ref_prop[0]]);
       this.set('rel_prop_key', constraintPropMap[ref_prop[0]]);
       if (rel_prop) {
-        this.set('rel_prop_dimensions', rel_prop[1]);
+        this.set('rel_prop_dimensions', ref_prop[1]?ref_prop[1]:['val']);
       }
-      this.set('ref_prop_dimensions', ref_prop[1]);
+      this.set('ref_prop_dimensions', ref_prop[1]?ref_prop[1]:['val']);
       this.calculateReferenceValues();
 
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
@@ -545,7 +546,7 @@ define([
 
         for (var i = 0; i < a_keys.length; i++) {
           var axis = a_keys[i];
-          var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
+          var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? 'val': ref_available_props[ref_available_props.length - 1];
           var cf = (function(d, a) {
             self.set('current_dimension', a);
             return function() {
@@ -585,7 +586,7 @@ define([
           for (var m = 0; m < a_keys.length; m++) {
 
             var axis = a_keys[m];
-            var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? undefined : ref_available_props[ref_available_props.length - 1];
+            var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? 'val' : ref_available_props[ref_available_props.length - 1];
             self.set('current_dimension', ap);
             var operators = self.get('operators');
             var mapOperand = self.get('map_operand');
@@ -663,6 +664,8 @@ define([
 
 
     getReferenceValue: function(index, dimension) {
+      this.calculateReferenceValues();
+      console.log('dimension',dimension);
        var ref_prop = this.get('ref_prop_key');
       console.log('ref_prop',ref_prop,'reference', this.get('references'),'property',this.get('references').getValueFor(ref_prop));
       var refPropAccess = this.get('references').get(ref_prop);

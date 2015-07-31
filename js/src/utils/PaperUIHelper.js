@@ -43,8 +43,8 @@ define([
      * @param relatives  - a list of relative instances
      */
     drawConstraintArrow: function( references, relatives ) {
-      var ref_positions = getPropFromList( references, 'translation_delta' );
-      var rel_positions = getPropFromList( relatives, 'translation_delta' );
+      var ref_positions = getPropFromList( references, 'translationDelta' );
+      var rel_positions = getPropFromList( relatives, 'translationDelta' );
       var ref_centroid = getCentroid( ref_positions );
       var rel_centroid = getCentroid( rel_positions );
       var arrowPath = new paper.Path();

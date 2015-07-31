@@ -71,14 +71,14 @@ define([
 
       var data = {};
       // TODO: make some normalizations util function
-      var rotation_delta;
+      var rotationDelta;
       if (matrix.rotation < 0) {
-        rotation_delta = 360 + matrix.rotation;
+        rotationDelta = 360 + matrix.rotation;
       } else {
-        rotation_delta = matrix.rotation;
+        rotationDelta = matrix.rotation;
       }
-      data.rotation_delta = {
-        val: rotation_delta
+      data.rotationDelta = {
+        val: rotationDelta
       };
 
       data.scaling_delta = {
@@ -87,7 +87,7 @@ define([
         operator: 'add'
       };
 
-      var translation_delta = {
+      var translationDelta = {
         x: matrix.translation.x,
         y: matrix.translation.y,
         operator: 'add'
@@ -98,7 +98,7 @@ define([
         operator: 'set'
       };
 
-      data.translation_delta = translation_delta;
+      data.translationDelta = translationDelta;
       data.position = position;
 
       data.rotation_origin = {
@@ -115,13 +115,13 @@ define([
         data.fill_color = {r:path.fillColor.red,g:path.fillColor.green,b:path.fillColor.blue,h:path.fillColor.hue,s:path.fillColor.saturation,l:path.fillColor.lightness,operator:'set'};
       }
       else{
-        data.fill_color = -1;
+        data.fill_color = {noColor:true};
       }
       if (path.strokeColor) {
         data.stroke_color = {r:path.strokeColor.red,g:path.strokeColor.green,b:path.strokeColor.blue,h:path.strokeColor.hue,s:path.strokeColor.saturation,l:path.strokeColor.lightness,operator:'set'};
       }
       else{
-        data.stroke_color=-1;
+        data.stroke_color={noColor:true};
       }
       data.stroke_width = {
         val: path.strokeWidth
@@ -227,7 +227,7 @@ define([
      */
     modifyPoints: function(data, mode, modifier, exclude) {
       var proto_node = this.get('proto_node');
-      var delta = new paper.Segment(new paper.Point(data.translation_delta.x, data.translation_delta.y), null, null);
+      var delta = new paper.Segment(new paper.Point(data.translationDelta.x, data.translationDelta.y), null, null);
       var origin = new paper.Point(0, 0);
       delta.transform(this._ri_matrix);
       delta.transform(this._si_matrix);
@@ -253,29 +253,29 @@ define([
           case 'segment':
           case 'curve':
             var p = selectedPoint.get('position');
-            p.add(data.translation_delta);
-            geomS.point.x += data.translation_delta.x;
-            geomS.point.y += data.translation_delta.y;
-            selectionS.point.x += data.translation_delta.x;
-            selectionS.point.y += data.translation_delta.y;
+            p.add(data.translationDelta);
+            geomS.point.x += data.translationDelta.x;
+            geomS.point.y += data.translationDelta.y;
+            selectionS.point.x += data.translationDelta.x;
+            selectionS.point.y += data.translationDelta.y;
 
             break;
           case 'handle-in':
             var hi = selectedPoint.get('handle_in');
-            hi.add(data.translation_delta);
-            geomS.handleIn.x += data.translation_delta.x;
-            geomS.handleIn.y += data.translation_delta.y;
-            selectionS.handleIn.x += data.translation_delta.x;
-            selectionS.handleIn.y += data.translation_delta.y;
+            hi.add(data.translationDelta);
+            geomS.handleIn.x += data.translationDelta.x;
+            geomS.handleIn.y += data.translationDelta.y;
+            selectionS.handleIn.x += data.translationDelta.x;
+            selectionS.handleIn.y += data.translationDelta.y;
             break;
 
           case 'handle-out':
             var ho = selectedPoint.get('handle_out');
-            ho.add(data.translation_delta);
-            geomS.handleOut.x += data.translation_delta.x;
-            geomS.handleOut.y += data.translation_delta.y;
-            selectionS.handleOut.x += data.translation_delta.x;
-            selectionS.handleOut.y += data.translation_delta.y;
+            ho.add(data.translationDelta);
+            geomS.handleOut.x += data.translationDelta.x;
+            geomS.handleOut.y += data.translationDelta.y;
+            selectionS.handleOut.x += data.translationDelta.x;
+            selectionS.handleOut.y += data.translationDelta.y;
             break;
         }
 

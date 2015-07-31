@@ -31,9 +31,9 @@ define([
 	var rootNode, currentNode, layersView, collectionView, mapView, functionManager, collectionManager, selected, currentSelectionIndex;
 	var constraintMode = false;
 	var constraintPropMap = {
-		'position': 'translation_delta',
+		'position': 'translationDelta',
 		'scale': 'scaling_delta',
-		'rotation': 'rotation_delta',
+		'rotation': 'rotationDelta',
 		'fill': 'fill_color',
 		'stroke': 'stroke_color'
 	};
@@ -486,7 +486,7 @@ define([
 				if (duplicator) {
 					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
 					newInstance = duplicator.getLastMember();
-					newInstance.get('translation_delta').setValue(parent.get('translation_delta').getValue());
+					newInstance.get('translationDelta').setValue(parent.get('translationDelta').getValue());
 					duplicator.setIndex(duplicator.getMemberIndex(parent),newInstance);
 				} else {
 					duplicator = this.addDuplicator(parent);

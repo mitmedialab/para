@@ -16,8 +16,8 @@ define([
 
       currentPaperObjects: null, //stores literal paperjs objects created / selected by tool
       matrix: null,
-      fill_color: {r:1,g:1,b:1},
-      stroke_color: {r:0,g:0,b:0},
+      fill_color: {r:1,g:1,b:1,noColor:false},
+      stroke_color: {r:0,g:0,b:0,noColor:false},
       stroke_width: 1,
       'tool-mode': 'standard',
       'tool-modifier': 'none',

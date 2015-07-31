@@ -121,20 +121,18 @@ define([
 			 * defaults to setting via HSB, need to figure out a flag for mo
 			 */
 			setValue: function(color) {
-
-				if (color.a) {
-					this.setA(color.a);
-				}
-				if(color.noColor){
+				if (color.noColor) {
 					this.setNoColor(color.noColor);
-				}
-				else{
-					this.setNoColor(false);
-				}
-				if (this.setMode === 'hsb') {
-					this.setValueHSB(color);
 				} else {
-					this.setValueRGB(color);
+					this.setNoColor(false);
+					if (color.a) {
+						this.setA(color.a);
+					}
+					if (this.setMode === 'hsb') {
+						this.setValueHSB(color);
+					} else {
+						this.setValueRGB(color);
+					}
 				}
 				this.setNull(false);
 			},
@@ -145,28 +143,28 @@ define([
 			add: function(color) {
 				this.setNoColor(false);
 				if (color.a) {
-					this.setA(color.a+this.getA());
+					this.setA(color.a + this.getA());
 				}
-				
+
 				if (this.setMode === 'hsb') {
-					if(color.h){
-						this.setValue(this.getH()+color.h);
+					if (color.h) {
+						this.setValue(this.getH() + color.h);
 					}
-					if(color.s){
-						this.setValue(this.getS()+color.s);
+					if (color.s) {
+						this.setValue(this.getS() + color.s);
 					}
-					if(color.l){
-						this.setValue(this.getL()+color.l);
+					if (color.l) {
+						this.setValue(this.getL() + color.l);
 					}
 				} else {
-					if(color.r){
-						this.setValue(this.getR()+color.r);
+					if (color.r) {
+						this.setValue(this.getR() + color.r);
 					}
-					if(color.g){
-						this.setValue(this.getG()+color.g);
+					if (color.g) {
+						this.setValue(this.getG() + color.g);
 					}
-					if(color.b){
-						this.setValue(this.getB()+color.b);
+					if (color.b) {
+						this.setValue(this.getB() + color.b);
 					}
 				}
 				this.setNull(false);
@@ -220,7 +218,7 @@ define([
 						s: this.getS(),
 						l: this.getL(),
 						a: this.getA(),
-						noColor:this.getNoColor()
+						noColor: this.getNoColor()
 					};
 				} else {
 					return this.getSelfConstraint().getValue();
@@ -284,8 +282,8 @@ define([
 				}
 			},
 
-			getNoColor: function(){
-					if (this.isSelfConstrained()) {
+			getNoColor: function() {
+				if (this.isSelfConstrained()) {
 					return this.getSelfConstraint().getValue().noColor;
 				} else {
 					return this.noColor.getValue();

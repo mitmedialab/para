@@ -64,17 +64,17 @@ define([
 
   // map property names for UI to instance properties to constrain
   //
-  // NOTE: ideally this would be 1-1; i.e. constraining translation_delta
+  // NOTE: ideally this would be 1-1; i.e. constraining translationDelta
   // would actually constrain position. In reality, an instance's position
-  // is based on both an original position AND a translation_delta. Thus
+  // is based on both an original position AND a translationDelta. Thus
   // making a position constraint really only constrains a delta for now.
   // 
   // UPSHOT: there should be properties on the instance which directly 
   // relate to the properties to be constrained
   var propToConstraintMap = {
-    'position': 'translation_delta',
+    'position': 'translationDelta',
     'scale': 'scaling_delta',
-    'orientation': 'rotation_delta'
+    'orientation': 'rotationDelta'
   };
 
   // model definition

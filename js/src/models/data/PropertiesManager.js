@@ -60,10 +60,10 @@ define(['jquery',
       var levels = 1;
       switch (selectTool.get('mode')) {
         case 'select':
-          property = 'translation_delta';
+          property = 'translationDelta';
           break;
         case 'rotate':
-          property = 'rotation_delta';
+          property = 'rotationDelta';
           break;
         case 'scale':
           property = 'scaling_delta';

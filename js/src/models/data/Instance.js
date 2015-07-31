@@ -21,12 +21,12 @@ define([
 ], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
-	var exporting_properties = ['position', 'translation_delta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
-		'rotation_delta', 'stroke_color', 'fill_color', 'stroke_width', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
+	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
+		'rotationDelta', 'stroke_color', 'fill_color', 'stroke_width', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
 	];
 
-	var constraints = ['position', 'translation_delta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
-		'rotation_delta', 'stroke_color', 'fill_color', 'stroke_width', 'val'
+	var constraints = ['position', 'translationDelta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
+		'rotationDelta', 'stroke_color', 'fill_color', 'stroke_width', 'val'
 	];
 
 	var Instance = SceneNode.extend({
@@ -56,11 +56,11 @@ define([
 			/*==begin JSON export===*/
 			/*constrainable properties to export to JSON*/
 			position: null,
-			translation_delta: null,
+			translationDelta: null,
 			scaling_origin: null,
 			scaling_delta: null,
 			rotation_origin: null,
-			rotation_delta: null,
+			rotationDelta: null,
 			stroke_color: null,
 			fill_color: null,
 			stroke_width: null,
@@ -81,11 +81,11 @@ define([
 			//map of constrainable properties
 			constrain_map: {
 				position: ['x', 'y'],
-				translation_delta: ['x', 'y'],
+				translationDelta: ['x', 'y'],
 				scaling_origin: ['x', 'y'],
 				scaling_delta: ['x', 'y'],
 				rotation_origin: ['val'],
-				rotation_delta: ['val'],
+				rotationDelta: ['val'],
 				stroke_color: ['r', 'g', 'b', 'a'],
 				fill_color: ['r', 'g', 'b', 'a'],
 				stroke_width: ['val'],
@@ -134,17 +134,17 @@ define([
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
 			this.set('alpha', new PFloat(1));
-			var translation_delta = new PPoint(0, 0);
-			translation_delta.setNull(true);
-			this.set('translation_delta', translation_delta);
+			var translationDelta = new PPoint(0, 0);
+			translationDelta.setNull(true);
+			this.set('translationDelta', translationDelta);
 
 			var scaling_delta = new PPoint(0, 0);
 			scaling_delta.setNull(true);
 			this.set('scaling_delta', scaling_delta);
 
-			var rotation_delta = new PFloat(0);
-			rotation_delta.setNull(true);
-			this.set('rotation_delta', rotation_delta);
+			var rotationDelta = new PFloat(0);
+			rotationDelta.setNull(true);
+			this.set('rotationDelta', rotationDelta);
 
 			var stroke_color = new PColor(0, 0, 0);
 			stroke_color.setNull(true);
@@ -174,8 +174,8 @@ define([
 			this._temp_matrix = new paper.Matrix();
 
 			//temporary attributes
-			this._translation_delta = new paper.Matrix();
-			this._rotation_delta = new paper.Matrix();
+			this._translationDelta = new paper.Matrix();
+			this._rotationDelta = new paper.Matrix();
 			this._scaling_delta = new paper.Matrix();
 			this._fill_color = {
 				r: undefined,
@@ -426,14 +426,14 @@ define([
 
 
 
-			this._ti_matrix = this._translation_delta.inverted();
-			this._ri_matrix = this._rotation_delta.inverted();
+			this._ti_matrix = this._translationDelta.inverted();
+			this._ri_matrix = this._rotationDelta.inverted();
 			this._si_matrix = this._scaling_delta.inverted();
 			this._itemp_matrix = this._temp_matrix.inverted();
 			this._temp_matrix.reset();
-			this._translation_delta.reset();
+			this._translationDelta.reset();
 			this._scaling_delta.reset();
-			this._rotation_delta.reset();
+			this._rotationDelta.reset();
 		},
 
 
@@ -492,7 +492,7 @@ define([
 				x: 0,
 				y: 0
 			});
-			this.get('translation_delta').setValue({
+			this.get('translationDelta').setValue({
 				x: 0,
 				y: 0
 			});
@@ -540,12 +540,12 @@ define([
 		 */
 		_setPropertiesToInstance: function(data, instance) {
 
-			if (data.translation_delta) {
-				this.get('translation_delta').setValue(instance.get('translation_delta').getValue());
+			if (data.translationDelta) {
+				this.get('translationDelta').setValue(instance.get('translationDelta').getValue());
 			}
 
-			if (data.rotation_delta) {
-				this.get('rotation_delta').setValue(instance.get('rotation_delta').getValue());
+			if (data.rotationDelta) {
+				this.get('rotationDelta').setValue(instance.get('rotationDelta').getValue());
 
 			}
 			if (data.scaling_delta) {
@@ -565,7 +565,7 @@ define([
 		 * if property exists in the data
 		 */
 		_setPropertiesToPrototype: function(data) {
-			if (data.translation_delta) {
+			if (data.translationDelta) {
 
 				var protoNode = this.get('proto_node');
 
@@ -573,12 +573,12 @@ define([
 					//this.set('position', protoNode.get('position').clone());
 					//this.set('rotation_origin', protoNode.get('rotation_origin').clone());
 					//this.set('scaling_origin', protoNode.get('scaling_origin').clone());
-					this.get('translation_delta').setNull(true);
+					this.get('translationDelta').setNull(true);
 				}
 			}
 
-			if (data.rotation_delta) {
-				this.get('rotation_delta').setNull(true);
+			if (data.rotationDelta) {
+				this.get('rotationDelta').setNull(true);
 			}
 			if (data.scaling_delta) {
 				this.get('scaling_delta').setNull(true);
@@ -659,7 +659,7 @@ define([
 			//attribute sub properties are constrained, selective modification allowed;
 
 			switch (property_name) {
-				case 'translation_delta':
+				case 'translationDelta':
 					if (!attribute_constraint) {
 						if (set) {
 							internal_matrix.tx = (value.translation) ? 0 : internal_matrix.tx;
@@ -726,7 +726,7 @@ define([
 						return false;
 					}
 					break;
-				case 'rotation_delta':
+				case 'rotationDelta':
 					var r_origin = this._rotation_origin;
 					if (attribute_constraint) {
 						return false;
@@ -788,7 +788,7 @@ define([
 		 *
 		 * 2) if some of the attributes of the instance are constrainted, returns an object with a
 		 * list of the currently constrained attributes of this instance, with references to these
-		 * constraints eg {translation_delta:{x:constraint_obj},rotation_delta:{self:constraint_obj}}
+		 * constraints eg {translationDelta:{x:constraint_obj},rotationDelta:{self:constraint_obj}}
 		 * note: these objects will either contain 1 property "self", meaning that the entire attribute
 		 * is constrained, or several properties reflecting the sub-attribuites of the instance attribute which are constrained
 		 *
@@ -1046,17 +1046,17 @@ define([
 
 		compileTransformation: function() {
 
-			var scaling_delta, rotation_delta, translation_delta;
+			var scaling_delta, rotationDelta, translationDelta;
 			var merged = this.get('merged');
 			if (!merged) {
 				scaling_delta = this.getValueFor('scaling_delta');
-				rotation_delta = this.getValueFor('rotation_delta');
-				translation_delta = this.getValueFor('translation_delta');
+				rotationDelta = this.getValueFor('rotationDelta');
+				translationDelta = this.getValueFor('translationDelta');
 			} else {
 
 				scaling_delta = merged.scaling_delta;
-				rotation_delta = merged.rotation_delta;
-				translation_delta = merged.translation_delta;
+				rotationDelta = merged.rotationDelta;
+				translationDelta = merged.translationDelta;
 			}
 
 			this._rotation_origin = this.get('rotation_origin').toPaperPoint();
@@ -1065,12 +1065,12 @@ define([
 
 
 			this._scaling_delta.scale(scaling_delta.x, scaling_delta.y, this._scaling_origin);
-			this._rotation_delta.rotate(rotation_delta, this._rotation_origin);
-			this._translation_delta.translate(translation_delta.x, translation_delta.y);
+			this._rotationDelta.rotate(rotationDelta, this._rotation_origin);
+			this._translationDelta.translate(translationDelta.x, translationDelta.y);
 
-			this._temp_matrix.preConcatenate(this._rotation_delta);
+			this._temp_matrix.preConcatenate(this._rotationDelta);
 			this._temp_matrix.preConcatenate(this._scaling_delta);
-			this._temp_matrix.preConcatenate(this._translation_delta);
+			this._temp_matrix.preConcatenate(this._translationDelta);
 
 		},
 
@@ -1252,17 +1252,17 @@ define([
 			geom.position = position;
 			bbox.position = position;
 			selection_clone.position = position;
-			geom.transform(this._rotation_delta);
+			geom.transform(this._rotationDelta);
 			geom.transform(this._scaling_delta);
-			geom.transform(this._translation_delta);
+			geom.transform(this._translationDelta);
 
-			selection_clone.transform(this._rotation_delta);
+			selection_clone.transform(this._rotationDelta);
 			selection_clone.transform(this._scaling_delta);
-			selection_clone.transform(this._translation_delta);
+			selection_clone.transform(this._translationDelta);
 
-			bbox.transform(this._rotation_delta);
+			bbox.transform(this._rotationDelta);
 			bbox.transform(this._scaling_delta);
-			bbox.transform(this._translation_delta);
+			bbox.transform(this._translationDelta);
 
 			this.updateScreenBounds(geom);
 
@@ -1274,8 +1274,8 @@ define([
 
 		copyAttributes: function(clone, deep) {
 			clone.get('position').setValue(this.get('position').getValue());
-			clone.get('translation_delta').setValue(this.get('translation_delta').clone());
-			clone.get('rotation_delta').setValue(this.get('rotation_delta').getValue());
+			clone.get('translationDelta').setValue(this.get('translationDelta').clone());
+			clone.get('rotationDelta').setValue(this.get('rotationDelta').getValue());
 			clone.get('scaling_delta').setValue(this.get('scaling_delta').getValue());
 			clone.get('center').setValue(this.get('center').getValue());
 			clone.get('scaling_origin').setValue(this.get('scaling_origin').getValue());

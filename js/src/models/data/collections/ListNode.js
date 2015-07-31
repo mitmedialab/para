@@ -30,9 +30,9 @@ define([
       member_count.setNull(false);
       this.set('member_count', member_count);
 
-      this.get('translation_delta').setNull(false);
+      this.get('translationDelta').setNull(false);
       this.get('scaling_delta').setNull(false);
-      this.get('rotation_delta').setNull(false);
+      this.get('rotationDelta').setNull(false);
       this.get('fill_color').setNull(false);
       this.get('stroke_color').setNull(false);
       this.get('stroke_width').setNull(false);

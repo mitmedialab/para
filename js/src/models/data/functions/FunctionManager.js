@@ -117,7 +117,7 @@ define([
 			centers.x /= childList.length;
 			centers.y /= childList.length;
 			var data = {
-				translation_delta: centers
+				translationDelta: centers
 			};
 			f.setValue(data);
 			this.functions.push(f);

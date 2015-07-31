@@ -31,7 +31,7 @@ define([
 			initialize: function() {
 				Instance.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
-				this.get('translation_delta').setNull(false);
+				this.get('translationDelta').setNull(false);
 				var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 100));
 				var path = new paper.Path.Rectangle(rectangle);
 				path.strokeColor = this.get('primary_selection_color');
@@ -201,7 +201,7 @@ define([
 				var open = this.get('open');
 				if (!open) {
 					ui.visible = true;
-					ui.position = this.get('translation_delta').toPaperPoint();
+					ui.position = this.get('translationDelta').toPaperPoint();
 					this.nameText.content = this.get('f_name');
 					this.renderSelection(ui.children['box']);
 					if (this.get('called')) {

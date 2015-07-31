@@ -27,17 +27,17 @@ define([
   
     normalizeGeometry: function(path, matrix) {
       var data = {};
-      data.rotation_delta = new PFloat(matrix.rotation);
+      data.rotationDelta = new PFloat(matrix.rotation);
       // TODO: make some normalizations util function
-      if (data.rotation_delta > 360 || data.rotation_delta < 0) {
-        data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
+      if (data.rotationDelta > 360 || data.rotationDelta < 0) {
+        data.rotationDelta = TrigFunc.wrap(data.rotationDelta, 0, 360);
       }
       data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
 
-      var translation_delta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
+      var translationDelta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
       var position = new PPoint(0, 0, 'set');
 
-      data.translation_delta = translation_delta;
+      data.translationDelta = translationDelta;
       data.position = position;
 
       data.rotation_origin = new PPoint(0, 0, 'set');
@@ -78,8 +78,8 @@ define([
       var position = this.get('position').toPaperPoint();
       geom.position = position;
       geom.transform(this._scale_delta);
-      geom.transform(this._rotation_delta);
-      geom.transform(this._translation_delta);
+      geom.transform(this._rotationDelta);
+      geom.transform(this._translationDelta);
       var screen_bounds = geom.bounds;
       //screen_bounds.selected = selected;
       this.set({
@@ -101,17 +101,17 @@ define([
 
     normalizeGeometryo: function(path, matrix) {
       var data = {};
-      data.rotation_delta = new PFloat(matrix.rotation);
+      data.rotationDelta = new PFloat(matrix.rotation);
       // TODO: make some normalizations util function
-      if (data.rotation_delta > 360 || data.rotation_delta < 0) {
-        data.rotation_delta = TrigFunc.wrap(data.rotation_delta, 0, 360);
+      if (data.rotationDelta > 360 || data.rotationDelta < 0) {
+        data.rotationDelta = TrigFunc.wrap(data.rotationDelta, 0, 360);
       }
       data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
       
-      var translation_delta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
+      var translationDelta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
       var position = new PPoint(0,0 ,'set');
 
-      data.translation_delta=translation_delta;
+      data.translationDelta=translationDelta;
       data.position = position;
 
       data.rotation_origin = new PPoint(0, 0, 'set');

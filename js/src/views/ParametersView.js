@@ -31,7 +31,7 @@ define([
 			this.tsource = this.$('#layerTemplate').html();
 			this.template = Handlebars.default.compile(this.tsource);
 			this.listenTo(this.model, "change:showLayers", this.showLayers);
-			this.listenTo(this.model, "change:translation_delta", this.setPosition);
+			this.listenTo(this.model, "change:translationDelta", this.setPosition);
 			this.listenTo(this.model, 'change:f_parameters', this.updateParameters);
 		},
 
@@ -83,7 +83,7 @@ define([
 
 		setPosition: function() {
 
-			var position = this.model.getValueFor('translation_delta');
+			var position = this.model.getValueFor('translationDelta');
 			var x = (position.x + 50).toString() + 'px';
 			var y = position.y.toString() + 'px';
 			this.$el.css({

@@ -68,11 +68,11 @@ define([
         }
         polyPath.strokeWidth = this.get('stroke_width');
         var strokeColor = this.get('stroke_color');
-        if (strokeColor != -1) {
+        if (!strokeColor.noColor) {
           polyPath.strokeColor = new paper.Color(strokeColor.r, strokeColor.g, strokeColor.b);
         }
         var fillColor = this.get('fill_color');
-        if (fillColor != -1) {
+        if (!fillColor.noColor) {
           polyPath.fillColor = new paper.Color(fillColor.r, fillColor.g, fillColor.b);
         }
 
@@ -267,11 +267,11 @@ define([
         polyPath.selected = true;
         polyPath.strokeWidth = this.get('stroke_width');
        var strokeColor = this.get('stroke_color');
-        if (strokeColor != -1) {
+        if (!strokeColor.noColor) {
           polyPath.strokeColor = new paper.Color(strokeColor.r, strokeColor.g, strokeColor.b);
         }
         var fillColor = this.get('fill_color');
-        if (fillColor != -1) {
+        if (!fillColor.noColor) {
           polyPath.fillColor = new paper.Color(fillColor.r, fillColor.g, fillColor.b);
         }
 

@@ -105,7 +105,7 @@ define([
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
         data = {
-          fill_color: -1
+          fill_color:{noColor:true}
         };
         this.model.modifyStyle(data);
 
@@ -113,7 +113,7 @@ define([
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
         data = {
-          stroke_color: -1
+          stroke_color:{noColor:true}
         };
         this.model.modifyStyle(data);
       }
