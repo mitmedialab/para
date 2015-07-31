@@ -151,8 +151,12 @@ define([
 					point2.add(data);
 					return point2;
 				} else {
-					this.setX(this.getX() + data.x);
-					this.setY(this.getY() + data.y);
+					if (data.x) {
+						this.setX(this.getX() + data.x);
+					}
+					if (data.y) {
+						this.setY(this.getY() + data.y);
+					}
 				}
 			},
 

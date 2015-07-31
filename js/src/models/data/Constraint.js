@@ -290,8 +290,8 @@ define([
 
 
     setOffset: function(ref_prop, rel_prop) {
-      var ref_dimensions = ref_prop.split('_').length > 1 ? ref_prop.split('_')[1] : ['v'];
-      var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : ['v'];
+      var ref_dimensions = ref_prop.split('_').length > 1 ? ref_prop.split('_')[1] : ['val'];
+      var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : ['val'];
       // relPropValue = propSwitch(rel_prop, 'rel');
 
       var ref_prop_strip = ref_prop.split('_')[0];
@@ -516,8 +516,8 @@ define([
       var rel_prop = this.get('rel_prop').split('_');
 
       //TODO: refactor- this addition is a little hacky, it's so it recognizes rotation as having the same num of properties..
-      var ref_dimensions = this.get('ref_prop').split('_').length > 1 ? this.get('ref_prop').split('_')[1] : ['v'];
-      var rel_dimensions = this.get('rel_prop').split('_').length > 1 ? this.get('rel_prop').split('_')[1] : ['v'];
+      var ref_dimensions = this.get('ref_prop').split('_').length > 1 ? this.get('ref_prop').split('_')[1] : ['val'];
+      var rel_dimensions = this.get('rel_prop').split('_').length > 1 ? this.get('rel_prop').split('_')[1] : ['val'];
 
       var reference = this.get('references');
       var relative = this.get('relatives');
@@ -556,7 +556,7 @@ define([
               var offsetValue = 0;//offset[axis][relative.get('index').getValue()];
               var y;
               eval(expression[d]);
-              if (d !== 'v') {
+              if (d !== 'val') {
                 relPropAccess[d].setValue(y);
               } else {
                 relPropAccess.setValue(y);
@@ -566,7 +566,7 @@ define([
           })(axis, ap);
 
           constraintFunctions.push(cf);
-          if (axis !== 'v') {
+          if (axis !== 'val') {
             relPropAccess[axis].setConstraint(cf);
             relPropAccess[axis].getConstraint();
 
@@ -600,8 +600,8 @@ define([
             relPropAccess.setValue(evalObj);
             return evalObj;
           } else {
-            relPropAccess.setValue(evalObj['v']);
-            return evalObj['v'];
+            relPropAccess.setValue(evalObj['val']);
+            return evalObj['val'];
           }
 
 
@@ -672,7 +672,7 @@ define([
       //console.log('reference value index,dimension', index, dimension,ref_values,ref_values[dimension][index]);
 
       return ref_values[dimension][index];
-      //if(a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
+      //if(a === 'val' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
     },
 
     setRefValueLength: function() {
@@ -723,7 +723,7 @@ define([
 
             var point;
 
-            if (ref_dimensions[j] === 'v') {
+            if (ref_dimensions[j] === 'val') {
               point = {
                 x: i,
                 y: members[i].accessProperty(ref_prop)
