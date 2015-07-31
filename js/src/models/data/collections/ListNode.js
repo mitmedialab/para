@@ -52,6 +52,7 @@ define([
           this.trigger('change:' + p);
         }
       }
+      this.setNull(false);
     },
 
 

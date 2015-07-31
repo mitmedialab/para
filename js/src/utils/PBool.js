@@ -45,6 +45,7 @@ define([
 				} else if (val === false) {
 					this.val.setValue(0);
 				}
+				this.setNull(false);
 			},
 
 			/* getValue
@@ -74,6 +75,11 @@ define([
 			 */
 			clone: function() {
 				return new PBool(this.getValue());
+			},
+
+			add: function(){
+				console.log("[ALERT], trying to add boolean value");
+				//does nothing
 			},
 
 		});

@@ -225,11 +225,6 @@ define([
 			this.isReturned = false;
 
 			var parent = this;
-			_.each(this.attributes, function(val, key) {
-				if (val instanceof PConstraint) {
-					parent.listenTo(val, 'modified', parent.propertyModified);
-				}
-			});
 
 		},
 
@@ -614,68 +609,6 @@ define([
 		},
 
 
-		/*©Property
-		 * called to update the property of an instance
-		 * data: defines the property to be modifed, along with the
-		 * new values
-		 * mode: proxy or standard: determines what is being updated (prototype or object)
-		 * modifer: overide or relative: determines how the updates should be implemented
-		 * should only be called by tool classes
-		 */
-		modifyProperty: function(data, mode, modifier) {
-			var proto_incremented = false;
-			var protoNode = this.get('proto_node');
-			var inheritors = this.get('inheritors').accessProperty();
-			if (mode === 'proxy') {
-				if (protoNode) {
-					if (modifier === 'override') {
-						protoNode._setPropertiesToInstance(data, this);
-					}
-					protoNode.modifyProperty(data, 'standard', 'none');
-					proto_incremented = true;
-				}
-			} else if (mode === 'standard') {
-				if (modifier === 'override') {
-					for (var j = 0; j < inheritors.length; j++) {
-						inheritors[j]._setPropertiesToPrototype(data);
-					}
-				} else if (modifier === 'relative') {
-					for (var i = 0; i < inheritors.length; i++) {
-						inheritors[i].modifyProperty(data, 'standard', 'none');
-					}
-
-				}
-			}
-
-			var constrained_props = this.getConstraintValues();
-			for (var p in data) {
-				if (data.hasOwnProperty(p)) {
-					var data_property = data[p];
-					if (this.has(p)) {
-
-						var property = this.get(p);
-						property.setNull(false);
-						property.modifyProperty(data_property);
-						//check to make sure rotation is between 0 and 360
-						if (p == 'rotation_delta') {
-							if (property.getValue() > 360 || property.getValue() < 0) {
-								property.setValue(TrigFunc.wrap(property.getValue(), 0, 360));
-							}
-						}
-						if (constrained_props) {
-							if (_.has(constrained_props, p)) {
-								var d = TrigFunc.merge(property.getValue(), constrained_props[p]);
-								property.setValue(d);
-							}
-						}
-						//console.log('modify property for', this.get('id'), 'property is valid', this.isValidFor(p), 'instance is valid', this.isValid());
-						this.trigger('change:' + p);
-
-					}
-				}
-			}
-		},
-
 		isValid: function() {
 			var constrainMap = this.get('constrain_map');
 			var valid = true;
@@ -708,9 +641,6 @@ define([
 			return true;
 		},
 
-		propertyModified: function(event) {
-			this.trigger('modified', this);
-		},
 
 		activateProperty: function(property_name) {
 			this.get(property_name).setNull(false);
@@ -954,9 +884,16 @@ define([
 					if(!p.operator){
 						p.operator = 'set';
 					}
-					this.get(prop).modifyProperty(p);
+					console.log('set_value',prop,p);
+					if(p.operator ==='set'){
+						this.get(prop).setValue(p);
+					}
+					else if(p.operator==='add'){
+						this.get(prop).add(p);
+					}
 				}
 			}
+			this.setNull(false);
 		},
 
 

@@ -5,12 +5,12 @@
  */
 
 define([
-	'underscore',
+		'underscore',
 		'utils/PProperty',
 		'utils/PConstraint'
 	],
 
-	function(_,PProperty, PConstraint) {
+	function(_, PProperty, PConstraint) {
 
 
 
@@ -51,7 +51,7 @@ define([
 			getConstraint: function() {
 				var data;
 				var self = this.getSelfConstraint();
-				if(self){
+				if (self) {
 					data = this.getSelfConstraint();
 					return data;
 				}
@@ -59,8 +59,14 @@ define([
 			/* setValue
 			 * sets the value of the property
 			 */
-			setValue: function(val) {
-				this.val.setValue(val);
+			setValue: function(data) {
+				if (data.val) {
+					this.val.setValue(data.val);
+					this.setNull(false);
+				} else if (typeof data === "number") {
+					this.val.setValue(data);
+					this.setNull(false);
+				}
 			},
 
 			/*
@@ -90,13 +96,17 @@ define([
 			},
 
 			/* basic math operations */
-			add: function(val, newP) {
+			add: function(data, newP) {
 				if (newP) {
 					var float2 = this.clone();
-					float2.add(val);
+					float2.add(data);
 					return float2;
 				} else {
-					this.setValue(this.val.getValue() + val);
+					if (data.val) {
+						this.setValue(this.val.getValue() + data.val);
+					} else if (typeof data === "number") {
+						this.setValue(this.val.getValue() + data);
+					}
 				}
 			},
 

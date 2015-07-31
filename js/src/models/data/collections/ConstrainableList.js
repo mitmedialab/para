@@ -65,6 +65,7 @@ define([
             this.trigger('change:' + p);
           }
         }
+        this.setNull(false);
       },
 
       removeConstraint: function(prop,dimensions){

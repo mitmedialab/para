@@ -24,11 +24,6 @@
 
 			constructor: function() {
 				Backbone.Model.apply(this, arguments);
-				for (var p in this) {
-					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
-						this.listenTo(this[p], 'modified', this.propertyModified);
-					}
-				}
 			},
 
 			/* setNull
@@ -110,37 +105,7 @@
 					return this.constraint;
 				}
 			},
-
-			/* modify
-			 * update the value of the property
-			 * based on a data argument. This is called
-			 * when shapes are transformed by the user to
-			 * update their properties
-			 */
-			modifyProperty: function(data) {
-				for (var p in data) {
-					if (data.hasOwnProperty(p)) {
-						var data_property = data[p];
-						if (this.hasOwnProperty(p) && !this.isNull()) {
-
-							if (data.operator === 'add') {
-								this[p].setValue(this[p].getValue() + data_property);
-
-							} else {
-								this[p].setValue(data_property);
-							
-							}
-						}
-					}
-				}
-				//console.log('on modify, is valid',this.get('name'),this.isValid());
-			},
-			//callback triggered when a subproperty is modified externally 
-			propertyModified: function(event) {
-				//console.log('property modified',this.get('name'));
-				this.trigger('modified', this);
-				
-			},
+		
 
 			isValid: function(){
 				var valid = true;

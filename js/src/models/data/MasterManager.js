@@ -776,7 +776,6 @@ define([
 					var instance = selected[i];
 					console.log('data = ',data);
 					instance.setValue(data);
-					//instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));
 				}
 				this.compile();
 			}
@@ -810,7 +809,6 @@ define([
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
 					instance.setValue(style_data);
-					//instance.modifyProperty(style_data, this.tool_mode, this.tool_modifer);
 				}
 				this.compile();
 			}

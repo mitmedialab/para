@@ -82,6 +82,7 @@ define([
 				if (point.y) {
 					this.setY(point.y);
 				}
+				this.setNull(false);
 			},
 
 			/* getValue

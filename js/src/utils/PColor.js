@@ -121,17 +121,55 @@ define([
 			 * defaults to setting via HSB, need to figure out a flag for mo
 			 */
 			setValue: function(color) {
+
 				if (color.a) {
 					this.setA(color.a);
 				}
 				if(color.noColor){
 					this.setNoColor(color.noColor);
 				}
+				else{
+					this.setNoColor(false);
+				}
 				if (this.setMode === 'hsb') {
 					this.setValueHSB(color);
 				} else {
 					this.setValueRGB(color);
 				}
+				this.setNull(false);
+			},
+
+			/* setValue
+			 * defaults to setting via HSB, need to figure out a flag for mo
+			 */
+			add: function(color) {
+				this.setNoColor(false);
+				if (color.a) {
+					this.setA(color.a+this.getA());
+				}
+				
+				if (this.setMode === 'hsb') {
+					if(color.h){
+						this.setValue(this.getH()+color.h);
+					}
+					if(color.s){
+						this.setValue(this.getS()+color.s);
+					}
+					if(color.l){
+						this.setValue(this.getL()+color.l);
+					}
+				} else {
+					if(color.r){
+						this.setValue(this.getR()+color.r);
+					}
+					if(color.g){
+						this.setValue(this.getG()+color.g);
+					}
+					if(color.b){
+						this.setValue(this.getB()+color.b);
+					}
+				}
+				this.setNull(false);
 			},
 
 			setValueRGB: function(color) {
@@ -347,42 +385,6 @@ define([
 				return new paper.Color(this.getR(), this.getG(), this.getB(), this.getA());
 			},
 
-			/* modify
-			 * converts hex values to color values
-			 * calls super modify following this conversion
-			 */
-			modifyProperty: function(style_data) {
-				if (style_data instanceof Object) {
-					this.setNoColor(false);
-					PConstraint.prototype.modifyProperty.call(this, style_data);
-
-				} else {
-					if (style_data === -1) {
-						this.setNoColor(true);
-					} else {
-
-						this.setNoColor(false);
-						var r = ColorUtils.hexToR(style_data);
-						var g = ColorUtils.hexToG(style_data);
-						var b = ColorUtils.hexToB(style_data);
-						var hsl = ColorUtils.rgbToHsl({
-							r: r,
-							g: g,
-							b: b
-						});
-						var data = {
-							operator: 'set',
-							r: r,
-							g: g,
-							b: b,
-							h: hsl[0],
-							s: hsl[1],
-							l: hsl[2]
-						};
-						PConstraint.prototype.modifyProperty.call(this, data);
-					}
-				}
-			},
 
 			toJSON: function() {
 				var data = this.getValue();

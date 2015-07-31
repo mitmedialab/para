@@ -33,7 +33,6 @@ define([
 
 			addInheritor: function(inheritor) {
 				this.inheritors.push(inheritor);
-				this.listenTo(inheritor, 'modified', this.propertyModified);
 
 			},
 
@@ -55,10 +54,6 @@ define([
 					this.inheritors[i].deleteSelf();
 				}
 				this.inheritors = [];
-			},
-
-			propertyModified: function(event) {
-				this.trigger('modified', this);
 			},
 
 			isConstrained: function() {
@@ -130,12 +125,6 @@ define([
 				}
 			},
 
-			//overrides PConstraint modifyProperty method
-			modifyProperty: function(data) {
-				if (data.inheritors) {
-					this.setValue(data);
-				}
-			}
 
 		});
 
