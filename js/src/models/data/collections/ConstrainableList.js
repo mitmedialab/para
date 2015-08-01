@@ -56,7 +56,6 @@ define([
       setValue: function(data) {
         var constrained_props = this.getConstraintValues();
         var stripped_data = TrigFunc.strip(data, constrained_props);
-        console.log('stripped_data',stripped_data);
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].setValue(stripped_data);
         }
@@ -74,7 +73,6 @@ define([
           var constraint_values = this.getConstraintValues();
           var data = {};
           data[prop] = constraint_values[prop];
-          console.log('constrained data',data,constraint_values);
           this.members[i].setValue(data); 
           this.increment();
         }

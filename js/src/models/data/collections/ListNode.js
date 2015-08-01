@@ -204,7 +204,6 @@ define([
       var selfRemoved = this.removeMember(data);
       if (selfRemoved) {
         orphans = data.removeAllMembers();
-        console.log('orphans =', orphans);
         this.addMember(orphans);
         removedItems.push(selfRemoved);
         modified.push(this);

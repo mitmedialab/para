@@ -124,7 +124,6 @@ define([
 		 */
 		removeCollection: function(collection) {
 			var removedLists, members;
-			console.log('lists',lists);
 			for (var j = 0; j < lists.length; j++) {
 				if (lists[j] === collection) {
 					lists.splice(j, 1);
@@ -143,7 +142,6 @@ define([
 			}
 
 			collection.deleteSelf();
-			console.log('lists after remove',lists);
 
 			return members;
 		},

@@ -208,9 +208,7 @@ define([
       if (selected_shape) {
         this.undelegateEvents();
         var fillColor = selected_shape.getValueFor('fillColor');
-        console.log('geometry selected', fillColor);
         var strokeColor = selected_shape.getValueFor('strokeColor');
-        console.log('fillColor,strokeColor',fillColor,strokeColor);
         var stroke_width = selected_shape.getValueFor('stroke_width');
         if (fillColor) {
           if (fillColor.noColor) {

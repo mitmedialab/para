@@ -196,7 +196,6 @@ define([
         x: event.delta.x,
         y: event.delta.y
       };
-      console.log('select drag data',data);
       this.trigger('geometryModified', data, event.modifiers);
     },
 
@@ -221,7 +220,6 @@ define([
           val: dAngle - angle,
           operator: 'add'
         };
-        console.log('rotate data',data);
         this.trigger('geometryModified', data, event.modifiers);
 
       }

@@ -774,7 +774,6 @@ define([
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					console.log('data = ',data);
 					instance.setValue(data);
 				}
 				this.compile();

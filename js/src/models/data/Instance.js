@@ -312,7 +312,6 @@ define([
 		create: function() {
 			var instance = new this.constructor();
 			var value = this.getValue();
-			console.log('create value',value);
 			instance.setValue(value);
 			this.addInheritor(instance);
 			return instance;
@@ -612,7 +611,6 @@ define([
 			var valid = true;
 			for (var property in constrainMap) {
 				if (constrainMap.hasOwnProperty(property)) {
-					//console.log('property is valid', property, this.isValidFor(property));
 					valid = valid ? this.isValidFor(property) : false;
 				}
 			}
@@ -828,7 +826,6 @@ define([
 		/*setValue
 		 * modifies the properties of this instance in accordance with the
 		 * data passed in
-		 * note- in future should unifiy this with the modify property function?
 		 */
 		setValue: function(data) {
 			for (var prop in data) {
@@ -843,7 +840,6 @@ define([
 					if(!p.operator){
 						p.operator = 'set';
 					}
-					console.log('set_value',prop,p);
 					if(p.operator ==='set'){
 						this.get(prop).setValue(p);
 					}

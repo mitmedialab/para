@@ -29,19 +29,15 @@ define([
 			return [color.red,color.green,color.blue];
 		};
 
-		
 		ColorUtils.toHex = function(color){
-			console.log('toHex',color);
 			if(color.h!==undefined){
 				var rgb = this.hslToRgb(color.h,color.s,color.l);
 				var hex =  this.rgbToHex({r:rgb[0],g:rgb[1],b:rgb[2]});
-				console.log('rgb,hex,color',rgb,hex,color);
 				return hex;
 			}
 			else{
 				return this.rgbToHex(color);
 			}
-
 		};
 
 

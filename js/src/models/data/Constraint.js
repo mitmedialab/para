@@ -8,31 +8,31 @@ define([
 ], function(_, paper, Backbone, ConstraintHandles, PFloat, TrigFunc) {
 
   var propConvMap = {
-    'position:scale': 0.01,
-    'position:position': 1,
-    'position:rotation': 1,
-    'position:fill': 0.01,
-    'position:stroke': 0.01,
-    'scale:position': 100,
-    'scale:scale': 1,
-    'scale:rotation': 100,
-    'scale:fill': 1,
-    'scale:stroke': 1,
-    'rotation:position': 1,
-    'rotation:scale': 0.01,
-    'rotation:rotation': 1,
-    'rotation:fill': 0.01,
-    'rotation:stroke': 0.01,
-    'fill:fill': 1,
-    'fill:stroke': 1,
-    'fill:scale': 1,
-    'fill:rotation': 100,
-    'fill:position': 100,
-    'stroke:fill': 1,
-    'stroke:stroke': 1,
-    'stroke:scale': 1,
-    'stroke:rotation': 100,
-    'stroke:position': 100,
+    'translationDelta:scalingDelta': 0.01,
+    'translationDelta:translationDelta': 1,
+    'translationDelta:rotationDelta': 1,
+    'translationDelta:fillColor': 0.01,
+    'translationDelta:strokeColor': 0.01,
+    'scalingDelta:translationDelta': 100,
+    'scalingDelta:scalingDelta': 1,
+    'scalingDelta:rotationDelta': 100,
+    'scalingDelta:fillColor': 1,
+    'scalingDelta:strokeColor': 1,
+    'rotationDelta:translationDelta': 1,
+    'rotationDelta:scalingDelta': 0.01,
+    'rotationDelta:rotationDelta': 1,
+    'rotationDelta:fillColor': 0.01,
+    'rotationDelta:strokeColor': 0.01,
+    'fillColor:fillColor': 1,
+    'fillColor:strokeColor': 1,
+    'fillColor:scalingDelta': 1,
+    'fillColor:rotationDelta': 100,
+    'fillColor:translationDelta': 100,
+    'strokeColor:fillColor': 1,
+    'strokeColor:strokeColor': 1,
+    'strokeColor:scalingDelta': 1,
+    'strokeColor:rotationDelta': 100,
+    'strokeColor:translationDelta': 100,
 
   };
 
@@ -93,20 +93,12 @@ define([
     },
   };
 
-  var constraintPropMap = {
-    'position': 'translationDelta',
-    'scale': 'scalingDelta',
-    'rotation': 'rotationDelta',
-    'fill': 'fillColor',
-    'stroke': 'strokeColor'
-  };
-
   var dimension_map = {
-    'position': 2,
-    'scale': 2,
-    'rotation': 1,
-    'fill': 3,
-    'stroke': 3
+    'translationDelta': 2,
+    'scalingDelta': 2,
+    'rotationDelta': 1,
+    'fillColor': 3,
+    'strokeColor': 3
   };
 
 
@@ -290,8 +282,8 @@ define([
 
 
     setOffset: function(ref_prop, rel_prop) {
-      var ref_dimensions = ref_prop.split('_').length > 1 ? ref_prop.split('_')[1] : ['val'];
-      var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : ['val'];
+      var ref_dimensions = ref_prop.split('_').length > 1 ? ref_prop.split('_')[1] : ['v'];
+      var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : ['v'];
       // relPropValue = propSwitch(rel_prop, 'rel');
 
       var ref_prop_strip = ref_prop.split('_')[0];
@@ -401,8 +393,8 @@ define([
     },
 
 
-    propSwitch: function(prop, side, index) {
-      var propValue, geom, instance;
+    propSwitch: function(proplabels, side, index) {
+      var geom, instance;
       if (side == 'ref') {
         instance = this.get('references');
       }
@@ -416,7 +408,25 @@ define([
 
       }
       var instance_value = instance.getValue();
-      switch (prop) {
+     var split = proplabels.split('_');
+     var propValue = {};
+      var propName = split[0];
+      var subprops = split[1];
+      for(var i=0;i<subprops.length;i++){
+        if(propValue[propName]===undefined){
+          propValue[propName] = {};
+        }
+        if(typeof instance_value[propName]==='number'){
+         propValue[propName][subprops[i]]=instance_value[propName];
+        }
+        else{
+          propValue[propName][subprops[i]]= instance_value[propName][subprops[i]];
+        }
+      }
+      console.log('instance_value',instance_value,'propName',propName,'subprops',subprops,'propvalue',propValue);
+
+
+     /* switch (prop) {
         case 'scale_x':
           propValue = instance.getValueFor('scalingDelta').x;
           break;
@@ -506,7 +516,7 @@ define([
         case 'rotation':
           propValue = instance.getValueFor('rotationDelta');
           break;
-      }
+      }*/
       return propValue;
     },
 
@@ -517,8 +527,8 @@ define([
       var rel_prop = this.get('rel_prop').split('_');
 
       //TODO: refactor- this addition is a little hacky, it's so it recognizes rotation as having the same num of properties..
-      var ref_dimensions = this.get('ref_prop').split('_').length > 1 ? this.get('ref_prop').split('_')[1] : ['val'];
-      var rel_dimensions = this.get('rel_prop').split('_').length > 1 ? this.get('rel_prop').split('_')[1] : ['val'];
+      var ref_dimensions = this.get('ref_prop').split('_').length > 1 ? this.get('ref_prop').split('_')[1] : ['v'];
+      var rel_dimensions = this.get('rel_prop').split('_').length > 1 ? this.get('rel_prop').split('_')[1] : ['v'];
 
       var reference = this.get('references');
       var relative = this.get('relatives');
@@ -527,17 +537,17 @@ define([
 
 
 
-      var refPropAccess = reference.get(constraintPropMap[ref_prop[0]]);
-      var relPropAccess = relative.get(constraintPropMap[rel_prop[0]]);
+      var refPropAccess = reference.get(ref_prop[0]);
+      var relPropAccess = relative.get(rel_prop[0]);
      
-      console.log('ref prop target', constraintPropMap[rel_prop[0]], refPropAccess.get('name'));
+      console.log('ref prop target', rel_prop[0], refPropAccess.get('name'));
 
-      this.set('ref_prop_key', constraintPropMap[ref_prop[0]]);
-      this.set('rel_prop_key', constraintPropMap[ref_prop[0]]);
+      this.set('ref_prop_key', ref_prop[0]);
+      this.set('rel_prop_key', ref_prop[0]);
       if (rel_prop) {
-        this.set('rel_prop_dimensions', ref_prop[1]?ref_prop[1]:['val']);
+        this.set('rel_prop_dimensions', ref_prop[1]?ref_prop[1]:['v']);
       }
-      this.set('ref_prop_dimensions', ref_prop[1]?ref_prop[1]:['val']);
+      this.set('ref_prop_dimensions', ref_prop[1]?ref_prop[1]:['v']);
       this.calculateReferenceValues();
 
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
@@ -546,7 +556,7 @@ define([
 
         for (var i = 0; i < a_keys.length; i++) {
           var axis = a_keys[i];
-          var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? 'val': ref_available_props[ref_available_props.length - 1];
+          var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? 'v': ref_available_props[ref_available_props.length - 1];
           var cf = (function(d, a) {
             self.set('current_dimension', a);
             return function() {
@@ -557,7 +567,7 @@ define([
               var offsetValue = 0;//offset[axis][relative.get('index').getValue()];
               var y;
               eval(expression[d]);
-              if (d !== 'val') {
+              if (d !== 'v') {
                 relPropAccess[d].setValue(y);
               } else {
                 relPropAccess.setValue(y);
@@ -567,7 +577,7 @@ define([
           })(axis, ap);
 
           constraintFunctions.push(cf);
-          if (axis !== 'val') {
+          if (axis !== 'v') {
             relPropAccess[axis].setConstraint(cf);
             relPropAccess[axis].getConstraint();
 
@@ -586,7 +596,7 @@ define([
           for (var m = 0; m < a_keys.length; m++) {
 
             var axis = a_keys[m];
-            var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? 'val' : ref_available_props[ref_available_props.length - 1];
+            var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? 'v' : ref_available_props[ref_available_props.length - 1];
             self.set('current_dimension', ap);
             var operators = self.get('operators');
             var mapOperand = self.get('map_operand');
@@ -601,8 +611,8 @@ define([
             relPropAccess.setValue(evalObj);
             return evalObj;
           } else {
-            relPropAccess.setValue(evalObj['val']);
-            return evalObj['val'];
+            relPropAccess.setValue(evalObj['v']);
+            return evalObj['v'];
           }
 
 
@@ -675,7 +685,7 @@ define([
       //console.log('reference value index,dimension', index, dimension,ref_values,ref_values[dimension][index]);
 
       return ref_values[dimension][index];
-      //if(a === 'val' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
+      //if(a === 'v' || !a) ? refPropAccess.getValue() : refPropAccess[a].getValue();
     },
 
     setRefValueLength: function() {
@@ -726,7 +736,7 @@ define([
 
             var point;
 
-            if (ref_dimensions[j] === 'val') {
+            if (ref_dimensions[j] === 'v') {
               point = {
                 x: i,
                 y: members[i].getValueFor(ref_prop)

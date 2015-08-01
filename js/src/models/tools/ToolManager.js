@@ -162,7 +162,6 @@ define([
     },
 
     geometryModified: function(data, modifiers) {
-      console.log('geometry modified',data);
       this.trigger('geometryModified', data, modifiers);
     },
 
@@ -202,7 +201,6 @@ define([
     },
 
     setToolStyle: function(style_data) {
-      console.log('style data',style_data);
       if (style_data.stroke_width) {
         style_data.stroke_width = style_data.stroke_width.val;
       }

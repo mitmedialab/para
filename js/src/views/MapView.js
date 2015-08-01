@@ -162,7 +162,6 @@ define([
 			graphShapes.length =0;
 			graphPoints.length =0;
 
-			console.log('min,max',min,max);
 			for(var i=0;i<points.length;i++){
 				var y= TrigFunc.map(points[i].y, min, max,height,0); 
 				var x = TrigFunc.map(points[i].x,0,points.length-1,0,width);
@@ -188,18 +187,15 @@ define([
 			this.setCollectionView();
 			var polynomial = TrigFunc.Lagrange(graphPoints);
 			functionPath.removeSegments();
-			console.log('polynomial =',polynomial);
 			var expression = polynomial[0];
 			for(var i=1;i<polynomial.length;i++){
 				expression = polynomial[i]+'*Math.pow(x,'+i+")+"+expression;
 			}
 			//var expression = "(Math.pow(x,2))+x+10";
-			console.log('expression',expression);
 			functionPath.removeSegments();
 			for(var j=0;j<51;j++){
 				var x = width/50*j;
 				var y = eval(expression);
-				console.log('on path x,y:',x,y);
 				functionPath.add(new paper.Segment(new paper.Point(x,y)));
 			}
 			functionPath.visible = true;
@@ -261,7 +257,6 @@ define([
 				var val = this.calculateValue(i, c_range, c_min, c_max, c_function);
 				values.push(val);
 			}
-			console.log('function values',values);
 			return values;
 		},
 
