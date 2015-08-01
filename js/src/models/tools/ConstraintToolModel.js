@@ -140,11 +140,7 @@ define([
 
     applyConstraint: function() {
       var constraint = this.get('currentConstraint');
-      constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
-      constraint.get('proxy').hide();
-      constraint.clearUI();
-      constraint.clearSelection();
-      constraint.create();
+       constraint.create();
       var constraintMap = this.get('constraints');
       constraintMap[constraint.get('id')] = constraint;
       /*var constraint_data = {

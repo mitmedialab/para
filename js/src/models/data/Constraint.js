@@ -114,6 +114,10 @@ define([
       rel_type: 'shape',
       ref_prop: null,
       rel_prop: null,
+      ref_dimensions:null,
+      rel_dimension:null,
+      rel_prop_key:null,
+      ref_prop_key:null,
       expression: '',
 
       // UI
@@ -281,17 +285,11 @@ define([
     },
 
 
-    setOffset: function(ref_prop, rel_prop) {
-      var ref_dimensions = ref_prop.split('_').length > 1 ? ref_prop.split('_')[1] : ['v'];
-      var rel_dimensions = rel_prop.split('_').length > 1 ? rel_prop.split('_')[1] : ['v'];
-      // relPropValue = propSwitch(rel_prop, 'rel');
+    setOffset: function(ref_prop_key,ref_dimensions,rel_prop_key,rel_dimensions) {
 
-      var ref_prop_strip = ref_prop.split('_')[0];
-      var rel_prop_strip = rel_prop.split('_')[0];
+      var convertFactor = propConvMap[ref_prop_key + ':' + rel_prop_key];
 
-      var convertFactor = propConvMap[ref_prop_strip + ':' + rel_prop_strip];
-
-      var refPropValue = this.propSwitch(ref_prop, 'ref');
+      var refPropValue = this.propSwitch(ref_prop_key,ref_dimensions,this.get('references'));
       var relPropValue;
       var conversion = {};
       var offset = this.get('offset') ? this.get('offset') : {};
@@ -300,57 +298,37 @@ define([
       var relativeRange = this.get('relatives').getRange() - offsetLength;
 
       if (ref_dimensions.length === rel_dimensions.length) {
-        if (ref_dimensions.length == 1) {
-          offset[rel_dimensions[0]] = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]] : [];
-          for (var n = 0; n < relativeRange; n++) {
-            relPropValue = this.propSwitch(rel_prop, 'rel', n);
-
-            conversion = refPropValue * convertFactor;
-            offset[rel_dimensions[0]].push(relPropValue - conversion);
-          }
-        } else {
 
           for (var i = 0; i < rel_dimensions.length; i++) {
             offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
             for (var p = 0; p < relativeRange; p++) {
-              relPropValue = this.propSwitch(rel_prop, 'rel', p);
+              var instance = this.get('relatives');
+             if (this.get('relatives').get('type') === 'collection') {
+              instance = instance.members[p];
+            } 
+              relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance);
+              console.log('relPropValue',relPropValue);
               conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
+              console.log('conversion=' ,conversion[rel_dimensions[i]]);
               offset[rel_dimensions[i]].push(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
+              console.log('offset prop value =' ,relPropValue[rel_dimensions[i]]);
             }
           }
-
-        }
       } else if (ref_dimensions.length > rel_dimensions.length) {
-        if (rel_dimensions.length == 1) {
-
-          keys = Object.keys(refPropValue);
-          offset[rel_dimensions[0]] = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]] : [];
-          for (var q = 0; q < relativeRange; q++) {
-            relPropValue = this.propSwitch(rel_prop, 'rel', q);
-            conversion = (rel_prop_strip == 'rotation') ? refPropValue[keys[0]] * convertFactor : refPropValue[rel_prop.split('_')[1]] * convertFactor;
-            offset[rel_dimensions[0]].push(relPropValue - conversion);
-          }
-        } else {
           for (var j = 0; j < rel_dimensions.length; j++) {
             offset[rel_dimensions[j]] = offset[rel_dimensions[j]] ? offset[rel_dimensions[j]] : [];
             for (var t = 0; t < relativeRange; t++) {
-              relPropValue = this.propSwitch(rel_prop, 'rel', t);
+               var instance = this.get('relatives');
+             if (this.get('relatives').get('type') === 'collection') {
+              instance = instance.members[t];
+            } 
+              relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance);
               conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]] * convertFactor : refPropValue[keys[j]] * convertFactor;
               offset[rel_dimensions[j]].push(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
             }
           }
-        }
+        
       } else if (ref_dimensions.length < rel_dimensions.length) {
-        if (ref_dimensions.length == 1) {
-          for (var k = 0; k < rel_dimensions.length; k++) {
-            offset[rel_dimensions[k]] = offset[rel_dimensions[k]] ? offset[rel_dimensions[k]] : [];
-            for (var r = 0; r < relativeRange; r++) {
-              relPropValue = this.propSwitch(rel_prop, 'rel', r);
-              conversion[rel_dimensions[k]] = refPropValue * convertFactor;
-              offset[rel_dimensions[k]].push(relPropValue[rel_dimensions[k]] - conversion[rel_dimensions[k]]);
-            }
-          }
-        } else {
           keys = Object.keys(refPropValue);
           for (var m = 0; m < rel_dimensions.length; m++) {
             offset[rel_dimensions[m]] = offset[rel_dimensions[m]] ? offset[rel_dimensions[m]] : [];
@@ -359,7 +337,7 @@ define([
               offset[rel_dimensions[m]].push(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
             }
           }
-        }
+        
       }
 
 
@@ -372,16 +350,18 @@ define([
           }
         }
       }
-      this.set('offset', offset);
-      return convertFactor;
+     
+      return {offset:offset, convertFactor:convertFactor};
     },
 
-    matchProperty: function(ref_prop, rel_prop) {
+    matchProperty: function(ref_prop_key,ref_dimensions,rel_prop_key,rel_dimensions) {
 
+      var data = this.setOffset(ref_prop_key,ref_dimensions,rel_prop_key,rel_dimensions);
+      var convertFactor = data.convertFactor;
 
+      var offset = data.offset;
+      this.set('offset', offset);
 
-      var convertFactor = this.setOffset(ref_prop, rel_prop);
-      var offset = this.get('offset');
       var exp_scale = 'y =' + convertFactor.toString() + ' * ' + 'x';
       var exp_object = {};
       for (var axis in offset) {
@@ -390,145 +370,50 @@ define([
         }
       }
       this.set('expression', exp_object);
+      console.log('expression',exp_object,'offset',offset);
     },
 
 
-    propSwitch: function(proplabels, side, index) {
-      var geom, instance;
-      if (side == 'ref') {
-        instance = this.get('references');
-      }
-      if (side == 'rel') {
-        var relatives = this.get('relatives');
-        if (relatives.get('type') === 'collection') {
-          instance = relatives.members[index];
-        } else {
-          instance = relatives;
-        }
-
-      }
+    propSwitch: function( propName, subprops, instance) {
+      console.log('propName subprops',propName,subprops);
       var instance_value = instance.getValue();
-     var split = proplabels.split('_');
-     var propValue = {};
-      var propName = split[0];
-      var subprops = split[1];
-      for(var i=0;i<subprops.length;i++){
-        if(propValue[propName]===undefined){
+      var propValue = {};
+      for (var i = 0; i < subprops.length; i++) {
+        if (propValue[propName] === undefined) {
           propValue[propName] = {};
         }
-        if(typeof instance_value[propName]==='number'){
-         propValue[propName][subprops[i]]=instance_value[propName];
-        }
-        else{
-          propValue[propName][subprops[i]]= instance_value[propName][subprops[i]];
+        if (typeof instance_value[propName] === 'number') {
+          propValue[propName][subprops[i]] = instance_value[propName];
+        } else {
+          propValue[propName][subprops[i]] = instance_value[propName][subprops[i]];
         }
       }
-      console.log('instance_value',instance_value,'propName',propName,'subprops',subprops,'propvalue',propValue);
-
-
-     /* switch (prop) {
-        case 'scale_x':
-          propValue = instance.getValueFor('scalingDelta').x;
-          break;
-        case 'scale_y':
-          propValue = instance.getValueFor('scalingDelta').y;
-          break;
-        case 'scale_xy':
-          propValue = instance.getValueFor('scalingDelta');
-          break;
-        case 'position_x':
-          propValue = instance.getValueFor('translationDelta').x;
-          break;
-        case 'position_y':
-          propValue = instance.getValueFor('translationDelta').y;
-          break;
-        case 'position_xy':
-          propValue = instance.getValueFor('translationDelta');
-          break;
-        case 'fill_h':
-          propValue = instance.getValueFor('fillColor').h;
-          break;
-        case 'fill_s':
-          propValue = instance.getValueFor('fillColor').s;
-          break;
-        case 'fill_l':
-          propValue = instance.getValueFor('fillColor').l;
-          break;
-        case 'fill_hs':
-          propValue = {
-            h: instance.getValueFor('fillColor').h,
-            s: instance.getValueFor('fillColor').s
-          };
-          break;
-        case 'fill_sl':
-          propValue = {
-            s: instance.getValueFor('fillColor').s,
-            l: instance.getValueFor('fillColor').l
-          };
-          break;
-        case 'fill_hl':
-          propValue = {
-            h: instance.getValueFor('fillColor').h,
-            l: instance.getValueFor('fillColor').l
-          };
-          break;
-        case 'fill_hsl':
-          propValue = {
-            h: instance.getValueFor('fillColor').h,
-            s: instance.getValueFor('fillColor').s,
-            l: instance.getValueFor('fillColor').l
-          };
-          break;
-        case 'stroke_h':
-          propValue = instance.getValueFor('strokeColor').h;
-          break;
-        case 'stroke_s':
-          propValue = instance.getValueFor('strokeColor').s;
-          break;
-        case 'stroke_l':
-          propValue = instance.getValueFor('strokeColor').l;
-          break;
-        case 'stroke_hs':
-          propValue = {
-            h: instance.getValueFor('strokeColor').h,
-            s: instance.getValueFor('strokeColor').s
-          };
-          break;
-        case 'stroke_sl':
-          propValue = {
-            s: instance.getValueFor('strokeColor').s,
-            l: instance.getValueFor('strokeColor').l
-          };
-          break;
-        case 'stroke_hl':
-          propValue = {
-            h: instance.getValueFor('strokeColor').h,
-            l: instance.getValueFor('strokeColor').l
-          };
-          break;
-        case 'stroke_hsl':
-          propValue = {
-            h: instance.getValueFor('strokeColor').h,
-            s: instance.getValueFor('strokeColor').s,
-            l: instance.getValueFor('strokeColor').l
-          };
-          break;
-        case 'rotation':
-          propValue = instance.getValueFor('rotationDelta');
-          break;
-      }*/
       return propValue;
     },
 
     create: function() {
-      var self = this;
-      var ref_prop = this.get('ref_prop').split('_');
-      var ref_available_props = ref_prop[1];
-      var rel_prop = this.get('rel_prop').split('_');
+      var ref_prop = this.get('ref_prop');
+      var rel_prop = this.get('rel_prop');
+      var refSplit = ref_prop.split('_');
+      var relSplit = rel_prop.split('_');
+      var ref_dimensions = refSplit[1];
+      var rel_dimensions = relSplit[1];
+      var ref_prop_key = refSplit[0];
+      var rel_prop_key = relSplit[0];
+      console.log('ref dimensions, refSplit, refpropkey',ref_dimensions,refSplit,ref_prop_key);
+      this.set('ref_dimensions',ref_dimensions);
+      this.set('rel_dimensions',rel_dimensions);
+      this.set('ref_prop_key',ref_prop_key);
+      this.set('rel_prop_key',rel_prop_key);
 
-      //TODO: refactor- this addition is a little hacky, it's so it recognizes rotation as having the same num of properties..
-      var ref_dimensions = this.get('ref_prop').split('_').length > 1 ? this.get('ref_prop').split('_')[1] : ['v'];
-      var rel_dimensions = this.get('rel_prop').split('_').length > 1 ? this.get('rel_prop').split('_')[1] : ['v'];
+      this.matchProperty(ref_prop_key,ref_dimensions,rel_prop_key,rel_dimensions);
+
+
+      this.get('proxy').hide();
+      this.clearUI();
+      this.clearSelection();
+
+      var self = this;
 
       var reference = this.get('references');
       var relative = this.get('relatives');
@@ -537,17 +422,11 @@ define([
 
 
 
-      var refPropAccess = reference.get(ref_prop[0]);
-      var relPropAccess = relative.get(rel_prop[0]);
-     
-      console.log('ref prop target', rel_prop[0], refPropAccess.get('name'));
+      var refPropAccess = reference.get(ref_prop_key);
+      var relPropAccess = relative.get(rel_prop_key);
 
-      this.set('ref_prop_key', ref_prop[0]);
-      this.set('rel_prop_key', ref_prop[0]);
-      if (rel_prop) {
-        this.set('rel_prop_dimensions', ref_prop[1]?ref_prop[1]:['v']);
-      }
-      this.set('ref_prop_dimensions', ref_prop[1]?ref_prop[1]:['v']);
+      console.log('ref prop target', ref_prop_key, refPropAccess.get('name'));
+
       this.calculateReferenceValues();
 
       if (expression_dimension_num < relPropAccess.get('dimension_num')) {
@@ -556,7 +435,7 @@ define([
 
         for (var i = 0; i < a_keys.length; i++) {
           var axis = a_keys[i];
-          var ap = (ref_available_props && ref_available_props[i]) ? ref_available_props[i] : (!ref_available_props) ? 'v': ref_available_props[ref_available_props.length - 1];
+          var ap = (ref_dimensions && ref_dimensions[i]) ? ref_dimensions[i] :  ref_dimensions[ref_dimensions.length - 1];
           var cf = (function(d, a) {
             self.set('current_dimension', a);
             return function() {
@@ -564,7 +443,7 @@ define([
               var offset = self.get('offset');
               var operators = self.get('operators');
               var mapOperand = self.get('map_operand');
-              var offsetValue = 0;//offset[axis][relative.get('index').getValue()];
+              var offsetValue = 0; //offset[axis][relative.get('index').getValue()];
               var y;
               eval(expression[d]);
               if (d !== 'v') {
@@ -596,13 +475,13 @@ define([
           for (var m = 0; m < a_keys.length; m++) {
 
             var axis = a_keys[m];
-            var ap = (ref_available_props && ref_available_props[m]) ? ref_available_props[m] : (!ref_available_props) ? 'v' : ref_available_props[ref_available_props.length - 1];
+            var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] :  ref_dimensions[ref_dimensions.length - 1];
             self.set('current_dimension', ap);
             var operators = self.get('operators');
             var mapOperand = self.get('map_operand');
             var x = self.get('ref_value').getValue();
             var offset = self.get('offset');
-            var offsetValue = 0;//offset[axis][relative.get('index').getValue()];
+            var offsetValue = 0; //offset[axis][relative.get('index').getValue()];
             var y;
             eval(expression[axis]);
             evalObj[axis] = y;
@@ -675,12 +554,12 @@ define([
 
     getReferenceValue: function(index, dimension) {
       this.calculateReferenceValues();
-      console.log('dimension',dimension);
-       var ref_prop = this.get('ref_prop_key');
-      console.log('ref_prop',ref_prop,'reference', this.get('references'),'property',this.get('references').getValueFor(ref_prop));
+      console.log('dimension', dimension);
+      var ref_prop = this.get('ref_prop_key');
+      console.log('ref_prop', ref_prop, 'reference', this.get('references'), 'property', this.get('references').getValueFor(ref_prop));
       var refPropAccess = this.get('references').get(ref_prop);
 
-      console.log('isValid:',refPropAccess.isValid()+this.get('references').get('id'));
+      console.log('isValid:', refPropAccess.isValid() + this.get('references').get('id'));
       var ref_values = this.get('ref_value_list');
       //console.log('reference value index,dimension', index, dimension,ref_values,ref_values[dimension][index]);
 
@@ -718,7 +597,7 @@ define([
       var reference = this.get('references');
       if (reference) {
         var ref_prop = this.get('ref_prop_key');
-        var ref_dimensions = this.get('ref_prop_dimensions');
+        var ref_dimensions = this.get('ref_dimensions');
         var members;
         if (reference.get('type') == 'collection') {
           members = reference.members;
@@ -731,7 +610,7 @@ define([
         for (var j = 0; j < ref_dimensions.length; j++) {
           var points = [];
           reference_values[ref_dimensions[j]] = [];
-          var min,max;
+          var min, max;
           for (var i = 0; i < members.length; i++) {
 
             var point;
@@ -748,14 +627,14 @@ define([
                 x: i,
                 y: members[i].getValueFor(ref_prop)[ref_dimensions[j]]
               };
-              if(!min && !max){
+              if (!min && !max) {
                 min = y;
                 max = y;
               }
-              if(y<min){
+              if (y < min) {
                 min = y;
               }
-              if(y>max){
+              if (y > max) {
                 max = y;
               }
               points.push(point);
@@ -769,26 +648,25 @@ define([
           for (var k = 1; k < polynomial.length; k++) {
             expression = polynomial[k] + '*Math.pow(x,' + k + ")+" + expression;
           }
-          console.log('expression', expression, 'min',min,'max',max);
+          console.log('expression', expression, 'min', min, 'max', max);
           var range = this.get('relatives').getRange();
-          
+
           for (var m = 0; m < range; m++) {
             var x;
-            if(range ==1){
-              x = (points.length-1)/2;
-            }
-            else{
-              x = TrigFunc.map(m,0,range-1,0,points.length-1);
+            if (range == 1) {
+              x = (points.length - 1) / 2;
+            } else {
+              x = TrigFunc.map(m, 0, range - 1, 0, points.length - 1);
             }
             var y = eval(expression);
-            console.log('x,y',x,y);
+            console.log('x,y', x, y);
             reference_values[ref_dimensions[j]].push(y);
           }
 
         }
-        console.log('ref property', ref_prop, 'dimensions', ref_dimensions, "points:", reference_points, 'reference_values',reference_values);
+        console.log('ref property', ref_prop, 'dimensions', ref_dimensions, "points:", reference_points, 'reference_values', reference_values);
         this.set('reference_points', reference_points);
-        this.set('ref_value_list',reference_values);
+        this.set('ref_value_list', reference_values);
       }
     },
 
