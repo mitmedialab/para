@@ -81,7 +81,7 @@ define([
         val: rotationDelta
       };
 
-      data.scaling_delta = {
+      data.scalingDelta = {
         x: matrix.scaling.x,
         y: matrix.scaling.y,
         operator: 'add'
@@ -112,16 +112,16 @@ define([
         operator: 'set'
       };
       if (path.fillColor) {
-        data.fill_color = {r:path.fillColor.red,g:path.fillColor.green,b:path.fillColor.blue,h:path.fillColor.hue,s:path.fillColor.saturation,l:path.fillColor.lightness,operator:'set'};
+        data.fillColor = {r:path.fillColor.red,g:path.fillColor.green,b:path.fillColor.blue,h:path.fillColor.hue,s:path.fillColor.saturation,l:path.fillColor.lightness,operator:'set'};
       }
       else{
-        data.fill_color = {noColor:true};
+        data.fillColor = {noColor:true};
       }
       if (path.strokeColor) {
-        data.stroke_color = {r:path.strokeColor.red,g:path.strokeColor.green,b:path.strokeColor.blue,h:path.strokeColor.hue,s:path.strokeColor.saturation,l:path.strokeColor.lightness,operator:'set'};
+        data.strokeColor = {r:path.strokeColor.red,g:path.strokeColor.green,b:path.strokeColor.blue,h:path.strokeColor.hue,s:path.strokeColor.saturation,l:path.strokeColor.lightness,operator:'set'};
       }
       else{
-        data.stroke_color={noColor:true};
+        data.strokeColor={noColor:true};
       }
       data.stroke_width = {
         val: path.strokeWidth

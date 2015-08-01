@@ -32,10 +32,10 @@ define([
 	var constraintMode = false;
 	var constraintPropMap = {
 		'position': 'translationDelta',
-		'scale': 'scaling_delta',
+		'scale': 'scalingDelta',
 		'rotation': 'rotationDelta',
-		'fill': 'fill_color',
-		'stroke': 'stroke_color'
+		'fill': 'fillColor',
+		'stroke': 'strokeColor'
 	};
 
 	var MasterManager = Backbone.Model.extend({

@@ -21,12 +21,12 @@ define([
 ], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
-	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
-		'rotationDelta', 'stroke_color', 'fill_color', 'stroke_width', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
+	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
+		'rotationDelta', 'strokeColor', 'fillColor', 'stroke_width', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
 	];
 
-	var constraints = ['position', 'translationDelta', 'scaling_origin', 'scaling_delta', 'rotation_origin',
-		'rotationDelta', 'stroke_color', 'fill_color', 'stroke_width', 'val'
+	var constraints = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
+		'rotationDelta', 'strokeColor', 'fillColor', 'stroke_width', 'val'
 	];
 
 	var Instance = SceneNode.extend({
@@ -58,11 +58,11 @@ define([
 			position: null,
 			translationDelta: null,
 			scaling_origin: null,
-			scaling_delta: null,
+			scalingDelta: null,
 			rotation_origin: null,
 			rotationDelta: null,
-			stroke_color: null,
-			fill_color: null,
+			strokeColor: null,
+			fillColor: null,
 			stroke_width: null,
 			path_altered: null,
 			val: null,
@@ -83,11 +83,11 @@ define([
 				position: ['x', 'y'],
 				translationDelta: ['x', 'y'],
 				scaling_origin: ['x', 'y'],
-				scaling_delta: ['x', 'y'],
+				scalingDelta: ['x', 'y'],
 				rotation_origin: ['val'],
 				rotationDelta: ['val'],
-				stroke_color: ['r', 'g', 'b', 'a'],
-				fill_color: ['r', 'g', 'b', 'a'],
+				strokeColor: ['r', 'g', 'b', 'a'],
+				fillColor: ['r', 'g', 'b', 'a'],
 				stroke_width: ['val'],
 				//inheritors: []
 			},
@@ -138,21 +138,21 @@ define([
 			translationDelta.setNull(true);
 			this.set('translationDelta', translationDelta);
 
-			var scaling_delta = new PPoint(0, 0);
-			scaling_delta.setNull(true);
-			this.set('scaling_delta', scaling_delta);
+			var scalingDelta = new PPoint(0, 0);
+			scalingDelta.setNull(true);
+			this.set('scalingDelta', scalingDelta);
 
 			var rotationDelta = new PFloat(0);
 			rotationDelta.setNull(true);
 			this.set('rotationDelta', rotationDelta);
 
-			var stroke_color = new PColor(0, 0, 0);
-			stroke_color.setNull(true);
-			this.set('stroke_color', stroke_color);
+			var strokeColor = new PColor(0, 0, 0,1);
+			strokeColor.setNull(true);
+			this.set('strokeColor', strokeColor);
 
-			var fill_color = new PColor(0, 0, 0);
-			fill_color.setNull(true);
-			this.set('fill_color', fill_color);
+			var fillColor = new PColor(0, 0, 0,1);
+			fillColor.setNull(true);
+			this.set('fillColor', fillColor);
 
 			var stroke_width = new PFloat(0);
 			stroke_width.setNull(true);
@@ -176,14 +176,14 @@ define([
 			//temporary attributes
 			this._translationDelta = new paper.Matrix();
 			this._rotationDelta = new paper.Matrix();
-			this._scaling_delta = new paper.Matrix();
-			this._fill_color = {
+			this._scalingDelta = new paper.Matrix();
+			this._fillColor = {
 				r: undefined,
 				g: undefined,
 				b: undefined,
 				a: undefined
 			};
-			this._stroke_color = {
+			this._strokeColor = {
 				r: undefined,
 				g: undefined,
 				b: undefined,
@@ -428,11 +428,11 @@ define([
 
 			this._ti_matrix = this._translationDelta.inverted();
 			this._ri_matrix = this._rotationDelta.inverted();
-			this._si_matrix = this._scaling_delta.inverted();
+			this._si_matrix = this._scalingDelta.inverted();
 			this._itemp_matrix = this._temp_matrix.inverted();
 			this._temp_matrix.reset();
 			this._translationDelta.reset();
-			this._scaling_delta.reset();
+			this._scalingDelta.reset();
 			this._rotationDelta.reset();
 		},
 
@@ -514,12 +514,12 @@ define([
 
 		resetStylesToPrototype: function(data, recurse) {
 
-			if (data.fill_color) {
-				this.get('fill_color').setNull(true);
+			if (data.fillColor) {
+				this.get('fillColor').setNull(true);
 			}
 
-			if (data.stroke_color) {
-				this.get('stroke_color').setNull(true);
+			if (data.strokeColor) {
+				this.get('strokeColor').setNull(true);
 			}
 
 			if (data.stroke_width) {
@@ -548,8 +548,8 @@ define([
 				this.get('rotationDelta').setValue(instance.get('rotationDelta').getValue());
 
 			}
-			if (data.scaling_delta) {
-				this.get('scaling_delta').setValue(instance.get('scaling_delta').getValue());
+			if (data.scalingDelta) {
+				this.get('scalingDelta').setValue(instance.get('scalingDelta').getValue());
 
 			}
 		},
@@ -580,8 +580,8 @@ define([
 			if (data.rotationDelta) {
 				this.get('rotationDelta').setNull(true);
 			}
-			if (data.scaling_delta) {
-				this.get('scaling_delta').setNull(true);
+			if (data.scalingDelta) {
+				this.get('scalingDelta').setNull(true);
 			}
 		},
 
@@ -691,7 +691,7 @@ define([
 						return false;
 					}
 					break;
-				case 'scaling_delta':
+				case 'scalingDelta':
 					var s_origin = this._scaling_origin;
 					if (!attribute_constraint) {
 						if (set) {
@@ -1046,15 +1046,15 @@ define([
 
 		compileTransformation: function() {
 
-			var scaling_delta, rotationDelta, translationDelta;
+			var scalingDelta, rotationDelta, translationDelta;
 			var merged = this.get('merged');
 			if (!merged) {
-				scaling_delta = this.getValueFor('scaling_delta');
+				scalingDelta = this.getValueFor('scalingDelta');
 				rotationDelta = this.getValueFor('rotationDelta');
 				translationDelta = this.getValueFor('translationDelta');
 			} else {
 
-				scaling_delta = merged.scaling_delta;
+				scalingDelta = merged.scalingDelta;
 				rotationDelta = merged.rotationDelta;
 				translationDelta = merged.translationDelta;
 			}
@@ -1064,12 +1064,12 @@ define([
 			this._position = this.get('position').toPaperPoint();
 
 
-			this._scaling_delta.scale(scaling_delta.x, scaling_delta.y, this._scaling_origin);
+			this._scalingDelta.scale(scalingDelta.x, scalingDelta.y, this._scaling_origin);
 			this._rotationDelta.rotate(rotationDelta, this._rotation_origin);
 			this._translationDelta.translate(translationDelta.x, translationDelta.y);
 
 			this._temp_matrix.preConcatenate(this._rotationDelta);
-			this._temp_matrix.preConcatenate(this._scaling_delta);
+			this._temp_matrix.preConcatenate(this._scalingDelta);
 			this._temp_matrix.preConcatenate(this._translationDelta);
 
 		},
@@ -1078,12 +1078,12 @@ define([
 
 			var merged = this.get('merged');
 			if (merged) {
-				this._fill_color = merged.fill_color;
-				this._stroke_color = merged.stroke_color;
+				this._fillColor = merged.fillColor;
+				this._strokeColor = merged.strokeColor;
 				this._stroke_width = merged.stroke_width;
 			} else {
-				this._fill_color = this.getValueFor('fill_color');
-				this._stroke_color = this.getValueFor('stroke_color');
+				this._fillColor = this.getValueFor('fillColor');
+				this._strokeColor = this.getValueFor('strokeColor');
 				this._stroke_width = this.getValueFor('stroke_width');
 			}
 
@@ -1114,26 +1114,26 @@ define([
 
 
 		renderStyle: function(geom) {
-			if (!this._fill_color.noColor) {
+			if (!this._fillColor.noColor) {
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
-				geom.fillColor.hue = this._fill_color.h;
-				geom.fillColor.saturation = this._fill_color.s;
-				geom.fillColor.lightness = this._fill_color.l;
-				geom.fillColor.alpha = this._fill_color.a;
+				geom.fillColor.hue = this._fillColor.h;
+				geom.fillColor.saturation = this._fillColor.s;
+				geom.fillColor.lightness = this._fillColor.l;
+				geom.fillColor.alpha = this._fillColor.a;
 			} else {
 				geom.fillColor = undefined;
 			}
-			if (!this._stroke_color.noColor) {
+			if (!this._strokeColor.noColor) {
 				if (!geom.fillColor) {
 					geom.strokeColor = new paper.Color(0, 0, 0);
 				}
-				geom.strokeColor.hue = this._stroke_color.h;
-				geom.strokeColor.saturation = this._stroke_color.s;
-				geom.strokeColor.lightness = this._stroke_color.l;
-				geom.strokeColor.alpha = this._stroke_color.a;
-				geom.strokeColor.alpha = this._stroke_color.a;
+				geom.strokeColor.hue = this._strokeColor.h;
+				geom.strokeColor.saturation = this._strokeColor.s;
+				geom.strokeColor.lightness = this._strokeColor.l;
+				geom.strokeColor.alpha = this._strokeColor.a;
+				geom.strokeColor.alpha = this._strokeColor.a;
 			} else {
 				geom.strokeColor = undefined;
 			}
@@ -1253,15 +1253,15 @@ define([
 			bbox.position = position;
 			selection_clone.position = position;
 			geom.transform(this._rotationDelta);
-			geom.transform(this._scaling_delta);
+			geom.transform(this._scalingDelta);
 			geom.transform(this._translationDelta);
 
 			selection_clone.transform(this._rotationDelta);
-			selection_clone.transform(this._scaling_delta);
+			selection_clone.transform(this._scalingDelta);
 			selection_clone.transform(this._translationDelta);
 
 			bbox.transform(this._rotationDelta);
-			bbox.transform(this._scaling_delta);
+			bbox.transform(this._scalingDelta);
 			bbox.transform(this._translationDelta);
 
 			this.updateScreenBounds(geom);
@@ -1276,7 +1276,7 @@ define([
 			clone.get('position').setValue(this.get('position').getValue());
 			clone.get('translationDelta').setValue(this.get('translationDelta').clone());
 			clone.get('rotationDelta').setValue(this.get('rotationDelta').getValue());
-			clone.get('scaling_delta').setValue(this.get('scaling_delta').getValue());
+			clone.get('scalingDelta').setValue(this.get('scalingDelta').getValue());
 			clone.get('center').setValue(this.get('center').getValue());
 			clone.get('scaling_origin').setValue(this.get('scaling_origin').getValue());
 			clone.get('rotation_origin').setValue(this.get('rotation_origin').getValue());

@@ -105,7 +105,7 @@ define([
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
         data = {
-          fill_color:{noColor:true}
+          fillColor:{noColor:true}
         };
         this.model.modifyStyle(data);
 
@@ -113,7 +113,7 @@ define([
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
         data = {
-          stroke_color:{noColor:true}
+          strokeColor:{noColor:true}
         };
         this.model.modifyStyle(data);
       }
@@ -150,7 +150,7 @@ define([
         $('#fillColorBlock').css('background-color', color);
         $('#fill').val(color);
         data = {
-          fill_color: ColorUtils.hexToRGB(color)
+          fillColor: ColorUtils.hexToRGB(color)
         };
         this.model.modifyStyle(data);
 
@@ -161,7 +161,7 @@ define([
         $('#strokeColorBlock').css('background-color', color);
         $('#stroke').val(color);
         data = {
-          stroke_color: ColorUtils.hexToRGB(color)
+          strokeColor: ColorUtils.hexToRGB(color)
         };
         this.model.modifyStyle(data);
 
@@ -207,31 +207,32 @@ define([
     geometrySelected: function(selected_shape) {
       if (selected_shape) {
         this.undelegateEvents();
-        var fill_color = selected_shape.getValueFor('fill_color');
-        console.log('geometry selected', fill_color);
-        var stroke_color = selected_shape.getValueFor('stroke_color');
+        var fillColor = selected_shape.getValueFor('fillColor');
+        console.log('geometry selected', fillColor);
+        var strokeColor = selected_shape.getValueFor('strokeColor');
+        console.log('fillColor,strokeColor',fillColor,strokeColor);
         var stroke_width = selected_shape.getValueFor('stroke_width');
-        if (fill_color) {
-          if (fill_color.noColor) {
+        if (fillColor) {
+          if (fillColor.noColor) {
             $('#fillColorBlock').addClass('remove-color');
           } else {
             $('#fillColorBlock').removeClass('remove-color');
-            $('#fillColorBlock').css('background-color', ColorUtils.rgbToHex(fill_color));
-            $('#fill').val(ColorUtils.rgbToHex(fill_color));
+            $('#fillColorBlock').css('background-color', ColorUtils.toHex(fillColor));
+            $('#fill').val(ColorUtils.toHex(fillColor));
             if ($('#fillColorBlock').hasClass('color-block-selected')) {
-              $('#color-window').iris('color', ColorUtils.rgbToHex(fill_color));
+              $('#color-window').iris('color', ColorUtils.toHex(fillColor));
             }
           }
         }
-        if (stroke_color) {
-          if (stroke_color.noColor) {
+        if (strokeColor) {
+          if (strokeColor.noColor) {
             $('#strokeColorBlock').addClass('remove-color');
           } else {
             $('#strokeColorBlock').removeClass('remove-color');
-            $('#strokeColorBlock').css('background-color', ColorUtils.rgbToHex(stroke_color));
-            $('#stroke').val(ColorUtils.rgbToHex(stroke_color));
+            $('#strokeColorBlock').css('background-color', ColorUtils.toHex(strokeColor));
+            $('#stroke').val(ColorUtils.toHex(strokeColor));
             if ($('#strokeColorBlock').hasClass('color-block-selected')) {
-              $('#color-window').iris('color', ColorUtils.rgbToHex(stroke_color));
+              $('#color-window').iris('color', ColorUtils.toHex(strokeColor));
             }
           }
         }

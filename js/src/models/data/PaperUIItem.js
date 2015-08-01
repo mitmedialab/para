@@ -32,7 +32,7 @@ define([
       if (data.rotationDelta > 360 || data.rotationDelta < 0) {
         data.rotationDelta = TrigFunc.wrap(data.rotationDelta, 0, 360);
       }
-      data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
+      data.scalingDelta = new PPoint(matrix.scaling.x, matrix.scaling.y);
 
       var translationDelta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
       var position = new PPoint(0, 0, 'set');
@@ -106,7 +106,7 @@ define([
       if (data.rotationDelta > 360 || data.rotationDelta < 0) {
         data.rotationDelta = TrigFunc.wrap(data.rotationDelta, 0, 360);
       }
-      data.scaling_delta = new PPoint(matrix.scaling.x, matrix.scaling.y);
+      data.scalingDelta = new PPoint(matrix.scaling.x, matrix.scaling.y);
       
       var translationDelta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');
       var position = new PPoint(0,0 ,'set');

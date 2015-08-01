@@ -271,7 +271,7 @@ define([
           }
 
           geom.onClick = function( event ) {
-            uiNode.set('stroke_color', new PColor(255, 0, 0));
+            uiNode.set('strokeColor', new PColor(255, 0, 0));
             geom.strokeColor = "#ff0000";
             geom.active = true;
 
@@ -329,7 +329,7 @@ define([
       }      
 
       var setActive = function( uiNode ) {
-        uiNode.set('stroke_color', new PColor(255, 0, 0));
+        uiNode.set('strokeColor', new PColor(255, 0, 0));
         var geom = uiNode.get('geom');
         var nameSplit = geom.name.split('-');
         geom.strokeColor = '#ff0000';

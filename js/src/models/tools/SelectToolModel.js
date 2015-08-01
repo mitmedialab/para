@@ -228,7 +228,7 @@ define([
     },
 
     scaleDrag: function(event) {
-      var scaleDelta = literal.data.instance.getValueFor('scaling_delta');
+      var scaleDelta = literal.data.instance.getValueFor('scalingDelta');
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 
@@ -262,7 +262,7 @@ define([
         // }
 
         var data = {};
-        data.scaling_delta = {
+        data.scalingDelta = {
           x: scaleX,
           y: scaleY,
           operator: 'set'

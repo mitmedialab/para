@@ -47,7 +47,7 @@ define([
         max: 1000
       }
     },
-    scaling_delta: {
+    scalingDelta: {
       x: {
         min: 0,
         max: 5
@@ -63,7 +63,7 @@ define([
         max: 360
       }
     },
-    fill_color: {
+    fillColor: {
       h: {
         min: 0,
         max: 360
@@ -77,7 +77,7 @@ define([
         max: 1
       }
     },
-    stroke_color: {
+    strokeColor: {
       h: {
         min: 0,
         max: 360
@@ -95,10 +95,10 @@ define([
 
   var constraintPropMap = {
     'position': 'translationDelta',
-    'scale': 'scaling_delta',
+    'scale': 'scalingDelta',
     'rotation': 'rotationDelta',
-    'fill': 'fill_color',
-    'stroke': 'stroke_color'
+    'fill': 'fillColor',
+    'stroke': 'strokeColor'
   };
 
   var dimension_map = {
@@ -418,13 +418,13 @@ define([
       var instance_value = instance.getValue();
       switch (prop) {
         case 'scale_x':
-          propValue = instance.getValueFor('scaling_delta').x;
+          propValue = instance.getValueFor('scalingDelta').x;
           break;
         case 'scale_y':
-          propValue = instance.getValueFor('scaling_delta').y;
+          propValue = instance.getValueFor('scalingDelta').y;
           break;
         case 'scale_xy':
-          propValue = instance.getValueFor('scaling_delta');
+          propValue = instance.getValueFor('scalingDelta');
           break;
         case 'position_x':
           propValue = instance.getValueFor('translationDelta').x;
@@ -436,71 +436,71 @@ define([
           propValue = instance.getValueFor('translationDelta');
           break;
         case 'fill_h':
-          propValue = instance.getValueFor('fill_color').h;
+          propValue = instance.getValueFor('fillColor').h;
           break;
         case 'fill_s':
-          propValue = instance.getValueFor('fill_color').s;
+          propValue = instance.getValueFor('fillColor').s;
           break;
         case 'fill_l':
-          propValue = instance.getValueFor('fill_color').l;
+          propValue = instance.getValueFor('fillColor').l;
           break;
         case 'fill_hs':
           propValue = {
-            h: instance.getValueFor('fill_color').h,
-            s: instance.getValueFor('fill_color').s
+            h: instance.getValueFor('fillColor').h,
+            s: instance.getValueFor('fillColor').s
           };
           break;
         case 'fill_sl':
           propValue = {
-            s: instance.getValueFor('fill_color').s,
-            l: instance.getValueFor('fill_color').l
+            s: instance.getValueFor('fillColor').s,
+            l: instance.getValueFor('fillColor').l
           };
           break;
         case 'fill_hl':
           propValue = {
-            h: instance.getValueFor('fill_color').h,
-            l: instance.getValueFor('fill_color').l
+            h: instance.getValueFor('fillColor').h,
+            l: instance.getValueFor('fillColor').l
           };
           break;
         case 'fill_hsl':
           propValue = {
-            h: instance.getValueFor('fill_color').h,
-            s: instance.getValueFor('fill_color').s,
-            l: instance.getValueFor('fill_color').l
+            h: instance.getValueFor('fillColor').h,
+            s: instance.getValueFor('fillColor').s,
+            l: instance.getValueFor('fillColor').l
           };
           break;
         case 'stroke_h':
-          propValue = instance.getValueFor('stroke_color').h;
+          propValue = instance.getValueFor('strokeColor').h;
           break;
         case 'stroke_s':
-          propValue = instance.getValueFor('stroke_color').s;
+          propValue = instance.getValueFor('strokeColor').s;
           break;
         case 'stroke_l':
-          propValue = instance.getValueFor('stroke_color').l;
+          propValue = instance.getValueFor('strokeColor').l;
           break;
         case 'stroke_hs':
           propValue = {
-            h: instance.getValueFor('stroke_color').h,
-            s: instance.getValueFor('stroke_color').s
+            h: instance.getValueFor('strokeColor').h,
+            s: instance.getValueFor('strokeColor').s
           };
           break;
         case 'stroke_sl':
           propValue = {
-            s: instance.getValueFor('stroke_color').s,
-            l: instance.getValueFor('stroke_color').l
+            s: instance.getValueFor('strokeColor').s,
+            l: instance.getValueFor('strokeColor').l
           };
           break;
         case 'stroke_hl':
           propValue = {
-            h: instance.getValueFor('stroke_color').h,
-            l: instance.getValueFor('stroke_color').l
+            h: instance.getValueFor('strokeColor').h,
+            l: instance.getValueFor('strokeColor').l
           };
           break;
         case 'stroke_hsl':
           propValue = {
-            h: instance.getValueFor('stroke_color').h,
-            s: instance.getValueFor('stroke_color').s,
-            l: instance.getValueFor('stroke_color').l
+            h: instance.getValueFor('strokeColor').h,
+            s: instance.getValueFor('strokeColor').s,
+            l: instance.getValueFor('strokeColor').l
           };
           break;
         case 'rotation':

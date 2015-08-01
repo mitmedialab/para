@@ -73,7 +73,7 @@ define([
   // relate to the properties to be constrained
   var propToConstraintMap = {
     'position': 'translationDelta',
-    'scale': 'scaling_delta',
+    'scale': 'scalingDelta',
     'orientation': 'rotationDelta'
   };
 

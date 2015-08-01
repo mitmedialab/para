@@ -66,7 +66,7 @@ define(['jquery',
           property = 'rotationDelta';
           break;
         case 'scale':
-          property = 'scaling_delta';
+          property = 'scalingDelta';
           break;
       }
       for (var i = 0; i < selectedShapes.length; i++) {
@@ -83,8 +83,8 @@ define(['jquery',
       var literal = instance.get('geom');
       if (literal) {
         styledata = {
-          fill_color: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
-          stroke_color: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
+          fillColor: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
+          strokeColor: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
           stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
         };
         this.setToolStyle(styledata);
@@ -103,11 +103,11 @@ define(['jquery',
       //var selectedTool = toolCollection.get(this.get('state'));
     /*  var style = selectedTool.get('style');
 
-      if (data.stroke_color) {
-        style.stroke_color = data.stroke_color;
+      if (data.strokeColor) {
+        style.strokeColor = data.strokeColor;
       }
-      if (data.fill_color) {
-        style.fill_color = data.fill_color;
+      if (data.fillColor) {
+        style.fillColor = data.fillColor;
       }
       if (data.stroke_width) {
         style.stroke_width = data.stroke_width.val;

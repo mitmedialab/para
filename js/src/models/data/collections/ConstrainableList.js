@@ -44,7 +44,7 @@ define([
         this.set('ui', geom);
         this.indexNumbers = [];
 
-        this.get('scaling_delta').setValue({
+        this.get('scalingDelta').setValue({
           x: 1,
           y: 1
         });

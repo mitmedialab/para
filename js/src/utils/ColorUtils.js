@@ -25,27 +25,28 @@ define([
 
 		ColorUtils.hslToRgb = function(h, s, l) {
 			
-			var color = new paper.Color();
-			color.hue = h;
-			color.saturation = s;
-			color.brightness = l;
+			var color = new paper.Color({hue:h,saturation:s,lightness:l});
 			return [color.red,color.green,color.blue];
 		};
 
 		
 		ColorUtils.toHex = function(color){
-			if(color.r){
-				return this.rgbToHex(color);
+			console.log('toHex',color);
+			if(color.h!==undefined){
+				var rgb = this.hslToRgb(color.h,color.s,color.l);
+				var hex =  this.rgbToHex({r:rgb[0],g:rgb[1],b:rgb[2]});
+				console.log('rgb,hex,color',rgb,hex,color);
+				return hex;
 			}
 			else{
-				var rgb = this.hslToRgb(color.h,color.s,color.l);
-				return this.rgbToHex({r:rgb[0],g:rgb[1],b:rgb[2]});
+				return this.rgbToHex(color);
 			}
+
 		};
 
 
 		ColorUtils.rgbToHex = function(color) {
-			return "#" + this.componentToHex(color.r*255) + this.componentToHex(color.g*255) + this.componentToHex(color.b*255);
+			return "#" + this.componentToHex(Math.round(color.r*255)) + this.componentToHex(Math.round(color.g*255)) + this.componentToHex(Math.round(color.b*255));
 		};
 
 		ColorUtils.componentToHex = function(c) {
@@ -54,21 +55,14 @@ define([
 		};
 
 		ColorUtils.hexToR = function(h) {
-			if (h == -1) {
-				return null;
-			}
+			
 			return parseInt((this.cutHex(h)).substring(0, 2), 16) / 255;
 		};
 		ColorUtils.hexToG = function(h) {
-			if (h == -1) {
-				return null;
-			}
+			
 			return parseInt((this.cutHex(h)).substring(2, 4), 16) / 255;
 		};
 		ColorUtils.hexToB = function(h) {
-			if (h == -1) {
-				return null;
-			}
 			return parseInt((this.cutHex(h)).substring(4, 6), 16) / 255;
 		};
 

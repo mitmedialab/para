@@ -67,13 +67,13 @@ define([
           polyPath.selected = true;
         }
         polyPath.strokeWidth = this.get('stroke_width');
-        var strokeColor = this.get('stroke_color');
+        var strokeColor = this.get('strokeColor');
         if (!strokeColor.noColor) {
-          polyPath.strokeColor = new paper.Color(strokeColor.r, strokeColor.g, strokeColor.b);
+          polyPath.strokeColor = new paper.Color({ hue: strokeColor.h, saturation: strokeColor.s, lightness: strokeColor.l });
         }
-        var fillColor = this.get('fill_color');
+        var fillColor = this.get('fillColor');
         if (!fillColor.noColor) {
-          polyPath.fillColor = new paper.Color(fillColor.r, fillColor.g, fillColor.b);
+          polyPath.fillColor = new paper.Color({ hue: fillColor.h, saturation: fillColor.s, lightness: fillColor.l });
         }
 
 
@@ -266,13 +266,13 @@ define([
         }
         polyPath.selected = true;
         polyPath.strokeWidth = this.get('stroke_width');
-       var strokeColor = this.get('stroke_color');
+       var strokeColor = this.get('strokeColor');
         if (!strokeColor.noColor) {
-          polyPath.strokeColor = new paper.Color(strokeColor.r, strokeColor.g, strokeColor.b);
+          polyPath.strokeColor = new paper.Color({ hue: strokeColor.h, saturation: strokeColor.s, lightness: strokeColor.l });
         }
-        var fillColor = this.get('fill_color');
+        var fillColor = this.get('fillColor');
         if (!fillColor.noColor) {
-          polyPath.fillColor = new paper.Color(fillColor.r, fillColor.g, fillColor.b);
+          polyPath.fillColor = new paper.Color({ hue: fillColor.h, saturation: fillColor.s, lightness: fillColor.l });
         }
 
       }
