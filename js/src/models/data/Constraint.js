@@ -301,17 +301,18 @@ define([
 
           for (var i = 0; i < rel_dimensions.length; i++) {
             offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
+            console.log("rel offset for",rel_dimensions[i],offset[rel_dimensions[i]]);
             for (var p = 0; p < relativeRange; p++) {
               var instance = this.get('relatives');
              if (this.get('relatives').get('type') === 'collection') {
               instance = instance.members[p];
             } 
               relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance);
-              console.log('relPropValue',relPropValue);
-              conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
+              console.log('relPropValue',relPropValue, refPropValue, ref_dimensions[i],refPropValue[ref_prop_key][ref_dimensions[i]]);
+              conversion[rel_dimensions[i]] = refPropValue[rel_prop_key][ref_dimensions[i]] * convertFactor;
               console.log('conversion=' ,conversion[rel_dimensions[i]]);
-              offset[rel_dimensions[i]].push(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
-              console.log('offset prop value =' ,relPropValue[rel_dimensions[i]]);
+              offset[rel_dimensions[i]].push(relPropValue[rel_prop_key][rel_dimensions[i]] - conversion[rel_dimensions[i]]);
+              console.log('offset prop value =' ,relPropValue[rel_prop_key][rel_dimensions[i]]);
             }
           }
       } else if (ref_dimensions.length > rel_dimensions.length) {
@@ -443,7 +444,7 @@ define([
               var offset = self.get('offset');
               var operators = self.get('operators');
               var mapOperand = self.get('map_operand');
-              var offsetValue = 0; //offset[axis][relative.get('index').getValue()];
+              var offsetValue = offset[axis][relative.get('index').getValue()];
               var y;
               eval(expression[d]);
               if (d !== 'v') {
@@ -481,7 +482,7 @@ define([
             var mapOperand = self.get('map_operand');
             var x = self.get('ref_value').getValue();
             var offset = self.get('offset');
-            var offsetValue = 0; //offset[axis][relative.get('index').getValue()];
+            var offsetValue =offset[axis][relative.get('index').getValue()];
             var y;
             eval(expression[axis]);
             evalObj[axis] = y;
