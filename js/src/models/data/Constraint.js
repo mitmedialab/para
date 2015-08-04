@@ -595,7 +595,7 @@ define([
         var polynomial, expression;
 
         if (points.length < 2) {
-                    console.log('1 points');
+          console.log('1 points');
 
           polynomial = [points[0].y];
           expression = points[0].y;
@@ -606,7 +606,7 @@ define([
           polynomial = [slope, b];
           expression = slope + "*x+" + b;
         } else {
-                              console.log('more than 2 points');
+          console.log('more than 2 points');
 
           polynomial = TrigFunc.Lagrange(points);
           expression = polynomial[0];

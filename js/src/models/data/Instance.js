@@ -227,8 +227,21 @@ define([
 			this.isReturned = false;
 
 			var parent = this;
+			var constrainMap = this.get('constrain_map');
+			
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						var property = this.get(propertyName);
+						if (property) {
+							this.listenTo(property, 'modified', this.modified);
+						}
+					
+					}
+				}	
+			
 
 		},
+
 
 		/* deleteSelf
 		 * function called before instance is removed from

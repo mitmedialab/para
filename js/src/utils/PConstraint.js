@@ -69,6 +69,7 @@
 
 			//callback triggered when a subproperty is modified externally 
 			modified: function() {
+				console.log('modified',this.get('name'));
 				this.trigger('modified', this);
 			},
 

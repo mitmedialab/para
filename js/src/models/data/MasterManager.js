@@ -180,12 +180,20 @@ define([
 		},
 
 		compile: function() {
-			renderQueue = [];
-			collectionManager.resetRenderQueue();
-			this.compileFunctions();
-			collectionManager.compileCollections();
-			this.compileInstances();
-			this.render();
+			//renderQueue = [];
+			//collectionManager.resetRenderQueue();
+			//this.compileFunctions();
+			//collectionManager.compileCollections();
+			//this.compileInstances();
+			//this.render();
+		},
+
+
+		modified:function(target){
+			console.log('target',target.get('id'),'modified');
+			target.reset();
+			target.compile();
+			target.render();
 		},
 
 		//TODO: move to function manager
@@ -474,6 +482,10 @@ define([
 				layersView.addShape(shape.toJSON());
 			}
 			this.selectShape(shape);
+			console.log('adding shape',shape.get('name'),shape);
+			this.listenTo(shape,'modified',this.modified);
+			shape.compile();
+			shape.render();
 		},
 
 		//called when creating an instance which inherits from existing shape
