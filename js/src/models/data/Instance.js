@@ -92,6 +92,8 @@ define([
 				//inheritors: []
 			},
 
+			dimension_num: 9,
+
 			reset: false,
 			geom: null,
 			selection_clone: null,
@@ -146,11 +148,11 @@ define([
 			rotationDelta.setNull(true);
 			this.set('rotationDelta', rotationDelta);
 
-			var strokeColor = new PColor(0, 0, 0,1);
+			var strokeColor = new PColor(0, 0, 0, 1);
 			strokeColor.setNull(true);
 			this.set('strokeColor', strokeColor);
 
-			var fillColor = new PColor(0, 0, 0,1);
+			var fillColor = new PColor(0, 0, 0, 1);
 			fillColor.setNull(true);
 			this.set('fillColor', fillColor);
 
@@ -643,7 +645,7 @@ define([
 			return this.get(property_name);
 		},
 
-		
+
 		modifyPriorToCompile: function(data) {
 			var value = this.getValue();
 			var merged = TrigFunc.merge(value, data);
@@ -819,6 +821,19 @@ define([
 
 		},
 
+		setConstraint: function(data) {
+			var constrainMap = this.get('constrain_map');
+			var keys = Object.keys(data);
+			//if(keys.length === this.get('dimension_num'))
+			var value = {};
+			for (var propertyName in data) {
+				if (data.hasOwnProperty(propertyName) && constrainMap.hasOwnProperty(propertyName)) {
+
+					this.get(propertyName).setConstraint(data[propertyName]);
+				}
+			}
+		},
+
 		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);
 		},
@@ -837,13 +852,12 @@ define([
 							val: data[prop]
 						};
 					}
-					if(!p.operator){
+					if (!p.operator) {
 						p.operator = 'set';
 					}
-					if(p.operator ==='set'){
+					if (p.operator === 'set') {
 						this.get(prop).setValue(p);
-					}
-					else if(p.operator==='add'){
+					} else if (p.operator === 'add') {
 						this.get(prop).add(p);
 					}
 				}
@@ -868,6 +882,7 @@ define([
 			}
 			return value;
 		},
+
 
 
 		/* getValueFor
@@ -1033,9 +1048,9 @@ define([
 			//if (this.isValid() || this.get('merged')) {
 			//	return false;
 			//} else {
-				this.compileTransformation();
-				this.compileStyle();
-				return true;
+			this.compileTransformation();
+			this.compileStyle();
+			return true;
 			//}
 			//this.set('merged', null);
 		},

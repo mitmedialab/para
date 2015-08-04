@@ -96,19 +96,9 @@ define([
       BaseToolModel.prototype.initialize.apply(this, arguments);
       this.set('currentConstraint', new Constraint());
       var self = this;
-      //this.on('ready:currentConstraint',function(){self.set('applicable',true);});
       this.on('change:currentConstraint', function() {
         self.set('applicable', false);
       });
-    },
-
-    start: function() {
-      // visitor: get selected constraint
-      // if selected
-      //  set currentConstraint to selected constraint
-      //  set mode to ref
-      // else
-      //  set mode to create
     },
 
     mouseDown: function(event) {
@@ -140,22 +130,12 @@ define([
 
     applyConstraint: function() {
       var constraint = this.get('currentConstraint');
-       constraint.create();
+      var ref_prop = constraint.get('ref_prop');
+      var rel_prop = constraint.get('rel_prop');
+      constraint.create([[ref_prop,rel_prop]]);
       var constraintMap = this.get('constraints');
       constraintMap[constraint.get('id')] = constraint;
-      /*var constraint_data = {
-        name: 'constraint',
-        id: constraint.get('id'),
-        relative: constraint.get('relatives').get('id'),
-        reference: constraint.get('references').get('id'),
-        ref_prop: constraint.get('ref_prop'),
-        rel_prop: constraint.get('rel_prop'),
-        ref_prop_key: constraint.get('rel_prop_key'),
-        rel_prop_key: constraint.get('rel_prop_key'),
-        ref_prop_dimensions: constraint.get('ref_prop_dimensions'),
-        rel_prop_dimensions: constraint.get('rel_prop_dimensions'),
-        constraint: constraint;
-      };*/
+
 
       this.set('currentConstraint', new Constraint());
       this.reset();
