@@ -373,6 +373,8 @@ define([
     create: function(properties) {
       var offsets = [];
       var expressions = [];
+      var refProperties = [];
+      var  relProperties = [];
       var constraint_data = {};
       var self = this;
       var reference = this.get('references');
@@ -381,18 +383,22 @@ define([
       this.get('proxy').hide();
       this.clearUI();
       this.clearSelection();
-
+      var relative_dimensions = relative.get('dimension_num');
+      console.log('relative value pre', relative.getValue());
 
       for (var j = 0; j < properties.length; j++) {
+
         var ref_prop = properties[j][0];
         var rel_prop = properties[j][1];
         var refSplit = ref_prop.split('_');
         var ref_dimensions = refSplit[1];
         var ref_prop_key = refSplit[0];
-        this.setReferenceValues(ref_prop_key, ref_dimensions);
         var relSplit = rel_prop.split('_');
         var rel_dimensions = relSplit[1];
         var rel_prop_key = relSplit[0];
+        var property_dimensions = relative.get(rel_prop_key).get('dimension_num');
+        refProperties.push([ref_prop_key,ref_dimensions]);
+        relProperties.push([rel_prop_key,rel_dimensions]);
 
         var offset_data = this.setOffset(reference, ref_prop_key, ref_dimensions, relative, rel_prop_key, rel_dimensions);
         var convertFactor = offset_data.convertFactor;
@@ -408,12 +414,34 @@ define([
         }
         expressions.push(expression);
 
-        var expression_dimension_num = Object.keys(expression).length;
-        var refPropAccess = reference.get(ref_prop_key);
-        var relPropAccess = relative.get(rel_prop_key);
-      console.log('relative value pre',relative.getValue());
+        this.setReferenceValues(ref_prop_key, ref_dimensions);
 
-        var constraintF = function() {
+
+      }
+      console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties,'reference_values', this.get('reference_values'));
+      /*for(var prop in this.get('reference_values')){
+        for(var d in this.get('reference_values')[prop]){
+          for(var z=0;z< this.get('reference_values')[prop][d].length;z++){
+          console.log('reference value at ', prop, d, z, "=", this.get('reference_values')[prop][d][z].getValue());
+        }
+      }
+      }*/
+      this.setConstraintOnInstance(relative,expressions,offsets,refProperties,relProperties);
+      console.log('relative value post', relative.getValue());
+
+    },
+
+
+    setConstraintOnInstance: function(relative, expressions, offsets, refProperties, relProperties) {
+      var self = this;
+      var constraintF = function() {
+        var data = {};
+        for (var i = 0; i < refProperties.length; i++) {
+          var ref_prop_key = refProperties[i][0];
+          var rel_prop_key = relProperties[i][0];
+          var ref_dimensions = refProperties[i][1];
+          var expression = expressions[i];
+          var offset = offsets[i];
           var evalObj = {};
           var a_keys = Object.keys(expression);
           for (var m = 0; m < a_keys.length; m++) {
@@ -423,35 +451,30 @@ define([
             self.set('current_ref_property', ref_prop_key);
             var reference_values = self.get('reference_values');
             var x = reference_values[ref_prop_key][axis][relative.get('index').getValue()].getValue();
-        
+
             var offsetValue = offset[axis][relative.get('index').getValue()];
             var y;
             eval(expression[axis]);
-            console.log('x val =',x,'offset val=',offsetValue, 'y val=',y);
+            console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
 
             evalObj[axis] = y;
           }
-
-          var data = {};
           data[rel_prop_key] = evalObj;
-          console.log('data =',data);
-          relative.setValue(data);
-          return data;
-        };
-
-        constraint_data[rel_prop_key] = constraintF;
-      }
-      console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, 'reference_values',this.get('reference_values'));
-      for(var prop in this.get('reference_values')){
-        for(var d in this.get('reference_values')[prop]){
-          for(var z=0;z< this.get('reference_values')[prop][d].length;z++){
-          console.log('reference value at ', prop, d, z, "=", this.get('reference_values')[prop][d][z].getValue());
         }
-      }
-      }
-      relative.setConstraint(constraint_data);
-      console.log('relative value post',relative.getValue());
-      //relative.getConstraint();
+        console.log('data =', data);
+        relative.setValue(data);
+        return data;
+      };
+
+      relative.setConstraint(constraintF);
+      relative.getValue();
+    },
+
+    setConstraintOnProperty: function(relative_property, expression, offset) {
+
+    },
+
+    setConstraintOnSubProperty: function() {
 
     },
 
@@ -467,9 +490,10 @@ define([
 
     setReferenceValues: function(ref_prop_key, ref_dimensions) {
       var reference_values = this.get('reference_values');
+       var reference = this.get('references');
       if (!reference_values) {
-        this.set('reference_values',{});
-        reference_values= this.get('reference_values');
+        this.set('reference_values', {});
+        reference_values = this.get('reference_values');
       }
 
       if (!reference_values[ref_prop_key]) {
@@ -478,33 +502,38 @@ define([
 
       for (var i = 0; i < ref_dimensions.length; i++) {
         var target_dimension = ref_dimensions[i];
-        if (!  reference_values[ref_prop_key][target_dimension]) {
-            reference_values[ref_prop_key][target_dimension] =[];
-    
+         var reference_subprop = reference.get(ref_prop_key)[target_dimension];
+        this.listenTo(reference_subprop,'changed',this.referenceValueChanged);
+        if (!reference_values[ref_prop_key][target_dimension]) {
+          reference_values[ref_prop_key][target_dimension] = [];
+
         }
 
-        
-        var diff =   reference_values[ref_prop_key][target_dimension].length - this.get('relatives').getRange();
+
+        var diff = reference_values[ref_prop_key][target_dimension].length - this.get('relatives').getRange();
         if (diff > 0) {
           for (var j = 0; j < diff; j++) {
-             reference_values[ref_prop_key][target_dimension].pop();
-
+           var removedItem = reference_values[ref_prop_key][target_dimension].pop();
           }
         } else if (diff < 0) {
           for (var k = 0; k < -diff; k++) {
             var newItem;
             if (reference_values[ref_prop_key][target_dimension].length > 0) {
-              var last =   reference_values[ref_prop_key][target_dimension].item(  reference_values[ref_prop_key][target_dimension].length - 1);
+              var last = reference_values[ref_prop_key][target_dimension].item(reference_values[ref_prop_key][target_dimension].length - 1);
               newItem = new PFloat(last.getValue());
             } else {
               newItem = new PFloat(1);
             }
-
-             reference_values[ref_prop_key][target_dimension].push(newItem);
+           
+            reference_values[ref_prop_key][target_dimension].push(newItem);
           }
         }
-        this.calculateReferenceValues(ref_prop_key,target_dimension,reference_values[ref_prop_key]);
+        this.calculateReferenceValues(ref_prop_key, target_dimension, reference_values[ref_prop_key]);
       }
+    },
+
+    referenceValueChanged: function(target){
+      console.log('reference value changed',target,target.getValue());
     },
 
 
@@ -514,7 +543,7 @@ define([
     },
 
 
-    calculateReferenceValues: function(ref_prop_key, ref_dimension,reference_values) {
+    calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values) {
       var reference = this.get('references');
       if (reference) {
         var members;

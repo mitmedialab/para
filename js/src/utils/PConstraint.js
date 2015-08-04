@@ -24,6 +24,11 @@
 
 			constructor: function() {
 				Backbone.Model.apply(this, arguments);
+				for (var p in this) {
+					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
+						this.listenTo(this[p], 'changed', this.changed);
+					}
+				}
 			},
 
 			/* setNull
@@ -60,6 +65,12 @@
 				if (r) {
 					this.reference = r;
 				}
+			},
+
+			//callback triggered when a subproperty is modified externally 
+			changed: function(target) {
+				console.log('changed',target)
+				this.trigger('changed', this);
 			},
 
 
@@ -105,13 +116,13 @@
 					return this.constraint;
 				}
 			},
-		
 
-			isValid: function(){
+
+			isValid: function() {
 				var valid = true;
 				for (var p in this) {
 					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
-						valid = valid ? this[p].isValid():false;
+						valid = valid ? this[p].isValid() : false;
 					}
 				}
 				return valid;

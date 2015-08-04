@@ -821,7 +821,7 @@ define([
 
 		},
 
-		setConstraint: function(data) {
+		/*setConstraint: function(data) {
 			console.log('setting constraint',data);
 			var constrainMap = this.get('constrain_map');
 			var keys = Object.keys(data);
@@ -833,7 +833,7 @@ define([
 					this.get(propertyName).setConstraint(data[propertyName]);
 				}
 			}
-		},
+		},*/
 
 		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);
@@ -878,10 +878,16 @@ define([
 			var value = {};
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
-					value[propertyName] = this.getValueFor(propertyName);
+					value[propertyName] = this.get(propertyName).getValue();
 				}
 			}
-			return value;
+			if(this.isSelfConstrained()){
+				var constrained_values = this.getSelfConstraint().getValue();
+				return TrigFunc.merge(value,constrained_values);
+			}
+			else{
+				return value;
+			}
 		},
 
 
@@ -892,7 +898,7 @@ define([
 		getValueFor: function(property_name) {
 			var property = this.get(property_name);
 			if (property) {
-				return property.getValue();
+				return this.getValue()[property_name];
 			} else {
 				return null;
 			}
@@ -1049,21 +1055,22 @@ define([
 			//if (this.isValid() || this.get('merged')) {
 			//	return false;
 			//} else {
-			this.compileTransformation();
-			this.compileStyle();
+			var value = this.getValue();
+			this.compileTransformation(value);
+			this.compileStyle(value);
 			return true;
 			//}
 			//this.set('merged', null);
 		},
 
-		compileTransformation: function() {
+		compileTransformation: function(value) {
 
 			var scalingDelta, rotationDelta, translationDelta;
 			var merged = this.get('merged');
 			if (!merged) {
-				scalingDelta = this.getValueFor('scalingDelta');
-				rotationDelta = this.getValueFor('rotationDelta');
-				translationDelta = this.getValueFor('translationDelta');
+				scalingDelta = value.scalingDelta;
+				rotationDelta =  value.rotationDelta;
+				translationDelta = value.translationDelta;
 			} else {
 
 				scalingDelta = merged.scalingDelta;
@@ -1086,7 +1093,7 @@ define([
 
 		},
 
-		compileStyle: function() {
+		compileStyle: function(value) {
 
 			var merged = this.get('merged');
 			if (merged) {
@@ -1094,9 +1101,9 @@ define([
 				this._strokeColor = merged.strokeColor;
 				this._stroke_width = merged.stroke_width;
 			} else {
-				this._fillColor = this.getValueFor('fillColor');
-				this._strokeColor = this.getValueFor('strokeColor');
-				this._stroke_width = this.getValueFor('stroke_width');
+				this._fillColor = value.fillColor;
+				this._strokeColor =value.strokeColor;
+				this._stroke_width = value.stroke_width;
 			}
 
 			//TODO: consider changing visible to a constrainable property?
