@@ -868,6 +868,13 @@ define([
 
 
 
+		getLiteralSubprops: function(key, subprop) {
+			var property = this.get(key);
+			if (property) {
+				return [property[subprop]];
+			}
+		},
+
 		/* getValue
 		 * returns an object containing all of the values of constrainable properties
 		 * TODO: Make recursive (will not work for objects with 3+ leves of heirarchy)
@@ -881,11 +888,10 @@ define([
 					value[propertyName] = this.get(propertyName).getValue();
 				}
 			}
-			if(this.isSelfConstrained()){
+			if (this.isSelfConstrained()) {
 				var constrained_values = this.getSelfConstraint().getValue();
-				return TrigFunc.merge(value,constrained_values);
-			}
-			else{
+				return TrigFunc.merge(value, constrained_values);
+			} else {
 				return value;
 			}
 		},
@@ -1069,7 +1075,7 @@ define([
 			var merged = this.get('merged');
 			if (!merged) {
 				scalingDelta = value.scalingDelta;
-				rotationDelta =  value.rotationDelta;
+				rotationDelta = value.rotationDelta;
 				translationDelta = value.translationDelta;
 			} else {
 
@@ -1102,7 +1108,7 @@ define([
 				this._stroke_width = merged.stroke_width;
 			} else {
 				this._fillColor = value.fillColor;
-				this._strokeColor =value.strokeColor;
+				this._strokeColor = value.strokeColor;
 				this._stroke_width = value.stroke_width;
 			}
 

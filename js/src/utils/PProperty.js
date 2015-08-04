@@ -20,20 +20,16 @@ define([
 			name: 'PProperty',
 			type: 'PProperty',
 		},
-		//callback triggered when a subproperty is modified externally 
-		modifyProperty: function() {
-			console.log('change on PProperty',this.get('name'));
-			this.trigger('changed',this);
-		},
-
+		
+		
 		constructor: function(val, operator) {
-			Backbone.Model.apply(this, arguments);
+			//Backbone.Model.apply(this, arguments);
 			this._val = cjs(val);
 
+			var callback = this.modified;
 			var target = this;
 			this._val.onChange(function() {
-				console.log('changed',target);
-				//target.modifyProperty.call(target);
+				callback.call(target);
 			});
 			//this.storage =  val;
 			if (operator) {
@@ -41,6 +37,7 @@ define([
 			}
 
 		},
+
 		getValue: function() {
 		
 			return this._val.get();
@@ -48,6 +45,11 @@ define([
 
 		setValue: function(val) {
 			this._val.set(val);
+		},
+
+		//callback triggered when a subproperty is modified externally 
+		modified: function() {
+			this.trigger('modified', this);
 		},
 
 		

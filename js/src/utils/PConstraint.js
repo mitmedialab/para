@@ -26,7 +26,7 @@
 				Backbone.Model.apply(this, arguments);
 				for (var p in this) {
 					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
-						this.listenTo(this[p], 'changed', this.changed);
+						this.listenTo(this[p], 'modified', this.modified);
 					}
 				}
 			},
@@ -68,9 +68,8 @@
 			},
 
 			//callback triggered when a subproperty is modified externally 
-			changed: function(target) {
-				console.log('changed',target)
-				this.trigger('changed', this);
+			modified: function() {
+				this.trigger('modified', this);
 			},
 
 

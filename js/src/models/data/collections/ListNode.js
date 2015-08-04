@@ -256,6 +256,15 @@ define([
       return null;
     },
 
+getLiteralSubprops: function(key, subprop) {
+     var subprops = [];
+     for (var i = 0; i < this.members.length; i++) {
+      var sp = this.members[i].getLiteralSubprops(key, subprop);
+      subprops = subprops.concat(sp);
+     }
+     return subprops;
+    },
+
 
     getLastMember: function() {
       if (this.members.length > 0) {
