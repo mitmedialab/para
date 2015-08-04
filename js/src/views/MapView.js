@@ -109,10 +109,10 @@ define([
 			var cmax = constraint.getMax();
 			dimensions = constraint.get('rel_prop').split('_');
 			this.setRange(constraint.getRange());
-			var points = constraint.getReferencePoints();
-			this.setMinMax(cmin,cmax,points[0]);
-			this.setFunctionPath(points[0]);
-			self.model.updateMapping(self.calculateValueSet());
+			//var points = constraint.getReferencePoints();
+			//this.setMinMax(cmin,cmax,points[0]);
+			//this.setFunctionPath(points[0]);
+			//self.model.updateMapping(self.calculateValueSet());
 		},
 
 		setMinMax: function(cmin,cmax,points){

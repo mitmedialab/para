@@ -822,13 +822,14 @@ define([
 		},
 
 		setConstraint: function(data) {
+			console.log('setting constraint',data);
 			var constrainMap = this.get('constrain_map');
 			var keys = Object.keys(data);
 			//if(keys.length === this.get('dimension_num'))
 			var value = {};
 			for (var propertyName in data) {
 				if (data.hasOwnProperty(propertyName) && constrainMap.hasOwnProperty(propertyName)) {
-
+					console.log('setting constraint for',propertyName, 'to',data[propertyName] );
 					this.get(propertyName).setConstraint(data[propertyName]);
 				}
 			}
