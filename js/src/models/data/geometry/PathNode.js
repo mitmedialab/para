@@ -145,8 +145,8 @@ define([
 
       this.setValue(data);
 
-      var path_altered = this.get('path_altered');
-      path_altered.setNull(false);
+      var pathAltered = this.get('pathAltered');
+      pathAltered.setNull(false);
       this.setPathAltered();
       return data;
     },
@@ -190,7 +190,7 @@ define([
           var index = segments[i].index;
           var point = points[index];
           point.set('selection_type', segments[i].type);
-          point.set('selected', true);
+          point.get('selected').setValue(true);
           selectedPoints.push(point);
         }
         return selectedPoints;
@@ -204,7 +204,7 @@ define([
       } else {
         var points = this.get('points');
         for (var i = 0; i < points.length; i++) {
-          points[i].set('selected', false);
+          points[i].get('selected').setValue(false);
         }
       }
     },
@@ -216,7 +216,7 @@ define([
       } else {
         var points = this.get('points');
         var selected_points = points.filter(function(point) {
-          return point.get('selected');
+          return point.get('selected').getValue();
         });
         return selected_points;
       }
@@ -307,7 +307,7 @@ define([
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
       var bbox = this.get('bbox');
-      if (!this.get('path_altered').getValue()) {
+      if (!this.get('pathAltered').getValue()) {
         geom.transform(this._ti_matrix);
         geom.transform(this._si_matrix);
         geom.transform(this._ri_matrix);
@@ -365,7 +365,7 @@ define([
       for (var i = 0; i < points.length; i++) {
         var selectedPoint = points[i];
         var geomS = geom.segments[selectedPoint.get('index')];
-        if (selectedPoint.get('selected')) {
+        if (selectedPoint.get('selected').getValue()) {
           geomS.selected = true;
           pointSelected = true;
         }

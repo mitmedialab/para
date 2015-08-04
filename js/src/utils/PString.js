@@ -7,14 +7,14 @@
 define([
 		'underscore',
 		'utils/PProperty',
-		'utils/PFloat'
+		'utils/PBool'
 	],
 
-	function(_, PProperty, PFloat) {
+	function(_, PProperty, PBool) {
 
-		var PBool = PFloat.extend({
-			defaults: _.extend({}, PFloat.prototype.defaults, {
-				name: 'PBool',
+		var PString = PBool.extend({
+			defaults: _.extend({}, PBool.prototype.defaults, {
+				name: 'PString',
 				dimension_num: 1
 			}),
 			/* constructor
@@ -23,18 +23,11 @@ define([
 			 * operation performed when property is modified
 			 */
 			constructor: function(val, operator) {
-				
-				if (val === true) {
-					this.val = new PProperty(1);
-				} else if (val === false) {
-					this.val = new PProperty(0);
-				}
-				PFloat.apply(this, arguments);
-				
+				this.val = new PProperty(val);
+				PBool.apply(this, arguments);
 				if (operator) {
 					this.set('operator', operator);
 				}
-
 				this.setNull(false);
 			},
 
@@ -42,13 +35,7 @@ define([
 			 * sets the value of the property
 			 */
 			setValue: function(val) {
-				console.log('setting pbool value',val);
-				if (val) {
-					this.val.setValue(1);
-				} else {
-					this.val.setValue(0);
-				}
-				console.log('pbool value',this.getValue());
+				this.val.setValue(val);
 				this.setNull(false);
 			},
 
@@ -64,12 +51,7 @@ define([
 				} else {
 					v = this.getSelfConstraint().getValue();
 				}
-				if (v === 1) {
-					return true;
-				} else if (v === 0) {
-					return false;
-				}
-
+				return v;
 
 			},
 
@@ -78,15 +60,15 @@ define([
 			 * does not clone the constraints of the original
 			 */
 			clone: function() {
-				return new PBool(this.getValue());
+				return new PString(this.getValue());
 			},
 
 			add: function(){
-				console.log("[ALERT], trying to add boolean value");
+				console.log("[ALERT], trying to add string value");
 				//does nothing
 			},
 
 		});
 
-		return PBool;
+		return PString;
 	});

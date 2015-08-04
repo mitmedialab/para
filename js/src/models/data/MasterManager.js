@@ -24,7 +24,6 @@ define([
 	var renderQueue = [];
 	var constraints = [];
 	var store = 0;
-	var compile = 1;
 	var remove = 2;
 	var visit = 3;
 	var search = 4;
@@ -149,45 +148,33 @@ define([
 			if (pref && prel) {
 				var pref_i = this.getById(pref);
 				var prel_i = this.getById(prel);
-				pref_i.set('constraint_selected', null);
-				prel_i.set('constraint_selected', null);
-				this.compile();
+				pref_i.get('constraintSelected').setValue(false);
+				prel_i.get('constraintSelected').setValue(false);
 
 			}
 			if (ref && rel) {
 				ref_i = this.getById(ref);
 				rel_i = this.getById(rel);
-				ref_i.set('constraint_selected', 'reference_selected');
-				rel_i.set('constraint_selected', 'relative_selected');
-				this.compile();
+				ref_i.get('constraintSelected').setValue('reference_selected');
+				rel_i.get('constraintSelected').setValue('relative_selected');
 
 			} else {
 				if (layersView.getCurrentRef() && layersView.getCurrentRel()) {
 					ref_i = this.getById(layersView.getCurrentRef());
 					rel_i = this.getById(layersView.getCurrentRel());
 					if (ref_i) {
-						ref_i.set('constraint_selected', null);
+						ref_i.get('constraintSelected').setValue(false);
 					}
 					if (rel_i) {
-						rel_i.set('constraint_selected', null);
+						rel_i.get('constraintSelected').setValue(false);
 					}
 					layersView.deactivateConstraint();
 					mapView.deactivate();
-					this.compile();
-
 				}
 			}
 		},
 
-		compile: function() {
-			//renderQueue = [];
-			//collectionManager.resetRenderQueue();
-			//this.compileFunctions();
-			//collectionManager.compileCollections();
-			//this.compileInstances();
-			//this.render();
-		},
-
+	
 
 		modified:function(target){
 			console.log('target',target.get('id'),'modified');
@@ -196,63 +183,26 @@ define([
 			target.render();
 		},
 
-		//TODO: move to function manager
-		compileFunctions: function() {
-			var state_data = {
-				func: compile,
-				instance: compile
-			};
-			var functions = functionManager.functions;
-			for (var i = 0; i < functions.length; i++) {
-				this.visit(functions[i], null, state_data);
-			}
-		},
-
-		//TODO: move to Geom manager
-		compileInstances: function() {
-			var state_data = {
-				list: store,
-				instance: compile,
-				func: compile,
-			};
-
-			this.visit(currentNode, null, state_data);
-		},
-
-		addToRenderQueue: function(obj) {
-			renderQueue.push(obj);
-		},
-
-		render: function(root) {
-			_.sortBy(renderQueue, function(item) {
-				return item.get('order');
-			});
-			for (var i = 0; i < renderQueue.length; i++) {
-				renderQueue[i].render();
-
-			}
-			collectionManager.render();
-		},
-
 		addObject: function(object, geom) {
+			var target;
 			switch (object) {
 				case 'geometry':
-					this.addShape(geom);
+					target = this.addShape(geom);
 					break;
 				case 'instance':
-					this.addInstance();
+					target = this.addInstance();
 					break;
 				case 'function':
-					this.addFunction(collectionManager.getLists());
+					target = this.addFunction(collectionManager.getLists());
 					break;
 				case 'param':
-					this.createParams();
+					target = this.createParams();
 					break;
 				case 'list':
-					var list = collectionManager.addList(selected);
-					layersView.addList(list.toJSON());
+					target = collectionManager.addList(selected);
+					layersView.addList(target.toJSON());
 					this.deselectAllShapes();
-					this.selectShape(list);
+					this.selectShape(target);
 					break;
 				case 'group':
 
@@ -261,14 +211,18 @@ define([
 				case 'duplicator':
 	
 					if (selected[0]) {
-						var duplicator = this.addDuplicator(selected[0]);
+						target = this.addDuplicator(selected[0]);
 						this.deselectAllShapes();
-						this.selectShape(duplicator);
+						this.selectShape(target);
 
 					}
-					break;
+				break;
 			}
-
+			if(target){
+				this.listenTo(target,'modified',this.modified);
+				target.compile();
+				target.render();
+			}
 		},
 
 
@@ -338,8 +292,9 @@ define([
 						this.removeCollection(selected[i]);
 						break;
 				}
+				this.stopListening(selected[i]);
+
 			}
-			this.compile();
 		},
 
 		removeGeometry: function(target) {
@@ -386,22 +341,6 @@ define([
 			var children = node.children;
 
 			switch (state) {
-				case compile:
-					node.reset();
-					var changed = node.compile();
-					renderQueue.push(node);
-	
-					for (var i = 0; i < children.length; i++) {
-						if (!node.get('open') && node.get('called')) {
-							if (children[i].isReturned) {
-								children[i].visit(this, 'visit', node, state_data);
-							}
-						} else if (node.get('open')) {
-							children[i].visit(this, 'visit', node, state_data);
-						}
-					}
-
-					break;
 				case search:
 					if (node.get('id') == state_data.data) {
 						return node;
@@ -423,21 +362,6 @@ define([
 			var state = state_data.instance;
 			var children = node.children;
 			switch (state) {
-				case compile:
-					node.reset();
-					var changed = node.compile();
-					var dIndex = 0;
-					if (departureNode) {
-						dIndex = departureNode.get('order');
-					}
-					node.set('order', dIndex + node.getChildIndex());
-					if(changed){
-						renderQueue.push(node);
-					}
-					for (var i = 0; i < children.length; i++) {
-						children[i].visit(this, 'visit', node, state_data);
-					}
-					break;
 				case search:
 					if (node.get('id') === state_data.data) {
 						return node;
@@ -461,15 +385,14 @@ define([
 			lists = lists.filter(function(item) {
 				return selected.indexOf(item) === -1;
 			});
-			functionManager.createFunction('my_function', selected);
-			this.compile();
+			return functionManager.createFunction('my_function', selected);
+			
 		},
 
 		createParams: function() {
 			for (var i = 0; i < selected.length; i++) {
 				functionManager.addParamToFunction(currentNode, selected[i]);
 			}
-			this.compile();
 		},
 
 		addShape: function(shape) {
@@ -482,10 +405,8 @@ define([
 				layersView.addShape(shape.toJSON());
 			}
 			this.selectShape(shape);
-			console.log('adding shape',shape.get('name'),shape);
-			this.listenTo(shape,'modified',this.modified);
-			shape.compile();
-			shape.render();
+			return shape;
+			
 		},
 
 		//called when creating an instance which inherits from existing shape
@@ -507,10 +428,10 @@ define([
 					this.setDuplicatorCount(2, duplicator);
 					newInstance = duplicator.getLastMember();
 				}
-				this.deselectShape(parent,true);
+				this.deselectShape(parent);
 				
 				this.selectShape(newInstance);
-
+				return newInstance;
 			}
 		},
 
@@ -535,7 +456,6 @@ define([
 			}
 			this.updateListConstraints(duplicator);
 
-			this.compile();
 		},
 
 		setDuplicatorCount: function(value, duplicator) {
@@ -591,10 +511,9 @@ define([
 						break;
 				}
 			}
-			this.compile();
 		},
 
-		selectShape: function(data, segments, noCompile) {
+		selectShape: function(data, segments) {
 			if (data instanceof Array) {
 				for (var i = 0; i < data.length; i++) {
 					this._selectSingleShape(data[i], segments);
@@ -606,10 +525,7 @@ define([
 			if(!constraintMode){
 				collectionView.toggleCollectionButtons(selected);
 			}
-			if(!noCompile){
-				this.compile();
-			}
-
+			
 		},
 
 
@@ -628,7 +544,7 @@ define([
 
 		},
 
-		deselectShape: function(data,noCompile) {
+		deselectShape: function(data) {
 			if (typeof data === 'string') {
 				var s = this.getById(data);
 				this._deselectSingleShape(s);
@@ -650,9 +566,7 @@ define([
 			if(!constraintMode){
 				collectionView.toggleCollectionButtons(selected);
 			}
-			if(!noCompile){
-				this.compile();
-			}
+			
 
 
 		},
@@ -676,7 +590,6 @@ define([
 			selected.length = 0;
 			this.updateLayers();
 			collectionView.toggleCollectionButtons(selected);
-			this.compile();
 
 		},
 
@@ -718,7 +631,6 @@ define([
 			if (cId) {
 				var constraint = this.getConstraintById(cId);
 				constraint.calculateReferenceValues();
-				this.compile();
 			}
 		},
 
@@ -729,7 +641,6 @@ define([
 				constraint.setMin(min);
 				constraint.setMax(max);
 				constraint.calculateReferenceValues();
-				this.compile();
 			}
 
 		},
@@ -788,7 +699,6 @@ define([
 					var instance = selected[i];
 					instance.setValue(data);
 				}
-				this.compile();
 			}
 		},
 
@@ -802,7 +712,6 @@ define([
 					var instance = instances[i];
 					instance.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
 				}
-				this.compile();
 			}
 		},
 
@@ -811,7 +720,6 @@ define([
 				for (var i = 0; i < selected.length; i++) {
 					selected[i].updateParams(data);
 				}
-				this.compile();
 			}
 		},
 
@@ -821,7 +729,6 @@ define([
 					var instance = selected[i];
 					instance.setValue(style_data);
 				}
-				this.compile();
 			}
 		},
 

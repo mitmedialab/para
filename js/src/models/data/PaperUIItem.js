@@ -62,8 +62,8 @@ define([
         }
       }
       this.set(data);
-      var path_altered = this.get('path_altered');
-      path_altered.setNull(false);
+      var pathAltered = this.get('pathAltered');
+      pathAltered.setNull(false);
       this.setPathAltered();
 
       return data;
@@ -141,8 +141,8 @@ define([
         }
       }
       this.set(data);
-      var path_altered = this.get('path_altered');
-      path_altered.setNull(false);
+      var pathAltered = this.get('pathAltered');
+      pathAltered.setNull(false);
       this.setPathAltered();
 
       return data;
@@ -165,8 +165,8 @@ define([
     renderGeomo: function() {
       var geom = this.get('geom');
 
-      var path_altered = this.get('path_altered').getValue();
-      if (!path_altered && geom) {
+      var pathAltered = this.get('pathAltered').getValue();
+      if (!pathAltered && geom) {
               geom.selected = false;
       } else {
               if (!geom) {
@@ -193,9 +193,9 @@ define([
       });
 
       this.set('geom', geom);
-      var p_altered = this.get('path_altered');
+      var p_altered = this.get('pathAltered');
       p_altered.setValue(false);
-      this.set('path_altered', p_altered);
+      this.set('pathAltered', p_altered);
 
       return geom;
 

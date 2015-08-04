@@ -14,11 +14,12 @@ define([
 	'utils/PFloat',
 	'utils/PColor',
 	'utils/PBool',
+	'utils/PString',
 	'utils/PProperty',
 	'utils/PConstraint',
 	'utils/TrigFunc',
 	'utils/ColorUtils'
-], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PProperty, PConstraint, TrigFunc, ColorUtils) {
+], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
 	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
@@ -35,12 +36,12 @@ define([
 		defaults: _.extend({}, SceneNode.prototype.defaults, {
 
 			//selection defaults
-			selected: false,
+		
 			proto_selected: false,
 			inheritor_selected: false,
 			ancestor_selected: false,
 			selected_indexes: null,
-			constraint_selected: null,
+
 
 			//bounding box defaults
 			bbox: null,
@@ -64,11 +65,12 @@ define([
 			strokeColor: null,
 			fillColor: null,
 			stroke_width: null,
-			path_altered: null,
+			pathAltered: null,
 			val: null,
 			index: null,
-			member_count: null,
-
+			memberCount: null,
+			constraintSelected: null,
+			selected: null,
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
@@ -89,6 +91,10 @@ define([
 				strokeColor: ['r', 'g', 'b', 'a'],
 				fillColor: ['r', 'g', 'b', 'a'],
 				stroke_width: ['val'],
+				selected: ['val'],
+				constraintSelected: ['val'],
+				memberCount: ['val'],
+				pathAltered: ['val']
 				//inheritors: []
 			},
 
@@ -207,17 +213,26 @@ define([
 				bottomRight: null,
 			});
 
-			var path_altered = new PBool(false);
-			path_altered.setNull(true);
-			this.set('path_altered', path_altered);
+			var pathAltered = new PBool(false);
+			pathAltered.setNull(true);
+			this.set('pathAltered', pathAltered);
 
 			var index = new PFloat(0);
 			index.setNull(false);
 			this.set('index', index);
 
-			var member_count = new PFloat(1);
-			member_count.setNull(false);
-			this.set('member_count', member_count);
+			var memberCount = new PFloat(1);
+			memberCount.setNull(false);
+
+			var selected= new PBool(false);
+			selected.setNull(false);
+			this.set('selected', selected);
+
+			var constraintSelected = new PString(false);
+			constraintSelected.setNull(false);
+			this.set('constraintSelected', constraintSelected);
+
+			this.set('memberCount', memberCount);
 
 			this.set('id', this.get('type') + '_' + new Date().getTime().toString());
 
@@ -233,6 +248,7 @@ define([
 					if (constrainMap.hasOwnProperty(propertyName)) {
 						var property = this.get(propertyName);
 						if (property) {
+							console.log('property name',propertyName);
 							this.listenTo(property, 'modified', this.modified);
 						}
 					
@@ -291,7 +307,7 @@ define([
 
 		/* getRange: function used to modify constraints mappings for lists*/
 		getRange: function() {
-			return 1; //this.get('member_count').getValue();
+			return 1; //this.get('memberXount').getValue();
 		},
 
 		toggleOpen: function(item) {
@@ -422,8 +438,8 @@ define([
 		},
 
 		setPathAltered: function() {
-			var path_altered = this.get('path_altered');
-			path_altered.setValue(true);
+			var pathAltered = this.get('pathAltered');
+			pathAltered.setValue(true);
 		},
 
 		reset: function() {
@@ -451,19 +467,11 @@ define([
 		},
 
 
-		//triggered on change of select property, removes bbox
-		selectionChange: function() {
-			if (!this.get('selected')) {
-				if (this.get('bbox')) {
-					//			this.get('bbox').visible = false;
-				}
-			}
-		},
-
+		
 		// sets the geom visibility to false
 		hide: function() {
 			this.set('visible', false);
-			this.set('selected', false);
+			this.get('selected').setValue(false);
 			this.get('geom').visible = false; // hacky
 			this.get('selection_clone').visible = false;
 		},
@@ -471,7 +479,7 @@ define([
 		show: function() {
 			this.set('visible', true);
 			this.get('geom').visible = true;
-			if (this.get('constraint_selected')) {
+			if (this.get('constraintSelected').getValue()) {
 				this.get('selection_clone').visible = true;
 			}
 
@@ -976,12 +984,12 @@ define([
 
 
 		deselect: function() {
-			this.set('selected', false);
+			this.get('selected').setValue(false);
 			this.setSelectionForInheritors(false);
 		},
 
 		select: function(segments) {
-			this.set('selected', true);
+			this.get('selected').setValue(true);
 			this.setSelectionForInheritors(true, null, null, 1);
 		},
 
@@ -1212,8 +1220,9 @@ define([
 		},
 
 		renderSelection: function(geom) {
-			var selected = this.get('selected');
-			var constraint_selected = this.get('constraint_selected');
+			var selected = this.get('selected').getValue();
+			console.log('renderSelection',selected);
+			var constraint_selected = this.get('constraintSelected').getValue();
 			var bbox;
 			var selection_clone = this.get('selection_clone');
 
@@ -1245,7 +1254,7 @@ define([
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 			geom.bringToFront();
-			var path_altered = this.get('path_altered').getValue();
+			var pathAltered = this.get('pathAltered').getValue();
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
 
@@ -1260,7 +1269,7 @@ define([
 				})[0];
 				targetLayer.addChild(bbox);
 			}
-			if (!path_altered) {
+			if (!pathAltered) {
 				//geom.transform(this._itemp_matrix);
 				geom.transform(this._ti_matrix);
 				geom.transform(this._si_matrix);
@@ -1304,7 +1313,7 @@ define([
 
 			this.updateScreenBounds(geom);
 
-			this.get('path_altered').setValue(false);
+			this.get('pathAltered').setValue(false);
 			geom.visible = visible;
 			return geom;
 		},

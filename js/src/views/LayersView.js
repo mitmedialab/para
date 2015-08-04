@@ -378,7 +378,7 @@ define([
 		},
 
 		toggleSelection: function(activeNode, shape) {
-			var select = shape.get('selected');
+			var select = shape.get('selected').getValue();
 			this.deselectAll(shapeRoot, true);
 			if (!select) {
 				this.model.selectShape(shape);

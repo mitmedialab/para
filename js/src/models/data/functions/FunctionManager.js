@@ -90,7 +90,7 @@ define([
 				//this.convert(paramList[i]);
 				//f.addParameter(paramList[i]);
 				childList[i].hide();
-				childList[i].set('selected', false);
+				childList[i].get('selected').setValue(false);
 				var center = childList[i].getValueFor('center');
 				centers.x += center.x;
 				centers.y += center.y;

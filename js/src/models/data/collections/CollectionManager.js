@@ -16,7 +16,6 @@ define([
 	//stores para lists
 	var lists, renderQueue, duplicators;
 	var collectionView;
-	var compile = 1;
 	var remove = 2;
 	var search = 4;
 
@@ -146,40 +145,11 @@ define([
 			return members;
 		},
 
-		/* compileCollections
-		 * method to begin rendering process of collections
-		 * following rendering of all non-list items in the tree
-		 * (calls visit on each member of listsToCompile array with render argument set
-		 * to true
-		 */
-		compileCollections: function() {
-			var state_data = {
-				state: compile
-			};
-			for (var i = 0; i < lists.length; i++) {
-				this.visit(lists[i], null, state_data);
-			}
-		},
-
 		/* visit funciton for lists */
 		visit: function(node, departure_node, state_data) {
 			var member;
 			var state = state_data.state;
 			switch (state) {
-				case compile:
-					node.reset();
-
-					var changed = node.compile();
-					if(changed){
-						renderQueue.push(node);
-					}
-					for (var i = 0; i < node.members.length; i++) {
-						member = node.members[i];
-						if (member.get('type') === 'collection') {
-							member.visit(this, 'visit', node, state_data);
-						}
-					}
-					break;
 				case search:
 					if (node.get('id') === state_data.id) {
 						return node;

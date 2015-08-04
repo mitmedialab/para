@@ -26,9 +26,9 @@ define([
       this.members = [];
       this.offsets = [];
 
-      var member_count = new PFloat(0);
-      member_count.setNull(false);
-      this.set('member_count', member_count);
+      var memberCount = new PFloat(0);
+      memberCount.setNull(false);
+      this.set('memberCount', memberCount);
 
       this.get('translationDelta').setNull(false);
       this.get('scalingDelta').setNull(false);
@@ -78,18 +78,19 @@ define([
 
           // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
+           this.listenTo(data[i],'modified',this.modified);
         }
       } else {
-        //this.listenTo(data, 'delete', this.deleteMember);
+        this.listenTo(data,'modified',this.modified);
         this.members.push(data);
       }
 
      
-      var member_count = {
+      var memberCount = {
         val: this.members.length,
         operator: 'set'
       };
-      this.get('member_count').setValue(member_count);
+      this.get('memberCount').setValue(memberCount);
       //this.computeCentroid();
 
     },
@@ -183,11 +184,12 @@ define([
       var index = $.inArray(data, this.members);
       if (index > -1) {
         var member = this.members.splice(index, 1)[0];
-       var member_count = {
+       var memberCount = {
           val: this.members.length,
           operator: 'set'
         };
-        this.get('member_count').setValue(member_count);
+        this.get('memberCount').setValue(memberCount);
+        this.stopListening(member);
         return member;
       }
 
@@ -319,7 +321,7 @@ getLiteralSubprops: function(key, subprop) {
 
 
     getMemberNumber: function() {
-      return this.getValueFor('member_count');
+      return this.getValueFor('memberCount');
     },
 
     getMemberIndex: function(member) {
@@ -401,7 +403,7 @@ getLiteralSubprops: function(key, subprop) {
     //triggered on change of select property, removes bbox
     selectionChange: function() {
       Instance.prototype.selectionChange.call(this, arguments);
-      if (!this.get('selected')) {
+      if (!this.get('selected').getValue()) {
         this.get('ui').visible = false;
       }
     },

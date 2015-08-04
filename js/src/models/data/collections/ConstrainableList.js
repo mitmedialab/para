@@ -192,8 +192,8 @@ define([
       },
 
       renderSelection: function(ui) {
-        var selected = this.get('selected');
-        var constraint_selected = this.get('constraint_selected');
+        var selected = this.get('selected').getValue();
+        var constraint_selected = this.get('constraintSelected').getValue();
         var selection_clone = this.get('selection_clone');
         var bbox = this.get('bbox');
         if (constraint_selected) {
@@ -216,8 +216,8 @@ define([
           }
 
           bbox.selectedColor = this.getSelectionColor();
-          bbox.selected = this.get('selected');
-          bbox.visible = this.get('selected');
+          bbox.selected = this.get('selected').getValue();
+          bbox.visible = this.get('selected').getValue();
           if (this.get('open')) {
             bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
             bbox.strokeWidth = 1;

@@ -208,14 +208,14 @@ define([
         }
       }
       var instance = selected[0];
-      instance.set('selected', false);
+      instance.get('selected').setValue(false);
       if (this.get('relatives')) {
         if (this.get('references')) {
-          this.get('references').set('constraint_selected', undefined);
+          this.get('references').set('constraintSelected', false);
 
         }
         this.set('references', instance);
-        instance.set('constraint_selected', 'reference_selected');
+        instance.get('constraintSelected').setValue('reference_selected');
         this.set('ref_type', type);
 
         // create proxy with important logic // TODO: maybe class it?
@@ -262,11 +262,11 @@ define([
         return true;
       }
       if (this.get('relatives')) {
-        this.get('relatives').set('constraint_selected', undefined);
+        this.get('relatives').get('constraintSelected').setValue(false);
       }
 
       this.set('relatives', instance);
-      instance.set('constraint_selected', 'relative_selected');
+      instance.get('constraintSelected').setValue('relative_selected');
       this.set('rel_type', type);
       return false;
     },
@@ -462,7 +462,8 @@ define([
           data[rel_prop_key] = evalObj;
         }
         console.log('data =', data);
-        relative.setValue(data);
+
+        //relative.setValue(data);
         return data;
       };
 
@@ -653,11 +654,11 @@ define([
 
     clearSelection: function() {
       if (this.get('references')) {
-        this.get('references').set('constraint_selected', undefined);
+        this.get('references').get('constraintSelected').setValue(false);
 
       }
       if (this.get('relatives')) {
-        this.get('relatives').set('constraint_selected', undefined);
+        this.get('relatives').get('constraintSelected').setValue(false);
 
       }
     },
