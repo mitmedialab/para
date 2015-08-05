@@ -55,15 +55,17 @@ define([
      */
       setValue: function(data) {
         var constrained_props = this.getConstraintValues();
-        var stripped_data = TrigFunc.strip(data, constrained_props);
         for (var i = 0; i < this.members.length; i++) {
+          if(constrained_props[i]){
+          var stripped_data = TrigFunc.strip(data, constrained_props[i]);
+          console.log('stripped_data=',stripped_data,constrained_props[i],data);
           this.members[i].setValue(stripped_data);
         }
-        for (var p in stripped_data) {
-          if (stripped_data.hasOwnProperty(p)) {
-            this.trigger('change:' + p);
-          }
+        else{
+          this.members[i].setValue(data);
         }
+        
+       }
         this.setNull(false);
       },
 
@@ -146,25 +148,21 @@ define([
         }
       },
 
-      compile: function() {
-        var constraint_values = this.get('merged') ? this.get('merged') : this.getConstraintValues();
+      //callback triggered when a subproperty is modified externally 
+      modified: function() {
+        var constraint_values = this.getConstraintValues();
         console.log('constraint_values',constraint_values,constraint_values.length,this.members.length);
         for (var i = 0; i < this.members.length; i++) {
-          this.compileMemberAt(i, constraint_values[i]);
+          this.setValueForMemberAt(i, constraint_values[i]);
         }
-
-        return true;
+        this.trigger('modified', this);
       },
 
-      modifyPriorToCompile: function(data) {
-        var value = this.getConstraintValues();
-        var merged = TrigFunc.merge(value, data);
-      },
-
-      compileMemberAt: function(index, data) {
+      
+      setValueForMemberAt: function(index, data) {
         console.log('constraint_values',data);
         var member = this.members[index];
-        member.modifyPriorToCompile(data);
+        member.setValue(data);
       },
 
       //renders the List UI

@@ -77,10 +77,10 @@ define([
 
           // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
-           this.listenTo(data[i],'modified',this.modified);
+          // this.listenTo(data[i],'modified',this.modified);
         }
       } else {
-        this.listenTo(data,'modified',this.modified);
+        //this.listenTo(data,'modified',this.modified);
         this.members.push(data);
       }
 
@@ -188,7 +188,7 @@ define([
           operator: 'set'
         };
         this.get('memberCount').setValue(memberCount);
-        this.stopListening(member);
+        //this.stopListening(member);
         return member;
       }
 
