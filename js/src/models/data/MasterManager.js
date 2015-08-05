@@ -677,10 +677,6 @@ define([
 			if (constraints.length > 0) {
 				for (var i = 0; i < constraints.length; i++) {
 					var constraint = constraints[i];
-					constraint.setRefValueLength();
-					constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
-					var values = mapView.calculateValueSet(constraint);
-					constraint.calculateReferenceValues();
 					if (cId && cId === constraint.get('id')) {
 						this.updateMapView(constraint.get('id'));
 					}

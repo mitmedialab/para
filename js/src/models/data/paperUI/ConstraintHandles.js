@@ -169,7 +169,7 @@ define([
         return arrows;
       };
 
-      var geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('proxy');
+      var geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('relatives').get('geom');
 
       if (!geom) {
         console.log('[ERROR] Cannot draw constraint handles without instance.');
@@ -267,7 +267,7 @@ define([
 
     redraw: function() {
       var geometry = this.get('geometry');
-      var object_geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('proxy');
+      var object_geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('relatives').get('geom');
       var delbox = geometry.children['delbox'];
       delbox.bounds = object_geom.bounds;
       var corners = geometry.getItems({
@@ -480,12 +480,10 @@ define([
       if (this.get('side') == 'ref') {
         applyClick(ref_target, ref_geom, 'ref');
         applyClick(rel_target, rel_geom, 'rel');
-        constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
         //constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
       } else {
         applyClick(rel_target, rel_geom, 'rel');
-        constraint.get('proxy').reset();
         constraint.get('rel_handle').redraw();
         //constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
       }

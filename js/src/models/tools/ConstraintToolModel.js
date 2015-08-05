@@ -118,6 +118,10 @@ define([
 
     },
 
+    mouseDrag: function(event){
+
+    },
+
     //checks to see if constraint is currently pending
     checkPending: function() {
       var constraint = this.get('currentConstraint');
@@ -132,6 +136,8 @@ define([
       var constraint = this.get('currentConstraint');
       var ref_prop = constraint.get('ref_prop');
       var rel_prop = constraint.get('rel_prop');
+      constraint.clearUI();
+      constraint.clearSelection();
       constraint.create([[ref_prop,rel_prop]]);
       var constraintMap = this.get('constraints');
       constraintMap[constraint.get('id')] = constraint;
@@ -159,10 +165,8 @@ define([
           relHandle.hide();
           break;
         case 'rel':
-          var proxy = constraint.get('proxy');
           var refHandle = constraint.get('ref_handle');
           var relHandle = constraint.get('rel_handle');
-          proxy.show();
           refHandle.hide();
           relHandle.show();
           break;
@@ -245,111 +249,7 @@ define([
       }
     },
 
-    mouseDrag: function(event) {
-      switch (this.get('mode')) {
-        case 'rel':
-          this.relMouseDrag(event);
-          break;
-      }
-    },
-
-
-    relMouseDrag: function(event) {
-      if (event.modifiers.shift && this.draggingHandle) {
-        var constraint = this.get('currentConstraint');
-        var proxy = constraint.get('proxy');
-        var rel_geom = constraint.get('relatives').get('geom');
-        if (proxy instanceof paper.Group) {
-          rel_geom = constraint.get('relatives').getInstanceMembers().map(function(instance) {
-            return instance.get('geom');
-          });
-        }
-        switch (this.draggingHandle) {
-          case 'scale_x':
-            if (!(proxy instanceof paper.Group)) {
-              var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
-              proxy.scaling = new paper.Point(x_scale, proxy.scaling.y);
-            } else {
-              var x_scale = 2 * Math.abs(event.point.x - proxy.children[0].position.x) / rel_geom[0].bounds.width;
-              for (var i = 0; i < proxy.children.length; i++) {
-                var proxy_child = proxy.children[i];
-                var rel_child = rel_geom[i];
-                proxy_child.scaling = new paper.Point(x_scale, proxy_child.scaling.y);
-              }
-            }
-            break;
-          case 'scale_y':
-            if (!(proxy instanceof paper.Group)) {
-              var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
-              proxy.scaling = new paper.Point(proxy.scaling.x, y_scale);
-            } else {
-              var y_scale = 2 * Math.abs(event.point.y - proxy.children[0].position.y) / rel_geom[0].bounds.height;
-              for (var i = 0; i < proxy.children.length; i++) {
-                var proxy_child = proxy.children[i];
-                var rel_child = rel_geom[i];
-                proxy_child.scaling = new paper.Point(proxy_child.scaling.x, y_scale);
-              }
-            }
-            break;
-          case 'scale_xy':
-            if (!(proxy instanceof paper.Group)) {
-              var x_scale = 2 * Math.abs(event.point.x - proxy.position.x) / rel_geom.bounds.width;
-              var y_scale = 2 * Math.abs(event.point.y - proxy.position.y) / rel_geom.bounds.height;
-              proxy.scaling = new paper.Point(x_scale, y_scale);
-            } else {
-              var x_scale = 2 * Math.abs(event.point.x - proxy.children[0].position.x) / rel_geom[0].bounds.width;
-              var y_scale = 2 * Math.abs(event.point.y - proxy.children[0].position.y) / rel_geom[0].bounds.height;
-              for (var i = 0; i < proxy.children.length; i++) {
-                var proxy_child = proxy.children[i];
-                var rel_child = rel_geom[i];
-                proxy_child.scaling = new paper.Point(x_scale, y_scale);
-              }
-            }
-            break;
-          case 'position_x':
-            if (!(proxy instanceof paper.Group)) {
-              proxy.position.x = event.point.x;
-            } else {
-              var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
-              proxy.position.x = event.point.x - child_pos_delta.x;
-            }
-            break;
-          case 'position_y':
-            if (!(proxy instanceof paper.Group)) {
-              proxy.position.y = event.point.y;
-            } else {
-              var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
-              proxy.position.y = event.point.y - child_pos_delta.y;
-            }
-            break;
-          case 'position_xy':
-            if (!(proxy instanceof paper.Group)) {
-              proxy.position.x = event.point.x;
-              proxy.position.y = event.point.y;
-            } else {
-              var child_pos_delta = proxy.children[0].position.subtract(proxy.position);
-              proxy.position.x = event.point.x - child_pos_delta.x;
-              proxy.position.y = event.point.y - child_pos_delta.y;
-            }
-            break;
-          case 'rotation':
-            var work_geom = (proxy instanceof paper.Group) ? proxy.children[0] : proxy;
-            var angle = event.lastPoint.subtract(work_geom.position).angle;
-            var dAngle = event.point.subtract(work_geom.position).angle;
-            if (!(proxy instanceof paper.Group)) {
-              proxy.rotation = (proxy.rotation + (dAngle - angle));
-            } else {
-              for (var i = 0; i < proxy.children.length; i++) {
-                proxy.children[i].rotation = proxy.children[i].rotation + (dAngle - angle);
-              }
-            }
-            break;
-        }
-
-        constraint.get('rel_handle').redraw();
-      }
-    },
-
+  
     mouseUp: function(event) {
       switch (this.get('mode')) {
         case 'create':
@@ -375,8 +275,6 @@ define([
     relMouseUp: function(event) {
       if (this.draggingHandle) {
         var constraint = this.get('currentConstraint');
-        var proxy = constraint.get('proxy');
-        //constraint.matchProperty(constraint.get('ref_prop'), constraint.get('rel_prop'));
         this.draggingHandle = false;
       }
     },

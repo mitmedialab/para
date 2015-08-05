@@ -947,7 +947,6 @@ define([
 		getConstraintValues: function() {
 			var constraints = this.getConstraint();
 			if (constraints.getValue) {
-				console.log('self constrained');
 				return constraints.getValue();
 			} else {
 				var value = {};
@@ -1089,16 +1088,9 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
-			//console.log('compiling', this.get('id'), 'isValid:', this.isValid());
-			//if (this.isValid() || this.get('merged')) {
-			//	return false;
-			//} else {
 			var value = this.getValue();
 			this.compileTransformation(value);
 			this.compileStyle(value);
-			return true;
-			//}
-			//this.set('merged', null);
 		},
 
 		compileTransformation: function(value) {

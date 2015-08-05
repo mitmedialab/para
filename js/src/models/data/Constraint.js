@@ -121,7 +121,6 @@ define([
       expression: '',
 
       // UI
-      proxy: null,
       ref_handle: null,
       rel_handle: null,
       commit_box: null,
@@ -144,7 +143,6 @@ define([
     initialize: function() {
       var self = this;
 
-      this.set('proxy', new paper.Path());
       this.set('ref_handle', new ConstraintHandles({
         constraint: this,
         side: 'ref',
@@ -218,47 +216,11 @@ define([
         instance.get('constraintSelected').setValue('reference_selected');
         this.set('ref_type', type);
 
-        // create proxy with important logic // TODO: maybe class it?
         var constraint = this;
         var relatives = this.get('relatives');
         var references = this.get('references');
         var rel_geom = relatives.get('geom');
         var ref_geom = references.get('geom');
-
-        //start of the proxy code: try to remove this //
-        var proxy = relatives.getShapeClone();
-        var targetLayer = paper.project.layers.filter(function(layer) {
-          return layer.name === 'geometry_layer';
-        })[0];
-        targetLayer.addChild(proxy);
-        proxy.name = 'proxy';
-        proxy.visible = false;
-        proxy.show = function() {
-          relatives.hide();
-          proxy.visible = true;
-        };
-        proxy.hide = function() {
-          relatives.show();
-          proxy.visible = false;
-        };
-        proxy.reset = function() {
-          if (this instanceof paper.Group) {
-            var check_rels = relatives.getInstanceMembers();
-            for (var i = 0; i < this.children.length; i++) {
-              this.children[i].scaling = 1;
-              this.children[i].rotation = check_rels[i].get('geom').rotation;
-              this.children[i].position = check_rels[i].get('geom').position;
-            }
-          } else {
-            this.scaling = 1;
-            this.rotation = rel_geom.rotation;
-            this.position = rel_geom.position;
-          }
-          paper.view.draw();
-        };
-
-        this.set('proxy', proxy);
-
         return true;
       }
       if (this.get('relatives')) {
@@ -290,7 +252,6 @@ define([
 
         for (var i = 0; i < rel_dimensions.length; i++) {
           offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
-          console.log("rel offset for", rel_dimensions[i], offset[rel_dimensions[i]]);
           for (var p = 0; p < relativeRange; p++) {
             instance = relative;
             if (relative.get('type') === 'collection') {
@@ -350,7 +311,6 @@ define([
     },
 
     propSwitch: function(propName, subprops, instance) {
-      console.log('propName subprops', propName, subprops);
       var instance_value = instance.getValue();
       var propValue = {};
       for (var i = 0; i < subprops.length; i++) {
@@ -371,6 +331,9 @@ define([
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
     create: function(properties) {
+      console.log('creating constraint',properties);
+      this.stopListening();
+
       var offsets = [];
       var expressions = [];
       var refProperties = [];
@@ -379,13 +342,10 @@ define([
       var self = this;
       var reference = this.get('references');
       var relative = this.get('relatives');
-
-      this.get('proxy').hide();
-      this.clearUI();
-      this.clearSelection();
       var relative_dimensions = relative.get('dimension_num');
-      console.log('relative value pre', relative.getValue());
-
+       this.listenTo(relative.get('memberCount'),'modified',function(){
+        self.create(properties);
+      });
       for (var j = 0; j < properties.length; j++) {
 
         var ref_prop = properties[j][0];
@@ -418,14 +378,13 @@ define([
         this.listenTo(reference.get('memberCount'), 'modified', function() {
           (
             function(rpk, rd) {
-              console.log("member count modified");
               self.setReferenceValues(rpk, rd);
             }(ref_prop_key, ref_dimensions)
           );
         });
-
       }
-      console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties, 'reference_values', this.get('reference_values'));
+     
+     // console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties, 'reference_values', this.get('reference_values'));
       /*for (var prop in this.get('reference_values')) {
         for (var d in this.get('reference_values')[prop]) {
           for (var z = 0; z < this.get('reference_values')[prop][d].length; z++) {
@@ -434,7 +393,6 @@ define([
         }
       }*/
       this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
-      console.log('relative value post', relative.getValue());
 
     },
 
@@ -451,7 +409,7 @@ define([
           var expression = expressions[i];
           var offset = offsets[i];
           var a_keys = Object.keys(expression);
-          var relative_range = relative.getRange(); 
+          var relative_range = relative.get('memberCount').getValue();
 
           for (var z = 0; z < relative_range; z++) {
             var data = {};
@@ -469,15 +427,13 @@ define([
               var offsetValue = offset[axis][z];
               var y;
               eval(expression[axis]);
-              console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
+              //console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
               evalObj[axis] = y;
             }
 
           }
         }
-        console.log('list data =', list);
-        console.trace();
-        if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection') {
           return list;
         } else {
           return list[0];
@@ -525,7 +481,6 @@ define([
           self.listenTo(target_prop, 'modified', function() {
             (
               function(rpk, td, rv) {
-                console.log("listener function called", rpk, td, rv);
                 self.calculateReferenceValues(rpk, td, rv);
               }(ref_prop_key, target_dimension, reference_values[ref_prop_key])
             );
@@ -565,7 +520,6 @@ define([
 
 
     calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values) {
-      console.log('calculate reference values for', ref_prop_key, ref_dimension);
       var reference = this.get('references');
       if (reference) {
         var members;
@@ -631,6 +585,7 @@ define([
         var range = this.get('relatives').getRange();
 
         for (var m = 0; m < range; m++) {
+          console.log('calculating reference value for relative at',m);
           var x;
           if (range == 1) {
             x = (points.length - 1) / 2;
@@ -653,14 +608,11 @@ define([
     },
 
     clearUI: function() {
-      this.get('proxy').hide();
-      this.get('proxy').remove();
-      this.get('ref_handle').remove();
-      this.get('rel_handle').remove();
-      this.set('proxy', null);
-      this.set('ref_handle', null);
-      this.set('rel_handle', null);
-
+        this.get('ref_handle').remove();
+        this.get('rel_handle').remove();
+        this.set('ref_handle', null);
+        this.set('rel_handle', null);
+    
     },
 
     clearSelection: function() {

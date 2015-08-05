@@ -58,9 +58,7 @@ define([
         for (var i = 0; i < this.members.length; i++) {
           if(constrained_props[i]){
           var set_data = this.members[i].getAddedValueFor(data);
-          console.log('set_data=',set_data);
           var stripped_data = TrigFunc.strip(set_data, constrained_props[i]);
-          console.log('stripped_data=',stripped_data,constrained_props[i],data);
           this.members[i].setValue(stripped_data);
         }
         else{
@@ -154,7 +152,6 @@ define([
       //callback triggered when a subproperty is modified externally 
       modified: function() {
         var constraint_values = this.getConstraintValues();
-        console.log('constraint_values',constraint_values,constraint_values.length,this.members.length);
         for (var i = 0; i < this.members.length; i++) {
           this.setValueForMemberAt(i, constraint_values[i]);
         }
@@ -163,7 +160,6 @@ define([
 
       
       setValueForMemberAt: function(index, data) {
-        console.log('constraint_values',data);
         var member = this.members[index];
         member.setValue(data);
       },
@@ -173,8 +169,10 @@ define([
         ListNode.prototype.render.call(this, arguments);
         var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();
-        for (var i = 0; i < this.indexNumbers.length; i++) {
+        console.log('member_length',this.members.length,'indexNumbers_length',this.indexNumbers.length);
+        for (var i = 0; i < this.members.length; i++) {
           var numText = this.indexNumbers[i];
+          if(numText){
           numText.content = (i + 1);
           numText.position = this.members[i].get('screen_bottom_left').toPaperPoint();
           numText.position.x += 10;
@@ -185,6 +183,7 @@ define([
             numText.visible = false;
           }
           numText.bringToFront();
+          }
         }
 
         ui.position = new paper.Point(bottomLeft.x + ui.bounds.width / 2, bottomLeft.y + ui.bounds.height / 2);
