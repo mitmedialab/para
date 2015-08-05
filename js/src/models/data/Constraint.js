@@ -33,7 +33,7 @@ define([
     'strokeColor:scalingDelta': 1,
     'strokeColor:rotationDelta': 100,
     'strokeColor:translationDelta': 100,
-
+    'strokeWidth:strokeWidth': 1,
   };
 
   var minMaxMap = {
@@ -61,6 +61,12 @@ define([
       v: {
         min: 0,
         max: 360
+      }
+    },
+   strokeWidth: {
+      v: {
+        min: 0.1,
+        max: 50
       }
     },
     fillColor: {

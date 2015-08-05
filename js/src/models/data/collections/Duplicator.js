@@ -60,6 +60,8 @@ define([
                     ['scalingDelta_xy', 'scalingDelta_xy'],
                     ['fillColor_hsl',  'fillColor_hsl'],
                     ['strokeColor_hsl',  'strokeColor_hsl'],
+                    ['rotationDelta_v','rotationDelta_v'],
+                    ['strokeWidth_v','strokeWidth_v']
                 ];
                 constraint.create(data);
                 return constraint;
