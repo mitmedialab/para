@@ -231,7 +231,7 @@ define([
 				lists.push(duplicator);
 			}
 
-			return duplicator;
+			return {duplicator:duplicator,toAdd:data.toAdd};
 		},
 
 

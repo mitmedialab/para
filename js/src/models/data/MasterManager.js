@@ -183,49 +183,48 @@ define([
 
 		addListener: function(target) {
 			this.stopListening(target);
+			target.compile();
+			target.render();
 			this.listenTo(target, 'modified', this.modified);
 		},
 
+		removeListener: function(target){
+			this.stopListening(target);
+		},
+
 		addObject: function(object, geom) {
-			var target;
 			switch (object) {
 				case 'geometry':
-					target = this.addShape(geom);
+					this.addShape(geom);
 					break;
 				case 'instance':
-					target = this.addInstance();
+					this.addInstance();
 					break;
 				case 'function':
-					target = this.addFunction(collectionManager.getLists());
+					this.addFunction(collectionManager.getLists());
 					break;
 				case 'param':
-					target = this.createParams();
+					 this.createParams();
 					break;
 				case 'list':
-					target = collectionManager.addList(selected);
-					layersView.addList(target.toJSON());
+					var list = collectionManager.addList(selected);
 					this.deselectAllShapes();
-					this.selectShape(target);
+					if (list) {
+						layersView.addList(list.toJSON());
+						this.selectShape(list);
+						this.addListener(list);
+					}
 					break;
 				case 'group':
-
 					break;
-
 				case 'duplicator':
-
 					if (selected[0]) {
-						target = this.addDuplicator(selected[0]);
-						this.deselectAllShapes();
-						this.selectShape(target);
+						this.addDuplicator(selected[0]);
 
 					}
 					break;
 			}
-			if (target) {
-				this.addListener(target);
-				target.compile();
-				target.render();
-			}
+
 		},
 
 
@@ -408,7 +407,9 @@ define([
 				layersView.addShape(shape.toJSON());
 			}
 			this.selectShape(shape);
-			return shape;
+
+			this.addListener(shape);
+
 
 		},
 
@@ -418,30 +419,42 @@ define([
 			if (parent) {
 				var duplicator = collectionManager.getDuplicatorThatContains(parent);
 
-				var newInstance;
+				var lastInstance;
 				if (duplicator) {
 					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
-					newInstance = duplicator.getLastMember();
-					newInstance.get('translationDelta').setValue(parent.get('translationDelta').getValue());
-					duplicator.setIndex(duplicator.getMemberIndex(parent), newInstance);
+					lastInstance = duplicator.getLastMember();
+					lastInstance.get('translationDelta').setValue(parent.get('translationDelta').getValue());
+					duplicator.setIndex(duplicator.getMemberIndex(parent), lastInstance);
 				} else {
 					duplicator = this.addDuplicator(parent);
+					this.deselectShape(duplicator);
 					collectionManager.toggleOpenLists([duplicator]);
 
 					this.setDuplicatorCount(2, duplicator);
-					newInstance = duplicator.getLastMember();
+					lastInstance = duplicator.getLastMember();
 				}
 				this.deselectShape(parent);
 
-				this.selectShape(newInstance);
-				return newInstance;
+				this.selectShape(lastInstance);
+
 			}
 		},
 
 		addDuplicator: function(object, open) {
-			var duplicator = collectionManager.addDuplicator(object);
-			layersView.addList(duplicator.toJSON());
-			return duplicator;
+			this.deselectAllShapes();
+			var data = collectionManager.addDuplicator(object);
+			layersView.addList(data.duplicator.toJSON());
+			this.selectShape(data.duplicator);
+			var targets = [data.duplicator];
+			if (data.toAdd) {
+				targets = targets.concat(data.toAdd);
+			}
+
+			for (var i = 0; i < targets.length; i++) {
+				this.addListener(targets[i]);
+			}
+			return data.duplicator;
+
 		},
 
 		duplicatorCountModified: function(data, duplicator) {
@@ -470,6 +483,16 @@ define([
 				for (var i = 0; i < selected.length; i++) {
 					data = selected[i].setCount(value);
 					this.duplicatorCountModified(data, selected[i]);
+				}
+			}
+			if (data.toRemove) {
+				for (var k = 0; k < data.toRemove.length; k++) {
+					this.removeListener(data.toRemove[k]); 
+				}
+			}
+			if (data.toAdd) {
+				for (var j = 0; j < data.toAdd.length; j++) {
+					this.addListener(data.toAdd[j]);
 				}
 			}
 		},

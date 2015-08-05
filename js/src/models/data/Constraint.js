@@ -415,17 +415,24 @@ define([
         expressions.push(expression);
 
         this.setReferenceValues(ref_prop_key, ref_dimensions);
-
+        this.listenTo(reference.get('memberCount'), 'modified', function() {
+          (
+            function(rpk, rd) {
+              console.log("member count modified");
+              self.setReferenceValues(rpk, rd);
+            }(ref_prop_key, ref_dimensions)
+          );
+        });
 
       }
       console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties, 'reference_values', this.get('reference_values'));
-      for (var prop in this.get('reference_values')) {
+      /*for (var prop in this.get('reference_values')) {
         for (var d in this.get('reference_values')[prop]) {
           for (var z = 0; z < this.get('reference_values')[prop][d].length; z++) {
             console.log('reference value at ', prop, d, z, "=", this.get('reference_values')[prop][d][z].getValue());
           }
         }
-      }
+      }*/
       this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
       console.log('relative value post', relative.getValue());
 
@@ -444,8 +451,7 @@ define([
           var expression = expressions[i];
           var offset = offsets[i];
           var a_keys = Object.keys(expression);
-          var relative_range = relative.getRange();
-
+          var relative_range = relative.getRange(); 
 
           for (var z = 0; z < relative_range; z++) {
             var data = {};

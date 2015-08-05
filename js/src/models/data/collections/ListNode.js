@@ -525,7 +525,7 @@ getLiteralSubprops: function(key, subprop) {
     },
 
     getRange: function() {
-      return this.members.length;
+      return this.get('memberCount').getValue();
     }
 
 

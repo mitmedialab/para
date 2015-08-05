@@ -211,14 +211,6 @@ define([
                 }
             },
 
-            /*compileMemberAt: function(index, data) {
-                var member = this.members[index];
-                if(member!=this.get('target')){
-                    member.modifyPriorToCompile(data);
-                }
-            },*/
-
-
 
         });
         return Duplicator;
