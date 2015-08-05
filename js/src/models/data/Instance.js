@@ -238,7 +238,6 @@ define([
 
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
-			this.on('change:selected', this.selectionChange);
 			this.isReturned = false;
 
 			var parent = this;
@@ -666,13 +665,6 @@ define([
 		},
 
 
-		modifyPriorToCompile: function(data) {
-			var value = this.getValue();
-			var merged = TrigFunc.merge(value, data);
-			this.set('merged', merged);
-		},
-
-
 		_modifyMatrixAfterCompile: function(property_name, internal_matrix, attribute_constraint, value, set) {
 			//attribute is not constrained, modification allowed
 
@@ -801,7 +793,7 @@ define([
 		},
 
 
-	
+
 		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);
 		},
@@ -812,26 +804,26 @@ define([
 		 */
 		setValue: function(data) {
 
-				for (var prop in data) {
-					if (data.hasOwnProperty(prop)) {
+			for (var prop in data) {
+				if (data.hasOwnProperty(prop)) {
 
-						var p = data[prop];
-						if (typeof data[prop] !== 'object') {
-							p = {
-								val: data[prop]
-							};
-						}
-						if (!p.operator) {
-							p.operator = 'set';
-						}
-						if (p.operator === 'set') {
-							this.get(prop).setValue(p);
-						} else if (p.operator === 'add') {
-							this.get(prop).add(p);
-						}
+					var p = data[prop];
+					if (typeof data[prop] !== 'object') {
+						p = {
+							val: data[prop]
+						};
+					}
+					if (!p.operator) {
+						p.operator = 'set';
+					}
+					if (p.operator === 'set') {
+						this.get(prop).setValue(p);
+					} else if (p.operator === 'add') {
+						this.get(prop).add(p);
 					}
 				}
-			
+			}
+
 			this.setNull(false);
 		},
 
@@ -879,7 +871,35 @@ define([
 			}
 		},
 
-	/* getConstraint
+
+		/*calculates a new value given a dataset of values to be added */
+		getAddedValueFor: function(data) {
+			var addedData = {};
+			for (var p in data) {
+				if (data.hasOwnProperty(p)) {
+					if (data[p].operator !== 'set') {
+						var current_val = this.getValueFor(p);
+						if (current_val) {
+							addedData[p] = {};
+							for (var d in data[p]) {
+								if (data[p].hasOwnProperty(d)) {
+									if (current_val.hasOwnProperty(d)) {
+										addedData[p][d] = data[p][d] + current_val[d];
+									} else if (typeof current_val === 'number' && d === 'val') {
+										addedData[p][d] = data[p][d] + current_val;
+									}
+								}
+							}
+						}
+					} else {
+						addedData[p] = data[p];
+					}
+				}
+			}
+			return addedData;
+		},
+
+		/* getConstraint
 		 * returns an object comprised of all existing constraints in one of 3 states:
 		 *
 		 * 1) if entire instance is constrained by a function returns {self: constraint_obj}
@@ -926,27 +946,26 @@ define([
 
 		getConstraintValues: function() {
 			var constraints = this.getConstraint();
-			if(constraints.getValue){
+			if (constraints.getValue) {
 				console.log('self constrained');
 				return constraints.getValue();
-			}
-			else{
-			var value = {};
-			for (var c in constraints) {
-				if (constraints.hasOwnProperty(c)) {
-					if (constraints[c].getValue) {
-						value[c] = constraints[c].getValue();
-					} else {
-						value[c] = {};
-						for (var v in constraints[c]) {
-							if (constraints[c].hasOwnProperty(v)) {
-								value[c][v] = constraints[c][v].getValue();
+			} else {
+				var value = {};
+				for (var c in constraints) {
+					if (constraints.hasOwnProperty(c)) {
+						if (constraints[c].getValue) {
+							value[c] = constraints[c].getValue();
+						} else {
+							value[c] = {};
+							for (var v in constraints[c]) {
+								if (constraints[c].hasOwnProperty(v)) {
+									value[c][v] = constraints[c][v].getValue();
+								}
 							}
 						}
 					}
 				}
-			}
-			return value;
+				return value;
 			}
 		},
 

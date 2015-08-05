@@ -46,11 +46,6 @@ define([
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].setValue(data, mode, modifier);
       }
-      for (var p in data) {
-        if (data.hasOwnProperty(p)) {
-          this.trigger('change:' + p);
-        }
-      }
       this.setNull(false);
     },
 
