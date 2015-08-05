@@ -24,12 +24,12 @@ define([
       this.set('userParams', [{
         label: 'width',
         type: 'text_box',
-        val: 0,
+        v: 0,
         property_name: 'width'
       }, {
         label: 'height',
         type: 'text_box',
-        val: 0,
+        v: 0,
         property_name: 'height'
       }]);
     },

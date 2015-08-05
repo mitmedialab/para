@@ -18,16 +18,16 @@ define([
 				dimension_num: 1
 			}),
 			/* constructor
-			 * val: initial value of the float
+			 * v: initial value of the float
 			 * operator: optional argument to specify the
 			 * operation performed when property is modified
 			 */
-			constructor: function(val, operator) {
+			constructor: function(v, operator) {
 				
-				if (val === true) {
-					this.val = new PProperty(1);
-				} else if (val === false) {
-					this.val = new PProperty(0);
+				if (v === true) {
+					this.v = new PProperty(1);
+				} else if ( v === false) {
+					this.v = new PProperty(0);
 				}
 				PFloat.apply(this, arguments);
 				
@@ -41,11 +41,11 @@ define([
 			/* setValue
 			 * sets the value of the property
 			 */
-			setValue: function(val) {
-				if (val) {
-					this.val.setValue(1);
+			setValue: function(v) {
+				if (v) {
+					this.v.setValue(1);
 				} else {
-					this.val.setValue(0);
+					this.v.setValue(0);
 				}
 				this.setNull(false);
 			},
@@ -56,15 +56,15 @@ define([
 			 * otherwise just returns the current value of val.
 			 */
 			getValue: function() {
-				var v;
+				var d;
 				if (!this.isSelfConstrained()) {
-					v = this.val.getValue();
+					d = this.v.getValue();
 				} else {
-					v = this.getSelfConstraint().getValue();
+					d = this.getSelfConstraint().getValue();
 				}
-				if (v === 1) {
+				if (d === 1) {
 					return true;
-				} else if (v === 0) {
+				} else if (d === 0) {
 					return false;
 				}
 

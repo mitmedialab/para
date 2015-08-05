@@ -272,7 +272,7 @@ define([
       var value = parseInt($(event.target).val(), 10);
       var data = {
         strokeWidth: {
-          val: value,
+          v: value,
           operator: 'set'
         }
       };

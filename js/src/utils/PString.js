@@ -18,12 +18,12 @@ define([
 				dimension_num: 1
 			}),
 			/* constructor
-			 * val: initial value of the float
+			 * v: initial value of the float
 			 * operator: optional argument to specify the
 			 * operation performed when property is modified
 			 */
-			constructor: function(val, operator) {
-				this.val = new PProperty(val);
+			constructor: function(v, operator) {
+				this.v = new PProperty(v);
 				PBool.apply(this, arguments);
 				if (operator) {
 					this.set('operator', operator);
@@ -34,8 +34,8 @@ define([
 			/* setValue
 			 * sets the value of the property
 			 */
-			setValue: function(val) {
-				this.val.setValue(val);
+			setValue: function(v) {
+				this.v.setValue(v);
 				this.setNull(false);
 			},
 
@@ -45,13 +45,13 @@ define([
 			 * otherwise just returns the current value of val.
 			 */
 			getValue: function() {
-				var v;
+				var d;
 				if (!this.isSelfConstrained()) {
-					v = this.val.getValue();
+					d = this.v.getValue();
 				} else {
-					v = this.getSelfConstraint().getValue();
+					d = this.getSelfConstraint().getValue();
 				}
-				return v;
+				return d;
 
 			},
 

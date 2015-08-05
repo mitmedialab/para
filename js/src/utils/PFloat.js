@@ -1,7 +1,7 @@
 /*PFloat.js*
  * constrainable float class
  * for para instance properties
- * x: PProperty object for storing float value
+ * x: PProperty object for storing float vue
  */
 
 define([
@@ -20,12 +20,12 @@ define([
 				dimension_num: 1
 			}),
 			/* constructor
-			 * val: initial value of the float
+			 * v: initial value of the float
 			 * operator: optional argument to specify the
 			 * operation performed when property is modified
 			 */
-			constructor: function(val, operator) {
-				this.val = new PProperty(val);
+			constructor: function(v, operator) {
+				this.v = new PProperty(v);
 				PConstraint.apply(this, arguments);
 				if (operator) {
 					this.set('operator', operator);
@@ -60,28 +60,28 @@ define([
 			 * sets the value of the property
 			 */
 			setValue: function(data) {
-				if (data.val) {
-					this.val.setValue(data.val);
+				if (data.v) {
+					this.v.setValue(data.v);
 					this.setNull(false);
 				} else if (typeof data === "number") {
-					this.val.setValue(data);
+					this.v.setValue(data);
 					this.setNull(false);
 				}
 			},
 
 			/*
-			messageConstraint: function(val){
+			messageConstraint: function(v){
 				this.trigger('constraint_set')
 			},*/
 
 			/* getValue
-			 * checks to see if val is constrained
+			 * checks to see if v is constrained
 			 * and if so, returns the constraint value
 			 * otherwise just returns the current value of val.
 			 */
 			getValue: function() {
 				if (!this.isSelfConstrained()) {
-					return this.val.getValue();
+					return this.v.getValue();
 				} else {
 					return this.getSelfConstraint().getValue();
 				}
@@ -102,41 +102,41 @@ define([
 					float2.add(data);
 					return float2;
 				} else {
-					if (data.val) {
-						this.setValue(this.val.getValue() + data.val);
+					if (data.v) {
+						this.setValue(this.v.getValue() + data.v);
 					} else if (typeof data === "number") {
-						this.setValue(this.val.getValue() + data);
+						this.setValue(this.v.getValue() + data);
 					}
 				}
 			},
 
-			sub: function(val, newP) {
+			sub: function(v, newP) {
 				if (newP) {
 					var float2 = this.clone();
-					float2.sub(val);
+					float2.sub(v);
 					return float2;
 				} else {
-					this.setValue(this.val.getValue() - val);
+					this.setValue(this.v.getValue() - v);
 				}
 			},
 
-			div: function(val, newP) {
+			div: function(v, newP) {
 				if (newP) {
 					var float2 = this.clone();
-					float2.div(val);
+					float2.div(v);
 					return float2;
 				} else {
-					this.setValue(this.val.getValue() / val);
+					this.setValue(this.v.getValue() / v);
 				}
 			},
 
-			mul: function(val, newP) {
+			mul: function(v, newP) {
 				if (newP) {
 					var float2 = this.clone();
-					float2.mul(val);
+					float2.mul(v);
 					return float2;
 				} else {
-					this.setValue(this.val.getValue() * val);
+					this.setValue(this.v.getValue() * v);
 				}
 			},
 

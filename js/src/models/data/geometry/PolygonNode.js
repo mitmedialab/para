@@ -26,7 +26,7 @@ define([
         label: 'points',
         max: 15,
         min: 3,
-        val: 6,
+        v: 6,
         property_name: 'point_num'
       }]);
     },

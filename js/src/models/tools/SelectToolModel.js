@@ -217,7 +217,7 @@ define([
         var dAngle = event.point.subtract(posPoint).angle;
         var data = {};
         data.rotationDelta = {
-          val: dAngle - angle,
+          v: dAngle - angle,
           operator: 'add'
         };
         this.trigger('geometryModified', data, event.modifiers);

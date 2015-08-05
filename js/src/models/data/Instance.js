@@ -23,11 +23,11 @@ define([
 
 
 	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
+		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'v', 'name', 'type', 'visible', 'closed', 'order', 'id'
 	];
 
 	var constraints = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'val'
+		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'v'
 	];
 
 	var Instance = SceneNode.extend({
@@ -66,7 +66,7 @@ define([
 			fillColor: null,
 			strokeWidth: null,
 			pathAltered: null,
-			val: null,
+			v: null,
 			index: null,
 			memberCount: null,
 			constraintSelected: null,
@@ -86,15 +86,15 @@ define([
 				translationDelta: ['x', 'y'],
 				scaling_origin: ['x', 'y'],
 				scalingDelta: ['x', 'y'],
-				rotation_origin: ['val'],
-				rotationDelta: ['val'],
+				rotation_origin: ['v'],
+				rotationDelta: ['v'],
 				strokeColor: ['r', 'g', 'b', 'a'],
 				fillColor: ['r', 'g', 'b', 'a'],
-				strokeWidth: ['val'],
-				selected: ['val'],
-				constraintSelected: ['val'],
-				memberCount: ['val'],
-				pathAltered: ['val']
+				strokeWidth: ['v'],
+				selected: ['v'],
+				constraintSelected: ['v'],
+				memberCount: ['v'],
+				pathAltered: ['v']
 					//inheritors: []
 			},
 
@@ -168,7 +168,7 @@ define([
 			this.set('sibling_instances', []);
 			this.set('inheritors', new InheritorCollection(this));
 			this.get('inheritors').setNull(false);
-			this.set('val', new PProperty(0));
+			this.set('v', new PProperty(0));
 
 
 			//============private properties==============//
@@ -810,7 +810,7 @@ define([
 					var p = data[prop];
 					if (typeof data[prop] !== 'object') {
 						p = {
-							val: data[prop]
+							v: data[prop]
 						};
 					}
 					if (!p.operator) {
@@ -851,7 +851,9 @@ define([
 			}
 			if (this.isSelfConstrained()) {
 				var constrained_values = this.getSelfConstraint().getValue();
-				return TrigFunc.merge(value, constrained_values);
+				var merged = TrigFunc.merge(value, constrained_values);
+				console.log('get instance value',value,constrained_values,merged);
+				return merged;
 			} else {
 				return value;
 			}
@@ -885,7 +887,7 @@ define([
 								if (data[p].hasOwnProperty(d)) {
 									if (current_val.hasOwnProperty(d)) {
 										addedData[p][d] = data[p][d] + current_val[d];
-									} else if (typeof current_val === 'number' && d === 'val') {
+									} else if (typeof current_val === 'number' && d === 'v') {
 										addedData[p][d] = data[p][d] + current_val;
 									}
 								}

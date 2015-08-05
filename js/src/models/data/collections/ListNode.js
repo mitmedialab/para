@@ -87,7 +87,7 @@ define([
 
      
       var memberCount = {
-        val: this.members.length,
+        v: this.members.length,
         operator: 'set'
       };
       this.get('memberCount').setValue(memberCount);
@@ -188,7 +188,7 @@ define([
 
         var member = this.members.splice(index, 1)[0];
        var memberCount = {
-          val: this.members.length,
+          v: this.members.length,
           operator: 'set'
         };
         this.get('memberCount').setValue(memberCount);

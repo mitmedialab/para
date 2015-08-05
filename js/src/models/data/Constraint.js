@@ -429,7 +429,13 @@ define([
                 var y;
                 eval(expression[axis]);
                 //console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
-                list[z][rel_prop_key][axis] = y;
+                if(axis === 'v'){
+                  list[z][rel_prop_key] = y;
+                }
+                else{
+                  list[z][rel_prop_key][axis] = y;
+                }
+                
               }
 
             }

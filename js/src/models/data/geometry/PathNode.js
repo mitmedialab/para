@@ -78,7 +78,7 @@ define([
         rotationDelta = matrix.rotation;
       }
       data.rotationDelta = {
-        val: rotationDelta
+        v: rotationDelta
       };
 
       data.scalingDelta = {
@@ -124,7 +124,7 @@ define([
         data.strokeColor={noColor:true};
       }
       data.strokeWidth = {
-        val: path.strokeWidth
+        v: path.strokeWidth
       };
 
       var imatrix = matrix.inverted();
