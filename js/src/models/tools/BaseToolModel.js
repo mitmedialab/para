@@ -18,7 +18,7 @@ define([
       matrix: null,
       fillColor: {a:1,r:1,g:1,b:1,h:0,s:0 ,l:1,noColor:false},
       strokeColor: {a:1,r:0,g:0,b:0,h:0,s:0 ,l:0,noColor:false},
-      stroke_width: 1,
+      strokeWidth: 1,
       'tool-mode': 'standard',
       'tool-modifier': 'none',
 

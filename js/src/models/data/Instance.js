@@ -23,11 +23,11 @@ define([
 
 
 	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'stroke_width', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
+		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'val', 'name', 'type', 'visible', 'closed', 'order', 'id'
 	];
 
 	var constraints = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'stroke_width', 'val'
+		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'val'
 	];
 
 	var Instance = SceneNode.extend({
@@ -64,7 +64,7 @@ define([
 			rotationDelta: null,
 			strokeColor: null,
 			fillColor: null,
-			stroke_width: null,
+			strokeWidth: null,
 			pathAltered: null,
 			val: null,
 			index: null,
@@ -90,7 +90,7 @@ define([
 				rotationDelta: ['val'],
 				strokeColor: ['r', 'g', 'b', 'a'],
 				fillColor: ['r', 'g', 'b', 'a'],
-				stroke_width: ['val'],
+				strokeWidth: ['val'],
 				selected: ['val'],
 				constraintSelected: ['val'],
 				memberCount: ['val'],
@@ -162,9 +162,9 @@ define([
 			fillColor.setNull(true);
 			this.set('fillColor', fillColor);
 
-			var stroke_width = new PFloat(0);
-			stroke_width.setNull(true);
-			this.set('stroke_width', stroke_width);
+			var strokeWidth = new PFloat(0);
+			strokeWidth.setNull(true);
+			this.set('strokeWidth', strokeWidth);
 			this.set('sibling_instances', []);
 			this.set('inheritors', new InheritorCollection(this));
 			this.get('inheritors').setNull(false);
@@ -198,7 +198,7 @@ define([
 				a: undefined
 			};
 
-			this._stroke_width = undefined;
+			this._strokeWidth = undefined;
 			this._rotation_origin = undefined;
 			this._scaling_origin = undefined;
 			this._position = undefined;
@@ -542,8 +542,8 @@ define([
 				this.get('strokeColor').setNull(true);
 			}
 
-			if (data.stroke_width) {
-				this.get('stroke_width').setNull(true);
+			if (data.strokeWidth) {
+				this.get('strokeWidth').setNull(true);
 			}
 			if (recurse) {
 				var inheritors = this.get('inheritors');
@@ -1138,11 +1138,11 @@ define([
 			if (merged) {
 				this._fillColor = merged.fillColor;
 				this._strokeColor = merged.strokeColor;
-				this._stroke_width = merged.stroke_width;
+				this._strokeWidth = merged.strokeWidth;
 			} else {
 				this._fillColor = value.fillColor;
 				this._strokeColor = value.strokeColor;
-				this._stroke_width = value.stroke_width;
+				this._strokeWidth = value.strokeWidth;
 			}
 
 			//TODO: consider changing visible to a constrainable property?
@@ -1196,7 +1196,7 @@ define([
 				geom.strokeColor = undefined;
 			}
 
-			geom.strokeWidth = this._stroke_width;
+			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
 
 		},

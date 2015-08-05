@@ -85,7 +85,7 @@ define(['jquery',
         styledata = {
           fillColor: (literal.fillColor) ? literal.fillColor.toCSS(true) : null,
           strokeColor: (literal.strokeColor) ? literal.strokeColor.toCSS(true) : null,
-          stroke_width: (literal.strokeWidth) ? literal.strokeWidth : null
+          strokeWidth: (literal.strokeWidth) ? literal.strokeWidth : null
         };
         this.setToolStyle(styledata);
       }
@@ -109,8 +109,8 @@ define(['jquery',
       if (data.fillColor) {
         style.fillColor = data.fillColor;
       }
-      if (data.stroke_width) {
-        style.stroke_width = data.stroke_width.val;
+      if (data.strokeWidth) {
+        style.strokeWidth = data.strokeWidth.val;
       }
       selectedTool.set('style', style);*/
     },

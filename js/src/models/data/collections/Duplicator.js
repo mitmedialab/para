@@ -58,7 +58,8 @@ define([
                 var data = [
                     ['translationDelta_xy', 'translationDelta_xy'],
                     ['scalingDelta_xy', 'scalingDelta_xy'],
-                    ['fillColor_hsl',  'fillColor_hsl']
+                    ['fillColor_hsl',  'fillColor_hsl'],
+                    ['strokeColor_hsl',  'strokeColor_hsl'],
                 ];
                 constraint.create(data);
                 return constraint;

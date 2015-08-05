@@ -201,8 +201,8 @@ define([
     },
 
     setToolStyle: function(style_data) {
-      if (style_data.stroke_width) {
-        style_data.stroke_width = style_data.stroke_width.val;
+      if (style_data.strokeWidth) {
+        style_data.strokeWidth = style_data.strokeWidth.val;
       }
       toolCollection.forEach(function(model, index) {
         model.set(style_data);

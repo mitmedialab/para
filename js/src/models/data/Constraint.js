@@ -435,7 +435,7 @@ define([
             }
           
         }
-
+        console.log('list',list);
         if (relative.get('type') === 'collection') {
           return list;
         } else {

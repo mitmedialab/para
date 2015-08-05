@@ -66,7 +66,7 @@ define([
         if (this.get('mode') !== 'pen') {
           polyPath.selected = true;
         }
-        polyPath.strokeWidth = this.get('stroke_width');
+        polyPath.strokeWidth = this.get('strokeWidth');
         var strokeColor = this.get('strokeColor');
         if (!strokeColor.noColor) {
           polyPath.strokeColor = new paper.Color({ hue: strokeColor.h, saturation: strokeColor.s, lightness: strokeColor.l });
@@ -265,7 +265,7 @@ define([
           polyPath = new paper.Path.Ellipse(rectangle);
         }
         polyPath.selected = true;
-        polyPath.strokeWidth = this.get('stroke_width');
+        polyPath.strokeWidth = this.get('strokeWidth');
        var strokeColor = this.get('strokeColor');
         if (!strokeColor.noColor) {
           polyPath.strokeColor = new paper.Color({ hue: strokeColor.h, saturation: strokeColor.s, lightness: strokeColor.l });

@@ -35,7 +35,7 @@ define([
       this.get('rotationDelta').setNull(false);
       this.get('fillColor').setNull(false);
       this.get('strokeColor').setNull(false);
-      this.get('stroke_width').setNull(false);
+      this.get('strokeWidth').setNull(false);
     },
 
     /*setValue

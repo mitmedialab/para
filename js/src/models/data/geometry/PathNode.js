@@ -123,7 +123,7 @@ define([
       else{
         data.strokeColor={noColor:true};
       }
-      data.stroke_width = {
+      data.strokeWidth = {
         val: path.strokeWidth
       };
 

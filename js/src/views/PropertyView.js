@@ -209,7 +209,7 @@ define([
         this.undelegateEvents();
         var fillColor = selected_shape.getValueFor('fillColor');
         var strokeColor = selected_shape.getValueFor('strokeColor');
-        var stroke_width = selected_shape.getValueFor('stroke_width');
+        var strokeWidth = selected_shape.getValueFor('strokeWidth');
         if (fillColor) {
           if (fillColor.noColor) {
             $('#fillColorBlock').addClass('remove-color');
@@ -234,8 +234,8 @@ define([
             }
           }
         }
-        if (stroke_width) {
-          $('#strokeSlider').val(stroke_width);
+        if (strokeWidth) {
+          $('#strokeSlider').val(strokeWidth);
         }
 
         //this.setParams(params,id);
@@ -271,7 +271,7 @@ define([
     strokeChange: function(event) {
       var value = parseInt($(event.target).val(), 10);
       var data = {
-        stroke_width: {
+        strokeWidth: {
           val: value,
           operator: 'set'
         }
