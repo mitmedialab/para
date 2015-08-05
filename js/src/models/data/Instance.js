@@ -852,7 +852,6 @@ define([
 			if (this.isSelfConstrained()) {
 				var constrained_values = this.getSelfConstraint().getValue();
 				var merged = TrigFunc.merge(value, constrained_values);
-				console.log('get instance value',value,constrained_values,merged);
 				return merged;
 			} else {
 				return value;

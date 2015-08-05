@@ -336,7 +336,6 @@ define([
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
     create: function(properties) {
-      console.log('create constraint called');
       this.stopListening(); 
       var offsets = [];
       var expressions = [];
@@ -388,14 +387,6 @@ define([
         });
       }
 
-      // console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties, 'reference_values', this.get('reference_values'));
-      /*for (var prop in this.get('reference_values')) {
-        for (var d in this.get('reference_values')[prop]) {
-          for (var z = 0; z < this.get('reference_values')[prop][d].length; z++) {
-            console.log('reference value at ', prop, d, z, "=", this.get('reference_values')[prop][d][z].getValue());
-          }
-        }
-      }*/
       this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
 
     },
@@ -434,7 +425,6 @@ define([
                 var offsetValue = 0; //offset[axis][z];
                 var y;
                 eval(expression[axis]);
-                //console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
                 if(axis === 'v'){
                   list[z][rel_prop_key] = y;
                 }
@@ -447,7 +437,6 @@ define([
             }
           
         }
-        console.log('list',list);
         if (relative.get('type') === 'collection') {
           return list;
         } else {
@@ -600,7 +589,6 @@ define([
             expression = polynomial[k] + '*Math.pow(x,' + k + ")+" + expression;
           }
         }
-        // console.log('expression', expression, 'min', min, 'max', max);
         var range = this.get('relatives').getRange();
 
         for (var m = 0; m < range; m++) {

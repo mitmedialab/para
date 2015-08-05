@@ -260,7 +260,7 @@ define([
 		},
 
 		toggleOpenLists: function(selected) {
-
+			this.closeAllLists();
 			var openedLists = [];
 			var openedItems = [];
 			var members = [];
