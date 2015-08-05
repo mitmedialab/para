@@ -42,13 +42,11 @@ define([
 			 * sets the value of the property
 			 */
 			setValue: function(val) {
-				console.log('setting pbool value',val);
 				if (val) {
 					this.val.setValue(1);
 				} else {
 					this.val.setValue(0);
 				}
-				console.log('pbool value',this.getValue());
 				this.setNull(false);
 			},
 

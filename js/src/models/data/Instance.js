@@ -36,7 +36,7 @@ define([
 		defaults: _.extend({}, SceneNode.prototype.defaults, {
 
 			//selection defaults
-		
+
 			proto_selected: false,
 			inheritor_selected: false,
 			ancestor_selected: false,
@@ -95,7 +95,7 @@ define([
 				constraintSelected: ['val'],
 				memberCount: ['val'],
 				pathAltered: ['val']
-				//inheritors: []
+					//inheritors: []
 			},
 
 			dimension_num: 9,
@@ -224,7 +224,7 @@ define([
 			var memberCount = new PFloat(1);
 			memberCount.setNull(false);
 
-			var selected= new PBool(false);
+			var selected = new PBool(false);
 			selected.setNull(false);
 			this.set('selected', selected);
 
@@ -243,18 +243,17 @@ define([
 
 			var parent = this;
 			var constrainMap = this.get('constrain_map');
-			
-				for (var propertyName in constrainMap) {
-					if (constrainMap.hasOwnProperty(propertyName)) {
-						var property = this.get(propertyName);
-						if (property) {
-							console.log('property name',propertyName);
-							this.listenTo(property, 'modified', this.modified);
-						}
-					
+
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					var property = this.get(propertyName);
+					if (property) {
+						this.listenTo(property, 'modified', this.modified);
 					}
-				}	
-			
+
+				}
+			}
+
 
 		},
 
@@ -467,7 +466,7 @@ define([
 		},
 
 
-		
+
 		// sets the geom visibility to false
 		hide: function() {
 			this.set('visible', false);
@@ -802,60 +801,7 @@ define([
 		},
 
 
-		/* getConstraint
-		 * returns an object comprised of all existing constraints in one of 3 states:
-		 *
-		 * 1) if entire instance is constrained by a function returns {self: constraint_obj}
-		 *
-		 * 2) if some of the attributes of the instance are constrainted, returns an object with a
-		 * list of the currently constrained attributes of this instance, with references to these
-		 * constraints eg {translationDelta:{x:constraint_obj},rotationDelta:{self:constraint_obj}}
-		 * note: these objects will either contain 1 property "self", meaning that the entire attribute
-		 * is constrained, or several properties reflecting the sub-attribuites of the instance attribute which are constrained
-		 *
-		 * 3) if there are no constraints on the instance, returns an empty object
-		 *
-		 */
-		getConstraint: function() {
-			var constrainMap = this.get('constrain_map');
-			var data = {};
-			var self = this.getSelfConstraint();
-			if (self) {
-				data.self = self;
-				return data;
-			} else {
-				var constraintFound = false;
-				for (var propertyName in constrainMap) {
-					if (constrainMap.hasOwnProperty(propertyName)) {
-						var constraint = this.get(propertyName).getConstraint();
-						if (constraint) {
-							data[propertyName] = constraint;
-						}
-						constraintFound = true;
-					}
-				}
-				if (constraintFound) {
-					return data;
-				}
-			}
-
-
-		},
-
-		/*setConstraint: function(data) {
-			console.log('setting constraint',data);
-			var constrainMap = this.get('constrain_map');
-			var keys = Object.keys(data);
-			//if(keys.length === this.get('dimension_num'))
-			var value = {};
-			for (var propertyName in data) {
-				if (data.hasOwnProperty(propertyName) && constrainMap.hasOwnProperty(propertyName)) {
-					console.log('setting constraint for',propertyName, 'to',data[propertyName] );
-					this.get(propertyName).setConstraint(data[propertyName]);
-				}
-			}
-		},*/
-
+	
 		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);
 		},
@@ -865,25 +811,27 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
-			for (var prop in data) {
-				if (data.hasOwnProperty(prop)) {
 
-					var p = data[prop];
-					if (typeof data[prop] !== 'object') {
-						p = {
-							val: data[prop]
-						};
-					}
-					if (!p.operator) {
-						p.operator = 'set';
-					}
-					if (p.operator === 'set') {
-						this.get(prop).setValue(p);
-					} else if (p.operator === 'add') {
-						this.get(prop).add(p);
+				for (var prop in data) {
+					if (data.hasOwnProperty(prop)) {
+
+						var p = data[prop];
+						if (typeof data[prop] !== 'object') {
+							p = {
+								val: data[prop]
+							};
+						}
+						if (!p.operator) {
+							p.operator = 'set';
+						}
+						if (p.operator === 'set') {
+							this.get(prop).setValue(p);
+						} else if (p.operator === 'add') {
+							this.get(prop).add(p);
+						}
 					}
 				}
-			}
+			
 			this.setNull(false);
 		},
 
@@ -931,6 +879,44 @@ define([
 			}
 		},
 
+	/* getConstraint
+		 * returns an object comprised of all existing constraints in one of 3 states:
+		 *
+		 * 1) if entire instance is constrained by a function returns {self: constraint_obj}
+		 *
+		 * 2) if some of the attributes of the instance are constrainted, returns an object with a
+		 * list of the currently constrained attributes of this instance, with references to these
+		 * constraints eg {translationDelta:{x:constraint_obj},rotationDelta:{self:constraint_obj}}
+		 * note: these objects will either contain 1 property "self", meaning that the entire attribute
+		 * is constrained, or several properties reflecting the sub-attribuites of the instance attribute which are constrained
+		 *
+		 * 3) if there are no constraints on the instance, returns an empty object
+		 *
+		 */
+		getConstraint: function() {
+			var constrainMap = this.get('constrain_map');
+			var data = {};
+			var self = this.getSelfConstraint();
+			if (self) {
+				return self;
+			} else {
+				var constraintFound = false;
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						var constraint = this.get(propertyName).getConstraint();
+						if (constraint) {
+							data[propertyName] = constraint;
+						}
+						constraintFound = true;
+					}
+				}
+				if (constraintFound) {
+					return data;
+				}
+			}
+
+
+		},
 
 		/* getConstraintValues
 		 * returns an object containing all constrained properties of
@@ -940,6 +926,11 @@ define([
 
 		getConstraintValues: function() {
 			var constraints = this.getConstraint();
+			if(constraints.getValue){
+				console.log('self constrained');
+				return constraints.getValue();
+			}
+			else{
 			var value = {};
 			for (var c in constraints) {
 				if (constraints.hasOwnProperty(c)) {
@@ -956,6 +947,7 @@ define([
 				}
 			}
 			return value;
+			}
 		},
 
 
@@ -1221,7 +1213,6 @@ define([
 
 		renderSelection: function(geom) {
 			var selected = this.get('selected').getValue();
-			console.log('renderSelection',selected);
 			var constraint_selected = this.get('constraintSelected').getValue();
 			var bbox;
 			var selection_clone = this.get('selection_clone');

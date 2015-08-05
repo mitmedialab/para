@@ -419,13 +419,13 @@ define([
 
       }
       console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties, 'reference_values', this.get('reference_values'));
-      /*for(var prop in this.get('reference_values')){
-        for(var d in this.get('reference_values')[prop]){
-          for(var z=0;z< this.get('reference_values')[prop][d].length;z++){
-          console.log('reference value at ', prop, d, z, "=", this.get('reference_values')[prop][d][z].getValue());
+      for (var prop in this.get('reference_values')) {
+        for (var d in this.get('reference_values')[prop]) {
+          for (var z = 0; z < this.get('reference_values')[prop][d].length; z++) {
+            console.log('reference value at ', prop, d, z, "=", this.get('reference_values')[prop][d][z].getValue());
+          }
         }
       }
-      }*/
       this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
       console.log('relative value post', relative.getValue());
 
@@ -435,36 +435,47 @@ define([
     setConstraintOnInstance: function(relative, expressions, offsets, refProperties, relProperties) {
       var self = this;
       var constraintF = function() {
-        var data = {};
+
+        var list = [];
         for (var i = 0; i < refProperties.length; i++) {
           var ref_prop_key = refProperties[i][0];
           var rel_prop_key = relProperties[i][0];
           var ref_dimensions = refProperties[i][1];
           var expression = expressions[i];
           var offset = offsets[i];
-          var evalObj = {};
           var a_keys = Object.keys(expression);
-          for (var m = 0; m < a_keys.length; m++) {
-            var axis = a_keys[m];
-            var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
-            self.set('current_dimension', ap);
-            self.set('current_ref_property', ref_prop_key);
-            var reference_values = self.get('reference_values');
-            var x = reference_values[ref_prop_key][axis][relative.get('index').getValue()].getValue();
+          var relative_range = relative.getRange();
 
-            var offsetValue = offset[axis][relative.get('index').getValue()];
-            var y;
-            eval(expression[axis]);
-            console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
 
-            evalObj[axis] = y;
+          for (var z = 0; z < relative_range; z++) {
+            var data = {};
+            var evalObj = {};
+            data[rel_prop_key] = evalObj;
+            list.push(data);
+            for (var m = 0; m < a_keys.length; m++) {
+              var axis = a_keys[m];
+              var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
+              self.set('current_dimension', ap);
+              self.set('current_ref_property', ref_prop_key);
+              var reference_values = self.get('reference_values');
+              var x = reference_values[ref_prop_key][axis][z].getValue();
+
+              var offsetValue = offset[axis][z];
+              var y;
+              eval(expression[axis]);
+              console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
+              evalObj[axis] = y;
+            }
+
           }
-          data[rel_prop_key] = evalObj;
         }
-        console.log('data =', data);
-
-        //relative.setValue(data);
-        return data;
+        console.log('list data =', list);
+        console.trace();
+        if (relative.get('type') === 'collection') {
+          return list;
+        } else {
+          return list[0];
+        }
       };
 
       relative.setConstraint(constraintF);
@@ -488,7 +499,6 @@ define([
             }
     */
 
-
     setReferenceValues: function(ref_prop_key, ref_dimensions) {
       var reference_values = this.get('reference_values');
       var reference = this.get('references');
@@ -501,22 +511,27 @@ define([
       if (!reference_values[ref_prop_key]) {
         reference_values[ref_prop_key] = {};
       }
-
-      for (var i = 0; i < ref_dimensions.length; i++) {
-        var target_dimension = ref_dimensions[i];
+      var ref_dimension_array = ref_dimensions.split('');
+      ref_dimension_array.forEach(function(target_dimension) {
         var reference_subprops = reference.getLiteralSubprops(ref_prop_key, target_dimension);
-        for (var z = 0; z < reference_subprops.length; z++) {
-          this.listenTo(reference_subprops[z], 'modified', function() {
-            self.calculateReferenceValues(ref_prop_key, target_dimension, reference_values[ref_prop_key]);
+        reference_subprops.forEach(function(target_prop) {
+
+          self.listenTo(target_prop, 'modified', function() {
+            (
+              function(rpk, td, rv) {
+                console.log("listener function called", rpk, td, rv);
+                self.calculateReferenceValues(rpk, td, rv);
+              }(ref_prop_key, target_dimension, reference_values[ref_prop_key])
+            );
           });
-        }
+        });
         if (!reference_values[ref_prop_key][target_dimension]) {
           reference_values[ref_prop_key][target_dimension] = [];
 
         }
 
 
-        var diff = reference_values[ref_prop_key][target_dimension].length - this.get('relatives').getRange();
+        var diff = reference_values[ref_prop_key][target_dimension].length - self.get('relatives').getRange();
         if (diff > 0) {
           for (var j = 0; j < diff; j++) {
             var removedItem = reference_values[ref_prop_key][target_dimension].pop();
@@ -534,15 +549,9 @@ define([
             reference_values[ref_prop_key][target_dimension].push(newItem);
           }
         }
-        this.calculateReferenceValues(ref_prop_key, target_dimension, reference_values[ref_prop_key]);
-      }
+        self.calculateReferenceValues(ref_prop_key, target_dimension, reference_values[ref_prop_key]);
+      });
     },
-
-    referenceValueChanged: function(target) {
-      console.log('reference value changed', target, target.getValue());
-    },
-
-
 
     getRange: function() {
       return this.get('ref_value_list').length;
@@ -550,7 +559,7 @@ define([
 
 
     calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values) {
-      console.log('calculate reference values', ref_prop_key, ref_dimension, reference_values);
+      console.log('calculate reference values for', ref_prop_key, ref_dimension);
       var reference = this.get('references');
       if (reference) {
         var members;
@@ -596,19 +605,15 @@ define([
         var polynomial, expression;
 
         if (points.length < 2) {
-          console.log('1 points');
 
           polynomial = [points[0].y];
           expression = points[0].y;
         } else if (points.length < 3) {
-          console.log('2 points');
           var slope = (points[0].y - points[1].y) / (points[0].x - points[1].x);
           var b = points[0].y - (slope * points[0].x);
           polynomial = [slope, b];
           expression = slope + "*x+" + b;
         } else {
-          console.log('more than 2 points');
-
           polynomial = TrigFunc.Lagrange(points);
           expression = polynomial[0];
 
@@ -616,7 +621,7 @@ define([
             expression = polynomial[k] + '*Math.pow(x,' + k + ")+" + expression;
           }
         }
-        console.log('expression', expression, 'min', min, 'max', max);
+        // console.log('expression', expression, 'min', min, 'max', max);
         var range = this.get('relatives').getRange();
 
         for (var m = 0; m < range; m++) {

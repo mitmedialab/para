@@ -67,16 +67,17 @@ define([
         this.setNull(false);
       },
 
-      removeConstraint: function(prop,dimensions){
+
+      removeConstraint: function(prop, dimensions) {
         this.reset();
-         for (var i = 0; i < this.members.length; i++) {
+        for (var i = 0; i < this.members.length; i++) {
           var constraint_values = this.getConstraintValues();
           var data = {};
           data[prop] = constraint_values[prop];
-          this.members[i].setValue(data); 
+          this.members[i].setValue(data);
           this.increment();
         }
-        ListNode.prototype.removeConstraint.call(this,prop,dimensions);
+        ListNode.prototype.removeConstraint.call(this, prop, dimensions);
       },
 
 
@@ -139,28 +140,29 @@ define([
         var end = this.members.length;
         var value = this.get('index').getValue();
 
-        if (value < end-1) {
+        if (value < end - 1) {
           var newIndex = value + 1;
           this.get('index').setValue(newIndex);
         }
       },
 
-
       compile: function() {
+        var constraint_values = this.get('merged') ? this.get('merged') : this.getConstraintValues();
+        console.log('constraint_values',constraint_values,constraint_values.length,this.members.length);
         for (var i = 0; i < this.members.length; i++) {
-          var constraint_values = this.get('merged') ? this.get('merged') : this.getConstraintValues();
-          this.compileMemberAt(i, constraint_values);
-          this.increment();
+          this.compileMemberAt(i, constraint_values[i]);
         }
+
         return true;
       },
 
       modifyPriorToCompile: function(data) {
         var value = this.getConstraintValues();
-        var merged = TrigFunc.merge(value,data);
+        var merged = TrigFunc.merge(value, data);
       },
 
       compileMemberAt: function(index, data) {
+        console.log('constraint_values',data);
         var member = this.members[index];
         member.modifyPriorToCompile(data);
       },
@@ -188,6 +190,7 @@ define([
         this.startText.content = 'count: ' + String(this.members.length);
 
         this.renderSelection(ui);
+        this.trigger('rendered', this);
 
       },
 

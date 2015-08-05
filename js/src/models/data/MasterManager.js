@@ -131,12 +131,11 @@ define([
 			return ref_constraints;
 		},
 
-		constraintModeChanged: function(active){
+		constraintModeChanged: function(active) {
 			constraintMode = active;
-			if(constraintMode){
+			if (constraintMode) {
 				collectionView.disableAll();
-			}
-			else{
+			} else {
 				collectionView.toggleCollectionButtons(selected);
 			}
 			this.visualizeConstraint();
@@ -174,13 +173,17 @@ define([
 			}
 		},
 
-	
 
-		modified:function(target){
-			console.log('target',target.get('id'),'modified');
+
+		modified: function(target) {
 			target.reset();
 			target.compile();
 			target.render();
+		},
+
+		addListener: function(target) {
+			this.stopListening(target);
+			this.listenTo(target, 'modified', this.modified);
 		},
 
 		addObject: function(object, geom) {
@@ -209,17 +212,17 @@ define([
 					break;
 
 				case 'duplicator':
-	
+
 					if (selected[0]) {
 						target = this.addDuplicator(selected[0]);
 						this.deselectAllShapes();
 						this.selectShape(target);
 
 					}
-				break;
+					break;
 			}
-			if(target){
-				this.listenTo(target,'modified',this.modified);
+			if (target) {
+				this.addListener(target);
 				target.compile();
 				target.render();
 			}
@@ -386,7 +389,7 @@ define([
 				return selected.indexOf(item) === -1;
 			});
 			return functionManager.createFunction('my_function', selected);
-			
+
 		},
 
 		createParams: function() {
@@ -406,7 +409,7 @@ define([
 			}
 			this.selectShape(shape);
 			return shape;
-			
+
 		},
 
 		//called when creating an instance which inherits from existing shape
@@ -414,22 +417,22 @@ define([
 			var parent = this.getLastSelected();
 			if (parent) {
 				var duplicator = collectionManager.getDuplicatorThatContains(parent);
-				
+
 				var newInstance;
 				if (duplicator) {
 					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
 					newInstance = duplicator.getLastMember();
 					newInstance.get('translationDelta').setValue(parent.get('translationDelta').getValue());
-					duplicator.setIndex(duplicator.getMemberIndex(parent),newInstance);
+					duplicator.setIndex(duplicator.getMemberIndex(parent), newInstance);
 				} else {
 					duplicator = this.addDuplicator(parent);
 					collectionManager.toggleOpenLists([duplicator]);
-					
+
 					this.setDuplicatorCount(2, duplicator);
 					newInstance = duplicator.getLastMember();
 				}
 				this.deselectShape(parent);
-				
+
 				this.selectShape(newInstance);
 				return newInstance;
 			}
@@ -483,7 +486,7 @@ define([
 			if (constraint) {
 				var reference = constraint.get('references');
 				var relative = constraint.get('relatives');
-				relative.removeConstraint(constraint.get('rel_prop_key'),constraint.get('rel_prop_dimensions'));
+				relative.removeConstraint(constraint.get('rel_prop_key'), constraint.get('rel_prop_dimensions'));
 				this.visualizeConstraint();
 				layersView.removeConstraint(constraint.get('id'));
 			}
@@ -522,10 +525,10 @@ define([
 				this._selectSingleShape(data, segments);
 			}
 			this.updateLayers();
-			if(!constraintMode){
+			if (!constraintMode) {
 				collectionView.toggleCollectionButtons(selected);
 			}
-			
+
 		},
 
 
@@ -563,10 +566,10 @@ define([
 				this._deselectSingleShape(data);
 			}
 			this.updateLayers();
-			if(!constraintMode){
+			if (!constraintMode) {
 				collectionView.toggleCollectionButtons(selected);
 			}
-			
+
 
 
 		},

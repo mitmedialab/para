@@ -55,6 +55,7 @@ define([
 				ui.addChild(path);
 				ui.addChild(eye);
 				ui.addChild(this.nameText);
+				ui.visible = false;
 				this.nameText.data.instance = ui.data.instance = path.data.instance = eye.data.instance = this;
 				this.set('ui', ui);
 				this.lists = [];
@@ -197,7 +198,7 @@ define([
 			},
 
 			render: function() {
-				var ui = this.get('ui');
+				/*var ui = this.get('ui');
 				var open = this.get('open');
 				if (!open) {
 					ui.visible = true;
@@ -211,7 +212,7 @@ define([
 					}
 				} else {
 					ui.visible = false;
-				}
+				}*/
 
 			},
 

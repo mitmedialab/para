@@ -59,6 +59,7 @@
 				this.setNull(false);
 				if (!this.isSelfConstrained()) {
 					this.constraint = new PProperty(func);
+					this.listenTo(this.constraint, 'modified', this.modified);
 				} else {
 					this.constraint.setValue(func);
 				}
@@ -69,7 +70,6 @@
 
 			//callback triggered when a subproperty is modified externally 
 			modified: function() {
-				console.log('modified',this.get('name'));
 				this.trigger('modified', this);
 			},
 
