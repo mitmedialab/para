@@ -61,6 +61,9 @@ define([
           var set_data = this.members[i].getAddedValueFor(data);
           var stripped_data = TrigFunc.strip(set_data, constrained_props[i]);
           this.members[i].setValue(stripped_data);
+          }s
+          else{
+            this.members[i].setValue(data);
           }
         }
         else{

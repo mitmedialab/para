@@ -426,11 +426,12 @@ define([
 					lastInstance.get('translationDelta').setValue(parent.get('translationDelta').getValue());
 					duplicator.setIndex(duplicator.getMemberIndex(parent), lastInstance);
 				} else {
-					duplicator = this.slicator(parent);
+					duplicator = this.addDuplicator(parent);
 					this.deselectShape(duplicator);
 					collectionManager.toggleOpenLists([duplicator]);
 
 					this.setDuplicatorCount(2, duplicator);
+
 					lastInstance = duplicator.getLastMember();
 				}
 				this.deselectShape(parent);
@@ -442,10 +443,13 @@ define([
 
 		addDuplicator: function(object, open) {
 			this.deselectAllShapes();
-			var data = collectionManager.addDuplicator(object);
-			layersView.addList(data.duplicator.toJSON());
-			this.selectShape(data.duplicator);
-			var targets = [data.duplicator];
+			var duplicator= collectionManager.addDuplicator(object);
+			layersView.addList(duplicator.toJSON());
+			this.selectShape(duplicator);
+			var targets = [duplicator];
+			var data = duplicator.setCount(5);
+			this.duplicatorCountModified(data,duplicator);
+
 			if (data.toAdd) {
 				targets = targets.concat(data.toAdd);
 			}
@@ -453,7 +457,9 @@ define([
 			for (var i = 0; i < targets.length; i++) {
 				this.addListener(targets[i]);
 			}
-			return data.duplicator;
+			var constraint = duplicator.setInternalConstraint();
+			this.addConstraint(constraint);
+			return duplicator;
 
 		},
 

@@ -55,6 +55,7 @@ define([
                 console.log('internal list=', this.internalList, this.internalList.members);
                 constraint.set('references', this.internalList);
                 constraint.set('relatives', this);
+                constraint.set('proxy_references',this.get('target'));
                 var data = [
                     ['translationDelta_xy', 'translationDelta_xy'],
                     ['scalingDelta_xy', 'scalingDelta_xy'],

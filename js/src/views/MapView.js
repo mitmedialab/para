@@ -107,7 +107,7 @@ define([
 		
 			var cmin = constraint.getMin();
 			var cmax = constraint.getMax();
-			dimensions = constraint.get('rel_prop').split('_');
+			//dimensions = constraint.get('rel_prop').split('_');
 			this.setRange(constraint.getRange());
 			//var points = constraint.getReferencePoints();
 			//this.setMinMax(cmin,cmax,points[0]);
