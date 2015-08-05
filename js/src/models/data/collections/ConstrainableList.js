@@ -57,9 +57,11 @@ define([
         var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
           if(constrained_props[i]){
+          if(!this.isReference(this.members[i])){
           var set_data = this.members[i].getAddedValueFor(data);
           var stripped_data = TrigFunc.strip(set_data, constrained_props[i]);
           this.members[i].setValue(stripped_data);
+          }
         }
         else{
           this.members[i].setValue(data);
@@ -85,8 +87,8 @@ define([
 
 
       //overrides ListNode addMember and removeMember functions
-      addMember: function(data) {
-        ListNode.prototype.addMember.call(this, data);
+      addMember: function(data,index) {
+        ListNode.prototype.addMember.call(this, data, index);
         var diff = this.members.length - this.indexNumbers.length;
         for (var i = 0; i < diff; i++) {
           var numText = new paper.PointText({

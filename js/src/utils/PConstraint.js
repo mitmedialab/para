@@ -55,7 +55,7 @@
 			 * or initializes a new one if it does not exist
 			 * expects paramter to be a function
 			 */
-			setConstraint: function(func, r) {
+			setConstraint: function(func, constraint) {
 				this.setNull(false);
 				if (!this.isSelfConstrained()) {
 					this.constraint = new PProperty(func);
@@ -63,9 +63,8 @@
 				} else {
 					this.constraint.setValue(func);
 				}
-				if (r) {
-					this.reference = r;
-				}
+				this.constraintObject = constraint;
+				
 			},
 
 			//callback triggered when a subproperty is modified externally 
@@ -83,6 +82,7 @@
 					if (this.isSelfConstrained()) {
 						var value = this.getValue();
 						this.constraint = null;
+						this.constraintObject = null;
 						this.setValue(value);
 					}
 				} else {

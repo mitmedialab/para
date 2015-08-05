@@ -137,7 +137,6 @@ define([
       offset: null,
       map_operand: null,
       operators: null,
-      current_dimension: null,
     },
 
     initialize: function() {
@@ -331,8 +330,8 @@ define([
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
     create: function(properties) {
-      this.stopListening();
-
+      console.log('create constraint called');
+      this.stopListening(); 
       var offsets = [];
       var expressions = [];
       var refProperties = [];
@@ -342,7 +341,7 @@ define([
       var reference = this.get('references');
       var relative = this.get('relatives');
       var relative_dimensions = relative.get('dimension_num');
-       this.listenTo(relative.get('memberCount'),'modified',function(){
+      this.listenTo(relative.get('memberCount'), 'modified', function() {
         self.create(properties);
       });
       for (var j = 0; j < properties.length; j++) {
@@ -382,8 +381,8 @@ define([
           );
         });
       }
-     
-     // console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties, 'reference_values', this.get('reference_values'));
+
+      // console.log("offsets", offsets, "expressions", expressions, "constraint_data", constraint_data, refProperties, relProperties, 'reference_values', this.get('reference_values'));
       /*for (var prop in this.get('reference_values')) {
         for (var d in this.get('reference_values')[prop]) {
           for (var z = 0; z < this.get('reference_values')[prop][d].length; z++) {
@@ -401,45 +400,50 @@ define([
       var constraintF = function() {
 
         var list = [];
+        var relative_range = relative.get('memberCount').getValue();
+
+        for (var w = 0; w < relative_range; w++) {
+           list.push({});
+         }
         for (var i = 0; i < refProperties.length; i++) {
-          var ref_prop_key = refProperties[i][0];
-          var rel_prop_key = relProperties[i][0];
-          var ref_dimensions = refProperties[i][1];
-          var expression = expressions[i];
-          var offset = offsets[i];
-          var a_keys = Object.keys(expression);
-          var relative_range = relative.get('memberCount').getValue();
+         
+            var ref_prop_key = refProperties[i][0];
+            var rel_prop_key = relProperties[i][0];
+            var ref_dimensions = refProperties[i][1];
+            var expression = expressions[i];
+            var offset = offsets[i];
+            var a_keys = Object.keys(expression);
+           
+            for (var z = 0; z < relative_range; z++) {
+              
+              if(!list[z][rel_prop_key]){
+                list[z][rel_prop_key] = {};
+              }
 
-          for (var z = 0; z < relative_range; z++) {
-            var data = {};
-            var evalObj = {};
-            data[rel_prop_key] = evalObj;
-            list.push(data);
-            for (var m = 0; m < a_keys.length; m++) {
-              var axis = a_keys[m];
-              var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
-              self.set('current_dimension', ap);
-              self.set('current_ref_property', ref_prop_key);
-              var reference_values = self.get('reference_values');
-              var x = reference_values[ref_prop_key][axis][z].getValue();
+              for (var m = 0; m < a_keys.length; m++) {
+                var axis = a_keys[m];
+                var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
+                var reference_values = self.get('reference_values');
+                var x = reference_values[ref_prop_key][axis][z].getValue();
+                var offsetValue = 0; //offset[axis][z];
+                var y;
+                eval(expression[axis]);
+                //console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
+                list[z][rel_prop_key][axis] = y;
+              }
 
-              var offsetValue = 0;//offset[axis][z];
-              var y;
-              eval(expression[axis]);
-              //console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
-              evalObj[axis] = y;
             }
-
-          }
+          
         }
-          if (relative.get('type') === 'collection') {
+
+        if (relative.get('type') === 'collection') {
           return list;
         } else {
           return list[0];
         }
       };
 
-      relative.setConstraint(constraintF);
+      relative.setConstraint(constraintF, this);
       relative.getValue();
     },
 
@@ -475,15 +479,19 @@ define([
       var ref_dimension_array = ref_dimensions.split('');
       ref_dimension_array.forEach(function(target_dimension) {
         var reference_subprops = reference.getLiteralSubprops(ref_prop_key, target_dimension);
+
         reference_subprops.forEach(function(target_prop) {
 
-          self.listenTo(target_prop, 'modified', function() {
-            (
-              function(rpk, td, rv) {
-                self.calculateReferenceValues(rpk, td, rv);
-              }(ref_prop_key, target_dimension, reference_values[ref_prop_key])
-            );
-          });
+          (function(refVals) {
+            self.listenTo(target_prop, 'modified', function() {
+              (
+                function(rpk, td, rv) {
+                  self.calculateReferenceValues(rpk, td, rv);
+                }(ref_prop_key, target_dimension, refVals)
+              );
+            });
+          }(reference_values[ref_prop_key]));
+
         });
         if (!reference_values[ref_prop_key][target_dimension]) {
           reference_values[ref_prop_key][target_dimension] = [];
@@ -606,11 +614,11 @@ define([
     },
 
     clearUI: function() {
-        this.get('ref_handle').remove();
-        this.get('rel_handle').remove();
-        this.set('ref_handle', null);
-        this.set('rel_handle', null);
-    
+      this.get('ref_handle').remove();
+      this.get('rel_handle').remove();
+      this.set('ref_handle', null);
+      this.set('rel_handle', null);
+
     },
 
     clearSelection: function() {

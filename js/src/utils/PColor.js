@@ -176,9 +176,15 @@ define([
 				if (isConstrained.h || isConstrained.s || isConstrained.l) {
 					return;
 				}
-				this.setR(color.r, true);
-				this.setG(color.g, true);
-				this.setB(color.b, true);
+				if (color.r) {
+					this.setR(color.r, true);
+				}
+				if (color.g) {
+					this.setG(color.g, true);
+				}
+				if (color.b) {
+					this.setB(color.b, true);
+				}
 				var hsl = ColorUtils.rgbToHsl({
 					r: this.getR(),
 					g: this.getG(),
@@ -196,9 +202,15 @@ define([
 				if (isConstrained.r || isConstrained.g || isConstrained.b) {
 					return;
 				}
-				this.setH(color.h, true);
-				this.setS(color.s, true);
-				this.setL(color.l, true);
+				if (color.h) {
+					this.setH(color.h, true);
+				}
+				if (color.s) {
+					this.setS(color.s, true);
+				}
+				if (color.l) {
+					this.setL(color.l, true);
+				}
 				var rgb = ColorUtils.hslToRgb(this.getH(), this.getS(), this.getL());
 				this.setR(rgb[0], true);
 				this.setB(rgb[1], true);

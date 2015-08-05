@@ -426,7 +426,7 @@ define([
 					lastInstance.get('translationDelta').setValue(parent.get('translationDelta').getValue());
 					duplicator.setIndex(duplicator.getMemberIndex(parent), lastInstance);
 				} else {
-					duplicator = this.addDuplicator(parent);
+					duplicator = this.slicator(parent);
 					this.deselectShape(duplicator);
 					collectionManager.toggleOpenLists([duplicator]);
 

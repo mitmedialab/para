@@ -65,7 +65,7 @@ define([
     /* addMember, removeMember
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
-    addMember: function(data) {
+    addMember: function(data,index) {
 
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
@@ -75,9 +75,13 @@ define([
           
         }
       } else {
-
+        if(index){
+          this.members.splice(index,0,data);
+        }
+        else{
         //this.listenTo(data,'modified',this.render);
-        this.members.push(data);
+          this.members.push(data);
+        }
 
       }
 

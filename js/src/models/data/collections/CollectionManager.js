@@ -220,7 +220,9 @@ define([
 			var duplicator = new Duplicator();
 
 			duplicator.setTarget(object);
+
 			var data = duplicator.setCount(5);
+			var constraint = duplicator.setInternalConstraint();
 			this.trigger('duplicatorCountModified', data, duplicator);
 			if (!this.addToOpenLists(duplicator)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
@@ -231,7 +233,7 @@ define([
 				lists.push(duplicator);
 			}
 
-			return {duplicator:duplicator,toAdd:data.toAdd};
+			return {duplicator:duplicator,toAdd:data.toAdd,constraint:constraint};
 		},
 
 

@@ -9,11 +9,12 @@ define([
         'utils/PBool',
         'paper',
         'utils/PConstraint',
+        'models/data/Constraint',
         'utils/TrigFunc'
 
     ],
 
-    function(_, ConstrainableList, PFloat, PBool, paper, PConstraint, TrigFunc) {
+    function(_, ConstrainableList, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
         var Duplicator = ConstrainableList.extend({
 
             defaults: _.extend({}, ConstrainableList.prototype.defaults, {
@@ -42,10 +43,35 @@ define([
 
             },
 
+            setInternalConstraint: function() {
+                console.log('number of members', this.members.length);
+                this.internalList = new ConstrainableList();
+                this.internalList.addMember(this.get('target'));
+                if (this.members.length > 1) {
+                    console.log('adding second member');
+                    this.internalList.addMember(this.members[this.members.length - 1]);
+                }
+                var constraint = new Constraint();
+                console.log('internal list=', this.internalList, this.internalList.members);
+                constraint.set('references', this.internalList);
+                constraint.set('relatives', this);
+                var data = [
+                    ['translationDelta_xy', 'translationDelta_xy'],
+                    ['scalingDelta_xy', 'scalingDelta_xy'],
+                    ['fillColor_hsl',  'fillColor_hsl']
+                ];
+                constraint.create(data);
+                return constraint;
+            },
 
             addClone: function(clone) {
                 this.clones.push(clone);
-                this.addMember(clone);
+                if(this.members.length>3){
+                    this.addMember(clone,this.members.length-2);
+                }
+                else{
+                    this.addMember(clone);
+                }
                 this.get('clone_count').setValue(this.clones.length);
             },
 
@@ -81,15 +107,18 @@ define([
             },
 
 
-            deleteMember: function(data) {
-                this.removeMember(data);
-                data.deleteSelf();
-                var parent = data.getParentNode();
-                if (parent) {
-                    parent.removeInheritor(data);
-                    parent.removeChildNode(data);
+            deleteMember: function() {
+                var data = this.clones[this.clones.length - 2];
+                if (data) {
+                    this.removeMember(data);
+                    data.deleteSelf();
+                    var parent = data.getParentNode();
+                    if (parent) {
+                        parent.removeInheritor(data);
+                        parent.removeChildNode(data);
+                    }
+                    return data;
                 }
-                return data;
             },
 
 
@@ -188,7 +217,7 @@ define([
                     }
                 } else if (diff < 0) {
                     for (var j = 0; j < 0 - diff; j++) {
-                        var member = this.deleteMember(this.clones[this.clones.length - 1]);
+                        var member = this.deleteMember();
                         if (member) {
                             toRemove.push(member);
                         }
