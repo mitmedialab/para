@@ -77,10 +77,10 @@ define([
 
           // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
-          // this.listenTo(data[i],'modified',this.modified);
+           this.listenTo(data[i],'modified',this.render);
         }
       } else {
-        //this.listenTo(data,'modified',this.modified);
+        this.listenTo(data,'modified',this.render);
         this.members.push(data);
       }
 
