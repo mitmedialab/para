@@ -331,7 +331,6 @@ define([
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
     create: function(properties) {
-      console.log('creating constraint',properties);
       this.stopListening();
 
       var offsets = [];
@@ -424,7 +423,7 @@ define([
               var reference_values = self.get('reference_values');
               var x = reference_values[ref_prop_key][axis][z].getValue();
 
-              var offsetValue = offset[axis][z];
+              var offsetValue = 0;//offset[axis][z];
               var y;
               eval(expression[axis]);
               //console.log('x val =', x, 'offset val=', offsetValue, 'y val=', y);
@@ -585,7 +584,6 @@ define([
         var range = this.get('relatives').getRange();
 
         for (var m = 0; m < range; m++) {
-          console.log('calculating reference value for relative at',m);
           var x;
           if (range == 1) {
             x = (points.length - 1) / 2;

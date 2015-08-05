@@ -169,7 +169,7 @@ define([
         ListNode.prototype.render.call(this, arguments);
         var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();
-        console.log('member_length',this.members.length,'indexNumbers_length',this.indexNumbers.length);
+       // console.log('member_length',this.members.length,'indexNumbers_length',this.indexNumbers.length);
         for (var i = 0; i < this.members.length; i++) {
           var numText = this.indexNumbers[i];
           if(numText){

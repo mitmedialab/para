@@ -66,21 +66,18 @@ define([
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
     addMember: function(data) {
-        console.log('attempting to add member',this.get('memberCount').getValue(),this.members.length);
 
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
           // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
            //this.listenTo(data[i],'modified',this.render);
-          console.log('adding member at',this.members.length-1);
-
+          
         }
       } else {
 
         //this.listenTo(data,'modified',this.render);
         this.members.push(data);
-        console.log('adding member at',this.members.length-1);
 
       }
 
@@ -90,7 +87,6 @@ define([
         operator: 'set'
       };
       this.get('memberCount').setValue(memberCount);
-      console.log('new member count',this.get('memberCount').getValue(),this.members.length);
 
       //this.computeCentroid();
 
@@ -183,10 +179,8 @@ define([
 
     removeMember: function(data) {
       var index = $.inArray(data, this.members);
-        console.log('attempting to remove member',this.get('memberCount').getValue(),this.members.length);
 
       if (index > -1) {
-        console.log('removing member at',index);
 
         var member = this.members.splice(index, 1)[0];
        var memberCount = {
@@ -194,7 +188,6 @@ define([
           operator: 'set'
         };
         this.get('memberCount').setValue(memberCount);
-        console.log('new member count',this.get('memberCount').getValue(),this.members.length);
 
         //this.stopListening(member);
         return member;

@@ -224,7 +224,7 @@ define([
           cross[1],
           arrows[0],
           arrows[1],
-          arrows[2],
+          arrows[2],  
           arrows[3]
         ]);
         handles.addChildren(color_ui);
