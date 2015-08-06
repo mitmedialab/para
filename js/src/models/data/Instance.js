@@ -664,135 +664,21 @@ define([
 			return this.get(property_name);
 		},
 
+		setParentConstraint: function(properties, val) {
+			console.log('setting parent constraint');
+			for (var i = 0; i < properties.length; i++) {
+				var property = properties[i];
+				var target_property = this.get(property[0]);
+				if (target_property.get('dimension_num') ===  property[1].length) {
+					console.log('setting parent constraint on', property[0]);
 
-		_modifyMatrixAfterCompile: function(property_name, internal_matrix, attribute_constraint, value, set) {
-			//attribute is not constrained, modification allowed
-
-			//attribute sub properties are constrained, selective modification allowed;
-
-			switch (property_name) {
-				case 'translationDelta':
-					if (!attribute_constraint) {
-						if (set) {
-							internal_matrix.tx = (value.translation) ? 0 : internal_matrix.tx;
-							internal_matrix.ty = (value.translation) ? 0 : internal_matrix.ty;
-						}
-						if (value.translation) {
-							internal_matrix.translate(value.translation.x, value.translation.y);
-							return true;
-						}
-						return false;
-
-					} else if (attribute_constraint && attribute_constraint.x && attribute_constraint.y) {
-						return false;
-					} else if (attribute_constraint.x && !attribute_constraint.y) {
-
-						if (set) {
-							internal_matrix.ty = (value.translation) ? 0 : internal_matrix.ty;
-						}
-						internal_matrix.translate(0, value.translation.y);
-						return true;
-					} else if (!attribute_constraint.x && attribute_constraint.y) {
-						if (set) {
-							internal_matrix.tx = (value.translation) ? 0 : internal_matrix.tx;
-						}
-						if (value.translation) {
-							internal_matrix.translate(value.translation.x, 0);
-							return true;
-						}
-						return false;
-					}
-					break;
-				case 'scalingDelta':
-					var s_origin = this._scaling_origin;
-					if (!attribute_constraint) {
-						if (set) {
-							internal_matrix.d = (value.scaling) ? 0 : internal_matrix.d;
-							internal_matrix.a = (value.scaling) ? 0 : internal_matrix.a;
-						}
-						if (value.scaling) {
-							internal_matrix.scale(value.scaling.x, value.scaling.y, s_origin);
-							return true;
-						}
-						return false;
-
-					} else if (attribute_constraint && attribute_constraint.x && attribute_constraint.y) {
-						return false;
-					} else if (attribute_constraint.x && !attribute_constraint.y) {
-						if (set) {
-							internal_matrix.d = (value.scaling) ? 0 : internal_matrix.d;
-						}
-						if (value.scaling) {
-							internal_matrix.scale(1, value.scaling.y, s_origin);
-							return true;
-						}
-						return false;
-					} else if (!attribute_constraint.x && attribute_constraint.y) {
-						if (set) {
-							internal_matrix.a = (value.scaling) ? 0 : internal_matrix.a;
-						}
-						if (value.scaling) {
-							internal_matrix.scale(value.scaling.x, 1, s_origin);
-							return true;
-						}
-						return false;
-					}
-					break;
-				case 'rotationDelta':
-					var r_origin = this._rotation_origin;
-					if (attribute_constraint) {
-						return false;
-					} else {
-						if (set) {
-							internal_matrix.a = (value.rotation) ? 0 : internal_matrix.a;
-							internal_matrix.b = (value.rotation) ? 0 : internal_matrix.b;
-							internal_matrix.c = (value.rotation) ? 0 : internal_matrix.c;
-							internal_matrix.d = (value.rotation) ? 0 : internal_matrix.d;
-						}
-						internal_matrix.rotate(value.rotation, r_origin);
-						return true;
-					}
-					break;
-
-
-			}
-
-			return false;
-
-		},
-
-		_modifyObjectAfterCompile: function(internal_attribute, attribute_constraint, value, set) {
-			//attribute is not constrained, modification allowed
-			if (!attribute_constraint) {
-				for (var v in value) {
-					if (value.hasOwnProperty(v)) {
-						internal_attribute[v] = value[v];
-					}
+					target_property.parentConstraint = val;
+				} else {
+					console.log('trying sub properties', property[0], property[1]);
+					target_property.setParentConstraint(properties[i], val);
 				}
-				return true;
 			}
-			//attribute sub properties are constrained, selective modification allowed;
-			else {
-				var modified = false;
-				for (var _v in value) {
-					if (value.hasOwnProperty(_v)) {
-						if (!attribute_constraint.hasOwnProperty(_v)) {
-							internal_attribute[_v] = value[_v];
-							modified = true;
-						}
-					}
-				}
-				return modified;
-			}
-			return false;
-
 		},
-
-		_modifyValueAfterCompile: function(internal_attribute, value, set) {
-
-		},
-
-
 
 		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);
@@ -965,16 +851,17 @@ define([
 						}
 					}
 				}
+
 				return value;
 			}
 		},
 
 
 		//placeholder function for determining if member of a list is being used as a reference value
-		isReference: function(instance){
-			if(this.isSelfConstrained()){
+		isReference: function(instance) {
+			if (this.isSelfConstrained()) {
 				var reference = this.constraintObject.get('references');
-				return reference.hasMember(instance,true,reference);
+				return reference.hasMember(instance, true, reference);
 			}
 			return false;
 		},

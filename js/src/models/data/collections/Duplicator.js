@@ -44,15 +44,12 @@ define([
             },
 
             setInternalConstraint: function() {
-                console.log('number of members', this.members.length);
                 this.internalList = new ConstrainableList();
                 this.internalList.addMember(this.get('target'));
                 if (this.members.length > 1) {
-                    console.log('adding second member');
                     this.internalList.addMember(this.members[this.members.length - 1]);
                 }
                 var constraint = new Constraint();
-                console.log('internal list=', this.internalList, this.internalList.members);
                 constraint.set('references', this.internalList);
                 constraint.set('relatives', this);
                 constraint.set('proxy_references',this.get('target'));
@@ -64,7 +61,7 @@ define([
                     ['rotationDelta_v','rotationDelta_v'],
                     ['strokeWidth_v','strokeWidth_v']
                 ];
-                constraint.create(data);
+                constraint.create(data,true);
                 return constraint;
             },
 

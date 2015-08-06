@@ -143,6 +143,8 @@ define([
       offset: null,
       map_operand: null,
       operators: null,
+      reference_properties: null,
+      relative_properties:null,
     },
 
     initialize: function() {
@@ -335,12 +337,14 @@ define([
     /*properties should take the form of an array listing constraints for each subprop
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
-    create: function(properties) {
+    create: function(properties,setOnInstance) {
       this.stopListening(); 
       var offsets = [];
       var expressions = [];
       var refProperties = [];
       var relProperties = [];
+      this.set('relative_properties',relProperties);
+      this.set('reference_properties',refProperties);
       var constraint_data = {};
       var self = this;
       var reference = this.get('references');
@@ -385,12 +389,69 @@ define([
             }(ref_prop_key, ref_dimensions)
           );
         });
+        if(!setOnInstance){
+          console.log('set on property');
+          this.setConstraintOnProperty(relative,expression,offset,[ref_prop_key, ref_dimensions],[rel_prop_key, rel_dimensions]);
+        }
       }
 
-      this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
-
+      if(setOnInstance){
+        this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
+      }
+      //set parent constraints on members
+       if(reference.get('type')==='collection'){
+        for(var i=0;i<reference.members.length; i++){
+          reference.members[i].setParentConstraint(relProperties,false);
+        }
+      }
+      
     },
 
+
+  setConstraintOnProperty: function(relative, expression, offset, refProperty, relProperty) {
+      var self = this;
+      var ref_prop_key = refProperty[0];
+      var rel_prop_key = relProperty[0];
+      var ref_dimensions = refProperty[1];
+      var constraintF = function() {
+
+        var list = [];
+        var relative_range = relative.get('memberCount').getValue();
+        var a_keys = Object.keys(expression);
+        for (var z = 0; z < relative_range; z++) {
+              var data = {};
+              data[rel_prop_key]= {};
+             
+              for (var m = 0; m < a_keys.length; m++) {
+                var axis = a_keys[m];
+                var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
+                var reference_values = self.get('reference_values');
+                var x = reference_values[ref_prop_key][axis][z].getValue();
+                var offsetValue = 0; //offset[axis][z];
+                var y;
+                eval(expression[axis]);
+                if(axis === 'v'){
+                  data[rel_prop_key] = y;
+                }
+                else{
+                 data[rel_prop_key][axis] = y;
+                }
+                
+              }
+              list.push(data);
+
+        }
+          
+        if (relative.get('type') === 'collection') {
+          return list;
+        } else {
+          return list[0][rel_prop_key];
+        }
+      };
+
+      relative.get(rel_prop_key).setConstraint(constraintF, this);
+      relative.get(rel_prop_key).getValue();
+    },
 
     setConstraintOnInstance: function(relative, expressions, offsets, refProperties, relProperties) {
       var self = this;
@@ -448,9 +509,7 @@ define([
       relative.getValue();
     },
 
-    setConstraintOnProperty: function(relative_property, expression, offset) {
-
-    },
+  
 
     setConstraintOnSubProperty: function() {
 
@@ -633,6 +692,12 @@ define([
     },
 
     remove: function() {
+      if(this.get('references').get('type')==='collection'){
+        for(var i=0;i<this.get('references').members.length; i++){
+          this.get('references').members[i].setParentConstraint(this.get('relative_properties'),false);
+        }
+      }
+
       // remove all paper UI elements
       // trigger nullification / deletion of all references
     },

@@ -56,23 +56,65 @@ define([
       setValue: function(data) {
         var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
-          if(constrained_props[i]){
-          if(!this.isReference(this.members[i])){
-          var set_data = this.members[i].getAddedValueFor(data);
-          var stripped_data = TrigFunc.strip(set_data, constrained_props[i]);
-          this.members[i].setValue(stripped_data);
-          }
-          else{
+          if (constrained_props[i]) {
+            if (!this.isReference(this.members[i])) {
+              var set_data = this.members[i].getAddedValueFor(data);
+              var stripped_data = TrigFunc.strip(set_data, constrained_props[i]);
+              this.members[i].setValue(stripped_data);
+            } else {
+              this.members[i].setValue(data);
+            }
+          } else {
             this.members[i].setValue(data);
           }
+
         }
-        else{
-          this.members[i].setValue(data);
-        }
-        
-       }
         this.setNull(false);
-        this.trigger('modified',this);
+        this.trigger('modified', this);
+      },
+
+      /* getConstraintValues
+       * returns an object containing all constrained properties of
+       * this instance with their values;
+       * TODO: Make recursive (will not work for objects with 3+ leves of heirarchy)
+       */
+
+      getConstraintValues: function() {
+        var constraints = this.getConstraint();
+        if (constraints.getValue) {
+          return constraints.getValue();
+        } else {
+          var valuelist = [];
+          for (var i = 0; i < this.members.length; i++) {
+            var value = {};
+            for (var c in constraints) {
+              if (constraints.hasOwnProperty(c)) {
+                if (constraints[c].getValue) {
+                  var cValue = constraints[c].getValue();
+                  if (cValue instanceof Array) {
+                    value[c] = cValue[i][c];
+                  } else {
+                    value[c] = cValue;
+                  }
+                } else {
+                  value[c] = {};
+                  for (var v in constraints[c]) {
+                    if (constraints[c].hasOwnProperty(v)) {
+                      var scValue = constraints[c][v].getValue();
+                      if (scValue instanceof Array) {
+                        value[c][v] = scValue[i][v];
+                      } else {
+                        value[c][v] = scValue;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            valuelist.push(value);
+          }
+          return valuelist;
+        }
       },
 
 
@@ -90,7 +132,7 @@ define([
 
 
       //overrides ListNode addMember and removeMember functions
-      addMember: function(data,index) {
+      addMember: function(data, index) {
         ListNode.prototype.addMember.call(this, data, index);
         var diff = this.members.length - this.indexNumbers.length;
         for (var i = 0; i < diff; i++) {
@@ -163,7 +205,7 @@ define([
         this.trigger('modified', this);
       },
 
-      
+
       setValueForMemberAt: function(index, data) {
         var member = this.members[index];
         member.setValue(data);
@@ -174,20 +216,20 @@ define([
         ListNode.prototype.render.call(this, arguments);
         var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();
-       // console.log('member_length',this.members.length,'indexNumbers_length',this.indexNumbers.length);
+        // console.log('member_length',this.members.length,'indexNumbers_length',this.indexNumbers.length);
         for (var i = 0; i < this.members.length; i++) {
           var numText = this.indexNumbers[i];
-          if(numText){
-          numText.content = (i + 1);
-          numText.position = this.members[i].get('screen_bottom_left').toPaperPoint();
-          numText.position.x += 10;
-          numText.position.y -= 10;
-          if (this.get('open')) {
-            numText.visible = true;
-          } else {
-            numText.visible = false;
-          }
-          numText.bringToFront();
+          if (numText) {
+            numText.content = (i + 1);
+            numText.position = this.members[i].get('screen_bottom_left').toPaperPoint();
+            numText.position.x += 10;
+            numText.position.y -= 10;
+            if (this.get('open')) {
+              numText.visible = true;
+            } else {
+              numText.visible = false;
+            }
+            numText.bringToFront();
           }
         }
 
