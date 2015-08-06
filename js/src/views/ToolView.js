@@ -26,7 +26,6 @@ define([
          $('#constraintApply').addClass('active');
         } else {
           $('#constraintApply').attr('disabled', true);
-             $('#constraintApply').removeAttr('disabled');
          $('#constraintApply').removeClass('active');
           
         }

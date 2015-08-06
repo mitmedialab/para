@@ -669,7 +669,7 @@ define([
 			for (var i = 0; i < properties.length; i++) {
 				var property = properties[i];
 				var target_property = this.get(property[0]);
-				if (target_property.get('dimension_num') ===  property[1].length) {
+				if (target_property.get('dimension_num') === property[1].length) {
 					console.log('setting parent constraint on', property[0]);
 
 					target_property.parentConstraint = val;
@@ -689,7 +689,7 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
-
+			if(!this.parentConstraint){
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
 
@@ -708,7 +708,9 @@ define([
 						this.get(prop).add(p);
 					}
 				}
+
 			}
+		}
 
 			this.setNull(false);
 		},

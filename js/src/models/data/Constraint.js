@@ -399,9 +399,14 @@ define([
         this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
       }
       //set parent constraints on members
-       if(reference.get('type')==='collection'){
-        for(var i=0;i<reference.members.length; i++){
-          reference.members[i].setParentConstraint(relProperties,false);
+       if(relative.get('type')==='collection'){
+        for(var i=0;i<relative.members.length; i++){
+          if(!reference.isReference(relative.members[i])){
+            relative.members[i].setParentConstraint(relProperties,true);
+          }
+          else{
+            console.log('excluding relative member',i);
+          }
         }
       }
       
@@ -692,9 +697,9 @@ define([
     },
 
     remove: function() {
-      if(this.get('references').get('type')==='collection'){
-        for(var i=0;i<this.get('references').members.length; i++){
-          this.get('references').members[i].setParentConstraint(this.get('relative_properties'),false);
+      if(this.get('relatives').get('type')==='collection'){
+        for(var i=0;i<this.get('relatives').members.length; i++){
+          this.get('relatives').members[i].setParentConstraint(this.get('relative_properties'),false);
         }
       }
 

@@ -76,15 +76,13 @@ define([
 			 * accepts an object with x,y properties as an argument
 			 */
 			setValue: function(point) {
-				if (!this.parentConstraint) {
-					if (point.x) {
-						this.setX(point.x);
-					}
-					if (point.y) {
-						this.setY(point.y);
-					}
-					this.setNull(false);
+				if (point.x) {
+					this.setX(point.x);
 				}
+				if (point.y) {
+					this.setY(point.y);
+				}
+				this.setNull(false);
 			},
 
 			/* getValue
@@ -162,14 +160,13 @@ define([
 					point2.add(data);
 					return point2;
 				} else {
-					if (!this.parentConstraint) {
-						if (data.x) {
-							this.setX(this.getX() + data.x);
-						}
-						if (data.y) {
-							this.setY(this.getY() + data.y);
-						}
+					if (data.x) {
+						this.setX(this.getX() + data.x);
 					}
+					if (data.y) {
+						this.setY(this.getY() + data.y);
+					}
+
 				}
 			},
 
@@ -179,10 +176,9 @@ define([
 					point2.sub(data);
 					return point2;
 				} else {
-					if (!this.parentConstraint) {
-						this.setX(this.getX() - data.x);
-						this.setY(this.getY() - data.y);
-					}
+					this.setX(this.getX() - data.x);
+					this.setY(this.getY() - data.y);
+
 
 				}
 			},
@@ -193,10 +189,9 @@ define([
 					point2.div(val);
 					return point2;
 				} else {
-					if (!this.parentConstraint) {
-						this.setX(this.getX() / val);
-						this.setY(this.getY() / val);
-					}
+					this.setX(this.getX() / val);
+					this.setY(this.getY() / val);
+
 				}
 			},
 
@@ -206,10 +201,9 @@ define([
 					point2.mul(val);
 					return point2;
 				} else {
-					if (!this.parentConstraint) {
-						this.setX(this.x.get() * val);
-						this.setY(this.y.get() * val);
-					}
+					this.setX(this.x.get() * val);
+					this.setY(this.y.get() * val);
+
 				}
 			},
 
