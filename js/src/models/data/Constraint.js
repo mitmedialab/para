@@ -63,7 +63,7 @@ define([
         max: 360
       }
     },
-   strokeWidth: {
+    strokeWidth: {
       v: {
         min: 0.1,
         max: 50
@@ -144,7 +144,7 @@ define([
       map_operand: null,
       operators: null,
       reference_properties: null,
-      relative_properties:null,
+      relative_properties: null,
     },
 
     initialize: function() {
@@ -337,14 +337,14 @@ define([
     /*properties should take the form of an array listing constraints for each subprop
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
-    create: function(properties,setOnInstance) {
-      this.stopListening(); 
+    create: function(properties, setOnInstance) {
+      this.stopListening();
       var offsets = [];
       var expressions = [];
       var refProperties = [];
       var relProperties = [];
-      this.set('relative_properties',relProperties);
-      this.set('reference_properties',refProperties);
+      this.set('relative_properties', relProperties);
+      this.set('reference_properties', refProperties);
       var constraint_data = {};
       var self = this;
       var reference = this.get('references');
@@ -389,31 +389,30 @@ define([
             }(ref_prop_key, ref_dimensions)
           );
         });
-        if(!setOnInstance){
+        if (!setOnInstance) {
           console.log('set on property');
-          this.setConstraintOnProperty(relative,expression,offset,[ref_prop_key, ref_dimensions],[rel_prop_key, rel_dimensions]);
+          this.setConstraintOnProperty(relative, expression, offset, [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
         }
       }
 
-      if(setOnInstance){
+      if (setOnInstance) {
         this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
       }
       //set parent constraints on members
-       if(relative.get('type')==='collection'){
-        for(var i=0;i<relative.members.length; i++){
-          if(!reference.isReference(relative.members[i])){
-            relative.members[i].setParentConstraint(relProperties,true);
-          }
-          else{
-            console.log('excluding relative member',i);
+      if (relative.get('type') === 'collection') {
+        for (var i = 0; i < relative.members.length; i++) {
+          if (!reference.isReference(relative.members[i])) {
+            relative.members[i].setParentConstraint(relProperties, true);
+          } else {
+            console.log('excluding relative member', i);
           }
         }
       }
-      
+
     },
 
 
-  setConstraintOnProperty: function(relative, expression, offset, refProperty, relProperty) {
+    setConstraintOnProperty: function(relative, expression, offset, refProperty, relProperty) {
       var self = this;
       var ref_prop_key = refProperty[0];
       var rel_prop_key = relProperty[0];
@@ -424,29 +423,28 @@ define([
         var relative_range = relative.get('memberCount').getValue();
         var a_keys = Object.keys(expression);
         for (var z = 0; z < relative_range; z++) {
-              var data = {};
-              data[rel_prop_key]= {};
-             
-              for (var m = 0; m < a_keys.length; m++) {
-                var axis = a_keys[m];
-                var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
-                var reference_values = self.get('reference_values');
-                var x = reference_values[ref_prop_key][axis][z].getValue();
-                var offsetValue = 0; //offset[axis][z];
-                var y;
-                eval(expression[axis]);
-                if(axis === 'v'){
-                  data[rel_prop_key] = y;
-                }
-                else{
-                 data[rel_prop_key][axis] = y;
-                }
-                
-              }
-              list.push(data);
+          var data = {};
+          data[rel_prop_key] = {};
+
+          for (var m = 0; m < a_keys.length; m++) {
+            var axis = a_keys[m];
+            var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
+            var reference_values = self.get('reference_values');
+            var x = reference_values[ref_prop_key][axis][z].getValue();
+            var offsetValue = 0; //offset[axis][z];
+            var y;
+            eval(expression[axis]);
+            if (axis === 'v') {
+              data[rel_prop_key] = y;
+            } else {
+              data[rel_prop_key][axis] = y;
+            }
+
+          }
+          list.push(data);
 
         }
-          
+
         if (relative.get('type') === 'collection') {
           return list;
         } else {
@@ -466,46 +464,47 @@ define([
         var relative_range = relative.get('memberCount').getValue();
 
         for (var w = 0; w < relative_range; w++) {
-           list.push({});
-         }
+          list.push({});
+        }
         for (var i = 0; i < refProperties.length; i++) {
-         
-            var ref_prop_key = refProperties[i][0];
-            var rel_prop_key = relProperties[i][0];
-            var ref_dimensions = refProperties[i][1];
-            var expression = expressions[i];
-            var offset = offsets[i];
-            var a_keys = Object.keys(expression);
-           
-            for (var z = 0; z < relative_range; z++) {
-              
-              if(!list[z][rel_prop_key]){
-                list[z][rel_prop_key] = {};
-              }
 
-              for (var m = 0; m < a_keys.length; m++) {
-                var axis = a_keys[m];
-                var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
-                var reference_values = self.get('reference_values');
-                var x = reference_values[ref_prop_key][axis][z].getValue();
-                var offsetValue = 0; //offset[axis][z];
-                var y;
-                eval(expression[axis]);
-                if(axis === 'v'){
-                  list[z][rel_prop_key] = y;
-                }
-                else{
-                  list[z][rel_prop_key][axis] = y;
-                }
-                
+          var ref_prop_key = refProperties[i][0];
+          var rel_prop_key = relProperties[i][0];
+          var ref_dimensions = refProperties[i][1];
+          var expression = expressions[i];
+          var offset = offsets[i];
+          var a_keys = Object.keys(expression);
+
+          for (var z = 0; z < relative_range; z++) {
+
+            if (!list[z][rel_prop_key]) {
+              list[z][rel_prop_key] = {};
+            }
+
+            for (var m = 0; m < a_keys.length; m++) {
+              var axis = a_keys[m];
+              var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
+              var reference_values = self.get('reference_values');
+              var x = reference_values[ref_prop_key][axis][z].getValue();
+              var offsetValue = 0; //offset[axis][z];
+              var y;
+              eval(expression[axis]);
+              if (axis === 'v') {
+                list[z][rel_prop_key] = y;
+              } else {
+                list[z][rel_prop_key][axis] = y;
               }
 
             }
-          
+
+          }
+
         }
         if (relative.get('type') === 'collection') {
+          relative.setValue(list);
           return list;
         } else {
+          relative.setValue(list[0]);
           return list[0];
         }
       };
@@ -514,7 +513,7 @@ define([
       relative.getValue();
     },
 
-  
+
 
     setConstraintOnSubProperty: function() {
 
@@ -697,9 +696,9 @@ define([
     },
 
     remove: function() {
-      if(this.get('relatives').get('type')==='collection'){
-        for(var i=0;i<this.get('relatives').members.length; i++){
-          this.get('relatives').members[i].setParentConstraint(this.get('relative_properties'),false);
+      if (this.get('relatives').get('type') === 'collection') {
+        for (var i = 0; i < this.get('relatives').members.length; i++) {
+          this.get('relatives').members[i].setParentConstraint(this.get('relative_properties'), false);
         }
       }
 
