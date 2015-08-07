@@ -689,7 +689,7 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
-			if(!this.parentConstraint){
+			
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
 
@@ -710,7 +710,7 @@ define([
 				}
 
 			}
-		}
+		
 
 			this.setNull(false);
 		},

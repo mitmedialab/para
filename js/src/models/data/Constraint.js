@@ -422,6 +422,7 @@ define([
         var list = [];
         var relative_range = relative.get('memberCount').getValue();
         var a_keys = Object.keys(expression);
+        relative.get(rel_prop_key).setValue({x:0,y:0});
         for (var z = 0; z < relative_range; z++) {
           var data = {};
           data[rel_prop_key] = {};
@@ -501,10 +502,8 @@ define([
 
         }
         if (relative.get('type') === 'collection') {
-          relative.setValue(list);
           return list;
         } else {
-          relative.setValue(list[0]);
           return list[0];
         }
       };
