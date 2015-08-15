@@ -353,10 +353,13 @@ define([
       this.listenTo(relative.get('memberCount'), 'modified', function() {
         self.create(properties);
       });
+      var modes= {};
+      this.set('modes',modes);
       for (var j = 0; j < properties.length; j++) {
 
         var ref_prop = properties[j][0];
         var rel_prop = properties[j][1];
+        var mode_list = properties[j][2];
         var refSplit = ref_prop.split('_');
         var ref_dimensions = refSplit[1];
         var ref_prop_key = refSplit[0];
@@ -366,7 +369,9 @@ define([
         var property_dimensions = relative.get(rel_prop_key).get('dimension_num');
         refProperties.push([ref_prop_key, ref_dimensions]);
         relProperties.push([rel_prop_key, rel_dimensions]);
-
+        for(var m =0;m<ref_dimensions.length;m++){
+            modes[ref_prop_key+'_'+ref_dimensions[m]]=mode_list[m];
+        }
         var offset_data = this.setOffset(reference, ref_prop_key, ref_dimensions, relative, rel_prop_key, rel_dimensions);
         var convertFactor = offset_data.convertFactor;
         var offset = offset_data.offset;
@@ -380,7 +385,6 @@ define([
           }
         }
         expressions.push(expression);
-
         this.setReferenceValues(ref_prop_key, ref_dimensions);
         this.listenTo(reference.get('memberCount'), 'modified', function() {
           (
@@ -408,6 +412,7 @@ define([
           }
         }
       }
+      console.log('mode object = ',this.get('modes'));
 
     },
 
@@ -422,7 +427,6 @@ define([
         var list = [];
         var relative_range = relative.get('memberCount').getValue();
         var a_keys = Object.keys(expression);
-        relative.get(rel_prop_key).setValue({x:0,y:0});
         for (var z = 0; z < relative_range; z++) {
           var data = {};
           data[rel_prop_key] = {};
@@ -542,7 +546,6 @@ define([
       var ref_dimension_array = ref_dimensions.split('');
       ref_dimension_array.forEach(function(target_dimension) {
         var reference_subprops = reference.getLiteralSubprops(ref_prop_key, target_dimension);
-
         reference_subprops.forEach(function(target_prop) {
 
           (function(refVals) {
@@ -573,8 +576,10 @@ define([
             if (reference_values[ref_prop_key][target_dimension].length > 0) {
               var last = reference_values[ref_prop_key][target_dimension][reference_values[ref_prop_key][target_dimension].length - 1];
               newItem = new PFloat(last.getValue());
+              newItem.setNull(true);
             } else {
               newItem = new PFloat(1);
+              newItem.setNull(true);
             }
 
             reference_values[ref_prop_key][target_dimension].push(newItem);
@@ -589,7 +594,80 @@ define([
     },
 
 
-    calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values) {
+
+    calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values){
+      var mode = this.get('modes')[ref_prop_key+'_'+ref_dimension];
+      switch(mode){
+        case 'interpolate':
+        this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
+        break;
+        case 'random': 
+        this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension, reference_values);
+        break;
+        default:
+        console.log('mode not found',mode);
+        break;
+      }
+    },
+
+    calculateReferenceValuesRandom:  function(ref_prop_key, ref_dimension, reference_values) {
+      console.trace();
+        var reference = this.get('references');
+       if (reference) {
+        var members;
+        if (reference.get('type') == 'collection') {
+          members = reference.members;
+        } else {
+          members = [reference, reference];
+        }
+        var reference_points = [];
+        var points = [];
+        var min, max;
+       
+        for (var i = 0; i < members.length; i++) {
+
+          var point;
+
+          if (ref_dimension === 'v') {
+            point = {
+              x: i,
+              y: members[i].getValue()[ref_prop_key]
+            };
+            points.push(point);
+
+          } else {
+            point = {
+              x: i,
+              y: members[i].getValue()[ref_prop_key][ref_dimension]
+            };
+            if (!min && !max) {
+              min = point.y;
+              max = point.y;
+            }
+            if (point.y < min) {
+              min = point.y;
+            }
+            if (point.y > max) {
+              max = point.y;
+            }
+            points.push(point);
+          }
+
+          reference_points.push(points);
+        }
+        var range = this.get('relatives').getRange();
+        console.log('min,max random=',min,max);
+        for (var m = 0; m < range; m++) {
+            var y = Math.floor(Math.random()*(max-min+1)+min);
+            console.log('y val=',y);
+            reference_values[ref_dimension][m].setValue(y);
+          
+        }
+      }
+
+    },
+
+    calculateReferenceValuesInterpolate: function(ref_prop_key, ref_dimension, reference_values) {
       var reference = this.get('references');
       if (reference) {
         var members;

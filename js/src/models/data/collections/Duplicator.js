@@ -54,12 +54,12 @@ define([
                 constraint.set('relatives', this);
                 constraint.set('proxy_references',this.get('target'));
                 var data = [
-                    ['translationDelta_xy', 'translationDelta_xy'],
-                    ['scalingDelta_xy', 'scalingDelta_xy'],
-                    ['fillColor_hsl',  'fillColor_hsl'],
-                    ['strokeColor_hsl',  'strokeColor_hsl'],
-                    ['rotationDelta_v','rotationDelta_v'],
-                    ['strokeWidth_v','strokeWidth_v']
+                    ['translationDelta_xy', 'translationDelta_xy', ['random','random']],
+                    ['scalingDelta_xy', 'scalingDelta_xy',['interpolate','interpolate']],
+                    ['fillColor_hsl',  'fillColor_hsl',['interpolate','interpolate','interpolate']],
+                    ['strokeColor_hsl',  'strokeColor_hsl',['interpolate','interpolate','interpolate']],
+                    ['rotationDelta_v','rotationDelta_v',['interpolate','interpolate']],
+                    ['strokeWidth_v','strokeWidth_v',['interpolate','interpolate']]
                 ];
                 constraint.create(data,true);
                 return constraint;

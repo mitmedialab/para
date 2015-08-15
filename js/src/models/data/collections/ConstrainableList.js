@@ -197,11 +197,17 @@ define([
       },
 
       //callback triggered when a subproperty is modified externally 
-      modified: function() {
-        var constraint_values = this.getConstraintValues();
+    modified: function() {  
+        var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
-          this.setValueForMemberAt(i, constraint_values[i]);
+          if (constrained_props[i]) {
+            if (!this.isReference(this.members[i])) {
+
+              this.members[i].setValue(constrained_props[i]);
+            }
+          }
         }
+        this.setNull(false);
         this.trigger('modified', this);
       },
 
