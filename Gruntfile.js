@@ -27,6 +27,7 @@ module.exports = function (grunt) {
         clean: ["./build"],
         copy: {
             html: { src: "para-build.html", dest: "build/para.html" },
+            workshop: { src: "workshop.html", dest: "build/workshop.html" },
             landing: { src: "index.html", dest: "build/index.html" },
             images: { expand: true, cwd: "images", src: "**", dest: "build/images/" },
             fonts: { expand: true, cwd: "fonts", src: "**", dest: "build/fonts/" },

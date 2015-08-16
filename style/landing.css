@@ -40,6 +40,20 @@ a: hover{
     background-attachment: local;   
 }
 
+.workshop-logo {
+    position: relative;
+    width: 700px;
+    height: 50px;
+    font-size: 18pt;
+    font-weight: bold;
+}
+.workshop-logo-center {
+    width: 700px;
+    margin-left:100px;
+    margin-top:10px;
+    height: 50px;
+}
+
 .header {
     height: 200px;
     width: 100%;
@@ -49,6 +63,19 @@ a: hover{
     display: block;
     position: fixed;
     z-index: 0;
+}
+
+.workshop-header {
+    height: 200px;
+    width: 100%;
+    background-color: rgba(125, 117, 123, 0.5);
+    background-image: url(../images/workshop-header.svg);
+background-size: 2000px;
+    display: block;
+    position: fixed;
+    z-index: 0;
+    background-position-x: -350px;
+    background-position-y: -500px;
 }
 
 .header {
