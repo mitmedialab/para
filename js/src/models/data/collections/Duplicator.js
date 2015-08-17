@@ -147,7 +147,6 @@ define([
 
             shiftTarget: function() {
                 if (this.clones.length < 1) {
-                    console.log('no more clones to shift target to');
                     this.setTarget();
                     return;
                 }

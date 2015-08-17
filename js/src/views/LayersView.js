@@ -282,7 +282,6 @@ define([
 				var pRel = currentRel;
 				currentRef = constraint.get('proxy_references')? constraint.get('proxy_references').get('id'):constraint.get('references').get('id');
 				currentRel = constraint.get('relatives').get('id');
-				console.log('currentRef=',currentRef,'currentRel=',currentRel);
 				activeNode.status = 'opened';
 				this.positionConstraintIcons();
 				this.model.visualizeConstraint(currentRef, currentRel, pRef, pRel);

@@ -370,7 +370,12 @@ define([
         refProperties.push([ref_prop_key, ref_dimensions]);
         relProperties.push([rel_prop_key, rel_dimensions]);
         for(var m =0;m<ref_dimensions.length;m++){
+          if(mode_list && mode_list[m]){
             modes[ref_prop_key+'_'+ref_dimensions[m]]=mode_list[m];
+          }
+          else{
+            modes[ref_prop_key+'_'+ref_dimensions[m]]='interpolate';
+          }
         }
         var offset_data = this.setOffset(reference, ref_prop_key, ref_dimensions, relative, rel_prop_key, rel_dimensions);
         var convertFactor = offset_data.convertFactor;
@@ -394,7 +399,6 @@ define([
           );
         });
         if (!setOnInstance) {
-          console.log('set on property');
           this.setConstraintOnProperty(relative, expression, offset, [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
         }
       }
@@ -407,12 +411,11 @@ define([
         for (var i = 0; i < relative.members.length; i++) {
           if (!reference.isReference(relative.members[i])) {
             relative.members[i].setParentConstraint(relProperties, true);
-          } else {
-            console.log('excluding relative member', i);
-          }
+          }// else {
+            //console.log('excluding relative member', i);
+         // }
         }
       }
-      console.log('mode object = ',this.get('modes'));
 
     },
 
@@ -605,13 +608,11 @@ define([
         this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension, reference_values);
         break;
         default:
-        console.log('mode not found',mode);
         break;
       }
     },
 
     calculateReferenceValuesRandom:  function(ref_prop_key, ref_dimension, reference_values) {
-      console.trace();
         var reference = this.get('references');
        if (reference) {
         var members;
@@ -656,10 +657,8 @@ define([
           reference_points.push(points);
         }
         var range = this.get('relatives').getRange();
-        console.log('min,max random=',min,max);
         for (var m = 0; m < range; m++) {
             var y = Math.floor(Math.random()*(max-min+1)+min);
-            console.log('y val=',y);
             reference_values[ref_dimension][m].setValue(y);
           
         }

@@ -165,7 +165,6 @@ define([
 			for(var i=0;i<points.length;i++){
 				var y= TrigFunc.map(points[i].y, min, max,height,0); 
 				var x = TrigFunc.map(points[i].x,0,points.length-1,0,width);
-				console.log('mapping point from',points[i].x,points[i].y,"to",x,y);
 				var graphPoint = new paper.Path.Circle(new paper.Point(x, y), 4);
 				graphPoint.fillColor= new paper.Color(0, 0, 0);
 				graphShapes.push(graphPoint);

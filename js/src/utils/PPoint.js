@@ -102,7 +102,6 @@ define([
 					if (!value.y) {
 						value.y = this.y.getValue();
 					}
-					console.log('point is constrained', value);
 					return value;
 				}
 			},
