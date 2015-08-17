@@ -452,10 +452,11 @@ define([
           list.push(data);
 
         }
-
         if (relative.get('type') === 'collection') {
           return list;
         } else {
+          console.log('setting value to ',relative.get('id'),a_keys[0],rel_prop_key,list[0][rel_prop_key]);
+        //  relative.get(rel_prop_key)[a_keys[0]].modified();
           return list[0][rel_prop_key];
         }
       };
