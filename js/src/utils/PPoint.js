@@ -76,13 +76,19 @@ define([
 			 * accepts an object with x,y properties as an argument
 			 */
 			setValue: function(point) {
+				var xSet, ySet;
 				if (point.x) {
-					this.setX(point.x);
+					xSet = this.setX(point.x);
 				}
 				if (point.y) {
-					this.setY(point.y);
+					ySet = this.setY(point.y);
 				}
 				this.setNull(false);
+				return {
+					xset: xSet,
+					yset: ySet
+				};
+
 			},
 
 			/* getValue
@@ -125,13 +131,13 @@ define([
 			},
 
 			setX: function(x) {
-				this.x.setValue(x);
 				this.setNull(false);
+				return this.x.setValue(x);
 			},
 
 			setY: function(y) {
-				this.y.setValue(y);
 				this.setNull(false);
+				return this.y.setValue(y);
 			},
 
 			/*clone

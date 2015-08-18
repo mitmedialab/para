@@ -60,13 +60,15 @@ define([
 			 * sets the value of the property
 			 */
 			setValue: function(data) {
+				var set;
 				if (data.v) {
-					this.v.setValue(data.v);
+					set = this.v.setValue(data.v);
 					this.setNull(false);
 				} else if (typeof data === "number") {
-					this.v.setValue(data);
+					set =this.v.setValue(data);
 					this.setNull(false);
 				}
+				return set;
 			},
 
 			/*

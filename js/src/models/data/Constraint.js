@@ -452,13 +452,12 @@ define([
           list.push(data);
 
         }
-          console.log('setting value to ',relative.get('id'),a_keys[0],rel_prop_key,list[0][rel_prop_key]);
-          relative.get(rel_prop_key).setValue(list[0][rel_prop_key]);
           
         if (relative.get('type') === 'collection') {
+          relative.get(rel_prop_key).setValue(list);
           return list;
         } else {
-
+          relative.get(rel_prop_key).setValue(list[0][rel_prop_key]);
           return list[0][rel_prop_key];
         }
       };
@@ -518,7 +517,6 @@ define([
       };
 
       relative.setConstraint(constraintF, this);
-      relative.getValue();
     },
 
 
@@ -556,6 +554,7 @@ define([
           (function(refVals) {
             self.listenTo(target_prop, 'modified', function() {
               (
+
                 function(rpk, td, rv) {
                   self.calculateReferenceValues(rpk, td, rv);
                 }(ref_prop_key, target_dimension, refVals)
