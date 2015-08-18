@@ -337,7 +337,7 @@ define([
     /*properties should take the form of an array listing constraints for each subprop
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
-    create: function(properties, setOnInstance) {
+    create: function(properties) {
       this.stopListening();
       var offsets = [];
       var expressions = [];
@@ -349,12 +349,19 @@ define([
       var self = this;
       var reference = this.get('references');
       var relative = this.get('relatives');
+
+      var setOnInstance = false;
+
+      if (properties.length === relative.get('dimension_num')) {
+        setOnInstance = true;
+      }
+
       var relative_dimensions = relative.get('dimension_num');
       this.listenTo(relative.get('memberCount'), 'modified', function() {
         self.create(properties);
       });
-      var modes= {};
-      this.set('modes',modes);
+      var modes = {};
+      this.set('modes', modes);
       for (var j = 0; j < properties.length; j++) {
 
         var ref_prop = properties[j][0];
@@ -369,12 +376,11 @@ define([
         var property_dimensions = relative.get(rel_prop_key).get('dimension_num');
         refProperties.push([ref_prop_key, ref_dimensions]);
         relProperties.push([rel_prop_key, rel_dimensions]);
-        for(var m =0;m<ref_dimensions.length;m++){
-          if(mode_list && mode_list[m]){
-            modes[ref_prop_key+'_'+ref_dimensions[m]]=mode_list[m];
-          }
-          else{
-            modes[ref_prop_key+'_'+ref_dimensions[m]]='interpolate';
+        for (var m = 0; m < ref_dimensions.length; m++) {
+          if (mode_list && mode_list[m]) {
+            modes[ref_prop_key + '_' + ref_dimensions[m]] = mode_list[m];
+          } else {
+            modes[ref_prop_key + '_' + ref_dimensions[m]] = 'interpolate';
           }
         }
         var offset_data = this.setOffset(reference, ref_prop_key, ref_dimensions, relative, rel_prop_key, rel_dimensions);
@@ -399,7 +405,15 @@ define([
           );
         });
         if (!setOnInstance) {
-          this.setConstraintOnProperty(relative, expression, offset, [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
+          if (relative.get(rel_prop_key).get('dimension_num') == rel_dimensions.length) {
+            this.setConstraintOnProperty(relative, expression, offset, [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
+          } else {
+            for (var n = 0; n < rel_dimensions.length; n++) {
+              console.log('rel dimension at',n,"="+rel_dimensions[n]);
+              console.log('ref dimension at',n,"="+ref_dimensions[n]);
+              this.setConstraintOnSubProperty(relative, expression[rel_dimensions[n]], offset[rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
+            }
+          }
         }
       }
 
@@ -411,14 +425,46 @@ define([
         for (var i = 0; i < relative.members.length; i++) {
           if (!reference.isReference(relative.members[i])) {
             relative.members[i].setParentConstraint(relProperties, true);
-          }// else {
-            //console.log('excluding relative member', i);
-         // }
+          } // else {
+          //console.log('excluding relative member', i);
+          // }
         }
       }
 
     },
 
+
+
+    setConstraintOnSubProperty: function(relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
+      var self = this;
+
+     
+      var constraintF = function() {
+         var list = [];
+        var relative_range = relative.get('memberCount').getValue();
+        for (var z = 0; z < relative_range; z++) {
+          var data = {};
+          data[rel_prop_key] = {};
+          var ap = ref_dimension;
+          var reference_values = self.get('reference_values');
+          var x = reference_values[ref_prop_key][ref_dimension][z].getValue();
+
+          var offsetValue = 0; //offset;
+          var y;
+          eval(expression);
+          data[rel_prop_key][rel_dimension] = y;
+          list.push(data);
+        }
+        if (relative.get('type') === 'collection') {
+          relative.get(rel_prop_key).setValue(list);
+          return list;
+        } else {
+          relative.get(rel_prop_key)[rel_dimension].setValue(list[0][rel_prop_key][rel_dimension]);
+          return list[0][rel_prop_key][rel_dimension];
+        }
+      };
+      relative.get(rel_prop_key)[rel_dimension].setConstraint(constraintF, this);
+    },
 
     setConstraintOnProperty: function(relative, expression, offset, refProperty, relProperty) {
       var self = this;
@@ -452,7 +498,7 @@ define([
           list.push(data);
 
         }
-          
+
         if (relative.get('type') === 'collection') {
           relative.get(rel_prop_key).setValue(list);
           return list;
@@ -461,7 +507,6 @@ define([
           return list[0][rel_prop_key];
         }
       };
-
       relative.get(rel_prop_key).setConstraint(constraintF, this);
     },
 
@@ -517,12 +562,6 @@ define([
       };
 
       relative.setConstraint(constraintF, this);
-    },
-
-
-
-    setConstraintOnSubProperty: function() {
-
     },
 
 
@@ -599,23 +638,23 @@ define([
 
 
 
-    calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values){
-      var mode = this.get('modes')[ref_prop_key+'_'+ref_dimension];
-      switch(mode){
+    calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values) {
+      var mode = this.get('modes')[ref_prop_key + '_' + ref_dimension];
+      switch (mode) {
         case 'interpolate':
-        this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
-        break;
-        case 'random': 
-        this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension, reference_values);
-        break;
+          this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
+          break;
+        case 'random':
+          this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension, reference_values);
+          break;
         default:
-        break;
+          break;
       }
     },
 
-    calculateReferenceValuesRandom:  function(ref_prop_key, ref_dimension, reference_values) {
-        var reference = this.get('references');
-       if (reference) {
+    calculateReferenceValuesRandom: function(ref_prop_key, ref_dimension, reference_values) {
+      var reference = this.get('references');
+      if (reference) {
         var members;
         if (reference.get('type') == 'collection') {
           members = reference.members;
@@ -625,7 +664,7 @@ define([
         var reference_points = [];
         var points = [];
         var min, max;
-       
+
         for (var i = 0; i < members.length; i++) {
 
           var point;
@@ -659,9 +698,9 @@ define([
         }
         var range = this.get('relatives').getRange();
         for (var m = 0; m < range; m++) {
-            var y = Math.floor(Math.random()*(max-min+1)+min);
-            reference_values[ref_dimension][m].setValue(y);
-          
+          var y = Math.floor(Math.random() * (max - min + 1) + min);
+          reference_values[ref_dimension][m].setValue(y);
+
         }
       }
 
@@ -803,7 +842,6 @@ define([
     getMax: function() {
       return this.get('max');
     }
-
 
 
 
