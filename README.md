@@ -5,6 +5,18 @@ Para is a digital illustration tool tool that uses direct manipulation to define
 
 Para began as opensource software in the Creative Technologies Lab at Adobe Research. Currently, Para is under development in the Lifelong Kindergarten Group at the MIT Media Lab. The software is part of a research project in broadening participation in procedural art and design. Para is maintained by Jennifer Jacobs of the MIT Media Lab, with contributions from Joel Brandt and Radomír Měch of Adobe Research.
 
+
+Build Instructions
+-------------------
+
+If you want to build from this repository you must install node.js and the Grunt CLI. Then, from inside the para source directory, run:
+
+npm install 
+bower install
+grunt build
+
+If the build is successful, you should be able to run para locally from your browser by navigating to the build folder within the para repository and opening para.html. For best results, run it in Chrome.
+
 License
 -------
 
@@ -17,3 +29,4 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
