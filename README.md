@@ -12,7 +12,9 @@ Build Instructions
 If you want to build from this repository you must install node.js and the Grunt CLI. Then, from inside the para source directory, run:
 
 npm install 
+
 bower install
+
 grunt build
 
 If the build is successful, you should be able to run para locally from your browser by navigating to the build folder within the para repository and opening para.html. For best results, run it in Chrome.
