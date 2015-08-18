@@ -61,7 +61,7 @@ define([
                     ['rotationDelta_v','rotationDelta_v',['interpolate','interpolate']],
                     ['strokeWidth_v','strokeWidth_v',['interpolate','interpolate']]
                 ];
-                constraint.create(data,true);
+                constraint.create(data);
                 return constraint;
             },
 

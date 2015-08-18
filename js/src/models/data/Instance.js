@@ -98,7 +98,7 @@ define([
 					//inheritors: []
 			},
 
-			dimension_num: 9,
+			dimension_num: 6,
 
 			reset: false,
 			geom: null,

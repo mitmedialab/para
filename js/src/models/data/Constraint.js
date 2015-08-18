@@ -351,12 +351,11 @@ define([
       var relative = this.get('relatives');
 
       var setOnInstance = false;
-
+      console.log('properties', properties.length, 'dimension_num', relative.get('dimension_num'));
       if (properties.length === relative.get('dimension_num')) {
         setOnInstance = true;
       }
 
-      var relative_dimensions = relative.get('dimension_num');
       this.listenTo(relative.get('memberCount'), 'modified', function() {
         self.create(properties);
       });
@@ -409,8 +408,8 @@ define([
             this.setConstraintOnProperty(relative, expression, offset, [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
           } else {
             for (var n = 0; n < rel_dimensions.length; n++) {
-              console.log('rel dimension at',n,"="+rel_dimensions[n]);
-              console.log('ref dimension at',n,"="+ref_dimensions[n]);
+              console.log('rel dimension at', n, "=" + rel_dimensions[n]);
+              console.log('ref dimension at', n, "=" + ref_dimensions[n]);
               this.setConstraintOnSubProperty(relative, expression[rel_dimensions[n]], offset[rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
             }
           }
@@ -418,6 +417,7 @@ define([
       }
 
       if (setOnInstance) {
+        console.log('setting constraint on instance');
         this.setConstraintOnInstance(relative, expressions, offsets, refProperties, relProperties);
       }
       //set parent constraints on members
@@ -438,9 +438,8 @@ define([
     setConstraintOnSubProperty: function(relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
 
-     
       var constraintF = function() {
-         var list = [];
+        var list = [];
         var relative_range = relative.get('memberCount').getValue();
         for (var z = 0; z < relative_range; z++) {
           var data = {};
@@ -454,12 +453,17 @@ define([
           eval(expression);
           data[rel_prop_key][rel_dimension] = y;
           list.push(data);
+          if (relative.get('type') === 'collection') {
+            relative.members[z].get(rel_prop_key)[rel_dimension].setValue(y);
+          } else {
+            relative.get(rel_prop_key)[rel_dimension].setValue(y);
+          }
+
         }
         if (relative.get('type') === 'collection') {
-          relative.get(rel_prop_key).setValue(list);
+          console.log('list=', list);
           return list;
         } else {
-          relative.get(rel_prop_key)[rel_dimension].setValue(list[0][rel_prop_key][rel_dimension]);
           return list[0][rel_prop_key][rel_dimension];
         }
       };
@@ -495,20 +499,23 @@ define([
             }
 
           }
+          if (relative.get('type') === 'collection') {
+            relative.members[z].get(rel_prop_key).setValue(data[rel_prop_key]);
+          } else {
+            relative.get(rel_prop_key).setValue(data[rel_prop_key]);
+          }
           list.push(data);
 
         }
 
         if (relative.get('type') === 'collection') {
-          relative.get(rel_prop_key).setValue(list);
           return list;
         } else {
-          relative.get(rel_prop_key).setValue(list[0][rel_prop_key]);
           return list[0][rel_prop_key];
         }
       };
       relative.get(rel_prop_key).setConstraint(constraintF, this);
-    },
+    },  
 
     setConstraintOnInstance: function(relative, expressions, offsets, refProperties, relProperties) {
       var self = this;
@@ -517,9 +524,9 @@ define([
         var list = [];
         var relative_range = relative.get('memberCount').getValue();
 
-        for (var w = 0; w < relative_range; w++) {
+        /*for (var w = 0; w < relative_range; w++) {
           list.push({});
-        }
+        }*/
         for (var i = 0; i < refProperties.length; i++) {
 
           var ref_prop_key = refProperties[i][0];
@@ -530,7 +537,9 @@ define([
           var a_keys = Object.keys(expression);
 
           for (var z = 0; z < relative_range; z++) {
-
+            if(list.length<z){
+                list.push({});
+            }
             if (!list[z][rel_prop_key]) {
               list[z][rel_prop_key] = {};
             }
