@@ -67,14 +67,6 @@
 				this.constraintObject = constraint;
 			},
 
-			setParentConstraint: function(dimensions, val) {
-				for (var i = 0; i < dimensions.length; i++) {
-					if (this.hasOwnProperty(dimensions[i]) && (this[dimensions[i]] instanceof PConstraint)) {
-						this[dimensions[i]].parentConstraint = val;
-					}
-				}
-			},
-
 			//callback triggered when a subproperty is modified externally 
 			modified: function() {
 				this.trigger('modified', this);

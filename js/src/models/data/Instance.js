@@ -664,21 +664,6 @@ define([
 			return this.get(property_name);
 		},
 
-		setParentConstraint: function(properties, val) {
-			//console.log('setting parent constraint');
-			for (var i = 0; i < properties.length; i++) {
-				var property = properties[i];
-				var target_property = this.get(property[0]);
-				if (target_property.get('dimension_num') === property[1].length) {
-					//console.log('setting parent constraint on', property[0]);
-
-					target_property.parentConstraint = val;
-				} else {
-					//console.log('trying sub properties', property[0], property[1]);
-					target_property.setParentConstraint(properties[i], val);
-				}
-			}
-		},
 
 		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);

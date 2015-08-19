@@ -54,7 +54,7 @@ define([
                 constraint.set('relatives', this);
                 constraint.set('proxy_references',this.get('target'));
                 var data = [
-                    ['translationDelta_xy', 'translationDelta_xy', ['random','random']],
+                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate','interpolate']],
                     ['scalingDelta_xy', 'scalingDelta_xy',['interpolate','interpolate']],
                     ['fillColor_hsl',  'fillColor_hsl',['interpolate','interpolate','interpolate']],
                     ['strokeColor_hsl',  'strokeColor_hsl',['interpolate','interpolate','interpolate']],

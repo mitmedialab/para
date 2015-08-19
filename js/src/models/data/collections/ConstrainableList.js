@@ -197,20 +197,22 @@ define([
       },
 
       //callback triggered when a subproperty is modified externally 
-   /* modified: function() {  
+   modified: function() {  
         var constrained_props = this.getConstraintValues();
-        for (var i = 0; i < this.members.length; i++) {
+        /*for (var i = 0; i < this.members.length; i++) {
           if (constrained_props[i]) {
             if (!this.isReference(this.members[i])) {
 
               //this.members[i].setValue(constrained_props[i]);
             }
           }
-        }
+        }*/
         this.setNull(false);
         this.trigger('modified', this);
-      },*/
+      },
 
+
+     
 
       //renders the List UI
       render: function() {
