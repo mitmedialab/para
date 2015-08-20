@@ -42,8 +42,12 @@
 </div>
   <div class="clearfix"></div>
 
+<div class="indexes">
+ <button class="btn btn-default btn-tool btn-prop" id="exempt_button" title="group"> <button class="btn btn-default btn-tool btn-prop" id="reference_button" title="group"></button><label> relative index <input id="relative_index" class="filename constraint-text" type="number"></label>
+</div>
+
 <div class="offsets">
- <label> reference <input id="reference_offset" class="filename constraint-text" type="text"></label> : <label> relative<input id="relative_offset" class="filename constraint-text" type="text"></label>  <button class="btn btn-default btn-tool btn-prop" id="lock" title="group"></button>
+ <button class="btn btn-default btn-tool btn-prop" id="lock_button" title="group"></button><label> reference <input id="reference_offset" class="filename constraint-text" type="number"></label> : <label> relative<input id="relative_offset" class="filename constraint-text" type="number"></label>  
 </div>
    <div class = "selectel">
   <select id="map-defaults">
@@ -54,8 +58,8 @@
 </select>
 </div>
 <div id="yaxis">
- <label> max <input id="max" class="filename constraint-text range-text" type="text"></label>
-   <label class="min"> min <input id="min" class="filename constraint-text range-text" type="text"></label>
+ <label> max <input id="max" class="filename constraint-text range-text" type="number"></label>
+   <label class="min"> min <input id="min" class="filename constraint-text range-text" type="number"></label>
 </div>
 <div id="collection-container"><canvas id="collection-canvas" width="175" height="175" style="-webkit-user-select: none; touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
 

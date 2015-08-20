@@ -242,13 +242,26 @@ input[type="range"]:active::-webkit-slider-thumb {
   border:none;
 }
 
+#lock_button{
+  background-position-y: -140px;
+}
+
+#reference_button{
+  background-position-y:-160px;
+}
+
+
+#exempt_button{
+  background-position-y:-180px;
+}
+
 
 
 .btn-prop{
   width:22px;
   height:22px;
   background-image: url(../images/property_icons.svg);
-  background-size: 20px 140px;
+  background-size: 20px 200px;
   background-repeat: no-repeat;
   background-position-x: 0px;
   background-position-y: 0px;
