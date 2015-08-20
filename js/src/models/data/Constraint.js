@@ -145,6 +145,7 @@ define([
       operators: null,
       reference_properties: null,
       relative_properties: null,
+      user_name: null,
     },
 
     initialize: function() {
@@ -239,6 +240,9 @@ define([
       this.set('rel_type', type);
       return false;
     },
+
+    
+
 
 
     setOffset: function(reference, ref_prop_key, ref_dimensions, relative, rel_prop_key, rel_dimensions) {
@@ -345,6 +349,8 @@ define([
       var relProperties = [];
       this.set('relative_properties', relProperties);
       this.set('reference_properties', refProperties);
+      this.set('offsets',offsets);
+      this.set('expressions',expressions);
       var constraint_data = {};
       var self = this;
       var reference = this.get('references');
@@ -420,9 +426,46 @@ define([
         console.log('setting constraint on instance');
         this.setConstraintOnInstance(reference, relative, expressions, offsets, refProperties, relProperties);
       }
+      console.log('modes',this.get('modes'));
     
     },
 
+
+    getProperties: function(){
+      var relative_properties = this.get('relative_properties');
+      var reference_values = this.get('reference_values');
+      var relative = this.get('relatives');
+      var properties =[]; 
+      for(var i=0;i<relative_properties.length;i++){
+        var data = {name:relative_properties[i][0]};
+        data.subproperties = [];
+        for(var j=0;j<relative_properties[i][1].length;j++){
+          var ref_vals = reference_values[relative_properties[i][0]][relative_properties[i][1][j]];
+          var rel_vals = [];
+          if(relative.get('type')==='collection'){
+            for(var k=0;k<relative.members.length;k++){
+              rel_vals.push(relative.members[k].get(relative_properties[i][0])[relative_properties[i][1][j]]);
+            }
+          }
+          else{
+             rel_vals.push(relative.get(relative_properties[i][0])[relative_properties[i][1][j]]);
+          }
+
+          data.subproperties.push({name:relative_properties[i][1][j],ref_vals:ref_vals,rel_vals:rel_vals});
+        }
+        properties.push(data);
+      }
+      return properties;
+    },
+
+ 
+
+    getRelativeRange:function(){
+      return this.get('relatives').getRange();
+    },
+
+    getOffsetsAt:function(index){
+    },
 
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {

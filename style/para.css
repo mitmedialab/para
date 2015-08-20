@@ -213,27 +213,27 @@ input[type="range"]:active::-webkit-slider-thumb {
     background-position-x: 0px;
     background-position-y: 0px;
 }
-#translation_delta {
+#translationDelta {
     background-position-y: 0px;
 
 }
-#rotation_delta {
+#rotationDelta {
   background-position-y: -20px;
 }
 
-#scaling_delta {
+#scalingDelta {
   background-position-y: -40px;
 }
 
-#stroke_width {
+#strokeWidth {
   background-position-y: -60px;
 }
 
-#fill_color {
+#fillColor {
   background-position-y: -80px;
 }
 
-#stroke_color {
+#strokeColor {
   background-position-y: -100px;
 }
 

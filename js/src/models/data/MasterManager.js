@@ -504,6 +504,9 @@ define([
 		},
 
 		addConstraint: function(constraint) {
+			if(!constraint.get('user_name')){
+				constraint.set('user_name','constraint '+(constraints.length+1));
+			}
 			constraints.push(constraint);
 			layersView.addConstraint(constraint);
 			this.updateMapView(constraint.get('id'));

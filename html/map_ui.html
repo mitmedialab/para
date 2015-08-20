@@ -6,45 +6,37 @@
      </h2>
      <div class="clearfix"></div>
    </header>
-   <div class = 'constraint-properties-container'>
-    <div class ="constraint_name"><label> name <input id="name" class="filename constraint-text" type="text"></label></div>
+   <div id="constraint-properties" class = 'constraint-properties-container'>
+     <script id="constraintTemplate" type="text/x-handlebars-template">
+
+    <div class ="constraint_name"><label> name <input id="name" class="filename constraint-text" type="text" value="{{name}}"></label></div>
      <div class="clearfix"></div>
 
    <div class = "property_list"> 
-        <button class="btn btn-default btn-tool btn-prop" id="translation_delta" title="group"></button>
-        <button class="btn btn-default btn-tool btn-prop" id="rotation_delta" title="group"></button>
-        <button class="btn btn-default btn-tool btn-prop" id="scaling_delta" title="group"></button>
-        <button class="btn btn-default btn-tool btn-prop" id="stroke_width" title="group"></button>
-        <button class="btn btn-default btn-tool btn-prop" id="fill_color" title="group"></button>
-        <button class="btn btn-default btn-tool btn-prop" id="stroke_color" title="group"></button>
+    {{#each properties}}
+        <button class="btn btn-default btn-tool btn-prop {{active}}" id={{name}} title={{name}}></button>
+    {{/each}}
         <button class="btn btn-default btn-tool btn-prop" id="add_button" title="group"></button>
+
   </div>
   <div class="clearfix"></div>
-
+ 
+  
    <div class="tabs">
+    {{#each subproperties}}
        <div class="tab">
-       <input type="radio" id="tab-1" name="tab-group-1" checked>
-       <label for="tab-1">x</label>
+       <input type="radio" id={{name}}  name="subprop-tabs" {{checked}} >
+       <label for={{name}}>{{name}}</label>
         <div class = "tab_rule"></div>
    </div>
-    
-   <div class="tab">
-       <input type="radio" id="tab-2" name="tab-group-1">
-       <label for="tab-2">y</label>
-        <div class = "tab_rule"></div>
-   </div>
-
-    <div class="tab">
-       <input type="radio" id="tab-3" name="tab-group-1">
-       <label for="tab-3">z</label>
-        <div class = "tab_rule"></div>
-   </div>
+     {{/each}} 
+ 
 
 </div>
   <div class="clearfix"></div>
 
 <div class="indexes">
- </button><label> relative index <input id="relative_index" class="filename constraint-text" type="number"></label><button class="btn btn-default btn-tool btn-prop" id="exempt_button" title="exempt"> <button class="btn btn-default btn-tool btn-prop" id="reference_button" title="reference">
+ </button><label> relative index <input id="relative_index" class="filename constraint-text" type="number" min="{{range_min}}" value="{{range_val}}" max="{{range_max}}"></label><button class="btn btn-default btn-tool btn-prop" id="exempt_button" title="exempt"> <button class="btn btn-default btn-tool btn-prop" id="reference_button" title="reference">
 </div>
   <div class="clearfix"></div>
 
@@ -56,10 +48,10 @@
 
    <div class = "selectel">
   <select id="map-defaults">
-  <option value="linear">linear</option>
-  <option value="linear">random</option>
-  <option value="linear">gaussian</option>
-  <option value="linear">custom</option>
+  <option value="interpolate">interpolate</option>
+  <option value="random">random</option>
+  <option value="gaussian">gaussian</option>
+  <option value="custom">custom</option>
 </select>
 </div>
   <div class="clearfix"></div>
@@ -79,6 +71,7 @@
   </ul>
 </div>
 </div>
+</script>
   <div class="clearfix"></div>
 
 </div>
