@@ -13,7 +13,7 @@ define([
 	"text!html/map_ui.html"
 
 ], function($, _, paper, Backbone, Handlebars, cjs, TrigFunc, ui) {
-	var mapPaperView, functionPath, intersectionPath, start, end, startPoint, endPoint, tool, master_tool, activePoint, self, template, source, properties, current_prop, current_subprop, current_index, constraint;
+	var mapPaperView, functionPath, intersectionPath, start, end, startPoint, endPoint, tool, master_tool, activePoint, self, propertiesTemplate, subpropertiesTemplate, properties, current_prop, current_subprop, current_index, constraint;
 	var width = 175;
 	var height = 175;
 	var graphPoints = [];
@@ -76,7 +76,8 @@ define([
 			'change #max': 'maxChange',
 			'change #relative_index': 'changeIndex',
 			'change input[name=subprop-tabs]:radio': 'changeSubprop',
-			'change #map-defaults': 'changeMapDefault'
+			'change #map-defaults': 'changeMapDefault',
+			'click #property_buttons': 'changeProperty'
 		},
 
 		initialize: function(obj) {
@@ -84,11 +85,13 @@ define([
 			$("body").append(ui);
 			self = this;
 			this.setElement($('#collection-mapper'));
-			source = $('#constraintTemplate').html();
+			var propsource = $('#propertiesTemplate').html();
+			propertiesTemplate = Handlebars.default.compile(propsource);
 
-			template = Handlebars.default.compile(source);
-			var html = template({});
-			$('#constraint-properties').html(html);
+			var subsource = $('#subpropertiesTemplate').html();
+			subpropertiesTemplate = Handlebars.default.compile(subsource);
+
+
 
 			paper.setup($('#collection-canvas')[0]);
 			mapPaperView = paper.View._viewsById['collection-canvas'];
@@ -140,22 +143,17 @@ define([
 
 		setConstraint: function(c) {
 			this.stopListening();
-			var data = {};
+
 			if (c) {
 
 				constraint = c;
 				properties = constraint.getProperties();
 				current_prop = 0;
 				current_subprop = 0;
-				properties[0].active = 'active';
-				data.properties = properties;
-				data.subproperties = properties[0].subproperties;
-				data.subproperties[0].checked = 'checked';
-				data.name = constraint.get('user_name');
-				data.range_min = 1;
-				data.range_max = constraint.getRelativeRange();
-				data.range_val = 1;
-				current_index = 0;
+
+				$('#relative_index').attr('min', 1);
+				$('#relative_index').attr('max', constraint.getRelativeRange());
+				$('#relative_index').val(1);
 				var cmin = constraint.getMin();
 				var cmax = constraint.getMax();
 
@@ -165,33 +163,65 @@ define([
 				//this.setMinMax(cmin,cmax,points[0]);
 				//this.setFunctionPath(points[0]);
 				//self.model.updateMapping(self.calculateValueSet());
-
-				console.log('data =', data);
-				var html = template(data);
+				var data = {};
+				data.properties = properties;
+				data.name = constraint.get('user_name');
+				var html = propertiesTemplate(data);
 				$('#constraint-properties').html(html);
-				$('#relative_offset').val(Math.round(data.subproperties[0].rel_vals[0].getValue()));
-				$('#reference_offset').val(Math.round(data.subproperties[0].ref_vals[0].getValue()));
-				this.listenTo(data.subproperties[0].ref_vals[0], 'modified', this.changeRefVal);
-				this.listenTo(data.subproperties[0].rel_vals[0], 'modified', this.changeRelVal);
+				this.changeProperty();
 
-				
 
 
 			}
 		},
 
-		changeProp: function(event){
+		changeProperty: function(event) {
+			this.stopListening(properties[current_prop].subproperties[current_subprop].rel_vals[current_index]);
+			this.stopListening(properties[current_prop].subproperties[current_subprop].ref_vals[current_index]);
+
+			if (event) {
+				$('#'+properties[current_prop].name).removeClass('active');
+				
+
+				var propName = event.target.id;
+				var targetProperty = properties.filter(function(prop) {
+					return prop.name == propName;	
+				})[0];
+				var index = properties.indexOf(targetProperty);
+				if (index != current_prop) {
+					current_prop = index;
+
+				}
+			}
+			$('#'+properties[current_prop].name).addClass('active');
+			var data = {
+				subproperties: properties[current_prop].subproperties
+			};
+			data.subproperties[0].checked = 'checked';
+			var html = subpropertiesTemplate(data);
+			$('#subproperties').html(html);
+			this.changeSubprop();
 
 		},
 
-		changeSubprop: function(event){
-			console.log('subprop change',event,event.target);
-			var subprop_name = event.target.id;
-			var targetSubprop = properties[current_prop].subproperties.filter(function(subprop){
-				return subprop.name == subprop_name;
-			})[0];
-			current_subprop = properties[current_prop].subproperties.indexOf(targetSubprop);
-			this.changeIndex();
+		changeSubprop: function(event) {
+			if (event) {
+				var subprop_name = event.target.id;
+				var targetSubprop = properties[current_prop].subproperties.filter(function(subprop) {
+					return subprop.name == subprop_name;
+				})[0];
+				current_subprop = properties[current_prop].subproperties.indexOf(targetSubprop);
+			} else {
+				current_subprop = 0;
+			}
+			var modes = constraint.get('modes');
+			var propName = properties[current_prop].name;
+			var referenceValues = constraint.get('reference_values')[propName];
+			var subpropName = properties[current_prop].subproperties[current_subprop].name;
+			var mode = modes[propName + '_' + subpropName];
+ 			$('#map-defaults').val(mode);
+
+ 			this.changeIndex();
 
 		},
 
@@ -200,8 +230,8 @@ define([
 			this.stopListening(properties[current_prop].subproperties[current_subprop].ref_vals[current_index]);
 
 
-			current_index = $('#relative_index').val()-1;
-			console.log('current_index=',current_index);
+			current_index = $('#relative_index').val() - 1;
+			console.log('current_index=', current_index);
 			$('#relative_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].rel_vals[current_index].getValue()));
 			$('#reference_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].ref_vals[current_index].getValue()));
 			this.listenTo(properties[current_prop].subproperties[current_subprop].ref_vals[current_index], 'modified', this.changeRefVal);
@@ -220,15 +250,15 @@ define([
 
 		},
 
-		changeMapDefault: function(){
+		changeMapDefault: function() {
+			console.log('change map defaults');
 			var value = $('#map-defaults').val();
-			console.log('value',value);
+			console.log('value', value);
 			var modes = constraint.get('modes');
 			var propName = properties[current_prop].name;
-			var referenceValues = constraint.get('reference_values')[propName];
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
-			modes[propName+'_'+subpropName] = value;
-			constraint.calculateReferenceValues(propName,subpropName,referenceValues);
+			modes[propName + '_' + subpropName] = value;
+			constraint.calculateReferenceValues(propName, subpropName);
 		},
 
 		setMinMax: function(cmin, cmax, points) {

@@ -6,23 +6,29 @@
      </h2>
      <div class="clearfix"></div>
    </header>
-   <div id="constraint-properties" class = 'constraint-properties-container'>
-     <script id="constraintTemplate" type="text/x-handlebars-template">
+   <div class = 'constraint-properties-container'>
+    <div id="constraint-properties">
+     <script id="propertiesTemplate" type="text/x-handlebars-template">
 
     <div class ="constraint_name"><label> name <input id="name" class="filename constraint-text" type="text" value="{{name}}"></label></div>
      <div class="clearfix"></div>
 
-   <div class = "property_list"> 
+   <div id='property_buttons' class = "property_list"> 
     {{#each properties}}
         <button class="btn btn-default btn-tool btn-prop {{active}}" id={{name}} title={{name}}></button>
     {{/each}}
         <button class="btn btn-default btn-tool btn-prop" id="add_button" title="group"></button>
 
   </div>
+  </script>
+ </div>
+
   <div class="clearfix"></div>
  
   
-   <div class="tabs">
+   <div id="subproperties" class="tabs">
+     <script id="subpropertiesTemplate" type="text/x-handlebars-template">
+
     {{#each subproperties}}
        <div class="tab">
        <input type="radio" id={{name}}  name="subprop-tabs" {{checked}} >
@@ -31,12 +37,12 @@
    </div>
      {{/each}} 
  
-
+</script>
 </div>
   <div class="clearfix"></div>
 
 <div class="indexes">
- </button><label> relative index <input id="relative_index" class="filename constraint-text" type="number" min="{{range_min}}" value="{{range_val}}" max="{{range_max}}"></label><button class="btn btn-default btn-tool btn-prop" id="exempt_button" title="exempt"> <button class="btn btn-default btn-tool btn-prop" id="reference_button" title="reference">
+ </button><label> relative index <input id="relative_index" class="filename constraint-text" type="number" min="" value="" max=""></label><button class="btn btn-default btn-tool btn-prop" id="exempt_button" title="exempt"> <button class="btn btn-default btn-tool btn-prop" id="reference_button" title="reference">
 </div>
   <div class="clearfix"></div>
 
@@ -71,7 +77,6 @@
   </ul>
 </div>
 </div>
-</script>
   <div class="clearfix"></div>
 
 </div>

@@ -357,13 +357,16 @@ define([
       var relative = this.get('relatives');
 
       var setOnInstance = false;
-      console.log('properties', properties.length, 'dimension_num', relative.get('dimension_num'));
       if (properties.length === relative.get('dimension_num')) {
         setOnInstance = true;
       }
 
       this.listenTo(relative.get('memberCount'), 'modified', function() {
-        self.create(properties);
+        for(var h=0;h<refProperties.length;h++){
+          for(var m=0;m<refProperties[h][1].length;m++){
+            self.calculateReferenceValues(refProperties[h][0],refProperties[h][1][m]);
+          }
+        }
       });
       var modes = {};
       this.set('modes', modes);
@@ -414,8 +417,6 @@ define([
             this.setConstraintOnProperty(reference, relative, expression, offset, [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
           } else {
             for (var n = 0; n < rel_dimensions.length; n++) {
-              console.log('rel dimension at', n, "=" + rel_dimensions[n]);
-              console.log('ref dimension at', n, "=" + ref_dimensions[n]);
               this.setConstraintOnSubProperty(reference, relative, expression[rel_dimensions[n]], offset[rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
             }
           }
@@ -423,10 +424,8 @@ define([
       }
 
       if (setOnInstance) {
-        console.log('setting constraint on instance');
         this.setConstraintOnInstance(reference, relative, expressions, offsets, refProperties, relProperties);
       }
-      console.log('modes',this.get('modes'));
     
     },
 
@@ -496,7 +495,6 @@ define([
 
         }
         if (relative.get('type') === 'collection') {
-          console.log('list=', list);
           return list;
         } else {
           return list[0][rel_prop_key][rel_dimension];
@@ -690,8 +688,9 @@ define([
 
 
 
-    calculateReferenceValues: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValues: function(ref_prop_key, ref_dimension) {
       var mode = this.get('modes')[ref_prop_key + '_' + ref_dimension];
+      var reference_values = this.get('reference_values')[ref_prop_key];
       switch (mode) {
         case 'interpolate':
           this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
@@ -733,6 +732,7 @@ define([
               x: i,
               y: members[i].getValue()[ref_prop_key][ref_dimension]
             };
+          }
             if (!min && !max) {
               min = point.y;
               max = point.y;
@@ -744,15 +744,23 @@ define([
               max = point.y;
             }
             points.push(point);
-          }
+          
 
           reference_points.push(points);
         }
         var range = this.get('relatives').getRange();
         for (var m = 0; m < range; m++) {
-          var y = Math.floor(Math.random() * (max - min + 1) + min);
-          reference_values[ref_dimension][m].setValue(y);
 
+          var y = Math.floor(Math.random() * (max - min + 1) + min);
+        
+          if(reference_values[ref_dimension][m]){
+            reference_values[ref_dimension][m].setValue(y);
+           }
+          else{
+            var newVal = new PFloat(y);
+            newVal.setNull(false);
+            reference_values[ref_dimension].push(newVal);
+          }
         }
       }
 
@@ -830,7 +838,14 @@ define([
             x = TrigFunc.map(m, 0, range - 1, 0, points.length - 1);
           }
           var y = eval(expression);
-          reference_values[ref_dimension][m].setValue(y);
+          if(reference_values[ref_dimension][m]){
+            reference_values[ref_dimension][m].setValue(y);
+          }
+          else{
+            var newVal = new PFloat(y);
+            newVal.setNull(false);
+            reference_values[ref_dimension].push(newVal);
+          }
         }
       }
     },
