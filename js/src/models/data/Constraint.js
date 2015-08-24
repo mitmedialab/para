@@ -4,8 +4,9 @@ define([
   'backbone',
   'models/data/paperUI/ConstraintHandles',
   'utils/PFloat',
+  'utils/PBool',
   'utils/TrigFunc',
-], function(_, paper, Backbone, ConstraintHandles, PFloat, TrigFunc) {
+], function(_, paper, Backbone, ConstraintHandles, PFloat, PBool, TrigFunc) {
 
   var propConvMap = {
     'translationDelta:scalingDelta': 0.01,
@@ -141,6 +142,7 @@ define([
       max: null,
       functionPath: null,
       offset: null,
+      exempt_indicies: null,
       map_operand: null,
       operators: null,
       reference_properties: null,
@@ -241,65 +243,108 @@ define([
       return false;
     },
 
-    
+
+    updateOffset: function(rel_prop_key, rel_dimension, index, value) {
+      this.get('offsets')[rel_prop_key][rel_dimension][index].setValue(value);
+    },
+
+    setExempt: function(rel_prop_key, rel_dimension, index, status) {
+      var exempt_indicies = this.get('exempt_indicies');
+      exempt_indicies[rel_prop_key][rel_dimension][index].setValue(status);
+    },
 
 
 
-    setOffset: function(reference, ref_prop_key, ref_dimensions, relative, rel_prop_key, rel_dimensions) {
-
+    createOffsetAt: function(index, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions) {
       var convertFactor = propConvMap[ref_prop_key + ':' + rel_prop_key];
-
-      var refProp = this.propSwitch(ref_prop_key, ref_dimensions, reference);
+      var reference_values = this.get('reference_values');
       var relPropValue;
-      var refPropValue = refProp[ref_prop_key];
+      var refPropValue = reference_values[ref_prop_key];
       var conversion = {};
-      var offset = this.get('offset') ? this.get('offset') : {};
+      var offsets = this.get('offsets');
+      if (!offsets[rel_prop_key]) {
+        offsets[rel_prop_key] = {};
+      }
+      var offset = offsets[rel_prop_key];
+      var expressions = this.get('expressions');
+      if (!expressions[rel_prop_key]) {
+        expressions[rel_prop_key] = {};
+      }
+      var expression = expressions[rel_prop_key];
+      var exempt_indicies = this.get('exempt_indicies');
+      if (!exempt_indicies[rel_prop_key]) {
+        exempt_indicies[rel_prop_key] = {};
+      }
+      var exempt_index = exempt_indicies[rel_prop_key];
+      var relative = this.get('relatives');
       var keys;
       var instance;
-      var offsetLength = offset[rel_dimensions[0]] ? offset[rel_dimensions[0]].length : 0;
-      var relativeRange = relative.getRange() - offsetLength;
+      var relativeRange = relative.get('memberCount').getValue();
 
       if (ref_dimensions.length === rel_dimensions.length) {
 
         for (var i = 0; i < rel_dimensions.length; i++) {
           offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
-          for (var p = 0; p < relativeRange; p++) {
-            instance = relative;
-            if (relative.get('type') === 'collection') {
-              instance = instance.members[p];
-            }
-            relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
-            conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]] * convertFactor;
-            offset[rel_dimensions[i]].push(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
+          exempt_index[rel_dimensions[i]] = exempt_index[rel_dimensions[i]] ? exempt_index[rel_dimensions[i]] : [];
+          instance = relative;
+          if (relative.get('type') === 'collection') {
+            instance = instance.members[index];
           }
+          relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
+          conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]][index].getValue() * convertFactor;
+          if (offset[rel_dimensions[i]].length <= index) {
+            offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
+          } else {
+            offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
+          }
+          if (exempt_index[rel_dimensions[i]].length <= index) {
+            exempt_index[rel_dimensions[i]].push(new PBool(false));
+          }
+
         }
       } else if (ref_dimensions.length > rel_dimensions.length) {
         for (var j = 0; j < rel_dimensions.length; j++) {
           offset[rel_dimensions[j]] = offset[rel_dimensions[j]] ? offset[rel_dimensions[j]] : [];
-          for (var t = 0; t < relativeRange; t++) {
-            instance = relative;
-            if (relative.get('type') === 'collection') {
-              instance = instance.members[t];
-            }
-            relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
-            conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]] * convertFactor : refPropValue[keys[j]] * convertFactor;
-            offset[rel_dimensions[j]].push(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
+          exempt_index[rel_dimensions[j]] = exempt_index[rel_dimensions[j]] ? exempt_index[rel_dimensions[j]] : [];
+
+          instance = relative;
+          if (relative.get('type') === 'collection') {
+            instance = instance.members[index];
           }
+          relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
+          conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]][index].getValue() * convertFactor : refPropValue[keys[j]][index].getValue() * convertFactor;
+          if (offset[rel_dimensions[j]].length <= index) {
+            offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
+          } else {
+            offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
+          }
+          if (exempt_index[rel_dimensions[j]].length <= index) {
+            exempt_index[rel_dimensions[j]].push(new PBool(false));
+          }
+
         }
 
       } else if (ref_dimensions.length < rel_dimensions.length) {
         keys = Object.keys(refPropValue);
         for (var m = 0; m < rel_dimensions.length; m++) {
           offset[rel_dimensions[m]] = offset[rel_dimensions[m]] ? offset[rel_dimensions[m]] : [];
-          for (var s = 0; s < relativeRange; s++) {
-            instance = relative;
-            if (relative.get('type') === 'collection') {
-              instance = instance.members[s];
-            }
-            relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
-            conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]] * convertFactor : (m < keys.length) ? refPropValue[keys[m]] * convertFactor : refPropValue[keys[keys.length - 1]];
-            offset[rel_dimensions[m]].push(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
+          exempt_index[rel_dimensions[m]] = exempt_index[rel_dimensions[m]] ? exempt_index[rel_dimensions[m]] : [];
+
+          instance = relative;
+          if (relative.get('type') === 'collection') {
+            instance = instance.members[index];
           }
+          relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
+          conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]][index].getValue() * convertFactor : (m < keys.length) ? refPropValue[keys[m]][index].getValue() * convertFactor : refPropValue[keys[keys.length - 1]][index].getValue();
+          if (offset[rel_dimensions[m]].length <= index) {
+            offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
+          } else {
+            offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
+          }
+          if (exempt_index[rel_dimensions[m]].length <= index) {
+            exempt_index[rel_dimensions[m]].push(new PBool(false));
+          }
+
         }
 
       }
@@ -315,10 +360,15 @@ define([
         }
       }
 
-      return {
-        offset: offset,
-        convertFactor: convertFactor
-      };
+
+      for (var f = 0; f < rel_dimensions.length; f++) {
+        var exp_scale = 'y =' + convertFactor.toString() + ' * ' + 'x';
+        var e = exp_scale + ' + ' + 'offsetValue';
+        expression[rel_dimensions[f]] = e;
+
+      }
+
+
     },
 
     propSwitch: function(propName, subprops, instance) {
@@ -337,34 +387,34 @@ define([
       return propValue;
     },
 
-
     /*properties should take the form of an array listing constraints for each subprop
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
     create: function(properties) {
       this.stopListening();
-      var offsets = [];
+      var offsets = {};
+      var exempt_indicies = {};
       var expressions = [];
       var refProperties = [];
       var relProperties = [];
       this.set('relative_properties', relProperties);
       this.set('reference_properties', refProperties);
-      this.set('offsets',offsets);
-      this.set('expressions',expressions);
+      this.set('offsets', offsets);
+      this.set('exempt_indicies', exempt_indicies);
+
+      this.set('expressions', expressions);
       var constraint_data = {};
       var self = this;
       var reference = this.get('references');
       var relative = this.get('relatives');
+      var relative_range = relative.get('memberCount').getValue();
 
       var setOnInstance = false;
-      if (properties.length === relative.get('dimension_num')) {
-        setOnInstance = true;
-      }
 
       this.listenTo(relative.get('memberCount'), 'modified', function() {
-        for(var h=0;h<refProperties.length;h++){
-          for(var m=0;m<refProperties[h][1].length;m++){
-            self.calculateReferenceValues(refProperties[h][0],refProperties[h][1][m]);
+        for (var h = 0; h < refProperties.length; h++) {
+          for (var m = 0; m < refProperties[h][1].length; m++) {
+            self.calculateReferenceValues(refProperties[h][0], refProperties[h][1][m]);
           }
         }
       });
@@ -384,6 +434,7 @@ define([
         var property_dimensions = relative.get(rel_prop_key).get('dimension_num');
         refProperties.push([ref_prop_key, ref_dimensions]);
         relProperties.push([rel_prop_key, rel_dimensions]);
+
         for (var m = 0; m < ref_dimensions.length; m++) {
           if (mode_list && mode_list[m]) {
             modes[ref_prop_key + '_' + ref_dimensions[m]] = mode_list[m];
@@ -391,99 +442,119 @@ define([
             modes[ref_prop_key + '_' + ref_dimensions[m]] = 'interpolate';
           }
         }
-        var offset_data = this.setOffset(reference, ref_prop_key, ref_dimensions, relative, rel_prop_key, rel_dimensions);
-        var convertFactor = offset_data.convertFactor;
-        var offset = offset_data.offset;
-        offsets.push(offset);
 
-        var exp_scale = 'y =' + convertFactor.toString() + ' * ' + 'x';
-        var expression = {};
-        for (var p in offset) {
-          if (offset.hasOwnProperty(p)) {
-            expression[p] = exp_scale + ' + ' + 'offsetValue'; //offset[axis].toString()';
-          }
-        }
-        expressions.push(expression);
         this.setReferenceValues(ref_prop_key, ref_dimensions);
-        this.listenTo(reference.get('memberCount'), 'modified', function() {
+
+        for (var g = 0; g < relative_range; g++) {
+          this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
+        }
+
+
+          if (relative.get(rel_prop_key).get('dimension_num') == 1) {
+            this.setConstraintOnProperty(reference, relative, expressions[rel_prop_key], offsets[rel_prop_key], [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
+          } else {
+            for (var n = 0; n < rel_dimensions.length; n++) {
+              this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
+            }
+          }
+      }
+
+    this.listenTo(reference.get('memberCount'), 'modified', function() {
+
+        for (var i = 0; i < refProperties.length; i++) {
           (
             function(rpk, rd) {
               self.setReferenceValues(rpk, rd);
-            }(ref_prop_key, ref_dimensions)
+            }(refProperties[i][0], refProperties[i][1])
           );
-        });
-        if (!setOnInstance) {
-          if (relative.get(rel_prop_key).get('dimension_num') == rel_dimensions.length) {
-            this.setConstraintOnProperty(reference, relative, expression, offset, [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
-          } else {
-            for (var n = 0; n < rel_dimensions.length; n++) {
-              this.setConstraintOnSubProperty(reference, relative, expression[rel_dimensions[n]], offset[rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
-            }
-          }
-        }
-      }
 
-      if (setOnInstance) {
-        this.setConstraintOnInstance(reference, relative, expressions, offsets, refProperties, relProperties);
-      }
-    
+        }
+      });
+
+      this.listenTo(relative.get('memberCount'), 'modified', function() {
+
+        for (var i = 0; i < relProperties.length; i++) {
+          (
+            function(rpk, rd, rlpk, rld) {
+              for (var g = 0; g < relative.get('memberCount').getValue(); g++) {
+                self.createOffsetAt(g, rpk, rd, rlpk, rld);
+              }
+            }(refProperties[i][0], refProperties[i][1], relProperties[i][0], relProperties[i][1])
+          );
+
+        }
+      });
+
     },
 
 
-    getProperties: function(){
+    getProperties: function() {
       var relative_properties = this.get('relative_properties');
       var reference_values = this.get('reference_values');
       var relative = this.get('relatives');
-      var properties =[]; 
-      for(var i=0;i<relative_properties.length;i++){
-        var data = {name:relative_properties[i][0]};
+      var properties = [];
+      for (var i = 0; i < relative_properties.length; i++) {
+        var data = {
+          name: relative_properties[i][0]
+        };
         data.subproperties = [];
-        for(var j=0;j<relative_properties[i][1].length;j++){
+        for (var j = 0; j < relative_properties[i][1].length; j++) {
           var ref_vals = reference_values[relative_properties[i][0]][relative_properties[i][1][j]];
           var rel_vals = [];
-          if(relative.get('type')==='collection'){
-            for(var k=0;k<relative.members.length;k++){
+          if (relative.get('type') === 'collection') {
+            for (var k = 0; k < relative.members.length; k++) {
               rel_vals.push(relative.members[k].get(relative_properties[i][0])[relative_properties[i][1][j]]);
             }
-          }
-          else{
-             rel_vals.push(relative.get(relative_properties[i][0])[relative_properties[i][1][j]]);
+          } else {
+            rel_vals.push(relative.get(relative_properties[i][0])[relative_properties[i][1][j]]);
           }
 
-          data.subproperties.push({name:relative_properties[i][1][j],ref_vals:ref_vals,rel_vals:rel_vals});
+          data.subproperties.push({
+            name: relative_properties[i][1][j],
+            ref_vals: ref_vals,
+            rel_vals: rel_vals
+          });
         }
         properties.push(data);
       }
       return properties;
     },
 
- 
 
-    getRelativeRange:function(){
+
+    getRelativeRange: function() {
       return this.get('relatives').getRange();
     },
 
-    getOffsetsAt:function(index){
-    },
+    getOffsetsAt: function(index) {},
 
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
-
       var constraintF = function() {
         var list = [];
+        var exempt_indicies = self.get('exempt_indicies');
         var relative_range = relative.get('memberCount').getValue();
+        var reference_values = self.get('reference_values');
+
         for (var z = 0; z < relative_range; z++) {
           var data = {};
+          var y;
           data[rel_prop_key] = {};
           var ap = ref_dimension;
-          var reference_values = self.get('reference_values');
-          var x = reference_values[ref_prop_key][ref_dimension][z].getValue();
-
-          var offsetValue = 0; //offset;
-          var y;
-          eval(expression);
+          if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue()) {
+            if (relative.get('type') === 'collection') {
+              y = relative.members[z].get(rel_prop_key)[rel_dimension].getValue();
+            } else {
+              y = relative.get(rel_prop_key)[rel_dimension].getValue();
+            }
+          } else {
+            var x = reference_values[ref_prop_key][ref_dimension][z].getValue();
+            var offsetValue = offset[z].getValue();
+            eval(expression);
+          }
           data[rel_prop_key][rel_dimension] = y;
+
           list.push(data);
           if (relative.get('type') === 'collection') {
             if (!relative.isReference(relative.members[z])) {
@@ -509,6 +580,7 @@ define([
       var rel_prop_key = relProperty[0];
       var ref_dimensions = refProperty[1];
       var constraintF = function() {
+        var exempt_indicies = self.get('exempt_indicies');
 
         var list = [];
         var relative_range = relative.get('memberCount').getValue();
@@ -519,12 +591,21 @@ define([
 
           for (var m = 0; m < a_keys.length; m++) {
             var axis = a_keys[m];
-            var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
-            var reference_values = self.get('reference_values');
-            var x = reference_values[ref_prop_key][axis][z].getValue();
-            var offsetValue = 0; //offset[axis][z];
             var y;
-            eval(expression[axis]);
+            if (exempt_indicies[rel_prop_key][axis][z].getValue()) {
+              if (relative.get('type') === 'collection') {
+                y = relative.members[z].get(rel_prop_key)[axis].getValue();
+              } else {
+                y = relative.get(rel_prop_key)[axis].getValue();
+              }
+            } else {
+              var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
+              var reference_values = self.get('reference_values');
+              var x = reference_values[ref_prop_key][axis][z].getValue();
+
+              var offsetValue = offset[axis][z].getValue();
+              eval(expression[axis]);
+            }
             if (axis === 'v') {
               data[rel_prop_key] = y;
             } else {
@@ -559,7 +640,7 @@ define([
         var list = [];
         var relative_range = relative.get('memberCount').getValue();
 
-        
+
         for (var z = 0; z < relative_range; z++) {
           list.push({});
           for (var i = 0; i < refProperties.length; i++) {
@@ -567,8 +648,8 @@ define([
             var ref_prop_key = refProperties[i][0];
             var rel_prop_key = relProperties[i][0];
             var ref_dimensions = refProperties[i][1];
-            var expression = expressions[i];
-            var offset = offsets[i];
+            var expression = expressions[rel_prop_key];
+            var offset = offsets[rel_prop_key];
             var a_keys = Object.keys(expression);
 
             if (!list[z][rel_prop_key]) {
@@ -580,7 +661,7 @@ define([
               var ap = (ref_dimensions && ref_dimensions[m]) ? ref_dimensions[m] : ref_dimensions[ref_dimensions.length - 1];
               var reference_values = self.get('reference_values');
               var x = reference_values[ref_prop_key][axis][z].getValue();
-              var offsetValue = 0; //offset[axis][z];
+              var offsetValue = offset[axis][z].getValue();
               var y;
               eval(expression[axis]);
               if (axis === 'v') {
@@ -592,7 +673,7 @@ define([
             }
 
           }
-           if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection') {
             if (!relative.isReference(relative.members[z])) {
               relative.members[z].setValue(list[z]);
             }
@@ -601,8 +682,6 @@ define([
           }
 
         }
-
-       
 
         if (relative.get('type') === 'collection') {
           return list;
@@ -733,18 +812,18 @@ define([
               y: members[i].getValue()[ref_prop_key][ref_dimension]
             };
           }
-            if (!min && !max) {
-              min = point.y;
-              max = point.y;
-            }
-            if (point.y < min) {
-              min = point.y;
-            }
-            if (point.y > max) {
-              max = point.y;
-            }
-            points.push(point);
-          
+          if (!min && !max) {
+            min = point.y;
+            max = point.y;
+          }
+          if (point.y < min) {
+            min = point.y;
+          }
+          if (point.y > max) {
+            max = point.y;
+          }
+          points.push(point);
+
 
           reference_points.push(points);
         }
@@ -752,11 +831,10 @@ define([
         for (var m = 0; m < range; m++) {
 
           var y = Math.floor(Math.random() * (max - min + 1) + min);
-        
-          if(reference_values[ref_dimension][m]){
+
+          if (reference_values[ref_dimension][m]) {
             reference_values[ref_dimension][m].setValue(y);
-           }
-          else{
+          } else {
             var newVal = new PFloat(y);
             newVal.setNull(false);
             reference_values[ref_dimension].push(newVal);
@@ -838,10 +916,9 @@ define([
             x = TrigFunc.map(m, 0, range - 1, 0, points.length - 1);
           }
           var y = eval(expression);
-          if(reference_values[ref_dimension][m]){
+          if (reference_values[ref_dimension][m]) {
             reference_values[ref_dimension][m].setValue(y);
-          }
-          else{
+          } else {
             var newVal = new PFloat(y);
             newVal.setNull(false);
             reference_values[ref_dimension].push(newVal);
@@ -879,7 +956,7 @@ define([
     },
 
     remove: function() {
-     
+
 
       // remove all paper UI elements
       // trigger nullification / deletion of all references
