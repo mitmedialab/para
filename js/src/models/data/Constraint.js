@@ -450,16 +450,16 @@ define([
         }
 
 
-          if (relative.get(rel_prop_key).get('dimension_num') == 1) {
-            this.setConstraintOnProperty(reference, relative, expressions[rel_prop_key], offsets[rel_prop_key], [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
-          } else {
-            for (var n = 0; n < rel_dimensions.length; n++) {
-              this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
-            }
+        if (relative.get(rel_prop_key).get('dimension_num') == 1) {
+          this.setConstraintOnProperty(reference, relative, expressions[rel_prop_key], offsets[rel_prop_key], [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
+        } else {
+          for (var n = 0; n < rel_dimensions.length; n++) {
+            this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
           }
+        }
       }
 
-    this.listenTo(reference.get('memberCount'), 'modified', function() {
+      this.listenTo(reference.get('memberCount'), 'modified', function() {
 
         for (var i = 0; i < refProperties.length; i++) {
           (
@@ -557,8 +557,13 @@ define([
 
           list.push(data);
           if (relative.get('type') === 'collection') {
-            if (!relative.isReference(relative.members[z])) {
+            if (!relative.get(rel_prop_key)[rel_dimension].isReference(relative.members[z])) {
+              console.log('relative is not reference ',z);
               relative.members[z].get(rel_prop_key)[rel_dimension].setValue(y);
+            }
+            else{
+
+              console.log('internal reference found at ',z);
             }
           } else {
             relative.get(rel_prop_key)[rel_dimension].setValue(y);
@@ -614,7 +619,7 @@ define([
 
           }
           if (relative.get('type') === 'collection') {
-            if (!relative.isReference(relative.members[z])) {
+            if (!relative.get(rel_prop_key).isReference(relative.members[z])) {
               relative.members[z].get(rel_prop_key).setValue(data[rel_prop_key]);
             }
           } else {

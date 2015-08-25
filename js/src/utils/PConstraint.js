@@ -118,6 +118,15 @@
 			},
 
 
+			isReference: function(instance) {
+			if (this.isSelfConstrained()) {
+				var reference = this.constraintObject.get('references');
+				return reference.hasMember(instance, true, reference);
+			}
+			return false;
+			},
+
+
 			isValid: function() {
 				var valid = true;
 				for (var p in this) {

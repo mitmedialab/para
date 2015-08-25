@@ -303,6 +303,15 @@ define([
 			return null;
 		},
 
+		getMemberAt: function(index){
+			if(index==0){
+				return this;
+			}
+			else{
+				console.log('ERROR, accessing member index other than zero for non list instance');
+			}
+		},
+
 		/* getRange: function used to modify constraints mappings for lists*/
 		getRange: function() {
 			return 1; //this.get('memberXount').getValue();
@@ -844,16 +853,7 @@ define([
 		},
 
 
-		//placeholder function for determining if member of a list is being used as a reference value
-		isReference: function(instance) {
-			if (this.isSelfConstrained()) {
-				var reference = this.constraintObject.get('references');
-				return reference.hasMember(instance, true, reference);
-			}
-			return false;
-		},
-
-
+	
 		getCenter: function() {
 			return {
 				x: this.get('position').x + this.get('delta').x,
