@@ -78,8 +78,8 @@ define([
 			'change input[name=subprop-tabs]:radio': 'changeSubprop',
 			'change #map-defaults': 'changeMapDefault',
 			'click #property_buttons': 'changeProperty',
-			'change #relative_offset' : 'changeOffset',
-			'click #exempt_button' : 'toggleExempt',
+			'change #relative_offset': 'changeOffset',
+			'click #exempt_button': 'toggleExempt',
 		},
 
 		initialize: function(obj) {
@@ -182,12 +182,12 @@ define([
 			//this.stopListening(properties[current_prop].subproperties[current_subprop].ref_vals[current_index]);
 
 			if (event) {
-				$('#'+properties[current_prop].name).removeClass('active');
-				
+				$('#' + properties[current_prop].name).removeClass('active');
+
 
 				var propName = event.target.id;
 				var targetProperty = properties.filter(function(prop) {
-					return prop.name == propName;	
+					return prop.name == propName;
 				})[0];
 				var index = properties.indexOf(targetProperty);
 				if (index != current_prop) {
@@ -195,7 +195,7 @@ define([
 
 				}
 			}
-			$('#'+properties[current_prop].name).addClass('active');
+			$('#' + properties[current_prop].name).addClass('active');
 			var data = {
 				subproperties: properties[current_prop].subproperties
 			};
@@ -221,9 +221,9 @@ define([
 			var referenceValues = constraint.get('reference_values')[propName];
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
 			var mode = modes[propName + '_' + subpropName];
- 			$('#map-defaults').val(mode);
+			$('#map-defaults').val(mode);
 
- 			this.changeIndex();
+			this.changeIndex();
 
 		},
 
@@ -238,37 +238,39 @@ define([
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
 			var exempt = constraint.get('exempt_indicies')[propName][subpropName][current_index].getValue();
 			var status = $('#exempt_button').hasClass('active');
-			if(exempt && !status){
-				$('#exempt_button').addClass('active');	
-			}
-			else if(!exempt && status){
-				$('#exempt_button').removeClass('active');	
+			if (exempt && !status) {
+				$('#exempt_button').addClass('active');
+			} else if (!exempt && status) {
+				$('#exempt_button').removeClass('active');
 			}
 
-			$('#relative_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].rel_vals[current_index].getValue()-properties[current_prop].subproperties[current_subprop].ref_vals[current_index].getValue()));
+			$('#relative_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].rel_vals[current_index].getValue() - properties[current_prop].subproperties[current_subprop].ref_vals[current_index].getValue()));
 			//this.listenTo(properties[current_prop].subproperties[current_subprop].ref_vals[current_index], 'modified', this.changeRefVal);
 			//this.listenTo(properties[current_prop].subproperties[current_subprop].rel_vals[current_index], 'modified', this.changeRelVal);
 
 		},
 
-		changeOffset: function(event){
+		changeOffset: function(event) {
 			var newValue = Number($('#relative_offset').val());
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
-			constraint.updateOffset(propName,subpropName, current_index, newValue);
+			constraint.updateOffset(propName, subpropName, current_index, newValue);
 		},
 
-		toggleExempt: function(event){
+		toggleExempt: function(event) {
 			var status = $('#exempt_button').hasClass('active');
-			if(status){
-				$('#exempt_button').removeClass('active');	
-			}
-			else{
-				$('#exempt_button').addClass('active');	
-			}
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
-			constraint.setExempt(propName,subpropName, current_index, !status);
+
+			var changed = constraint.setExempt(propName, subpropName, current_index, !status);
+			if (changed) {
+				if (status) {
+					$('#exempt_button').removeClass('active');
+				} else {
+					$('#exempt_button').addClass('active');
+				}
+			}	
+			
 		},
 
 		changeRefVal: function() {

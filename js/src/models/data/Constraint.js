@@ -235,7 +235,7 @@ define([
         return true;
       }
       if (this.get('relatives')) {
-        this.get('relatives').get('constraintSelected').setValue(false);
+        this.get('relatives').get('constraintraintSelected').setValue(false);
       }
 
       this.set('relatives', instance);
@@ -251,7 +251,15 @@ define([
 
     setExempt: function(rel_prop_key, rel_dimension, index, status) {
       var exempt_indicies = this.get('exempt_indicies');
+      if(status===false){
+        var reference = this.get('references');
+        var relative = this.get('relatives');
+         if(!reference.hasMember(relative.getMemberAt(index), true, reference)){
+          return false;
+         }
+      }
       exempt_indicies[rel_prop_key][rel_dimension][index].setValue(status);
+      return true; 
     },
 
 
@@ -451,6 +459,11 @@ define([
 
         for (var g = 0; g < relative_range; g++) {
           this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
+           if(reference.hasMember(relative.getMemberAt(g), true, reference)){
+            for(var r=0;r<rel_dimensions.length;r++){
+              this.setExempt(rel_prop_key, rel_dimensions[r], g, true);
+            }
+          }
         }
 
         if (!setOnInstance) {
@@ -567,9 +580,6 @@ define([
             list.push(data);
 
            relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
-
-
-
           }
           if (relative.get('type') === 'collection') {
             return list;
@@ -808,7 +818,6 @@ define([
         var reference_points = [];
         var points = [];
         var min, max;
-
         for (var i = 0; i < members.length; i++) {
 
           var point;
@@ -841,6 +850,7 @@ define([
 
           reference_points.push(points);
         }
+        console.log('min=',min,'max=',max);
         var range = this.get('relatives').getRange();
         for (var m = 0; m < range; m++) {
 

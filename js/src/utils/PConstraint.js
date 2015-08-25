@@ -50,11 +50,9 @@
 						this.constraintObject.set('paused',false);
 					}
 					this.constraint.invalidate();
-					console.log('resuming self',this.get('name'),this.constraintObject.get);
 				} else {
 					for (var p in this) {
 						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
-							console.log('resuming',p);
 							this[p].resume();
 						}
 					}
@@ -95,7 +93,6 @@
 			 */
 			setConstraint: function(func, constraint) {
 				this.setNull(false);
-				console.log('setting constraint',this.isSelfConstrained(),this.constraint);
 				if (!this.isSelfConstrained()) {
 					this.constraint = new PProperty(func);
 					this.listenTo(this.constraint, 'modified', this.modified);
@@ -103,7 +100,6 @@
 					this.constraint.setValue(func);
 				}
 				this.constraintObject = constraint;
-			console.log('post setting constraint',this.isSelfConstrained(),this.constraint);
 
 			},
 

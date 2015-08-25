@@ -825,14 +825,12 @@ define([
 		resume: function() {
 			if (this.isSelfConstrained()) {
 				this.constraintObject.set('paused', false);
-				console.log('resuming instance self');
 
 			} else {
 				var constrainMap = this.get('constrain_map');
 				var properties = {};
 				for (var propertyName in constrainMap) {
 					if (constrainMap.hasOwnProperty(propertyName)) {
-						console.log('resuming',propertyName);
 						this.get(propertyName).resume();
 					}
 				}
