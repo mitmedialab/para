@@ -303,11 +303,10 @@ define([
 			return null;
 		},
 
-		getMemberAt: function(index){
-			if(index==0){
+		getMemberAt: function(index) {
+			if (index === 0) {
 				return this;
-			}
-			else{
+			} else {
 				console.log('ERROR, accessing member index other than zero for non list instance');
 			}
 		},
@@ -683,7 +682,7 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
-			
+
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
 
@@ -704,7 +703,7 @@ define([
 				}
 
 			}
-		
+
 
 			this.setNull(false);
 		},
@@ -782,6 +781,76 @@ define([
 			return addedData;
 		},
 
+		/*isReference
+		 *recursively used to check if member is a reference object in 
+		 *order to allow edits to self-referencing constraints
+		 */
+
+		isReference: function(instance) {
+			if (this.isSelfConstrained()) {
+				var reference = this.constraintObject.get('references');
+				var hasMember = reference.hasMember(instance, true, reference);
+				if (hasMember) {
+					return true;
+				}
+				return false;
+			} else {
+				var constrainMap = this.get('constrain_map');
+				var properties = {};
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						properties[propertyName] = this.get(propertyName).isReference(instance);
+					}
+
+				}
+				return properties;
+			}
+		},
+
+
+		pause: function() {
+			if (this.isSelfConstrained()) {
+				this.constraintObject.set('paused', true);
+			} else {
+				var constrainMap = this.get('constrain_map');
+				var properties = {};
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						this.get(propertyName).pause();
+					}
+				}
+			}
+		},
+
+		resume: function() {
+			if (this.isSelfConstrained()) {
+				this.constraintObject.set('paused', false);
+				console.log('resuming instance self');
+
+			} else {
+				var constrainMap = this.get('constrain_map');
+				var properties = {};
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						console.log('resuming',propertyName);
+						this.get(propertyName).resume();
+					}
+				}
+			}
+		},
+
+		destroy: function() {
+			var constrainMap = this.get('constrain_map');
+			var properties = {};
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					this.get(propertyName).destroy();
+				}
+			}
+		},
+
+
+
 		/* getConstraint
 		 * returns an object comprised of all existing constraints in one of 3 states:
 		 *
@@ -853,7 +922,7 @@ define([
 		},
 
 
-	
+
 		getCenter: function() {
 			return {
 				x: this.get('position').x + this.get('delta').x,

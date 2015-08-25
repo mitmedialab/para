@@ -62,6 +62,7 @@ define([
                     ['strokeWidth_v','strokeWidth_v',['interpolate','interpolate']]
                 ];
                 constraint.create(data);
+                this.pause();
                 return constraint;
             },
 

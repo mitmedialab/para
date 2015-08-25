@@ -54,23 +54,12 @@ define([
     passes modifications onto members, stripped of any properties that are constrained on the list
      */
       setValue: function(data) {
-        var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
-          if (constrained_props[i]) {
-            if (!this.isReference(this.members[i])) {
-              var set_data = this.members[i].getAddedValueFor(data);
-              var stripped_data = TrigFunc.strip(set_data, constrained_props[i]);
-              this.members[i].setValue(stripped_data);
-            } else {
-              this.members[i].setValue(data);
-            }
-          } else {
-            this.members[i].setValue(data);
-          }
-
+          this.members[i].setValue(data);
         }
-        this.setNull(false);
+
         this.trigger('modified', this);
+
       },
 
       /* getConstraintValues
@@ -162,6 +151,23 @@ define([
       },
 
 
+      toggleOpen: function(item) {
+        var opened = ListNode.prototype.toggleOpen.call(this, item);
+        if (this.get('open')) {
+          this.resume();
+        }
+        return opened;
+
+      },
+
+      toggleClosed: function(item) {
+        var closed = ListNode.prototype.toggleClosed.call(this, item);
+        if (!this.get('open')) {
+          this.pause();
+        }
+        return closed;
+      },
+
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
         this.get('index').setValue(0);
@@ -197,7 +203,7 @@ define([
       },
 
       //callback triggered when a subproperty is modified externally 
-   modified: function() {  
+      modified: function() {
         var constrained_props = this.getConstraintValues();
         /*for (var i = 0; i < this.members.length; i++) {
           if (constrained_props[i]) {
@@ -212,7 +218,6 @@ define([
       },
 
 
-     
 
       //renders the List UI
       render: function() {

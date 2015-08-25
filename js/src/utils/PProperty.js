@@ -63,7 +63,13 @@ define([
 		//invalidate all constrainable properties
 		invalidate: function() {
 			this._val.invalidate();
-		}
+		},
+
+		destroy: function(){
+			this._val.destroy();
+		},
+
+
 
 
 		//no toJSON required

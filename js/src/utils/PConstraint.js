@@ -32,6 +32,43 @@
 				this.parentConstraint = false;
 			},
 
+			pause: function() {
+				if (this.isSelfConstrained()) {
+					this.constraintObject.set('paused', true);
+				} else {
+					for (var p in this) {
+						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+							this[p].pause();
+						}
+					}
+				}
+			},
+
+			resume: function() {
+				if (this.isSelfConstrained()) {
+					if(this.constraintObject.get('paused')){
+						this.constraintObject.set('paused',false);
+					}
+					this.constraint.invalidate();
+					console.log('resuming self',this.get('name'),this.constraintObject.get);
+				} else {
+					for (var p in this) {
+						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+							console.log('resuming',p);
+							this[p].resume();
+						}
+					}
+				}
+			},
+
+			destroy: function() {
+				for (var p in this) {
+					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
+						this[p].destroy();
+					}
+				}
+			},
+
 			/* setNull
 			 *  sets property default isNull to true
 			 * used for prototpical inheritance functionality
@@ -58,6 +95,7 @@
 			 */
 			setConstraint: function(func, constraint) {
 				this.setNull(false);
+				console.log('setting constraint',this.isSelfConstrained(),this.constraint);
 				if (!this.isSelfConstrained()) {
 					this.constraint = new PProperty(func);
 					this.listenTo(this.constraint, 'modified', this.modified);
@@ -65,6 +103,8 @@
 					this.constraint.setValue(func);
 				}
 				this.constraintObject = constraint;
+			console.log('post setting constraint',this.isSelfConstrained(),this.constraint);
+
 			},
 
 			//callback triggered when a subproperty is modified externally 
@@ -119,11 +159,25 @@
 
 
 			isReference: function(instance) {
-			if (this.isSelfConstrained()) {
-				var reference = this.constraintObject.get('references');
-				return reference.hasMember(instance, true, reference);
-			}
-			return false;
+				if (this.isSelfConstrained()) {
+					var reference = this.constraintObject.get('references');
+					var hasMember = reference.hasMember(instance, true, reference);
+					if (hasMember) {
+						return true;
+					}
+					return false;
+				} else {
+					var subproperties = {};
+
+					for (var p in this) {
+						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+							subproperties[p] = this[p].isReference(instance);
+
+						}
+					}
+					return subproperties;
+				}
+				return false;
 			},
 
 
