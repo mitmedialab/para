@@ -32,8 +32,8 @@ define([
 
 			var r = 0;
 			var theta = 0;
-			var x = p2.getX() - p1.getX();
-			var y = p2.getY() - p1.getY();
+			var x = p2.x - p1.x;
+			var y = p2.y - p1.y;
 			r = Math.sqrt((x * x) + (y * y));
 
 			var type = 0;
@@ -59,19 +59,19 @@ define([
 			//Find theta
 			switch (type) {
 				case (1):
-					theta = Math.atan(y / x) * (180.0 / Math.PI);
+					theta = Math.atan(y / x);
 					break;
 				case (2):
-					theta = (Math.atan(y / x) + 2 * Math.PI) * (180.0 / Math.PI);
+					theta = (Math.atan(y / x) + 2 * Math.PI);
 					break;
 				case (3):
-					theta = (Math.atan(y / x) + Math.PI) * (180.0 / Math.PI);
+					theta = (Math.atan(y / x) + Math.PI);
 					break;
 				case (4):
-					theta = (Math.PI / 2.0) * (180.0 / Math.PI);
+					theta = (Math.PI / 2.0);
 					break;
 				case (5):
-					theta = ((3 * Math.PI) / 2.0) * (180.0 / Math.PI);
+					theta = ((3 * Math.PI) / 2.0);
 					break;
 				case (6):
 					theta = 0.0;
@@ -295,6 +295,7 @@ define([
 			}
 			return polynomial;
 		};
+
 
 
 

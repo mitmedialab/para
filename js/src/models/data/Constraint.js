@@ -302,10 +302,9 @@ define([
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
           conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]][index].getValue() * convertFactor;
           if (offset[rel_dimensions[i]].length <= index) {
-            if(relative.get('name')==='duplicator'){
+            if (relative.get('name') === 'duplicator') {
               offset[rel_dimensions[i]].push(new PFloat(0));
-            }
-            else{
+            } else {
               offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
             }
           } else {
@@ -328,12 +327,11 @@ define([
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
           conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]][index].getValue() * convertFactor : refPropValue[keys[j]][index].getValue() * convertFactor;
           if (offset[rel_dimensions[j]].length <= index) {
-             if(relative.get('name')==='duplicator'){
+            if (relative.get('name') === 'duplicator') {
               offset[rel_dimensions[j]].push(new PFloat(0));
+            } else {
+              offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
             }
-            else{
-            offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
-          }
           } else {
             //offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
           }
@@ -356,12 +354,11 @@ define([
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
           conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]][index].getValue() * convertFactor : (m < keys.length) ? refPropValue[keys[m]][index].getValue() * convertFactor : refPropValue[keys[keys.length - 1]][index].getValue();
           if (offset[rel_dimensions[m]].length <= index) {
-            if(relative.get('name')==='duplicator'){
+            if (relative.get('name') === 'duplicator') {
               offset[rel_dimensions[m]].push(new PFloat(0));
+            } else {
+              offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
             }
-            else{
-            offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
-          }
           } else {
             //offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
           }
@@ -822,6 +819,9 @@ define([
         case 'random':
           this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension, reference_values);
           break;
+        case 'radial':
+          this.calculateReferenceValuesRadial(ref_prop_key, ref_dimension, reference_values);
+          break;
         default:
           break;
       }
@@ -871,7 +871,6 @@ define([
 
           reference_points.push(points);
         }
-        console.log('min=', min, 'max=', max);
         var range = this.get('relatives').getRange();
         for (var m = 0; m < range; m++) {
 
@@ -885,6 +884,94 @@ define([
             reference_values[ref_dimension].push(newVal);
           }
         }
+      }
+
+    },
+
+    calculateReferenceValuesRadial: function(ref_prop_key, ref_dimension, reference_values) {
+      var reference = this.get('references');
+      if (reference) {
+        var members;
+        if (reference.get('type') == 'collection') {
+          members = reference.members;
+        } else {
+          members = [reference, reference];
+        }
+        var reference_points = [];
+        var points = [];
+        var min, max, rad, center;
+        var minPoint = {};
+        var maxPoint = {};
+
+        if (ref_dimension !== 'x' || ref_dimension !== 'y') {
+          min = {
+            x: members[0].getValue()[ref_prop_key]['x'],
+            y: members[0].getValue()[ref_prop_key]['y']
+          };
+          max = {
+            x: members[1].getValue()[ref_prop_key]['x'],
+            y: members[1].getValue()[ref_prop_key]['y']
+          };
+
+        } else {
+          min = {
+            x: members[0].getValue()[ref_prop_key],
+            y: members[0].getValue()[ref_prop_key]
+          };
+          max = {
+            x: members[1].getValue()[ref_prop_key],
+            y: members[1].getValue()[ref_prop_key]
+          };
+        }
+
+        rad = {
+          x: Math.abs(max.x - min.x),
+          y: Math.abs(max.y - min.y)
+        };
+        center = {
+          x: min.x + rad.x,
+          y: min.y + rad.y
+        };
+
+
+
+        reference_points.push(min);
+        reference_points.push(max);
+
+
+        var range = this.get('relatives').getRange();
+        var theta_increment = (2 * Math.PI) / range;
+        var start = TrigFunc.cartToPolar(center, min);
+        var start_theta = start.theta;
+        console.log('start_theta', rad, center, start_theta * 180 / Math.PI)  ;
+        for (var m = 0; m < range; m++) {
+          var y;
+          var angle;
+         // if (m < range / 2) {
+            angle = start_theta + (theta_increment * (m));
+            //console.log('adding theta', m, angle * 180 / Math.PI);
+
+          //} else {
+            //angle = (start_theta + Math.PI) - (theta_increment * (m));
+            //console.log('subtracting theta', m, angle * 180 / Math.PI);
+         // }
+          if (ref_dimension == 'y') {
+            y = (Math.sin(angle) * rad.y) + center.y/2;
+          } else {
+            y = (Math.cos(angle) * rad.x) + center.x/2;
+
+          }
+
+
+          if (reference_values[ref_dimension][m]) {
+            reference_values[ref_dimension][m].setValue(y);
+          } else {
+            var newVal = new PFloat(y);
+            newVal.setNull(false);
+            reference_values[ref_dimension].push(newVal);
+          }
+        }
+
       }
 
     },
