@@ -903,26 +903,53 @@ define([
         var minPoint = {};
         var maxPoint = {};
 
-        if (ref_dimension !== 'x' || ref_dimension !== 'y') {
+         if (ref_dimension === 'x' || ref_dimension === 'y') {
           min = {
             x: members[0].getValue()[ref_prop_key]['x'],
             y: members[0].getValue()[ref_prop_key]['y']
           };
           max = {
-            x: members[1].getValue()[ref_prop_key]['x'],
-            y: members[1].getValue()[ref_prop_key]['y']
+            x: members[0].getValue()[ref_prop_key]['x'],
+            y: members[0].getValue()[ref_prop_key]['y']
           };
 
         } else {
           min = {
-            x: members[0].getValue()[ref_prop_key],
-            y: members[0].getValue()[ref_prop_key]
+            x: members[0].get(ref_prop_key)[ref_dimension].getValue(),
+            y: members[0].get(ref_prop_key)[ref_dimension].getValue()
           };
           max = {
-            x: members[1].getValue()[ref_prop_key],
-            y: members[1].getValue()[ref_prop_key]
+            x: members[0].get(ref_prop_key)[ref_dimension].getValue(),
+            y:members[0].get(ref_prop_key)[ref_dimension].getValue()
           };
         }
+        for (var i = 1; i < members.length; i++) {
+        if (ref_dimension === 'x' || ref_dimension === 'y') {
+          if(members[i].get(ref_prop_key)['x'].getValue()<min.x){
+            min.x = members[i].get(ref_prop_key)['x'].getValue();
+          }
+          else if(members[i].get(ref_prop_key)['x'].getValue()>max.x){
+            max.x = members[i].get(ref_prop_key)['x'].getValue();
+          }
+
+          if(members[i].get(ref_prop_key)['y'].getValue()<min.y){
+            min.y = members[i].get(ref_prop_key)['y'].getValue();
+          } 
+          else if(members[i].get(ref_prop_key)['y'].getValue()>max.y){
+            max.y = members[i].get(ref_prop_key)['y'].getValue();
+          }
+
+        } else {
+          if(members[i].get(ref_prop_key)[ref_dimension].getValue()<min.x){
+            min.x = members[i].get(ref_prop_key)[ref_dimension].getValue();
+            min.y = members[i].get(ref_prop_key)[ref_dimension].getValue();
+          }
+          else if(members[i].get(ref_prop_key)[ref_dimension].getValue()>max.x){
+            max.x = members[i].get(ref_prop_key)[ref_dimension].getValue();
+            max.y = members[i].get(ref_prop_key)[ref_dimension].getValue();
+          }
+        }
+      }
 
         rad = {
           x: Math.abs(max.x - min.x)/2,
