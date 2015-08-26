@@ -52,14 +52,14 @@ define([
                 var constraint = new Constraint();
                 constraint.set('references', this.internalList);
                 constraint.set('relatives', this);
-                constraint.set('proxy_references',this.get('target'));
+                constraint.set('proxy_references', this.get('target'));
                 var data = [
-                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate','interpolate']],
-                    ['scalingDelta_xy', 'scalingDelta_xy',['interpolate','interpolate']],
-                    ['fillColor_hsl',  'fillColor_hsl',['interpolate','interpolate','interpolate']],
-                    ['strokeColor_hsl',  'strokeColor_hsl',['interpolate','interpolate','interpolate']],
-                    ['rotationDelta_v','rotationDelta_v',['interpolate','interpolate']],
-                    ['strokeWidth_v','strokeWidth_v',['interpolate','interpolate']]
+                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
+                    ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
+                    ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                    ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                    ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
+                    ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
                 constraint.create(data);
                 return constraint;
@@ -67,13 +67,32 @@ define([
 
             addClone: function(clone) {
                 this.clones.push(clone);
-                if(this.members.length>3){
-                    this.addMember(clone,this.members.length-2);
-                }
-                else{
-                    this.addMember(clone);
+                if (this.members.length > 1) {
+                    clone.setValue(this.members[this.members.length-2].getValue());
+                    console.log('adding clone at ',this.members.length-1);
+                    this.addCloneMember(clone, this.members.length - 1);
+                } else {
+                    clone.setValue(this.members[0].getValue());
+                    this.addCloneMember(clone, 1);
                 }
                 this.get('clone_count').setValue(this.clones.length);
+            },
+
+            addCloneMember: function(clone, index) {
+
+                this.members.splice(index, 0, clone);
+                var diff = this.members.length - this.indexNumbers.length;
+                for (var i = 0; i < diff; i++) {
+                    var numText = new paper.PointText({
+                        point: new paper.Point(0, 0),
+                        content: '0',
+                        justification: 'left',
+                        fontSize: 12,
+                        fontFamily: 'Source Sans Pro',
+                        fillColor: this.get('primary_selection_color')
+                    });
+                    this.indexNumbers.push(numText);
+                }
             },
 
             addMemberToOpen: function(data) {
@@ -96,6 +115,7 @@ define([
                 }
                 return false;
             },
+
 
 
             addException: function(exception) {
@@ -192,6 +212,11 @@ define([
                         data = this.updateCountStandard();
                         break;
                 }
+                var memberCount = {
+                    v: this.members.length,
+                    operator: 'set'
+                };
+                this.get('memberCount').setValue(memberCount);
                 return data;
 
             },

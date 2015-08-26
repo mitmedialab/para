@@ -696,6 +696,16 @@ define([
 						p.operator = 'set';
 					}
 					if (p.operator === 'set') {
+						if(prop ==='scalingDelta'){
+							if(data[prop].x && data[prop].x===0){
+								
+								data[prop].x = 0.01;
+							}
+							if(data[prop].y && data[prop].y===0){
+								
+								data[prop].y = 0.01;
+							}
+						}
 						this.get(prop).setValue(p);
 					} else if (p.operator === 'add') {
 						this.get(prop).add(p);
