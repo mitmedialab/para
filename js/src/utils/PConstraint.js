@@ -158,20 +158,27 @@
 				if (this.isSelfConstrained()) {
 					var reference = this.constraintObject.get('references');
 					var hasMember = reference.hasMember(instance, true, reference);
+
 					if (hasMember) {
 						return true;
 					}
 					return false;
 				} else {
 					var subproperties = {};
-
+					var isReference = false;
 					for (var p in this) {
 						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+
 							subproperties[p] = this[p].isReference(instance);
+							if(subproperties[p]){
+								isReference=true;
+							}
 
 						}
 					}
-					return subproperties;
+					if(isReference){
+						return subproperties;
+					}
 				}
 				return false;
 			},

@@ -135,13 +135,13 @@ define([
 
 
 		TrigFunc.distance = function(p1, p2) {
-		
+
 			var distance = Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
 			return distance;
 		};
 
 		TrigFunc.midpoint = function(p1, p2) {
-		
+
 			var x = (p1.getX() + p2.getX()) / 2;
 			var y = (p1.getY() + p2.getY()) / 2;
 
@@ -207,8 +207,33 @@ define([
 							stripped[p] = target[p];
 						} else {
 							var val = TrigFunc.strip(target[p], reference[p]);
-							if(val){
+							if (val) {
 								stripped[p] = val;
+							}
+						}
+					}
+				}
+				return stripped;
+			}
+		};
+
+		TrigFunc.stripBoolean = function(target, reference, boolCompare) {
+			if (!_.isObject(reference)) {
+				return null;
+			} else {
+				var stripped = {};
+				for (var p in target) {
+					if (target.hasOwnProperty(p)) {
+						if (!reference.hasOwnProperty(p)) {
+							stripped[p] = target[p];
+						} else {
+							if (boolCompare[p] === true) {
+								stripped[p] = target[p];
+							} else {
+								var val = TrigFunc.stripBoolean(target[p], reference[p],boolCompare[p]);
+								if (val) {
+									stripped[p] = val;
+								}
 							}
 						}
 					}

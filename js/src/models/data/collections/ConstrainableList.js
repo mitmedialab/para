@@ -48,18 +48,26 @@ define([
           x: 1,
           y: 1
         });
+        this.count = 0;
       },
 
       /*setValue
     passes modifications onto members, stripped of any properties that are constrained on the list
      */
       setValue: function(data) {
+        var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
-          this.members[i].setValue(data);
+          if (constrained_props[i]) {
+              var reference_status = this.isReference(this.members[i]);
+              var set_data = this.members[i].getAddedValueFor(data);
+              var stripped_data = TrigFunc.stripBoolean(set_data, constrained_props[i],reference_status);
+              this.members[i].setValue(stripped_data);
+          } else {
+            this.members[i].setValue(data);
+          }
+
         }
-
         this.trigger('modified', this);
-
       },
 
       /* getConstraintValues
@@ -89,9 +97,10 @@ define([
                   value[c] = {};
                   for (var v in constraints[c]) {
                     if (constraints[c].hasOwnProperty(v)) {
+
                       var scValue = constraints[c][v].getValue();
                       if (scValue instanceof Array) {
-                        value[c][v] = scValue[i][v];
+                        value[c][v] = scValue[i][c][v];
                       } else {
                         value[c][v] = scValue;
                       }
@@ -153,18 +162,18 @@ define([
 
       toggleOpen: function(item) {
         var opened = ListNode.prototype.toggleOpen.call(this, item);
-        if (this.get('open')) {
+        /*if (this.get('open')) {
           this.resume();
-        }
+        }*/
         return opened;
 
       },
 
       toggleClosed: function(item) {
         var closed = ListNode.prototype.toggleClosed.call(this, item);
-        if (!this.get('open')) {
+        /*if (!this.get('open')) {
           this.pause();
-        }
+        }*/
         return closed;
       },
 
