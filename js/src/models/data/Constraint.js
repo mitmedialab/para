@@ -925,8 +925,8 @@ define([
         }
 
         rad = {
-          x: Math.abs(max.x - min.x),
-          y: Math.abs(max.y - min.y)
+          x: Math.abs(max.x - min.x)/2,
+          y: Math.abs(max.y - min.y)/2
         };
         center = {
           x: min.x + rad.x,
@@ -943,6 +943,7 @@ define([
         var theta_increment = (2 * Math.PI) / range;
         var start = TrigFunc.cartToPolar(center, min);
         var start_theta = start.theta;
+        var resulting_rad = start.rad;
         console.log('start_theta', rad, center, start_theta * 180 / Math.PI)  ;
         for (var m = 0; m < range; m++) {
           var y;
@@ -956,9 +957,9 @@ define([
             //console.log('subtracting theta', m, angle * 180 / Math.PI);
          // }
           if (ref_dimension == 'y') {
-            y = (Math.sin(angle) * rad.y) + center.y/2;
+            y = (Math.sin(angle) * resulting_rad) + center.y;
           } else {
-            y = (Math.cos(angle) * rad.x) + center.x/2;
+            y = (Math.cos(angle) * resulting_rad) + center.x;
 
           }
 
