@@ -6,7 +6,8 @@ define([
   'utils/PFloat',
   'utils/PBool',
   'utils/TrigFunc',
-], function(_, paper, Backbone, ConstraintHandles, PFloat, PBool, TrigFunc) {
+  'utils/Ziggurat'
+], function(_, paper, Backbone, ConstraintHandles, PFloat, PBool, TrigFunc, Ziggurat) {
 
   var propConvMap = {
     'translationDelta:scalingDelta': 0.01,
@@ -108,6 +109,7 @@ define([
     'strokeColor': 3
   };
 
+  var ziggurat = new Ziggurat();
 
   var Constraint = Backbone.Model.extend({
 
@@ -308,7 +310,7 @@ define([
               offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
             }
           } else {
-            offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
+            //offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
           }
           if (exempt_index[rel_dimensions[i]].length <= index) {
             exempt_index[rel_dimensions[i]].push(new PBool(false));
@@ -333,7 +335,7 @@ define([
               offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
             }
           } else {
-            offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
+            //offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
           }
           if (exempt_index[rel_dimensions[j]].length <= index) {
             exempt_index[rel_dimensions[j]].push(new PBool(false));
@@ -360,7 +362,7 @@ define([
               offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
             }
           } else {
-            offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
+            //offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
           }
           if (exempt_index[rel_dimensions[m]].length <= index) {
             exempt_index[rel_dimensions[m]].push(new PBool(false));
@@ -822,6 +824,9 @@ define([
         case 'radial':
           this.calculateReferenceValuesRadial(ref_prop_key, ref_dimension, reference_values);
           break;
+        case 'gaussian':
+          this.calculateReferenceValuesGaussian(ref_prop_key, ref_dimension, reference_values);
+          break;
         default:
           break;
       }
@@ -888,36 +893,67 @@ define([
 
     },
 
-    calculateReferenceValuesRadial: function(ref_prop_key, ref_dimension, reference_values) {
-      if(ref_prop_key==='translationDelta'){
-        this.calculateReferenceValuesRadialCartesian(ref_prop_key, ref_dimension, reference_values);
-      }
-      else{
-        var reference = this.get('references');
-        if (reference) {
+    calculateReferenceValuesGaussian: function(ref_prop_key, ref_dimension, reference_values) {
+      var reference = this.get('references');
+      if (reference) {
         var members;
         if (reference.get('type') == 'collection') {
           members = reference.members;
         } else {
           members = [reference, reference];
         }
-        var diff = members[1].get(ref_prop_key)[ref_dimension].getValue()-members[0].get(ref_prop_key)[ref_dimension].getValue();
-     
+        var reference_points = [];
+        var points = [];
+        var mean, std;
+        mean = members[0].get(ref_prop_key)[ref_dimension].getValue();
+        std = Math.abs(mean - members[1].get(ref_prop_key)[ref_dimension].getValue());
         var range = this.get('relatives').getRange();
-        var increment = diff/range;
-         for (var m = 0; m < range; m++) {
-          var y =  members[0].get(ref_prop_key)[ref_dimension].getValue() + m*increment;
-          console.log('y val',y,members[1].get(ref_prop_key)[ref_dimension].getValue());
+
+        for (var m = 0; m < range; m++) {
+
+          var y_val = (std * ziggurat.nextGaussian()) + mean;
+
           if (reference_values[ref_dimension][m]) {
-            reference_values[ref_dimension][m].setValue(y);
+            reference_values[ref_dimension][m].setValue(y_val);
           } else {
-            var newVal = new PFloat(y);
+            var newVal = new PFloat(y_val);
             newVal.setNull(false);
             reference_values[ref_dimension].push(newVal);
           }
         }
       }
-    }
+
+    },
+
+    calculateReferenceValuesRadial: function(ref_prop_key, ref_dimension, reference_values) {
+      if (ref_prop_key === 'translationDelta') {
+        this.calculateReferenceValuesRadialCartesian(ref_prop_key, ref_dimension, reference_values);
+      } else {
+        var reference = this.get('references');
+        if (reference) {
+          var members;
+          if (reference.get('type') == 'collection') {
+            members = reference.members;
+          } else {
+            members = [reference, reference];
+          }
+          var diff = members[1].get(ref_prop_key)[ref_dimension].getValue() - members[0].get(ref_prop_key)[ref_dimension].getValue();
+
+          var range = this.get('relatives').getRange();
+          var increment = diff / range;
+          for (var m = 0; m < range; m++) {
+            var y = members[0].get(ref_prop_key)[ref_dimension].getValue() + m * increment;
+            //console.log('y val', y, members[1].get(ref_prop_key)[ref_dimension].getValue());
+            if (reference_values[ref_dimension][m]) {
+              reference_values[ref_dimension][m].setValue(y);
+            } else {
+              var newVal = new PFloat(y);
+              newVal.setNull(false);
+              reference_values[ref_dimension].push(newVal);
+            }
+          }
+        }
+      }
 
     },
 
@@ -936,7 +972,7 @@ define([
         var minPoint = {};
         var maxPoint = {};
 
-         if (ref_dimension === 'x' || ref_dimension === 'y') {
+        if (ref_dimension === 'x' || ref_dimension === 'y') {
           min = {
             x: members[0].getValue()[ref_prop_key]['x'],
             y: members[0].getValue()[ref_prop_key]['y']
@@ -953,15 +989,15 @@ define([
           };
           max = {
             x: members[1].get(ref_prop_key)[ref_dimension].getValue(),
-            y:members[1].get(ref_prop_key)[ref_dimension].getValue()
+            y: members[1].get(ref_prop_key)[ref_dimension].getValue()
           };
         }
-      
+
         rad = {
-          x: Math.abs(max.x - min.x)/2,
-          y: Math.abs(max.y - min.y)/2
+          x: Math.abs(max.x - min.x) / 2,
+          y: Math.abs(max.y - min.y) / 2
         };
-        center = TrigFunc.midpoint(min,max);
+        center = TrigFunc.midpoint(min, max);
 
 
 
@@ -973,16 +1009,16 @@ define([
         var theta_increment = (2 * Math.PI) / range;
         var start = TrigFunc.cartToPolar(center, min);
         var start_theta = start.theta;
-        var end_theta = start_theta+Math.PI;
+        var end_theta = start_theta + Math.PI;
         var resulting_rad = start.rad;
         for (var m = 0; m < range; m++) {
           var y;
           var angle;
           angle = start_theta + theta_increment * (m);
-          if(angle==end_theta){
-            angle =  start_theta + theta_increment * (range-1);
+          if (angle == end_theta) {
+            angle = start_theta + theta_increment * (range - 1);
           }
-          console.log(m,'angle',angle,'start_theta',start_theta,'end_theta',end_theta);
+          //console.log(m, 'angle', angle, 'start_theta', start_theta, 'end_theta', end_theta);
           if (ref_dimension == 'y') {
             y = (Math.sin(angle) * resulting_rad) + center.y;
           } else {
