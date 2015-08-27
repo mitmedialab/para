@@ -308,7 +308,7 @@ define([
               offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
             }
           } else {
-            //offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
+            offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
           }
           if (exempt_index[rel_dimensions[i]].length <= index) {
             exempt_index[rel_dimensions[i]].push(new PBool(false));
@@ -333,7 +333,7 @@ define([
               offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
             }
           } else {
-            //offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
+            offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
           }
           if (exempt_index[rel_dimensions[j]].length <= index) {
             exempt_index[rel_dimensions[j]].push(new PBool(false));
@@ -360,7 +360,7 @@ define([
               offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
             }
           } else {
-            //offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
+            offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
           }
           if (exempt_index[rel_dimensions[m]].length <= index) {
             exempt_index[rel_dimensions[m]].push(new PBool(false));
@@ -889,6 +889,39 @@ define([
     },
 
     calculateReferenceValuesRadial: function(ref_prop_key, ref_dimension, reference_values) {
+      if(ref_prop_key==='translationDelta'){
+        this.calculateReferenceValuesRadialCartesian(ref_prop_key, ref_dimension, reference_values);
+      }
+      else{
+        var reference = this.get('references');
+        if (reference) {
+        var members;
+        if (reference.get('type') == 'collection') {
+          members = reference.members;
+        } else {
+          members = [reference, reference];
+        }
+        var diff = members[1].get(ref_prop_key)[ref_dimension].getValue()-members[0].get(ref_prop_key)[ref_dimension].getValue();
+     
+        var range = this.get('relatives').getRange();
+        var increment = diff/range;
+         for (var m = 0; m < range; m++) {
+          var y =  members[0].get(ref_prop_key)[ref_dimension].getValue() + m*increment;
+          console.log('y val',y,members[1].get(ref_prop_key)[ref_dimension].getValue());
+          if (reference_values[ref_dimension][m]) {
+            reference_values[ref_dimension][m].setValue(y);
+          } else {
+            var newVal = new PFloat(y);
+            newVal.setNull(false);
+            reference_values[ref_dimension].push(newVal);
+          }
+        }
+      }
+    }
+
+    },
+
+    calculateReferenceValuesRadialCartesian: function(ref_prop_key, ref_dimension, reference_values) {
       var reference = this.get('references');
       if (reference) {
         var members;
@@ -909,8 +942,8 @@ define([
             y: members[0].getValue()[ref_prop_key]['y']
           };
           max = {
-            x: members[0].getValue()[ref_prop_key]['x'],
-            y: members[0].getValue()[ref_prop_key]['y']
+            x: members[1].getValue()[ref_prop_key]['x'],
+            y: members[1].getValue()[ref_prop_key]['y']
           };
 
         } else {
@@ -919,46 +952,16 @@ define([
             y: members[0].get(ref_prop_key)[ref_dimension].getValue()
           };
           max = {
-            x: members[0].get(ref_prop_key)[ref_dimension].getValue(),
-            y:members[0].get(ref_prop_key)[ref_dimension].getValue()
+            x: members[1].get(ref_prop_key)[ref_dimension].getValue(),
+            y:members[1].get(ref_prop_key)[ref_dimension].getValue()
           };
         }
-        for (var i = 1; i < members.length; i++) {
-        if (ref_dimension === 'x' || ref_dimension === 'y') {
-          if(members[i].get(ref_prop_key)['x'].getValue()<min.x){
-            min.x = members[i].get(ref_prop_key)['x'].getValue();
-          }
-          else if(members[i].get(ref_prop_key)['x'].getValue()>max.x){
-            max.x = members[i].get(ref_prop_key)['x'].getValue();
-          }
-
-          if(members[i].get(ref_prop_key)['y'].getValue()<min.y){
-            min.y = members[i].get(ref_prop_key)['y'].getValue();
-          } 
-          else if(members[i].get(ref_prop_key)['y'].getValue()>max.y){
-            max.y = members[i].get(ref_prop_key)['y'].getValue();
-          }
-
-        } else {
-          if(members[i].get(ref_prop_key)[ref_dimension].getValue()<min.x){
-            min.x = members[i].get(ref_prop_key)[ref_dimension].getValue();
-            min.y = members[i].get(ref_prop_key)[ref_dimension].getValue();
-          }
-          else if(members[i].get(ref_prop_key)[ref_dimension].getValue()>max.x){
-            max.x = members[i].get(ref_prop_key)[ref_dimension].getValue();
-            max.y = members[i].get(ref_prop_key)[ref_dimension].getValue();
-          }
-        }
-      }
-
+      
         rad = {
           x: Math.abs(max.x - min.x)/2,
           y: Math.abs(max.y - min.y)/2
         };
-        center = {
-          x: min.x + rad.x,
-          y: min.y + rad.y
-        };
+        center = TrigFunc.midpoint(min,max);
 
 
 
@@ -970,19 +973,16 @@ define([
         var theta_increment = (2 * Math.PI) / range;
         var start = TrigFunc.cartToPolar(center, min);
         var start_theta = start.theta;
+        var end_theta = start_theta+Math.PI;
         var resulting_rad = start.rad;
-        console.log('start_theta', rad, center, start_theta * 180 / Math.PI)  ;
         for (var m = 0; m < range; m++) {
           var y;
           var angle;
-         // if (m < range / 2) {
-            angle = start_theta + (theta_increment * (m));
-            //console.log('adding theta', m, angle * 180 / Math.PI);
-
-          //} else {
-            //angle = (start_theta + Math.PI) - (theta_increment * (m));
-            //console.log('subtracting theta', m, angle * 180 / Math.PI);
-         // }
+          angle = start_theta + theta_increment * (m);
+          if(angle==end_theta){
+            angle =  start_theta + theta_increment * (range-1);
+          }
+          console.log(m,'angle',angle,'start_theta',start_theta,'end_theta',end_theta);
           if (ref_dimension == 'y') {
             y = (Math.sin(angle) * resulting_rad) + center.y;
           } else {

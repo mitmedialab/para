@@ -142,8 +142,8 @@ define([
 
 		TrigFunc.midpoint = function(p1, p2) {
 
-			var x = (p1.getX() + p2.getX()) / 2;
-			var y = (p1.getY() + p2.getY()) / 2;
+			var x = (p1.x+ p2.x) / 2;
+			var y = (p1.y+ p2.y) / 2;
 
 			return {
 				x: x,

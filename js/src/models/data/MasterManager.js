@@ -447,7 +447,7 @@ define([
 			layersView.addList(duplicator.toJSON());
 			this.selectShape(duplicator);
 			var targets = [duplicator];
-			var data = duplicator.setCount(5);
+			var data = duplicator.setCount(8);
 			this.duplicatorCountModified(data,duplicator);
 
 			if (data.toAdd) {
