@@ -430,7 +430,7 @@ define([
 				title: shape.name,
 				key: shape.id
 			};
-			var node = shapeRoot.addChildren(s);
+			var node = shapeRoot.children.length>0?shapeRoot.addChildren(s,0): shapeRoot.addChildren(s);
 			this.selectNode(node);
 			this.resetConstraintHeight();
 
@@ -455,7 +455,14 @@ define([
 					title: shape.name,
 					key: shape.id
 				};
-				var node = parentNode.addChildren(s);
+				var node;
+				if(parentNode.children){
+						node = parentNode.children.length>0?parentNode.addChildren(s,0): parentNode.addChildren(s);
+				}
+				else{
+					node = parentNode.addChildren(s);
+				}
+			
 				this.selectNode(node);
 
 				this.resetConstraintHeight();
@@ -471,7 +478,7 @@ define([
 				title: list.name,
 				key: list.id
 			};
-			var listNode = listRoot.addChildren(listData);
+			var listNode =  listRoot.children.length>0? listRoot.addChildren(listData,0):  listRoot.addChildren(listData);
 			this.selectNode(listNode);
 			this.resetConstraintHeight();
 			this.visualizeConstraint();
@@ -497,7 +504,7 @@ define([
 				rel: data.get('relatives').get('id'),
 				ref: data.get('references').get('id')
 			};
-			var constraintNode = constraintRoot.addChildren(constraintData);
+			var constraintNode = constraintRoot.children.length>0? constraintRoot.addChildren(constraintData,0) : constraintRoot.addChildren(constraintData);
 			this.selectNode(constraintNode);
 			constraintNode.setActive(true);
 			shapeTree.activateKey(false);

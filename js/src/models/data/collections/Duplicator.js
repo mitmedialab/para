@@ -216,6 +216,12 @@ define([
                     v: this.members.length,
                     operator: 'set'
                 };
+                var zIndex = this.members[0].get('zIndex').getValue();
+                console.log('duplicator zindex',zIndex);
+                for(var i=1;i<this.members.length;i++){
+
+                    this.members[i].get('zIndex').setValue(i+zIndex);
+                }
                 this.get('memberCount').setValue(memberCount);
                 return data;
 

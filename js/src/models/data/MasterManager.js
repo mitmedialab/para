@@ -188,7 +188,7 @@ define([
 			this.listenTo(target, 'modified', this.modified);
 		},
 
-		removeListener: function(target){
+		removeListener: function(target) {
 			this.stopListening(target);
 		},
 
@@ -204,7 +204,7 @@ define([
 					this.addFunction(collectionManager.getLists());
 					break;
 				case 'param':
-					 this.createParams();
+					this.createParams();
 					break;
 				case 'list':
 					var list = collectionManager.addList(selected);
@@ -443,12 +443,12 @@ define([
 
 		addDuplicator: function(object, open) {
 			this.deselectAllShapes();
-			var duplicator= collectionManager.addDuplicator(object);
+			var duplicator = collectionManager.addDuplicator(object);
 			layersView.addList(duplicator.toJSON());
 			this.selectShape(duplicator);
 			var targets = [duplicator];
 			var data = duplicator.setCount(8);
-			this.duplicatorCountModified(data,duplicator);
+			this.duplicatorCountModified(data, duplicator);
 
 			if (data.toAdd) {
 				targets = targets.concat(data.toAdd);
@@ -493,7 +493,7 @@ define([
 			}
 			if (data.toRemove) {
 				for (var k = 0; k < data.toRemove.length; k++) {
-					this.removeListener(data.toRemove[k]); 
+					this.removeListener(data.toRemove[k]);
 				}
 			}
 			if (data.toAdd) {
@@ -504,8 +504,8 @@ define([
 		},
 
 		addConstraint: function(constraint) {
-			if(!constraint.get('user_name')){
-				constraint.set('user_name','constraint '+(constraints.length+1));
+			if (!constraint.get('user_name')) {
+				constraint.set('user_name', 'constraint ' + (constraints.length + 1));
 			}
 			constraints.push(constraint);
 			layersView.addConstraint(constraint);
@@ -533,16 +533,21 @@ define([
 						relativeShape.addInheritor(movedShape);
 						break;
 					default:
-						if (movedShape.isSibling(relativeShape)) {
-							switch (mode) {
-								case 'after':
-									movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
-									break;
-								case 'before':
-									movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
-									break;
-							}
+						if (!movedShape.isSibling(relativeShape)) {
+							var parent = movedShape.getParentNode();
+							parent.removeChildNode(movedShape);
+							relativeShape.getParentNode.addChildNode(movedShape);
 						}
+						switch (mode) {
+							case 'after':
+								movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
+								break;
+							case 'before':
+								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
+								break;
+						}
+
+
 						break;
 				}
 			}
@@ -812,8 +817,6 @@ define([
 				//TODO: some issue here with correctly selecting shapes when list is toggled closed.
 			}
 		},
-
-
 
 
 

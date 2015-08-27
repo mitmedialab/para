@@ -18,7 +18,8 @@ define([
 	'utils/PProperty',
 	'utils/PConstraint',
 	'utils/TrigFunc',
-	'utils/ColorUtils'
+	'utils/ColorUtils',
+
 ], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
@@ -71,6 +72,7 @@ define([
 			memberCount: null,
 			constraintSelected: null,
 			selected: null,
+			zIndex: null,
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
@@ -94,7 +96,8 @@ define([
 				selected: ['v'],
 				constraintSelected: ['v'],
 				memberCount: ['v'],
-				pathAltered: ['v']
+				pathAltered: ['v'],
+				zIndex: ['v']
 					//inheritors: []
 			},
 
@@ -169,6 +172,7 @@ define([
 			this.set('inheritors', new InheritorCollection(this));
 			this.get('inheritors').setNull(false);
 			this.set('v', new PProperty(0));
+			this.set('zIndex', new PFloat(0));
 
 
 			//============private properties==============//
@@ -352,6 +356,33 @@ define([
 			instance.setValue(value);
 			this.addInheritor(instance);
 			return instance;
+		},
+
+		addChildNode: function(node) {
+			SceneNode.prototype.addChildNode.call(this, node);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+		},
+
+		setChildAfter: function(child, sibling) {
+			SceneNode.prototype.setChildBefore.call(this, child, sibling);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+			console.log('set child before',child.get('name'),'to',child.get('zIndex').getValue());
+		console.log('sibling',sibling.get('name'),'to',sibling.get('zIndex').getValue());
+
+		},
+
+		setChildBefore: function(child, sibling) {
+			SceneNode.prototype.setChildAfter.call(this, child, sibling);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+		console.log('set child after',child.get('name'),'to',child.get('zIndex').getValue());
+		console.log('sibling',sibling.get('name'),'to',sibling.get('zIndex').getValue());
+
 		},
 
 		addInheritor: function(instance) {
@@ -696,13 +727,13 @@ define([
 						p.operator = 'set';
 					}
 					if (p.operator === 'set') {
-						if(prop ==='scalingDelta'){
-							if(data[prop].x && data[prop].x===0){
-								
+						if (prop === 'scalingDelta') {
+							if (data[prop].x && data[prop].x === 0) {
+
 								data[prop].x = 0.01;
 							}
-							if(data[prop].y && data[prop].y===0){
-								
+							if (data[prop].y && data[prop].y === 0) {
+
 								data[prop].y = 0.01;
 							}
 						}
@@ -1216,7 +1247,10 @@ define([
 		renderGeom: function() {
 			var visible = this.get('visible');
 			var geom = this.get('geom');
-			geom.bringToFront();
+			var zIndex = this.get('zIndex').getValue();
+			if (geom.index != zIndex) {
+				geom.parent.insertChild(zIndex, geom);
+			}
 			var pathAltered = this.get('pathAltered').getValue();
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
