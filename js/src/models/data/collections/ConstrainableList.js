@@ -40,7 +40,10 @@ define([
         geom.addChild(path);
         geom.addChild(this.startText);
         this.startText.data.instance = geom.data.instance = path.data.instance = this;
-
+var targetLayer = paper.project.layers.filter(function(layer) {
+          return layer.name === 'ui_layer';
+        })[0];
+        targetLayer.addChild(geom);
         this.set('ui', geom);
         this.indexNumbers = [];
 
@@ -131,7 +134,12 @@ define([
 
       //overrides ListNode addMember and removeMember functions
       addMember: function(data, index) {
-        ListNode.prototype.addMember.call(this, data, index);
+         ListNode.prototype.addMember.call(this, data, index);
+        this.addMemberNotation();
+
+      },
+
+      addMemberNotation: function(){
         var diff = this.members.length - this.indexNumbers.length;
         for (var i = 0; i < diff; i++) {
           var numText = new paper.PointText({
@@ -142,21 +150,27 @@ define([
             fontFamily: 'Source Sans Pro',
             fillColor: this.get('primary_selection_color')
           });
+          var targetLayer = paper.project.layers.filter(function(layer) {
+          return layer.name === 'ui_layer';
+        })[0];
+        targetLayer.addChild(numText);
           this.indexNumbers.push(numText);
         }
-
       },
 
-      removeMember: function(data) {
-        data.set('merged', undefined);
+     removeMember: function(data) {
         var memberIndex = _.indexOf(this.members, data);
         var member = ListNode.prototype.removeMember.call(this, data);
+        this.removeMemberNotation();
+        return member;
+      },
+
+      removeMemberNotation: function() {       
         var diff = this.indexNumbers.length - this.members.length;
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
           numText.remove();
         }
-        return member;
       },
 
 
@@ -233,7 +247,6 @@ define([
         ListNode.prototype.render.call(this, arguments);
         var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();
-        // console.log('member_length',this.members.length,'indexNumbers_length',this.indexNumbers.length);
         for (var i = 0; i < this.members.length; i++) {
           var numText = this.indexNumbers[i];
           if (numText) {
@@ -262,7 +275,8 @@ define([
         var selected = this.get('selected').getValue();
         var constraint_selected = this.get('constraintSelected').getValue();
         var selection_clone = this.get('selection_clone');
-        var bbox = this.get('bbox');
+        var bbox = this.get('bbox')
+
         if (constraint_selected) {
           if (!selection_clone) {
             this.createSelectionClone();

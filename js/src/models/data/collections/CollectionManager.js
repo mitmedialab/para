@@ -175,6 +175,8 @@ define([
 		 * and state of lists which contain those objects(open vs closed)
 		 */
 		filterSelection: function(lInstance) {
+			
+
 			var sInstances = [];
 			var itemFound = false;
 			for (var i = 0; i < lists.length; i++) {

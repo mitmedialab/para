@@ -365,13 +365,27 @@ define([
 			}
 		},
 
+		insertChild: function(index,child){
+           	SceneNode.prototype.insertChild.call(this, index,child);
+           	for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+
+        },
+		removeChildNode: function(node) {
+			SceneNode.prototype.removeChildNode.call(this, node);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+		},
+
 		setChildAfter: function(child, sibling) {
 			SceneNode.prototype.setChildBefore.call(this, child, sibling);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
-			console.log('set child before',child.get('name'),'to',child.get('zIndex').getValue());
-		console.log('sibling',sibling.get('name'),'to',sibling.get('zIndex').getValue());
+			console.log('set child before', child.get('name'), 'to', child.get('zIndex').getValue());
+			console.log('sibling', sibling.get('name'), 'to', sibling.get('zIndex').getValue());
 
 		},
 
@@ -380,8 +394,8 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
-		console.log('set child after',child.get('name'),'to',child.get('zIndex').getValue());
-		console.log('sibling',sibling.get('name'),'to',sibling.get('zIndex').getValue());
+			console.log('set child after', child.get('name'), 'to', child.get('zIndex').getValue());
+			console.log('sibling', sibling.get('name'), 'to', sibling.get('zIndex').getValue());
 
 		},
 
@@ -394,7 +408,6 @@ define([
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
 			instance.createSelectionClone();
-			this.addChildNode(instance);
 		},
 
 		removeInheritor: function(instance) {
@@ -1088,17 +1101,11 @@ define([
 		compileTransformation: function(value) {
 
 			var scalingDelta, rotationDelta, translationDelta;
-			var merged = this.get('merged');
-			if (!merged) {
-				scalingDelta = value.scalingDelta;
-				rotationDelta = value.rotationDelta;
-				translationDelta = value.translationDelta;
-			} else {
 
-				scalingDelta = merged.scalingDelta;
-				rotationDelta = merged.rotationDelta;
-				translationDelta = merged.translationDelta;
-			}
+			scalingDelta = value.scalingDelta;
+			rotationDelta = value.rotationDelta;
+			translationDelta = value.translationDelta;
+
 
 			this._rotation_origin = this.get('rotation_origin').toPaperPoint();
 			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
@@ -1117,16 +1124,10 @@ define([
 
 		compileStyle: function(value) {
 
-			var merged = this.get('merged');
-			if (merged) {
-				this._fillColor = merged.fillColor;
-				this._strokeColor = merged.strokeColor;
-				this._strokeWidth = merged.strokeWidth;
-			} else {
-				this._fillColor = value.fillColor;
-				this._strokeColor = value.strokeColor;
-				this._strokeWidth = value.strokeWidth;
-			}
+			this._fillColor = value.fillColor;
+			this._strokeColor = value.strokeColor;
+			this._strokeWidth = value.strokeWidth;
+
 
 			//TODO: consider changing visible to a constrainable property?
 			this._visible = this.get('visible');

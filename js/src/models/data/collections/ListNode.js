@@ -440,8 +440,10 @@ getLiteralSubprops: function(key, subprop) {
           bbox = new paper.Path.Rectangle(bbox_dimensions.topLeft, new paper.Size(width, height));
           bbox.data.instance = this;
           this.set('bbox', bbox);
-          this.set('geom', bbox);
-          bbox.sendToBack();
+          var targetLayer = paper.project.layers.filter(function(layer) {
+          return layer.name === 'ui_layer';
+        })[0];
+        targetLayer.addChild(bbox);
 
 
         } else {

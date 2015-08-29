@@ -443,8 +443,12 @@ define([
 
 		addDuplicator: function(object, open) {
 			this.deselectAllShapes();
+			var index = object.index;
+			object.nodeParent.removeChildNode(object);
 			var duplicator = collectionManager.addDuplicator(object);
-			layersView.addList(duplicator.toJSON());
+			currentNode.insertChild(index,duplicator);
+			layersView.addShape(duplicator.toJSON());
+			layersView.removeShape(object.get('id'));
 			this.selectShape(duplicator);
 			var targets = [duplicator];
 			var data = duplicator.setCount(8);
@@ -473,7 +477,7 @@ define([
 			}
 			if (data.toAdd) {
 				for (var j = 0; j < data.toAdd.length; j++) {
-					layersView.addInstance(data.toAdd[j].toJSON(), data.toAdd[j].get('proto_node').get('id'));
+					layersView.addChild(data.toAdd[j].toJSON(), duplicator.get('id'));
 				}
 			}
 			this.updateListConstraints(duplicator);

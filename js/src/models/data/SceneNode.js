@@ -197,6 +197,24 @@ define([
             }
         },
 
+        insertChild: function(index,child){
+            if(child.nodeParent){
+                child.nodeParent.removeChildNode(child);
+                console.log('removing child node',child.get('name'));
+            }
+            if(index<this.length){
+                this.children.splice(index,0,child);
+            }
+            else{
+                this.children.push(child);
+
+            }
+             child.setParentNode(this);
+             for(var i=0;i<this.children.length;i++){
+                this.children[i].index = i;
+             }
+        },
+
         getChildIndex: function() {
           return _.indexOf(this.getParentNode().children,this);
         },
@@ -264,7 +282,9 @@ define([
         },
         //adds new child and sets child parent to this
         addChildNode: function(node) {
-
+            if(node.nodeParent){
+                node.nodeParent.removeChildNode(node);
+            }
             if (node !== null) {
                 node.setParentNode(this);
                 this.children.push(node);

@@ -446,7 +446,7 @@ define([
 			}
 		},
 
-		addInstance: function(shape, pId) {
+		addChild: function(shape, pId) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var parentNode = shapeTree.getNodeByKey(pId);
