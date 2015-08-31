@@ -9,10 +9,11 @@ define([
   'underscore',
   'paper',
   'models/data/collections/Duplicator',
+  'models/data/Instance',
   'utils/TrigFunc'
 
 
-], function(_, paper, Duplicator, TrigFunc) {
+], function(_, paper, Duplicator, Instance, TrigFunc) {
   var Group = Duplicator.extend({
 
     defaults: _.extend({}, Duplicator.prototype.defaults, {
@@ -24,70 +25,39 @@ define([
 
     initialize: function() {
       Duplicator.prototype.initialize.apply(this, arguments);
+      this.tf_matrix = new paper.Matrix();
     },
 
     /*setValue
     passes modifications onto members, stripped of any properties that are constrained on the list
      */
     setValue: function(data) {
-      var constrained_props = this.getConstraintValues();
-            console.log('data', data,constrained_props);
-
+      Instance.prototype.setValue.call(this, data);
       var centroid = this.calculateGroupCentroid();
+      var tD = this.get('translationDelta').getValue();
+      var rD = this.get('rotationDelta').getValue();
+      var sD = this.get('scalingDelta').getValue();
+      this.tf_matrix = new paper.Matrix();
+      this.tf_matrix = this.tf_matrix.rotate(rD, centroid.x, centroid.y);
+      this.tf_matrix = this.tf_matrix.scale(sD.x, sD.y, new paper.Point(centroid.x, centroid.y));
+      this.tf_matrix = this.tf_matrix.translate(tD.x, tD.y);
+
       for (var i = 0; i < this.members.length; i++) {
-        if (constrained_props[i]) {
-          var reference_status = this.isReference(this.members[i]);
-          var stripped_data = TrigFunc.stripBoolean(data, constrained_props[i], reference_status);
-
-          if (stripped_data['rotationDelta']) {
-            console.log('stripped_data',i,stripped_data);
-            var mod_data = this.rotate(stripped_data['rotationDelta'], centroid,this.members[i]);
-            console.log('mod_data', mod_data);
-            console.log('translationDelta pre', this.members[i].get('translationDelta').getValue());
-
-            this.members[i].setValue(mod_data);
-            console.log('translationDelta post', this.members[i].get('translationDelta').getValue());
-
-          }
-
-        } else {
-          this.members[i].setValue(data);
-        }
-
+        this.members[i].trigger('modified', this.members[i]);
       }
-      this.trigger('modified', this);
     },
 
 
-    scale: function(data, centroid) {
+    getGroupMatrix: function() {
 
-    },
-
-    rotate: function(data, centroid, member) {
-      console.log('centroid =', centroid);
-
-      var angle = data.v;
-     
-      
-      console.log('angle=', angle, 'centroid=', centroid);
-      var geom = member.get('geom');
-      var cloned_matrix = geom.matrix.clone();
-      var tf= cloned_matrix.rotate(angle, centroid.x, centroid.y);
-      console.log('tf',tf.rotation, tf.translation);
-
-      var mod_data = {
-        rotationDelta: {
-          v: tf.rotation,
-          operator: 'add'
-        },
-        translationDelta: {
-          x: tf.translation.x,
-          y: tf.translation.y,
-          operator: 'add'
-        }
-      };
-      return mod_data;
-
+      if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+        var matrix = this.nodeParent.getGroupMatrix();
+        matrix.concatenate(this.tf_matrix);
+        return matrix;
+      } else {
+        console.log('this.tf_matrix', this.tf_matrix);
+        return this.tf_matrix;
+      }
     },
 
 
@@ -103,7 +73,7 @@ define([
       }
       var centroid = TrigFunc.centroid(center_list);
       return centroid;
-    }
+    },
 
 
 

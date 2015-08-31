@@ -401,7 +401,7 @@ define([
 
 		addShape: function(shape) {
 
-			if (!shape.parentNode) {
+			if (!shape.nodeParent) {
 				currentNode.addChildNode(shape);
 			}
 			collectionManager.addToOpenLists(shape);

@@ -752,7 +752,6 @@ define([
 						}
 						this.get(prop).setValue(p);
 					} else if (p.operator === 'add') {
-						console.log('adding value',p);
 						this.get(prop).add(p);
 					}
 				}
@@ -1247,6 +1246,7 @@ define([
 
 
 		renderGeom: function() {
+			console.log('rendering geom',this.nodeParent.get('name'));
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 			var zIndex = this.get('zIndex').getValue();
@@ -1270,6 +1270,10 @@ define([
 			}
 			if (!pathAltered) {
 				//geom.transform(this._itemp_matrix);
+				if(this.nodeParent.get('name')==='group'){
+				console.log(' inverse transforming geom based on group parent');
+			  	geom.transform(this.nodeParent.getGroupMatrix().inverted());
+			 }
 				geom.transform(this._ti_matrix);
 				geom.transform(this._si_matrix);
 				geom.transform(this._ri_matrix);
@@ -1301,7 +1305,10 @@ define([
 			geom.transform(this._rotationDelta);
 			geom.transform(this._scalingDelta);
 			geom.transform(this._translationDelta);
-
+			if(this.nodeParent.get('name')==='group'){
+				console.log('transforming geom based on group parent');
+			  	geom.transform(this.nodeParent.getGroupMatrix());
+			 }
 			selection_clone.transform(this._rotationDelta);
 			selection_clone.transform(this._scalingDelta);
 			selection_clone.transform(this._translationDelta);

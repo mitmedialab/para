@@ -87,6 +87,8 @@ define([
                 else{
                      this.members.push(clone);
                      this.get('geom').addChild(clone.get('geom'));
+                    this.addChildNode(clone);
+
                     clone.get('zIndex').setValue(this.members.length-1);
 
                 }
@@ -146,6 +148,7 @@ define([
 
                     var member = this.members.splice(index, 1)[0];
                     this.get('geom').removeChildren(index,index+1);
+                    this.removeChildNode(member);
                     var memberCount = {
                         v: this.members.length,
                         operator: 'set'
