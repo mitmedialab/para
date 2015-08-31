@@ -200,7 +200,6 @@ define([
         insertChild: function(index,child){
             if(child.nodeParent){
                 child.nodeParent.removeChildNode(child);
-                console.log('removing child node',child.get('name'));
             }
             if(index<this.length){
                 this.children.splice(index,0,child);

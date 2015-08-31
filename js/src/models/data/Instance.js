@@ -150,11 +150,11 @@ define([
 			this.set('translationDelta', translationDelta);
 
 			var scalingDelta = new PPoint(0, 0);
-			scalingDelta.setNull(true);
+			scalingDelta.setNull(false);
 			this.set('scalingDelta', scalingDelta);
 
 			var rotationDelta = new PFloat(0);
-			rotationDelta.setNull(true);
+			rotationDelta.setNull(false);
 			this.set('rotationDelta', rotationDelta);
 
 			var strokeColor = new PColor(0, 0, 0, 1);
@@ -752,6 +752,7 @@ define([
 						}
 						this.get(prop).setValue(p);
 					} else if (p.operator === 'add') {
+						console.log('adding value',p);
 						this.get(prop).add(p);
 					}
 				}

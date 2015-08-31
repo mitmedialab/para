@@ -142,14 +142,27 @@ define([
 
 		TrigFunc.midpoint = function(p1, p2) {
 
-			var x = (p1.x+ p2.x) / 2;
-			var y = (p1.y+ p2.y) / 2;
+			var x = (p1.x + p2.x) / 2;
+			var y = (p1.y + p2.y) / 2;
 
 			return {
 				x: x,
 				y: y
 			};
 		};
+
+		TrigFunc.centroid = function(pointList) {
+			// should check for instances of PPoint
+			var sum_point = pointList.reduce(function(point1, point2) {
+				return {x:point1.x + point2.x, y:point1.y + point2.y};
+			});
+			var centroid = {
+				x: sum_point.x / pointList.length,
+				y: sum_point.y / pointList.length
+			};
+			return centroid;
+		};
+
 
 		//determines if point is on left or right of line
 		TrigFunc.side = function(pA, pB, pM) {
@@ -230,7 +243,7 @@ define([
 							if (boolCompare[p] === true) {
 								stripped[p] = target[p];
 							} else {
-								var val = TrigFunc.stripBoolean(target[p], reference[p],boolCompare[p]);
+								var val = TrigFunc.stripBoolean(target[p], reference[p], boolCompare[p]);
 								if (val) {
 									stripped[p] = val;
 								}
@@ -295,7 +308,6 @@ define([
 			}
 			return polynomial;
 		};
-
 
 
 

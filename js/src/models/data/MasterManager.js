@@ -7,6 +7,7 @@ define([
 	'underscore',
 	'backbone',
 	'models/data/Instance',
+	'models/data/geometry/Group',
 	'models/data/functions/FunctionNode',
 	'models/data/functions/FunctionManager',
 	'models/data/collections/CollectionManager',
@@ -15,7 +16,7 @@ define([
 	'views/MapView'
 
 
-], function(_, Backbone, Instance, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView) {
+], function(_, Backbone, Instance, Group, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -216,6 +217,7 @@ define([
 					}
 					break;
 				case 'group':
+					this.addGroup(selected);
 					break;
 				case 'duplicator':
 					if (selected[0]) {
@@ -441,6 +443,22 @@ define([
 			}
 		},
 
+		addGroup: function(selected){
+			console.log('adding group');
+			var group = collectionManager.addGroup(selected);
+			layersView.addShape(group.toJSON());
+
+			for(var i=0;i<selected.length;i++){
+				layersView.removeShape(selected[i].get('id'));
+				layersView.addChild(selected[i].toJSON(), group.get('id'));
+			}
+			this.deselectAllShapes();
+			currentNode.addChildNode(group);
+			this.addListener(group);
+			this.selectShape(group);
+			return group;
+		},
+
 		addDuplicator: function(object, open) {
 			this.deselectAllShapes();
 			var index = object.index;
@@ -461,6 +479,7 @@ define([
 			for (var i = 0; i < targets.length; i++) {
 				this.addListener(targets[i]);
 			}
+			this.addListener(duplicator);
 			var constraint = duplicator.setInternalConstraint();
 			this.addConstraint(constraint);
 			return duplicator;

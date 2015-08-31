@@ -8,9 +8,11 @@ define([
 	'backbone',
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
+		'models/data/geometry/Group'
 
 
-], function(_, Backbone, ConstrainableList, Duplicator) {
+
+], function(_, Backbone, ConstrainableList, Duplicator, Group) {
 
 
 	//stores para lists
@@ -175,7 +177,7 @@ define([
 		 * and state of lists which contain those objects(open vs closed)
 		 */
 		filterSelection: function(lInstance) {
-			
+
 
 			var sInstances = [];
 			var itemFound = false;
@@ -233,6 +235,25 @@ define([
 			}
 
 			return duplicator;
+		},
+
+		addGroup: function(selected) {
+			var group = new Group();
+
+			for(var j=0;j<selected.length;j++){
+				group.addMember(selected[j]);
+			}
+
+			if (!this.addToOpenLists(group)) {
+				for (var i = lists.length - 1; i >= 0; i--) {
+					if (group.hasMember(lists[i], true)) {
+						lists.splice(i, 1);
+					}
+				}
+				lists.push(group);
+			}
+
+			return group;
 		},
 
 

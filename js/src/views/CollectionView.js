@@ -142,7 +142,7 @@ define([
 					this.disable('count');
 				}
 				if (selected.length > 1) {
-					//this.enable('group');
+					this.enable('group');
 					this.disable('duplicator');
 					this.enable('list');
 				} else {

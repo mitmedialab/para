@@ -422,12 +422,12 @@ getLiteralSubprops: function(key, subprop) {
         topLeft: null,
         bottomRight: null,
       });
-
       for (var k = 0; k < this.members.length; k++) {
         this.calculateBoundingBox(this.members[k]);
       }
 
       var bbox_dimensions = this.get('bbox_dimensions');
+
       if (bbox_dimensions.bottomRight) {
         var width = bbox_dimensions.bottomRight.x - bbox_dimensions.topLeft.x;
         var height = bbox_dimensions.bottomRight.y - bbox_dimensions.topLeft.y;
