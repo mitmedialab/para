@@ -559,7 +559,6 @@ define([
 		},
 
 		resetProperties: function() {
-			this.clear().set(this.defaults);
 			this.get('position').setValue({
 				x: 0,
 				y: 0
@@ -580,7 +579,6 @@ define([
 				x: 0,
 				y: 0
 			});
-			this.get('matrix').reset();
 		},
 
 
@@ -1137,6 +1135,7 @@ define([
 		 * draws instance on canvas
 		 */
 		render: function() {
+			console.log('rendering instance');
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 
@@ -1246,7 +1245,6 @@ define([
 
 
 		renderGeom: function() {
-			console.log('rendering geom',this.nodeParent.get('name'));
 			var visible = this.get('visible');
 			var geom = this.get('geom');
 			var zIndex = this.get('zIndex').getValue();
@@ -1269,11 +1267,7 @@ define([
 				targetLayer.addChild(bbox);
 			}
 			if (!pathAltered) {
-				//geom.transform(this._itemp_matrix);
-				if(this.nodeParent.get('name')==='group'){
-				console.log(' inverse transforming geom based on group parent');
-			  	geom.transform(this.nodeParent.getGroupMatrix().inverted());
-			 }
+			
 				geom.transform(this._ti_matrix);
 				geom.transform(this._si_matrix);
 				geom.transform(this._ri_matrix);
@@ -1305,10 +1299,7 @@ define([
 			geom.transform(this._rotationDelta);
 			geom.transform(this._scalingDelta);
 			geom.transform(this._translationDelta);
-			if(this.nodeParent.get('name')==='group'){
-				console.log('transforming geom based on group parent');
-			  	geom.transform(this.nodeParent.getGroupMatrix());
-			 }
+			
 			selection_clone.transform(this._rotationDelta);
 			selection_clone.transform(this._scalingDelta);
 			selection_clone.transform(this._translationDelta);
@@ -1321,6 +1312,11 @@ define([
 
 			this.get('pathAltered').setValue(false);
 			geom.visible = visible;
+			if(this.nodeParent && this.nodeParent.get('name')==='group'){
+				this.nodeParent.reset();
+				this.nodeParent.compile();
+				this.nodeParent.render();
+			}
 			return geom;
 		},
 

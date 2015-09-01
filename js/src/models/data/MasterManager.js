@@ -594,15 +594,18 @@ define([
 
 
 		_selectSingleShape: function(instance, segments) {
-			if (!_.contains(selected, instance)) {
-				selected.push(instance);
-			}
-			instance.select(segments);
+			
 
 			var data = collectionManager.filterSelection(instance);
 			if (data) {
 				this.deselectShape(data.toRemove);
 				this.selectShape(data.toAdd);
+			}
+			else{
+				if (!_.contains(selected, instance)) {
+				selected.push(instance);
+			}
+			instance.select(segments);
 			}
 
 		},

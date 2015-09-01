@@ -26,6 +26,9 @@ define([
     initialize: function() {
       Duplicator.prototype.initialize.apply(this, arguments);
       this.tf_matrix = new paper.Matrix();
+      this.resetProperties();
+      this.get('geom').data.geom = true;
+       this.get('geom').data.nodetype = this.get('name');
     },
 
     /*setValue
@@ -33,20 +36,22 @@ define([
      */
     setValue: function(data) {
       Instance.prototype.setValue.call(this, data);
-      var centroid = this.calculateGroupCentroid();
-      var tD = this.get('translationDelta').getValue();
-      var rD = this.get('rotationDelta').getValue();
-      var sD = this.get('scalingDelta').getValue();
-      this.tf_matrix = new paper.Matrix();
-      this.tf_matrix = this.tf_matrix.rotate(rD, centroid.x, centroid.y);
-      this.tf_matrix = this.tf_matrix.scale(sD.x, sD.y, new paper.Point(centroid.x, centroid.y));
-      this.tf_matrix = this.tf_matrix.translate(tD.x, tD.y);
-
-      for (var i = 0; i < this.members.length; i++) {
-        this.members[i].trigger('modified', this.members[i]);
-      }
     },
 
+
+    addMember: function(clone, index) {
+      Duplicator.prototype.addMember.call(this, clone, index);
+      var memberCount = {
+        v: this.members.length,
+        operator: 'set'
+      };
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].get('zIndex').setValue(i);
+      }
+      this.get('memberCount').setValue(memberCount);
+      this.get('translationDelta').setValue(this.calculateGroupCentroid());
+   
+    },
 
     getGroupMatrix: function() {
 
@@ -73,6 +78,64 @@ define([
       }
       var centroid = TrigFunc.centroid(center_list);
       return centroid;
+    },
+
+
+    compile: function() {
+      Instance.prototype.compile.call(this);
+    },
+
+
+    //renders the List UI
+    render: function() {
+      console.log('rendering geom');
+      if (!this.get('rendered')) {
+
+        var geom = this.renderGeom();
+        if (geom) {
+         //this.renderSelection(geom);
+        }
+
+        this.set('rendered', true);
+
+
+
+      }
+
+    },
+
+    renderGeom: function() {
+      var visible = this.get('visible');
+      var geom = this.get('geom');
+      var zIndex = this.get('zIndex').getValue();
+      if (geom.index != zIndex) {
+        geom.parent.insertChild(zIndex, geom);
+      }
+      var pathAltered = this.get('pathAltered').getValue();
+
+      if (!pathAltered) {
+        //geom.transform(this._itemp_matrix);
+
+        geom.transform(this._ti_matrix);
+        geom.transform(this._si_matrix);
+        geom.transform(this._ri_matrix);
+      }
+
+      //var position = this.get('position').toPaperPoint();
+     geom.position.x=0;
+     geom.position.y=0;
+     geom.transform(this._rotationDelta);
+     // geom.transform(this._scalingDelta);
+      geom.transform(this._translationDelta);
+     
+
+
+      this.updateScreenBounds(geom);
+
+      this.get('pathAltered').setValue(false);
+      geom.visible = visible;
+      console.log('geom',geom.position,geom.scaling,geom.visible,geom.rotation,geom.bounds.width,geom.bounds.height);
+      return geom;
     },
 
 
