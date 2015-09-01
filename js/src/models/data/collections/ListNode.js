@@ -69,9 +69,7 @@ define([
 
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
-          // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
-           //this.listenTo(data[i],'modified',this.render);
           
         }
       } else {
@@ -79,21 +77,16 @@ define([
           this.members.splice(index,0,data);
         }
         else{
-        //this.listenTo(data,'modified',this.render);
           this.members.push(data);
         }
 
       }
 
-     
       var memberCount = {
         v: this.members.length,
         operator: 'set'
       };
       this.get('memberCount').setValue(memberCount);
-
-      //this.computeCentroid();
-
     },
 
     computeCentroid: function() {

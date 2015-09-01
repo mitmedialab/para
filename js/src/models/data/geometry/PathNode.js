@@ -140,9 +140,7 @@ define([
       path.data.nodetype = this.get('name');
       path.data.instance = this;
       path.data.geom = true;
-      this.set('geom', path);
-      this.createBBox();
-      this.createSelectionClone();
+     this.changeGeomInheritance(path);
 
       this.setValue(data);
 

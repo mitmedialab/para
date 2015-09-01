@@ -374,8 +374,7 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
-			console.log('set child before', child.get('name'), 'to', child.get('zIndex').getValue());
-			console.log('sibling', sibling.get('name'), 'to', sibling.get('zIndex').getValue());
+			
 
 		},
 
@@ -384,9 +383,7 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
-			console.log('set child after', child.get('name'), 'to', child.get('zIndex').getValue());
-			console.log('sibling', sibling.get('name'), 'to', sibling.get('zIndex').getValue());
-
+			
 		},
 
 		addInheritor: function(instance) {
@@ -397,7 +394,6 @@ define([
 			instance.reset();
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
-			instance.createSelectionClone();
 		},
 
 		removeInheritor: function(instance) {
@@ -470,6 +466,8 @@ define([
 		changeGeomInheritance: function(geom) {
 			if (this.get('geom')) {
 				this.get('geom').remove();
+				this.set('geom',null);
+
 			}
 			if (this.get('selection_clone')) {
 				this.get('selection_clone').remove();
@@ -479,11 +477,18 @@ define([
 				this.get('bbox').remove();
 				this.set('bbox', null);
 			}
+			if (this.get('normal_geom')) {
+				this.get('normal_geom').remove();
+				this.set('normal_geom',null);
+			}
 
 			geom.data.instance = this;
 			geom.data.geom = true;
 			geom.data.nodetype = this.get('name');
 			this.set('geom', geom);
+			this.set('normal_geom',geom.clone());
+			this.createBBox();
+			this.createSelectionClone();
 			for (var i = 0; i < this.children.length; i++) {
 				if (this.children[i].get('name') === 'point') {
 					this.children[i].deleteSelf();
@@ -1125,7 +1130,6 @@ define([
 			this._matrix.translate(translationDelta.x, translationDelta.y);
 			this._matrix.rotate(rotationDelta, 0, 0);
 			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
-			console.log('geom.matrix', geom.matrix);
 			geom.matrix.reset();
 			geom.transform(this._matrix);
 			bbox.transform(this._matrix);
@@ -1140,33 +1144,24 @@ define([
 			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
 				this.nodeParent.inverseTransformRecurse([]);
 			}
-			//otherwise only inverse self
 			else {
 				this.inverseTransformSelf();
-				console.log('geom posiion after non group inverse', geom.position, this.get('id'));
-
 			}
-
 
 			geom.visible = true;
 			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
 				this.nodeParent.transformRecurse([]);
 			} else {
 				this.transformSelf();
-				console.log('geom posiion after  non group transform', geom.position, this.get('id'));
 
 			}
 
 		},
 
 		compileStyle: function(value) {
-
 			this._fillColor = value.fillColor;
 			this._strokeColor = value.strokeColor;
 			this._strokeWidth = value.strokeWidth;
-
-
-			//TODO: consider changing visible to a constrainable property?
 			this._visible = this.get('visible');
 		},
 
@@ -1174,19 +1169,12 @@ define([
 		 * draws instance on canvas
 		 */
 		render: function() {
-			console.log('rendering instance');
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
-
 					var geom = this.get('geom');
 					this.renderStyle(geom);
 					this.renderSelection(geom);
-					
-
 					this.set('rendered', true);
-
-
-
 				}
 				return 'root';
 			}
@@ -1233,7 +1221,6 @@ define([
 			var constraint_selected = this.get('constraintSelected').getValue();
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
-			console.log('constraint selected',constraint_selected,'selected',selected);
 			if (constraint_selected) {
 				selection_clone.visible = true;
 				selection_clone.strokeColor = this.get(constraint_selected + '_color');
@@ -1284,10 +1271,7 @@ define([
 
 		/*returns a clone of the paper js shape*/
 		getShapeClone: function(relative) {
-			var clone = this.get('geom').clone();
-			if (relative) {
-				clone.transform(this._matrix);
-			}
+			var clone = this.get('normal_geom').clone();
 			return clone;
 		},
 

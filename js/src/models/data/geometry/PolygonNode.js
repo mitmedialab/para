@@ -52,9 +52,7 @@ define([
         new_master.data.instance = this;
      new_master.data.geom = true;
      new_master.data.nodetype =this.get('name');
-          this.get('geom').remove();
-          this.set('geom',null);
-          this.set('geom',new_master);
+        this.changeGeomInheritance(new_master);
           new_master.remove();
       }
     }

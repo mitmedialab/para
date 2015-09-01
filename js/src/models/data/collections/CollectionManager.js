@@ -325,6 +325,7 @@ define([
 				for (var i = 0; i < lists.length; i++) {
 					if ($.inArray(lists[i], toggledLists) === -1) {
 						var r = lists[i].toggleClosed(item);
+						console.log('checking toggle closed list',r,lists[i].get('name'));
 						if (r) {
 							returnedLists = returnedLists.concat(r);
 							toggledLists.push(lists[i]);

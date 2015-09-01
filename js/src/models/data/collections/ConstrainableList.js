@@ -40,7 +40,7 @@ define([
         geom.addChild(path);
         geom.addChild(this.startText);
         this.startText.data.instance = geom.data.instance = path.data.instance = this;
-var targetLayer = paper.project.layers.filter(function(layer) {
+        var targetLayer = paper.project.layers.filter(function(layer) {
           return layer.name === 'ui_layer';
         })[0];
         targetLayer.addChild(geom);
@@ -61,10 +61,10 @@ var targetLayer = paper.project.layers.filter(function(layer) {
         var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
           if (constrained_props[i]) {
-              var reference_status = this.isReference(this.members[i]);
-              var set_data = this.members[i].getAddedValueFor(data);
-              var stripped_data = TrigFunc.stripBoolean(set_data, constrained_props[i],reference_status);
-              this.members[i].setValue(stripped_data);
+            var reference_status = this.isReference(this.members[i]);
+            var set_data = this.members[i].getAddedValueFor(data);
+            var stripped_data = TrigFunc.stripBoolean(set_data, constrained_props[i], reference_status);
+            this.members[i].setValue(stripped_data);
           } else {
             this.members[i].setValue(data);
           }
@@ -134,12 +134,12 @@ var targetLayer = paper.project.layers.filter(function(layer) {
 
       //overrides ListNode addMember and removeMember functions
       addMember: function(data, index) {
-         ListNode.prototype.addMember.call(this, data, index);
+        ListNode.prototype.addMember.call(this, data, index);
         this.addMemberNotation();
 
       },
 
-      addMemberNotation: function(){
+      addMemberNotation: function() {
         var diff = this.members.length - this.indexNumbers.length;
         for (var i = 0; i < diff; i++) {
           var numText = new paper.PointText({
@@ -151,21 +151,21 @@ var targetLayer = paper.project.layers.filter(function(layer) {
             fillColor: this.get('primary_selection_color')
           });
           var targetLayer = paper.project.layers.filter(function(layer) {
-          return layer.name === 'ui_layer';
-        })[0];
-        targetLayer.addChild(numText);
+            return layer.name === 'ui_layer';
+          })[0];
+          targetLayer.addChild(numText);
           this.indexNumbers.push(numText);
         }
       },
 
-     removeMember: function(data) {
+      removeMember: function(data) {
         var memberIndex = _.indexOf(this.members, data);
         var member = ListNode.prototype.removeMember.call(this, data);
         this.removeMemberNotation();
         return member;
       },
 
-      removeMemberNotation: function() {       
+      removeMemberNotation: function() {
         var diff = this.indexNumbers.length - this.members.length;
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();

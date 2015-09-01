@@ -827,14 +827,6 @@ define([
 		toggleClosed: function() {
 			var data = collectionManager.toggleClosedLists(selected);
 
-			if (data.toSelect.length < 1) {
-				collectionManager.closeAllLists();
-				currentNode.list = collectionManager.getLists();
-				data = functionManager.toggleClosedFunctions(currentNode, rootNode);
-				currentNode = data.currentNode;
-				collectionManager.setLists(currentNode.lists);
-			}
-
 			if (data.toRemove && data.toRemove.length > 0) {
 				this.deselectShape(data.toRemove);
 			}

@@ -38,12 +38,6 @@ define([
         operator: 'set'
       });
       this.members = [];
-      /*this.centroid = new paper.Path.Circle(new paper.Point(0, 0), 10);
-      this.centroid.fillColor = 'red';
-      var targetLayer = paper.project.layers.filter(function(layer) {
-        return layer.name === 'ui_layer';
-      })[0];
-      targetLayer.addChild(this.centroid);*/
     },
 
 
@@ -60,11 +54,9 @@ define([
         clone.get('zIndex').setValue(this.members.length - 1);
 
       }
-      //this.compile();
     },
 
     setValue: function(data) {
-      console.log('group set value');
       Instance.prototype.setValue.call(this, data);
     },
 
@@ -72,22 +64,32 @@ define([
       return Duplicator.prototype.getMember.call(this, member);
     },
 
+
+    hasMember: function(member, top, last) {
+      return Duplicator.prototype.hasMember.call(this, member, top, last);
+    },
+
     toggleOpen: function(item) {
       var result = Duplicator.prototype.toggleOpen.call(this, item);
-      this.inverseTransformRecurse([]);
-      for(var i=0;i<this.members.length;i++){
-        this.members[i].transformSelf();
+      if (result) {
+        this.inverseTransformRecurse([]);
+        for (var i = 0; i < this.members.length; i++) {
+          this.members[i].transformSelf();
+        }
       }
       return result;
 
     },
 
     toggleClosed: function(item) {
+      console.log('toggle close group', this.hasMember(item));
       var result = Duplicator.prototype.toggleClosed.call(this, item);
-      for(var i=0;i<this.members.length;i++){
-        this.members[i].inverseTransformSelf();
+      if (result) {
+        for (var i = 0; i < this.members.length; i++) {
+          this.members[i].inverseTransformSelf();
+        }
+        this.transformRecurse([]);
       }
-      this.transformRecurse([]);
       return result;
 
     },
@@ -109,8 +111,6 @@ define([
 
 
     compile: function() {
-      console.log('group compile');
-      console.trace();
       if (this.members.length > 0) {
         this.members[0].compile();
       }
@@ -121,7 +121,6 @@ define([
       for (var i = 0; i < this.members.length; i++) {
         geom_list.push.apply(geom_list, [this.members[i].get('geom')]);
       }
-      console.log('geom list', geom_list);
 
       if (this.nodeParent && this.nodeParent.get('name') === 'group') {
         this.nodeParent.inverseTransformRecurse(geom_list);
@@ -129,22 +128,22 @@ define([
       }
 
       this.inverseTransformSelf();
-      console.log('parent inverse transformation', this._invertedMatrix.translation, this._invertedMatrix.rotation, this._invertedMatrix.scaling);
+      //console.log('parent inverse transformation', this._invertedMatrix.translation, this._invertedMatrix.rotation, this._invertedMatrix.scaling);
       //debugger;
 
       for (var j = 0; j < geom_list.length; j++) {
-        console.log('geom position before parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
+        //console.log('geom position before parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
 
         geom_list[j].transform(this._invertedMatrix);
-        console.log('geom position after parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
+        //console.log('geom position after parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
         //debugger;
       }
 
       for (var k = 0; k < this.members.length; k++) {
-        console.log('geom position before individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
+        //console.log('geom position before individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
 
         this.members[k].inverseTransformSelf();
-        console.log('geom position after individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
+        //console.log('geom position after individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
         //debugger;
       }
 
@@ -153,21 +152,21 @@ define([
 
     transformRecurse: function(geom_list) {
       for (var i = 0; i < this.members.length; i++) {
-        console.log('geom position before individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
+        // console.log('geom position before individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
 
         geom_list.push.apply(geom_list, this.members[i].transformSelf());
-        console.log('geom position after individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
+        //console.log('geom position after individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
         //debugger;
       }
 
       this.transformSelf();
-      console.log('parent transformation', this._matrix.translation, this._matrix.rotation, this._matrix.scaling);
+      //console.log('parent transformation', this._matrix.translation, this._matrix.rotation, this._matrix.scaling);
       // debugger;
       for (var j = 0; j < geom_list.length; j++) {
-        console.log('geom position before parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
+        //console.log('geom position before parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
 
         geom_list[j].transform(this._matrix);
-        console.log('geom position after parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
+        // console.log('geom position after parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
         //debugger;
       }
       if (this.nodeParent && this.nodeParent.get('name') === 'group') {
@@ -185,9 +184,6 @@ define([
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
       var center = this.calculateGroupCentroid();
-      //this.centroid.position.x = center.x;
-     // this.centroid.position.y = center.y;
-      console.log('translationDelta', translationDelta, rotationDelta, scalingDelta, center);
 
       this._matrix.translate(translationDelta.x, translationDelta.y);
       this._matrix.rotate(rotationDelta, new paper.Point(center.x, center.y));
