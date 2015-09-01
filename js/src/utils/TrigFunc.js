@@ -101,16 +101,16 @@ define([
 
 		TrigFunc.subtract = function(p1, p2) {
 			return {
-				x: p1.getX() - p2.getX(),
-				y: p1.getY() - p2.getY()
+				x: p1.x - p2.x,
+				y: p1.y - p2.y
 			};
 		};
 
 
 		TrigFunc.add = function(p1, p2) {
 			return {
-				x: p1.getX() + p2.getX(),
-				y: p1.getY() + p2.getY()
+				x: p1.x + p2.x,
+				y: p1.y + p2.y
 			};
 		};
 

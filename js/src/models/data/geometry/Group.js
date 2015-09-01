@@ -28,7 +28,7 @@ define([
       this.tf_matrix = new paper.Matrix();
       this.resetProperties();
       this.get('geom').data.geom = true;
-       this.get('geom').data.nodetype = this.get('name');
+      this.get('geom').data.nodetype = this.get('name');
     },
 
     /*setValue
@@ -49,8 +49,16 @@ define([
         this.members[i].get('zIndex').setValue(i);
       }
       this.get('memberCount').setValue(memberCount);
-      this.get('translationDelta').setValue(this.calculateGroupCentroid());
-   
+      this.updateCentroid();
+    },
+
+    updateCentroid:function(){
+      var old_centroid = this.get('translationDelta').getValue();
+      var new_centroid = this.calculateGroupCentroid();
+      var diff = TrigFunc.subtract(new_centroid,old_centroid);
+      this.get('translationDelta').add(diff);
+
+      console.log('old_centroid diff',diff,this.get('translationDelta').getValue());
     },
 
     getGroupMatrix: function() {
@@ -67,16 +75,7 @@ define([
 
 
     calculateGroupCentroid: function() {
-      var center_list = [];
-      for (var i = 0; i < this.members.length; i++) {
-        var center = this.members[i].get('center');
-
-        center_list.push({
-          x: center.x.getValue(),
-          y: center.y.getValue()
-        });
-      }
-      var centroid = TrigFunc.centroid(center_list);
+      var centroid = {x:this.get('geom').position.x,y:this.get('geom').position.y};
       return centroid;
     },
 
@@ -93,7 +92,7 @@ define([
 
         var geom = this.renderGeom();
         if (geom) {
-         //this.renderSelection(geom);
+          //this.renderSelection(geom);
         }
 
         this.set('rendered', true);
@@ -122,19 +121,19 @@ define([
       }
 
       //var position = this.get('position').toPaperPoint();
-     geom.position.x=0;
-     geom.position.y=0;
-     geom.transform(this._rotationDelta);
-     // geom.transform(this._scalingDelta);
+      geom.position.x = 0;
+      geom.position.y = 0;
+      geom.transform(this._rotationDelta);
+      geom.transform(this._scalingDelta);
       geom.transform(this._translationDelta);
-     
+
 
 
       this.updateScreenBounds(geom);
 
       this.get('pathAltered').setValue(false);
       geom.visible = visible;
-      console.log('geom',geom.position,geom.scaling,geom.visible,geom.rotation,geom.bounds.width,geom.bounds.height);
+      console.log('geom', geom.position, geom.scaling, geom.visible, geom.rotation, geom.bounds.width, geom.bounds.height);
       return geom;
     },
 

@@ -365,13 +365,13 @@ define([
 			}
 		},
 
-		insertChild: function(index,child){
-           	SceneNode.prototype.insertChild.call(this, index,child);
-           	for (var i = 0; i < this.children.length; i++) {
+		insertChild: function(index, child) {
+			SceneNode.prototype.insertChild.call(this, index, child);
+			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
 
-        },
+		},
 		removeChildNode: function(node) {
 			SceneNode.prototype.removeChildNode.call(this, node);
 			for (var i = 0; i < this.children.length; i++) {
@@ -1267,7 +1267,14 @@ define([
 				targetLayer.addChild(bbox);
 			}
 			if (!pathAltered) {
-			
+				if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+					this.nodeParent.get('pathAltered').setValue(true);
+					var npg = this.nodeParent.get('geom');
+					npg.transform(npg._ti_matrix);
+					npg.transform(npg._si_matrix);
+					npg.transform(npg._ri_matrix);
+				}
+
 				geom.transform(this._ti_matrix);
 				geom.transform(this._si_matrix);
 				geom.transform(this._ri_matrix);
@@ -1296,10 +1303,11 @@ define([
 			geom.position = position;
 			bbox.position = position;
 			selection_clone.position = position;
+
 			geom.transform(this._rotationDelta);
 			geom.transform(this._scalingDelta);
 			geom.transform(this._translationDelta);
-			
+
 			selection_clone.transform(this._rotationDelta);
 			selection_clone.transform(this._scalingDelta);
 			selection_clone.transform(this._translationDelta);
@@ -1312,8 +1320,10 @@ define([
 
 			this.get('pathAltered').setValue(false);
 			geom.visible = visible;
-			if(this.nodeParent && this.nodeParent.get('name')==='group'){
+			if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+				console.log('rendering parent group');
 				this.nodeParent.reset();
+				this.nodeParent.updateCentroid();
 				this.nodeParent.compile();
 				this.nodeParent.render();
 			}
