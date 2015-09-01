@@ -11,8 +11,8 @@ define([
   'models/data/collections/Duplicator',
   'models/data/Instance',
   'utils/TrigFunc',
-   'utils/PFloat',
-   'utils/PPoint',
+  'utils/PFloat',
+  'utils/PPoint',
 
 
 ], function(_, paper, Duplicator, Instance, TrigFunc, PFloat, PPoint) {
@@ -29,11 +29,21 @@ define([
     initialize: function() {
       Instance.prototype.initialize.apply(this, arguments);
       this.resetProperties();
-       var memberCount = new PFloat(0);
+      var memberCount = new PFloat(0);
       memberCount.setNull(false);
       this.set('memberCount', memberCount);
-      this.get('scalingDelta').setValue({x:1,y:1,operator:'set'});
+      this.get('scalingDelta').setValue({
+        x: 1,
+        y: 1,
+        operator: 'set'
+      });
       this.members = [];
+      /*this.centroid = new paper.Path.Circle(new paper.Point(0, 0), 10);
+      this.centroid.fillColor = 'red';
+      var targetLayer = paper.project.layers.filter(function(layer) {
+        return layer.name === 'ui_layer';
+      })[0];
+      targetLayer.addChild(this.centroid);*/
     },
 
 
@@ -53,26 +63,37 @@ define([
       //this.compile();
     },
 
-    setValue:function(data){
+    setValue: function(data) {
       console.log('group set value');
-      Instance.prototype.setValue.call(this,data);
+      Instance.prototype.setValue.call(this, data);
     },
 
-     getMember: function(member) {
-      return Duplicator.prototype.getMember.call(this,member);
+    getMember: function(member) {
+      return Duplicator.prototype.getMember.call(this, member);
     },
 
     toggleOpen: function(item) {
-     return Duplicator.prototype.toggleOpen.call(this, item);
+      var result = Duplicator.prototype.toggleOpen.call(this, item);
+      this.inverseTransformRecurse([]);
+      for(var i=0;i<this.members.length;i++){
+        this.members[i].transformSelf();
+      }
+      return result;
 
     },
 
     toggleClosed: function(item) {
-      return Duplicator.prototype.toggleClosed.call(this, item);
+      var result = Duplicator.prototype.toggleClosed.call(this, item);
+      for(var i=0;i<this.members.length;i++){
+        this.members[i].inverseTransformSelf();
+      }
+      this.transformRecurse([]);
+      return result;
+
     },
 
-    closeAllMembers: function(){
-       Duplicator.prototype.closeAllMembers.call(this);
+    closeAllMembers: function() {
+      Duplicator.prototype.closeAllMembers.call(this);
     },
 
 
@@ -141,7 +162,7 @@ define([
 
       this.transformSelf();
       console.log('parent transformation', this._matrix.translation, this._matrix.rotation, this._matrix.scaling);
-     // debugger;
+      // debugger;
       for (var j = 0; j < geom_list.length; j++) {
         console.log('geom position before parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
 
@@ -164,11 +185,13 @@ define([
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
       var center = this.calculateGroupCentroid();
+      //this.centroid.position.x = center.x;
+     // this.centroid.position.y = center.y;
       console.log('translationDelta', translationDelta, rotationDelta, scalingDelta, center);
 
       this._matrix.translate(translationDelta.x, translationDelta.y);
       this._matrix.rotate(rotationDelta, new paper.Point(center.x, center.y));
-      this._matrix.scale(scalingDelta.x,scalingDelta.y, new paper.Point(center.x, center.y));
+      this._matrix.scale(scalingDelta.x, scalingDelta.y, new paper.Point(center.x, center.y));
       return [];
     },
 

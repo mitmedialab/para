@@ -141,7 +141,8 @@ define([
       path.data.instance = this;
       path.data.geom = true;
       this.set('geom', path);
-
+      this.createBBox();
+      this.createSelectionClone();
 
       this.setValue(data);
 

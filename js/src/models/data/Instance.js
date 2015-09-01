@@ -449,6 +449,24 @@ define([
 			this.set('selection_clone', selection_clone);
 		},
 
+		createBBox: function() {
+			if (this.get('bbox')) {
+				this.get('bbox').remove();
+				this.set('bbox', null);
+			}
+			var geom = this.get('geom');
+			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
+
+			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
+			bbox.data.instance = this;
+			this.set('bbox', bbox);
+			var targetLayer = paper.project.layers.filter(function(layer) {
+				return layer.name === 'ui_layer';
+			})[0];
+			targetLayer.addChild(bbox);
+
+		},
+
 		changeGeomInheritance: function(geom) {
 			if (this.get('geom')) {
 				this.get('geom').remove();
@@ -1075,20 +1093,29 @@ define([
 			var value = this.getValue();
 			this.compileTransformation(value);
 			this.compileStyle(value);
+			this.updateScreenBounds(this.get('geom'));
 		},
 
-		
 
-		inverseTransformSelf: function(){
+
+		inverseTransformSelf: function() {
 			var geom = this.get('geom');
+			var bbox = this.get('bbox');
+			var selection_clone = this.get('selection_clone');
+
 			this._invertedMatrix = this._matrix.inverted();
 			geom.transform(this._invertedMatrix);
+			bbox.transform(this._invertedMatrix);
+			selection_clone.transform(this._invertedMatrix);
+
 			return [geom];
 		},
 
 		transformSelf: function() {
 			this._matrix.reset();
 			var geom = this.get('geom');
+			var bbox = this.get('bbox');
+			var selection_clone = this.get('selection_clone');
 			var scalingDelta, rotationDelta, translationDelta;
 			var value = this.getValue();
 			scalingDelta = value.scalingDelta;
@@ -1096,53 +1123,39 @@ define([
 			translationDelta = value.translationDelta;
 
 			this._matrix.translate(translationDelta.x, translationDelta.y);
-			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
 			this._matrix.rotate(rotationDelta, 0, 0);
+			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
+			console.log('geom.matrix', geom.matrix);
+			geom.matrix.reset();
 			geom.transform(this._matrix);
+			bbox.transform(this._matrix);
+			selection_clone.transform(this._matrix);
 			return [geom];
 		},
 
 
-		
-
 
 		compileTransformation: function(value) {
 			var geom = this.get('geom');
-
-
-			geom.fillColor = 'white';
-			geom.strokeColor = 'black';
-
-			if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
 				this.nodeParent.inverseTransformRecurse([]);
 			}
 			//otherwise only inverse self
 			else {
 				this.inverseTransformSelf();
-											console.log('geom posiion after non group inverse', geom.position,this.get('id'));
+				console.log('geom posiion after non group inverse', geom.position, this.get('id'));
 
 			}
-		
+
 
 			geom.visible = true;
-			if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
 				this.nodeParent.transformRecurse([]);
-			}
-			else {
+			} else {
 				this.transformSelf();
-							console.log('geom posiion after  non group transform', geom.position,this.get('id'));
+				console.log('geom posiion after  non group transform', geom.position, this.get('id'));
 
 			}
-
-
-			
-
-
-			/*this._rotation_origin = this.get('rotation_origin').toPaperPoint();
-			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
-			this._position = this.get('position').toPaperPoint();*/
-
-
 
 		},
 
@@ -1165,13 +1178,13 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 
-					var geom = this.renderGeom();
-					if (geom) {
+					var geom = this.get('geom');
 					this.renderStyle(geom);
 					this.renderSelection(geom);
-					}
+					
 
 					this.set('rendered', true);
+
 
 
 				}
@@ -1207,24 +1220,41 @@ define([
 
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
-
+			var zIndex = this.get('zIndex').getValue();
+			if (geom.index != zIndex) {
+				geom.parent.insertChild(zIndex, geom);
+			}
 		},
 
-		renderInheritorBoundingBox: function(geom) {
-			if (this.get('inheritor_bbox')) {
-				this.get('inheritor_bbox').remove();
+		
+
+		renderSelection: function(geom) {
+			var selected = this.get('selected').getValue();
+			var constraint_selected = this.get('constraintSelected').getValue();
+			var selection_clone = this.get('selection_clone');
+			var bbox = this.get('bbox');
+			console.log('constraint selected',constraint_selected,'selected',selected);
+			if (constraint_selected) {
+				selection_clone.visible = true;
+				selection_clone.strokeColor = this.get(constraint_selected + '_color');
+
+			} else {
+				selection_clone.visible = false;
+
 			}
-			var inheritors = this.get('inheritors').getValueFor();
-			for (var k = 0; k < inheritors.length; k++) {
-				this.updateBoundingBox(inheritors[k]);
+
+			if (selected) {
+				geom.selectedColor = this.getSelectionColor();
+				
+				bbox.selectedColor = this.getSelectionColor();
+				bbox.selected = (constraint_selected) ? false : true;
+				bbox.visible = (constraint_selected) ? false : true;
+				geom.selected = (constraint_selected) ? false : true;
 			}
-			var i_bbox = this.get('i_bbox');
-			if (i_bbox.bottomRight) {
-				var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
-				var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
-				var inheritor_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
-				this.set('inheritor_bbox', inheritor_bbox);
-				return inheritor_bbox;
+			else{
+				bbox.selected = false;
+				bbox.visible = false;
+				geom.selected =false;
 			}
 		},
 
@@ -1239,98 +1269,6 @@ define([
 
 			}
 		},
-
-		renderSelection: function(geom) {
-			var selected = this.get('selected').getValue();
-			var constraint_selected = this.get('constraintSelected').getValue();
-			var bbox;
-			var selection_clone = this.get('selection_clone');
-
-			if (constraint_selected) {
-				if (!selection_clone) {
-					this.createSelectionClone();
-					selection_clone = this.get('selection_clone');
-				}
-				selection_clone.visible = true;
-				selection_clone.strokeColor = this.get(constraint_selected + '_color');
-
-			} else {
-				selection_clone.visible = false;
-
-			}
-
-			if (selected) {
-				geom.selectedColor = this.getSelectionColor();
-				bbox = this.get('bbox');
-				bbox.selectedColor = this.getSelectionColor();
-				bbox.selected = (constraint_selected) ? false : true;
-				bbox.visible = (constraint_selected) ? false : true;
-				geom.selected = (constraint_selected) ? false : true;
-			}
-		},
-
-
-		renderGeom: function() {
-			var visible = this.get('visible');
-			var geom = this.get('geom');
-			var zIndex = this.get('zIndex').getValue();
-			if (geom.index != zIndex) {
-				geom.parent.insertChild(zIndex, geom);
-			}
-			var pathAltered = this.get('pathAltered').getValue();
-			var selection_clone = this.get('selection_clone');
-			var bbox = this.get('bbox');
-
-			if (!bbox) {
-				var size = new paper.Size(geom.bounds.width, geom.bounds.height);
-
-				bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
-				bbox.data.instance = this;
-				this.set('bbox', bbox);
-				var targetLayer = paper.project.layers.filter(function(layer) {
-					return layer.name === 'ui_layer';
-				})[0];
-				targetLayer.addChild(bbox);
-			}
-			if (!pathAltered) {
-				var widthScale = geom.bounds.width / bbox.bounds.width;
-				var heightScale = geom.bounds.height / bbox.bounds.height;
-				bbox.scale(widthScale, heightScale);
-				geom.selected = false;
-				bbox.selected = false;
-				
-				bbox.transform(this._invertedMatrix);
-				selection_clone.transform(this._invertedMatrix);
-
-
-			} else {
-				if (!selection_clone) {
-					this.createSelectionClone();
-					selection_clone = this.get('selection_clone');
-				}
-
-
-			}
-
-			var position = this.get('position').toPaperPoint();
-			bbox.position = position;
-			selection_clone.position = position;
-
-
-			selection_clone.transform(this._matrix);
-			selection_clone.transform(this._matrix);
-			selection_clone.transform(this._matrix);
-
-			bbox.transform(this._matrix);
-
-			this.updateScreenBounds(geom);
-
-			this.get('pathAltered').setValue(false);
-			geom.visible = visible;
-
-			return geom;
-		},
-
 
 		copyAttributes: function(clone, deep) {
 			clone.get('position').setValue(this.get('position').getValue());
