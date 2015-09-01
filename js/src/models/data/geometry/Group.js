@@ -52,13 +52,33 @@ define([
       this.updateCentroid();
     },
 
+    toggleOpen: function(item){
+      Duplicator.prototype.toggleOpen.call(this,item);
+        var geom = this.get('geom');
+        geom.transform(this._ti_matrix);
+        geom.transform(this._si_matrix);
+        geom.transform(this._ri_matrix);
+        for(var i=0;i<this.members.length;i++){
+          this.members[i].trigger('modified',this.members[i]);
+        }
+    },
+
+    toggleClosed: function(item){
+      Duplicator.prototype.toggleClosed.call(this,item);
+      var geom = this.get('geom');
+      geom.transform(this._rotationDelta);
+      geom.transform(this._scalingDelta);
+      geom.transform(this._translationDelta);
+      this.updateCentroid();
+
+    },
+
     updateCentroid:function(){
       var old_centroid = this.get('translationDelta').getValue();
       var new_centroid = this.calculateGroupCentroid();
       var diff = TrigFunc.subtract(new_centroid,old_centroid);
       this.get('translationDelta').add(diff);
 
-      console.log('old_centroid diff',diff,this.get('translationDelta').getValue());
     },
 
     getGroupMatrix: function() {
@@ -68,7 +88,6 @@ define([
         matrix.concatenate(this.tf_matrix);
         return matrix;
       } else {
-        console.log('this.tf_matrix', this.tf_matrix);
         return this.tf_matrix;
       }
     },
@@ -87,7 +106,6 @@ define([
 
     //renders the List UI
     render: function() {
-      console.log('rendering geom');
       if (!this.get('rendered')) {
 
         var geom = this.renderGeom();
@@ -133,7 +151,6 @@ define([
 
       this.get('pathAltered').setValue(false);
       geom.visible = visible;
-      console.log('geom', geom.position, geom.scaling, geom.visible, geom.rotation, geom.bounds.width, geom.bounds.height);
       return geom;
     },
 

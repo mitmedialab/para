@@ -1267,14 +1267,8 @@ define([
 				targetLayer.addChild(bbox);
 			}
 			if (!pathAltered) {
-				if (this.nodeParent && this.nodeParent.get('name') === 'group') {
-					this.nodeParent.get('pathAltered').setValue(true);
-					var npg = this.nodeParent.get('geom');
-					npg.transform(npg._ti_matrix);
-					npg.transform(npg._si_matrix);
-					npg.transform(npg._ri_matrix);
-				}
-
+	
+	
 				geom.transform(this._ti_matrix);
 				geom.transform(this._si_matrix);
 				geom.transform(this._ri_matrix);
@@ -1320,13 +1314,7 @@ define([
 
 			this.get('pathAltered').setValue(false);
 			geom.visible = visible;
-			if (this.nodeParent && this.nodeParent.get('name') === 'group') {
-				console.log('rendering parent group');
-				this.nodeParent.reset();
-				this.nodeParent.updateCentroid();
-				this.nodeParent.compile();
-				this.nodeParent.render();
-			}
+			
 			return geom;
 		},
 
