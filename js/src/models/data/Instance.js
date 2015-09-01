@@ -176,19 +176,9 @@ define([
 
 
 			//============private properties==============//
-
-			//inverse transformation matricies
-			this._ti_matrix = undefined;
-			this._si_matrix = undefined;
-			this._ri_matrix = undefined;
-
-			this._itemp_matrix = undefined;
-			this._temp_matrix = new paper.Matrix();
-
+			this._matrix = new paper.Matrix();
+		
 			//temporary attributes
-			this._translationDelta = new paper.Matrix();
-			this._rotationDelta = new paper.Matrix();
-			this._scalingDelta = new paper.Matrix();
 			this._fillColor = {
 				r: undefined,
 				g: undefined,
@@ -504,16 +494,7 @@ define([
 				this.get('inheritor_bbox').remove();
 			}
 
-
-
-			this._ti_matrix = this._translationDelta.inverted();
-			this._ri_matrix = this._rotationDelta.inverted();
-			this._si_matrix = this._scalingDelta.inverted();
-			this._itemp_matrix = this._temp_matrix.inverted();
-			this._temp_matrix.reset();
-			this._translationDelta.reset();
-			this._scalingDelta.reset();
-			this._rotationDelta.reset();
+		
 		},
 
 
@@ -1098,26 +1079,25 @@ define([
 
 		compileTransformation: function(value) {
 
+			this._invertedMatrix = this._matrix.inverted();
+			this._matrix.reset();
 			var scalingDelta, rotationDelta, translationDelta;
 
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
 
+			this._matrix.translate(translationDelta.x,translationDelta.y);
+			this._matrix.rotate(rotationDelta,0,0);
+			this._matrix.scale(scalingDelta.x,scalingDelta.y,0,0);
 
-			this._rotation_origin = this.get('rotation_origin').toPaperPoint();
+			
+			/*this._rotation_origin = this.get('rotation_origin').toPaperPoint();
 			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
-			this._position = this.get('position').toPaperPoint();
+			this._position = this.get('position').toPaperPoint();*/
 
 
-			this._scalingDelta.scale(scalingDelta.x, scalingDelta.y, this._scaling_origin);
-			this._rotationDelta.rotate(rotationDelta, this._rotation_origin);
-			this._translationDelta.translate(translationDelta.x, translationDelta.y);
-
-			this._temp_matrix.preConcatenate(this._rotationDelta);
-			this._temp_matrix.preConcatenate(this._scalingDelta);
-			this._temp_matrix.preConcatenate(this._translationDelta);
-
+		
 		},
 
 		compileStyle: function(value) {
@@ -1267,22 +1247,18 @@ define([
 				targetLayer.addChild(bbox);
 			}
 			if (!pathAltered) {
-	
-	
-				geom.transform(this._ti_matrix);
-				geom.transform(this._si_matrix);
-				geom.transform(this._ri_matrix);
-				selection_clone.transform(this._ti_matrix);
-				selection_clone.transform(this._si_matrix);
-				selection_clone.transform(this._ri_matrix);
-				bbox.transform(this._ti_matrix);
-				bbox.transform(this._si_matrix);
-				bbox.transform(this._ri_matrix);
 				var widthScale = geom.bounds.width / bbox.bounds.width;
 				var heightScale = geom.bounds.height / bbox.bounds.height;
 				bbox.scale(widthScale, heightScale);
 				geom.selected = false;
 				bbox.selected = false;
+				 if(this.nodeParent && this.nodeParent.get('name')==='group'){
+       				this.nodeParent.inverseTransform(geom);
+      			}
+				geom.transform(this._invertedMatrix);
+				bbox.transform(this._invertedMatrix);
+				selection_clone.transform(this._invertedMatrix);
+
 
 			} else {
 				if (!selection_clone) {
@@ -1298,17 +1274,16 @@ define([
 			bbox.position = position;
 			selection_clone.position = position;
 
-			geom.transform(this._rotationDelta);
-			geom.transform(this._scalingDelta);
-			geom.transform(this._translationDelta);
+			geom.transform(this._matrix);
+			 if(this.nodeParent && this.nodeParent.get('name')==='group'){
+       				this.nodeParent.transform(geom);
+      			}
 
-			selection_clone.transform(this._rotationDelta);
-			selection_clone.transform(this._scalingDelta);
-			selection_clone.transform(this._translationDelta);
+			selection_clone.transform(this._matrix);
+			selection_clone.transform(this._matrix);
+			selection_clone.transform(this._matrix);
 
-			bbox.transform(this._rotationDelta);
-			bbox.transform(this._scalingDelta);
-			bbox.transform(this._translationDelta);
+			bbox.transform(this._matrix);
 
 			this.updateScreenBounds(geom);
 
@@ -1335,9 +1310,7 @@ define([
 		getShapeClone: function(relative) {
 			var clone = this.get('geom').clone();
 			if (relative) {
-				clone.transform(this._ti_matrix);
-				clone.transform(this._ri_matrix);
-				clone.transform(this._si_matrix);
+				clone.transform(this._matrix);
 			}
 			return clone;
 		},

@@ -40,16 +40,23 @@ define([
 
 
     addMember: function(clone, index) {
-      Duplicator.prototype.addMember.call(this, clone, index);
-      var memberCount = {
-        v: this.members.length,
-        operator: 'set'
-      };
-      for (var i = 0; i < this.members.length; i++) {
-        this.members[i].get('zIndex').setValue(i);
-      }
-      this.get('memberCount').setValue(memberCount);
-      this.updateCentroid();
+      if(index){
+                    this.members.splice(index, 0, clone);
+                    this.insertChild(index,clone);
+                    clone.get('zIndex').setValue(index);
+
+                }
+                else{
+                     this.members.push(clone);
+                    this.addChildNode(clone);
+
+                    clone.get('zIndex').setValue(this.members.length-1);
+
+                }
+                var diff = this.members.length - this.indexNumbers.length;
+                
+                this.addMemberNotation();
+
     },
 
     toggleOpen: function(item){
@@ -81,20 +88,14 @@ define([
 
     },
 
-    getGroupMatrix: function() {
-
-      if (this.nodeParent && this.nodeParent.get('name') === 'group') {
-        var matrix = this.nodeParent.getGroupMatrix();
-        matrix.concatenate(this.tf_matrix);
-        return matrix;
-      } else {
-        return this.tf_matrix;
-      }
-    },
 
 
     calculateGroupCentroid: function() {
-      var centroid = {x:this.get('geom').position.x,y:this.get('geom').position.y};
+      var point_list = [];
+      for(var i=0;i<this.members.length;i++){
+        point_list.push(this.members[i].get('geom').position);
+      }
+      var centroid = TrigFunc.centroid(point_list);
       return centroid;
     },
 
@@ -103,26 +104,52 @@ define([
       Instance.prototype.compile.call(this);
     },
 
+    compileTransformation: function(value) {
+      
+      this._invertedMatrix = this._matrix.inverted();
+      this._matrix.reset();
+      var scalingDelta, rotationDelta, translationDelta;
+
+      scalingDelta = value.scalingDelta;
+      rotationDelta = value.rotationDelta;
+      translationDelta = value.translationDelta;
+      var center = this.calculateGroupCentroid();
+      this._matrix.translate(translationDelta.x,translationDelta.y);
+      this._matrix.rotate(rotationDelta,center.x,center.y);
+      this._matrix.scale(scalingDelta.x,scalingDelta.y,center.x,center.y);
+      /*this._rotation_origin = this.get('rotation_origin').toPaperPoint();
+      this._scaling_origin = this.get('scaling_origin').toPaperPoint();
+      this._position = this.get('position').toPaperPoint();*/
+
+    },
+
+    inverseTransform: function(geom){
+      if(this.nodeParent && this.nodeParent.get('name')==='group'){
+        this.nodeParent.inverseTransform(geom);
+      }
+    geom.transform(this._invertedMatrix);
+
+    },
+
+    transform: function(geom){
+      geom.transform(this._matrix);
+       if(this.nodeParent && this.nodeParent.get('name')==='group'){
+        this.nodeParent.transform(geom);
+      }
+    },
 
     //renders the List UI
     render: function() {
-      if (!this.get('rendered')) {
-
-        var geom = this.renderGeom();
-        if (geom) {
-          //this.renderSelection(geom);
-        }
-
-        this.set('rendered', true);
-
-
-
+      for(var i=0;i<this.members.length;i++){
+        this.members[i].reset();
+        this.members[i].compile();
+        this.members[i].render();
       }
 
     },
 
     renderGeom: function() {
-      var visible = this.get('visible');
+     /* var visible = this.get('visible');
       var geom = this.get('geom');
       var zIndex = this.get('zIndex').getValue();
       if (geom.index != zIndex) {
@@ -151,7 +178,7 @@ define([
 
       this.get('pathAltered').setValue(false);
       geom.visible = visible;
-      return geom;
+      return geom;*/
     },
 
 
