@@ -10,89 +10,76 @@ define([
   'paper',
   'models/data/collections/Duplicator',
   'models/data/Instance',
-  'utils/TrigFunc'
+  'utils/TrigFunc',
+   'utils/PFloat',
+   'utils/PPoint',
 
 
-], function(_, paper, Duplicator, Instance, TrigFunc) {
-  var Group = Duplicator.extend({
+], function(_, paper, Duplicator, Instance, TrigFunc, PFloat, PPoint) {
+  var Group = Instance.extend({
 
-    defaults: _.extend({}, Duplicator.prototype.defaults, {
+    defaults: _.extend({}, Instance.prototype.defaults, {
 
       name: 'group',
       type: 'geometry',
       points: null,
+      open: false,
     }),
 
     initialize: function() {
-      Duplicator.prototype.initialize.apply(this, arguments);
-      this.tf_matrix = new paper.Matrix();
+      Instance.prototype.initialize.apply(this, arguments);
       this.resetProperties();
-      this.get('geom').data.geom = true;
-      this.get('geom').data.nodetype = this.get('name');
-    },
-
-    /*setValue
-    passes modifications onto members, stripped of any properties that are constrained on the list
-     */
-    setValue: function(data) {
-      Instance.prototype.setValue.call(this, data);
+       var memberCount = new PFloat(0);
+      memberCount.setNull(false);
+      this.set('memberCount', memberCount);
+      this.get('scalingDelta').setValue({x:1,y:1,operator:'set'});
+      this.members = [];
     },
 
 
     addMember: function(clone, index) {
-      if(index){
-                    this.members.splice(index, 0, clone);
-                    this.insertChild(index,clone);
-                    clone.get('zIndex').setValue(index);
+      if (index) {
+        this.members.splice(index, 0, clone);
+        this.insertChild(index, clone);
+        clone.get('zIndex').setValue(index);
 
-                }
-                else{
-                     this.members.push(clone);
-                    this.addChildNode(clone);
+      } else {
+        this.members.push(clone);
+        this.addChildNode(clone);
 
-                    clone.get('zIndex').setValue(this.members.length-1);
+        clone.get('zIndex').setValue(this.members.length - 1);
 
-                }
-                var diff = this.members.length - this.indexNumbers.length;
-                
-                this.addMemberNotation();
+      }
+      //this.compile();
+    },
+
+    setValue:function(data){
+      console.log('group set value');
+      Instance.prototype.setValue.call(this,data);
+    },
+
+     getMember: function(member) {
+      return Duplicator.prototype.getMember.call(this,member);
+    },
+
+    toggleOpen: function(item) {
+     return Duplicator.prototype.toggleOpen.call(this, item);
 
     },
 
-    toggleOpen: function(item){
-      Duplicator.prototype.toggleOpen.call(this,item);
-        var geom = this.get('geom');
-        geom.transform(this._ti_matrix);
-        geom.transform(this._si_matrix);
-        geom.transform(this._ri_matrix);
-        for(var i=0;i<this.members.length;i++){
-          this.members[i].trigger('modified',this.members[i]);
-        }
+    toggleClosed: function(item) {
+      return Duplicator.prototype.toggleClosed.call(this, item);
     },
 
-    toggleClosed: function(item){
-      Duplicator.prototype.toggleClosed.call(this,item);
-      var geom = this.get('geom');
-      geom.transform(this._rotationDelta);
-      geom.transform(this._scalingDelta);
-      geom.transform(this._translationDelta);
-      this.updateCentroid();
-
-    },
-
-    updateCentroid:function(){
-      var old_centroid = this.get('translationDelta').getValue();
-      var new_centroid = this.calculateGroupCentroid();
-      var diff = TrigFunc.subtract(new_centroid,old_centroid);
-      this.get('translationDelta').add(diff);
-
+    closeAllMembers: function(){
+       Duplicator.prototype.closeAllMembers.call(this);
     },
 
 
 
     calculateGroupCentroid: function() {
       var point_list = [];
-      for(var i=0;i<this.members.length;i++){
+      for (var i = 0; i < this.members.length; i++) {
         point_list.push(this.members[i].get('geom').position);
       }
       var centroid = TrigFunc.centroid(point_list);
@@ -101,84 +88,132 @@ define([
 
 
     compile: function() {
-      Instance.prototype.compile.call(this);
+      console.log('group compile');
+      console.trace();
+      if (this.members.length > 0) {
+        this.members[0].compile();
+      }
+
     },
 
-    compileTransformation: function(value) {
-      
-      this._invertedMatrix = this._matrix.inverted();
+    inverseTransformRecurse: function(geom_list) {
+      for (var i = 0; i < this.members.length; i++) {
+        geom_list.push.apply(geom_list, [this.members[i].get('geom')]);
+      }
+      console.log('geom list', geom_list);
+
+      if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+        this.nodeParent.inverseTransformRecurse(geom_list);
+
+      }
+
+      this.inverseTransformSelf();
+      console.log('parent inverse transformation', this._invertedMatrix.translation, this._invertedMatrix.rotation, this._invertedMatrix.scaling);
+      //debugger;
+
+      for (var j = 0; j < geom_list.length; j++) {
+        console.log('geom position before parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
+
+        geom_list[j].transform(this._invertedMatrix);
+        console.log('geom position after parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
+        //debugger;
+      }
+
+      for (var k = 0; k < this.members.length; k++) {
+        console.log('geom position before individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
+
+        this.members[k].inverseTransformSelf();
+        console.log('geom position after individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
+        //debugger;
+      }
+
+    },
+
+
+    transformRecurse: function(geom_list) {
+      for (var i = 0; i < this.members.length; i++) {
+        console.log('geom position before individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
+
+        geom_list.push.apply(geom_list, this.members[i].transformSelf());
+        console.log('geom position after individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
+        //debugger;
+      }
+
+      this.transformSelf();
+      console.log('parent transformation', this._matrix.translation, this._matrix.rotation, this._matrix.scaling);
+     // debugger;
+      for (var j = 0; j < geom_list.length; j++) {
+        console.log('geom position before parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
+
+        geom_list[j].transform(this._matrix);
+        console.log('geom position after parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
+        //debugger;
+      }
+      if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+        this.nodeParent.transformRecurse(geom_list);
+      }
+    },
+
+    transformSelf: function(exclude) {
+
       this._matrix.reset();
+      var value = this.getValue();
       var scalingDelta, rotationDelta, translationDelta;
 
       scalingDelta = value.scalingDelta;
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
       var center = this.calculateGroupCentroid();
-      this._matrix.translate(translationDelta.x,translationDelta.y);
-      this._matrix.rotate(rotationDelta,center.x,center.y);
-      this._matrix.scale(scalingDelta.x,scalingDelta.y,center.x,center.y);
-      /*this._rotation_origin = this.get('rotation_origin').toPaperPoint();
-      this._scaling_origin = this.get('scaling_origin').toPaperPoint();
-      this._position = this.get('position').toPaperPoint();*/
+      console.log('translationDelta', translationDelta, rotationDelta, scalingDelta, center);
 
+      this._matrix.translate(translationDelta.x, translationDelta.y);
+      this._matrix.rotate(rotationDelta, new paper.Point(center.x, center.y));
+      this._matrix.scale(scalingDelta.x,scalingDelta.y, new paper.Point(center.x, center.y));
+      return [];
     },
 
-    inverseTransform: function(geom){
-      if(this.nodeParent && this.nodeParent.get('name')==='group'){
-        this.nodeParent.inverseTransform(geom);
-      }
-    geom.transform(this._invertedMatrix);
-
+    inverseTransformSelf: function() {
+      this._invertedMatrix = this._matrix.inverted();
+      return [];
     },
 
-    transform: function(geom){
-      geom.transform(this._matrix);
-       if(this.nodeParent && this.nodeParent.get('name')==='group'){
-        this.nodeParent.transform(geom);
-      }
-    },
 
     //renders the List UI
     render: function() {
-      for(var i=0;i<this.members.length;i++){
-        this.members[i].reset();
-        this.members[i].compile();
-        this.members[i].render();
-      }
 
     },
 
     renderGeom: function() {
-     /* var visible = this.get('visible');
-      var geom = this.get('geom');
-      var zIndex = this.get('zIndex').getValue();
-      if (geom.index != zIndex) {
-        geom.parent.insertChild(zIndex, geom);
-      }
-      var pathAltered = this.get('pathAltered').getValue();
+      /* var visible = this.get('visible');
+       var geom = this.get('geom');
+       var zIndex = this.get('zIndex').getValue();
+       if (geom.index != zIndex) {
+         geom.parent.insertChild(zIndex, geom);
+       }
+       var pathAltered = this.get('pathAltered').getValue();
 
-      if (!pathAltered) {
-        //geom.transform(this._itemp_matrix);
+       if (!pathAltered) {
+         //geom.transform(this._itemp_matrix);
 
-        geom.transform(this._ti_matrix);
-        geom.transform(this._si_matrix);
-        geom.transform(this._ri_matrix);
-      }
+         geom.transform(this._ti_matrix);
+         geom.transform(this._si_matrix);
+         geom.transform(this._ri_matrix);
+       }
 
-      //var position = this.get('position').toPaperPoint();
-      geom.position.x = 0;
-      geom.position.y = 0;
-      geom.transform(this._rotationDelta);
-      geom.transform(this._scalingDelta);
-      geom.transform(this._translationDelta);
+       //var position = this.get('position').toPaperPoint();
+       geom.position.x = 0;
+       geom.position.y = 0;
+       geom.transform(this._rotationDelta);
+       geom.transform(this._scalingDelta);
+       geom.transform(this._translationDelta);
 
 
 
-      this.updateScreenBounds(geom);
+       this.updateScreenBounds(geom);
 
-      this.get('pathAltered').setValue(false);
-      geom.visible = visible;
-      return geom;*/
+       this.get('pathAltered').setValue(false);
+       geom.visible = visible;
+       return geom;*/
     },
 
 

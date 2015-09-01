@@ -177,7 +177,7 @@ define([
 
 			//============private properties==============//
 			this._matrix = new paper.Matrix();
-		
+
 			//temporary attributes
 			this._fillColor = {
 				r: undefined,
@@ -494,7 +494,7 @@ define([
 				this.get('inheritor_bbox').remove();
 			}
 
-		
+
 		},
 
 
@@ -1077,27 +1077,73 @@ define([
 			this.compileStyle(value);
 		},
 
-		compileTransformation: function(value) {
+		
 
+		inverseTransformSelf: function(){
+			var geom = this.get('geom');
 			this._invertedMatrix = this._matrix.inverted();
-			this._matrix.reset();
-			var scalingDelta, rotationDelta, translationDelta;
+			geom.transform(this._invertedMatrix);
+			return [geom];
+		},
 
+		transformSelf: function() {
+			this._matrix.reset();
+			var geom = this.get('geom');
+			var scalingDelta, rotationDelta, translationDelta;
+			var value = this.getValue();
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
 
-			this._matrix.translate(translationDelta.x,translationDelta.y);
-			this._matrix.rotate(rotationDelta,0,0);
-			this._matrix.scale(scalingDelta.x,scalingDelta.y,0,0);
+			this._matrix.translate(translationDelta.x, translationDelta.y);
+			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
+			this._matrix.rotate(rotationDelta, 0, 0);
+			geom.transform(this._matrix);
+			return [geom];
+		},
+
+
+		
+
+
+		compileTransformation: function(value) {
+			var geom = this.get('geom');
+
+
+			geom.fillColor = 'white';
+			geom.strokeColor = 'black';
+
+			if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+				this.nodeParent.inverseTransformRecurse([]);
+			}
+			//otherwise only inverse self
+			else {
+				this.inverseTransformSelf();
+											console.log('geom posiion after non group inverse', geom.position,this.get('id'));
+
+			}
+		
+
+			geom.visible = true;
+			if (this.nodeParent && this.nodeParent.get('name') === 'group') {
+				this.nodeParent.transformRecurse([]);
+			}
+			else {
+				this.transformSelf();
+							console.log('geom posiion after  non group transform', geom.position,this.get('id'));
+
+			}
+
 
 			
+
+
 			/*this._rotation_origin = this.get('rotation_origin').toPaperPoint();
 			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
 			this._position = this.get('position').toPaperPoint();*/
 
 
-		
+
 		},
 
 		compileStyle: function(value) {
@@ -1121,8 +1167,8 @@ define([
 
 					var geom = this.renderGeom();
 					if (geom) {
-						this.renderStyle(geom);
-						this.renderSelection(geom);
+					this.renderStyle(geom);
+					this.renderSelection(geom);
 					}
 
 					this.set('rendered', true);
@@ -1252,10 +1298,7 @@ define([
 				bbox.scale(widthScale, heightScale);
 				geom.selected = false;
 				bbox.selected = false;
-				 if(this.nodeParent && this.nodeParent.get('name')==='group'){
-       				this.nodeParent.inverseTransform(geom);
-      			}
-				geom.transform(this._invertedMatrix);
+				
 				bbox.transform(this._invertedMatrix);
 				selection_clone.transform(this._invertedMatrix);
 
@@ -1270,14 +1313,9 @@ define([
 			}
 
 			var position = this.get('position').toPaperPoint();
-			geom.position = position;
 			bbox.position = position;
 			selection_clone.position = position;
 
-			geom.transform(this._matrix);
-			 if(this.nodeParent && this.nodeParent.get('name')==='group'){
-       				this.nodeParent.transform(geom);
-      			}
 
 			selection_clone.transform(this._matrix);
 			selection_clone.transform(this._matrix);
@@ -1289,7 +1327,7 @@ define([
 
 			this.get('pathAltered').setValue(false);
 			geom.visible = visible;
-			
+
 			return geom;
 		},
 

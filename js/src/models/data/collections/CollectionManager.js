@@ -183,7 +183,10 @@ define([
 			var itemFound = false;
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
+			console.log('checking list at ',i,lists[i].get('name'),item);
+
 				if (item && item != lInstance) {
+					console.log('list is closed');
 					sInstances.push(item);
 					itemFound = true;
 				}
