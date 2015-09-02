@@ -40,7 +40,8 @@ define([
       this.members = [];
       var geom = new paper.Group();
       this.set('geom', geom);
-      geom.data.instance  = this;
+      geom.data.instance = this;
+
     },
 
 
@@ -48,15 +49,37 @@ define([
       if (index) {
         this.members.splice(index, 0, clone);
         this.insertChild(index, clone);
+        this.get('geom').insertChild(index, clone.get('geom'));
         clone.get('zIndex').setValue(index);
 
       } else {
         this.members.push(clone);
         this.addChildNode(clone);
+        this.get('geom').addChild(clone.get('geom'));
 
         clone.get('zIndex').setValue(this.members.length - 1);
 
       }
+    },
+
+    removeMember: function(data) {
+      this.toggleOpen();
+      var index = $.inArray(data, this.members);
+
+      if (index > -1) {
+
+        var member = this.members.splice(index, 1)[0];
+        this.get('geom').removeChildren(index, index + 1);
+        this.removeChildNode(member);
+        var memberCount = {
+          v: this.members.length,
+          operator: 'set'
+        };
+
+        return member;
+      }
+      this.toggleClosed();
+
     },
 
     setValue: function(data) {
@@ -72,10 +95,10 @@ define([
       return Duplicator.prototype.hasMember.call(this, member, top, last);
     },
 
-    accessMemberGeom: function(){
+    accessMemberGeom: function() {
       var geom_list = [];
-      for(var i=0;i<this.members.length;i++){
-       geom_list.push.apply(geom_list, this.members[i].accessMemberGeom());
+      for (var i = 0; i < this.members.length; i++) {
+        geom_list.push.apply(geom_list, this.members[i].accessMemberGeom());
       }
       return geom_list;
     },
@@ -128,9 +151,13 @@ define([
 
     },
 
+    render: function(){
+      this.renderSelection(this.get('geom'));
+    },
+
     inverseTransformRecurse: function(geom_list) {
-      
-      geom_list.push.apply(geom_list,this.accessMemberGeom());
+
+      geom_list.push.apply(geom_list, this.accessMemberGeom());
 
       if (this.nodeParent && this.nodeParent.get('name') === 'group') {
         this.nodeParent.inverseTransformRecurse(geom_list);
@@ -206,43 +233,52 @@ define([
       return [];
     },
 
+    renderSelection: function(geom) {
+      var selected = this.get('selected').getValue();
+      var constraint_selected = this.get('constraintSelected').getValue();
+      var selection_clone = this.get('selection_clone');
+      var bbox = this.get('bbox');
+      if (!bbox) {
 
-    //renders the List UI
-    render: function() {
+        bbox = new paper.Path.Rectangle(geom.position, new paper.Size(geom.bounds.width, geom.bounds.height));
+        bbox.data.instance = this;
+        this.set('bbox', bbox);
+        var targetLayer = paper.project.layers.filter(function(layer) {
+          return layer.name === 'ui_layer';
+        })[0];
+        targetLayer.addChild(bbox);
 
-    },
 
-    renderGeom: function() {
-      /* var visible = this.get('visible');
-       var geom = this.get('geom');
-       var zIndex = this.get('zIndex').getValue();
-       if (geom.index != zIndex) {
-         geom.parent.insertChild(zIndex, geom);
-       }
-       var pathAltered = this.get('pathAltered').getValue();
-
-       if (!pathAltered) {
-         //geom.transform(this._itemp_matrix);
-
-         geom.transform(this._ti_matrix);
-         geom.transform(this._si_matrix);
-         geom.transform(this._ri_matrix);
-       }
-
-       //var position = this.get('position').toPaperPoint();
-       geom.position.x = 0;
-       geom.position.y = 0;
-       geom.transform(this._rotationDelta);
-       geom.transform(this._scalingDelta);
-       geom.transform(this._translationDelta);
+      } else {
+        bbox.scale(geom.bounds.width / bbox.bounds.width, geom.bounds.height / bbox.bounds.height);
+        bbox.position = geom.position;
 
 
 
-       this.updateScreenBounds(geom);
+      }
+      if (constraint_selected) {
+        if (!selection_clone) {
+          Duplicator.prototype.createSelectionClone.call(this);
+          selection_clone = this.get('selection_clone');
+        }
+        selection_clone.visible = true;
+        selection_clone.strokeColor = this.get(constraint_selected + '_color');
+        bbox.selected = false;
 
-       this.get('pathAltered').setValue(false);
-       geom.visible = visible;
-       return geom;*/
+      } else {
+        if (selection_clone) {
+          selection_clone.visible = false;
+        }
+
+        bbox.selectedColor = this.getSelectionColor();
+        bbox.selected = this.get('selected').getValue();
+        bbox.visible = this.get('selected').getValue();
+        if (this.get('open')) {
+          bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
+          bbox.strokeWidth = 1;
+          bbox.visible = true;
+        }
+      }
     },
 
 

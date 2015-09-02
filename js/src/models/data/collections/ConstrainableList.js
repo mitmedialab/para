@@ -173,24 +173,6 @@ define([
         }
       },
 
-
-      toggleOpen: function(item) {
-        var opened = ListNode.prototype.toggleOpen.call(this, item);
-        /*if (this.get('open')) {
-          this.resume();
-        }*/
-        return opened;
-
-      },
-
-      toggleClosed: function(item) {
-        var closed = ListNode.prototype.toggleClosed.call(this, item);
-        /*if (!this.get('open')) {
-          this.pause();
-        }*/
-        return closed;
-      },
-
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
         this.get('index').setValue(0);
