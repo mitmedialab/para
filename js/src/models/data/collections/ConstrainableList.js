@@ -9,11 +9,12 @@ define([
     'utils/PBool',
     'paper',
     'utils/PConstraint',
-    'utils/TrigFunc'
+    'utils/TrigFunc',
+    'models/data/Instance'
 
   ],
 
-  function(_, ListNode, PFloat, PBool, paper, PConstraint, TrigFunc) {
+  function(_, ListNode, PFloat, PBool, paper, PConstraint, TrigFunc, Instance) {
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'list',
@@ -54,10 +55,11 @@ define([
         this.count = 0;
       },
 
-      /*setValue
+    /*setValue
     passes modifications onto members, stripped of any properties that are constrained on the list
-     */
+    */
       setValue: function(data) {
+        Instance.prototype.setValue.call(this.data);
         var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
           if (constrained_props[i]) {
@@ -68,7 +70,6 @@ define([
           } else {
             this.members[i].setValue(data);
           }
-
         }
         this.trigger('modified', this);
       },
@@ -257,7 +258,7 @@ define([
         var selected = this.get('selected').getValue();
         var constraint_selected = this.get('constraintSelected').getValue();
         var selection_clone = this.get('selection_clone');
-        var bbox = this.get('bbox')
+        var bbox = this.get('bbox');
 
         if (constraint_selected) {
           if (!selection_clone) {

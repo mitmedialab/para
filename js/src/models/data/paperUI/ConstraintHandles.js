@@ -169,14 +169,14 @@ define([
         return arrows;
       };
 
-      var geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('relatives').get('geom');
+      var target_instance = (this.get('side') == 'ref') ? this.get('constraint').get('references') : this.get('constraint').get('relatives');
 
-      if (!geom) {
+      /*if (!geom) {
         console.log('[ERROR] Cannot draw constraint handles without instance.');
         return;
-      }
+      }*/
 
-      var gen_bounds = geom.bounds;
+      var gen_bounds = target_instance.getBounds();
       var gen_delbox = createDelimBox(gen_bounds);
       var gen_corners = createCorners(gen_bounds);
       var hand_geom, hand_bounds, hand_delbox, hand_corners;
@@ -202,7 +202,7 @@ define([
       // TODO: Handles for stroke/fill/weight
 
       var handles;
-      if (geom instanceof paper.Group) {
+      if (target_instance.get('type') === 'collection') {
         handles = new paper.Group([
           gen_delbox,
           gen_corners[0], gen_corners[1], gen_corners[2], gen_corners[3], gen_corners[4], gen_corners[5], gen_corners[6], gen_corners[7], gen_corners[8],
@@ -224,7 +224,7 @@ define([
           cross[1],
           arrows[0],
           arrows[1],
-          arrows[2],  
+          arrows[2],
           arrows[3]
         ]);
         handles.addChildren(color_ui);
@@ -267,9 +267,10 @@ define([
 
     redraw: function() {
       var geometry = this.get('geometry');
-      var object_geom = (this.get('side') == 'ref') ? this.get('constraint').get('references').get('geom') : this.get('constraint').get('relatives').get('geom');
+      var target_instance = (this.get('side') == 'ref') ? this.get('constraint').get('references') : this.get('constraint').get('relatives');
+
       var delbox = geometry.children['delbox'];
-      delbox.bounds = object_geom.bounds;
+      delbox.bounds = target_instance.get('bounds');
       var corners = geometry.getItems({
         name: 'corner'
       });
@@ -277,7 +278,6 @@ define([
         corners[i].position = new paper.Point(delbox.bounds.x + (i % 3) / 2.0 * delbox.bounds.width, delbox.bounds.y + Math.floor(i / 3) / 2.0 * delbox.bounds.height, 3, 3);
       }
 
-      var hand_object_geom = object_geom;
       var hand_delbox = delbox;
       var hand_corners = corners;
       /*if (object_geom instanceof paper.Group) {
@@ -303,8 +303,8 @@ define([
 
       var cross_v = geometry.children['translationDelta_y'];
       var cross_h = geometry.children['translationDelta_x'];
-      cross_v.position = hand_object_geom.position;
-      cross_h.position = hand_object_geom.position;
+      cross_v.position = new paper.Point(yarrow.position.x,xarrow.position.y);
+      cross_h.position = new paper.Point(yarrow.position.x,xarrow.position.y);
     },
 
     addListeners: function() {
@@ -507,7 +507,7 @@ define([
         return;
       }
 
-      
+
       var tooltip_target;
       if (!target.name) {
         tooltip_target = target.parent;
@@ -552,7 +552,7 @@ define([
         } else {
           target.opacity = 1;
         }
-        interval = setInterval(self.hideText,500);
+        interval = setInterval(self.hideText, 500);
 
         return;
       } else {
@@ -572,7 +572,7 @@ define([
             target.fillColor.saturation = target.fillColor.brightness = 0;
           }
         }
-        interval = setInterval(self.hideText,500);
+        interval = setInterval(self.hideText, 500);
       }
 
 
@@ -583,7 +583,7 @@ define([
       if (geometry) {
         geometry.remove();
         geometry = null;
-      } 
+      }
 
       this.tipText.remove();
       this.tipText = null;

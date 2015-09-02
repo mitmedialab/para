@@ -332,6 +332,10 @@ define([
 			return [this.get('geom')];
 		},
 
+		getBounds: function(){
+			return this.get('geom').bounds;
+		},
+
 
 
 		close: function() {
@@ -763,9 +767,6 @@ define([
 				}
 
 			}
-
-
-			this.setNull(false);
 		},
 
 

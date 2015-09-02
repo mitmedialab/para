@@ -494,6 +494,10 @@ getLiteralSubprops: function(key, subprop) {
 
     },
 
+    getBounds: function(){
+      return this.get('bbox').bounds;
+    },
+
     toJSON: function() {
       var data = Instance.prototype.toJSON.call(this, arguments);
       var memberIds = [];
