@@ -298,7 +298,7 @@ define([
           offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
           exempt_index[rel_dimensions[i]] = exempt_index[rel_dimensions[i]] ? exempt_index[rel_dimensions[i]] : [];
           instance = relative;
-          if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             instance = instance.members[index];
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
@@ -323,7 +323,7 @@ define([
           exempt_index[rel_dimensions[j]] = exempt_index[rel_dimensions[j]] ? exempt_index[rel_dimensions[j]] : [];
 
           instance = relative;
-          if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             instance = instance.members[index];
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
@@ -350,7 +350,7 @@ define([
           exempt_index[rel_dimensions[m]] = exempt_index[rel_dimensions[m]] ? exempt_index[rel_dimensions[m]] : [];
 
           instance = relative;
-          if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             instance = instance.members[index];
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
@@ -532,7 +532,7 @@ define([
         for (var j = 0; j < relative_properties[i][1].length; j++) {
           var ref_vals = reference_values[relative_properties[i][0]][relative_properties[i][1][j]];
           var rel_vals = [];
-          if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection' ||relative.get('name') === 'duplicator' ) {
             for (var k = 0; k < relative.members.length; k++) {
               rel_vals.push(relative.members[k].get(relative_properties[i][0])[relative_properties[i][1][j]]);
             }
@@ -599,7 +599,7 @@ define([
 
             relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
           }
-          if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             return list;
           } else {
             return list[0][rel_prop_key][rel_dimension];
@@ -660,7 +660,7 @@ define([
 
           }
 
-          if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             return list;
           } else {
             return list[0][rel_prop_key];
@@ -727,7 +727,7 @@ define([
 
           }
 
-          if (relative.get('type') === 'collection') {
+          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             return list;
           } else {
             return list[0];
@@ -837,7 +837,7 @@ define([
       var reference = this.get('references');
       if (reference) {
         var members;
-        if (reference.get('type') == 'collection') {
+        if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
         } else {
           members = [reference, reference];
@@ -898,7 +898,7 @@ define([
       var reference = this.get('references');
       if (reference) {
         var members;
-        if (reference.get('type') == 'collection') {
+        if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
         } else {
           members = [reference, reference];
@@ -933,7 +933,7 @@ define([
         var reference = this.get('references');
         if (reference) {
           var members;
-          if (reference.get('type') == 'collection') {
+          if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
             members = reference.members;
           } else {
             members = [reference, reference];
@@ -962,7 +962,7 @@ define([
       var reference = this.get('references');
       if (reference) {
         var members;
-        if (reference.get('type') == 'collection') {
+        if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
         } else {
           members = [reference, reference];
@@ -1045,7 +1045,7 @@ define([
       var reference = this.get('references');
       if (reference) {
         var members;
-        if (reference.get('type') == 'collection') {
+        if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
         } else {
           members = [reference, reference];

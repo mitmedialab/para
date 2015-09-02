@@ -23,22 +23,25 @@ define([
                 target: null,
                 mode: 'standard',
                 clone_count: null,
-                type: 'geometry'
+                type: 'geometry',
+                exception_count: null
             }),
 
             initialize: function() {
                 ConstrainableList.prototype.initialize.apply(this, arguments);
                 this.set('count', new PFloat(0));
                 this.clones = [];
-
+                this.exceptions = [];
                 var clone_count = new PFloat(0);
                 clone_count.setNull(false);
                 this.set('clone_count', clone_count);
-
+                var exception_count = new PFloat(0);
+                exception_count.setNull(false);
+                this.set('exception_count', exception_count);
 
                 var geom = new paper.Group();
                 this.set('geom', geom);
-                geom.data.instance  = this;
+                geom.data.instance = this;
 
             },
 
@@ -65,7 +68,7 @@ define([
             },
 
             addClone: function(clone) {
-                this.clones.push(clone);
+                
                 if (this.members.length > 1) {
                     clone.setValue(this.members[this.members.length - 2].getValue());
                     this.addMember(clone, this.members.length - 1);
@@ -73,27 +76,27 @@ define([
                     clone.setValue(this.members[0].getValue());
                     this.addMember(clone, 1);
                 }
+                this.clones.splice(this.clones.length-1, 0, clone);
                 this.get('clone_count').setValue(this.clones.length);
             },
 
             addMember: function(clone, index) {
-                if(index){
+                if (index) {
                     this.members.splice(index, 0, clone);
-                    this.insertChild(index,clone);
-                    this.get('geom').insertChild(index,clone.get('geom'));
+                    this.insertChild(index, clone);
+                    this.get('geom').insertChild(index, clone.get('geom'));
                     clone.get('zIndex').setValue(index);
 
-                }
-                else{
-                     this.members.push(clone);
-                     this.get('geom').addChild(clone.get('geom'));
+                } else {
+                    this.members.push(clone);
+                    this.get('geom').addChild(clone.get('geom'));
                     this.addChildNode(clone);
 
-                    clone.get('zIndex').setValue(this.members.length-1);
+                    clone.get('zIndex').setValue(this.members.length - 1);
 
                 }
                 var diff = this.members.length - this.indexNumbers.length;
-                
+
                 this.addMemberNotation();
 
             },
@@ -143,11 +146,16 @@ define([
             removeMember: function(data) {
                 var target = this.get('target');
                 var index = $.inArray(data, this.members);
-
+                var cloneIndex =  $.inArray(data, this.clones);
+              if (cloneIndex > -1) {
+                this.clones.splice(cloneIndex, 1);
+                this.get('clone_count').setValue(this.clones.length);
+              }
                 if (index > -1) {
 
                     var member = this.members.splice(index, 1)[0];
-                    this.get('geom').removeChildren(index,index+1);
+                    var childIndex = member.get('geom').index;
+                    this.get('geom').removeChildren(childIndex, childIndex + 1);
                     this.removeChildNode(member);
                     var memberCount = {
                         v: this.members.length,
@@ -201,13 +209,15 @@ define([
                         data = this.updateCountStandard();
                         break;
                 }
-                var memberCount = {
+               
+
+                for (var i = 0; i < this.members.length; i++) {
+                    this.members[i].get('zIndex').setValue(i);
+                }
+                 var memberCount = {
                     v: this.members.length,
                     operator: 'set'
                 };
-                for(var i=0;i<this.members.length;i++){
-                    this.members[i].get('zIndex').setValue(i);
-                }
                 this.get('memberCount').setValue(memberCount);
                 return data;
 

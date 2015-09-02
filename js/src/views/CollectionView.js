@@ -130,7 +130,6 @@ define([
 				var geometry = selected.filter(function(item) {
 					return (item.get('type') == 'geometry' && item.get('name') != 'group');
 				});
-				console.log('duplicators', duplicators);
 				if (selected.length > 1) {
 					this.setCount();
 					if (collections.length == selected.length) {
@@ -154,7 +153,6 @@ define([
 						this.disable('ungroup');
 					}
 					if (duplicators.length == selected.length) {
-						console.log('enabling count');
 						this.enable('count');
 					} else {
 						this.disable('count');

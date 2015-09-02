@@ -438,6 +438,7 @@ define([
 		},
 
 		removeShape: function(pId) {
+			console.log('remove node',pId);
 			var node = shapeTree.getNodeByKey(pId);
 			if (node) {
 				node.remove();
@@ -457,6 +458,7 @@ define([
 		},
 
 		addChild: function(shape, pId) {
+			console.log('adding child with id',shape.id);
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var parentNode = shapeTree.getNodeByKey(pId);
@@ -479,6 +481,12 @@ define([
 				this.resetConstraintHeight();
 			}
 		},
+		
+		/*removeChild:function(childId, parentId, delete){
+			this.deselectAll(shapeRoot);
+			this.deselectAll(listRoot);
+			
+		},*/
 
 
 

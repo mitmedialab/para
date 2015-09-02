@@ -194,6 +194,7 @@ define([
         ui = null;
         this.members.length = 0;
         this.members = null;
+
       },
 
 

@@ -69,7 +69,8 @@ define([
       if (index > -1) {
 
         var member = this.members.splice(index, 1)[0];
-        this.get('geom').removeChildren(index, index + 1);
+        var childIndex = member.get('geom').index;
+        this.get('geom').removeChildren(childIndex, childIndex + 1);
         this.removeChildNode(member);
         var memberCount = {
           v: this.members.length,
@@ -105,7 +106,7 @@ define([
 
 
     toggleOpen: function(item) {
-      if ((this === item  || this.hasMember(item)) && !this.get('open')) {
+      if ((this === item || this.hasMember(item)) && !this.get('open')) {
         this.inverseTransformRecurse([]);
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].transformSelf();
@@ -119,7 +120,7 @@ define([
     },
 
     toggleClosed: function(item) {
-      if ((this === item  || this.hasMember(item))  && this.get('open')) {
+      if ((this === item || this.hasMember(item)) && this.get('open')) {
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].inverseTransformSelf();
         }
@@ -132,7 +133,7 @@ define([
     },
 
     closeAllMembers: function() {
-     this.toggleClosed(this);
+      this.toggleClosed(this);
     },
 
 

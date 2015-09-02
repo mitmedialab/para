@@ -276,7 +276,7 @@ define([
 			if (parent) {
 				parent.removeChildNode(this);
 			}
-			//this.trigger('delete', this);
+			this.trigger('delete', this);
 		},
 
 
@@ -1215,6 +1215,7 @@ define([
 			geom.visible = this._visible;
 			var zIndex = this.get('zIndex').getValue();
 			if (geom.index != zIndex) {
+				console.log('geom id',this.get('id'));
 				geom.parent.insertChild(zIndex, geom);
 			}
 		},
