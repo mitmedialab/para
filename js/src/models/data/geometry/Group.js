@@ -105,31 +105,34 @@ define([
 
 
     toggleOpen: function(item) {
-      var result = Duplicator.prototype.toggleOpen.call(this, item);
-      if (result) {
+      if ((this === item  || this.hasMember(item)) && !this.get('open')) {
         this.inverseTransformRecurse([]);
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].transformSelf();
         }
+        this.set('open', true);
+
+        return [this];
       }
-      return result;
+
 
     },
 
     toggleClosed: function(item) {
-      var result = Duplicator.prototype.toggleClosed.call(this, item);
-      if (result) {
+      if ((this === item  || this.hasMember(item))  && this.get('open')) {
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].inverseTransformSelf();
         }
         this.transformRecurse([]);
+        this.set('open', false);
+
+        return [this];
       }
-      return result;
 
     },
 
     closeAllMembers: function() {
-      Duplicator.prototype.closeAllMembers.call(this);
+     this.toggleClosed(this);
     },
 
 
@@ -151,7 +154,7 @@ define([
 
     },
 
-    render: function(){
+    render: function() {
       this.renderSelection(this.get('geom'));
     },
 
@@ -263,6 +266,8 @@ define([
         }
         selection_clone.visible = true;
         selection_clone.strokeColor = this.get(constraint_selected + '_color');
+        selection_clone.scale(geom.bounds.width / selection_clone.bounds.width, geom.bounds.height / selection_clone.bounds.height);
+        selection_clone.position = geom.position;
         bbox.selected = false;
 
       } else {

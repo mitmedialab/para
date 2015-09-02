@@ -290,7 +290,7 @@ define([
       var relative = this.get('relatives');
       var keys;
       var instance;
-      var relativeRange = relative.get('memberCount').getValue();
+      var relativeRange = relative.getRange();
 
       if (ref_dimensions.length === rel_dimensions.length) {
 
@@ -430,7 +430,7 @@ define([
       var self = this;
       var reference = this.get('references');
       var relative = this.get('relatives');
-      var relative_range = relative.get('memberCount').getValue();
+      var relative_range = relative.getRange();
 
       var setOnInstance = false;
       /*if (properties.length === relative.get('dimension_num')) {
@@ -475,6 +475,7 @@ define([
           this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
 
         }
+        console.log('expressions',expressions,'offsets',offsets,relative_range);
 
         if (!setOnInstance) {
           if (relative.get(rel_prop_key).get('dimension_num') == 1) {
@@ -568,7 +569,7 @@ define([
           return relative.get(rel_prop_key)[rel_dimension].getValue();
         } else {
           var exempt_indicies = self.get('exempt_indicies');
-          var relative_range = relative.get('memberCount').getValue();
+          var relative_range = relative.getRange();
           var reference_values = self.get('reference_values');
 
           for (var z = 0; z < relative_range; z++) {
@@ -620,7 +621,7 @@ define([
         } else {
           var exempt_indicies = self.get('exempt_indicies');
           var list = [];
-          var relative_range = relative.get('memberCount').getValue();
+          var relative_range = relative.getRange();
           var a_keys = Object.keys(expression);
           for (var z = 0; z < relative_range; z++) {
             var relative_target = relative.getMemberAt(z);
@@ -677,7 +678,7 @@ define([
         } else {
           var exempt_indicies = self.get('exempt_indicies');
           var list = [];
-          var relative_range = relative.get('memberCount').getValue();
+          var relative_range = relative.getRange();
           console.log('calling constraint function on', relative.get('id'));
 
           for (var z = 0; z < relative_range; z++) {
