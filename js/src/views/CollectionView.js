@@ -122,41 +122,48 @@ define([
 				this.setCount();
 			} else {
 				var collections = selected.filter(function(item) {
-					return (item.get('type') == 'collection' || item.get('name') == 'group');
+					return (item.get('type') == 'collection' || item.get('name') == 'group' || item.get('name')=='duplicator');
 				});
 				var duplicators = collections.filter(function(item) {
 					return (item.get('name') == 'duplicator');
 				});
-				var geometry = selected.filter(function(item){
-						return (item.get('type')=='geometry' && item.get('name')!='group');
+				var geometry = selected.filter(function(item) {
+					return (item.get('type') == 'geometry' && item.get('name') != 'group');
 				});
-				if (collections.length == selected.length) {
-					this.enable('ungroup');
-					this.setCount(selected);
-				} else {
-					this.disable('ungroup');
-					this.setCount();
-				}
-				if (duplicators.length == selected.length) {
-					console.log('enabling count');
-					this.enable('count');
-
-				} else {
-					this.disable('count');
-				}
+				console.log('duplicators', duplicators);
 				if (selected.length > 1) {
-					
-					if(geometry.length==selected.length){
+					this.setCount();
+					if (collections.length == selected.length) {
+						this.enable('ungroup');
+					} else {
+						this.disable('ungroup');
+					}
+					if (geometry.length == selected.length) {
 						this.enable('group');
 					}
 					this.disable('duplicator');
 					this.enable('list');
 				} else {
-					this.disable('group');
 					this.disable('list');
+					this.disable('group');
+
+					if (collections.length == selected.length) {
+						this.enable('ungroup');
+						this.setCount(selected[0]);
+					} else {
+						this.disable('ungroup');
+					}
+					if (duplicators.length == selected.length) {
+						console.log('enabling count');
+						this.enable('count');
+					} else {
+						this.disable('count');
+					}
 					//TODO: right now can only create duplicator on geometry
 					if (selected[0].get('type') === 'geometry') {
 						this.enable('duplicator');
+					} else {
+						this.disable('duplicator');
 					}
 				}
 			}

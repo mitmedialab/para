@@ -307,7 +307,7 @@ define([
 
 		/* getRange: function used to modify constraints mappings for lists*/
 		getRange: function() {
-			return 1; //this.get('memberXount').getValue();
+			return 1;
 		},
 
 		toggleOpen: function(item) {
