@@ -166,6 +166,7 @@ define([
 		positionConstraintIcons: function(checkVisible) {
 			this.toggleConstraintsForAllNodes();
 			if (currentRef && currentRel) {
+				console.log('currentRef=',currentRef);
 				var ref = shapeTree.getNodeByKey(currentRef);
 				var rel = shapeTree.getNodeByKey(currentRel);
 
@@ -446,6 +447,15 @@ define([
 			}
 		},
 
+		moveShape: function(pId,nodeId){
+			var node = shapeTree.getNodeByKey(pId);
+			var parentNode = shapeTree.getNodeByKey(nodeId);
+			if(node && parentNode){
+				node.moveTo(parentNode,'child');
+			}
+
+		},
+
 		addChild: function(shape, pId) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
@@ -462,6 +472,7 @@ define([
 				else{
 					node = parentNode.addChildren(s);
 				}
+				console.log('node added',node.key);
 			
 				this.selectNode(node);
 

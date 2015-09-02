@@ -183,10 +183,8 @@ define([
 			var itemFound = false;
 			for (var i = 0; i < lists.length; i++) {
 				var item = lists[i].getMember(lInstance);
-			console.log('checking list at ',i,lists[i].get('name'),item);
 
 				if (item && item != lInstance) {
-					console.log('list is closed');
 					sInstances.push(item);
 					itemFound = true;
 				}
@@ -325,7 +323,6 @@ define([
 				for (var i = 0; i < lists.length; i++) {
 					if ($.inArray(lists[i], toggledLists) === -1) {
 						var r = lists[i].toggleClosed(item);
-						console.log('checking toggle closed list',r,lists[i].get('name'));
 						if (r) {
 							returnedLists = returnedLists.concat(r);
 							toggledLists.push(lists[i]);

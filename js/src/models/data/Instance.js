@@ -328,6 +328,10 @@ define([
 			return [];
 		},
 
+		accessMemberGeom: function(){
+			return [this.get('geom')];
+		},
+
 
 
 		close: function() {

@@ -38,6 +38,9 @@ define([
         operator: 'set'
       });
       this.members = [];
+      var geom = new paper.Group();
+      this.set('geom', geom);
+      geom.data.instance  = this;
     },
 
 
@@ -69,6 +72,15 @@ define([
       return Duplicator.prototype.hasMember.call(this, member, top, last);
     },
 
+    accessMemberGeom: function(){
+      var geom_list = [];
+      for(var i=0;i<this.members.length;i++){
+       geom_list.push.apply(geom_list, this.members[i].accessMemberGeom());
+      }
+      return geom_list;
+    },
+
+
     toggleOpen: function(item) {
       var result = Duplicator.prototype.toggleOpen.call(this, item);
       if (result) {
@@ -82,7 +94,6 @@ define([
     },
 
     toggleClosed: function(item) {
-      console.log('toggle close group', this.hasMember(item));
       var result = Duplicator.prototype.toggleClosed.call(this, item);
       if (result) {
         for (var i = 0; i < this.members.length; i++) {
@@ -118,9 +129,8 @@ define([
     },
 
     inverseTransformRecurse: function(geom_list) {
-      for (var i = 0; i < this.members.length; i++) {
-        geom_list.push.apply(geom_list, [this.members[i].get('geom')]);
-      }
+      
+      geom_list.push.apply(geom_list,this.accessMemberGeom());
 
       if (this.nodeParent && this.nodeParent.get('name') === 'group') {
         this.nodeParent.inverseTransformRecurse(geom_list);

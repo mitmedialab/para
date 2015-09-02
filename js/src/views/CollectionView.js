@@ -127,22 +127,28 @@ define([
 				var duplicators = collections.filter(function(item) {
 					return (item.get('name') == 'duplicator');
 				});
+				var geometry = selected.filter(function(item){
+						return (item.get('type')=='geometry' && item.get('name')!='group');
+				});
 				if (collections.length == selected.length) {
 					this.enable('ungroup');
 					this.setCount(selected);
-
 				} else {
 					this.disable('ungroup');
 					this.setCount();
 				}
 				if (duplicators.length == selected.length) {
+					console.log('enabling count');
 					this.enable('count');
 
 				} else {
 					this.disable('count');
 				}
 				if (selected.length > 1) {
-					this.enable('group');
+					
+					if(geometry.length==selected.length){
+						this.enable('group');
+					}
 					this.disable('duplicator');
 					this.enable('list');
 				} else {

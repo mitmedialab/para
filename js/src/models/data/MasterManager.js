@@ -466,7 +466,7 @@ define([
 			var duplicator = collectionManager.addDuplicator(object);
 			currentNode.insertChild(index,duplicator);
 			layersView.addShape(duplicator.toJSON());
-			layersView.removeShape(object.get('id'));
+			layersView.moveShape(object.get('id'), duplicator.get('id'));
 			this.selectShape(duplicator);
 			var targets = [duplicator];
 			var data = duplicator.setCount(8);
