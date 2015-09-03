@@ -8,7 +8,7 @@ define([
 	'backbone',
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
-		'models/data/geometry/Group'
+	'models/data/geometry/Group'
 
 
 
@@ -16,7 +16,7 @@ define([
 
 
 	//stores para lists
-	var lists, renderQueue, duplicators;
+	var lists, renderQueue, duplicators, groups;
 	var collectionView;
 	var remove = 2;
 	var search = 4;
@@ -178,12 +178,20 @@ define([
 		 */
 		filterSelection: function(lInstance) {
 
-
 			var sInstances = [];
 			var itemFound = false;
+			var item;
 			for (var i = 0; i < lists.length; i++) {
-				var item = lists[i].getMember(lInstance);
+				item = lists[i].getMember(lInstance);
 
+				if (item && item != lInstance) {
+					sInstances.push(item);
+					itemFound = true;
+				}
+			}
+
+			for (var j = 0; j < groups.length; j++) {
+				item = groups[j].getMember(lInstance);
 				if (item && item != lInstance) {
 					sInstances.push(item);
 					itemFound = true;
@@ -220,7 +228,7 @@ define([
 			return list;
 		},
 
-		addListCopy: function(copy){
+		addListCopy: function(copy) {
 			lists.push(copy);
 		},
 
@@ -245,19 +253,12 @@ define([
 		addGroup: function(selected) {
 			var group = new Group();
 
-			for(var j=0;j<selected.length;j++){
+			for (var j = 0; j < selected.length; j++) {
 				group.addMember(selected[j]);
 			}
 
-			if (!this.addToOpenLists(group)) {
-				for (var i = lists.length - 1; i >= 0; i--) {
-					if (group.hasMember(lists[i], true)) {
-						lists.splice(i, 1);
-					}
-				}
-				lists.push(group);
-			}
-
+			this.addToOpenLists(group);
+			groups.push(group);
 			return group;
 		},
 
@@ -287,24 +288,42 @@ define([
 			}
 		},
 
-		toggleOpenLists: function(selected) {
+		toggleOpen: function(item) {
+			if(item.get('type')=='group'){
+				this.closeAllGroups();	
+				item.toggleOpen();	
+			}
+			else{
+				this.toggleOpenLists(item);
+			}
+		},
+
+		toggleClosed: function(item) {
+			if(item.get('type')=='group'){
+				this.closeAllGroups();	
+			}
+			else{
+				this.toggleClosedLists(item);
+			}
+		},
+
+		toggleOpenLists: function(item) {
 			this.closeAllLists();
 			var openedLists = [];
 			var openedItems = [];
 			var members = [];
-			for (var j = 0; j < selected.length; j++) {
-				var item = selected[j];
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], openedLists) === -1) {
-						var r = lists[i].toggleOpen(item);
-						if (r) {
-							openedItems = openedItems.concat(r);
-							openedLists.push(lists[i]);
-						}
 
+			for (var i = 0; i < lists.length; i++) {
+				if ($.inArray(lists[i], openedLists) === -1) {
+					var r = lists[i].toggleOpen(item);
+					if (r) {
+						openedItems = openedItems.concat(r);
+						openedLists.push(lists[i]);
 					}
+
 				}
 			}
+
 			for (var k = 0; k < openedItems.length; k++) {
 				members = members.concat(openedLists[k].members);
 
@@ -319,11 +338,11 @@ define([
 		/* toggleClosedLists
 		 * closes selected open lists
 		 */
-		toggleClosedLists: function(selected) {
+		toggleClosedLists: function(item) {
 			var toggledLists = [];
 			var returnedLists = [];
-			for (var j = 0; j < selected.length; j++) {
-				var item = selected[j];
+		
+				
 				for (var i = 0; i < lists.length; i++) {
 					if ($.inArray(lists[i], toggledLists) === -1) {
 						var r = lists[i].toggleClosed(item);
@@ -332,17 +351,13 @@ define([
 							toggledLists.push(lists[i]);
 						}
 					}
-				}
+				
 			}
 			return {
 				toSelect: returnedLists,
-				toRemove: selected
+				toRemove: [item]
 			};
 		},
-
-
-
-
 
 
 
@@ -353,14 +368,19 @@ define([
 			}
 		},
 
-		 getListJSON: function(){
-		 	var list_json =[];
-      		for (var i = 0; i < lists.length; i++) {
-      			list_json.push(lists[i].toJSON());
-      		}
-   		}
+		closeAllGroups: function() {
+			for (var i = 0; i < groups.length; i++) {
+				groups[i].closeAllMembers();
+			}
+		},
 
-		
+		getListJSON: function() {
+			var list_json = [];
+			for (var i = 0; i < lists.length; i++) {
+				list_json.push(lists[i].toJSON());
+			}
+			return list_json;
+		},
 
 
 

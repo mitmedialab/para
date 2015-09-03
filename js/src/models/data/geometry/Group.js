@@ -50,7 +50,7 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       for (var i = 0; i < this.members.length; i++) {
-        console.log('cloning member at',i);
+        console.log('cloning member at', i);
         var clone = this.members[i].create();
         instance.addMember(clone);
       }
@@ -73,11 +73,11 @@ define([
         clone.get('zIndex').setValue(this.members.length - 1);
 
       }
-        var memberCount = {
-                    v: this.members.length,
-                    operator: 'set'
-                };
-                this.get('memberCount').setValue(memberCount);
+      var memberCount = {
+        v: this.members.length,
+        operator: 'set'
+      };
+      this.get('memberCount').setValue(memberCount);
     },
 
     removeMember: function(data) {
@@ -94,12 +94,12 @@ define([
           v: this.members.length,
           operator: 'set'
         };
-           this.get('memberCount').setValue(memberCount);
+        this.get('memberCount').setValue(memberCount);
 
         return member;
       }
       this.toggleClosed();
-        
+
 
     },
 
@@ -154,6 +154,11 @@ define([
 
     closeAllMembers: function() {
       this.toggleClosed(this);
+      for(var i=0;i<this.members.length;i++){
+        this.members[i].closeAllMembers();
+
+        
+      }
     },
 
 

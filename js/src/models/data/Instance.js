@@ -341,6 +341,10 @@ define([
 			return this.getParentNode();
 		},
 
+		closeAllMembers: function(){
+			return this;
+		}
+
 		/* create
 		 * Prototypal inheritance action:
 		 * creates a new instance which inherits from
