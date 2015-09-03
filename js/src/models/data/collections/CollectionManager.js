@@ -330,8 +330,12 @@ define([
 						openedItems = openedItems.concat(r);
 						openedLists.push(lists[i]);
 					}
+					else{
+						lists[i].toggleClosed(lists[i]);
+					}
 
 				}
+
 			}
 
 			for (var k = 0; k < openedItems.length; k++) {
