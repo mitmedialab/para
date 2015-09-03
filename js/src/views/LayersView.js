@@ -22,7 +22,7 @@ define([
 			'click #delete': 'deleteActive'
 		},
 
-		initialize: function(obj) {
+		initialize: function() {
 			this.$el.append(ui);
 
 			//source = $('#constraint_template').html();

@@ -340,12 +340,21 @@ define([
 
 
 
+
+
 		closeAllLists: function() {
 			for (var i = 0; i < lists.length; i++) {
 				lists[i].closeAllMembers();
 				lists[i].set('open', false);
 			}
 		},
+
+		 getListJSON: function(){
+		 	var list_json =[];
+      		for (var i = 0; i < lists.length; i++) {
+      			list_json.push(lists[i].toJSON());
+      		}
+   		}
 
 		
 

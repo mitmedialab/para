@@ -276,7 +276,6 @@ define([
 			if (parent) {
 				parent.removeChildNode(this);
 			}
-			this.trigger('delete', this);
 		},
 
 
@@ -680,6 +679,10 @@ define([
 					data[property] = target.get(property);
 				}
 			});
+			data.children = [];
+			for(var i=0;i<this.children.length;i++){
+				data.children.push(this.children[i].toJSON());
+			}
 			return data;
 
 		},

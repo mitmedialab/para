@@ -395,6 +395,8 @@ getLiteralSubprops: function(key, subprop) {
 
     },
 
+   
+
 
 
     //triggered on change of select property, removes bbox

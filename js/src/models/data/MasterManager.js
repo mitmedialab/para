@@ -13,10 +13,13 @@ define([
 	'models/data/collections/CollectionManager',
 	'views/LayersView',
 	'views/CollectionView',
-	'views/MapView'
+	'views/MapView',
+	'views/SaveExportView',
+	'backbone.undo',
 
 
-], function(_, Backbone, Instance, Group, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView) {
+
+], function(_, Backbone, Instance, Group, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -61,6 +64,12 @@ define([
 				el: '#layers-constraints-container',
 				model: this
 			});
+
+			SaveExportView = new SaveExportView({
+				el: '#save-export-container',
+				model: this
+			});
+
 			mapView = new MapView({
 				model: this
 			});
@@ -69,8 +78,25 @@ define([
 			this.listenTo(collectionManager, 'listLengthChange', this.updateListConstraints);
 			this.listenTo(collectionManager, 'duplicatorCountModified', this.duplicatorCountModified);
 
+		},
 
+		importProjectJSON: function(json){
 
+		},
+
+		exportProjectJSON: function(json){
+			var geometry_json= rootNode.toJSON();
+			var constraint_json = [];
+			for(var i=0;i<constraints.length;i++){
+				constraint_json.push(this.constraints[i].toJSON());
+			}
+			var list_json = collectionManager.getListJSON();
+			var project_json = {
+				geometry: geometry_json,
+				constraints: constraint_json,
+				lists: list_json
+			};
+			return project_json;
 		},
 
 		getById: function(id) {
@@ -173,8 +199,6 @@ define([
 				}
 			}
 		},
-
-
 
 		modified: function(target) {
 			target.reset();

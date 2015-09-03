@@ -144,45 +144,48 @@
  
 
  <!--======================= SAVE MENU =======================-->
-
- <section id = "save-menu ">
+<div id = 'save-export-container'>
+ <section id = "save-menu">
   <header >
-    <h2>Save</h2>
+    <h2>Save or Load a file</h2>
     <div class="clearfix"></div>
   </header>
   <div  class="section-background">
 
    <div class="form-group">
-    <label>name <input class="form-control filename" type="text" id="text-filename" placeholder="my_drawing"/></label>
-
     <select id ="fileselect" class="form-control"></select>
   </div>
   <div class="form-group">
     <input type="button" id="save" value="save" disabled="true"/>
+    <input type="button" id="saveas" value="save as" disabled="true"/>
+    <input type="button" id="downloadFile" value="download file to desktop" disabled="true"/>
+   <label>upload file from desktop<input class="form-group custom-file-input" type="file" accept=".txt" id="uploadFile" name="files" single /></label> <output id="loaded"></output>
+
   </div>
 
 </section> <!--/save-menu-->
 
 <!--======================= EXPORT MENU =======================-->
 
-<section id = "save-menu ">
+<section id = "export-menu ">
   <header >
-    <h2>Export</h2>
+    <h2>Import or Export an SVG</h2>
     <div class="clearfix"></div>
   </header>
   <div  class="section-background">
 
     <div class="form-group">
-      <input type="button" id="saveFile" value="download file" disabled="true"/>
     </div>
     <div class="form-group">
-      <label>upload file from desktop<input class="form-group custom-file-input" type="file" accept=".txt" id="upload" name="files" single /></label> <output id="loaded"></output>
+     
     </div>
     <div class="form-group">
       <input type="button" id ="export" value="export svg"/>
+      <input type="button" id ="import" value="import svg"/>
     </div>
   </div>
-</section> <!--/save-menu-->
+</section> <!--/export-menu-->
+</div>
 </div><!--/properties-->
 </div><!--/properties-container-->
 </div><!--/properties-wrapper-->
