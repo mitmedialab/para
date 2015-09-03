@@ -24,8 +24,10 @@ define([
 	var CollectionManager = Backbone.Model.extend({
 		defaults: {},
 
-		initialize: function() {},
+		initialize: function() {
+			groups = [];
 
+		},
 		/* setters and getters for current lists
 		 */
 		setLists: function(l) {
@@ -289,21 +291,31 @@ define([
 		},
 
 		toggleOpen: function(item) {
-			if(item.get('type')=='group'){
-				this.closeAllGroups();	
-				item.toggleOpen();	
-			}
-			else{
-				this.toggleOpenLists(item);
+			if (item.get('name') ==='group') {
+				console.log('toggling group open');
+				this.closeAllGroups();
+				item.toggleOpen(item);
+				console.log('item open',item,item.get('open'),item.get('name'));
+				return {
+					toSelect: item.members,
+					toRemove: [item]
+				};
+			} else {
+				return this.toggleOpenLists(item);
 			}
 		},
 
 		toggleClosed: function(item) {
-			if(item.get('type')=='group'){
-				this.closeAllGroups();	
-			}
-			else{
-				this.toggleClosedLists(item);
+			console.log(item.nodeParent.get('name'),  item.nodeParent.get('open'));
+			if (item.nodeParent.get('name') === 'group' && item.nodeParent.get('open')) {
+				console.log('toggling group closed');
+				item.nodeParent.toggleClosed(item);
+				return{
+					toSelect: [item.nodeParent],
+					toRemove: [item]
+				};
+			} else {
+				return this.toggleClosedLists(item);
 			}
 		},
 
@@ -341,17 +353,15 @@ define([
 		toggleClosedLists: function(item) {
 			var toggledLists = [];
 			var returnedLists = [];
-		
-				
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], toggledLists) === -1) {
-						var r = lists[i].toggleClosed(item);
-						if (r) {
-							returnedLists = returnedLists.concat(r);
-							toggledLists.push(lists[i]);
-						}
+			for (var i = 0; i < lists.length; i++) {
+				if ($.inArray(lists[i], toggledLists) === -1) {
+					var r = lists[i].toggleClosed(item);
+					if (r) {
+						returnedLists = returnedLists.concat(r);
+						toggledLists.push(lists[i]);
 					}
-				
+				}
+
 			}
 			return {
 				toSelect: returnedLists,

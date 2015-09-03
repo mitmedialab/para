@@ -829,23 +829,8 @@ define([
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function() {
-			var data;
-			var functions = selected.filter(function(item) {
-				return item.get('type') === 'function';
-			});
-			if (functions.length > 0) {
-				collectionManager.closeAllLists();
-				currentNode.lists = collectionManager.getLists();
-				data = functionManager.toggleOpenFunctions(currentNode, functions[functions.length - 1]);
-				collectionManager.setLists(data.lists);
-				currentNode = data.currentNode;
-			} else {
-				data = collectionManager.toggleOpenLists(selected);
-			}
-
-			if (data.toRemove && data.toRemove.length > 0) {
-				this.deselectShape(data.toRemove);
-			}
+			var data = collectionManager.toggleOpen(selected[selected.length-1]);
+			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
 				this.selectShape(data.toSelect);
 			}
@@ -855,11 +840,8 @@ define([
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function() {
-			var data = collectionManager.toggleClosedLists(selected);
-
-			if (data.toRemove && data.toRemove.length > 0) {
-				this.deselectShape(data.toRemove);
-			}
+			var data = collectionManager.toggleClosed(selected[selected.length-1]);
+			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
 				this.selectShape(data.toSelect);
 				//TODO: some issue here with correctly selecting shapes when list is toggled closed.

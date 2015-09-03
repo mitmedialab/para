@@ -343,7 +343,7 @@ define([
 
 		closeAllMembers: function(){
 			return this;
-		}
+		},
 
 		/* create
 		 * Prototypal inheritance action:
