@@ -65,18 +65,17 @@ define([
     /* addMember, removeMember
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
-    addMember: function(data,index) {
+    addMember: function(data, index) {
 
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
           this.members.push(data[i]);
-          
+
         }
       } else {
-        if(index){
-          this.members.splice(index,0,data);
-        }
-        else{
+        if (index) {
+          this.members.splice(index, 0, data);
+        } else {
           this.members.push(data);
         }
 
@@ -180,7 +179,7 @@ define([
       if (index > -1) {
 
         var member = this.members.splice(index, 1)[0];
-       var memberCount = {
+        var memberCount = {
           v: this.members.length,
           operator: 'set'
         };
@@ -255,13 +254,13 @@ define([
       return null;
     },
 
-getLiteralSubprops: function(key, subprop) {
-     var subprops = [];
-     for (var i = 0; i < this.members.length; i++) {
-      var sp = this.members[i].getLiteralSubprops(key, subprop);
-      subprops = subprops.concat(sp);
-     }
-     return subprops;
+    getLiteralSubprops: function(key, subprop) {
+      var subprops = [];
+      for (var i = 0; i < this.members.length; i++) {
+        var sp = this.members[i].getLiteralSubprops(key, subprop);
+        subprops = subprops.concat(sp);
+      }
+      return subprops;
     },
 
 
@@ -331,8 +330,8 @@ getLiteralSubprops: function(key, subprop) {
         var spliced_member = this.members.splice(old_index, 1)[0];
 
         this.members.splice(index, 0, spliced_member);
-       
-       //TODO: create something that specifies child order here 
+
+        //TODO: create something that specifies child order here 
         return true;
       }
       return false;
@@ -359,7 +358,20 @@ getLiteralSubprops: function(key, subprop) {
           var toggledLists = [];
           for (var i = 0; i < this.members.length; i++) {
             var toggled = this.members[i].toggleOpen(item);
+
             if (toggled) {
+              var c_members = this.members;
+              var shared_members = toggled.filter(function(item){
+                return c_members.indexOf(item)>-1;
+              });
+              
+              if (shared_members.length>0) {
+                for (var j = 0; j < this.members.length; j++) {
+                  if (shared_members.indexOf(this.members[j]) === -1) {
+                    this.members[j].toggleClosed();
+                  }
+                }
+              }
               toggledLists = toggledLists.concat(toggled);
             }
           }
@@ -394,8 +406,6 @@ getLiteralSubprops: function(key, subprop) {
     compile: function() {
 
     },
-
-   
 
 
 
@@ -436,9 +446,9 @@ getLiteralSubprops: function(key, subprop) {
           bbox.data.instance = this;
           this.set('bbox', bbox);
           var targetLayer = paper.project.layers.filter(function(layer) {
-          return layer.name === 'ui_layer';
-        })[0];
-        targetLayer.addChild(bbox);
+            return layer.name === 'ui_layer';
+          })[0];
+          targetLayer.addChild(bbox);
 
 
         } else {
@@ -496,7 +506,7 @@ getLiteralSubprops: function(key, subprop) {
 
     },
 
-    getBounds: function(){
+    getBounds: function() {
       return this.get('bbox').bounds;
     },
 

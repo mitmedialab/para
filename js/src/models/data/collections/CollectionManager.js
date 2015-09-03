@@ -306,8 +306,7 @@ define([
 		},
 
 		toggleClosed: function(item) {
-			console.log(item.nodeParent.get('name'),  item.nodeParent.get('open'));
-			if (item.nodeParent.get('name') === 'group' && item.nodeParent.get('open')) {
+			if (item.nodeParent && item.nodeParent.get('name') === 'group' && item.nodeParent.get('open')) {
 				console.log('toggling group closed');
 				item.nodeParent.toggleClosed(item);
 				return{
@@ -320,7 +319,6 @@ define([
 		},
 
 		toggleOpenLists: function(item) {
-			this.closeAllLists();
 			var openedLists = [];
 			var openedItems = [];
 			var members = [];
