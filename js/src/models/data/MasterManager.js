@@ -206,16 +206,27 @@ define([
 			target.render();
 		},
 
-		addListener: function(target) {
+		addListener: function(target, recurse) {
 			this.stopListening(target);
 			target.compile();
 			target.render();
 			this.listenTo(target, 'modified', this.modified);
+			if(recurse){
+				for (var i=0;i<target.children.length;i++){
+					this.addListener(target.members[i],recurse);
+				}
+			}
 
 		},
 
-		removeListener: function(target) {
+		removeListener: function(target, recurse) {
 			this.stopListening(target);
+			if(recurse){
+				for (var i=0;i<target.children.length;i++){
+					this.removeListener(target.members[i],recurse);
+				}
+			}
+
 		},
 
 		addObject: function(object, geom) {
@@ -224,7 +235,7 @@ define([
 					this.addShape(geom);
 					break;
 				case 'instance':
-					this.addInstance();
+					this.addCopy(selected);
 					break;
 				case 'function':
 					this.addFunction(collectionManager.getLists());
@@ -468,14 +479,28 @@ define([
 			}
 		},
 
+		addCopy: function(selected){
+			for (var i = 0; i < selected.length; i++) {
+				var copy = selected[i].create();
+				rootNode.addChildNode(copy);
+				layersView.addShape(copy.toJSON());
+				this.addListener(copy);
+				this.selectShape(copy);
+				this.deselectShape(selected[i]);
+				this.addListener(copy,true);
+				if(copy.get('type')=='collection'|| copy.get('name')=='group' || copy.get('name')=='duplicator'){
+					collectionManager.addListCopy(copy);
+				}
+
+			}
+		},
+
 		addGroup: function(selected){
 			var group = collectionManager.addGroup(selected);
-			layersView.addShape(group.toJSON());
-
 			for (var i = 0; i < selected.length; i++) {
 				layersView.removeShape(selected[i].get('id'));
-				layersView.addChild(selected[i].toJSON(), group.get('id'));
 			}
+			layersView.addShape(group.toJSON());
 			this.deselectAllShapes();
 			currentNode.addChildNode(group);
 			this.addListener(group);
@@ -489,8 +514,8 @@ define([
 			object.nodeParent.removeChildNode(object);
 			var duplicator = collectionManager.addDuplicator(object);
 			currentNode.insertChild(index, duplicator);
+			layersView.removeShape(object.get('id'));
 			layersView.addShape(duplicator.toJSON());
-			layersView.moveShape(object.get('id'), duplicator.get('id'));
 			this.selectShape(duplicator);
 			var data = duplicator.setCount(8);
 			this.duplicatorCountModified(data, duplicator);
@@ -505,14 +530,14 @@ define([
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
-					this.removeListener(data.toRemove[i]);
+					this.removeListener(data.toRemove[i],true);
 					layersView.removeShape(data.toRemove[i].get('id'));
 				}
 			}
 			if (data.toAdd) {
 				for (var j = 0; j < data.toAdd.length; j++) {
-					this.addListener(data.toAdd[j]);
-					layersView.addChild(data.toAdd[j].toJSON(), duplicator.get('id'));
+					this.addListener(data.toAdd[j],true);
+					layersView.addShape(data.toAdd[j].toJSON(), duplicator.get('id'));
 				}
 			}
 			this.updateListConstraints(duplicator);

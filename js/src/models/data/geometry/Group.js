@@ -45,6 +45,19 @@ define([
     },
 
 
+    create: function() {
+      var instance = new this.constructor();
+      var value = this.getValue();
+      instance.setValue(value);
+      for (var i = 0; i < this.members.length; i++) {
+        console.log('cloning member at',i);
+        var clone = this.members[i].create();
+        instance.addMember(clone);
+      }
+      console.log(instance.get('memberCount').getValue());
+      return instance;
+    },
+
     addMember: function(clone, index) {
       if (index) {
         this.members.splice(index, 0, clone);
@@ -60,6 +73,11 @@ define([
         clone.get('zIndex').setValue(this.members.length - 1);
 
       }
+        var memberCount = {
+                    v: this.members.length,
+                    operator: 'set'
+                };
+                this.get('memberCount').setValue(memberCount);
     },
 
     removeMember: function(data) {
@@ -76,10 +94,12 @@ define([
           v: this.members.length,
           operator: 'set'
         };
+           this.get('memberCount').setValue(memberCount);
 
         return member;
       }
       this.toggleClosed();
+        
 
     },
 

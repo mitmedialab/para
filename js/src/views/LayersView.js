@@ -424,16 +424,36 @@ define([
 			}
 		},
 
-		addShape: function(shape) {
+		addShape: function(shape,parentId) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var s = {
 				title: shape.name,
 				key: shape.id
 			};
-			var node = shapeRoot.children.length>0?shapeRoot.addChildren(s,0): shapeRoot.addChildren(s);
+			var parentNode;
+			console.log('parentId',parentId);
+			if(parentId){
+				parentNode = shapeTree.getNodeByKey(parentId);
+			}
+			else{
+				parentNode = shapeRoot;
+			}
+			console.log('parent node',parentNode);
+			var node;
+			if(parentNode.children){
+				node = parentNode.children.length>0?parentNode.addChildren(s,0): parentNode.addChildren(s);
+			}
+			else{
+				node = parentNode.addChildren(s);
+			}
 			this.selectNode(node);
 			this.resetConstraintHeight();
+			for(var i=0;i<shape.children.length;i++){
+				if(shape.children[i].name!='point'){
+					this.addShape(shape.children[i],shape.id);
+				}
+			}
 
 		},
 

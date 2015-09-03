@@ -220,6 +220,10 @@ define([
 			return list;
 		},
 
+		addListCopy: function(copy){
+			lists.push(copy);
+		},
+
 
 		addDuplicator: function(object) {
 			var duplicator = new Duplicator();
