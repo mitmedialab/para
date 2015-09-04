@@ -20,7 +20,7 @@ define([
 			'click #import': 'importSVG',
 			//'change #text-filename': 'nameChange',
 			'change #uploadFile': 'uploadFile',
-			//'change #fileselect': 'load',
+			'change #fileselect': 'loadLocal',
 		},
 
 		initialize: function() {
@@ -70,9 +70,8 @@ define([
 				}
 			});
 			if (!exists) {
-				var val = select.size();
 				select.append($('<option>', {
-					value: val,
+					value:filename,
 					text: filename
 				}));
 				return true;
@@ -118,22 +117,20 @@ define([
 
 
 
-		loadLocal: function(filename) {
+		load: function(filename) {
+			this.save();
 			var data = localStorage.getItem(filename);
-			this.load(JSON.parse(data));
+			this.model.importProjectJSON(JSON.parse(data));
+			currentName = filename;
 		},
 
 
-		/*
-		  load: function() {
-      var id = $('#fileselect option:selected').val();
-      var filename = $('#fileselect option:selected').text();
-      this.model.loadLocal(id);
-      $('#text-filename').val(filename);
-    },
-
-    */
-
+		loadLocal: function() {
+			var filename = $('#fileselect option:selected').val();
+			console.log('filename =',filename);
+			this.load(filename);
+			$('#text-filename').val(filename);
+		},
 
 
 		downloadFile: function() {

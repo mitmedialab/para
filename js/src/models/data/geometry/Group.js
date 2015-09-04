@@ -44,6 +44,26 @@ define([
 
     },
 
+   /*deleteAllChildren
+     * function which deletes all children
+     */
+    deleteAllChildren: function(deleted) {
+      if(!deleted){
+        deleted = [];
+      }
+      for(var i=this.members.length-1;i>=0;i--){
+        console.log('deleting member at ',i,deleted);
+        deleted.push.apply(deleted,this.members[i].deleteAllChildren());
+        deleted.push(this.members[i].deleteSelf());
+        this.removeMember(this.members[i]);
+      }
+      return deleted;
+    },
+
+    deleteSelf: function(){
+      this.members.length = 0;
+      return Instance.prototype.deleteSelf.call(this);
+    },
 
     create: function() {
       var instance = new this.constructor();

@@ -16,7 +16,7 @@ define([
 
 
 	//stores para lists
-	var lists, renderQueue, duplicators, groups;
+	var lists, renderQueue, groups;
 	var collectionView;
 	var remove = 2;
 	var search = 4;
@@ -393,6 +393,21 @@ define([
 			}
 			return list_json;
 		},
+
+
+		deleteAll: function(){
+			var deleted = [];
+			for(var i=0;i<lists.length;i++){
+				if(lists[i].get('type')==='collection'){
+					deleted.push.apply(deleted,lists[i].deleteAllMembers());
+					deleted.push(lists[i].deleteSelf());
+				}
+			}
+			lists.length=0;
+			groups.length=0;
+
+			return deleted;
+		}
 
 
 

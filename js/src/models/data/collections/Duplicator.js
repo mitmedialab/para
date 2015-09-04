@@ -51,9 +51,9 @@ define([
             },
 
             setInternalConstraint: function() {
-                var constraints =[];
+                var constraints = [];
                 if (this.get('target').get('name') == 'group') {
-                   constraints.push.apply(constraints,this.setInternalGroupConstraint());
+                    constraints.push.apply(constraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
                 if (this.members.length > 1) {
@@ -139,10 +139,10 @@ define([
 
                 }
                 var diff = this.members.length - this.indexNumbers.length;
-                if(clone.get('name')==='group'){
-                    for(var j=0;j<clone.members.length;j++){
-                        for(var i=0;i<this.group_relative.length; i++){
-                            this.group_relative[j].addMember(clone.members[j],index);
+                if (clone.get('name') === 'group') {
+                    for (var j = 0; j < clone.members.length; j++) {
+                        for (var i = 0; i < this.group_relative.length; i++) {
+                            this.group_relative[j].addMember(clone.members[j], index);
                         }
                     }
                 }
@@ -173,7 +173,7 @@ define([
 
 
 
-            deleteMember: function() {
+            deleteClone: function() {
                 var data = this.clones[this.clones.length - 2];
                 if (data) {
                     this.removeMember(data);
@@ -186,11 +186,48 @@ define([
                 }
             },
 
-
-            deleteSelf: function() {
-                ConstrainableList.prototype.deleteSelf.call(this);
-                this.clones.length = 0;
+            deleteMember: function(member) {
+     
+                    this.removeMember(member);
+                   member.deleteSelf();
+                    var parent = member.getParentNode();
+                    if (parent) {
+                        parent.removeChildNode(member);
+                    }
+                    return member;
+                
             },
+
+            /*deleteAllChildren
+             * function which deletes all children
+             */
+            deleteAllChildren: function(deleted) {
+                if (!deleted) {
+                    deleted = [];
+                }
+                for (var i = this.members.length - 1; i >= 0; i--) {
+                    console.log('deleting member at ', i, deleted);
+                    deleted.push.apply(deleted,this.members[i].deleteAllChildren());
+                    deleted.push(this.deleteMember(this.members[i]));
+                }
+                this.members.length=0;
+                this.clones.length=0;
+                this.children.length=0;
+                return deleted;
+            },
+
+           
+            deleteSelf: function() {
+                this.internalList.deleteSelf();
+                for(var i=0;i<this.group_relative.length;i++){
+                    this.group_relative[i].deleteSelf();
+                }
+                for(var j=0;i<this.group_reference.length;j++){
+                    this.group_reference[j].deleteSelf();
+                }
+                return ConstrainableList.prototype.deleteSelf.call(this);
+            },
+
 
             removeMember: function(data) {
                 var target = this.get('target');
@@ -215,9 +252,9 @@ define([
                     }
                     return member;
                 }
-                 if(data.get('name')==='group'){
-                    for(var j=0;j<data.members.length;j++){
-                        for(var i=0;i<this.group_relative.length; i++){
+                if (data.get('name') === 'group') {
+                    for (var j = 0; j < data.members.length; j++) {
+                        for (var i = 0; i < this.group_relative.length; i++) {
                             this.group_relative[j].removeMember(data.members[j]);
                         }
                     }
@@ -300,7 +337,7 @@ define([
                     }
                 } else if (diff < 0) {
                     for (var j = 0; j < 0 - diff; j++) {
-                        var member = this.deleteMember();
+                        var member = this.deleteClone();
                         if (member) {
                             toRemove.push(member);
                         }

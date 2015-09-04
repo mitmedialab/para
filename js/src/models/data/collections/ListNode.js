@@ -164,14 +164,24 @@ define([
       return removed;
     },
 
-    /* deleteMember
-     * callback triggered when a member is deleted by some other entity
-     */
-    deleteMember: function(target) {
-      this.stopListening(target);
-      this.removeMember(target);
-      this.computeCentroid();
+
+    deleteAllMembers: function(deleted){
+       if(!deleted){
+        deleted = [];
+      }
+      for(var i=this.members.length-1;i>=0;i--){
+        console.log('deleting member at ',i,deleted);
+        deleted.push.apply(deleted,this.members[i].deleteAllMembers());
+        if(this.members[i].get('type')==='collection'){
+          this.members[i].deleteSelf();
+          deleted.push(this.members[i]);
+        }
+        this.removeMember(this.members[i]);
+      }
+      return deleted;
     },
+
+
 
     removeMember: function(data) {
       var index = $.inArray(data, this.members);

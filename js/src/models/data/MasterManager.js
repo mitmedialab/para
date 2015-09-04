@@ -5,6 +5,7 @@
 
 define([
 	'underscore',
+	'paper',
 	'backbone',
 	'models/data/Instance',
 	'models/data/geometry/Group',
@@ -19,7 +20,7 @@ define([
 
 
 
-], function(_, Backbone, Instance, Group, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -50,7 +51,6 @@ define([
 			rootNode.open();
 			selected = rootNode.selected;
 			rootNode.set('name', 'root');
-			this.listenTo(rootNode, 'parseJSON', this.parseJSON);
 			currentNode = rootNode;
 			functionManager = new FunctionManager();
 			functionManager.selected = selected;
@@ -81,15 +81,29 @@ define([
 		},
 
 		importProjectJSON: function(json){
+			layersView.deleteAll();
+			mapView.deactivate();
 
+			var deleted_collections = collectionManager.deleteAll();
+			var deleted_instances = rootNode.deleteAllChildren([]);
+			console.log('deleted_instances',deleted_instances);
+
+			for(var i=0;i<deleted_instances.length;i++){
+				this.stopListening(deleted_instances[i]);
+			}
+			console.log('deleted_collections',deleted_collections);
+			for(var j=0;j<deleted_collections.length;j++){
+				this.stopListening(deleted_collections[j]);
+			}
+			console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
 		},
 
 		exportProjectJSON: function(json){
 			var geometry_json= rootNode.toJSON();
 			var constraint_json = [];
-			for(var i=0;i<constraints.length;i++){
+			/*for(var i=0;i<constraints.length;i++){
 				constraint_json.push(this.constraints[i].toJSON());
-			}
+			}*/
 			var list_json = collectionManager.getListJSON();
 			var project_json = {
 				geometry: geometry_json,
@@ -229,6 +243,7 @@ define([
 
 		},
 
+	
 		addObject: function(object, geom) {
 			switch (object) {
 				case 'geometry':

@@ -184,16 +184,12 @@ define([
       },
 
       deleteSelf: function() {
-        var bbox = this.get('bbox');
-        if (bbox) {
-          bbox.remove();
-          bbox = null;
-        }
         var ui = this.get('ui');
         ui.remove();
         ui = null;
         this.members.length = 0;
         this.members = null;
+        return  ListNode.prototype.deleteSelf.call(this);
 
       },
 
@@ -212,14 +208,6 @@ define([
       //callback triggered when a subproperty is modified externally 
       modified: function() {
         var constrained_props = this.getConstraintValues();
-        /*for (var i = 0; i < this.members.length; i++) {
-          if (constrained_props[i]) {
-            if (!this.isReference(this.members[i])) {
-
-              //this.members[i].setValue(constrained_props[i]);
-            }
-          }
-        }*/
         this.setNull(false);
         this.trigger('modified', this);
       },
