@@ -46,6 +46,10 @@ define([
             },
 
             setInternalConstraint: function() {
+                var constraints =[];
+                if (this.get('target').get('name') == 'group') {
+                   constraints.push.apply(constraints,this.setInternalGroupConstraint());
+                }
                 this.internalList = new ConstrainableList();
                 this.internalList.addMember(this.get('target'));
                 if (this.members.length > 1) {
@@ -64,11 +68,44 @@ define([
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
                 constraint.create(data);
-                return constraint;
+                constraints.push(constraint);
+                return constraints;
+            },
+
+            setInternalGroupConstraint: function() {
+                var member_constraints = [];
+                var target = this.get('target');
+                for (var i = 0; i < target.members.length; i++) {
+                    var relative_list = new ConstrainableList();
+                    var reference_list = new ConstrainableList();
+                    reference_list.addMember(target.members[i]);
+                    /*if (this.members.length > 1) {
+                        reference_list.addMember(this.members[this.members.length - 1].members[i]);
+                    }*/
+                    for (var j = 0; j < this.members.length; j++) {
+                        relative_list.addMember(this.members[j].members[i]);
+                    }
+                    var constraint = new Constraint();
+                    constraint.set('references', reference_list);
+                    constraint.set('relatives', relative_list);
+                    constraint.set('proxy_references', target.members[i]);
+                    constraint.set('proxy_relatives', this.members[1].members[i]);
+                    var data = [
+                        ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
+                        ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
+                        ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                        ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                        ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
+                        ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
+                    ];
+                    constraint.create(data);
+                    member_constraints.push(constraint);
+                }
+                return member_constraints;
             },
 
             addClone: function(clone) {
-                
+
                 if (this.members.length > 1) {
                     clone.setValue(this.members[this.members.length - 2].getValue());
                     this.addMember(clone, this.members.length - 1);
@@ -76,7 +113,7 @@ define([
                     clone.setValue(this.members[0].getValue());
                     this.addMember(clone, 1);
                 }
-                this.clones.splice(this.clones.length-1, 0, clone);
+                this.clones.splice(this.clones.length - 1, 0, clone);
                 this.get('clone_count').setValue(this.clones.length);
             },
 
@@ -146,11 +183,11 @@ define([
             removeMember: function(data) {
                 var target = this.get('target');
                 var index = $.inArray(data, this.members);
-                var cloneIndex =  $.inArray(data, this.clones);
-              if (cloneIndex > -1) {
-                this.clones.splice(cloneIndex, 1);
-                this.get('clone_count').setValue(this.clones.length);
-              }
+                var cloneIndex = $.inArray(data, this.clones);
+                if (cloneIndex > -1) {
+                    this.clones.splice(cloneIndex, 1);
+                    this.get('clone_count').setValue(this.clones.length);
+                }
                 if (index > -1) {
 
                     var member = this.members.splice(index, 1)[0];
@@ -209,12 +246,12 @@ define([
                         data = this.updateCountStandard();
                         break;
                 }
-               
+
 
                 for (var i = 0; i < this.members.length; i++) {
                     this.members[i].get('zIndex').setValue(i);
                 }
-                 var memberCount = {
+                var memberCount = {
                     v: this.members.length,
                     operator: 'set'
                 };

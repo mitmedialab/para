@@ -520,8 +520,10 @@ define([
 			var data = duplicator.setCount(8);
 			this.duplicatorCountModified(data, duplicator);
 			this.addListener(duplicator);
-			var constraint = duplicator.setInternalConstraint();
-			this.addConstraint(constraint);
+			var constraints = duplicator.setInternalConstraint();
+			for(var i=0;i<constraints.length;i++){
+				this.addConstraint(constraints[i]);
+			}
 			return duplicator;
 
 		},
