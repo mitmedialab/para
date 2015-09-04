@@ -815,6 +815,8 @@ define([
     calculateReferenceValues: function(ref_prop_key, ref_dimension) {
       var mode = this.get('modes')[ref_prop_key + '_' + ref_dimension];
       var reference_values = this.get('reference_values')[ref_prop_key];
+
+      //if((ref_prop_key==='fillColor' || ref_prop_key ==='strokeColor')&&
       switch (mode) {
         case 'interpolate':
           this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
@@ -832,6 +834,22 @@ define([
           break;
       }
     },
+
+    /*calculateNullReferenceValues: function(ref_prop_key, ref_dimension, reference_values){
+
+        var range = this.get('relatives').getRange();
+        for (var m = 0; m < range; m++) {
+          if (reference_values[ref_dimension][m]) {
+            reference_values[ref_dimension][m].setValue(-1);
+          } else {
+            var newVal = new PFloat(-1);
+            newVal.setNull(false);
+            reference_values[ref_dimension].push(newVal);
+          }
+        }
+      
+    },*/
+
 
     calculateReferenceValuesRandom: function(ref_prop_key, ref_dimension, reference_values) {
       var reference = this.get('references');

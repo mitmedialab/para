@@ -1194,7 +1194,7 @@ define([
 
 
 		renderStyle: function(geom) {
-			if (!this._fillColor.noColor) {
+			if (!this._fillColor.noColor && (this._fillColor.h>-1 && this._fillColor.s>-1 && this._fillColor.l>-1)) {
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
@@ -1205,7 +1205,7 @@ define([
 			} else {
 				geom.fillColor = undefined;
 			}
-			if (!this._strokeColor.noColor) {
+			if (!this._strokeColor.noColor  && (this._strokeColor.h>-1 && this._strokeColor.s>-1 && this._strokeColor.l>-1)) {
 				if (!geom.fillColor) {
 					geom.strokeColor = new paper.Color(0, 0, 0);
 				}
