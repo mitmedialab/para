@@ -43,6 +43,11 @@ define([
                 this.set('geom', geom);
                 geom.data.instance = this;
 
+                //internal constraint lists storage
+                this.group_relative = [];
+                this.group_reference = [];
+                this.internalList = new ConstrainableList();
+
             },
 
             setInternalConstraint: function() {
@@ -50,7 +55,6 @@ define([
                 if (this.get('target').get('name') == 'group') {
                    constraints.push.apply(constraints,this.setInternalGroupConstraint());
                 }
-                this.internalList = new ConstrainableList();
                 this.internalList.addMember(this.get('target'));
                 if (this.members.length > 1) {
                     this.internalList.addMember(this.members[this.members.length - 1]);
@@ -78,6 +82,8 @@ define([
                 for (var i = 0; i < target.members.length; i++) {
                     var relative_list = new ConstrainableList();
                     var reference_list = new ConstrainableList();
+                    this.group_relative.push(relative_list);
+                    this.group_reference.push(reference_list);
                     reference_list.addMember(target.members[i]);
                     /*if (this.members.length > 1) {
                         reference_list.addMember(this.members[this.members.length - 1].members[i]);
@@ -133,7 +139,13 @@ define([
 
                 }
                 var diff = this.members.length - this.indexNumbers.length;
-
+                if(clone.get('name')==='group'){
+                    for(var j=0;j<clone.members.length;j++){
+                        for(var i=0;i<this.group_relative.length; i++){
+                            this.group_relative[j].addMember(clone.members[j],index);
+                        }
+                    }
+                }
                 this.addMemberNotation();
 
             },
@@ -202,6 +214,13 @@ define([
                         this.shiftTarget();
                     }
                     return member;
+                }
+                 if(data.get('name')==='group'){
+                    for(var j=0;j<data.members.length;j++){
+                        for(var i=0;i<this.group_relative.length; i++){
+                            this.group_relative[j].removeMember(data.members[j]);
+                        }
+                    }
                 }
                 this.removeMemberNotation();
 
