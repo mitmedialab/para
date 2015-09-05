@@ -52,7 +52,6 @@ define([
         deleted = [];
       }
       for(var i=this.members.length-1;i>=0;i--){
-        console.log('deleting member at ',i,deleted);
         deleted.push.apply(deleted,this.members[i].deleteAllChildren());
         deleted.push(this.members[i].deleteSelf());
         this.removeMember(this.members[i]);
@@ -70,11 +69,9 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       for (var i = 0; i < this.members.length; i++) {
-        console.log('cloning member at', i);
         var clone = this.members[i].create();
         instance.addMember(clone);
       }
-      console.log(instance.get('memberCount').getValue());
       return instance;
     },
 

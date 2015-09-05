@@ -206,7 +206,6 @@ define([
                     deleted = [];
                 }
                 for (var i = this.members.length - 1; i >= 0; i--) {
-                    console.log('deleting member at ', i, deleted);
                     deleted.push.apply(deleted,this.members[i].deleteAllChildren());
                     deleted.push(this.deleteMember(this.members[i]));
                 }

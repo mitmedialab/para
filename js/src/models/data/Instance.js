@@ -23,13 +23,6 @@ define([
 ], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
-	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'v', 'name', 'type', 'visible', 'closed', 'order', 'id'
-	];
-
-	var constraints = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'v'
-	];
 
 	var Instance = SceneNode.extend({
 
@@ -78,12 +71,12 @@ define([
 			name: 'instance',
 			type: 'instance',
 			visible: true,
-			closed: false,
-			order: 0,
+			open: false,
 			/*==end JSON export===*/
 
 			//map of constrainable properties
 			constrain_map: {
+				constraintSelected: ['v'],
 				position: ['x', 'y'],
 				translationDelta: ['x', 'y'],
 				scaling_origin: ['x', 'y'],
@@ -94,7 +87,6 @@ define([
 				fillColor: ['r', 'g', 'b', 'a'],
 				strokeWidth: ['v'],
 				selected: ['v'],
-				constraintSelected: ['v'],
 				memberCount: ['v'],
 				pathAltered: ['v'],
 				zIndex: ['v']
@@ -243,7 +235,6 @@ define([
 					if (property) {
 						this.listenTo(property, 'modified', this.modified);
 					}
-
 				}
 			}
 
@@ -259,9 +250,7 @@ define([
 				deleted = [];
 			}
 			for (var i = this.children.length - 1; i >= 0; i--) {
-				console.log('deleting children',this.children.length);
 				if (this.children[i].get('name') !== 'point') {
-					console.log('deleting children at ', i, this.children[i].get('name'));
 					deleted.push.apply(deleted, this.children[i].deleteAllChildren());
 					deleted.push(this.children[i].deleteSelf());
 				}
@@ -497,7 +486,7 @@ define([
 				this.get('bbox').remove();
 				this.set('bbox', null);
 			}
-			var geom = this.get('geom');
+			var geom = this.get('normal_geom');
 			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 
 			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
@@ -709,26 +698,44 @@ define([
 
 		toJSON: function() {
 			var data = {};
-			var target = this;
-			_.each(exporting_properties, function(property) {
-				if (_.contains(constraints, property)) {
-					data[property] = target.get(property).toJSON();
-
-				} else {
-
-					data[property] = target.get(property);
+			var constrainMap = this.get('constrain_map');
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					data[propertyName] = this.get(propertyName).toJSON();
 				}
-			});
+			}
+			data.name = this.get('name');
+			data.type = this.get('type');
+			data.id = this.get('id');
+			data.visible = this.get('visible');
+			data.open = this.get('open');
+
 			data.children = [];
 			for (var i = 0; i < this.children.length; i++) {
 				data.children.push(this.children[i].toJSON());
 			}
+
 			return data;
 
 		},
 
 		parseJSON: function(data) {
-			this.set(data.toJSON);
+			var constrainMap = this.get('constrain_map');
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					this.get(propertyName).setValue(data[propertyName]);
+				}
+			}
+			this.set('name', data.name);
+			this.set('type', data.type);
+			this.set('id', data.id);
+			this.set('visible', data.visible);
+			this.set('open', data.open);
+
+			var children = data.children;
+			/*for (var i = 0; i < this.children.length; i++) {
+				data.children.push(this.children[i].toJSON());
+			}*/
 		},
 
 
@@ -1055,6 +1062,7 @@ define([
 
 		select: function(segments) {
 			this.get('selected').setValue(true);
+			console.log('selected value',this.get('selected').getValue());
 			this.setSelectionForInheritors(true, null, null, 1);
 		},
 
@@ -1257,7 +1265,6 @@ define([
 			geom.visible = this._visible;
 			var zIndex = this.get('zIndex').getValue();
 			if (geom.index != zIndex) {
-				console.log('geom id', this.get('id'));
 				geom.parent.insertChild(zIndex, geom);
 			}
 		},
@@ -1267,6 +1274,7 @@ define([
 		renderSelection: function(geom) {
 			var selected = this.get('selected').getValue();
 			var constraint_selected = this.get('constraintSelected').getValue();
+			console.log('constraint_selected',constraint_selected);
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
 			if (constraint_selected) {
@@ -1290,6 +1298,7 @@ define([
 				bbox.visible = false;
 				geom.selected = false;
 			}
+			console.log('bbox',bbox.bounds,bbox.visible,bbox.position);
 		},
 
 		clearBoundingBoxes: function() {

@@ -34,8 +34,15 @@ define([
 			/* setValue
 			 * sets the value of the property
 			 */
-			setValue: function(v) {
-				this.v.setValue(v);
+			setValue: function(data) {
+				console.log('setting value for pstring',data);
+				if(data.hasOwnProperty('v')){
+					this.v.setValue(data.v);
+				}
+				else{
+					this.v.setValue(data);
+				}
+				console.log('new value',this.getValue());
 				this.setNull(false);
 			},
 
@@ -67,6 +74,14 @@ define([
 				console.log("[ALERT], trying to add string value");
 				//does nothing
 			},
+
+
+			toJSON: function() {
+				var data = {v:this.getValue()};
+				data.type = 'PString';
+				return data;
+			},
+
 
 		});
 

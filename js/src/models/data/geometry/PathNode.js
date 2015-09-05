@@ -62,6 +62,26 @@ define([
       return instance;
     },
 
+    toJSON: function() {
+           console.log('calling to JSON for path',this.get('bbox').bounds);
+
+      var data =GeometryNode.prototype.toJSON.call(this);
+      this.get('normal_geom').data.instance = null;
+      data.geom = this.get('normal_geom').exportJSON(false);
+      this.get('normal_geom').data.instance = this;
+      return data;
+
+    },
+
+    parseJSON: function(data) {
+     GeometryNode.prototype.parseJSON.call(this,data);
+     var geom = new paper.Path();
+     geom.importJSON(data.geom);
+     this.changeGeomInheritance(geom);
+     console.log('calling parse JSON for path',this.get('bbox').bounds);
+    },
+
+
     /*normalizeGeometry
      * generates a set of transformation data based on the matrix
      * then inverts the matrix and normalizes the path based on these values
@@ -137,10 +157,7 @@ define([
 
       path.visible = false;
       path.selected = false;
-      path.data.nodetype = this.get('name');
-      path.data.instance = this;
-      path.data.geom = true;
-     this.changeGeomInheritance(path);
+      this.changeGeomInheritance(path);
 
       this.setValue(data);
 

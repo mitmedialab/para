@@ -166,7 +166,6 @@ define([
 		positionConstraintIcons: function(checkVisible) {
 			this.toggleConstraintsForAllNodes();
 			if (currentRef && currentRel) {
-				console.log('currentRef=', currentRef);
 				var ref = shapeTree.getNodeByKey(currentRef);
 				var rel = shapeTree.getNodeByKey(currentRel);
 
@@ -441,13 +440,11 @@ define([
 				key: shape.id
 			};
 			var parentNode;
-			console.log('parentId', parentId);
 			if (parentId) {
 				parentNode = shapeTree.getNodeByKey(parentId);
 			} else {
 				parentNode = shapeRoot;
 			}
-			console.log('parent node', parentNode);
 			var node;
 			if (parentNode.children) {
 				node = parentNode.children.length > 0 ? parentNode.addChildren(s, 0) : parentNode.addChildren(s);
@@ -465,7 +462,6 @@ define([
 		},
 
 		removeShape: function(pId) {
-			console.log('remove node', pId);
 			var node = shapeTree.getNodeByKey(pId);
 			if (node) {
 				node.remove();
@@ -485,7 +481,6 @@ define([
 		},
 
 		addChild: function(shape, pId) {
-			console.log('adding child with id', shape.id);
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var parentNode = shapeTree.getNodeByKey(pId);
@@ -500,7 +495,6 @@ define([
 				} else {
 					node = parentNode.addChildren(s);
 				}
-				console.log('node added', node.key);
 
 				this.selectNode(node);
 

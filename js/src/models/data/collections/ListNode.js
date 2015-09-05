@@ -170,7 +170,6 @@ define([
         deleted = [];
       }
       for(var i=this.members.length-1;i>=0;i--){
-        console.log('deleting member at ',i,deleted);
         deleted.push.apply(deleted,this.members[i].deleteAllMembers());
         if(this.members[i].get('type')==='collection'){
           this.members[i].deleteSelf();
@@ -378,10 +377,8 @@ define([
           var shared_members = toggledLists.filter(function(item) {
             return c_members.indexOf(item) > -1;
           });
-          console.log('shared members',shared_members);
           if (shared_members.length > 0) {
             for (var j = 0; j < this.members.length; j++) {
-              console.log('shared members is member being checked?',j,shared_members.indexOf(this.members[j]));
               if (shared_members.indexOf(this.members[j]) === -1) {
                 this.members[j].toggleClosed(this.members[j]);
               }

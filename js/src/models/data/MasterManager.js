@@ -9,6 +9,10 @@ define([
 	'backbone',
 	'models/data/Instance',
 	'models/data/geometry/Group',
+	'models/data/geometry/PathNode',
+	'models/data/geometry/RectNode',
+	'models/data/geometry/EllipseNode',
+	'models/data/geometry/PolygonNode',
 	'models/data/functions/FunctionNode',
 	'models/data/functions/FunctionManager',
 	'models/data/collections/CollectionManager',
@@ -20,7 +24,7 @@ define([
 
 
 
-], function(_, paper, Backbone, Instance, Group, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -80,26 +84,67 @@ define([
 
 		},
 
-		importProjectJSON: function(json){
+		importProjectJSON: function(json) {
+			this.deleteAll();
+			var lists = json.lists;
+			var geometry = json.geometry.children;
+			var constraints = json.constraints;
+
+			for (var i = 0; i < geometry.length; i++) {
+				var geom;
+				switch (geometry[i].name) {
+
+					case 'duplicator':
+						break;
+					case 'group':
+						break;
+					default:
+						switch (geometry[i].name) {
+							case 'path':
+								geom = new PathNode();
+								break;
+							case 'rectangle':
+								geom = new RectNode();
+								break;
+							case 'ellipse':
+								geom = new EllipseNode();
+								break;
+							case 'polygon':
+								geom = new PolygonNode();
+								break;
+
+						}
+						geom.parseJSON(geometry[i]);
+						console.log('new geom',geom,geom.nodeParent,geom.getValue(),geom.visible);
+						this.addShape(geom,true);
+						break;
+
+				}
+			}
+			 paper.view.draw();
+
+		},
+
+
+		deleteAll: function() {
+			this.deselectAllShapes();
 			layersView.deleteAll();
 			mapView.deactivate();
 
 			var deleted_collections = collectionManager.deleteAll();
 			var deleted_instances = rootNode.deleteAllChildren([]);
-			console.log('deleted_instances',deleted_instances);
 
-			for(var i=0;i<deleted_instances.length;i++){
+			for (var i = 0; i < deleted_instances.length; i++) {
 				this.stopListening(deleted_instances[i]);
 			}
-			console.log('deleted_collections',deleted_collections);
-			for(var j=0;j<deleted_collections.length;j++){
+			for (var j = 0; j < deleted_collections.length; j++) {
 				this.stopListening(deleted_collections[j]);
 			}
-			console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
+			//console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
 		},
 
-		exportProjectJSON: function(json){
-			var geometry_json= rootNode.toJSON();
+			exportProjectJSON: function(json) {
+			var geometry_json = rootNode.toJSON();
 			var constraint_json = [];
 			/*for(var i=0;i<constraints.length;i++){
 				constraint_json.push(this.constraints[i].toJSON());
@@ -225,9 +270,9 @@ define([
 			target.compile();
 			target.render();
 			this.listenTo(target, 'modified', this.modified);
-			if(recurse){
-				for (var i=0;i<target.children.length;i++){
-					this.addListener(target.members[i],recurse);
+			if (recurse) {
+				for (var i = 0; i < target.children.length; i++) {
+					this.addListener(target.members[i], recurse);
 				}
 			}
 
@@ -235,15 +280,15 @@ define([
 
 		removeListener: function(target, recurse) {
 			this.stopListening(target);
-			if(recurse){
-				for (var i=0;i<target.children.length;i++){
-					this.removeListener(target.members[i],recurse);
+			if (recurse) {
+				for (var i = 0; i < target.children.length; i++) {
+					this.removeListener(target.members[i], recurse);
 				}
 			}
 
 		},
 
-	
+
 		addObject: function(object, geom) {
 			switch (object) {
 				case 'geometry':
@@ -251,12 +296,6 @@ define([
 					break;
 				case 'instance':
 					this.addCopy(selected);
-					break;
-				case 'function':
-					this.addFunction(collectionManager.getLists());
-					break;
-				case 'param':
-					this.createParams();
 					break;
 				case 'list':
 					var list = collectionManager.addList(selected);
@@ -450,16 +489,18 @@ define([
 			}
 		},
 
-		addShape: function(shape) {
+		addShape: function(shape,noSelect) {
 
 			if (!shape.nodeParent) {
 				currentNode.addChildNode(shape);
 			}
-			collectionManager.addToOpenLists(shape);
+			//collectionManager.addToOpenLists(shape);
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				layersView.addShape(shape.toJSON());
 			}
-			this.selectShape(shape);
+			if(!noSelect){
+				this.selectShape(shape);
+			}
 
 			this.addListener(shape);
 
@@ -494,7 +535,7 @@ define([
 			}
 		},
 
-		addCopy: function(selected){
+		addCopy: function(selected) {
 			for (var i = 0; i < selected.length; i++) {
 				var copy = selected[i].create();
 				rootNode.addChildNode(copy);
@@ -502,15 +543,15 @@ define([
 				this.addListener(copy);
 				this.selectShape(copy);
 				this.deselectShape(selected[i]);
-				this.addListener(copy,true);
-				if(copy.get('type')=='collection'|| copy.get('name')=='group' || copy.get('name')=='duplicator'){
+				this.addListener(copy, true);
+				if (copy.get('type') == 'collection' || copy.get('name') == 'group' || copy.get('name') == 'duplicator') {
 					collectionManager.addListCopy(copy);
 				}
 
 			}
 		},
 
-		addGroup: function(selected){
+		addGroup: function(selected) {
 			var group = collectionManager.addGroup(selected);
 			for (var i = 0; i < selected.length; i++) {
 				layersView.removeShape(selected[i].get('id'));
@@ -536,7 +577,7 @@ define([
 			this.duplicatorCountModified(data, duplicator);
 			this.addListener(duplicator);
 			var constraints = duplicator.setInternalConstraint();
-			for(var i=0;i<constraints.length;i++){
+			for (var i = 0; i < constraints.length; i++) {
 				this.addConstraint(constraints[i]);
 			}
 			return duplicator;
@@ -547,13 +588,13 @@ define([
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
-					this.removeListener(data.toRemove[i],true);
+					this.removeListener(data.toRemove[i], true);
 					layersView.removeShape(data.toRemove[i].get('id'));
 				}
 			}
 			if (data.toAdd) {
 				for (var j = 0; j < data.toAdd.length; j++) {
-					this.addListener(data.toAdd[j],true);
+					this.addListener(data.toAdd[j], true);
 					layersView.addShape(data.toAdd[j].toJSON(), duplicator.get('id'));
 				}
 			}
@@ -846,7 +887,7 @@ define([
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function() {
-			var data = collectionManager.toggleOpen(selected[selected.length-1]);
+			var data = collectionManager.toggleOpen(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
 				this.selectShape(data.toSelect);
@@ -857,7 +898,7 @@ define([
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function() {
-			var data = collectionManager.toggleClosed(selected[selected.length-1]);
+			var data = collectionManager.toggleClosed(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
 				this.selectShape(data.toSelect);
