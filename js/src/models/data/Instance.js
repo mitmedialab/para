@@ -702,6 +702,7 @@ define([
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
+					console.log('property_name',propertyName);
 					data[propertyName] = this.get(propertyName).toJSON();
 				}
 			}

@@ -16,6 +16,8 @@ define([
 	'models/data/functions/FunctionNode',
 	'models/data/functions/FunctionManager',
 	'models/data/collections/CollectionManager',
+	'models/data/collections/Duplicator',
+
 	'views/LayersView',
 	'views/CollectionView',
 	'views/MapView',
@@ -24,7 +26,7 @@ define([
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -95,11 +97,14 @@ define([
 				switch (geometry[i].name) {
 
 					case 'duplicator':
+						var duplicator = new Duplicator();
+						duplicator.parseJSON(geometry[i]);
+						this.addDuplicator(duplicator);
 						break;
 					case 'group':
 						var group = new Group();
 						group.parseJSON(geometry[i]);
-						this.addGroup(null,group);
+						this.addGroup(null, group);
 						break;
 					default:
 						switch (geometry[i].name) {
@@ -314,7 +319,7 @@ define([
 					break;
 				case 'duplicator':
 					if (selected[0]) {
-						this.addDuplicator(selected[0]);
+						this.initializeDuplicator(selected[0]);
 
 					}
 					break;
@@ -555,15 +560,14 @@ define([
 		},
 
 		addGroup: function(selected, group) {
-			group = collectionManager.addGroup(selected,group);
+			group = collectionManager.addGroup(selected, group);
 			if (selected) {
-				
+
 				for (var i = 0; i < selected.length; i++) {
 					layersView.removeShape(selected[i].get('id'));
 				}
-			}
-			else{
-				for(var j=0;j<group.members.length;j++){
+			} else {
+				for (var j = 0; j < group.members.length; j++) {
 					this.addListener(group.members[j]);
 				}
 			}
@@ -576,7 +580,20 @@ define([
 			return group;
 		},
 
-		addDuplicator: function(object, open) {
+		//called when duplicator is loaded in via JSON
+		addDuplicator: function(duplicator) {
+			this.deselectAllShapes();
+			currentNode.addChildNode(duplicator);
+			collectionManager.addDuplicator(null,duplicator);
+
+			layersView.addShape(duplicator.toJSON());
+			this.addListener(duplicator);
+			for (var j = 0; j < duplicator.members.length; j++) {
+				this.addListener(duplicator.members[j]);
+			}
+		},
+
+		initializeDuplicator: function(object, open) {
 			this.deselectAllShapes();
 			var index = object.index;
 			object.nodeParent.removeChildNode(object);

@@ -235,10 +235,12 @@ define([
 		},
 
 
-		addDuplicator: function(object) {
-			var duplicator = new Duplicator();
+		addDuplicator: function(object,duplicator) {
+			if(object){
+			duplicator = new Duplicator();
 
 			duplicator.setTarget(object);
+			}
 
 			if (!this.addToOpenLists(duplicator)) {
 				for (var i = lists.length - 1; i >= 0; i--) {

@@ -21,6 +21,12 @@ define([
 
 
 ], function(_, paper, Duplicator, Instance, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
+  var init_lookup=  {
+        'path': PathNode,
+        'ellipse': EllipseNode,
+        'polygon': PolygonNode,
+        'Rectangle': RectNode,
+      };
   var Group = Instance.extend({
 
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -29,12 +35,7 @@ define([
       type: 'geometry',
       points: null,
       open: false,
-      init_lookup: {
-        'path': PathNode,
-        'ellipse': EllipseNode,
-        'polygon': PolygonNode,
-        'Rectangle': RectNode,
-      }
+      
     }),
 
     initialize: function() {
@@ -60,13 +61,19 @@ define([
       Instance.prototype.parseJSON.call(this,data);
       for(var i=0;i<data.children.length; i++){
         var name = data.children[i].name;
-        var target_class = this.get('init_lookup')[name];
-        var child = new target_class();
-        console.log('target_class',target_class,'child',child);
+        var child = this.getTargetClass(name);
         child.parseJSON(data.children[i]);
         this.addMember(child);
       }
       return this;
+    },
+
+    /*returns new child instance based on string name
+    */
+    getTargetClass: function(name){
+      var target_class = init_lookup[name];
+      var child = new target_class();
+      return child;
     },
 
    /*deleteAllChildren
