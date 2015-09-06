@@ -18,7 +18,7 @@ define([
 	'utils/PProperty',
 	'utils/PConstraint',
 	'utils/TrigFunc',
-	'utils/ColorUtils',
+	'utils/ColorUtils'
 
 ], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
@@ -93,6 +93,7 @@ define([
 					//inheritors: []
 			},
 
+			
 			dimension_num: 6,
 
 			reset: false,

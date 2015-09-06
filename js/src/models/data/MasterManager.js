@@ -97,6 +97,9 @@ define([
 					case 'duplicator':
 						break;
 					case 'group':
+						var group = new Group();
+						group.parseJSON(geometry[i]);
+						this.addGroup(null,group);
 						break;
 					default:
 						switch (geometry[i].name) {
@@ -115,13 +118,13 @@ define([
 
 						}
 						geom.parseJSON(geometry[i]);
-						console.log('new geom',geom,geom.nodeParent,geom.getValue(),geom.visible);
-						this.addShape(geom,true);
+						console.log('new geom', geom, geom.nodeParent, geom.getValue(), geom.visible);
+						this.addShape(geom, true);
 						break;
 
 				}
 			}
-			 paper.view.draw();
+			paper.view.draw();
 
 		},
 
@@ -143,7 +146,7 @@ define([
 			//console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
 		},
 
-			exportProjectJSON: function(json) {
+		exportProjectJSON: function(json) {
 			var geometry_json = rootNode.toJSON();
 			var constraint_json = [];
 			/*for(var i=0;i<constraints.length;i++){
@@ -489,7 +492,7 @@ define([
 			}
 		},
 
-		addShape: function(shape,noSelect) {
+		addShape: function(shape, noSelect) {
 
 			if (!shape.nodeParent) {
 				currentNode.addChildNode(shape);
@@ -498,7 +501,7 @@ define([
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				layersView.addShape(shape.toJSON());
 			}
-			if(!noSelect){
+			if (!noSelect) {
 				this.selectShape(shape);
 			}
 
@@ -551,11 +554,20 @@ define([
 			}
 		},
 
-		addGroup: function(selected) {
-			var group = collectionManager.addGroup(selected);
-			for (var i = 0; i < selected.length; i++) {
-				layersView.removeShape(selected[i].get('id'));
+		addGroup: function(selected, group) {
+			group = collectionManager.addGroup(selected,group);
+			if (selected) {
+				
+				for (var i = 0; i < selected.length; i++) {
+					layersView.removeShape(selected[i].get('id'));
+				}
 			}
+			else{
+				for(var j=0;j<group.members.length;j++){
+					this.addListener(group.members[j]);
+				}
+			}
+
 			layersView.addShape(group.toJSON());
 			this.deselectAllShapes();
 			currentNode.addChildNode(group);

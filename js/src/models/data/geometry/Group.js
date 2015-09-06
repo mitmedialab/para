@@ -10,12 +10,17 @@ define([
   'paper',
   'models/data/collections/Duplicator',
   'models/data/Instance',
+ 'models/data/geometry/PathNode',
+  'models/data/geometry/RectNode',
+  'models/data/geometry/EllipseNode',
+  'models/data/geometry/PolygonNode',
   'utils/TrigFunc',
   'utils/PFloat',
   'utils/PPoint',
 
 
-], function(_, paper, Duplicator, Instance, TrigFunc, PFloat, PPoint) {
+
+], function(_, paper, Duplicator, Instance, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
   var Group = Instance.extend({
 
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -24,6 +29,12 @@ define([
       type: 'geometry',
       points: null,
       open: false,
+      init_lookup: {
+        'path': PathNode,
+        'ellipse': EllipseNode,
+        'polygon': PolygonNode,
+        'Rectangle': RectNode,
+      }
     }),
 
     initialize: function() {
@@ -42,6 +53,20 @@ define([
       this.set('geom', geom);
       geom.data.instance = this;
 
+    },
+
+    parseJSON: function(data) {
+      this.deleteAllChildren();
+      Instance.prototype.parseJSON.call(this,data);
+      for(var i=0;i<data.children.length; i++){
+        var name = data.children[i].name;
+        var target_class = this.get('init_lookup')[name];
+        var child = new target_class();
+        console.log('target_class',target_class,'child',child);
+        child.parseJSON(data.children[i]);
+        this.addMember(child);
+      }
+      return this;
     },
 
    /*deleteAllChildren

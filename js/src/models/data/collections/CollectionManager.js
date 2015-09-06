@@ -252,11 +252,13 @@ define([
 			return duplicator;
 		},
 
-		addGroup: function(selected) {
-			var group = new Group();
+		addGroup: function(selected, group) {
+			if (selected) {
+				group = new Group();
 
-			for (var j = 0; j < selected.length; j++) {
-				group.addMember(selected[j]);
+				for (var j = 0; j < selected.length; j++) {
+					group.addMember(selected[j]);
+				}
 			}
 
 			this.addToOpenLists(group);
@@ -291,11 +293,11 @@ define([
 		},
 
 		toggleOpen: function(item) {
-			if (item.get('name') ==='group') {
+			if (item.get('name') === 'group') {
 				console.log('toggling group open');
 				this.closeAllGroups();
 				item.toggleOpen(item);
-				console.log('item open',item,item.get('open'),item.get('name'));
+				console.log('item open', item, item.get('open'), item.get('name'));
 				return {
 					toSelect: item.members,
 					toRemove: [item]
@@ -309,7 +311,7 @@ define([
 			if (item.nodeParent && item.nodeParent.get('name') === 'group' && item.nodeParent.get('open')) {
 				console.log('toggling group closed');
 				item.nodeParent.toggleClosed(item);
-				return{
+				return {
 					toSelect: [item.nodeParent],
 					toRemove: [item]
 				};
@@ -329,8 +331,7 @@ define([
 					if (r) {
 						openedItems = openedItems.concat(r);
 						openedLists.push(lists[i]);
-					}
-					else{
+					} else {
 						lists[i].toggleClosed(lists[i]);
 					}
 
@@ -395,16 +396,16 @@ define([
 		},
 
 
-		deleteAll: function(){
+		deleteAll: function() {
 			var deleted = [];
-			for(var i=0;i<lists.length;i++){
-				if(lists[i].get('type')==='collection'){
-					deleted.push.apply(deleted,lists[i].deleteAllMembers());
+			for (var i = 0; i < lists.length; i++) {
+				if (lists[i].get('type') === 'collection') {
+					deleted.push.apply(deleted, lists[i].deleteAllMembers());
 					deleted.push(lists[i].deleteSelf());
 				}
 			}
-			lists.length=0;
-			groups.length=0;
+			lists.length = 0;
+			groups.length = 0;
 
 			return deleted;
 		}
