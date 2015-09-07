@@ -123,7 +123,6 @@ define([
 
 						}
 						geom.parseJSON(geometry[i]);
-						console.log('new geom', geom, geom.nodeParent, geom.getValue(), geom.visible);
 						this.addShape(geom, true);
 						break;
 
@@ -676,6 +675,12 @@ define([
 			if (movedShape && relativeShape) {
 				switch (mode) {
 					case 'over':
+						if(movedShape.nodeParent = relativeShape){
+							return false;
+						}
+						if(relativeShape.get('name')==='duplicator'){
+							return false;
+						}
 						if(relativeShape.get('name')==='group'){
 							relativeShape.addMember(movedShape);
 							layersView.removeChildren(relativeShape.get('id'));
@@ -688,8 +693,22 @@ define([
 					default:
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
-							parent.removeChildNode(movedShape);
-							relativeShape.getParentNode.addChildNode(movedShape);
+							console.log('parent name:',parent.get('name'));
+							if(parent.get('name')==='group'){
+								parent.removeMember(movedShape);
+							}
+							else if(parent.get('name')==='duplicator'){
+								var success = parent.removeMember(movedShape,true);
+								if(!success){
+									return false
+								}
+
+							}
+							console.log('movedShape',movedShape);
+
+							currentNode.addChildNode(movedShape);
+							this.modified(movedShape);
+
 						}
 						switch (mode) {
 							case 'after':
@@ -699,11 +718,10 @@ define([
 								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
 								break;
 						}
-
-
 						break;
 				}
 			}
+			return true;
 		},
 
 		selectShape: function(data, segments) {

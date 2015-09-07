@@ -101,10 +101,8 @@ define([
 				}
 			}
 			var project_json = this.model.exportProjectJSON();
-			console.log('project_json=', project_json);
 			var data = JSON.stringify(project_json);
 			localStorage.setItem(currentName, data);
-			console.log('saved-data', JSON.parse(localStorage.getItem(currentName)));
 			return project_json;
 
 		},
@@ -127,7 +125,6 @@ define([
 
 		loadLocal: function() {
 			var filename = $('#fileselect option:selected').val();
-			console.log('filename =',filename);
 			this.load(filename);
 			$('#text-filename').val(filename);
 		},
@@ -139,12 +136,10 @@ define([
 		},
 
 		exportSVG: function() {
-			console.log('export svg');
 
 		},
 
 		importSVG: function() {
-			console.log('import svg');
 
 		},
 
@@ -152,7 +147,6 @@ define([
 			var file = event.target.files[0];
 
 			this.listenToOnce(this, 'loadComplete', function(result) {
-				console.log('upload file', result);
 
 
 			});

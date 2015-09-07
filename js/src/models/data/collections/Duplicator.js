@@ -56,7 +56,6 @@ define([
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
                 var secondary_index = this.members.indexOf(this.internalList.members[1]);
-                console.log('secondary index=',secondary_index);    
                 return data;
             },
 
@@ -64,11 +63,9 @@ define([
             parseJSON: function(data) {
                 Instance.prototype.parseJSON.call(this, data);
                 var target_index = data.target_index;
-                console.log('target index=',target_index);
                 var target_data = data.children[target_index];
                 var target = this.getTargetClass(target_data.name);
                 target.parseJSON(target_data);
-                console.log('target = ',target, target.get('geom'));
                 this.setTarget(target);
 
                 for (var i = 0; i < data.children.length; i++) {
@@ -76,7 +73,6 @@ define([
                         var name = data.children[i].name;
                         var child = this.getTargetClass(name);
                         child.parseJSON(data.children[i]);
-                        console.log('adding non reference member at',i);
                         this.addMember(child, i);
                     }
                 }
@@ -185,7 +181,6 @@ define([
             addMember: function(member, index) {
 
                 if (index) {
-                    console.log('target index',index,'length',this.members.length);
                     this.members.splice(index, 0, member);
                     this.insertChild(index,member);
                     this.get('geom').insertChild(index,member.get('geom'));
@@ -288,20 +283,21 @@ define([
             },
 
 
-            removeMember: function(data) {
+            removeMember: function(data, updateCount) {
                 var target = this.get('target');
+                if (this.internalList.hasMember(data,true,this)) {
+                       return false;
+                }
                 var index = $.inArray(data, this.members);
+                var member;
+                
                 if (index > -1) {
 
-                    var member = this.members.splice(index, 1)[0];
+                    member = this.members.splice(index, 1)[0];
                     var childIndex = member.get('geom').index;
                     this.get('geom').removeChildren(childIndex, childIndex + 1);
                     this.removeChildNode(member);
-
-                    if (member === target) {
-                        this.shiftTarget(0);
-                    }
-                    return member;
+                    
                 }
                 if (data.get('name') === 'group') {
                     for (var j = 0; j < data.members.length; j++) {
@@ -311,18 +307,31 @@ define([
                     }
                 }
                 this.removeMemberNotation();
+                    console.log('updating member count',updateCount);
 
+                if(updateCount){
+                    for (var i = 0; i < this.members.length; i++) {
+                        this.members[i].get('zIndex').setValue(i);
+                    }
+                    this.get('memberCount').setValue(this.members.length);
+                }
+                return member;
             },
 
            shiftTarget: function(index) {
-               
+                var old_target = this.get('target');
+
                 var newTarget = this.members[index];
                 this.set('target', newTarget);
                 for (var i = 0; i < this.members.length; i++) {
                     if(i!=index){
-                        this.members[i].setPrototype(newTarget);
-                        }
+                        this.members[i].changeGeomInheritance(newTarget.getShapeClone(true));
+                    }
                 }
+                this.internalList.addMember(this.get('target'),0);
+                //this.internalList.removeMember(this.get('target'));
+
+                console.log('new target',this.get('target'),this.internalList.members);
 
             },
 
@@ -357,7 +366,6 @@ define([
                 var count = this.get('count').getValue();
                 var range = this.getRange();
                 var diff = count - range;
-                console.log('diff =',diff,count,range);
                 var target = this.get('target');
 
                 var toRemove = [];

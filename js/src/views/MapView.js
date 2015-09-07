@@ -233,7 +233,6 @@ define([
 
 
 			current_index = $('#relative_index').val() - 1;
-			console.log('current_index=', current_index);
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
 			var exempt = constraint.get('exempt_indicies')[propName][subpropName][current_index].getValue();
@@ -285,9 +284,7 @@ define([
 		},
 
 		changeMapDefault: function() {
-			console.log('change map defaults');
 			var value = $('#map-defaults').val();
-			console.log('value', value);
 			var modes = constraint.get('modes');
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;

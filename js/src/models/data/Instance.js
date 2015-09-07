@@ -93,7 +93,7 @@ define([
 					//inheritors: []
 			},
 
-			
+
 			dimension_num: 6,
 
 			reset: false,
@@ -386,7 +386,13 @@ define([
 		},
 
 		addChildNode: function(node) {
+
 			SceneNode.prototype.addChildNode.call(this, node);
+			if (node.get('geom')) {
+				if (!node.get('geom').parent) {
+					paper.project.activeLayer.addChild(node.get('geom'));
+				}
+			}
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
@@ -702,7 +708,6 @@ define([
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
-					console.log('property_name',propertyName);
 					data[propertyName] = this.get(propertyName).toJSON();
 				}
 			}
@@ -711,7 +716,7 @@ define([
 			data.id = this.get('id');
 			data.visible = this.get('visible');
 			data.open = this.get('open');
-			
+
 			data.children = [];
 			for (var i = 0; i < this.children.length; i++) {
 				data.children.push(this.children[i].toJSON());
@@ -1064,7 +1069,6 @@ define([
 
 		select: function(segments) {
 			this.get('selected').setValue(true);
-			console.log('selected value',this.get('selected').getValue());
 			this.setSelectionForInheritors(true, null, null, 1);
 		},
 
@@ -1276,7 +1280,6 @@ define([
 		renderSelection: function(geom) {
 			var selected = this.get('selected').getValue();
 			var constraint_selected = this.get('constraintSelected').getValue();
-			console.log('constraint_selected',constraint_selected);
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
 			if (constraint_selected) {
@@ -1300,7 +1303,6 @@ define([
 				bbox.visible = false;
 				geom.selected = false;
 			}
-			console.log('bbox',bbox.bounds,bbox.visible,bbox.position);
 		},
 
 		clearBoundingBoxes: function() {

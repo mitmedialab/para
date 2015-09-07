@@ -475,7 +475,6 @@ define([
           this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
 
         }
-        console.log('expressions',expressions,'offsets',offsets,relative_range);
 
         if (!setOnInstance) {
           if (relative.get(rel_prop_key).get('dimension_num') == 1) {
@@ -679,7 +678,6 @@ define([
           var exempt_indicies = self.get('exempt_indicies');
           var list = [];
           var relative_range = relative.getRange();
-          console.log('calling constraint function on', relative.get('id'));
 
           for (var z = 0; z < relative_range; z++) {
             list.push({});
@@ -962,7 +960,6 @@ define([
           var increment = diff / range;
           for (var m = 0; m < range; m++) {
             var y = members[0].get(ref_prop_key)[ref_dimension].getValue() + m * increment;
-            //console.log('y val', y, members[1].get(ref_prop_key)[ref_dimension].getValue());
             if (reference_values[ref_dimension][m]) {
               reference_values[ref_dimension][m].setValue(y);
             } else {

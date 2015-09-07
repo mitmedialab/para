@@ -63,7 +63,6 @@ define([
     },
 
     toJSON: function() {
-           console.log('calling to JSON for path',this.get('bbox').bounds);
 
       var data =GeometryNode.prototype.toJSON.call(this);
       this.get('normal_geom').data.instance = null;
@@ -78,7 +77,6 @@ define([
      var geom = new paper.Path();
      geom.importJSON(data.geom);
      this.changeGeomInheritance(geom);
-     console.log('calling parse JSON for path',this.get('bbox').bounds);
     },
 
 

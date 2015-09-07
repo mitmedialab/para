@@ -37,13 +37,15 @@ define([
 					focusOnClick: true,
 					preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
 					preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+        	
 					dragStart: function(node, data) {
 						return true;
 					},
 					dragEnter: function(node, data) {
-						return true;
+						return view.checkValidDrop(data.otherNode, node, data.hitMode);
 					},
 					dragDrop: function(node, data) {
+						console.log('drop completed')
 						data.otherNode.moveTo(node, data.hitMode);
 						view.dropCompleted(data.otherNode, node, data.hitMode);
 					}
@@ -313,8 +315,13 @@ define([
 
 		},
 
+		checkValidDrop: function(nodeA, nodeB, hitMode) {
+			var value = this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
+			console.log('valid drop?',value);
+			return value;
+		},
+
 		dropCompleted: function(nodeA, nodeB, hitMode) {
-			this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
 			var stored = nodeA.data.zIndex;
 			nodeA.data.zIndex = nodeB.data.zIndex;
 			nodeB.data.zIndex= stored;
@@ -489,14 +496,9 @@ define([
 		sortChildren: function(pId) {
 			var node = shapeTree.getNodeByKey(pId);
 			node.sortChildren(function(a, b) {
-				console.log('a', a.data.zIndex, 'b', b.data.zIndex);
 				if (a.data.zIndex < b.data.zIndex) {
-					console.log('returning -1');
-
 					return 1;
 				} else {
-					console.log('returning 1');
-
 					return -1;
 				}
 			});

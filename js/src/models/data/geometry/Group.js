@@ -134,10 +134,10 @@ define([
     removeMember: function(data) {
       this.toggleOpen();
       var index = $.inArray(data, this.members);
-
+      var member
       if (index > -1) {
 
-        var member = this.members.splice(index, 1)[0];
+        member = this.members.splice(index, 1)[0];
         var childIndex = member.get('geom').index;
         this.get('geom').removeChildren(childIndex, childIndex + 1);
         this.removeChildNode(member);
@@ -147,10 +147,9 @@ define([
         };
         this.get('memberCount').setValue(memberCount);
 
-        return member;
       }
       this.toggleClosed();
-
+      return member;
 
     },
 
