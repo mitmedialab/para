@@ -243,7 +243,7 @@ define([
 				$('#exempt_button').removeClass('active');
 			}
 
-			$('#relative_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].rel_vals[current_index].getValue() - properties[current_prop].subproperties[current_subprop].ref_vals[current_index].getValue()));
+			$('#relative_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].rel_vals[current_index].getValue() - properties[current_prop].subproperties[current_subprop].ref_vals.vals[current_index].getValue()));
 			//this.listenTo(properties[current_prop].subproperties[current_subprop].ref_vals[current_index], 'modified', this.changeRefVal);
 			//this.listenTo(properties[current_prop].subproperties[current_subprop].rel_vals[current_index], 'modified', this.changeRelVal);
 
@@ -279,7 +279,7 @@ define([
 
 		changeRelVal: function() {
 			var index = current_index;
-			$('#reference_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].ref_vals[index].getValue()));
+			$('#reference_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].ref_vals.vals[index].getValue()));
 
 		},
 

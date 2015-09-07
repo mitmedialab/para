@@ -30,6 +30,11 @@
 					}
 				}
 				this.parentConstraint = false;
+				this.pauseModNotice = false;
+			},
+
+			setPauseModifyNotice:function(status){
+				this.pauseModNotice = status;
 			},
 
 			pause: function() {
@@ -105,7 +110,9 @@
 
 			//callback triggered when a subproperty is modified externally 
 			modified: function() {
-				this.trigger('modified', this);
+				if(!this.pauseModNotice){
+					this.trigger('modified', this);
+				}
 			},
 
 
