@@ -237,7 +237,7 @@ define([
 
 		addDuplicator: function(object,duplicator) {
 			if(object){
-			duplicator = new Duplicator();
+			var duplicator = new Duplicator();
 
 			duplicator.setTarget(object);
 			}

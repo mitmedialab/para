@@ -108,6 +108,7 @@ define([
     },
 
     addMember: function(clone, index) {
+
       if (index) {
         this.members.splice(index, 0, clone);
         this.insertChild(index, clone);
@@ -126,6 +127,7 @@ define([
         v: this.members.length,
         operator: 'set'
       };
+
       this.get('memberCount').setValue(memberCount);
     },
 

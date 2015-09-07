@@ -417,7 +417,7 @@ define([
 
 		/*visit
 		 * visitor method to walk the tree and compute and render each
-		 * node on the screen according to type;
+		 * node on the screen daccording to type;
 		 */
 		visit: function(node, departureNode, state_data) {
 			node.set({
@@ -618,15 +618,20 @@ define([
 				for (var i = 0; i < data.toRemove.length; i++) {
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
 					this.removeListener(data.toRemove[i], true);
-					layersView.removeShape(data.toRemove[i].get('id'));
+					//layersView.removeShape(data.toRemove[i].get('id'));
 				}
 			}
 			if (data.toAdd) {
 				for (var j = 0; j < data.toAdd.length; j++) {
 					this.addListener(data.toAdd[j], true);
-					layersView.addShape(data.toAdd[j].toJSON(), duplicator.get('id'));
+					//layersView.addShape(data.toAdd[j].toJSON(), duplicator.get('id'), data.toAdd[j].get('zIndex').getValue());
 				}
 			}
+			layersView.removeChildren(duplicator.get('id'));
+			for(var k=0;k<duplicator.members.length;k++){
+				layersView.addShape(duplicator.members[k].toJSON(), duplicator.get('id'));
+			}
+			layersView.sortChildren(duplicator.get('id'));
 			this.updateListConstraints(duplicator);
 
 		},
@@ -671,7 +676,14 @@ define([
 			if (movedShape && relativeShape) {
 				switch (mode) {
 					case 'over':
-						relativeShape.addInheritor(movedShape);
+						if(relativeShape.get('name')==='group'){
+							relativeShape.addMember(movedShape);
+							layersView.removeChildren(relativeShape.get('id'));
+							for(var i=0;i<relativeShape.members.length;i++){
+								layersView.addShape(relativeShape.members[i].toJSON(),relativeShape.get('id'));
+							}
+							layersView.sortChildren(relativeShape.get('id'));
+						}
 						break;
 					default:
 						if (!movedShape.isSibling(relativeShape)) {

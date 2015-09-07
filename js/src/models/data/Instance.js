@@ -711,7 +711,7 @@ define([
 			data.id = this.get('id');
 			data.visible = this.get('visible');
 			data.open = this.get('open');
-
+			
 			data.children = [];
 			for (var i = 0; i < this.children.length; i++) {
 				data.children.push(this.children[i].toJSON());

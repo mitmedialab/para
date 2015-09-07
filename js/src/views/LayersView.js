@@ -315,6 +315,9 @@ define([
 
 		dropCompleted: function(nodeA, nodeB, hitMode) {
 			this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
+			var stored = nodeA.data.zIndex;
+			nodeA.data.zIndex = nodeB.data.zIndex;
+			nodeB.data.zIndex= stored;
 		},
 
 		shapeClicked: function(event) {
@@ -433,11 +436,16 @@ define([
 		},
 
 		addShape: function(shape, parentId) {
+			var index = shape.zIndex;
+			if (!index) {
+				index = 0;
+			}
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var s = {
 				title: shape.name,
-				key: shape.id
+				key: shape.id,
+				zIndex: index,
 			};
 			var parentNode;
 			if (parentId) {
@@ -459,6 +467,8 @@ define([
 				}
 			}
 
+
+
 		},
 
 		removeShape: function(pId) {
@@ -469,6 +479,27 @@ define([
 			} else {
 				console.error('could not find node to remove');
 			}
+		},
+
+		removeChildren: function(pId) {
+			var node = shapeTree.getNodeByKey(pId);
+			node.removeChildren();
+		},
+
+		sortChildren: function(pId) {
+			var node = shapeTree.getNodeByKey(pId);
+			node.sortChildren(function(a, b) {
+				console.log('a', a.data.zIndex, 'b', b.data.zIndex);
+				if (a.data.zIndex < b.data.zIndex) {
+					console.log('returning -1');
+
+					return 1;
+				} else {
+					console.log('returning 1');
+
+					return -1;
+				}
+			});
 		},
 
 		moveShape: function(pId, nodeId) {

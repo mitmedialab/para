@@ -33,7 +33,6 @@ define([
                 count: null,
                 target: null,
                 mode: 'standard',
-                clone_count: null,
                 type: 'geometry',
                 exception_count: null
             }),
@@ -41,14 +40,6 @@ define([
             initialize: function() {
                 ConstrainableList.prototype.initialize.apply(this, arguments);
                 this.set('count', new PFloat(0));
-                this.clones = [];
-                this.exceptions = [];
-                var clone_count = new PFloat(0);
-                clone_count.setNull(false);
-                this.set('clone_count', clone_count);
-                var exception_count = new PFloat(0);
-                exception_count.setNull(false);
-                this.set('exception_count', exception_count);
 
                 var geom = new paper.Group();
                 this.set('geom', geom);
@@ -64,7 +55,8 @@ define([
             toJSON: function() {
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
-
+                var secondary_index = this.members.indexOf(this.internalList.members[1]);
+                console.log('secondary index=',secondary_index);    
                 return data;
             },
 
@@ -84,13 +76,17 @@ define([
                         var name = data.children[i].name;
                         var child = this.getTargetClass(name);
                         child.parseJSON(data.children[i]);
-                        this.addClone(child, i, true);
+                        console.log('adding non reference member at',i);
+                        this.addMember(child, i);
                     }
                 }
                 var memberCount = {
                     v: this.members.length,
                     operator: 'set'
                 };
+                 for (var j = 0; j < this.members.length; j++) {
+                    this.members[j].get('zIndex').setValue(j);
+                }
                 this.get('memberCount').setValue(memberCount);
                 this.toggleClosed(this);
                 return this;
@@ -165,49 +161,49 @@ define([
                 return member_constraints;
             },
 
-            addClone: function(clone, index, preset) {
+            addRelativeMember: function(copy, index) {
 
                 if (this.members.length > 1) {
-                    if (!preset) {
-                        clone.setValue(this.members[this.members.length - 2].getValue());
-                    }
+                  
+                    copy.setValue(this.members[this.members.length - 2].getValue());
+                    
                     if(!index){
                         index = this.members.length - 1;
                     }
                 } else {
-                    if (!preset) {
-                        clone.setValue(this.members[0].getValue());
-                    }
+                    
+                     copy.setValue(this.members[0].getValue());
+                    
                     if(!index){
                         index = 1;
                     }
                 }
 
-                this.addMember(clone,index);
-                this.clones.splice(index, 0, clone);
-                this.get('clone_count').setValue(this.clones.length);
+                this.addMember(copy,index);
             },
 
-            addMember: function(clone, index) {
+            addMember: function(member, index) {
+
                 if (index) {
-                    this.members.splice(index, 0, clone);
-                    this.insertChild(index, clone);
-                    this.get('geom').insertChild(index, clone.get('geom'));
-                    clone.get('zIndex').setValue(index);
+                    console.log('target index',index,'length',this.members.length);
+                    this.members.splice(index, 0, member);
+                    this.insertChild(index,member);
+                    this.get('geom').insertChild(index,member.get('geom'));
+                    member.get('zIndex').setValue(index);
 
                 } else {
-                    this.members.push(clone);
-                    this.get('geom').addChild(clone.get('geom'));
-                    this.addChildNode(clone);
+                    this.members.push(member);
+                    this.get('geom').addChild(member.get('geom'));
+                    this.addChildNode(member);
 
-                    clone.get('zIndex').setValue(this.members.length - 1);
+                    member.get('zIndex').setValue(this.members.length - 1);
 
                 }
                 var diff = this.members.length - this.indexNumbers.length;
-                if (clone.get('name') === 'group') {
-                    for (var j = 0; j < clone.members.length; j++) {
+                if (member.get('name') === 'group') {
+                    for (var j = 0; j < member.members.length; j++) {
                         for (var i = 0; i < this.group_relative.length; i++) {
-                            this.group_relative[j].addMember(clone.members[j], index);
+                            this.group_relative[j].addMember(member.members[j], index);
                         }
                     }
                 }
@@ -238,8 +234,8 @@ define([
 
 
 
-            deleteClone: function() {
-                var data = this.clones[this.clones.length - 2];
+            deleteRelativeMember: function() {
+                var data = this.members[this.members.length-2];
                 if (data) {
                     this.removeMember(data);
                     data.deleteSelf();
@@ -275,7 +271,6 @@ define([
                     deleted.push(this.deleteMember(this.members[i]));
                 }
                 this.members.length = 0;
-                this.clones.length = 0;
                 this.children.length = 0;
                 return deleted;
             },
@@ -296,11 +291,6 @@ define([
             removeMember: function(data) {
                 var target = this.get('target');
                 var index = $.inArray(data, this.members);
-                var cloneIndex = $.inArray(data, this.clones);
-                if (cloneIndex > -1) {
-                    this.clones.splice(cloneIndex, 1);
-                    this.get('clone_count').setValue(this.clones.length);
-                }
                 if (index > -1) {
 
                     var member = this.members.splice(index, 1)[0];
@@ -309,7 +299,7 @@ define([
                     this.removeChildNode(member);
 
                     if (member === target) {
-                        this.shiftTarget();
+                        this.shiftTarget(0);
                     }
                     return member;
                 }
@@ -324,35 +314,17 @@ define([
 
             },
 
-            shiftTarget: function() {
-                if (this.clones.length < 1) {
-                    this.setTarget();
-                    return;
-                }
-                var newTarget = this.clones.splice(0, 1);
+           shiftTarget: function(index) {
+               
+                var newTarget = this.members[index];
                 this.set('target', newTarget);
-                for (var i = 0; i < this.clones.length; i++) {
-                    this.clones[i].setPrototype(newTarget);
+                for (var i = 0; i < this.members.length; i++) {
+                    if(i!=index){
+                        this.members[i].setPrototype(newTarget);
+                        }
                 }
 
-                this.get('clone_count').setValue(this.clones.length);
             },
-
-            removeClone: function(clone) {
-                var index = _.indexOf(this.clones, clone);
-                if (index > -1) {
-                    this.removeCloneByIndex(index);
-                }
-            },
-
-            removeCloneByIndex: function(index) {
-                var clone = this.clones.splice(index, 1)[0];
-                var member = this.removeMember(clone);
-                this.get('clone_count').setValue(this.clones.length);
-                member.removePrototype();
-                return member;
-            },
-
 
 
             setCount: function(count) {
@@ -383,24 +355,25 @@ define([
 
             updateCountStandard: function() {
                 var count = this.get('count').getValue();
-                var range = this.get('clone_count').getValue() + 1;
+                var range = this.getRange();
                 var diff = count - range;
+                console.log('diff =',diff,count,range);
                 var target = this.get('target');
 
                 var toRemove = [];
                 var toAdd = [];
                 if (diff > 0) {
                     for (var i = 0; i < diff; i++) {
-                        var clone = target.create();
-                        this.addClone(clone);
-                        toAdd.push(clone);
+                        var member = target.create();
+                        this.addRelativeMember(member);
+                        toAdd.push(member);
 
                     }
                 } else if (diff < 0) {
                     for (var j = 0; j < 0 - diff; j++) {
-                        var member = this.deleteClone();
-                        if (member) {
-                            toRemove.push(member);
+                        var d_member = this.deleteRelativeMember();
+                        if (d_member) {
+                            toRemove.push(d_member);
                         }
                     }
                 }
@@ -419,6 +392,7 @@ define([
                 } else {
                     this.set('target', null);
                 }
+                this.get('memberCount').setValue(this.members.length);
             },
 
             render: function() {
