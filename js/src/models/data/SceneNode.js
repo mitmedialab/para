@@ -198,17 +198,14 @@ define([
         },
 
         insertChild: function(index,child){
-            if(child.nodeParent){
+            if(child.nodeParent!=this){
+                if(child.nodeParent){
                 child.nodeParent.removeChildNode(child);
+                }
+                child.setParentNode(this);
             }
-            if(index<this.length){
-                this.children.splice(index,0,child);
-            }
-            else{
-                this.children.push(child);
-
-            }
-             child.setParentNode(this);
+            
+            this.children.splice(index,0,child);
              for(var i=0;i<this.children.length;i++){
                 this.children[i].index = i;
              }

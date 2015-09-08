@@ -176,11 +176,13 @@ define([
                 }
 
                 this.addMember(copy,index);
+               
             },
 
             addMember: function(member, index) {
 
                 if (index) {
+
                     this.members.splice(index, 0, member);
                     this.insertChild(index,member);
                     this.get('geom').insertChild(index,member.get('geom'));
@@ -307,11 +309,9 @@ define([
                     }
                 }
                 this.removeMemberNotation();
-                    console.log('updating member count',updateCount);
-
                 if(updateCount){
-                    for (var i = 0; i < this.members.length; i++) {
-                        this.members[i].get('zIndex').setValue(i);
+                    for (var k = 0; k < this.members.length; k++) {
+                        this.members[k].get('zIndex').setValue(k);
                     }
                     this.get('memberCount').setValue(this.members.length);
                 }
