@@ -204,6 +204,120 @@ define([
 
     },
 
+    toJSON: function() {
+      var data = {};
+      data.properties = this.get('properties');
+      data.references = this.get('references').get('id');
+      data.relatives = this.get('relatives').get('id');
+      data.modes = this.get('modes');
+      data.relative_properties = this.get('relative_properties');
+      data.reference_properties = this.get('reference_properties');
+      var prop, subprop, i, vals;
+
+      data.exempt_indicies = {};
+      var exempt_indicies = this.get('exempt_indicies');
+
+      data.expressions = {};
+      var expressions = this.get('expressions');
+
+      data.offsets = {};
+      var offsets = this.get('offsets');
+      for (prop in offsets) {
+        if (offsets.hasOwnProperty(prop)) {
+          data.offsets[prop] = {};
+          data.exempt_indicies[prop] = {};
+          data.expressions[prop] = {};
+          for (subprop in offsets[prop]) {
+            if (offsets[prop].hasOwnProperty(subprop)) {
+              data.offsets[prop][subprop] = [];
+              data.exempt_indicies[prop][subprop] = [];
+
+              vals = offsets[prop][subprop];
+              for (i = 0; i < vals.length; i++) {
+                data.offsets[prop][subprop].push(vals[i].toJSON());
+              }
+              vals = exempt_indicies[prop][subprop];
+              for (i = 0; i < vals.length; i++) {
+                data.exempt_indicies[prop][subprop].push(vals[i].toJSON());
+              }
+              data.expressions[prop][subprop] = expressions[prop][subprop];
+
+            }
+          }
+        }
+      }
+
+
+
+      data.reference_values = [];
+      var reference_values = this.get('reference_values');
+      for (prop in reference_values) {
+        if (reference_values.hasOwnProperty(prop)) {
+          data.reference_values[prop] = {};
+
+          for (subprop in reference_values[prop]) {
+            if (reference_values[prop].hasOwnProperty(subprop)) {
+              data.reference_values[prop][subprop] = {};
+              data.reference_values[prop][subprop].min = reference_values[prop][subprop].min;
+              data.reference_values[prop][subprop].max = reference_values[prop][subprop].max;
+              data.reference_values[prop][subprop].vals = [];
+              vals = reference_values[prop][subprop].vals;
+              for (i = 0; i < vals.length; i++) {
+                data.reference_values[prop][subprop].vals.push(vals[i].toJSON());
+              }
+            }
+          }
+        }
+      }
+      console.log('data', data);
+      return data;
+    },
+
+    parseJSON: function(data, manager) {
+      var reference = manager.getById(data.references);
+      var relative = manager.getById(data.relatives);
+      this.set('references',reference);
+      this.set('relatives',relative);
+      this.set('modes', data.modes);
+      this.set('relative_properties', data.relative_properties);
+      this.set('reference_properties', data.reference_properties);
+      var prop, subprop, i, vals;
+
+      var exempt_indicies = {};
+      var expressions = {};
+      var offsets = {};
+
+      for (prop in data.offsets) {
+        if (data.offsets.hasOwnProperty(prop)) {
+          offsets[prop] = {};
+          exempt_indicies[prop] = {};
+          expressions[prop] = {};
+          for (subprop in data.offsets[prop]) {
+            if (data.offsets[prop].hasOwnProperty(subprop)) {
+              offsets[prop][subprop] = [];
+              exempt_indicies[prop][subprop] = [];
+
+              vals = data.offsets[prop][subprop];
+              for (i = 0; i < vals.length; i++) {
+                offsets[prop][subprop].push(new PFloat(vals[i]));
+              }
+              vals = data.exempt_indicies[prop][subprop];
+              for (i = 0; i < vals.length; i++) {
+                exempt_indicies[prop][subprop].push(new PBool(vals[i].v));
+              }
+              expressions[prop][subprop] = data.expressions[prop][subprop];
+
+            }
+          }
+        }
+      }
+      this.set('exempt_indicies', exempt_indicies);
+      this.set('offsets', offsets);
+      this.set('expressions', expressions);
+      console.log('data.properties',data.properties);
+      this.create(data.properties,true);
+    },
+
     setSelection: function(selected, type) {
 
       if (this.get('references') && this.get('relatives')) {
@@ -413,19 +527,30 @@ define([
     /*properties should take the form of an array listing constraints for each subprop
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
-    create: function(properties) {
+    create: function(properties, json_loaded) {
       this.stopListening();
+      this.set('properties', properties);
       var offsets = {};
       var exempt_indicies = {};
       var expressions = [];
       var refProperties = [];
       var relProperties = [];
+      var modes = {};
+      if (!json_loaded) {
+
+        this.set('modes', modes);
+
+        this.set('offsets', offsets);
+        this.set('exempt_indicies', exempt_indicies);
+        this.set('expressions', expressions);
+      } else {
+        offsets = this.get('offsets');
+        exempt_indicies = this.get('exempt_indicies');
+        expressions = this.get('expressions');
+        modes = this.get('modes');
+      }
       this.set('relative_properties', relProperties);
       this.set('reference_properties', refProperties);
-      this.set('offsets', offsets);
-      this.set('exempt_indicies', exempt_indicies);
-
-      this.set('expressions', expressions);
       var constraint_data = {};
       var self = this;
       var reference = this.get('references');
@@ -444,8 +569,7 @@ define([
           }
         }
       });
-      var modes = {};
-      this.set('modes', modes);
+
       for (var j = 0; j < properties.length; j++) {
 
         var ref_prop = properties[j][0];
@@ -461,19 +585,22 @@ define([
         refProperties.push([ref_prop_key, ref_dimensions]);
         relProperties.push([rel_prop_key, rel_dimensions]);
 
-        for (var m = 0; m < ref_dimensions.length; m++) {
-          if (mode_list && mode_list[m]) {
-            modes[ref_prop_key + '_' + ref_dimensions[m]] = mode_list[m];
-          } else {
-            modes[ref_prop_key + '_' + ref_dimensions[m]] = 'interpolate';
+        if (!json_loaded) {
+          for (var m = 0; m < ref_dimensions.length; m++) {
+            if (mode_list && mode_list[m]) {
+              modes[ref_prop_key + '_' + ref_dimensions[m]] = mode_list[m];
+            } else {
+              modes[ref_prop_key + '_' + ref_dimensions[m]] = 'interpolate';
+            }
           }
         }
 
         this.setReferenceValues(ref_prop_key, ref_dimensions);
+        if (!json_loaded) {
+          for (var g = 0; g < relative_range; g++) {
+            this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
 
-        for (var g = 0; g < relative_range; g++) {
-          this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
-
+          }
         }
 
         if (!setOnInstance) {
@@ -1208,7 +1335,7 @@ define([
     /* functions for getting and setting info related to mapping */
     setMin: function(val) {
       this.set('min', val);
-    },   
+    },
     setMax: function(val) {
       this.set('max', val);
     },

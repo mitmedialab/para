@@ -17,6 +17,7 @@ define([
 	'models/data/functions/FunctionManager',
 	'models/data/collections/CollectionManager',
 	'models/data/collections/Duplicator',
+	 'models/data/Constraint',
 'models/data/collections/ConstrainableList',
 	'views/LayersView',
 	'views/CollectionView',
@@ -26,7 +27,7 @@ define([
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, ConstrainableList,LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList,LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -141,6 +142,14 @@ define([
 				}
 				collectionManager.addList(null,list);
 			}
+
+			for (var m = 0; m < constraints.length; m++) {
+				var constraint = new Constraint();
+				constraint.parseJSON(constraints[m],this);
+				this.addConstraint(constraint,true);
+
+	
+			}
 			paper.view.draw();
 
 		},
@@ -166,9 +175,9 @@ define([
 		exportProjectJSON: function(json) {
 			var geometry_json = rootNode.toJSON();
 			var constraint_json = [];
-			/*for(var i=0;i<constraints.length;i++){
-				constraint_json.push(this.constraints[i].toJSON());
-			}*/
+			for(var i=0;i<constraints.length;i++){
+				constraint_json.push(constraints[i].toJSON());
+			}
 			var list_json = collectionManager.getListJSON();
 			var project_json = {
 				geometry: geometry_json,
@@ -661,13 +670,16 @@ define([
 			}
 		},
 
-		addConstraint: function(constraint) {
+		addConstraint: function(constraint,noUpdate) {
 			if (!constraint.get('user_name')) {
 				constraint.set('user_name', 'constraint ' + (constraints.length + 1));
 			}
 			constraints.push(constraint);
 			layersView.addConstraint(constraint);
-			this.updateMapView(constraint.get('id'));
+			if(!noUpdate){
+				this.updateMapView(constraint.get('id'));
+			}
+
 
 		},
 
