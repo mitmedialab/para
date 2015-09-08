@@ -215,18 +215,21 @@ define([
 		 *adds a list to the closedlist array and removes any items
 		 * on the array which are members of the added list
 		 */
-		addList: function(selected) {
-			var list = new ConstrainableList();
-			list.addMember(selected);
-			if (!this.addToOpenLists(list)) {
-				for (var i = lists.length - 1; i >= 0; i--) {
-					if (list.hasMember(lists[i], true)) {
-						lists.splice(i, 1);
+		addList: function(selected, list) {
+			if (!list) {
+				list = new ConstrainableList();
+				list.addMember(selected);
+				if (!this.addToOpenLists(list)) {
+					for (var i = lists.length - 1; i >= 0; i--) {
+						if (list.hasMember(lists[i], true)) {
+							lists.splice(i, 1);
+						}
 					}
+					lists.push(list);
 				}
+			} else {
 				lists.push(list);
 			}
-
 			return list;
 		},
 
@@ -235,11 +238,11 @@ define([
 		},
 
 
-		addDuplicator: function(object,duplicator) {
-			if(object){
-			var duplicator = new Duplicator();
+		addDuplicator: function(object, duplicator) {
+			if (object) {
+				duplicator = new Duplicator();
 
-			duplicator.setTarget(object);
+				duplicator.setTarget(object);
 			}
 
 			if (!this.addToOpenLists(duplicator)) {

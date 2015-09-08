@@ -17,7 +17,7 @@ define([
 	'models/data/functions/FunctionManager',
 	'models/data/collections/CollectionManager',
 	'models/data/collections/Duplicator',
-
+'models/data/collections/ConstrainableList',
 	'views/LayersView',
 	'views/CollectionView',
 	'views/MapView',
@@ -26,7 +26,7 @@ define([
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, ConstrainableList,LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -127,6 +127,19 @@ define([
 						break;
 
 				}
+			}
+
+			for (var j = 0; j < lists.length; j++) {
+				var list = new ConstrainableList();
+				console.log('list at',j,lists[i],list);
+
+				var toAdd = list.parseJSON(lists[j],this);
+				console.log('to add',toAdd);
+				for(var k=0;k<toAdd.length;k++){
+					layersView.addList(toAdd[k].toJSON());
+					this.addListener(toAdd[k]);
+				}
+				collectionManager.addList(null,list);
 			}
 			paper.view.draw();
 
@@ -675,7 +688,7 @@ define([
 			if (movedShape && relativeShape) {
 				switch (mode) {
 					case 'over':
-						if(movedShape.nodeParent = relativeShape){
+						if(movedShape.nodeParent == relativeShape){
 							return false;
 						}
 						if(relativeShape.get('name')==='duplicator'){
@@ -700,11 +713,10 @@ define([
 							else if(parent.get('name')==='duplicator'){
 								var success = parent.removeMember(movedShape,true);
 								if(!success){
-									return false
+									return false;
 								}
 
 							}
-							console.log('movedShape',movedShape);
 
 							currentNode.addChildNode(movedShape);
 							this.modified(movedShape);

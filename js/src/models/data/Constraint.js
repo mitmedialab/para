@@ -1208,7 +1208,7 @@ define([
     /* functions for getting and setting info related to mapping */
     setMin: function(val) {
       this.set('min', val);
-    },
+    },   
     setMax: function(val) {
       this.set('max', val);
     },

@@ -521,13 +521,31 @@ define([
 
     toJSON: function() {
       var data = Instance.prototype.toJSON.call(this, arguments);
-      var memberIds = [];
+      var members = [];
       _.each(this.members, function(item) {
-        memberIds.push(item.get('id'));
+        members.push(item.toJSON());
       });
-      data.members = memberIds;
-
+      data.members = members;
       return data;
+    },
+
+    parseJSON: function(data,manager){
+      Instance.prototype.parseJSON.call(this, data);
+      var members = data.members;
+      var collection_members = [];
+      for(var i=0;i<members.length;i++){
+        var member;
+        if(members[i].type ==='collection'){
+          member = new this.constructor();
+          collection_members.push.apply(collection_members,member.parseJSON(members[i],manager));
+        }
+        else{
+          member = manager.getById(members[i].id);
+        }
+        this.addMember(member,i);
+      }
+      collection_members.push(this);
+      return collection_members;
     },
 
     getShapeClone: function() {
