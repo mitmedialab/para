@@ -187,6 +187,9 @@ define([
         var ui = this.get('ui');
         ui.remove();
         ui = null;
+        if(this.get('selectionClone')){
+          this.get('selectionClone').remove();
+        }
         this.members.length = 0;
         this.members = null;
         return  ListNode.prototype.deleteSelf.call(this);

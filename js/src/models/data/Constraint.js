@@ -246,30 +246,6 @@ define([
           }
         }
       }
-
-
-
-      data.reference_values = [];
-      var reference_values = this.get('reference_values');
-      for (prop in reference_values) {
-        if (reference_values.hasOwnProperty(prop)) {
-          data.reference_values[prop] = {};
-
-          for (subprop in reference_values[prop]) {
-            if (reference_values[prop].hasOwnProperty(subprop)) {
-              data.reference_values[prop][subprop] = {};
-              data.reference_values[prop][subprop].min = reference_values[prop][subprop].min;
-              data.reference_values[prop][subprop].max = reference_values[prop][subprop].max;
-              data.reference_values[prop][subprop].vals = [];
-              vals = reference_values[prop][subprop].vals;
-              for (i = 0; i < vals.length; i++) {
-                data.reference_values[prop][subprop].vals.push(vals[i].toJSON());
-              }
-            }
-          }
-        }
-      }
-      console.log('data', data);
       return data;
     },
 
