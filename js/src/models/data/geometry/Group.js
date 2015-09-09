@@ -25,7 +25,7 @@ define([
         'path': PathNode,
         'ellipse': EllipseNode,
         'polygon': PolygonNode,
-        'Rectangle': RectNode,
+        'rectangle': RectNode,
       };
   var Group = Instance.extend({
 
@@ -75,6 +75,21 @@ define([
       var child = new target_class();
       return child;
     },
+
+    getById: function(id){
+      if(this.get('id')==id){
+        return this;
+      }
+      else{
+        for(var i=0;i<this.members.length;i++){
+          var match = this.members[i].getById(id);
+          if(match){
+            return match;
+          }
+        }
+      }
+    },
+
 
    /*deleteAllChildren
      * function which deletes all children
@@ -134,7 +149,7 @@ define([
     removeMember: function(data) {
       this.toggleOpen();
       var index = $.inArray(data, this.members);
-      var member
+      var member;
       if (index > -1) {
 
         member = this.members.splice(index, 1)[0];

@@ -371,6 +371,12 @@ define([
 			return this;
 		},
 
+		getById: function(id){
+			if(this.get('id')==id){
+				return this;
+			}
+		},
+
 		/* create
 		 * Prototypal inheritance action:
 		 * creates a new instance which inherits from

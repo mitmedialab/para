@@ -194,6 +194,9 @@ define([
 				case 'collection':
 					obj = collectionManager.getCollectionById(id);
 					break;
+				case 'internalcollection':
+					obj = collectionManager.getInternalList(id);
+					break;
 				case 'constraint':
 					obj = this.getConstraintById(id);
 					break;

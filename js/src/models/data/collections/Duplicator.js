@@ -10,6 +10,7 @@ define([
         'models/data/geometry/RectNode',
         'models/data/geometry/EllipseNode',
         'models/data/geometry/PolygonNode',
+        'models/data/geometry/Group',
         'utils/PFloat',
         'utils/PBool',
         'paper',
@@ -19,12 +20,13 @@ define([
 
     ],
 
-    function(_, Instance, ConstrainableList, PathNode, RectNode, EllipseNode, PolygonNode, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
+    function(_, Instance, ConstrainableList, PathNode, RectNode, EllipseNode, PolygonNode, Group, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
         var init_lookup = {
             'path': PathNode,
             'ellipse': EllipseNode,
             'polygon': PolygonNode,
-            'Rectangle': RectNode,
+            'rectangle': RectNode,
+            'group': Group
         };
         var Duplicator = ConstrainableList.extend({
 
@@ -40,7 +42,7 @@ define([
             initialize: function() {
                 ConstrainableList.prototype.initialize.apply(this, arguments);
                 this.set('count', new PFloat(0));
-
+                console.log('group',Group);
                 var geom = new paper.Group();
                 this.set('geom', geom);
                 geom.data.instance = this;
@@ -49,13 +51,22 @@ define([
                 this.group_relative = [];
                 this.group_reference = [];
                 this.internalList = new ConstrainableList();
+                this.internalList.set('id', 'internal' + this.internalList.get('id'));
 
             },
 
             toJSON: function() {
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
-                var secondary_index = this.members.indexOf(this.internalList.members[1]);
+                data.internalList = this.internalList.toJSON();
+                data.group_relative = [];
+                data.group_reference = [];
+                for (var i = 0; i < this.group_relative.length; i++) {
+                    data.group_relative.push(this.group_relative[i].toJSON());
+                }
+                for (var j = 0; j < this.group_reference.length; j++) {
+                    data.group_reference.push(this.group_reference[j].toJSON());
+                }
                 return data;
             },
 
@@ -67,8 +78,8 @@ define([
                 var target = this.getTargetClass(target_data.name);
                 target.parseJSON(target_data);
                 this.setTarget(target);
-
-                for (var i = 0; i < data.children.length; i++) {
+                var i, j, list;
+                for (i = 0; i < data.children.length; i++) {
                     if (i != target_index) {
                         var name = data.children[i].name;
                         var child = this.getTargetClass(name);
@@ -80,21 +91,57 @@ define([
                     v: this.members.length,
                     operator: 'set'
                 };
-                 for (var j = 0; j < this.members.length; j++) {
+                for (j = 0; j < this.members.length; j++) {
                     this.members[j].get('zIndex').setValue(j);
                 }
                 this.get('memberCount').setValue(memberCount);
+                this.internalList.parseJSON(data.internalList, this);
+                for (i = 0; i < data.group_relative.length; i++) {
+                    list = new ConstrainableList();
+                    list.parseJSON(data.group_relative[i], this);
+                    this.group_relative.push(list);
+                }
+                for (j = 0; j < data.group_reference.length; j++) {
+                    list = new ConstrainableList();
+                    list.parseJSON(data.group_reference[j], this);
+                    this.group_reference.push(list);
+                }
                 this.toggleClosed(this);
                 return this;
 
+            },
+
+            getById: function(id) {
+                for (var i = 0; i < this.members.length; i++) {
+                    var match = this.members[i].getById(id);
+                    if (match) {
+                        return match;
+                    }
+                }
             },
 
             /*returns new child instance based on string name
              */
             getTargetClass: function(name) {
                 var target_class = init_lookup[name];
+                console.log('name',name,target_class);
+
                 var child = new target_class();
                 return child;
+            },
+
+            getInternalList: function(id) {
+                if (this.internalList.get('id') === id) {
+                    return this.internalList;
+                }
+                for(var i=0;i<this.relative_list.length;i++){
+                    if(this.relative_list[i].get('id')===id){
+                        return this.relative_list[i];
+                    }
+                    else if(this.reference_list[i].get('id')===id){
+                        return this.reference_list[i];
+                    }
+                }
             },
 
             setInternalConstraint: function() {
@@ -129,6 +176,8 @@ define([
                 for (var i = 0; i < target.members.length; i++) {
                     var relative_list = new ConstrainableList();
                     var reference_list = new ConstrainableList();
+                    relative_list.set('id', 'internal' + relative_list.get('id'));
+                    reference_list.set('id', 'internal' + reference_list.get('id'));
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
                     reference_list.addMember(target.members[i]);
@@ -160,23 +209,23 @@ define([
             addRelativeMember: function(copy, index) {
 
                 if (this.members.length > 1) {
-                  
+
                     copy.setValue(this.members[this.members.length - 2].getValue());
-                    
-                    if(!index){
+
+                    if (!index) {
                         index = this.members.length - 1;
                     }
                 } else {
-                    
-                     copy.setValue(this.members[0].getValue());
-                    
-                    if(!index){
+
+                    copy.setValue(this.members[0].getValue());
+
+                    if (!index) {
                         index = 1;
                     }
                 }
 
-                this.addMember(copy,index);
-               
+                this.addMember(copy, index);
+
             },
 
             addMember: function(member, index) {
@@ -184,8 +233,8 @@ define([
                 if (index) {
 
                     this.members.splice(index, 0, member);
-                    this.insertChild(index,member);
-                    this.get('geom').insertChild(index,member.get('geom'));
+                    this.insertChild(index, member);
+                    this.get('geom').insertChild(index, member.get('geom'));
                     member.get('zIndex').setValue(index);
 
                 } else {
@@ -232,7 +281,7 @@ define([
 
 
             deleteRelativeMember: function() {
-                var data = this.members[this.members.length-2];
+                var data = this.members[this.members.length - 2];
                 if (data) {
                     this.removeMember(data);
                     data.deleteSelf();
@@ -287,19 +336,19 @@ define([
 
             removeMember: function(data, updateCount) {
                 var target = this.get('target');
-                if (this.internalList.hasMember(data,true,this)) {
-                       return false;
+                if (this.internalList.hasMember(data, true, this)) {
+                    return false;
                 }
                 var index = $.inArray(data, this.members);
                 var member;
-                
+
                 if (index > -1) {
 
                     member = this.members.splice(index, 1)[0];
                     var childIndex = member.get('geom').index;
                     this.get('geom').removeChildren(childIndex, childIndex + 1);
                     this.removeChildNode(member);
-                    
+
                 }
                 if (data.get('name') === 'group') {
                     for (var j = 0; j < data.members.length; j++) {
@@ -309,7 +358,7 @@ define([
                     }
                 }
                 this.removeMemberNotation();
-                if(updateCount){
+                if (updateCount) {
                     for (var k = 0; k < this.members.length; k++) {
                         this.members[k].get('zIndex').setValue(k);
                     }
@@ -318,20 +367,20 @@ define([
                 return member;
             },
 
-           shiftTarget: function(index) {
+            shiftTarget: function(index) {
                 var old_target = this.get('target');
 
                 var newTarget = this.members[index];
                 this.set('target', newTarget);
                 for (var i = 0; i < this.members.length; i++) {
-                    if(i!=index){
+                    if (i != index) {
                         this.members[i].changeGeomInheritance(newTarget.getShapeClone(true));
                     }
                 }
-                this.internalList.addMember(this.get('target'),0);
+                this.internalList.addMember(this.get('target'), 0);
                 //this.internalList.removeMember(this.get('target'));
 
-                console.log('new target',this.get('target'),this.internalList.members);
+                console.log('new target', this.get('target'), this.internalList.members);
 
             },
 

@@ -81,6 +81,19 @@ define([
 			}
 		},
 
+		getInternalList: function(id) {
+			var duplicators = lists.filter(function(item) {
+				return item.get('name') == 'duplicator';
+			});
+			for(var i=0;i<duplicators.length;i++){
+				var list = duplicators[i].getInternalList(id);
+				if(list){
+					return list;
+				}
+			}
+		},
+
+
 		getListsThatContain: function(object) {
 			var collections = this.getCollectionThatContains(object);
 			var slists = collections.filter(function(item) {
