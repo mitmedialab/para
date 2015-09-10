@@ -46,7 +46,7 @@ define([
 
 			/* getValue
 			 * checks to see if val is constrained
-			 * and if so, returns the constraint value
+			 * and if so, returns the constrainedstraint value
 			 * otherwise just returns the current value of val.
 			 */
 			getValue: function() {

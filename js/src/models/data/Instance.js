@@ -193,7 +193,7 @@ define([
 			//============ end private properties==============//
 
 
-			var bounds = new paper.Rectangle(0, 0, 1, 1);
+			var bounds = new paper.Rectangle(0,	 0, 1, 1);
 			this.set('i_bbox', {
 				topLeft: null,
 				bottomRight: null,
@@ -303,6 +303,12 @@ define([
 			return this;
 		},
 
+
+		getById:function(id){
+			if(this.get('id')==id){
+				return this;
+			}
+		},
 
 		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
 		 * evaluation and access functions to assist in managing lists

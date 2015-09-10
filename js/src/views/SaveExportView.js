@@ -8,7 +8,7 @@ define([
 	'handlebars',
 	'filesaver'
 
-], function($, _, Backbone, Handlebars, FileSaver) {
+], function($, _, Backbone, Handlebars,FileSaver) {
 
 	var currentName;
 	var SaveExportView = Backbone.View.extend({
@@ -72,7 +72,7 @@ define([
 			});
 			if (!exists) {
 				select.append($('<option>', {
-					value:filename,
+					value: filename,
 					text: filename
 				}));
 				return true;
@@ -82,7 +82,7 @@ define([
 
 		},
 
-		save: function(data) {
+		save: function(event,data) {
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
@@ -101,16 +101,20 @@ define([
 
 				}
 			}
-			if(!data){
-			var project_json = this.model.exportProjectJSON();
-			data = JSON.stringify(project_json);
+			if (!data) {
+				console.log('no data passed in');
+				data = this.model.exportProjectJSON();
 			}
-			localStorage.setItem(currentName, data);
+			console.log('data =',data);
+			var string_data = JSON.stringify(data);
+			console.log('data saving',string_data, currentName);
+			localStorage.setItem(currentName, string_data);
+
 		},
 
-		saveAs: function(data) {
+		saveAs: function(event,data) {
 			currentName = null;
-			this.save(data);
+			this.save(null,data);
 
 		},
 
@@ -119,6 +123,7 @@ define([
 		load: function(filename) {
 			this.save();
 			var data = localStorage.getItem(filename);
+			console.log('data =', data);
 			this.model.importProjectJSON(JSON.parse(data));
 			currentName = filename;
 		},
@@ -136,7 +141,7 @@ define([
 
 		},
 
-		exportSVG: function() {
+	exportSVG: function() {
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
@@ -145,7 +150,6 @@ define([
 				currentName = name; 
 			}
 			var data = this.model.exportSVG();
-			console.log('data',data);
 			var blob = new Blob([data], {
               type: 'image/svg+xml'
             });
@@ -167,7 +171,7 @@ define([
 			var file = event.target.files[0];
 
 			this.listenToOnce(this, 'loadComplete', function(result) {
-				this.saveAs(result);
+				this.saveAs(null,result);
 
 			});
 			this.completeFileLoad(file);

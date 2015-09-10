@@ -42,7 +42,7 @@ define([
             initialize: function() {
                 ConstrainableList.prototype.initialize.apply(this, arguments);
                 this.set('count', new PFloat(0));
-                console.log('group',Group);
+                console.log('group',Group,'PolygonNode',PolygonNode);
                 var geom = new paper.Group();
                 this.set('geom', geom);
                 geom.data.instance = this;

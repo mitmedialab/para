@@ -158,8 +158,6 @@ define([
 		importSVG: function(data) {
 			var start_item = new paper.Group();
 			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
-			
-
 			var path, pathMatrix;
 			if (item.children) {
 				var children = item.removeChildren();
@@ -197,10 +195,7 @@ define([
 			for(var i=0;i<children.length;i++){
 				svg_string+= children[i].exportSVG();
 			}
-			svg_string+='</svg>'
-			/*var svg_string = paper.project.exportSVG({
-              asString: true
-            });*/
+			svg_string+='</svg>';
 			return svg_string;
 		},
 
@@ -244,6 +239,7 @@ define([
 					obj = collectionManager.getCollectionById(id);
 					break;
 				case 'internalcollection':
+					console.log('accessing internal collection',id);
 					obj = collectionManager.getInternalList(id);
 					break;
 				case 'constraint':

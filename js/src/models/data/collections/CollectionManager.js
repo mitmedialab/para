@@ -405,7 +405,9 @@ define([
 		getListJSON: function() {
 			var list_json = [];
 			for (var i = 0; i < lists.length; i++) {
-				list_json.push(lists[i].toJSON());
+				if(lists[i].get('name')!=='duplicator'){
+					list_json.push(lists[i].toJSON());
+				}
 			}
 			return list_json;
 		},

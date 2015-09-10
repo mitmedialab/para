@@ -8,9 +8,8 @@
 define([
   'underscore',
   'paper',
-  'models/data/collections/Duplicator',
   'models/data/Instance',
- 'models/data/geometry/PathNode',
+  'models/data/geometry/PathNode',
   'models/data/geometry/RectNode',
   'models/data/geometry/EllipseNode',
   'models/data/geometry/PolygonNode',
@@ -20,13 +19,13 @@ define([
 
 
 
-], function(_, paper, Duplicator, Instance, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
-  var init_lookup=  {
-        'path': PathNode,
-        'ellipse': EllipseNode,
-        'polygon': PolygonNode,
-        'rectangle': RectNode,
-      };
+], function(_, paper, Instance, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
+  var init_lookup = {
+    'path': PathNode,
+    'ellipse': EllipseNode,
+    'polygon': PolygonNode,
+    'rectangle': RectNode,
+  };
   var Group = Instance.extend({
 
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -35,7 +34,7 @@ define([
       type: 'geometry',
       points: null,
       open: false,
-      
+
     }),
 
     initialize: function() {
@@ -58,8 +57,8 @@ define([
 
     parseJSON: function(data) {
       this.deleteAllChildren();
-      Instance.prototype.parseJSON.call(this,data);
-      for(var i=0;i<data.children.length; i++){
+      Instance.prototype.parseJSON.call(this, data);
+      for (var i = 0; i < data.children.length; i++) {
         var name = data.children[i].name;
         var child = this.getTargetClass(name);
         child.parseJSON(data.children[i]);
@@ -69,21 +68,20 @@ define([
     },
 
     /*returns new child instance based on string name
-    */
-    getTargetClass: function(name){
+     */
+    getTargetClass: function(name) {
       var target_class = init_lookup[name];
       var child = new target_class();
       return child;
     },
 
-    getById: function(id){
-      if(this.get('id')==id){
+    getById: function(id) {
+      if (this.get('id') == id) {
         return this;
-      }
-      else{
-        for(var i=0;i<this.members.length;i++){
+      } else {
+        for (var i = 0; i < this.members.length; i++) {
           var match = this.members[i].getById(id);
-          if(match){
+          if (match) {
             return match;
           }
         }
@@ -91,22 +89,22 @@ define([
     },
 
 
-   /*deleteAllChildren
+    /*deleteAllChildren
      * function which deletes all children
      */
     deleteAllChildren: function(deleted) {
-      if(!deleted){
+      if (!deleted) {
         deleted = [];
       }
-      for(var i=this.members.length-1;i>=0;i--){
-        deleted.push.apply(deleted,this.members[i].deleteAllChildren());
+      for (var i = this.members.length - 1; i >= 0; i--) {
+        deleted.push.apply(deleted, this.members[i].deleteAllChildren());
         deleted.push(this.members[i].deleteSelf());
         this.removeMember(this.members[i]);
       }
       return deleted;
     },
 
-    deleteSelf: function(){
+    deleteSelf: function() {
       this.members.length = 0;
       return Instance.prototype.deleteSelf.call(this);
     },
@@ -173,13 +171,33 @@ define([
     },
 
     getMember: function(member) {
-      return Duplicator.prototype.getMember.call(this, member);
+
+      for (var i = 0; i < this.members.length; i++) {
+        var m = this.members[i].getMember(member);
+        if (m) {
+          if (this.get('open')) {
+            return m;
+          } else {
+            return this;
+          }
+        }
+      }
+      return null;
     },
-
-
     hasMember: function(member, top, last) {
-      return Duplicator.prototype.hasMember.call(this, member, top, last);
+      if (!top) {
+        if (this === member) {
+          return last;
+        }
+      }
+      for (var i = 0; i < this.members.length; i++) {
+        var member_found = this.members[i].hasMember(member, false, this);
+        if (member_found) {
+          return member_found;
+        }
+      }
     },
+
 
     accessMemberGeom: function() {
       var geom_list = [];
@@ -219,10 +237,10 @@ define([
 
     closeAllMembers: function() {
       this.toggleClosed(this);
-      for(var i=0;i<this.members.length;i++){
+      for (var i = 0; i < this.members.length; i++) {
         this.members[i].closeAllMembers();
 
-        
+
       }
     },
 
@@ -352,7 +370,7 @@ define([
       }
       if (constraint_selected) {
         if (!selection_clone) {
-          Duplicator.prototype.createSelectionClone.call(this);
+          this.createSelectionClone();
           selection_clone = this.get('selection_clone');
         }
         selection_clone.visible = true;
@@ -375,6 +393,23 @@ define([
           bbox.visible = true;
         }
       }
+    },
+
+       createSelectionClone: function() {
+      if (this.get('selection_clone')) {
+        this.get('selection_clone').remove();
+        this.set('selection_clone', null);
+      }
+      var selection_clone = this.get('bbox').clone();
+      var targetLayer = paper.project.layers.filter(function(layer) {
+        return layer.name === 'ui_layer';
+      })[0];
+      targetLayer.addChild(selection_clone);
+      selection_clone.data.instance = this;
+      selection_clone.fillColor = null;
+      selection_clone.strokeWidth = 3;
+      selection_clone.selected = false;
+      this.set('selection_clone', selection_clone);
     },
 
 
