@@ -61,6 +61,10 @@ define([
                 console.log('imported data',item);
             },
 
+            exportSVG: function(){
+                return this.get('geom').exportSVG({asString:true});
+            },
+
             toJSON: function() {
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));

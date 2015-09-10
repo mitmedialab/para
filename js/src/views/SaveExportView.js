@@ -6,8 +6,9 @@ define([
 	'underscore',
 	'backbone',
 	'handlebars',
+	'filesaver'
 
-], function($, _, Backbone, Handlebars) {
+], function($, _, Backbone, Handlebars, FileSaver) {
 
 	var currentName;
 	var SaveExportView = Backbone.View.extend({
@@ -105,8 +106,6 @@ define([
 			data = JSON.stringify(project_json);
 			}
 			localStorage.setItem(currentName, data);
-			return project_json;
-
 		},
 
 		saveAs: function(data) {
@@ -138,7 +137,19 @@ define([
 		},
 
 		exportSVG: function() {
-
+			if (!currentName) {
+				var name = this.promptName();
+				if (!name) {
+					return;
+				}
+				currentName = name; 
+			}
+			var data = this.model.exportSVG();
+			console.log('data',data);
+			var blob = new Blob([data], {
+              type: 'image/svg+xml'
+            });
+            var fileSaver = new FileSaver(blob, currentName);
 		},
 
 		importSVG: function(event) {

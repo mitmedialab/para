@@ -518,11 +518,22 @@ define([
 				this.set('normal_geom', null);
 			}
 
-			geom.data.instance = this;
-			geom.data.geom = true;
-			geom.data.nodetype = this.get('name');
-			this.set('geom', geom);
 			this.set('normal_geom', geom.clone());
+
+			var self = this;
+			var setChildrenData = function(child) {
+				child.data.instance = self;
+				child.data.geom = true;
+				child.data.nodetype = self.get('name');
+				if (child.children) {
+					for (var i = 0; i < child.children.length; i++) {
+						setChildrenData(child.children[i]);
+					}
+				}
+			};
+			setChildrenData(geom);
+
+			this.set('geom', geom);
 			this.get('normal_geom').visible = false;
 			this.createBBox();
 			this.createSelectionClone();
@@ -557,7 +568,11 @@ define([
 
 		},
 
-
+		exportSVG: function() {
+			return this.get('geom').exportSVG({
+				asString: true
+			});
+		},
 
 		// sets the geom visibility to false
 		hide: function() {
@@ -1186,7 +1201,7 @@ define([
 			this._matrix.translate(translationDelta.x, translationDelta.y);
 			this._matrix.rotate(rotationDelta, 0, 0);
 			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
-			
+
 			geom.transform(this._matrix);
 			bbox.transform(this._matrix);
 			selection_clone.transform(this._matrix);
@@ -1241,11 +1256,11 @@ define([
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
-				if(this._fillColor.h){
-				geom.fillColor.hue = this._fillColor.h;
-				geom.fillColor.saturation = this._fillColor.s;
-				geom.fillColor.lightness = this._fillColor.l;
-				geom.fillColor.alpha = this._fillColor.a;
+				if (this._fillColor.h) {
+					geom.fillColor.hue = this._fillColor.h;
+					geom.fillColor.saturation = this._fillColor.s;
+					geom.fillColor.lightness = this._fillColor.l;
+					geom.fillColor.alpha = this._fillColor.a;
 				}
 			} else {
 				geom.fillColor = undefined;

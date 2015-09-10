@@ -125,7 +125,7 @@ define([
       this.changeGeomInheritance(path);
 
       this.setValue(data);
-
+      
      var pathAltered = this.get('pathAltered');
      pathAltered.setNull(false);
      this.setPathAltered();
@@ -138,33 +138,6 @@ define([
     },
 
     renderStyle: function(geom) {
-      if (!this._fillColor.noColor && (this._fillColor.h > -1 && this._fillColor.s > -1 && this._fillColor.l > -1)) {
-        if (!geom.fillColor) {
-          geom.fillColor = new paper.Color(0, 0, 0);
-        }
-        if(this._fillColor.h){
-        geom.fillColor.hue = this._fillColor.h;
-        geom.fillColor.saturation = this._fillColor.s;
-        geom.fillColor.lightness = this._fillColor.l;
-        geom.fillColor.alpha = this._fillColor.a;
-        }
-      } else {
-        geom.fillColor = undefined;
-      }
-      if (!this._strokeColor.noColor && (this._strokeColor.h > -1 && this._strokeColor.s > -1 && this._strokeColor.l > -1)) {
-        if (!geom.fillColor) {
-          geom.strokeColor = new paper.Color(0, 0, 0);
-        }
-        geom.strokeColor.hue = this._strokeColor.h;
-        geom.strokeColor.saturation = this._strokeColor.s;
-        geom.strokeColor.lightness = this._strokeColor.l;
-        geom.strokeColor.alpha = this._strokeColor.a;
-        geom.strokeColor.alpha = this._strokeColor.a;
-      } else {
-        geom.strokeColor = undefined;
-      }
-
-      geom.strokeWidth = this._strokeWidth;
       geom.visible = this._visible;
       var zIndex = this.get('zIndex').getValue();
       if (geom.index != zIndex) {

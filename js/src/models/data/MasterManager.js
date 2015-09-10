@@ -10,7 +10,7 @@ define([
 	'models/data/Instance',
 	'models/data/geometry/Group',
 	'models/data/geometry/PathNode',
-		'models/data/geometry/SVGNode',
+	'models/data/geometry/SVGNode',
 
 	'models/data/geometry/RectNode',
 	'models/data/geometry/EllipseNode',
@@ -19,8 +19,8 @@ define([
 	'models/data/functions/FunctionManager',
 	'models/data/collections/CollectionManager',
 	'models/data/collections/Duplicator',
-	 'models/data/Constraint',
-'models/data/collections/ConstrainableList',
+	'models/data/Constraint',
+	'models/data/collections/ConstrainableList',
 	'views/LayersView',
 	'views/CollectionView',
 	'views/MapView',
@@ -29,7 +29,7 @@ define([
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList,LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -134,20 +134,20 @@ define([
 
 			for (var j = 0; j < lists.length; j++) {
 				var list = new ConstrainableList();
-				console.log('list at',j,lists[i],list);
-				var toAdd = list.parseJSON(lists[j],this);
-				console.log('to add',toAdd);
-				for(var k=0;k<toAdd.length;k++){
+				console.log('list at', j, lists[i], list);
+				var toAdd = list.parseJSON(lists[j], this);
+				console.log('to add', toAdd);
+				for (var k = 0; k < toAdd.length; k++) {
 					layersView.addList(toAdd[k].toJSON());
 					this.addListener(toAdd[k]);
 				}
-				collectionManager.addList(null,list);
+				collectionManager.addList(null, list);
 			}
 
 			for (var m = 0; m < constraints.length; m++) {
 				var constraint = new Constraint();
-				constraint.parseJSON(constraints[m],this);
-				this.addConstraint(constraint,true);
+				constraint.parseJSON(constraints[m], this);
+				this.addConstraint(constraint, true);
 
 			}
 			paper.view.draw();
@@ -155,29 +155,54 @@ define([
 		},
 
 
-         importSVG: function(data){
-              var item = new paper.Group();
-              item.importSVG(data,{expandShapes:true,applyMatrix:true});
-              item=item.reduce();
-            
-              
-             var children = item.removeChildren();
-             paper.project.activeLayer.addChildren(children);
-             var new_children = [];
-              for(var i=0;i<children.length;i++){
-              
-              		var path = new SVGNode();
-              			var pathMatrix = new paper.Matrix();
-              			pathMatrix.translate(children[i].bounds.center.x,children[i].bounds.center.y);
-              			path.normalizeGeometry(children[i],pathMatrix);
-              			this.addShape(path,true);
-              			new_children.push(path);
-             
-              }
-             this.addGroup(new_children);
+		importSVG: function(data) {
+			var start_item = new paper.Group();
+			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
+			
 
-          },
+			var path, pathMatrix;
+			if (item.children) {
+				var children = item.removeChildren();
+				paper.project.activeLayer.addChildren(children);
+				var new_children = [];
+				for (var i = 0; i < children.length; i++) {
+					if (children[i].children) {
+						path = new SVGNode();
+					} else {
+						path = new PathNode();
+					}
+					pathMatrix = new paper.Matrix();
+					pathMatrix.translate(children[i].bounds.center.x, children[i].bounds.center.y);
+					path.normalizeGeometry(children[i], pathMatrix);
+					this.addShape(path, true);
+					new_children.push(path);
 
+				}
+				if(children.length>1){
+					this.addGroup(new_children);
+				}
+			} else {
+				path = new PathNode();
+				pathMatrix = new paper.Matrix();
+				pathMatrix.translate(item.bounds.center.x, item.bounds.center.y);
+				path.normalizeGeometry(item, pathMatrix);
+				this.addShape(path, true);
+			}
+
+		},
+
+		exportSVG: function(){
+			var svg_string = '<svg x="0" y="0" width="1280" height="355" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
+			var children = rootNode.children;
+			for(var i=0;i<children.length;i++){
+				svg_string+= children[i].exportSVG();
+			}
+			svg_string+='</svg>'
+			/*var svg_string = paper.project.exportSVG({
+              asString: true
+            });*/
+			return svg_string;
+		},
 
 		deleteAll: function() {
 			this.deselectAllShapes();
@@ -199,7 +224,7 @@ define([
 		exportProjectJSON: function(json) {
 			var geometry_json = rootNode.toJSON();
 			var constraint_json = [];
-			for(var i=0;i<constraints.length;i++){
+			for (var i = 0; i < constraints.length; i++) {
 				constraint_json.push(constraints[i].toJSON());
 			}
 			var list_json = collectionManager.getListJSON();
@@ -631,7 +656,7 @@ define([
 		addDuplicator: function(duplicator) {
 			this.deselectAllShapes();
 			currentNode.addChildNode(duplicator);
-			collectionManager.addDuplicator(null,duplicator);
+			collectionManager.addDuplicator(null, duplicator);
 
 			layersView.addShape(duplicator.toJSON());
 			this.addListener(duplicator);
@@ -675,7 +700,7 @@ define([
 				}
 			}
 			layersView.removeChildren(duplicator.get('id'));
-			for(var k=0;k<duplicator.members.length;k++){
+			for (var k = 0; k < duplicator.members.length; k++) {
 				layersView.addShape(duplicator.members[k].toJSON(), duplicator.get('id'));
 			}
 			layersView.sortChildren(duplicator.get('id'));
@@ -696,13 +721,13 @@ define([
 			}
 		},
 
-		addConstraint: function(constraint,noUpdate) {
+		addConstraint: function(constraint, noUpdate) {
 			if (!constraint.get('user_name')) {
 				constraint.set('user_name', 'constraint ' + (constraints.length + 1));
 			}
 			constraints.push(constraint);
 			layersView.addConstraint(constraint);
-			if(!noUpdate){
+			if (!noUpdate) {
 				this.updateMapView(constraint.get('id'));
 			}
 
@@ -726,17 +751,17 @@ define([
 			if (movedShape && relativeShape) {
 				switch (mode) {
 					case 'over':
-						if(movedShape.nodeParent == relativeShape){
+						if (movedShape.nodeParent == relativeShape) {
 							return false;
 						}
-						if(relativeShape.get('name')==='duplicator'){
+						if (relativeShape.get('name') === 'duplicator') {
 							return false;
 						}
-						if(relativeShape.get('name')==='group'){
+						if (relativeShape.get('name') === 'group') {
 							relativeShape.addMember(movedShape);
 							layersView.removeChildren(relativeShape.get('id'));
-							for(var i=0;i<relativeShape.members.length;i++){
-								layersView.addShape(relativeShape.members[i].toJSON(),relativeShape.get('id'));
+							for (var i = 0; i < relativeShape.members.length; i++) {
+								layersView.addShape(relativeShape.members[i].toJSON(), relativeShape.get('id'));
 							}
 							layersView.sortChildren(relativeShape.get('id'));
 						}
@@ -744,13 +769,12 @@ define([
 					default:
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
-							console.log('parent name:',parent.get('name'));
-							if(parent.get('name')==='group'){
+							console.log('parent name:', parent.get('name'));
+							if (parent.get('name') === 'group') {
 								parent.removeMember(movedShape);
-							}
-							else if(parent.get('name')==='duplicator'){
-								var success = parent.removeMember(movedShape,true);
-								if(!success){
+							} else if (parent.get('name') === 'duplicator') {
+								var success = parent.removeMember(movedShape, true);
+								if (!success) {
 									return false;
 								}
 

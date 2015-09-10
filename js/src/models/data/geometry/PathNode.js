@@ -133,13 +133,13 @@ define([
         data.fillColor = {r:path.fillColor.red,g:path.fillColor.green,b:path.fillColor.blue,h:path.fillColor.hue,s:path.fillColor.saturation,l:path.fillColor.lightness,operator:'set'};
       }
       else{
-        data.fillColor = {noColor:true};
+        data.fillColor = {noColor:true,r:0,g:0,b:0};
       }
       if (path.strokeColor) {
         data.strokeColor = {r:path.strokeColor.red,g:path.strokeColor.green,b:path.strokeColor.blue,h:path.strokeColor.hue,s:path.strokeColor.saturation,l:path.strokeColor.lightness,operator:'set'};
       }
       else{
-        data.strokeColor={noColor:true};
+        data.strokeColor={noColor:true,r:0,g:0,b:0};
       }
       data.strokeWidth = {
         v: path.strokeWidth
