@@ -69,7 +69,14 @@ define([
 
 			var cval = $('#count').val();
 			var value = this.verifyNumeric(cval);
+			
 			if (value) {
+				if (cval > 60) {
+				if (!confirm("Setting duplicator counts to values greater than 60 can slow down the system considerably, are you sure you want to proceed? ")) {
+					$('#count').val(countVal);
+					return;
+				}
+			}
 				countVal = +cval;
 				this.model.setDuplicatorCount(+cval);
 			} else {
@@ -122,7 +129,7 @@ define([
 				this.setCount();
 			} else {
 				var collections = selected.filter(function(item) {
-					return (item.get('type') == 'collection' || item.get('name') == 'group' || item.get('name')=='duplicator');
+					return (item.get('type') == 'collection' || item.get('name') == 'group' || item.get('name') == 'duplicator');
 				});
 				var duplicators = collections.filter(function(item) {
 					return (item.get('name') == 'duplicator');

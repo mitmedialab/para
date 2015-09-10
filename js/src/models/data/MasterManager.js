@@ -161,20 +161,22 @@ define([
               item.importSVG(data,{expandShapes:true,applyMatrix:true});
               item=item.reduce();
             
-              var group = new Group();
+              
              var children = item.removeChildren();
              paper.project.activeLayer.addChildren(children);
-
+             var new_children = [];
               for(var i=0;i<children.length;i++){
               
-              			var path = new SVGNode();
+              		var path = new SVGNode();
               			var pathMatrix = new paper.Matrix();
               			console.log('position',children[i].bounds.center);
               			pathMatrix.translate(children[i].bounds.center.x,children[i].bounds.center.y);
               			path.normalizeGeometry(children[i],pathMatrix);
-              			this.addShape(path);
+              			this.addShape(path,true);
+              			new_children.push(path);
              
               }
+             this.addGroup(new_children);
 
           },
 
