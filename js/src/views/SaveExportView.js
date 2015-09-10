@@ -102,12 +102,9 @@ define([
 				}
 			}
 			if (!data) {
-				console.log('no data passed in');
 				data = this.model.exportProjectJSON();
 			}
-			console.log('data =',data);
 			var string_data = JSON.stringify(data);
-			console.log('data saving',string_data, currentName);
 			localStorage.setItem(currentName, string_data);
 
 		},
@@ -123,7 +120,6 @@ define([
 		load: function(filename) {
 			this.save();
 			var data = localStorage.getItem(filename);
-			console.log('data =', data);
 			this.model.importProjectJSON(JSON.parse(data));
 			currentName = filename;
 		},

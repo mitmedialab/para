@@ -212,6 +212,13 @@ define([
       data.modes = this.get('modes');
       data.relative_properties = this.get('relative_properties');
       data.reference_properties = this.get('reference_properties');
+      if(this.get('proxy_references')){
+        data.proxy_references = this.get('proxy_references').get('id');
+      }
+       if(this.get('proxy_relatives')){
+        data.proxy_relatives= this.get('proxy_relatives').get('id');
+      }
+
       var prop, subprop, i, vals;
 
       data.exempt_indicies = {};
@@ -257,6 +264,13 @@ define([
       this.set('modes', data.modes);
       this.set('relative_properties', data.relative_properties);
       this.set('reference_properties', data.reference_properties);
+      if(data.proxy_references){
+        this.set('proxy_references',manager.getById(data.proxy_references));
+      }
+      if(data.proxy_relatives){
+        this.set('proxy_relatives',manager.getById(data.proxy_relatives));
+      }
+
       var prop, subprop, i, vals;
 
       var exempt_indicies = {};

@@ -66,6 +66,8 @@ define([
             },
 
             toJSON: function() {
+                console.log('prior to json group_relative, reference',this.group_relative,this.group_reference);
+
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
                 data.internalList = this.internalList.toJSON();
@@ -77,6 +79,8 @@ define([
                 for (var j = 0; j < this.group_reference.length; j++) {
                     data.group_reference.push(this.group_reference[j].toJSON());
                 }
+                                console.log('json group_relative, reference',data.group_relative,data.group_reference);
+
                 return data;
             },
 
@@ -117,6 +121,7 @@ define([
                     this.group_reference.push(list);
                 }
                 this.toggleClosed(this);
+                console.log('parsed group_relative, reference',this.group_relative,this.group_reference);
                 return this;
 
             },
@@ -144,12 +149,12 @@ define([
                 if (this.internalList.get('id') === id) {
                     return this.internalList;
                 }
-                for(var i=0;i<this.relative_list.length;i++){
-                    if(this.relative_list[i].get('id')===id){
-                        return this.relative_list[i];
+                for(var i=0;i<this.group_relative.length;i++){
+                    if(this.group_relative[i].get('id')===id){
+                        return this.group_relative[i];
                     }
-                    else if(this.reference_list[i].get('id')===id){
-                        return this.reference_list[i];
+                    else if(this.group_reference[i].get('id')===id){
+                        return this.group_reference[i];
                     }
                 }
             },
@@ -303,9 +308,9 @@ define([
                 }
             },
 
-            deleteMember: function(member) {
+            deleteMember: function(member,removeAll) {
 
-                this.removeMember(member);
+                this.removeMember(member,false, removeAll);
                 member.deleteSelf();
                 var parent = member.getParentNode();
                 if (parent) {
@@ -324,7 +329,9 @@ define([
                 }
                 for (var i = this.members.length - 1; i >= 0; i--) {
                     deleted.push.apply(deleted, this.members[i].deleteAllChildren());
-                    deleted.push(this.deleteMember(this.members[i]));
+                    var deleted_member = this.deleteMember(this.members[i],true);
+                    console.log('trying to delete member at ',i,deleted_member);
+                    deleted.push(deleted_member);
                 }
                 this.members.length = 0;
                 this.children.length = 0;
@@ -344,9 +351,10 @@ define([
             },
 
 
-            removeMember: function(data, updateCount) {
+            removeMember: function(data, updateCount,fullDelete) {
                 var target = this.get('target');
-                if (this.internalList.hasMember(data, true, this)) {
+                if (this.internalList.hasMember(data, true, this) && !fullDelete) {
+                    console.log('returning false',fullDelete);
                     return false;
                 }
                 var index = $.inArray(data, this.members);

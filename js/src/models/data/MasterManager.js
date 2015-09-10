@@ -94,7 +94,7 @@ define([
 			var lists = json.lists;
 			var geometry = json.geometry.children;
 			var constraints = json.constraints;
-
+			console.log('stored constraints',json.constraints);
 			for (var i = 0; i < geometry.length; i++) {
 				var geom;
 				switch (geometry[i].name) {
@@ -176,7 +176,7 @@ define([
 					new_children.push(path);
 
 				}
-				if(children.length>1){
+				if (children.length > 1) {
 					this.addGroup(new_children);
 				}
 			} else {
@@ -189,14 +189,29 @@ define([
 
 		},
 
-		exportSVG: function(){
+		exportSVG: function() {
 			var svg_string = '<svg x="0" y="0" width="1280" height="355" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
 			var children = rootNode.children;
-			for(var i=0;i<children.length;i++){
-				svg_string+= children[i].exportSVG();
+			for (var i = 0; i < children.length; i++) {
+				svg_string += children[i].exportSVG();
 			}
-			svg_string+='</svg>';
+			svg_string += '</svg>';
 			return svg_string;
+		},
+
+		exportProjectJSON: function(json) {
+			var geometry_json = rootNode.toJSON();
+			var constraint_json = [];
+			for (var i = 0; i < constraints.length; i++) {
+				constraint_json.push(constraints[i].toJSON());
+			}
+			var list_json = collectionManager.getListJSON();
+			var project_json = {
+				geometry: geometry_json,
+				constraints: constraint_json,
+				lists: list_json
+			};
+			return project_json;
 		},
 
 		deleteAll: function() {
@@ -216,20 +231,7 @@ define([
 			//console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
 		},
 
-		exportProjectJSON: function(json) {
-			var geometry_json = rootNode.toJSON();
-			var constraint_json = [];
-			for (var i = 0; i < constraints.length; i++) {
-				constraint_json.push(constraints[i].toJSON());
-			}
-			var list_json = collectionManager.getListJSON();
-			var project_json = {
-				geometry: geometry_json,
-				constraints: constraint_json,
-				lists: list_json
-			};
-			return project_json;
-		},
+
 
 		getById: function(id) {
 			var prefix = id.split('_')[0];
@@ -239,7 +241,6 @@ define([
 					obj = collectionManager.getCollectionById(id);
 					break;
 				case 'internalcollection':
-					console.log('accessing internal collection',id);
 					obj = collectionManager.getInternalList(id);
 					break;
 				case 'constraint':
@@ -657,7 +658,14 @@ define([
 			layersView.addShape(duplicator.toJSON());
 			this.addListener(duplicator);
 			for (var j = 0; j < duplicator.members.length; j++) {
+				if (duplicator.members[j].get('name') === 'group') {
+					for (var i = 0; i < duplicator.members[j].members.length; i++) {
+						this.addListener(duplicator.members[j].members[i]);
+
+					}
+				}
 				this.addListener(duplicator.members[j]);
+
 			}
 		},
 
