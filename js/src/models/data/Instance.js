@@ -1186,12 +1186,8 @@ define([
 			this._matrix.translate(translationDelta.x, translationDelta.y);
 			this._matrix.rotate(rotationDelta, 0, 0);
 			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
-			console.log('position before matrix reset',geom.position,this.get('id'));
-
-			//geom.matrix.reset();
-			console.log('position after matrix reset',geom.position,this.get('id'));
+			
 			geom.transform(this._matrix);
-			console.log('position after transformation',geom.position,this.get('id'));
 			bbox.transform(this._matrix);
 			selection_clone.transform(this._matrix);
 			return [geom];

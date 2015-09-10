@@ -39,7 +39,6 @@ define([
      * returns the transformation data
      */
     normalizeGeometry: function(path, matrix) {
-      console.log('matrix translation value',matrix.translation);
       var data = {};
       // TODO: make some normalizations util function
       var rotationDelta;
@@ -130,7 +129,6 @@ define([
      var pathAltered = this.get('pathAltered');
      pathAltered.setNull(false);
      this.setPathAltered();
-     console.log('normalized path position',this.get('geom').position);
       return data;
     },
 
@@ -140,9 +138,7 @@ define([
     },
 
     renderStyle: function(geom) {
-      console.log('geom position at render',geom.position);
-      console.trace();
-      /*if (!this._fillColor.noColor && (this._fillColor.h > -1 && this._fillColor.s > -1 && this._fillColor.l > -1)) {
+      if (!this._fillColor.noColor && (this._fillColor.h > -1 && this._fillColor.s > -1 && this._fillColor.l > -1)) {
         if (!geom.fillColor) {
           geom.fillColor = new paper.Color(0, 0, 0);
         }
@@ -168,7 +164,7 @@ define([
         geom.strokeColor = undefined;
       }
 
-      geom.strokeWidth = this._strokeWidth;*/
+      geom.strokeWidth = this._strokeWidth;
       geom.visible = this._visible;
       var zIndex = this.get('zIndex').getValue();
       if (geom.index != zIndex) {

@@ -156,7 +156,6 @@ define([
 
 
          importSVG: function(data){
-         	console.log('import svg');
               var item = new paper.Group();
               item.importSVG(data,{expandShapes:true,applyMatrix:true});
               item=item.reduce();
@@ -169,7 +168,6 @@ define([
               
               		var path = new SVGNode();
               			var pathMatrix = new paper.Matrix();
-              			console.log('position',children[i].bounds.center);
               			pathMatrix.translate(children[i].bounds.center.x,children[i].bounds.center.y);
               			path.normalizeGeometry(children[i],pathMatrix);
               			this.addShape(path,true);
