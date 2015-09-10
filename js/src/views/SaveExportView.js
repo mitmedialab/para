@@ -17,7 +17,7 @@ define([
 			'click #saveas': 'saveAs',
 			'click #downloadFile': 'downloadFile',
 			'click #export': 'exportSVG',
-			'click #import': 'importSVG',
+			'change #importSVG': 'importSVG',
 			//'change #text-filename': 'nameChange',
 			'change #uploadFile': 'uploadFile',
 			'change #fileselect': 'loadLocal',
@@ -81,7 +81,7 @@ define([
 
 		},
 
-		save: function() {
+		save: function(data) {
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
@@ -100,16 +100,18 @@ define([
 
 				}
 			}
+			if(!data){
 			var project_json = this.model.exportProjectJSON();
-			var data = JSON.stringify(project_json);
+			data = JSON.stringify(project_json);
+			}
 			localStorage.setItem(currentName, data);
 			return project_json;
 
 		},
 
-		saveAs: function() {
+		saveAs: function(data) {
 			currentName = null;
-			this.save();
+			this.save(data);
 
 		},
 
@@ -139,7 +141,14 @@ define([
 
 		},
 
-		importSVG: function() {
+		importSVG: function(event) {
+			var file = event.target.files[0];
+
+			this.listenToOnce(this, 'loadComplete', function(result) {
+				this.model.importSVG(result);
+
+			});
+			this.completeFileLoad(file);
 
 		},
 
@@ -147,7 +156,7 @@ define([
 			var file = event.target.files[0];
 
 			this.listenToOnce(this, 'loadComplete', function(result) {
-
+				this.saveAs(result);
 
 			});
 			this.completeFileLoad(file);

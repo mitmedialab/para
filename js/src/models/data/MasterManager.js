@@ -10,6 +10,8 @@ define([
 	'models/data/Instance',
 	'models/data/geometry/Group',
 	'models/data/geometry/PathNode',
+		'models/data/geometry/SVGNode',
+
 	'models/data/geometry/RectNode',
 	'models/data/geometry/EllipseNode',
 	'models/data/geometry/PolygonNode',
@@ -27,7 +29,7 @@ define([
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList,LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList,LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
@@ -133,7 +135,6 @@ define([
 			for (var j = 0; j < lists.length; j++) {
 				var list = new ConstrainableList();
 				console.log('list at',j,lists[i],list);
-
 				var toAdd = list.parseJSON(lists[j],this);
 				console.log('to add',toAdd);
 				for(var k=0;k<toAdd.length;k++){
@@ -148,11 +149,34 @@ define([
 				constraint.parseJSON(constraints[m],this);
 				this.addConstraint(constraint,true);
 
-	
 			}
 			paper.view.draw();
 
 		},
+
+
+         importSVG: function(data){
+         	console.log('import svg');
+              var item = new paper.Group();
+              item.importSVG(data,{expandShapes:true,applyMatrix:true});
+              item=item.reduce();
+            
+              var group = new Group();
+             var children = item.removeChildren();
+             paper.project.activeLayer.addChildren(children);
+
+              for(var i=0;i<children.length;i++){
+              
+              			var path = new SVGNode();
+              			var pathMatrix = new paper.Matrix();
+              			console.log('position',children[i].bounds.center);
+              			pathMatrix.translate(children[i].bounds.center.x,children[i].bounds.center.y);
+              			path.normalizeGeometry(children[i],pathMatrix);
+              			this.addShape(path);
+             
+              }
+
+          },
 
 
 		deleteAll: function() {
@@ -522,7 +546,6 @@ define([
 		},
 
 		addShape: function(shape, noSelect) {
-
 			if (!shape.nodeParent) {
 				currentNode.addChildNode(shape);
 			}

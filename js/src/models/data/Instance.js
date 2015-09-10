@@ -18,7 +18,7 @@ define([
 	'utils/PProperty',
 	'utils/PConstraint',
 	'utils/TrigFunc',
-	'utils/ColorUtils'
+	'utils/ColorUtils',
 
 ], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
@@ -92,7 +92,6 @@ define([
 				zIndex: ['v']
 					//inheritors: []
 			},
-
 
 			dimension_num: 6,
 
@@ -371,12 +370,6 @@ define([
 			return this;
 		},
 
-		getById: function(id){
-			if(this.get('id')==id){
-				return this;
-			}
-		},
-
 		/* create
 		 * Prototypal inheritance action:
 		 * creates a new instance which inherits from
@@ -392,13 +385,7 @@ define([
 		},
 
 		addChildNode: function(node) {
-
 			SceneNode.prototype.addChildNode.call(this, node);
-			if (node.get('geom')) {
-				if (!node.get('geom').parent) {
-					paper.project.activeLayer.addChild(node.get('geom'));
-				}
-			}
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
@@ -536,6 +523,7 @@ define([
 			geom.data.nodetype = this.get('name');
 			this.set('geom', geom);
 			this.set('normal_geom', geom.clone());
+			this.get('normal_geom').visible = false;
 			this.createBBox();
 			this.createSelectionClone();
 			for (var i = 0; i < this.children.length; i++) {
@@ -1198,8 +1186,12 @@ define([
 			this._matrix.translate(translationDelta.x, translationDelta.y);
 			this._matrix.rotate(rotationDelta, 0, 0);
 			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
-			geom.matrix.reset();
+			console.log('position before matrix reset',geom.position,this.get('id'));
+
+			//geom.matrix.reset();
+			console.log('position after matrix reset',geom.position,this.get('id'));
 			geom.transform(this._matrix);
+			console.log('position after transformation',geom.position,this.get('id'));
 			bbox.transform(this._matrix);
 			selection_clone.transform(this._matrix);
 			return [geom];
@@ -1253,10 +1245,12 @@ define([
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
+				if(this._fillColor.h){
 				geom.fillColor.hue = this._fillColor.h;
 				geom.fillColor.saturation = this._fillColor.s;
 				geom.fillColor.lightness = this._fillColor.l;
 				geom.fillColor.alpha = this._fillColor.a;
+				}
 			} else {
 				geom.fillColor = undefined;
 			}

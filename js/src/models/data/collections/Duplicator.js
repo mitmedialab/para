@@ -55,6 +55,12 @@ define([
 
             },
 
+            importSVG: function(data){
+                var item = new paper.Group();
+                item.importSVG(data);
+                console.log('imported data',item);
+            },
+
             toJSON: function() {
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
