@@ -246,7 +246,6 @@ define([
               for (i = 0; i < vals.length; i++) {
                 data.exempt_indicies[prop][subprop].push(vals[i].toJSON());
               }
-               console.log('export exempt length for ', subprop, data.exempt_indicies[prop][subprop].length);
               data.expressions[prop][subprop] = expressions[prop][subprop];
 
             }
@@ -257,7 +256,6 @@ define([
     },
 
     parseJSON: function(data, manager) {
-      console.log('parsing constraint json',data);
       var reference = manager.getById(data.references);
       var relative = manager.getById(data.relatives);
       this.set('references',reference);
@@ -296,7 +294,6 @@ define([
               for (i = 0; i < vals.length; i++) {
                 exempt_indicies[prop][subprop].push(new PFloat(vals[i]));
               }
-               console.log('parse exempt length for ', subprop, exempt_indicies[prop][subprop].length);
               expressions[prop][subprop] = data.expressions[prop][subprop];
 
             }
@@ -699,7 +696,6 @@ define([
             data[rel_prop_key] = {};
             var relative_target = relative.getMemberAt(z);
             var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
-           // console.log('exempt_indicies',rel_prop_key,rel_dimension,z,exempt_indicies[rel_prop_key][rel_dimension][z].length);
             if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue()===1 || isReference) {
               y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
 

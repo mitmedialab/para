@@ -25,22 +25,23 @@ define([
 		},
 
 		initialize: function() {
-			unsavedChanges= false;
+			unsavedChanges = false;
 			this.enable('saveas');
 			this.enable('downloadFile');
 			this.enable('export');
 			this.enable('import');
 			this.enable('uploadFile');
-			this.listenTo(this.model,'modified',this.enableSave);
+			this.listenTo(this.model, 'modified', this.enableSave);
+			$('#uploadFile').on('click', function() { $('#uploadFile').val(''); });
 
 		},
 
-		enableSave: function(){
+		enableSave: function() {
 			this.enable('save');
 			unsavedChanges = true;
 		},
 
-		disableSave: function(){
+		disableSave: function() {
 			this.disable('save');
 			unsavedChanges = false;
 		},
@@ -117,7 +118,7 @@ define([
 				data = this.model.exportProjectJSON();
 			}
 			var string_data = JSON.stringify(data);
-			console.log('setting data',currentName,data);
+			console.log('setting data', currentName, data);
 			localStorage.removeItem(currentName);
 			try {
 				localStorage.setItem(currentName, string_data);
@@ -128,12 +129,12 @@ define([
 			this.disableSave();
 			//console.log('localStorageSet',localStorage);
 
-
+			return true;
 		},
 
 		saveAs: function(event, data) {
 			currentName = null;
-			this.save(null, data);
+			return this.save(null, data);
 
 		},
 
@@ -144,14 +145,14 @@ define([
 			//this.save();
 			var data = localStorage.getItem(filename);
 			var data_obj = JSON.parse(data);
-			console.log('loading filename',filename, data_obj);
+			console.log('loading filename', filename, data_obj);
 			this.model.importProjectJSON(data_obj);
 			currentName = filename;
 		},
 
 
 		loadLocal: function() {
-			if(unsavedChanges){
+			if (unsavedChanges) {
 				if (!confirm("you have unsaved changes, do you wish to continue?" + name)) {
 					$('#text-filename').val(currentName);
 					return;
@@ -165,10 +166,6 @@ define([
 
 		downloadFile: function() {
 
-
-		},
-
-		exportSVG: function() {
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
@@ -176,6 +173,21 @@ define([
 				}
 				currentName = name;
 			}
+			var data = JSON.stringify(this.model.exportProjectJSON());
+			var blob = new Blob([data], {
+				type: 'text/plain;charset=utf-8'
+			});
+			var fileSaver = new FileSaver(blob, currentName);
+		},
+
+		exportSVG: function() {
+			/*if (!currentName) {
+				var name = this.promptName();
+				if (!name) {
+					return;
+				}
+				currentName = name;
+			}*/
 			var data = this.model.exportSVG();
 			var blob = new Blob([data], {
 				type: 'image/svg+xml'
@@ -195,10 +207,20 @@ define([
 		},
 
 		uploadFile: function(event) {
+			if (unsavedChanges) {
+				if (!confirm("you have unsaved changes, do you wish to continue?" + name)) {
+					$('#text-filename').val(currentName);
+					return;
+				}
+			}
 			var file = event.target.files[0];
 
 			this.listenToOnce(this, 'loadComplete', function(result) {
-				this.saveAs(null, result);
+				var saved = this.saveAs(null, JSON.parse(result));
+				if(saved){
+					this.load(currentName);
+				}
+
 
 			});
 			this.completeFileLoad(file);
