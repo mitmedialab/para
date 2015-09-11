@@ -95,7 +95,7 @@ define([
 
 
 
-			paper.setup($('#collection-canvas')[0]);
+			/*paper.setup($('#collection-canvas')[0]);
 			mapPaperView = paper.View._viewsById['collection-canvas'];
 			intersectionPath = new paper.Path.Line(new paper.Point(width / 2, 0), new paper.Point(width / 2, height));
 			intersectionPath.name = 'intersectionPath';
@@ -127,6 +127,8 @@ define([
 			this.resetMasterView();
 			this.setMin();
 			this.setMax();
+			*/
+
 			this.setRange();
 			this.setToDefault();
 
@@ -134,13 +136,9 @@ define([
 		},
 
 		setToDefault: function() {
-			this.setCollectionView();
-			//start.point.x = 0;
-			//start.point.y = height / 2;
-			//end.point.x = width;
-			//end.point.y = height / 2;
-			mapPaperView.draw();
-			this.resetMasterView();
+			//this.setCollectionView();
+			//mapPaperView.draw();
+			//this.resetMasterView();
 		},
 
 		setConstraint: function(c) {
@@ -268,8 +266,8 @@ define([
 				} else {
 					$('#exempt_button').addClass('active');
 				}
-			}	
-			
+			}
+
 		},
 
 		changeRefVal: function() {
@@ -548,14 +546,14 @@ define([
 		},
 
 		mouseEnter: function() {
-			this.setCollectionView();
+			//this.setCollectionView();
 			//functionPath.fullySelected = true;
 
 		},
 
 		mouseLeave: function() {
-			this.resetMasterView();
-			activePoint = null;
+			//this.resetMasterView();
+			//activePoint = null;
 		},
 
 		toolMouseUp: function(event) {
