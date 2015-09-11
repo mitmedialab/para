@@ -1207,7 +1207,6 @@ define([
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-			console.log('translationDelta',translationDelta,geom.position);
 			this._matrix.translate(translationDelta.x, translationDelta.y);
 			this._matrix.rotate(rotationDelta, 0, 0);
 			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
@@ -1216,6 +1215,33 @@ define([
 			bbox.transform(this._matrix);
 			selection_clone.transform(this._matrix);
 			return [geom];
+		},
+
+		transformPoint: function(delta){
+			var translationDelta = this.get('translationDelta').getValue();
+			var line = new paper.Path.Line(new paper.Point(0,0),delta);
+			//delta.x-=translationDelta.x;
+			//delta.y-=translationDelta.y;
+			line.transform(this._matrix);
+			var new_delta = line.segments[1].point;
+			new_delta.x-=translationDelta.x;
+			new_delta.y-=translationDelta.y;
+			console.log(line,delta,new_delta);
+			line.remove();
+			return new_delta;
+		},
+
+		inverseTransformPoint: function(delta){
+			var translationDelta = this.get('translationDelta').getValue();
+			delta.x+=translationDelta.x;
+			delta.y+=translationDelta.y;
+			var line = new paper.Path.Line(new paper.Point(0,0),delta);
+			var invertedMatrix = this._matrix.inverted();
+			line.transform(invertedMatrix);
+			var new_delta = line.segments[1].point;
+			console.log(line,delta,new_delta);
+			line.remove();
+			return new_delta;
 		},
 
 

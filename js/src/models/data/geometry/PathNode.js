@@ -267,11 +267,13 @@ define([
       var selectedPoints = this.inheritSelectedPoints();
       //maintains constraints on points
       var indicies = [];
-        if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+     
+        /*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
         this.nodeParent.inverseTransformRecurse([]);
       } else {
         this.inverseTransformSelf();
-      }
+      }*/      
+
       for (var i = 0; i < selectedPoints.length; i++) {
 
         var selectedPoint = selectedPoints[i];
@@ -297,8 +299,8 @@ define([
             hi.add(data.translationDelta);
             geomS.handleIn.x += data.translationDelta.x;
             geomS.handleIn.y += data.translationDelta.y;
-            selectionS.handleIn.x += data.translationDelta.x;
-            selectionS.handleIn.y += data.translationDelta.y;
+            selectionS.handleIn.x +=data.translationDelta.x;
+            selectionS.handleIn.y +=data.translationDelta.y;
             break;
 
           case 'handle-out':
@@ -306,30 +308,38 @@ define([
             ho.add(data.translationDelta);
             geomS.handleOut.x += data.translationDelta.x;
             geomS.handleOut.y += data.translationDelta.y;
-            selectionS.handleOut.x += data.translationDelta.x;
+            selectionS.handleOut.x +=data.translationDelta.x;
             selectionS.handleOut.y += data.translationDelta.y;
             break;
         }
 
       }
 
-       if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+     /* if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
         this.nodeParent.transformRecurse([]);
       } else {
         this.transformSelf();
 
-      }
+      }*/
       var endWidth = geom.bounds.width;
       var endHeight = geom.bounds.height;
       var wDiff = (endWidth - startWidth) / 2;
       var hDiff = (endHeight - startHeight) / 2;
 
       var inheritors = this.get('inheritors').inheritors;
+      var delta;
+
+      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+        delta = this.nodeParent.inverseTransformRecursePoint(new paper.Point(data.translationDelta.x,data.translationDelta.y));
+      } else {
+        delta = this.inverseTransformPoint(new paper.Point(data.translationDelta.x,data.translationDelta.y));
+      }
+
       for (var j = 0; j < inheritors.length; j++) {
-        inheritors[j].modifyPointsByIndex(data, indicies, exclude);
+        inheritors[j].modifyPointsByIndex(delta, indicies, exclude);
       }
       if (proto_node) {
-        proto_node.modifyPointsByIndex(data, indicies, this);
+        proto_node.modifyPointsByIndex(delta, indicies, this);
       }
 
     },
@@ -341,18 +351,26 @@ define([
      * which would be too memory intensive. Instead just applies transformations
      * on the prototype's geometry to those of the inheritor
      */
-    modifyPointsByIndex: function(data, indicies, exclude) {
-      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+    modifyPointsByIndex: function(initial_delta, indicies, exclude) {
+      /*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
         this.nodeParent.inverseTransformRecurse([]);
       } else {
         this.inverseTransformSelf();
-      }
+      }*/
 
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
       //var startWidth = geom.bounds.width;
       //var startHeight = geom.bounds.height;
-
+  //var delta = new paper.Point(data.translationDelta.x,data.translationDelta.y);
+      console.log('pre_delta',initial_delta);
+      var delta;
+      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+        delta = this.nodeParent.transformRecursePoint(delta);
+      } else {
+        delta = this.transformPoint(initial_delta);
+      }
+      console.log('post_delta',delta);
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
 
@@ -361,24 +379,24 @@ define([
         switch (indicies[i].type) {
           case 'segment':
           case 'curve':
-            geomS.point.x += data.translationDelta.x;
-            geomS.point.y += data.translationDelta.y;
-            selectionS.point.x += data.translationDelta.x;
-            selectionS.point.y += data.translationDelta.y;
+            geomS.point.x += delta.x;
+            geomS.point.y += delta.y;
+            selectionS.point.x += delta.x;
+            selectionS.point.y += delta.y;
 
             break;
           case 'handle-in':
-            geomS.handleIn.x += data.translationDelta.x;
-            geomS.handleIn.y += data.translationDelta.y;
-            selectionS.handleIn.x += data.translationDelta.x;
-            selectionS.handleIn.y += data.translationDelta.y;
+            geomS.handleIn.x += delta.x;
+            geomS.handleIn.y += delta.y;
+            selectionS.handleIn.x += delta.x;
+            selectionS.handleIn.y +=delta.y;
             break;
 
           case 'handle-out':
-            geomS.handleOut.x += data.translationDelta.x;
-            geomS.handleOut.y += data.translationDelta.y;
-            selectionS.handleOut.x += data.translationDelta.x;
-            selectionS.handleOut.y += data.translationDelta.y;
+            geomS.handleOut.x += delta.x;
+            geomS.handleOut.y += delta.y;
+            selectionS.handleOut.x += delta.x;
+            selectionS.handleOut.y += delta.y;
             break;
         }
 
@@ -387,17 +405,17 @@ define([
       var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {
         if (!exclude || inheritors[j] != exclude) {
-          inheritors[j].modifyPointsByIndex(data, indicies);
+          inheritors[j].modifyPointsByIndex(initial_delta, indicies);
         }
       }
 
       geom.visible = true;
-      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+    /*  if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
         this.nodeParent.transformRecurse([]);
       } else {
         this.transformSelf();
 
-      }
+      }*/
     },
 
 
