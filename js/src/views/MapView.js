@@ -320,9 +320,9 @@ define([
 		},
 
 		deactivate: function() {
-			this.setFunctionPath();
-			this.setMin();
-			this.setMax();
+			//this.setFunctionPath();
+			//this.setMin();
+			//this.setMax();
 			this.setRange();
 
 		},

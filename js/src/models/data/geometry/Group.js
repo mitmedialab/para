@@ -223,7 +223,8 @@ define([
     },
 
     toggleClosed: function(item) {
-      if ((this === item || this.hasMember(item)) && this.get('open')) {
+      console.log('calling toggle closed',item.get('name'));
+      if ((this === item || this.hasMember(item) || item.nodeParent === this.nodeParent) && this.get('open') ) {
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].inverseTransformSelf();
         }
