@@ -161,14 +161,17 @@ define([
       return data;
     },
 
-    generatePoints: function(path) {
+    generatePoints: function(path,clear) {
       var points = this.get('points');
+      if(clear){
+        points.length = 0;
+      }
       if (path.segments) {
         var segments = path.segments;
         for (var j = 0; j < segments.length; j++) {
           var pointNode = new PointNode();
           pointNode.normalizeGeometry(segments[j]);
-          this.addChildNode(pointNode);
+          //this.addChildNode(pointNode);
           points.push(pointNode);
         }
       }

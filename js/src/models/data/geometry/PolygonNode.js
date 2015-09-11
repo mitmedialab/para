@@ -41,26 +41,55 @@ define([
 
     //called when path points are modified 
     updateParams: function(data) {
-      console.log('calling update params', data);
-      var proto_node = this.get('proto_node');
-      if (proto_node) {
-        proto_node.updateParams(data);
-      } else {
-        if (data.property_name == 'point_num') {
+      if (data.property_name == 'point_num') {
+
+        var proto_node = this.get('proto_node');
+        if (proto_node) {
+          proto_node.updateParams(data);
+        } else {
           var userParams = this.get('userParams');
           userParams[0].val = data.value;
           this.set('userParams', userParams);
 
           var radius = this.get('width') / 2;
           var path = new paper.Path.RegularPolygon(new paper.Point(0, 0), data.value, radius);
-          path.position = new paper.Point(0,0);
+          path.position = new paper.Point(0, 0);
           path.fillColor = this.get('geom').fillColor;
           path.strokeColor = this.get('geom').strokeColor;
+          this.generatePoints(path, true);
           this.changeGeomInheritance(path);
+
           path.visible = false;
+
           this.transformSelf();
-          this.trigger('modified',this);
+
+          var inheritors = this.get('inheritors').inheritors;
+          this.trigger('modified', this);
         }
+      }
+      this.updateInheritorParams(data);
+
+    },
+
+    updateInheritorParams: function(data) {
+    
+      var inheritors = this.get('inheritors').inheritors;
+      for (var i = 0; i < inheritors.length; i++) {
+          var path = this.get('normal_geom').clone();
+        var userParams = inheritors[i].get('userParams');
+        userParams[0].val = data.value;
+        inheritors[i].set('userParams', userParams);
+
+        var radius = inheritors[i].get('width') / 2;
+        path.position = new paper.Point(0, 0);
+        path.fillColor = inheritors[i].get('geom').fillColor;
+        path.strokeColor = inheritors[i].get('geom').strokeColor;
+        inheritors[i].generatePoints(path, true);
+        inheritors[i].changeGeomInheritance(path);
+
+        path.visible = false;
+        inheritors[i].transformSelf();
+        inheritors[i].trigger('modified', inheritors[i]);
       }
     }
 
