@@ -682,6 +682,7 @@ define([
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
       var constraintF = function() {
+        console.log('calling constraint',ref_prop_key,ref_dimension);
         var list = [];
         if (self.get('paused')) {
           return relative.get(rel_prop_key)[rel_dimension].getValue();
@@ -1291,13 +1292,7 @@ define([
       return this.get('functionPath');
     },
 
-    clearUI: function() {
-      this.get('ref_handle').remove();
-      this.get('rel_handle').remove();
-      this.set('ref_handle', null);
-      this.set('rel_handle', null);
-
-    },
+   
 
     clearSelection: function() {
       if (this.get('references')) {
@@ -1310,22 +1305,33 @@ define([
       }
     },
 
+
+    clearUI: function() {
+      this.get('ref_handle').remove();
+      this.get('rel_handle').remove();
+      this.set('ref_handle', null);
+      this.set('rel_handle', null);
+
+    },
+
     deleteSelf: function() {
+     
+      this.clearSelection();
+      this.stopListening();
       var relatives = this.get('relatives');
       var relative_properties = this.get('relative_properties');
       for(var j=0;j<relative_properties.length;j++){
         relatives.removeConstraint(relative_properties[j][0],relative_properties[j][1]);
       }
-      this.clearUI();
-      this.clearSelection();
-      this.stopListening();
+
       var reference_values = this.get('reference_values');
-      for(var prop in reference_values){
+      var prop, subprop, vals, i;
+      for( prop in reference_values){
         if(reference_values.hasOwnProperty(prop)){
-          for(var subprop in reference_values[prop]){
+          for(subprop in reference_values[prop]){
             if(reference_values[prop].hasOwnProperty(subprop)){
-                var vals = reference_values[prop][subprop];
-                for(var i=0;i<vals.length;i++){
+                vals = reference_values[prop][subprop];
+                for( i=0;i<vals.length;i++){
                   vals[i].deleteSelf();
                 }
                 vals.length=0;
@@ -1333,6 +1339,38 @@ define([
           }
         }
       }
+
+      var offsets = this.get('offsets');
+      for( prop in offsets){
+        if(offsets.hasOwnProperty(prop)){
+          for(subprop in offsets[prop]){
+            if(offsets[prop].hasOwnProperty(subprop)){
+                 vals = offsets[prop][subprop];
+                for(i=0;i<vals.length;i++){
+                  vals[i].deleteSelf();
+                }
+              vals.length=0;
+            }
+          }
+        }
+      }
+
+       var exempt_indicies= this.get('exempt_indicies');
+      for( prop in exempt_indicies){
+        if(exempt_indicies.hasOwnProperty(prop)){
+          for(subprop in exempt_indicies[prop]){
+            if(exempt_indicies[prop].hasOwnProperty(subprop)){
+                 vals = exempt_indicies[prop][subprop];
+                for(i=0;i<vals.length;i++){
+                  vals[i].deleteSelf();
+                }
+               vals.length=0;
+            }
+          }
+        }
+      }
+
+      
       this.set('reference_values',null);
       this.set('expressions',null);
       this.set('relatives',null);

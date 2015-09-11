@@ -27,7 +27,6 @@ define([
 
 			deleteSelf: function(){
 				this.removeAllInheritors();
-				PConstraint.prototype.deleteSelf.call(this, arguments);
 			},
 			
 

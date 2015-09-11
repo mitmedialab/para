@@ -65,8 +65,13 @@ define([
 			this._val.invalidate();
 		},
 
-		destroy: function(){
+		deleteSelf: function(){
+			console.log('deleting self',this._val);
+			this._val.set(0);
+			this.stopListening();
+			this._val.offChange();
 			this._val.destroy();
+			console.log(this._val.get());
 		},
 
 
