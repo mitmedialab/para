@@ -1318,9 +1318,8 @@ define([
       var relatives = this.get('relatives');
       var relative_properties = this.get('relative_properties');
       for(var j=0;j<relative_properties.length;j++){
-        console.log('relative_properties',j,relative_properties[j]);
+        relatives.removeConstraint(relative_properties[j][0],relative_properties[j][1]);
       }
-     // relatives.removeConstraint();
       this.clearUI();
       this.clearSelection();
       this.stopListening();

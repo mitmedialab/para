@@ -229,13 +229,7 @@ define([
 			//console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
 		},
 
-		deleteAllConstraints: function(){
-			for (var i=0;i<constraints.length;i++){
-				constraints[i].deleteSelf();
-			}
-			constraints.length=0;
-		},
-
+		
 
 
 		getById: function(id) {
@@ -746,13 +740,21 @@ define([
 		removeConstraint: function(id) {
 			var constraint = this.getConstraintById(id);
 			if (constraint) {
-				var reference = constraint.get('references');
-				var relative = constraint.get('relatives');
-				relative.removeConstraint(constraint.get('rel_prop_key'), constraint.get('rel_prop_dimensions'));
+				var index = constraints.indexOf(constraint);
+				constraints.splice(index,1);
+				constraint.deleteSelf();
 				this.visualizeConstraint();
 				layersView.removeConstraint(constraint.get('id'));
 			}
 		},
+
+		deleteAllConstraints: function(){
+			for (var i=0;i<constraints.length;i++){
+				constraints[i].deleteSelf();
+			}
+			constraints.length=0;
+		},
+
 
 		reorderShapes: function(movedId, relativeId, mode) {
 			var movedShape = this.getById(movedId);
