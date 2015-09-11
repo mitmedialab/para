@@ -4,10 +4,9 @@ define([
   'backbone',
   'models/data/paperUI/ConstraintHandles',
   'utils/PFloat',
-  'utils/PBool',
   'utils/TrigFunc',
   'utils/Ziggurat'
-], function(_, paper, Backbone, ConstraintHandles, PFloat, PBool, TrigFunc, Ziggurat) {
+], function(_, paper, Backbone, ConstraintHandles, PFloat, TrigFunc, Ziggurat) {
 
   var propConvMap = {
     'translationDelta:scalingDelta': 0.01,
@@ -247,6 +246,7 @@ define([
               for (i = 0; i < vals.length; i++) {
                 data.exempt_indicies[prop][subprop].push(vals[i].toJSON());
               }
+               console.log('export exempt length for ', subprop, data.exempt_indicies[prop][subprop].length);
               data.expressions[prop][subprop] = expressions[prop][subprop];
 
             }
@@ -257,6 +257,7 @@ define([
     },
 
     parseJSON: function(data, manager) {
+      console.log('parsing constraint json',data);
       var reference = manager.getById(data.references);
       var relative = manager.getById(data.relatives);
       this.set('references',reference);
@@ -293,8 +294,9 @@ define([
               }
               vals = data.exempt_indicies[prop][subprop];
               for (i = 0; i < vals.length; i++) {
-                exempt_indicies[prop][subprop].push(new PBool(vals[i].v));
+                exempt_indicies[prop][subprop].push(new PFloat(vals[i]));
               }
+               console.log('parse exempt length for ', subprop, exempt_indicies[prop][subprop].length);
               expressions[prop][subprop] = data.expressions[prop][subprop];
 
             }
@@ -304,7 +306,6 @@ define([
       this.set('exempt_indicies', exempt_indicies);
       this.set('offsets', offsets);
       this.set('expressions', expressions);
-      console.log('data.properties',data.properties);
       this.create(data.properties,true);
     },
 
@@ -364,7 +365,11 @@ define([
           return false;
         }
       }
-      exempt_indicies[rel_prop_key][rel_dimension][index].setValue(status);
+      var value = 0;
+      if(status ===true){
+        value = 1;
+      }
+      exempt_indicies[rel_prop_key][rel_dimension][index].setValue(value);
       return true;
     },
 
@@ -417,7 +422,7 @@ define([
             //offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
           }
           if (exempt_index[rel_dimensions[i]].length <= index) {
-            exempt_index[rel_dimensions[i]].push(new PBool(false));
+            exempt_index[rel_dimensions[i]].push(new PFloat(0));
           }
 
         }
@@ -442,7 +447,7 @@ define([
             //offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
           }
           if (exempt_index[rel_dimensions[j]].length <= index) {
-            exempt_index[rel_dimensions[j]].push(new PBool(false));
+            exempt_index[rel_dimensions[j]].push(new PFloat(0));
           }
 
         }
@@ -469,7 +474,7 @@ define([
             //offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
           }
           if (exempt_index[rel_dimensions[m]].length <= index) {
-            exempt_index[rel_dimensions[m]].push(new PBool(false));
+            exempt_index[rel_dimensions[m]].push(new PFloat(0));
           }
 
         }
@@ -694,7 +699,8 @@ define([
             data[rel_prop_key] = {};
             var relative_target = relative.getMemberAt(z);
             var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
-            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue() || isReference) {
+           // console.log('exempt_indicies',rel_prop_key,rel_dimension,z,exempt_indicies[rel_prop_key][rel_dimension][z].length);
+            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue()===1 || isReference) {
               y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
 
             } else {
@@ -1020,7 +1026,6 @@ define([
         /*if (fMin && fMax) {
           var fdiff = fMax - fMin;
           var newDiff = max - min;
-          console.log('fMin',fMin,'fMax',fMax,'min',min,'max',max,'fdiff',fdiff,'newDiff',newDiff,'difference',fdiff - newDiff);
 
           if (Math.abs(fdiff - newDiff) === 0) {
             reset = false;
@@ -1177,7 +1182,6 @@ define([
           if (angle == end_theta) {
             angle = start_theta + theta_increment * (range - 1);
           }
-          //console.log(m, 'angle', angle, 'start_theta', start_theta, 'end_theta', end_theta);
           if (ref_dimension == 'y') {
             y = (Math.sin(angle) * resulting_rad) + center.y;
           } else {
@@ -1310,11 +1314,38 @@ define([
       }
     },
 
-    remove: function() {
+    deleteSelf: function() {
+      var relatives = this.get('relatives');
+      var relative_properties = this.get('relative_properties');
+      for(var j=0;j<relative_properties.length;j++){
+        console.log('relative_properties',j,relative_properties[j]);
+      }
+     // relatives.removeConstraint();
+      this.clearUI();
+      this.clearSelection();
+      this.stopListening();
+      var reference_values = this.get('reference_values');
+      for(var prop in reference_values){
+        if(reference_values.hasOwnProperty(prop)){
+          for(var subprop in reference_values[prop]){
+            if(reference_values[prop].hasOwnProperty(subprop)){
+                var vals = reference_values[prop][subprop];
+                for(var i=0;i<vals.length;i++){
+                  vals[i].deleteSelf();
+                }
+                vals.length=0;
+            }
+          }
+        }
+      }
+      this.set('reference_values',null);
+      this.set('expressions',null);
+      this.set('relatives',null);
+      this.set('references',null);
+      this.set('relatives',null);
+      this.set('offsets',null);
+      this.set('exempt_indicies',null);
 
-
-      // remove all paper UI elements
-      // trigger nullification / deletion of all references
     },
 
     reset: function() {

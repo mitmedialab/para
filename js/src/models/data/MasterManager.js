@@ -94,7 +94,6 @@ define([
 			var lists = json.lists;
 			var geometry = json.geometry.children;
 			var constraints = json.constraints;
-			console.log('stored constraints',json.constraints);
 			for (var i = 0; i < geometry.length; i++) {
 				var geom;
 				switch (geometry[i].name) {
@@ -134,9 +133,7 @@ define([
 
 			for (var j = 0; j < lists.length; j++) {
 				var list = new ConstrainableList();
-				console.log('list at', j, lists[i], list);
 				var toAdd = list.parseJSON(lists[j], this);
-				console.log('to add', toAdd);
 				for (var k = 0; k < toAdd.length; k++) {
 					layersView.addList(toAdd[k].toJSON());
 					this.addListener(toAdd[k]);
@@ -218,6 +215,7 @@ define([
 			this.deselectAllShapes();
 			layersView.deleteAll();
 			mapView.deactivate();
+			this.deleteAllConstraints();
 
 			var deleted_collections = collectionManager.deleteAll();
 			var deleted_instances = rootNode.deleteAllChildren([]);
@@ -229,6 +227,13 @@ define([
 				this.stopListening(deleted_collections[j]);
 			}
 			//console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
+		},
+
+		deleteAllConstraints: function(){
+			for (var i=0;i<constraints.length;i++){
+				constraints[i].deleteSelf();
+			}
+			constraints.length=0;
 		},
 
 
@@ -773,7 +778,6 @@ define([
 					default:
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
-							console.log('parent name:', parent.get('name'));
 							if (parent.get('name') === 'group') {
 								parent.removeMember(movedShape);
 							} else if (parent.get('name') === 'duplicator') {

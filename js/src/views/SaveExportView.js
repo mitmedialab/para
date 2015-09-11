@@ -8,7 +8,7 @@ define([
 	'handlebars',
 	'filesaver'
 
-], function($, _, Backbone, Handlebars,FileSaver) {
+], function($, _, Backbone, Handlebars, FileSaver) {
 
 	var currentName;
 	var SaveExportView = Backbone.View.extend({
@@ -82,7 +82,7 @@ define([
 
 		},
 
-		save: function(event,data) {
+		save: function(event, data) {
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
@@ -105,22 +105,33 @@ define([
 				data = this.model.exportProjectJSON();
 			}
 			var string_data = JSON.stringify(data);
-			localStorage.setItem(currentName, string_data);
+			console.log('setting data',currentName,data);
+			localStorage.removeItem(currentName);
+			try {
+				localStorage.setItem(currentName, string_data);
+			} catch (e) {
+				console.log("LIMIT REACHED:", string_data);
+				console.log(e);
+			}
+			//console.log('localStorageSet',localStorage);
+
 
 		},
 
-		saveAs: function(event,data) {
+		saveAs: function(event, data) {
 			currentName = null;
-			this.save(null,data);
+			this.save(null, data);
 
 		},
 
 
 
 		load: function(filename) {
-			this.save();
+			//this.save();
 			var data = localStorage.getItem(filename);
-			this.model.importProjectJSON(JSON.parse(data));
+			var data_obj = JSON.parse(data);
+			console.log('loading filename',filename, data_obj);
+			this.model.importProjectJSON(data_obj);
 			currentName = filename;
 		},
 
@@ -137,19 +148,19 @@ define([
 
 		},
 
-	exportSVG: function() {
+		exportSVG: function() {
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
 					return;
 				}
-				currentName = name; 
+				currentName = name;
 			}
 			var data = this.model.exportSVG();
 			var blob = new Blob([data], {
-              type: 'image/svg+xml'
-            });
-            var fileSaver = new FileSaver(blob, currentName);
+				type: 'image/svg+xml'
+			});
+			var fileSaver = new FileSaver(blob, currentName);
 		},
 
 		importSVG: function(event) {
@@ -167,7 +178,7 @@ define([
 			var file = event.target.files[0];
 
 			this.listenToOnce(this, 'loadComplete', function(result) {
-				this.saveAs(null,result);
+				this.saveAs(null, result);
 
 			});
 			this.completeFileLoad(file);

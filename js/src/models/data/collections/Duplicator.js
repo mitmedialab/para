@@ -42,7 +42,6 @@ define([
             initialize: function() {
                 ConstrainableList.prototype.initialize.apply(this, arguments);
                 this.set('count', new PFloat(0));
-                console.log('group',Group,'PolygonNode',PolygonNode);
                 var geom = new paper.Group();
                 this.set('geom', geom);
                 geom.data.instance = this;
@@ -58,7 +57,6 @@ define([
             importSVG: function(data){
                 var item = new paper.Group();
                 item.importSVG(data);
-                console.log('imported data',item);
             },
 
             exportSVG: function(){
@@ -66,7 +64,6 @@ define([
             },
 
             toJSON: function() {
-                console.log('prior to json group_relative, reference',this.group_relative,this.group_reference);
 
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
@@ -79,7 +76,6 @@ define([
                 for (var j = 0; j < this.group_reference.length; j++) {
                     data.group_reference.push(this.group_reference[j].toJSON());
                 }
-                                console.log('json group_relative, reference',data.group_relative,data.group_reference);
 
                 return data;
             },
@@ -101,14 +97,7 @@ define([
                         this.addMember(child, i);
                     }
                 }
-                var memberCount = {
-                    v: this.members.length,
-                    operator: 'set'
-                };
-                for (j = 0; j < this.members.length; j++) {
-                    this.members[j].get('zIndex').setValue(j);
-                }
-                this.get('memberCount').setValue(memberCount);
+               
                 this.internalList.parseJSON(data.internalList, this);
                 for (i = 0; i < data.group_relative.length; i++) {
                     list = new ConstrainableList();
@@ -120,8 +109,16 @@ define([
                     list.parseJSON(data.group_reference[j], this);
                     this.group_reference.push(list);
                 }
+                 var memberCount = {
+                    v: this.members.length,
+                    operator: 'set'
+                };
+                for (j = 0; j < this.members.length; j++) {
+                    this.members[j].get('zIndex').setValue(j);
+                }
+                this.get('memberCount').setValue(memberCount);
+                console.log('member count =',this.get('memberCount').getValue());
                 this.toggleClosed(this);
-                console.log('parsed group_relative, reference',this.group_relative,this.group_reference);
                 return this;
 
             },
@@ -139,8 +136,6 @@ define([
              */
             getTargetClass: function(name) {
                 var target_class = init_lookup[name];
-                console.log('name',name,target_class);
-
                 var child = new target_class();
                 return child;
             },
@@ -330,7 +325,6 @@ define([
                 for (var i = this.members.length - 1; i >= 0; i--) {
                     deleted.push.apply(deleted, this.members[i].deleteAllChildren());
                     var deleted_member = this.deleteMember(this.members[i],true);
-                    console.log('trying to delete member at ',i,deleted_member);
                     deleted.push(deleted_member);
                 }
                 this.members.length = 0;
@@ -354,7 +348,6 @@ define([
             removeMember: function(data, updateCount,fullDelete) {
                 var target = this.get('target');
                 if (this.internalList.hasMember(data, true, this) && !fullDelete) {
-                    console.log('returning false',fullDelete);
                     return false;
                 }
                 var index = $.inArray(data, this.members);
@@ -398,7 +391,6 @@ define([
                 this.internalList.addMember(this.get('target'), 0);
                 //this.internalList.removeMember(this.get('target'));
 
-                console.log('new target', this.get('target'), this.internalList.members);
 
             },
 

@@ -34,7 +34,6 @@ define([
           fontSize: 12,
           fontFamily: 'Source Sans Pro',
           fillColor: this.get('primary_selection_color')
-
         });
 
         var geom = new paper.Group();
@@ -79,7 +78,6 @@ define([
        * this instance with their values;
        * TODO: Make recursive (will not work for objects with 3+ leves of heirarchy)
        */
-
       getConstraintValues: function() {
         var constraints = this.getConstraint();
         if (constraints.getValue) {
@@ -121,11 +119,11 @@ define([
 
 
       removeConstraint: function(prop, dimensions) {
-        this.reset();
+        var constraint_values = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
-          var constraint_values = this.getConstraintValues();
           var data = {};
-          data[prop] = constraint_values[prop];
+          data[prop] = constraint_values[i][prop];
+          console.log('setting value',data,prop);
           this.members[i].setValue(data);
           this.increment();
         }
@@ -168,7 +166,6 @@ define([
 
       removeMemberNotation: function() {
         var diff = this.indexNumbers.length - this.members.length;
-        console.log('diff',diff);
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
           numText.remove();

@@ -45,7 +45,6 @@ define([
 						return view.checkValidDrop(data.otherNode, node, data.hitMode);
 					},
 					dragDrop: function(node, data) {
-						console.log('drop completed')
 						data.otherNode.moveTo(node, data.hitMode);
 						view.dropCompleted(data.otherNode, node, data.hitMode);
 					}
@@ -317,7 +316,6 @@ define([
 
 		checkValidDrop: function(nodeA, nodeB, hitMode) {
 			var value = this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
-			console.log('valid drop?',value);
 			return value;
 		},
 
