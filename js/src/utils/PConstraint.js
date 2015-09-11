@@ -128,7 +128,7 @@
 					if (this.isSelfConstrained()) {
 						var value = this.getValue();
 
-
+						this.constraint.pause();
 						var deleted = this.constraintStack.pop();
 						
 						if (this.constraintStack.length > 0) {

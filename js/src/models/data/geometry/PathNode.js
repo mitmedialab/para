@@ -158,10 +158,6 @@ define([
       this.changeGeomInheritance(path);
 
       this.setValue(data);
-
-      var pathAltered = this.get('pathAltered');
-      pathAltered.setNull(false);
-      this.setPathAltered();
       return data;
     },
 

@@ -551,7 +551,11 @@ define([
 				}
 
 			}
+			console.log('set inheritance',geom.position);
+
 			this.setPathAltered();
+			console.log('after path altered',geom.position);
+
 		},
 
 		setPathAltered: function() {
@@ -1203,7 +1207,7 @@ define([
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-
+			console.log('translationDelta',translationDelta,geom.position);
 			this._matrix.translate(translationDelta.x, translationDelta.y);
 			this._matrix.rotate(rotationDelta, 0, 0);
 			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
@@ -1248,6 +1252,7 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.get('geom');
+					console.log('geom value',this.get('geom'));
 					this.renderStyle(geom);
 					this.renderSelection(geom);
 					this.set('rendered', true);

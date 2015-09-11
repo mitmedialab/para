@@ -12,7 +12,7 @@ define([
   'utils/ColorUtils'
 ], function($, _, Backbone, Handlebars, IrisColorPicker, paper, ColorUtils) {
 
-  var template, source;
+  var param_template, param_source;
   var constraintTypeMap = {};
   constraintTypeMap['more-box'] = 'more';
   constraintTypeMap['more'] = 'more';
@@ -35,8 +35,8 @@ define([
 
       this.listenTo(this.model, 'toolViewUpdate', this.update);
       this.currentPaths = [];
-      source = $('#parameterTemplate').html();
-      template = Handlebars.default.compile(source);
+      param_source = $('#parameterTemplate').html();
+      param_template = Handlebars.default.compile(param_source);
 
       $('#fillColorBlock').addClass('color-block-selected');
       $('#fillColorBlock').css('background-color', 'white');
@@ -231,8 +231,7 @@ define([
         if (strokeWidth) {
           $('#strokeSlider').val(strokeWidth);
         }
-
-        //this.setParams(params,id);
+        this.setParams(selected_shape.get('userParams'),selected_shape.get('id'));
         this.delegateEvents();
       } else {
         this.geometryDeselected();
@@ -309,7 +308,6 @@ define([
         };
         this.model.geometryParamsModified(data);
       }
-
     },
 
 
@@ -330,7 +328,7 @@ define([
 
 
     clearParams: function() {
-      var html = template({});
+      var html = param_template({});
       var count = 0;
       $('#parameters').html(html);
     },
@@ -339,16 +337,10 @@ define([
     setParams: function(userParams, id) {
 
       var paramSliders = [];
-      var paramTexts = [];
-      var behaviorParams = [];
       var context = {};
-
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
           userParams[i].id = id;
-          if (userParams[i].type === 'text_box') {
-            paramTexts.push(userParams[i]);
-          } else {
             paramSliders.push(userParams[i]);
           }
         }
@@ -356,11 +348,9 @@ define([
 
         context = {
           paramSlider: paramSliders,
-          paramText: paramTexts
         };
-      }
-
-      var html = template(context);
+   
+      var html = param_template(context);
       var count = 0;
       $('#parameters').html(html);
       $('#parameterSliders input').each(function() {

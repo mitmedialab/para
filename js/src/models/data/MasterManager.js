@@ -1011,6 +1011,7 @@ define([
 		},
 
 		modifyParams: function(data) {
+			console.log('modifying param data',data);
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					selected[i].updateParams(data);
