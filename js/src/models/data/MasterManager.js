@@ -340,6 +340,7 @@ define([
 			target.reset();
 			target.compile();
 			target.render();
+			this.trigger('modified');
 		},
 
 		addListener: function(target, recurse) {
@@ -393,6 +394,7 @@ define([
 					}
 					break;
 			}
+			this.trigger('modified');
 
 		},
 
@@ -734,7 +736,7 @@ define([
 				this.updateMapView(constraint.get('id'));
 			}
 
-
+			this.trigger('modified');
 		},
 
 		removeConstraint: function(id) {

@@ -536,7 +536,7 @@ define([
       for(var i=0;i<members.length;i++){
         var member;
         if(members[i].type ==='collection'){
-          member = new this.constructor();
+          member = new this.constructor();  
           collection_members.push.apply(collection_members,member.parseJSON(members[i],manager));
         }
         else{

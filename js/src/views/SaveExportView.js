@@ -10,7 +10,7 @@ define([
 
 ], function($, _, Backbone, Handlebars, FileSaver) {
 
-	var currentName;
+	var currentName, unsavedChanges;
 	var SaveExportView = Backbone.View.extend({
 
 		events: {
@@ -25,14 +25,26 @@ define([
 		},
 
 		initialize: function() {
-			this.enable('save');
+			unsavedChanges= false;
 			this.enable('saveas');
 			this.enable('downloadFile');
 			this.enable('export');
 			this.enable('import');
 			this.enable('uploadFile');
+			this.listenTo(this.model,'modified',this.enableSave);
 
 		},
+
+		enableSave: function(){
+			this.enable('save');
+			unsavedChanges = true;
+		},
+
+		disableSave: function(){
+			this.disable('save');
+			unsavedChanges = false;
+		},
+
 
 		enable: function(type) {
 			if ($('#' + type).is(':disabled')) {
@@ -113,6 +125,7 @@ define([
 				console.log("LIMIT REACHED:", string_data);
 				console.log(e);
 			}
+			this.disableSave();
 			//console.log('localStorageSet',localStorage);
 
 
@@ -127,6 +140,7 @@ define([
 
 
 		load: function(filename) {
+
 			//this.save();
 			var data = localStorage.getItem(filename);
 			var data_obj = JSON.parse(data);
@@ -137,6 +151,12 @@ define([
 
 
 		loadLocal: function() {
+			if(unsavedChanges){
+				if (!confirm("you have unsaved changes, do you wish to continue?" + name)) {
+					$('#text-filename').val(currentName);
+					return;
+				}
+			}
 			var filename = $('#fileselect option:selected').val();
 			this.load(filename);
 			$('#text-filename').val(filename);
