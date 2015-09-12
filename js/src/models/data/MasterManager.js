@@ -519,12 +519,22 @@ define([
 		},
 
 		removeGeometry: function(target) {
-			target.deleteSelf();
+			if(target.get('name')==='duplicator'){
+				collectionManager.removeCollection(target);
+			}
+			var deleted = [];
+			deleted.push.apply(deleted, target.deleteAllChildren());
+			deleted.push( target.deleteSelf());
+
+			for (var i = 0; i < deleted.length; i++) {
+				this.stopListening(deleted[i]);
+			}
 			var parent = target.getParentNode();
 			if (parent) {
 				parent.removeInheritor(target);
 				parent.removeChildNode(target);
 			}
+
 		},
 
 		removeCollection: function(target) {
