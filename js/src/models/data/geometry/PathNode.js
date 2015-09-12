@@ -179,14 +179,19 @@ define([
       this.set('width', path.bounds.width);
       this.set('height', path.bounds.height);
 
-      this.generatePoints(path);
-
+      
       path.visible = false;
       path.selected = false;
       this.changeGeomInheritance(path);
 
       this.setValue(data);
       return data;
+    },
+
+    changeGeomInheritance:function(path){
+      GeometryNode.prototype.changeGeomInheritance.call(this,path);
+      this.generatePoints(path,true);
+
     },
 
     generatePoints: function(path, clear) {

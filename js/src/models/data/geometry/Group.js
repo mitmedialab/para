@@ -176,6 +176,14 @@ define([
 
     },
 
+    ungroup: function(){
+      var members = [];
+      for(var i=0;i<this.members.length;i++){
+        members.push(this.removeMember(this.members[i]));
+      }
+      return members;
+    },
+
     setValue: function(data) {
       Instance.prototype.setValue.call(this, data);
     },

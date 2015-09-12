@@ -387,11 +387,16 @@ define([
 		 * the parent instance.
 		 * TODO: add in checks to prevent diamond inheritance
 		 */
-		create: function() {
+		create: function(noInheritor) {
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
-			this.addInheritor(instance);
+
+			if(!noInheritor){
+				this.addInheritor(instance);
+			}
+			var g_clone = this.getShapeClone(true);
+			instance.changeGeomInheritance(g_clone);
 			return instance;
 		},
 
@@ -439,8 +444,7 @@ define([
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
-			var g_clone = this.getShapeClone(true);
-			instance.changeGeomInheritance(g_clone);
+			
 		},
 
 		removeInheritor: function(instance) {
