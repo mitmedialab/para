@@ -336,6 +336,8 @@ define([
              * function which deletes all children
              */
             deleteAllChildren: function() {
+                                console.log('calling delete children duplicator');
+
                 this.internalList.deleteSelf();
                 this.internalList = null;
                 for (var i = 0; i < this.group_relative.length; i++) {
@@ -348,8 +350,9 @@ define([
                  var   deleted = [];
                 
                 for (var k = this.members.length - 1; k >= 0; k--) {
+                    console.log('deleting member at',i,this.members.length);
                     deleted.push.apply(deleted, this.members[k].deleteAllChildren());
-                    var deleted_member = this.deleteMember(this.members[i],true);
+                    var deleted_member = this.deleteMember(this.members[k],true);
                     deleted.push(deleted_member);
                 }
                 this.members.length = 0;
@@ -359,6 +362,7 @@ define([
 
 
             deleteSelf: function() {
+                console.log('calling delete self duplicator');
                 this.stopListening();
                 
                 var data = ConstrainableList.prototype.deleteSelf.call(this);
@@ -368,6 +372,7 @@ define([
 
 
             removeMember: function(data, updateCount,fullDelete) {
+                console.log('data',data);
                 var target = this.get('target');
                 if (!fullDelete && this.internalList.hasMember(data, true, this)) {
                     return false;

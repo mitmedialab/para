@@ -288,7 +288,7 @@ define([
       if (this.members.length > 0) {
         this.members[0].compile();
       }
-
+      //this.updateScreenBounds(this.get('geom'));
     },
 
     render: function() {

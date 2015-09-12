@@ -899,7 +899,6 @@ define([
 
 		_selectSingleShape: function(instance, segments) {
 
-
 			var data = collectionManager.filterSelection(instance);
 			if (data) {
 				this.deselectShape(data.toRemove);
