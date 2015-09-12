@@ -88,7 +88,6 @@ define([
         }
       }
       var hitResult = paper.project.hitTest(event.point, hitOptions);
-
       // make sure that a true instance is selected
       if (hitResult && hitResult.item.data.instance) {
 
@@ -96,8 +95,6 @@ define([
 
         literal = path;
         instance = literal.data.instance;
-
-
         modifier = event.modifiers.command;
         this.trigger('geometrySelected', instance, null, modifier);
 

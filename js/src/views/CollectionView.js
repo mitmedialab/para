@@ -69,7 +69,14 @@ define([
 
 			var cval = $('#count').val();
 			var value = this.verifyNumeric(cval);
+			
 			if (value) {
+				if (cval > 60) {
+				if (!confirm("Setting duplicator counts to values greater than 60 can slow down the system considerably, are you sure you want to proceed? ")) {
+					$('#count').val(countVal);
+					return;
+				}
+			}
 				countVal = +cval;
 				this.model.setDuplicatorCount(+cval);
 			} else {
@@ -122,35 +129,46 @@ define([
 				this.setCount();
 			} else {
 				var collections = selected.filter(function(item) {
-					return (item.get('type') == 'collection' || item.get('name') == 'group');
+					return (item.get('type') == 'collection' || item.get('name') == 'group' || item.get('name') == 'duplicator');
 				});
 				var duplicators = collections.filter(function(item) {
 					return (item.get('name') == 'duplicator');
 				});
-				if (collections.length == selected.length) {
-					this.enable('ungroup');
-					this.setCount(selected);
-
-				} else {
-					this.disable('ungroup');
-					this.setCount();
-				}
-				if (duplicators.length == selected.length) {
-					this.enable('count');
-
-				} else {
-					this.disable('count');
-				}
+				var geometry = selected.filter(function(item) {
+					return (item.get('type') == 'geometry' && item.get('name') != 'group');
+				});
 				if (selected.length > 1) {
-					//this.enable('group');
+					this.setCount();
+					if (collections.length == selected.length) {
+						this.enable('ungroup');
+					} else {
+						this.disable('ungroup');
+					}
+					if (geometry.length == selected.length) {
+						this.enable('group');
+					}
 					this.disable('duplicator');
 					this.enable('list');
 				} else {
-					this.disable('group');
 					this.disable('list');
+					this.disable('group');
+
+					if (collections.length == selected.length) {
+						this.enable('ungroup');
+						this.setCount(selected[0]);
+					} else {
+						this.disable('ungroup');
+					}
+					if (duplicators.length == selected.length) {
+						this.enable('count');
+					} else {
+						this.disable('count');
+					}
 					//TODO: right now can only create duplicator on geometry
-					if (selected[0].get('type') === 'geometry') {
+					if (selected[0].get('type') === 'geometry' && selected[0].get('name')!=='duplicator') {
 						this.enable('duplicator');
+					} else {
+						this.disable('duplicator');
 					}
 				}
 			}

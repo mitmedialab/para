@@ -1,3 +1,4 @@
+
 /*PFloat.js*
  * constrainable float class
  * for para instance properties
@@ -50,8 +51,8 @@ define([
 			 */
 			getConstraint: function() {
 				var data;
-				var self = this.getSelfConstraint();
-				if (self) {
+				
+				if (this.isSelfConstrained()) {
 					data = this.getSelfConstraint();
 					return data;
 				}

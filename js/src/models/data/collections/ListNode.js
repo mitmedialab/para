@@ -65,35 +65,27 @@ define([
     /* addMember, removeMember
      * methods for adding and removing members from the list
      * accepts both arrays and single objects as arguments */
-    addMember: function(data,index) {
+    addMember: function(data, index) {
 
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
-          // this.listenTo(data[i], 'delete', this.deleteMember);
           this.members.push(data[i]);
-           //this.listenTo(data[i],'modified',this.render);
-          
+
         }
       } else {
-        if(index){
-          this.members.splice(index,0,data);
-        }
-        else{
-        //this.listenTo(data,'modified',this.render);
+        if (index) {
+          this.members.splice(index, 0, data);
+        } else {
           this.members.push(data);
         }
 
       }
 
-     
       var memberCount = {
         v: this.members.length,
         operator: 'set'
       };
       this.get('memberCount').setValue(memberCount);
-
-      //this.computeCentroid();
-
     },
 
     computeCentroid: function() {
@@ -172,14 +164,23 @@ define([
       return removed;
     },
 
-    /* deleteMember
-     * callback triggered when a member is deleted by some other entity
-     */
-    deleteMember: function(target) {
-      this.stopListening(target);
-      this.removeMember(target);
-      this.computeCentroid();
+
+    deleteAllMembers: function(deleted){
+       if(!deleted){
+        deleted = [];
+      }
+      for(var i=this.members.length-1;i>=0;i--){
+        deleted.push.apply(deleted,this.members[i].deleteAllMembers());
+        if(this.members[i].get('type')==='collection'){
+          this.members[i].deleteSelf();
+          deleted.push(this.members[i]);
+        }
+        this.removeMember(this.members[i]);
+      }
+      return deleted;
     },
+
+
 
     removeMember: function(data) {
       var index = $.inArray(data, this.members);
@@ -187,7 +188,7 @@ define([
       if (index > -1) {
 
         var member = this.members.splice(index, 1)[0];
-       var memberCount = {
+        var memberCount = {
           v: this.members.length,
           operator: 'set'
         };
@@ -262,13 +263,13 @@ define([
       return null;
     },
 
-getLiteralSubprops: function(key, subprop) {
-     var subprops = [];
-     for (var i = 0; i < this.members.length; i++) {
-      var sp = this.members[i].getLiteralSubprops(key, subprop);
-      subprops = subprops.concat(sp);
-     }
-     return subprops;
+    getLiteralSubprops: function(key, subprop) {
+      var subprops = [];
+      for (var i = 0; i < this.members.length; i++) {
+        var sp = this.members[i].getLiteralSubprops(key, subprop);
+        subprops = subprops.concat(sp);
+      }
+      return subprops;
     },
 
 
@@ -338,8 +339,8 @@ getLiteralSubprops: function(key, subprop) {
         var spliced_member = this.members.splice(old_index, 1)[0];
 
         this.members.splice(index, 0, spliced_member);
-       
-       //TODO: create something that specifies child order here 
+
+        //TODO: create something that specifies child order here 
         return true;
       }
       return false;
@@ -366,8 +367,21 @@ getLiteralSubprops: function(key, subprop) {
           var toggledLists = [];
           for (var i = 0; i < this.members.length; i++) {
             var toggled = this.members[i].toggleOpen(item);
+
             if (toggled) {
+
               toggledLists = toggledLists.concat(toggled);
+            }
+          }
+          var c_members = this.members;
+          var shared_members = toggledLists.filter(function(item) {
+            return c_members.indexOf(item) > -1;
+          });
+          if (shared_members.length > 0) {
+            for (var j = 0; j < this.members.length; j++) {
+              if (shared_members.indexOf(this.members[j]) === -1) {
+                this.members[j].toggleClosed(this.members[j]);
+              }
             }
           }
           return toggledLists;
@@ -422,12 +436,12 @@ getLiteralSubprops: function(key, subprop) {
         topLeft: null,
         bottomRight: null,
       });
-
       for (var k = 0; k < this.members.length; k++) {
         this.calculateBoundingBox(this.members[k]);
       }
 
       var bbox_dimensions = this.get('bbox_dimensions');
+
       if (bbox_dimensions.bottomRight) {
         var width = bbox_dimensions.bottomRight.x - bbox_dimensions.topLeft.x;
         var height = bbox_dimensions.bottomRight.y - bbox_dimensions.topLeft.y;
@@ -440,8 +454,10 @@ getLiteralSubprops: function(key, subprop) {
           bbox = new paper.Path.Rectangle(bbox_dimensions.topLeft, new paper.Size(width, height));
           bbox.data.instance = this;
           this.set('bbox', bbox);
-          this.set('geom', bbox);
-          bbox.sendToBack();
+          var targetLayer = paper.project.layers.filter(function(layer) {
+            return layer.name === 'ui_layer';
+          })[0];
+          targetLayer.addChild(bbox);
 
 
         } else {
@@ -499,15 +515,37 @@ getLiteralSubprops: function(key, subprop) {
 
     },
 
+    getBounds: function() {
+      return this.get('bbox').bounds;
+    },
+
     toJSON: function() {
       var data = Instance.prototype.toJSON.call(this, arguments);
-      var memberIds = [];
+      var members = [];
       _.each(this.members, function(item) {
-        memberIds.push(item.get('id'));
+        members.push(item.toJSON());
       });
-      data.members = memberIds;
-
+      data.members = members;
       return data;
+    },
+
+    parseJSON: function(data,manager){
+      Instance.prototype.parseJSON.call(this, data);
+      var members = data.members;
+      var collection_members = [];
+      for(var i=0;i<members.length;i++){
+        var member;
+        if(members[i].type ==='collection'){
+          member = new this.constructor();  
+          collection_members.push.apply(collection_members,member.parseJSON(members[i],manager));
+        }
+        else{
+          member = manager.getById(members[i].id);
+        }
+        this.addMember(member,i);
+      }
+      collection_members.push(this);
+      return collection_members;
     },
 
     getShapeClone: function() {

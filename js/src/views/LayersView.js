@@ -22,7 +22,7 @@ define([
 			'click #delete': 'deleteActive'
 		},
 
-		initialize: function(obj) {
+		initialize: function() {
 			this.$el.append(ui);
 
 			//source = $('#constraint_template').html();
@@ -37,11 +37,12 @@ define([
 					focusOnClick: true,
 					preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
 					preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+        	
 					dragStart: function(node, data) {
 						return true;
 					},
 					dragEnter: function(node, data) {
-						return true;
+						return view.checkValidDrop(data.otherNode, node, data.hitMode);
 					},
 					dragDrop: function(node, data) {
 						data.otherNode.moveTo(node, data.hitMode);
@@ -270,7 +271,7 @@ define([
 			shapeTree.activateKey(false);
 			listTree.activateKey(false);
 			event.data.view.visualizeConstraint();
-			
+
 		},
 
 		visualizeConstraint: function() {
@@ -280,8 +281,8 @@ define([
 				var constraint = this.model.getConstraintById(activeNode.key);
 				var pRef = currentRef;
 				var pRel = currentRel;
-				currentRef = constraint.get('proxy_references')? constraint.get('proxy_references').get('id'):constraint.get('references').get('id');
-				currentRel = constraint.get('relatives').get('id');
+				currentRef = constraint.get('proxy_references') ? constraint.get('proxy_references').get('id') : constraint.get('references').get('id');
+				currentRel = constraint.get('proxy_relatives') ? constraint.get('proxy_relatives').get('id') : constraint.get('relatives').get('id');
 				activeNode.status = 'opened';
 				this.positionConstraintIcons();
 				this.model.visualizeConstraint(currentRef, currentRel, pRef, pRel);
@@ -304,8 +305,24 @@ define([
 
 		},
 
+		deleteAll: function() {
+			shapeRoot.removeChildren();
+			listRoot.removeChildren();
+			constraintRoot.removeChildren();
+			this.deactivateConstraint();
+			this.resetConstraintHeight();
+
+		},
+
+		checkValidDrop: function(nodeA, nodeB, hitMode) {
+			var value = this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
+			return value;
+		},
+
 		dropCompleted: function(nodeA, nodeB, hitMode) {
-			this.model.reorderShapes(nodeA.key, nodeB.key, hitMode);
+			var stored = nodeA.data.zIndex;
+			nodeA.data.zIndex = nodeB.data.zIndex;
+			nodeB.data.zIndex= stored;
 		},
 
 		shapeClicked: function(event) {
@@ -423,16 +440,39 @@ define([
 			}
 		},
 
-		addShape: function(shape) {
+		addShape: function(shape, parentId) {
+			var index = shape.zIndex;
+			if (!index) {
+				index = 0;
+			}
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var s = {
 				title: shape.name,
-				key: shape.id
+				key: shape.id,
+				zIndex: index,
 			};
-			var node = shapeRoot.addChildren(s);
+			var parentNode;
+			if (parentId) {
+				parentNode = shapeTree.getNodeByKey(parentId);
+			} else {
+				parentNode = shapeRoot;
+			}
+			var node;
+			if (parentNode.children) {
+				node = parentNode.children.length > 0 ? parentNode.addChildren(s, 0) : parentNode.addChildren(s);
+			} else {
+				node = parentNode.addChildren(s);
+			}
 			this.selectNode(node);
 			this.resetConstraintHeight();
+			for (var i = 0; i < shape.children.length; i++) {
+				if (shape.children[i].name != 'point') {
+					this.addShape(shape.children[i], shape.id);
+				}
+			}
+
+
 
 		},
 
@@ -446,7 +486,32 @@ define([
 			}
 		},
 
-		addInstance: function(shape, pId) {
+		removeChildren: function(pId) {
+			var node = shapeTree.getNodeByKey(pId);
+			node.removeChildren();
+		},
+
+		sortChildren: function(pId) {
+			var node = shapeTree.getNodeByKey(pId);
+			node.sortChildren(function(a, b) {
+				if (a.data.zIndex < b.data.zIndex) {
+					return 1;
+				} else {
+					return -1;
+				}
+			});
+		},
+
+		moveShape: function(pId, nodeId) {
+			var node = shapeTree.getNodeByKey(pId);
+			var parentNode = shapeTree.getNodeByKey(nodeId);
+			if (node && parentNode) {
+				node.moveTo(parentNode, 'child');
+			}
+
+		},
+
+		addChild: function(shape, pId) {
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var parentNode = shapeTree.getNodeByKey(pId);
@@ -455,12 +520,24 @@ define([
 					title: shape.name,
 					key: shape.id
 				};
-				var node = parentNode.addChildren(s);
+				var node;
+				if (parentNode.children) {
+					node = parentNode.children.length > 0 ? parentNode.addChildren(s, 0) : parentNode.addChildren(s);
+				} else {
+					node = parentNode.addChildren(s);
+				}
+
 				this.selectNode(node);
 
 				this.resetConstraintHeight();
 			}
 		},
+
+		/*removeChild:function(childId, parentId, delete){
+			this.deselectAll(shapeRoot);
+			this.deselectAll(listRoot);
+			
+		},*/
 
 
 
@@ -471,7 +548,12 @@ define([
 				title: list.name,
 				key: list.id
 			};
-			var listNode = listRoot.addChildren(listData);
+			var listNode;
+			if (listRoot.children) {
+				listNode = listRoot.children.length > 0 ? listRoot.addChildren(listData, 0) : listRoot.addChildren(listData);
+			} else {
+				listNode = listRoot.addChildren(listData);
+			}
 			this.selectNode(listNode);
 			this.resetConstraintHeight();
 			this.visualizeConstraint();
@@ -497,7 +579,12 @@ define([
 				rel: data.get('relatives').get('id'),
 				ref: data.get('references').get('id')
 			};
-			var constraintNode = constraintRoot.addChildren(constraintData);
+			var constraintNode;
+			if (constraintRoot.children) {
+				constraintNode = constraintRoot.children.length > 0 ? constraintRoot.addChildren(constraintData, 0) : constraintRoot.addChildren(constraintData);
+			} else {
+				constraintNode = constraintRoot.addChildren(constraintData);
+			}
 			this.selectNode(constraintNode);
 			constraintNode.setActive(true);
 			shapeTree.activateKey(false);
@@ -563,8 +650,6 @@ define([
 		getCurrentRel: function() {
 			return currentRel;
 		},
-
-
 
 
 

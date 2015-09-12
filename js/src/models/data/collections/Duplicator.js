@@ -4,7 +4,13 @@
 
 define([
         'underscore',
+        'models/data/Instance',
         'models/data/collections/ConstrainableList',
+        'models/data/geometry/PathNode',
+        'models/data/geometry/RectNode',
+        'models/data/geometry/EllipseNode',
+        'models/data/geometry/PolygonNode',
+        'models/data/geometry/Group',
         'utils/PFloat',
         'utils/PBool',
         'paper',
@@ -14,7 +20,14 @@ define([
 
     ],
 
-    function(_, ConstrainableList, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
+    function(_, Instance, ConstrainableList, PathNode, RectNode, EllipseNode, PolygonNode, Group, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
+        var init_lookup = {
+            'path': PathNode,
+            'ellipse': EllipseNode,
+            'polygon': PolygonNode,
+            'rectangle': RectNode,
+            'group': Group
+        };
         var Duplicator = ConstrainableList.extend({
 
             defaults: _.extend({}, ConstrainableList.prototype.defaults, {
@@ -22,29 +35,132 @@ define([
                 count: null,
                 target: null,
                 mode: 'standard',
-                clone_count: null,
+                type: 'geometry',
                 exception_count: null
             }),
 
             initialize: function() {
                 ConstrainableList.prototype.initialize.apply(this, arguments);
                 this.set('count', new PFloat(0));
-                this.clones = [];
-                this.exceptions = [];
+                var geom = new paper.Group();
+                this.set('geom', geom);
+                geom.data.instance = this;
 
-                var clone_count = new PFloat(0);
-                clone_count.setNull(false);
-                this.set('clone_count', clone_count);
-
-
-                var exception_count = new PFloat(0);
-                exception_count.setNull(false);
-                this.set('exception_count', exception_count);
+                //internal constraint lists storage
+                this.group_relative = [];
+                this.group_reference = [];
+                this.internalList = new ConstrainableList();
+                this.internalList.set('id', 'internal' + this.internalList.get('id'));
 
             },
 
+            importSVG: function(data){
+                var item = new paper.Group();
+                item.importSVG(data);
+            },
+
+            exportSVG: function(){
+                return this.get('geom').exportSVG({asString:true});
+            },
+
+            toJSON: function() {
+
+                var data = ConstrainableList.prototype.toJSON.call(this, data);
+                data.target_index = this.members.indexOf(this.get('target'));
+                data.internalList = this.internalList.toJSON();
+                data.group_relative = [];
+                data.group_reference = [];
+                for (var i = 0; i < this.group_relative.length; i++) {
+                    data.group_relative.push(this.group_relative[i].toJSON());
+                }
+                for (var j = 0; j < this.group_reference.length; j++) {
+                    data.group_reference.push(this.group_reference[j].toJSON());
+                }
+
+                return data;
+            },
+
+
+            parseJSON: function(data) {
+                Instance.prototype.parseJSON.call(this, data);
+                var target_index = data.target_index;
+                var target_data = data.children[target_index];
+                var target = this.getTargetClass(target_data.name);
+                target.parseJSON(target_data,this);
+                this.setTarget(target);
+                var i, j, list;
+                for (i = 0; i < data.children.length; i++) {
+                    if (i != target_index) {
+                        var name = data.children[i].name;
+                        var child = this.getTargetClass(name);
+                        child.parseJSON(data.children[i],this);
+                        this.addMember(child, i);
+                    }
+                }
+
+                target.parseInheritorJSON(target_data,this);
+
+               
+                this.internalList.parseJSON(data.internalList, this);
+                for (i = 0; i < data.group_relative.length; i++) {
+                    list = new ConstrainableList();
+                    list.parseJSON(data.group_relative[i], this);
+                    this.group_relative.push(list);
+                }
+                for (j = 0; j < data.group_reference.length; j++) {
+                    list = new ConstrainableList();
+                    list.parseJSON(data.group_reference[j], this);
+                    this.group_reference.push(list);
+                }
+                 var memberCount = {
+                    v: this.members.length,
+                    operator: 'set'
+                };
+                for (j = 0; j < this.members.length; j++) {
+                    this.members[j].get('zIndex').setValue(j);
+                }
+                this.get('memberCount').setValue(memberCount);
+                this.toggleClosed(this);
+                return this;
+
+            },
+
+            getById: function(id) {
+                for (var i = 0; i < this.members.length; i++) {
+                    var match = this.members[i].getById(id);
+                    if (match) {
+                        return match;
+                    }
+                }
+            },
+
+            /*returns new child instance based on string name
+             */
+            getTargetClass: function(name) {
+                var target_class = init_lookup[name];
+                var child = new target_class();
+                return child;
+            },
+
+            getInternalList: function(id) {
+                if (this.internalList.get('id') === id) {
+                    return this.internalList;
+                }
+                for(var i=0;i<this.group_relative.length;i++){
+                    if(this.group_relative[i].get('id')===id){
+                        return this.group_relative[i];
+                    }
+                    else if(this.group_reference[i].get('id')===id){
+                        return this.group_reference[i];
+                    }
+                }
+            },
+
             setInternalConstraint: function() {
-                this.internalList = new ConstrainableList();
+                var constraints = [];
+                if (this.get('target').get('name') == 'group') {
+                    constraints.push.apply(constraints, this.setInternalGroupConstraint());
+                }
                 this.internalList.addMember(this.get('target'));
                 if (this.members.length > 1) {
                     this.internalList.addMember(this.members[this.members.length - 1]);
@@ -52,28 +168,105 @@ define([
                 var constraint = new Constraint();
                 constraint.set('references', this.internalList);
                 constraint.set('relatives', this);
-                constraint.set('proxy_references',this.get('target'));
+                constraint.set('proxy_references', this.get('target'));
                 var data = [
-                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate','interpolate']],
-                    ['scalingDelta_xy', 'scalingDelta_xy',['interpolate','interpolate']],
-                    ['fillColor_hsl',  'fillColor_hsl',['interpolate','interpolate','interpolate']],
-                    ['strokeColor_hsl',  'strokeColor_hsl',['interpolate','interpolate','interpolate']],
-                    ['rotationDelta_v','rotationDelta_v',['interpolate','interpolate']],
-                    ['strokeWidth_v','strokeWidth_v',['interpolate','interpolate']]
+                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
+                    ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
+                    ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                    ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                    ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
+                    ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
                 constraint.create(data);
-                return constraint;
+                constraints.push(constraint);
+                return constraints;
             },
 
-            addClone: function(clone) {
-                this.clones.push(clone);
-                if(this.members.length>3){
-                    this.addMember(clone,this.members.length-2);
+            setInternalGroupConstraint: function() {
+                var member_constraints = [];
+                var target = this.get('target');
+                for (var i = 0; i < target.members.length; i++) {
+                    var relative_list = new ConstrainableList();
+                    var reference_list = new ConstrainableList();
+                    relative_list.set('id', 'internal' + relative_list.get('id'));
+                    reference_list.set('id', 'internal' + reference_list.get('id'));
+                    this.group_relative.push(relative_list);
+                    this.group_reference.push(reference_list);
+                    reference_list.addMember(target.members[i]);
+                    /*if (this.members.length > 1) {
+                        reference_list.addMember(this.members[this.members.length - 1].members[i]);
+                    }*/
+                    for (var j = 0; j < this.members.length; j++) {
+                        relative_list.addMember(this.members[j].members[i]);
+                    }
+                    var constraint = new Constraint();
+                    constraint.set('references', reference_list);
+                    constraint.set('relatives', relative_list);
+                    constraint.set('proxy_references', target.members[i]);
+                    constraint.set('proxy_relatives', this.members[1].members[i]);
+                    var data = [
+                        ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
+                        ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
+                        ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                        ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                        ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
+                        ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
+                    ];
+                    constraint.create(data);
+                    member_constraints.push(constraint);
                 }
-                else{
-                    this.addMember(clone);
+                return member_constraints;
+            },
+
+            addRelativeMember: function(copy, index) {
+
+                if (this.members.length > 1) {
+
+                    copy.setValue(this.members[this.members.length - 2].getValue());
+
+                    if (!index) {
+                        index = this.members.length - 1;
+                    }
+                } else {
+
+                    copy.setValue(this.members[0].getValue());
+
+                    if (!index) {
+                        index = 1;
+                    }
                 }
-                this.get('clone_count').setValue(this.clones.length);
+
+                this.addMember(copy, index);
+
+            },
+
+            addMember: function(member, index) {
+
+                if (index) {
+
+                    this.members.splice(index, 0, member);
+                    this.insertChild(index, member);
+                    this.get('geom').insertChild(index, member.get('geom'));
+                    member.get('zIndex').setValue(index);
+
+                } else {
+                    this.members.push(member);
+                    this.get('geom').addChild(member.get('geom'));
+                    this.addChildNode(member);
+
+                    member.get('zIndex').setValue(this.members.length - 1);
+
+                }
+                var diff = this.members.length - this.indexNumbers.length;
+                if (member.get('name') === 'group') {
+                    for (var j = 0; j < member.members.length; j++) {
+                        for (var i = 0; i < this.group_relative.length; i++) {
+                            this.group_relative[j].addMember(member.members[j], index);
+                        }
+                    }
+                }
+                this.addMemberNotation();
+
             },
 
             addMemberToOpen: function(data) {
@@ -98,91 +291,112 @@ define([
             },
 
 
-            addException: function(exception) {
-                this.exceptions.push(exception);
-                if (_.indexOf(this.clones, exception) > -1) {
-                    return this.removeClone(exception);
-                }
-                this.addMember(exception);
-                this.get('exception_count').setValue(this.exceptions.length);
-            },
 
-
-            deleteMember: function() {
-                var data = this.clones[this.clones.length - 2];
+            deleteRelativeMember: function() {
+                var data = this.members[this.members.length - 2];
                 if (data) {
                     this.removeMember(data);
                     data.deleteSelf();
                     var parent = data.getParentNode();
                     if (parent) {
-                        parent.removeInheritor(data);
                         parent.removeChildNode(data);
                     }
                     return data;
                 }
             },
 
+            deleteMember: function(member,removeAll) {
+
+                this.removeMember(member,false, removeAll);
+                member.deleteSelf();
+                var parent = member.getParentNode();
+                if (parent) {
+                    parent.removeChildNode(member);
+                }
+                return member;
+
+            },
+
+            /*deleteAllChildren
+             * function which deletes all children
+             */
+            deleteAllChildren: function(deleted) {
+                if (!deleted) {
+                    deleted = [];
+                }
+                for (var i = this.members.length - 1; i >= 0; i--) {
+                    deleted.push.apply(deleted, this.members[i].deleteAllChildren());
+                    var deleted_member = this.deleteMember(this.members[i],true);
+                    deleted.push(deleted_member);
+                }
+                this.members.length = 0;
+                this.children.length = 0;
+                return deleted;
+            },
+
 
             deleteSelf: function() {
-                ConstrainableList.prototype.deleteSelf.call(this);
-                this.clones.length = 0;
-                this.exceptions.length = 0;
+                this.stopListening();
+                this.internalList.deleteSelf();
+                for (var i = 0; i < this.group_relative.length; i++) {
+                    this.group_relative[i].deleteSelf();
+                }
+                for (var j = 0; i < this.group_reference.length; j++) {
+                    this.group_reference[j].deleteSelf();
+                }
+                return ConstrainableList.prototype.deleteSelf.call(this);
             },
 
-            removeMember: function(data) {
+
+            removeMember: function(data, updateCount,fullDelete) {
                 var target = this.get('target');
-                if (data != target) {
-                    if (_.indexOf(this.clones, data) > -1) {
-                        return this.removeClone(data);
-                    } else if (_.indexOf(this.exceptions, data) > -1) {
-                        return this.removeException(data);
-                    }
-                } else {
-                    ConstrainableList.prototype.removeMember.call(this, target);
-                    this.shiftTarget();
-                    return target;
+                if (this.internalList.hasMember(data, true, this) && !fullDelete) {
+                    return false;
                 }
-            },
+                var index = $.inArray(data, this.members);
+                var member;
 
-
-            shiftTarget: function() {
-                if (this.clones.length < 1) {
-                    this.setTarget();
-                    return;
-                }
-
-                ConstrainableList.prototype.removeMember.call(this, this.get('target'));
-                var newTarget = this.clones.splice(0, 1);
-                this.set('target', newTarget);
-                for (var i = 0; i < this.clones.length; i++) {
-                    this.clones[i].setPrototype(newTarget);
-                }
-
-                this.get('clone_count').setValue(this.clones.length);
-            },
-
-            removeClone: function(clone) {
-                var index = _.indexOf(this.clones, clone);
                 if (index > -1) {
-                    this.removeCloneByIndex(index);
+
+                    member = this.members.splice(index, 1)[0];
+                    var childIndex = member.get('geom').index;
+                    this.get('geom').removeChildren(childIndex, childIndex + 1);
+                    this.removeChildNode(member);
+
                 }
-            },
-
-            removeCloneByIndex: function(index) {
-                var clone = this.clones.splice(index, 1)[0];
-                var member = ConstrainableList.prototype.removeMember.call(this, clone);
-                this.get('clone_count').setValue(this.clones.length);
-                member.removePrototype();
+                if (data.get('name') === 'group') {
+                    for (var j = 0; j < data.members.length; j++) {
+                        for (var i = 0; i < this.group_relative.length; i++) {
+                            this.group_relative[j].removeMember(data.members[j]);
+                        }
+                    }
+                }
+                this.removeMemberNotation();
+                if (updateCount) {
+                    for (var k = 0; k < this.members.length; k++) {
+                        this.members[k].get('zIndex').setValue(k);
+                    }
+                    this.get('memberCount').setValue(this.members.length);
+                }
                 return member;
             },
 
-            removeException: function(exception) {
-                var index = _.indexOf(this.exceptions, exception);
-                this.exceptions.splice(index, 1);
-                var member = ConstrainableList.prototype.removeMember.call(this, exception);
-                this.get('exception_count').setValue(this.exceptions.length);
-                return member;
+            shiftTarget: function(index) {
+                var old_target = this.get('target');
+
+                var newTarget = this.members[index];
+                this.set('target', newTarget);
+                for (var i = 0; i < this.members.length; i++) {
+                    if (i != index) {
+                        this.members[i].changeGeomInheritance(newTarget.getShapeClone(true));
+                    }
+                }
+                this.internalList.addMember(this.get('target'), 0);
+                //this.internalList.removeMember(this.get('target'));
+
+
             },
+
 
             setCount: function(count) {
                 this.get('count').setValue(count);
@@ -192,6 +406,16 @@ define([
                         data = this.updateCountStandard();
                         break;
                 }
+
+
+                for (var i = 0; i < this.members.length; i++) {
+                    this.members[i].get('zIndex').setValue(i);
+                }
+                var memberCount = {
+                    v: this.members.length,
+                    operator: 'set'
+                };
+                this.get('memberCount').setValue(memberCount);
                 return data;
 
             },
@@ -202,7 +426,7 @@ define([
 
             updateCountStandard: function() {
                 var count = this.get('count').getValue();
-                var range = this.get('clone_count').getValue() + 1;
+                var range = this.getRange();
                 var diff = count - range;
                 var target = this.get('target');
 
@@ -210,16 +434,16 @@ define([
                 var toAdd = [];
                 if (diff > 0) {
                     for (var i = 0; i < diff; i++) {
-                        var clone = target.create();
-                        this.addClone(clone);
-                        toAdd.push(clone);
+                        var member = target.create();
+                        this.addRelativeMember(member);
+                        toAdd.push(member);
 
                     }
                 } else if (diff < 0) {
                     for (var j = 0; j < 0 - diff; j++) {
-                        var member = this.deleteMember();
-                        if (member) {
-                            toRemove.push(member);
+                        var d_member = this.deleteRelativeMember();
+                        if (d_member) {
+                            toRemove.push(d_member);
                         }
                     }
                 }
@@ -238,7 +462,13 @@ define([
                 } else {
                     this.set('target', null);
                 }
+                this.get('memberCount').setValue(this.members.length);
             },
+
+            render: function() {
+                ConstrainableList.prototype.render.call(this);
+
+            }
 
 
         });

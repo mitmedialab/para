@@ -9,11 +9,12 @@ define([
     'utils/PBool',
     'paper',
     'utils/PConstraint',
-    'utils/TrigFunc'
+    'utils/TrigFunc',
+    'models/data/Instance'
 
   ],
 
-  function(_, ListNode, PFloat, PBool, paper, PConstraint, TrigFunc) {
+  function(_, ListNode, PFloat, PBool, paper, PConstraint, TrigFunc, Instance) {
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'list',
@@ -33,14 +34,16 @@ define([
           fontSize: 12,
           fontFamily: 'Source Sans Pro',
           fillColor: this.get('primary_selection_color')
-
         });
 
         var geom = new paper.Group();
         geom.addChild(path);
         geom.addChild(this.startText);
         this.startText.data.instance = geom.data.instance = path.data.instance = this;
-
+        var targetLayer = paper.project.layers.filter(function(layer) {
+          return layer.name === 'ui_layer';
+        })[0];
+        targetLayer.addChild(geom);
         this.set('ui', geom);
         this.indexNumbers = [];
 
@@ -48,28 +51,25 @@ define([
           x: 1,
           y: 1
         });
+        this.count = 0;
       },
 
-      /*setValue
+    /*setValue
     passes modifications onto members, stripped of any properties that are constrained on the list
-     */
+    */
       setValue: function(data) {
+        Instance.prototype.setValue.call(this.data);
         var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
           if (constrained_props[i]) {
-            if (!this.isReference(this.members[i])) {
-              var set_data = this.members[i].getAddedValueFor(data);
-              var stripped_data = TrigFunc.strip(set_data, constrained_props[i]);
-              this.members[i].setValue(stripped_data);
-            } else {
-              this.members[i].setValue(data);
-            }
+            var reference_status = this.isReference(this.members[i]);
+            var set_data = this.members[i].getAddedValueFor(data);
+            var stripped_data = TrigFunc.stripBoolean(set_data, constrained_props[i], reference_status);
+            this.members[i].setValue(stripped_data);
           } else {
             this.members[i].setValue(data);
           }
-
         }
-        this.setNull(false);
         this.trigger('modified', this);
       },
 
@@ -78,7 +78,6 @@ define([
        * this instance with their values;
        * TODO: Make recursive (will not work for objects with 3+ leves of heirarchy)
        */
-
       getConstraintValues: function() {
         var constraints = this.getConstraint();
         if (constraints.getValue) {
@@ -100,9 +99,10 @@ define([
                   value[c] = {};
                   for (var v in constraints[c]) {
                     if (constraints[c].hasOwnProperty(v)) {
+
                       var scValue = constraints[c][v].getValue();
                       if (scValue instanceof Array) {
-                        value[c][v] = scValue[i][v];
+                        value[c][v] = scValue[i][c][v];
                       } else {
                         value[c][v] = scValue;
                       }
@@ -119,11 +119,10 @@ define([
 
 
       removeConstraint: function(prop, dimensions) {
-        this.reset();
+        var constraint_values = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
-          var constraint_values = this.getConstraintValues();
           var data = {};
-          data[prop] = constraint_values[prop];
+          data[prop] = constraint_values[i][prop];
           this.members[i].setValue(data);
           this.increment();
         }
@@ -134,6 +133,11 @@ define([
       //overrides ListNode addMember and removeMember functions
       addMember: function(data, index) {
         ListNode.prototype.addMember.call(this, data, index);
+        this.addMemberNotation();
+
+      },
+
+      addMemberNotation: function() {
         var diff = this.members.length - this.indexNumbers.length;
         for (var i = 0; i < diff; i++) {
           var numText = new paper.PointText({
@@ -144,23 +148,28 @@ define([
             fontFamily: 'Source Sans Pro',
             fillColor: this.get('primary_selection_color')
           });
+          var targetLayer = paper.project.layers.filter(function(layer) {
+            return layer.name === 'ui_layer';
+          })[0];
+          targetLayer.addChild(numText);
           this.indexNumbers.push(numText);
         }
-
       },
 
       removeMember: function(data) {
-        data.set('merged', undefined);
         var memberIndex = _.indexOf(this.members, data);
         var member = ListNode.prototype.removeMember.call(this, data);
+        this.removeMemberNotation();
+        return member;
+      },
+
+      removeMemberNotation: function() {
         var diff = this.indexNumbers.length - this.members.length;
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
           numText.remove();
         }
-        return member;
       },
-
 
       reset: function() {
         ListNode.prototype.reset.call(this, arguments);
@@ -172,16 +181,21 @@ define([
       },
 
       deleteSelf: function() {
-        var bbox = this.get('bbox');
-        if (bbox) {
-          bbox.remove();
-          bbox = null;
-        }
+        var data =ListNode.prototype.deleteSelf.call(this);
         var ui = this.get('ui');
         ui.remove();
         ui = null;
+        if(this.get('selectionClone')){
+          this.get('selectionClone').remove();
+        }
+        for(var i=0;i<this.members.length;i++){
+          if(this.members[i].get('type')=='collection'){
+            this.members[i].deleteSelf();
+          }
+        }
         this.members.length = 0;
         this.members = null;
+        return data;
       },
 
 
@@ -197,29 +211,19 @@ define([
       },
 
       //callback triggered when a subproperty is modified externally 
-   modified: function() {  
+      modified: function() {
         var constrained_props = this.getConstraintValues();
-        /*for (var i = 0; i < this.members.length; i++) {
-          if (constrained_props[i]) {
-            if (!this.isReference(this.members[i])) {
-
-              //this.members[i].setValue(constrained_props[i]);
-            }
-          }
-        }*/
         this.setNull(false);
         this.trigger('modified', this);
       },
 
 
-     
 
       //renders the List UI
       render: function() {
         ListNode.prototype.render.call(this, arguments);
         var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();
-        // console.log('member_length',this.members.length,'indexNumbers_length',this.indexNumbers.length);
         for (var i = 0; i < this.members.length; i++) {
           var numText = this.indexNumbers[i];
           if (numText) {
@@ -249,6 +253,7 @@ define([
         var constraint_selected = this.get('constraintSelected').getValue();
         var selection_clone = this.get('selection_clone');
         var bbox = this.get('bbox');
+
         if (constraint_selected) {
           if (!selection_clone) {
             this.createSelectionClone();

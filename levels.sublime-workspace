@@ -4,534 +4,545 @@
 		"selected_items":
 		[
 			[
-				"is",
-				"isConstrained"
+				"pro",
+				"property_name"
 			],
 			[
-				"un",
-				"uncompileTransforms"
+				"property",
+				"property_name"
 			],
 			[
-				"tras",
+				"get",
+				"getConstraints"
+			],
+			[
+				"member",
+				"member_constraints"
+			],
+			[
+				"mi",
+				"mirror_y"
+			],
+			[
+				"cons",
+				"constrainMap"
+			],
+			[
+				"constra",
+				"constrainMap"
+			],
+			[
+				"st",
+				"stroke_width"
+			],
+			[
+				"defa",
+				"defaults"
+			],
+			[
+				"toll",
+				"toolCollection"
+			],
+			[
+				"prop",
+				"propertiesManager"
+			],
+			[
+				"translat",
 				"translation_delta"
 			],
 			[
-				"add",
-				"addToOpenLists"
+				"ad",
+				"added_shape"
 			],
 			[
-				"ret",
-				"returnedLists"
+				"selec",
+				"selected_shapes"
 			],
 			[
-				"open",
-				"openedLists"
+				"hide",
+				"hideChildren"
 			],
 			[
-				"ope",
-				"openedLists"
+				"dese",
+				"deselectShape"
 			],
 			[
-				"op",
-				"openedLists"
+				"des",
+				"deselectShape"
 			],
 			[
-				"opened",
-				"openedLists"
+				"too",
+				"toolManager"
 			],
 			[
-				"t",
-				"tmatrix"
+				"sele",
+				"selected_shapes"
 			],
 			[
-				"ne",
-				"newVal"
+				"filter",
+				"filterSelection"
 			],
 			[
-				"ger",
-				"generator"
-			],
-			[
-				"ge",
-				"generator"
-			],
-			[
-				"comp",
-				"compileTransforms"
-			],
-			[
-				"pro",
-				"prototype"
-			],
-			[
-				"com",
-				"compileTransforms"
+				"sel",
+				"selected_shapes"
 			],
 			[
 				"render",
 				"renderQueue"
 			],
 			[
-				"data",
-				"data"
+				"si",
+				"sizeDelta"
 			],
 			[
-				"lists",
-				"listsToRender"
+				"end",
+				"endWidth"
 			],
 			[
-				"closed",
-				"closedLists"
-			],
-			[
-				"sele",
-				"selectedInstances"
-			],
-			[
-				"selected",
-				"selectedShapes"
-			],
-			[
-				"fun",
-				"function"
-			],
-			[
-				"sel",
-				"selectedShapes"
-			],
-			[
-				"shif",
-				"shiftKey"
-			],
-			[
-				"select",
-				"selectTool"
-			],
-			[
-				"se",
-				"selectedShapes"
-			],
-			[
-				"j",
-				"jquery"
-			],
-			[
-				"curr",
-				"currentNode"
-			],
-			[
-				"scre",
-				"screen_bounds"
-			],
-			[
-				"abs",
-				"absolute_position"
-			],
-			[
-				"scree",
-				"screen_height"
-			],
-			[
-				"renderS",
-				"renderSelection"
-			],
-			[
-				"inh",
-				"inheritor_bbox"
-			],
-			[
-				"renderG",
-				"renderInheritorBoundingBox"
-			],
-			[
-				"rend",
-				"renderTransforms"
-			],
-			[
-				"proto",
-				"proto_node"
-			],
-			[
-				"propert",
-				"property_name"
-			],
-			[
-				"insta",
-				"instance_bbox"
-			],
-			[
-				"instan",
-				"instances"
-			],
-			[
-				"ti",
-				"ti_matrix"
-			],
-			[
-				"path",
-				"path_altered"
-			],
-			[
-				"handle",
-				"handleIn"
-			],
-			[
-				"poin",
-				"pointNode"
-			],
-			[
-				"selec",
-				"selectedShapes"
-			],
-			[
-				"ref",
-				"reference"
-			],
-			[
-				"property",
-				"propertyName"
-			],
-			[
-				"get",
-				"getValue"
-			],
-			[
-				"inheri",
-				"inheritProperty"
-			],
-			[
-				"set",
-				"setNull"
-			],
-			[
-				"proper",
-				"property"
-			],
-			[
-				"prop",
-				"property"
+				"start",
+				"startWidth"
 			],
 			[
 				"remove",
-				"removeConstraint"
+				"removeSelectedShape"
 			],
 			[
-				"PCo",
-				"PConstraint"
+				"parent",
+				"nodeParent"
 			],
 			[
-				"fi",
-				"fill_color"
+				"poi",
+				"pointSelected"
 			],
 			[
-				"prope",
-				"property_name"
+				"added",
+				"added_shape"
 			],
 			[
-				"str",
-				"stroke_width"
+				"tool",
+				"tool_collection"
 			],
 			[
-				"c",
-				"constraint"
+				"con",
+				"constraintTool"
 			],
 			[
-				"P",
-				"PProperty"
+				"poly",
+				"polyTool"
 			],
 			[
-				"const",
-				"constraint"
+				"select",
+				"selectionChanged"
 			],
 			[
-				"acces",
-				"accessProperty"
-			],
-			[
-				"in",
-				"inherit"
-			],
-			[
-				"pr",
-				"property"
-			],
-			[
-				"stroke",
-				"stroke_weight"
-			],
-			[
-				"stle",
-				"style_data"
+				"selecte",
+				"selected_shapes"
 			],
 			[
 				"sty",
 				"style_data"
 			],
 			[
-				"dat",
-				"data_property"
+				"geom",
+				"geometryParamsModified"
 			],
 			[
-				"fill",
-				"fill_color"
+				"Tool",
+				"ToolCollection"
 			],
 			[
-				"p",
-				"property"
+				"modi",
+				"modifyGeometry"
 			],
 			[
-				"has",
-				"hasOwnProperty"
-			],
-			[
-				"co",
-				"command"
-			],
-			[
-				"rot",
-				"rotation_delta"
-			],
-			[
-				"rota",
-				"rotation_constraint"
-			],
-			[
-				"ro",
-				"rotation_delta"
-			],
-			[
-				"rotat",
-				"rotation_delta"
-			],
-			[
-				"rotation",
-				"rotation_delta"
-			],
-			[
-				"a",
-				"alpha"
-			],
-			[
-				"tool",
-				"tool-mode"
-			],
-			[
-				"mode",
-				"modeChanged"
-			],
-			[
-				"too",
+				"tool-mod",
 				"tool-modifier"
 			],
 			[
-				"inheritance",
-				"inheritance_selection_color"
+				"selectio",
+				"selectionChanged"
 			],
 			[
-				"selecte",
-				"selectedShapes"
+				"selected",
+				"selected_shapes"
 			],
 			[
-				"transfo",
-				"transformation"
+				"addS",
+				"addSelectedShape"
 			],
 			[
-				"copy",
-				"copyInitialized"
+				"selection",
+				"selectionFiltered"
 			],
 			[
-				"tool-",
-				"tool-modifier"
+				"dele",
+				"delegateMethod"
 			],
 			[
-				"fu",
-				"function"
+				"insta",
+				"instanceAdded"
 			],
 			[
-				"modm",
-				"modMatchClick"
-			],
-			[
-				"modeStandar",
-				"modeStandardClick"
-			],
-			[
-				"border",
-				"border-bottom"
-			],
-			[
-				"marg",
-				"margin-left"
-			],
-			[
-				"inher",
-				"inherit"
-			],
-			[
-				"rotatio",
-				"rotation_delta"
-			],
-			[
-				"fil",
-				"fill_color"
-			],
-			[
-				"o",
-				"override"
-			],
-			[
-				"mod",
-				"modifyPoints"
-			],
-			[
-				"prot",
-				"proto_node"
-			],
-			[
-				"hand",
-				"handleIn"
-			],
-			[
-				"h",
-				"handle-in"
-			],
-			[
-				"seg",
-				"segments"
-			],
-			[
-				"hit",
-				"hitResult"
-			],
-			[
-				"pol",
-				"polyPath"
-			],
-			[
-				"pe",
-				"penMouseDrag"
-			],
-			[
-				"new",
-				"new_master"
-			],
-			[
-				"poi",
-				"point_num"
-			],
-			[
-				"PO",
-				"PolygonNode"
+				"ge",
+				"geometrySegmentModified"
 			],
 			[
 				"geo",
 				"geometrySelected"
 			],
 			[
-				"strok",
-				"stroke_color"
+				"Pa",
+				"PathNode"
 			],
 			[
-				"stro",
-				"stroke_color"
+				"Ell",
+				"EllipseNode"
 			],
 			[
-				"inhe",
-				"inherit"
+				"Rect",
+				"RectNode"
 			],
 			[
-				"reset",
-				"resetStylesToPrototype"
+				"Co",
+				"ConstraintToolModel"
 			],
 			[
-				"sca",
-				"scaling_delta"
+				"style",
+				"styledata"
 			],
 			[
-				"tra",
-				"translation_delta"
+				"fanc",
+				"fancytree-title"
 			],
 			[
-				"poly",
-				"polyPath"
+				"de",
+				"departureNode"
 			],
 			[
-				"rec",
-				"rectangle"
+				"chil",
+				"childIndex"
 			],
 			[
-				"reg",
-				"regularMouseDrag"
+				"chi",
+				"childIndex"
 			],
 			[
-				"el",
-				"ellipse"
+				"change",
+				"changeGeomInheritance"
 			],
 			[
-				"to",
-				"topLeft"
+				"rela",
+				"relativeShape"
 			],
 			[
-				"i_",
-				"i_bottomRight"
+				"state",
+				"state_data"
 			],
 			[
-				"Pap",
-				"toPaperPoint"
+				"add",
+				"addInheritor"
 			],
 			[
-				"top",
-				"topLeft"
+				"relat",
+				"relativeId"
 			],
 			[
-				"geome",
-				"geometrySelected"
+				"drop",
+				"dropCompleted"
 			],
 			[
-				"current",
-				"currentView"
+				"dro",
+				"drop_completed"
 			],
 			[
-				"mast",
-				"master_path"
+				"padding",
+				"padding-left"
 			],
 			[
-				"trans",
-				"translation_delta"
+				"ch",
+				"checkVisible"
 			],
 			[
-				"main",
-				"mainView"
+				"posi",
+				"positionConstraintIcons"
 			],
 			[
-				"can",
+				"fancy",
+				"fancytree-active"
+			],
+			[
+				"tree",
+				"treeExpanded"
+			],
+			[
+				"bac",
+				"backgroundColor"
+			],
+			[
+				"background",
+				"background-color"
+			],
+			[
+				"propert",
+				"properties-container"
+			],
+			[
+				"layers",
+				"layers-wrapper"
+			],
+			[
+				"proper",
+				"properties-wrapper"
+			],
+			[
+				"max",
+				"max-height"
+			],
+			[
+				"clear",
+				"clearBoundingBoxes"
+			],
+			[
+				"const",
+				"constrained_props"
+			],
+			[
+				"p",
+				"propertyModified"
+			],
+			[
+				"proto",
+				"proto_node"
+			],
+			[
+				"inheritor",
+				"InheritorCollection"
+			],
+			[
+				"In",
+				"InheritorCollection"
+			],
+			[
+				"in",
+				"inheritors"
+			],
+			[
+				"inh",
+				"inheritors"
+			],
+			[
+				"instance",
+				"instance_parent"
+			],
+			[
+				"inher",
+				"inheritors"
+			],
+			[
+				"modifyPoints",
+				"modifyPointsByIndex"
+			],
+			[
+				"int",
+				"initialize"
+			],
+			[
+				"proerty",
+				"property_name"
+			],
+			[
+				"curr",
+				"currentArgument"
+			],
+			[
+				"cur",
+				"currentArgument"
+			],
+			[
+				"fu",
+				"functionManager"
+			],
+			[
+				"para",
+				"paramId"
+			],
+			[
+				"active",
+				"activeParam"
+			],
+			[
+				"upd",
+				"updateParameters"
+			],
+			[
+				"set",
+				"setPosition"
+			],
+			[
+				"paddi",
+				"padding-right"
+			],
+			[
+				"param",
+				"parameters"
+			],
+			[
+				"pa",
+				"path"
+			],
+			[
+				"ca",
 				"canvasDblclick"
 			],
 			[
-				"sub",
-				"subView"
+				"conta",
+				"contains"
 			],
 			[
-				"target",
+				"roo",
+				"rootFunctions"
+			],
+			[
+				"close",
+				"closeAllLists"
+			],
+			[
+				"se",
+				"toSelect"
+			],
+			[
+				"func",
+				"functionManager"
+			],
+			[
+				"togg",
+				"toggleClosedFunctions"
+			],
+			[
+				"child",
+				"childList"
+			],
+			[
+				"Func",
+				"FunctionNode"
+			],
+			[
+				"funct",
+				"functions"
+			],
+			[
+				"path",
+				"pathNode"
+			],
+			[
+				"function",
+				"functionManager"
+			],
+			[
+				"name",
+				"nameText"
+			],
+			[
+				"f",
+				"f_parameters"
+			],
+			[
+				"pC",
+				"PConstraint"
+			],
+			[
+				"matr",
+				"matrixMap"
+			],
+			[
+				"mod",
+				"modifyProperty"
+			],
+			[
+				"multi",
+				"multiplier_map"
+			],
+			[
+				"scae",
+				"scaleDelta"
+			],
+			[
+				"scal",
+				"scaling_delta"
+			],
+			[
+				"targ",
 				"targetPoint"
+			],
+			[
+				"inde",
+				"indexNumbers"
+			],
+			[
+				"scree",
+				"screen_bottom_left"
+			],
+			[
+				"scre",
+				"screen_width"
+			],
+			[
+				"screenTo",
+				"screen_top_left"
+			],
+			[
+				"transla",
+				"translation_delta"
+			],
+			[
+				"hand",
+				"handleOut"
+			],
+			[
+				"mast",
+				"masterPath"
+			],
+			[
+				"compi",
+				"compileMembers"
+			],
+			[
+				"star",
+				"start_val"
+			],
+			[
+				"to",
+				"toPaperPoint"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "js/src/models/StateManagerModel.js",
+			"file": "js/src/models/data/ListNode.js",
 			"settings":
 			{
-				"buffer_size": 30787,
+				"buffer_size": 0,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/data/PointNode.js",
+			"contents": "/*ConstrainableList.js\n * list which can enact iterative constraints on its members\n */\n\ndefine([\n    'underscore',\n    'models/data/ListNode',\n    'utils/PFloat',\n    'utils/PBool',\n    'paper',\n    'utils/PConstraint',\n\n  ],\n\n  function(_, ListNode, PFloat, PBool, paper, PConstraint) {\n    var ConstrainableList = ListNode.extend({\n      defaults: _.extend({}, ListNode.prototype.defaults, {\n        name: 'constrainable_list',\n        index: 0,\n      }),\n\n      initialize: function() {\n        ListNode.prototype.initialize.apply(this, arguments);\n        this.get('translation_delta').setNull(false);\n        //code for creating list UI\n        var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));\n        var path = new paper.Path.Rectangle(rectangle);\n        path.strokeColor = this.get('primary_selection_color');\n\n        this.startText = new paper.PointText({\n          point: new paper.Point(5, 13),\n          content: 'range:',\n          justification: 'left',\n          fontSize: 12,\n          fontFamily: 'Source Sans Pro',\n          fillColor: this.get('primary_selection_color')\n        });\n\n        var geom = new paper.Group();\n        geom.addChild(path);\n        geom.addChild(this.startText);\n        this.startText.data.instance = geom.data.instance = path.data.instance = this;\n\n        this.set('ui', geom);\n        this.indexNumbers = [];\n      },\n\n      //overrides ListNode addMember and removeMember functions\n      addMember: function(data) {\n        ListNode.prototype.addMember.call(this, data);\n        var diff = this.members.length - this.indexNumbers.length;\n        for (var i = 0; i < diff; i++) {\n          var numText = new paper.PointText({\n            point: new paper.Point(0, 0),\n            content: '0',\n            justification: 'left',\n            fontSize: 12,\n            fontFamily: 'Source Sans Pro',\n            fillColor: this.get('primary_selection_color')\n          });\n          this.indexNumbers.push(numText);\n        }\n      },\n\n      removeMember: function(data) {\n        ListNode.prototype.removeMember.call(this, data);\n        var diff = this.indexNumbers.length - this.members.length;\n        console.log('diff', diff);\n        for (var i = 0; i < diff; i++) {\n          var numText = this.indexNumbers.pop();\n          numText.remove();\n        }\n      },\n\n\n      reset: function() {\n        ListNode.prototype.reset.call(this, arguments);\n        this.setIndex(0);\n        var ui = this.get('ui');\n        ui.position.x = 0;\n        ui.position.y = 0;\n\n      },\n\n      getIndex: function() {\n        return this.get('index');\n      },\n\n      setIndex: function(value) {\n        this.set('index', value);\n      },\n\n\n      increment: function() {\n        var start = 0;\n        var end = this.members.length;\n        var index = this.getIndex();\n\n        if (index < end) {\n          var newIndex = index + 1;\n          this.setIndex(newIndex);\n        }\n      },\n\n      compile: function() {\n        var constraints = this.getConstraints();\n        console.log('list constraints', constraints);\n        for (var i = 0; i < this.members.length; i++) {\n          var i_matricies = this.compileTransforms();\n          /*if (this.members[i].get('type') === 'list') {\n            this.members[i].reset();\n          }*/\n          this.compileMemberAt(i, i_matricies, constraints);\n          this.increment();\n        }\n      },\n\n      updateMemberTranslation: function(){\n        var deltaConstrained = this.get('translation_delta').isConstrained();\n       // var memberDeltaConstrained = this.get()\n      },\n\n\n      compileMemberAt: function(index, list_constraints) {\n        console.log('list_constraints');\n        var member = this.members[index];\n        member.modifyMatrix('translation_delta');\n      },\n      /*  var delta = this.inheritProperty(propname);\n\n        if (delta) {\n          var member = this.members[index];\n          var member_property = member.inheritProperty(propname);\n          var matrixMap = this.get('matrix_map');\n          var matrix_props = matrixMap[propname].properties;\n          var member_matrix = member.get(matrixMap[propname].name);\n          var delta_constrained = delta.isSelfConstrained();\n          var member_property_constrained = member_property.isSelfConstrained();\n\n          for (var p in matrix_props) {\n            if (delta.hasOwnProperty(p)) {\n              var delta_subproperty_constrained = false;\n              var member_subproperty_constrained = false;\n              if (delta[p] instanceof PConstraint) {\n                delta_subproperty_constrained = delta[p].isSelfConstrained();\n                member_subproperty_constrained = member_property[p].isSelfConstrained();\n              }\n              for (var i = 0; i < matrix_props[p].length; i++) {\n                if ((delta_subproperty_constrained || delta_constrained) && !member_subproperty_constrained && !member_property_constrained) {\n                  member_matrix[matrix_props[p][i]] = 0;\n                }\n                if (member_subproperty_constrained || member_property_constrained) {\n                  l_matrix[matrix_props[p][i]] = 0;\n                }\n              }\n            }\n          }\n          member_matrix.concatenate(l_matrix);\n        }\n\n      },*/\n\n      //renders the List UI\n      render: function() {\n        ListNode.prototype.render.call(this, arguments);\n        var ui = this.get('ui');\n        var bottomLeft = this.get('screen_bottom_left').getValue();\n        for (var i = 0; i < this.indexNumbers.length; i++) {\n          var numText = this.indexNumbers[i];\n          numText.content = (i + 1);\n          numText.position = this.members[i].get('screen_bottom_left').toPaperPoint();\n          numText.position.x += 10;\n          numText.position.y -= 10;\n          if (this.get('open')) {\n            numText.visible = true;\n          } else {\n            numText.visible = false;\n          }\n          numText.bringToFront();\n        }\n\n        ui.position = new paper.Point(bottomLeft.x + ui.bounds.width / 2, bottomLeft.y + ui.bounds.height / 2);\n        this.startText.content = 'count: '+ String(this.members.length);\n\n        //this.renderSelection(geom);\n        if (this.get('selected') || this.get('open')) {\n          ui.visible = true;\n        } else {\n          ui.visible = false;\n        }\n\n      },\n    });\n    return ConstrainableList;\n\n  });",
+			"file": "js/src/models/data/ConstrainableList.js",
+			"file_size": 6418,
+			"file_write_time": 1432499373000000,
 			"settings":
 			{
-				"buffer_size": 1240,
+				"buffer_size": 6418,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/TrigFunc.js",
+			"settings":
+			{
+				"buffer_size": 6368,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,100 +550,31 @@
 			"file": "js/src/models/data/PathNode.js",
 			"settings":
 			{
-				"buffer_size": 5257,
+				"buffer_size": 0,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/models/data/ListNode.js",
+			"file": "js/src/models/tools/PolyToolModel.js",
 			"settings":
 			{
-				"buffer_size": 9836,
+				"buffer_size": 8512,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/utils/PFloat.js",
+			"file": "js/src/views/drawing/LayersView.js",
 			"settings":
 			{
-				"buffer_size": 2261,
+				"buffer_size": 0,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "js/src/utils/PPoint.js",
+			"file": "js/src/models/data/InheritorCollection.js",
 			"settings":
 			{
-				"buffer_size": 4083,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/data/Generator.js",
-			"settings":
-			{
-				"buffer_size": 2340,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/data/Instance.js",
-			"settings":
-			{
-				"buffer_size": 22519,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "Searching 71 files for \"setRange\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Generator.js:\n   36        },\n   37  \n   38:       setRange: function(start, end, loop) {\n   39          this.setStart(start);\n   40          this.setEnd(end);\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js:\n  287            var generator = new Generator();\n  288            generator.addChildNode(list);\n  289:           generator.setRange(0, selectedShapes.length);\n  290  \n  291            visitor.addList(list);\n\n2 matches across 2 files\n\n\nSearching 71 files for \"modifyProperty\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Generator.js:\n   47  \n   48        setValue: function(value) {\n   49:         this.modifyProperty({value:  {val:value,operator:'set'}});\n   50        },\n   51  \n   ..\n   56  \n   57        setStart: function(value) {\n   58:         this.modifyProperty({start_val:  {val:value,operator:'set'}});\n   59        },\n   60  \n   61        setEnd: function(value) {\n   62:         this.modifyProperty({end_val: {val:value,operator:'set'}});\n   63        },\n   64  \n   65        setLoop: function(value) {\n   66:         this.modifyProperty({loop: {val:value,operator:'set'}});\n   67        },\n   68  \n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Instance.js:\n  394  		},\n  395  \n  396: 		modifyProperty: function(data, mode, modifier) {\n  397  			var matrix = this.get('matrix');\n  398  			var proto_incremented = false;\n  ...\n  404  						protoNode._setPropertiesToInstance(data, this);\n  405  					}\n  406: 					protoNode.modifyProperty(data, 'standard', 'none');\n  407  					proto_incremented = true;\n  408  				}\n  ...\n  414  				} else if (modifier === 'relative') {\n  415  					for (var i = 0; i < inheritors.length; i++) {\n  416: 						inheritors[i].modifyProperty(data, 'standard', 'none');\n  417  					}\n  418  \n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ListNode.js:\n   32        if (data instanceof Array) {\n   33          for (var i = 0; i < data.length; i++) {\n   34:           data[i].modifyProperty()\n   35            this.members.push(data[i]);\n   36          }\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js:\n  619        for (var i = 0; i < selectedShapes.length; i++) {\n  620          var instance = selectedShapes[i];\n  621:         instance.modifyProperty(data, this.get('tool-mode'), this.get('tool-modifier'));\n  622        }\n  623        this.compile();\n  ...\n  671        for (var i = 0; i < selectedShapes.length; i++) {\n  672          var instance = selectedShapes[i];\n  673:         instance.modifyProperty(style_data, this.get('tool-mode'), this.get('tool-modifier'));\n  674        }\n  675        this.compile();\n\n10 matches across 4 files\n\n\nSearching 71 files for \"closeMembers\"\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ListNode.js:\n  108      },\n  109  \n  110:     /*closeMembers\n  111       * recursively closes all members\n  112       *of this list\n  113       */\n  114:     closeMembers: function() {\n  115        for (var i = 0; i < this.members.length; i++) {\n  116          if (this.members[i].get('type') === 'list') {\n  117:           this.members[i].closeMembers();\n  118            this.members[i].set('open', false);\n  119          }\n\n/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Visitor.js:\n  287  						var parentList = openLists[i];\n  288  						removeFromOpen.push(parentList);\n  289: 						parentList.closeMembers();\n  290  						for (var j = closedLists.length - 1; j >= 0; j--) {\n  291  							if (parentList.hasMember(closedLists[j], true)) {\n\n4 matches across 2 files\n",
-			"settings":
-			{
-				"buffer_size": 3759,
-				"line_ending": "Unix",
-				"name": "Find Results",
-				"scratch": true
-			}
-		},
-		{
-			"file": "js/src/utils/PConstraint.js",
-			"settings":
-			{
-				"buffer_size": 2359,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/data/Visitor.js",
-			"settings":
-			{
-				"buffer_size": 6772,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "/*SelectToolModel.js\n *base model class for all direct manipulation tool models*/\n\ndefine([\n  'underscore',\n  'paper',\n  'backbone',\n  'models/tools/BaseToolModel',\n  'utils/PPoint'\n\n\n\n], function(_, paper, Backbone, BaseToolModel, PPoint) {\n  var segments = [];\n  var literal;\n  var handle;\n  var segmentMod = false;\n  var copyReset = true;\n  //keeps track of when a copy was released to set correct position data for the new instance\n  var copyInitialized = false;\n  var startPoint, startDist, startWidth, startHeight = null;\n  var dHitOptions = {\n    segments: true,\n    curves: true,\n    handles: true,\n    tolerance: 5,\n  };\n\n  var hitOptions = {\n    stroke: true,\n    fill: true,\n    bounds: true,\n    center: true,\n    tolerance: 2\n  };\n\n  var SelectToolModel = BaseToolModel.extend({\n    defaults: _.extend({}, BaseToolModel.prototype.defaults, {\n      selected_shapes: null,\n      selections: null,\n      current_sel_index: 0,\n      mode: 'select'\n    }),\n\n    initialize: function() {\n      BaseToolModel.prototype.initialize.apply(this, arguments);\n      this.set('selected_shapes', []);\n      this.set('selections', []);\n      //this.on('change:literals',this.triggerChange);\n\n    },\n\n\n    deselectAll: function() {\n      // TODO: do this across all selections\n\n      var selected_shapes = this.get('selected_shapes');\n      for (var i = selected_shapes.length - 1; i >= 0; i--) {\n        selected_shapes[i].set('selected', false);\n        selected_shapes[i].setSelectionForInheritors(false);\n      }\n      this.set('selected_shapes', []);\n    },\n\n    addSelectedShape: function(data) {\n      if (data instanceof Array) {\n        for (var i = 0; i < data.length; i++) {\n          this.addSingleShape(data[i]);\n        }\n      } else {\n        this.addSingleShape(data);\n      }\n    },\n\n    addSingleShape: function(instance) {\n      var selected_shapes = this.get('selected_shapes');\n      if (!_.contains(selected_shapes, instance)) {\n        instance.set('selected', true);\n        instance.set('sel_palette_index', this.get('current_sel_index'));\n        selected_shapes.push(instance);\n        this.set('selected_shapes', selected_shapes);\n      }\n    },\n\n    removeSelectedShape: function(data) {\n      if (data instanceof Array) {\n        for (var i = 0; i < data.length; i++) {\n          this.removeSingleShape(data[i]);\n        }\n      } else {\n        this.removeSingleShape(data);\n      }\n    },\n\n    removeSingleShape: function(shape) {\n      shape.set('selected', false);\n      shape.setSelectionForInheritors(false);\n      var selected_shapes = this.get('selected_shapes');\n      var index = $.inArray(shape, selected_shapes);\n      selected_shapes.splice(shape, 1);\n    },\n\n    // EXPERIMENTAL\n    saveSelection: function() {\n      var selections = this.get('selections');\n      selections.push(this.get('selected_shapes'));\n      this.set('selected_shapes', []);\n      this.set('selections', selections);\n      var current_sel_index = this.get('current_sel_index');\n      current_sel_index += 1;\n      this.set('current_sel_index', current_sel_index);\n    },\n\n    resetSelections: function() {\n      this.deselectAll();\n      var selections = this.get('selections');\n      for (var i = 0; i < selections.length; i++) {\n        this.set('selected_shapes', selections[i]);\n        this.deselectAll();\n      }\n      this.set('selections', []);\n      this.set('current_sel_index', 0);\n    },\n\n    getCurrentSelection: function() {\n      var selections = this.get('selected_shapes');\n      return selections;\n    },\n    // END EXPERIMENTAL\n\n\n    getLastSelected: function() {\n      var selected_shapes = this.get('selected_shapes');\n      if (selected_shapes.length > 0) {\n        return selected_shapes[selected_shapes.length - 1];\n      }\n      return null;\n    },\n\n    /*mousedown event\n     */\n    mouseDown: function(event) {\n      switch (this.get('mode')) {\n        case 'select':\n          this.selectDown(event);\n          break;\n        case 'dselect':\n          this.dSelectDown(event);\n          break;\n        case 'rotate':\n        case 'scale':\n          this.rotateDown(event);\n          startDist = event.point.subtract(literal.position);\n\n          startWidth = literal.bounds.width;\n          startHeight = literal.bounds.height;\n\n          break;\n      }\n    },\n\n    rotateDown: function(event) {\n      if (event.modifiers.option) {\n        this.selectDown(event, true);\n      } else {\n        this.selectDown(event);\n      }\n    },\n\n\n    selectDown: function(event, noDeselect) {\n      //automaticall deselect all on mousedown if shift modifier is not enabled\n      if (!event.modifiers.shift) {\n        if (!noDeselect) {\n          this.deselectAll();\n        }\n      }\n      var hitResult = paper.project.hitTest(event.point, hitOptions);\n\n      if (hitResult) {\n\n        var path = hitResult.item;\n\n        literal = path;\n\n      }\n      var constrain = event.modifiers.command;\n      this.trigger('geometrySelected', literal, constrain);\n\n\n\n    },\n\n    dSelectDown: function(event, noDeselect) {\n      //automaticall deselect all on mousedown if shift modifier is not enabled\n      console.log('dselect down');\n\n      if (!event.modifiers.shift) {\n        if (!noDeselect) {\n          this.deselectAll();\n        }\n      }\n\n\n      var hitResult = paper.project.hitTest(event.point, dHitOptions);\n\n      if (hitResult) {\n\n        if (hitResult.type == 'segment') {\n          hitResult.segment.fullySelected = true;\n          segments.push(hitResult.segment);\n        } else if (hitResult.type == 'handle-in' || hitResult.type == 'handle-out') {\n          handle = hitResult.type;\n          segments.push(hitResult.segment);\n        } else if (hitResult.type == 'curve') {\n          console.log('hit result', hitResult.location);\n          segments.push(hitResult.location._segment1);\n          segments.push(hitResult.location._segment2);\n        }\n\n\n      }\n\n      this.trigger('geometryDSelected', segments, event.modifiers.command);\n\n\n    },\n\n    triggerChange: function() {\n      this.trigger('geometrySelected', literal);\n    },\n\n\n    //mouse drag event\n    mouseDrag: function(event) {\n      switch (this.get('mode')) {\n        case 'select':\n          this.selectDrag(event);\n          break;\n        case 'dselect':\n          this.dSelectDrag(event);\n          break;\n        case 'rotate':\n          this.rotateDrag(event);\n          break;\n        case 'scale':\n          this.scaleDrag(event);\n          break;\n      }\n    },\n\n    selectDrag: function(event) {\n\n      if (event.modifiers.option && copyReset) {\n        copyReset = false;\n        copyInitialized = true;\n        this.trigger('addInstance');\n      }\n\n      var data = {};\n      data.translation_delta = {\n        operator: 'add',\n        x: event.delta.x,\n        y: event.delta.y\n      };\n      this.trigger('geometryModified', data, event.modifiers);\n\n\n    },\n\n    dSelectDrag: function(event) {\n      var data = {};\n      data.translation_delta = {\n        operator: 'add',\n        x: event.delta.x,\n        y: event.delta.y\n      };\n      this.trigger('geometrySegmentModified', data, handle, event.modifiers);\n\n\n    },\n\n    rotateDrag: function(event) {\n      var posPoint = this.getRelativePoint();\n      if (posPoint) {\n        var angle = event.lastPoint.subtract(posPoint).angle;\n        var dAngle = event.point.subtract(posPoint).angle;\n        var data = {};\n        data.rotation_delta = {\n          val: dAngle - angle,\n          operator: 'add'\n        };\n        this.trigger('geometryModified', data, event.modifiers);\n\n      }\n\n    },\n\n    scaleDrag: function(event) {\n      var posPoint = this.getRelativePoint();\n      if (posPoint) {\n        var d1 = startDist;\n        var d2x = startWidth / 2 - startDist.x;\n        var d2y = startWidth / 2 - startDist.x;\n\n        var d3 = event.point.subtract(posPoint);\n\n        var rscaleX = d3.x / d1.x;\n        var rscaleY = d3.y / d1.y;\n\n        var tScaleX = ((startWidth / 2) * rscaleX) / ((d3.x + d2x) / rscaleX);\n        var tScaleY = ((startHeight / 2) * rscaleY) / ((d3.y + d2y) / rscaleY);\n        tScaleX = (tScaleX === 0) ? 1 : tScaleX;\n        tScaleY = (tScaleY === 0) ? 1 : tScaleY;\n\n        var data = {};\n        data.set = true;\n        data.scaling_delta = {\n          x: tScaleX,\n          y: tScaleY,\n          operator: 'add'\n        };\n        this.trigger('geometryModified', data, event.modifiers);\n\n      }\n\n    },\n\n    getRelativePoint: function() {\n\n      if (literal) {\n\n        return literal.position;\n      }\n      return null;\n    },\n\n    dblClick: function(event) {\n      if (this.currentPaths.length > 0) {\n        this.trigger('moveDownNode', this.currentPaths[this.currentPaths.length - 1]);\n      } else {\n        this.trigger('moveUpNode');\n      }\n    },\n\n\n    //mouse up event\n    mouseUp: function(event) {\n      var selected_shapes = this.get('selected_shapes');\n      for (var i = 0; i < selected_shapes.length; i++) {\n\n        if (copyInitialized) {\n          copyInitialized = false;\n          console.log(\"setting position\");\n          //this.trigger('setPositionForIntialized',event.point);\n        }\n        // selected_shapes[i].setSelectionForInheritors(true,false);\n\n\n\n      }\n      literal = null;\n      segments = [];\n      handle = null;\n      copyReset = true;\n\n    },\n\n\n\n  });\n\n  return SelectToolModel;\n\n});",
-			"file": "js/src/models/tools/SelectToolModel.js",
-			"file_size": 9347,
-			"file_write_time": 1423760688000000,
-			"settings":
-			{
-				"buffer_size": 9347,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/views/drawing/CanvasView.js",
-			"settings":
-			{
-				"buffer_size": 7637,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/models/data/SceneNode.js",
-			"settings":
-			{
-				"buffer_size": 9954,
+				"buffer_size": 2833,
 				"line_ending": "Unix"
 			}
 		},
@@ -640,7 +582,79 @@
 			"file": "js/src/models/tools/ConstraintToolModel.js",
 			"settings":
 			{
-				"buffer_size": 15531,
+				"buffer_size": 9947,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/Constraint.js",
+			"settings":
+			{
+				"buffer_size": 38201,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/router.js",
+			"settings":
+			{
+				"buffer_size": 3179,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/tools/ToolManager.js",
+			"settings":
+			{
+				"buffer_size": 8896,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/PBool.js",
+			"settings":
+			{
+				"buffer_size": 1795,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/Instance.js",
+			"settings":
+			{
+				"buffer_size": 35912,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/PFloat.js",
+			"settings":
+			{
+				"buffer_size": 3248,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/tools/SelectToolModel.js",
+			"settings":
+			{
+				"buffer_size": 8066,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/models/data/Visitor.js",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/src/utils/PPoint.js",
+			"settings":
+			{
+				"buffer_size": 5486,
 				"line_ending": "Unix"
 			}
 		}
@@ -693,58 +707,96 @@
 	},
 	"file_history":
 	[
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/datatype/Generator.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PPoint.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/SelectToolModel.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PointNode.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/RectNode.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/SceneNode.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/PropertyView.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PColor.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PFloat.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ContextView.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/Utils.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PaperUI.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/router.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/ColorUtils.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PBool.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/datatype/:*Function Node",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Sampler.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ListFunction.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Instance.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/ConstraintToolModel.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PathNode.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PolygonNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/html/layers_ui.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/analytics.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/Utils.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Visitor.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/functions/FunctionManager.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/BaseToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/CanvasView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/PolyToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PaperUIHelper.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ProtoView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ParametersView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/PropertyView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/html/ui.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/LayersView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/ToolManager.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PropertiesManager.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/router.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PConstraint.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PointNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ToolView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PathNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/SelectToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/ConstraintToolModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PPoint.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Constraint.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/para-build.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/style/para.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/Sampler.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PathSampler.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/SceneNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/PropertiesManager.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PaperUI.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/config.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/functions/FunctionNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/app.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower.json",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ConstraintMap.js",
+		"/Users/jennifermaryjacobs/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/Gruntfile.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/constraintjs/.npmignore",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/fancytree/dist/jquery.fancytree.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/fancytree/dist/jquery.fancytree-all.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/fancytree/dist/skin-bootstrap/ui.fancytree.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/build/style/fancytree/ui.fancytree.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/build/style/fancytree/ui.fancytree.min.css",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/fancytree/dist/jquery.fancytree.min.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PFloat.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/EllipseNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PProperty.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/InheritorCollection.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ListNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/TrigFunc.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ListSampler.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/RectNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PolygonNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PBool.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PColor.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PaperUIItem.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ContextView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ObjectsView.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/functions/ParameterNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ParameterNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/uiloader.js",
+		"/Applications/eclipse/configuration/org.eclipse.osgi/153/data/-949526685/artifacts.xml",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/logKeys.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/GeneratorNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/SamplerView",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/html/generator.html",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/BehaviorNode.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/datatype/Generator.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PaperUI.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/ColorUtils.js",
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/datatype/:*Function Node",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ShapeNode.js",
 		"/Users/jennifermaryjacobs/Library/Application Support/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/StateManagerModel.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/TrigFunc.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/PProperty.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/TransformationNode.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/PenToolModel.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/BaseToolModel.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/style/para.css",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ToolView.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/bower.json",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/Gruntfile.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/RotateNode.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PConstraint.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/html/ui.html",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/para-build.html",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/para.html",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/build/para.html",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/bower_components/constraintjs/test/resources/qunit-1.12.0.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/PProperty.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/config.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Condition.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/CanvasView.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/.jscsrc",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/uiloader.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/app.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/views/drawing/ProtoView.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/GeometryNode.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/tools/PolyToolModel.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/Visitor.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/texput.log",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/EllipseNode",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/GroupNode.js",
@@ -764,7 +816,6 @@
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/ScaleNode.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/build/style/para.css",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/BaseBehavior.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/GeneratorNode.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/BlockNode.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/BaseNode.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/build/style/jqueryui/images/ui-icons_cd0a0a_256x240.png",
@@ -775,7 +826,6 @@
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/RootManager.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/fonts/SourceSansPro-ExtraLight.otf.woff",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/InstanceGroupNode.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/utils/analytics.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/BehaviorManagerModel.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/actions/TranslateNode.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/ProcedureEditor.js",
@@ -784,53 +834,20 @@
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/Generator.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/CopyBehavior.js",
 		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/FillBehavior",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/scaffold.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/ScaleBehavior.js",
-		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data/BehaviorNode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/FollowPathBehavior.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/RootManager.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/CanvasView.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/GeometryNode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/PathNode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ContextView.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/router.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/main.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/utils/Vec2D.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/PaperManager.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/BehaviorNode.js",
-		"/Users/jejacobs/Desktop/test2.svg",
-		"/Users/jejacobs/Desktop/test.svg",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/CopyBehavior.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/DistributeBehavior.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/StateManagerModel.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/utils/TrigFunc.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/tools/ToolCollection.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/Instance.js",
-		"/Users/jejacobs/Library/Application Support/Sublime Text 2/Packages/JsFormat/JsFormat.sublime-settings",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/ParentBehavior.js",
-		"/Users/jejacobs/Library/Application Support/Sublime Text 2/Packages/JsFormat/Default (OSX).sublime-keymap",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/css/basic.css",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/.gitignore",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/index.html",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/PropertyView.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/DrawingView.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/views/drawing/ToolView.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/data/TestNode.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/behaviors/BaseBehavior",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Utils.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/src/models/Actions/ParentBehavior.js",
-		"/Users/jejacobs/Documents/Adobe/dev/sketches/sketch1/js/lib/paper/examples/Tools/PathEditing.html"
+		"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/behaviors/scaffold.js"
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 48.0
 	},
 	"find_in_files":
 	{
 		"height": 0.0,
 		"where_history":
 		[
+			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/",
+			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models",
+			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/models/data",
 			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src",
 			"/Users/jennifermaryjacobs/Documents/work/code/para/",
 			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src",
@@ -850,134 +867,134 @@
 		"case_sensitive": false,
 		"find_history":
 		[
-			"closedLists",
-			"ti_matrix",
-			"listsToCompile",
-			"console.log",
-			"filterSelection",
-			"modifyProperty:",
-			"openedLists",
-			"closeMembers",
-			"console.log",
-			"modifyProperty",
-			"\n      ",
-			"'end'",
-			"'end",
-			"'start'",
-			"setRange",
-			"proto_node",
-			"accessProperty",
-			"start",
-			"grop",
-			"modify",
-			"modifyProp",
-			"modifyPropert",
-			"modifyProperty",
-			"accessValue",
-			"listsToRender",
-			"visitList",
-			") ",
-			"rootNode",
-			"render:",
-			"isNull",
-			"console.log(",
-			"'constrained",
-			"'constraint_set'",
-			"setConstraint:",
-			"getListMember",
-			"splice",
-			"map",
-			"get('lists')",
-			"closeSelectedGroups",
-			"group",
-			"screen_top_left",
-			"'screen_top_left'",
-			"this.set('scre",
-			"this.get('top_left",
-			"color_ind",
-			"getSelectionColor",
-			"console.log",
-			"hasMember",
-			"'selected_indexes",
-			"render",
-			"geometrySel",
-			"groupKey",
-			"groupKey\\",
-			".clear",
-			"pathReferences",
-			"drawPositionDelimiters",
-			"Utils",
-			"setConstraintExpression",
-			"this.set('expression",
-			"this.set('references",
-			"references",
-			"showWheel",
-			"sel_palette_index",
-			"'inheritor_bbox",
-			"instance_",
-			"updateBoundingBox",
-			"compile:",
-			"compile",
-			"primary_selection_color",
-			"this.get('bbox",
-			"compile:",
-			"createInstance",
-			"PaperUI",
-			"new paper.",
-			" new paper.",
-			"compile",
-			"complie",
-			"addInstance",
-			"selected",
-			"set('i_",
-			"console.l",
-			"compile",
-			"normalizePath",
-			"modifyPoints",
-			"normalizePath",
-			"constraintTool",
-			"group",
-			"grou",
-			"edge",
-			"visit",
-			"PPoint",
-			"Instance",
-			"PathNode",
-			"GeometryNode",
-			"cmdKeu",
-			"altKey",
-			"getR",
-			".val",
-			"getValue",
-			"removeConstraint",
+			"getSelfConstraint",
+			"getSelfConstrain",
+			"PFloat",
+			"path_altered",
+			"PBool",
+			"reset",
+			"rmatrix.",
+			"path_altered",
+			"PBool",
+			"geom",
+			"reset",
+			"resetPrototypes",
+			"reset",
+			"this.reset",
+			".reset",
+			"reset",
+			"constrain_map",
 			"getConstraint",
-			"inheritPr",
-			"console.log",
-			"modify",
-			"accessProperty",
-			"inheritProperty",
-			"inheritConstraint",
-			"inheritProperty",
-			"inheritConstraint",
-			".call",
-			"prototype.call",
-			"'alpha",
-			"set('alpha'",
-			".set('alpha",
-			".set('alpha'",
-			"animateALpha",
-			"console.log",
-			"console.olg",
+			"mirror",
+			"hitOptions",
+			"renderGeom",
+			"renderGeom:",
 			"setNull",
-			"isNull",
+			"mirror_x",
+			"inheritProperty",
+			"accessProperty",
+			"renderGeom",
+			"return",
+			"addCon",
+			"constraintSet",
+			"trigger",
+			"20",
+			"#constraints",
+			"zeros",
+			"horner",
+			"denominator",
+			"sampler",
+			"indexNumbers",
+			"sampler",
+			"'sampler",
+			"sampler",
+			"ListSampler",
+			"getValue()",
+			".increment",
 			"modifyProperty",
-			"modify",
-			"exportJSOn",
-			"setToolStyle",
-			"stroke_wei",
+			"('style",
+			"stroke-chabge",
 			"styleModified",
-			"console.log('selected tool style =',selectedTool.get('style'));",
-			"console.log(\"selected"
+			"geometryModified",
+			"penMouseDown",
+			"itemClicked",
+			"deselectAllNodes",
+			"deselectAll",
+			"updateSelection",
+			"geometryDeselected",
+			"addToSelection",
+			"deselectShape",
+			"getPrototypeById",
+			"getPrototype",
+			"selectionChange",
+			"selectionChanged",
+			"changeSelection",
+			"grou",
+			"console.log",
+			"removeSelectedShape",
+			"filterSelect",
+			"console.log",
+			"},\n",
+			"'selected'",
+			"selectionC",
+			"selection",
+			"selectionCha",
+			"('selected', true)",
+			".addSelectedShape",
+			"('selected', true)",
+			"set('selected',true",
+			"triggerChange",
+			".addSelectedShape",
+			"selectDown",
+			"StateMan",
+			"'visible",
+			"HEAD",
+			"Head",
+			"HEAD",
+			"removeShape",
+			"modifyProperty",
+			"selectDown:",
+			"toggleOpen",
+			"visitor",
+			"toggleOpen",
+			"openSelected:",
+			"\n			",
+			"();\n",
+			"filterSelection",
+			".get('selected'",
+			"this.get('tool_collection').get('state')",
+			"this.get(this.get('state'))",
+			"toolCollection",
+			"ToolCollection",
+			"this.model.",
+			"this.model.setState",
+			"this.get('tool_modifier')",
+			"this.get('tool_mode')",
+			"'state",
+			".set(",
+			"'tool-m",
+			"'tool-md",
+			"setState",
+			"remove",
+			"removeInstance",
+			"toggleOpen",
+			"applySampleToInstance",
+			"addList",
+			"updateProperties",
+			"segmentModified",
+			"geometryModified",
+			"'mode",
+			"trigger",
+			"selectGeometry:",
+			"geometrySelected",
+			"setPosition",
+			"setPositionForIntialized",
+			"setPositionForInitialized",
+			"setPositionForIntit",
+			"this.compile()",
+			"removeSelectedShape",
+			"addInstance",
+			"literal"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -985,6 +1002,22 @@
 		"regex": false,
 		"replace_history":
 		[
+			"ConstrainableList",
+			"modifyStyle",
+			"this.get('tool_collection').get(this.get('state'))",
+			"this.get('tool_collection').get('state')",
+			"this.get('tool_collection').get('state'))",
+			"toolManager",
+			"this.collection.setState",
+			"this.tool_modifer",
+			"this.tool_mode",
+			"visitor.compile()",
+			"this.get('inheritors').accessProperty()",
+			".isReturned",
+			"getSelfConstraint",
+			"sampler",
+			"Sampler",
+			"deleteKey",
 			"lists",
 			"'end_val'",
 			"'start_val'",
@@ -1044,7 +1077,7 @@
 			"children",
 			"parent"
 		],
-		"reverse": true,
+		"reverse": false,
 		"show_context": true,
 		"use_buffer2": true,
 		"whole_word": false,
@@ -1053,484 +1086,15 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "js/src/models/StateManagerModel.js",
-					"settings":
-					{
-						"buffer_size": 30787,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								24081,
-								24094
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true,
-							"word_wrap": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 20603.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "js/src/models/data/PointNode.js",
-					"settings":
-					{
-						"buffer_size": 1240,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1173,
-								1173
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 46.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "js/src/models/data/PathNode.js",
-					"settings":
-					{
-						"buffer_size": 5257,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1893,
-								1893
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 632.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "js/src/models/data/ListNode.js",
 					"settings":
 					{
-						"buffer_size": 9836,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								645,
-								645
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 174.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "js/src/utils/PFloat.js",
-					"settings":
-					{
-						"buffer_size": 2261,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								795,
-								795
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "js/src/utils/PPoint.js",
-					"settings":
-					{
-						"buffer_size": 4083,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1582,
-								1582
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 430.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 5,
-			"sheets":
-			[
-				{
-					"buffer": 6,
-					"file": "js/src/models/data/Generator.js",
-					"settings":
-					{
-						"buffer_size": 2340,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								985,
-								985
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 657.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "js/src/models/data/Instance.js",
-					"settings":
-					{
-						"buffer_size": 22519,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1578,
-								1578
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1189.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"settings":
-					{
-						"buffer_size": 3759,
-						"regions":
-						{
-							"match":
-							{
-								"flags": 112,
-								"regions":
-								[
-									[
-										156,
-										164
-									],
-									[
-										477,
-										485
-									],
-									[
-										783,
-										797
-									],
-									[
-										936,
-										950
-									],
-									[
-										1077,
-										1091
-									],
-									[
-										1216,
-										1230
-									],
-									[
-										1405,
-										1419
-									],
-									[
-										1641,
-										1655
-									],
-									[
-										1874,
-										1888
-									],
-									[
-										2144,
-										2158
-									],
-									[
-										2447,
-										2461
-									],
-									[
-										2705,
-										2719
-									],
-									[
-										3013,
-										3025
-									],
-									[
-										3123,
-										3135
-									],
-									[
-										3305,
-										3317
-									],
-									[
-										3588,
-										3600
-									]
-								],
-								"scope": ""
-							}
-						},
-						"selection":
-						[
-							[
-								3593,
-								3593
-							]
-						],
-						"settings":
-						{
-							"detect_indentation": false,
-							"output_tag": 3,
-							"result_base_dir": "",
-							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
-							"result_line_regex": "^ +([0-9]+):",
-							"scroll_past_end": true,
-							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1666.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "js/src/utils/PConstraint.js",
-					"settings":
-					{
-						"buffer_size": 2359,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2092,
-								2092
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1308.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "js/src/models/data/Visitor.js",
-					"settings":
-					{
-						"buffer_size": 6772,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								647,
-								647
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "js/src/models/tools/SelectToolModel.js",
-					"settings":
-					{
-						"buffer_size": 9347,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8406,
-								8406
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 4956.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "js/src/views/drawing/CanvasView.js",
-					"settings":
-					{
-						"buffer_size": 7637,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3614,
-								3617
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 8.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "js/src/models/data/SceneNode.js",
-					"settings":
-					{
-						"buffer_size": 9954,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								164,
-								164
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 77.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "js/src/models/tools/ConstraintToolModel.js",
-					"settings":
-					{
-						"buffer_size": 15531,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
@@ -1547,8 +1111,454 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 13.0,
+						"translation.x": 0.0,
 						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "js/src/models/data/ConstrainableList.js",
+					"settings":
+					{
+						"buffer_size": 6418,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1938.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/src/utils/TrigFunc.js",
+					"settings":
+					{
+						"buffer_size": 6368,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 21.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/src/models/data/PathNode.js",
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 8.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "js/src/models/tools/PolyToolModel.js",
+					"settings":
+					{
+						"buffer_size": 8512,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 2.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 7,
+			"sheets":
+			[
+				{
+					"buffer": 5,
+					"file": "js/src/views/drawing/LayersView.js",
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2895.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "js/src/models/data/InheritorCollection.js",
+					"settings":
+					{
+						"buffer_size": 2833,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 35.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "js/src/models/tools/ConstraintToolModel.js",
+					"settings":
+					{
+						"buffer_size": 9947,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1283.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "js/src/models/data/Constraint.js",
+					"settings":
+					{
+						"buffer_size": 38201,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "js/src/router.js",
+					"settings":
+					{
+						"buffer_size": 3179,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 2.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "js/src/models/tools/ToolManager.js",
+					"settings":
+					{
+						"buffer_size": 8896,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 446.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "js/src/utils/PBool.js",
+					"settings":
+					{
+						"buffer_size": 1795,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "js/src/models/data/Instance.js",
+					"settings":
+					{
+						"buffer_size": 35912,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 285.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "js/src/utils/PFloat.js",
+					"settings":
+					{
+						"buffer_size": 3248,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 75.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "js/src/models/tools/SelectToolModel.js",
+					"settings":
+					{
+						"buffer_size": 8066,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3997.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "js/src/models/data/Visitor.js",
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "js/src/utils/PPoint.js",
+					"settings":
+					{
+						"buffer_size": 5486,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 148.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1584,7 +1594,7 @@
 		"cols":
 		[
 			0.0,
-			0.391564420318,
+			0.554470495901,
 			1.0
 		],
 		"rows":
@@ -1605,12 +1615,156 @@
 		"selected_items":
 		[
 			[
-				"polygon",
-				"js/src/models/data/PolygonNode.js"
+				"polyto",
+				"js/src/models/tools/PolyToolModel.js"
+			],
+			[
+				"path",
+				"js/src/models/data/PathNode.js"
+			],
+			[
+				"ppoint",
+				"js/src/utils/PPoint.js"
+			],
+			[
+				"pfloat",
+				"js/src/utils/PFloat.js"
+			],
+			[
+				"visitor",
+				"js/src/models/data/Visitor.js"
+			],
+			[
+				"instan",
+				"js/src/models/data/Instance.js"
+			],
+			[
+				"selecttoo",
+				"js/src/models/tools/SelectToolModel.js"
+			],
+			[
+				"pbool",
+				"js/src/utils/PBool.js"
+			],
+			[
+				"patn",
+				"js/src/models/data/PathNode.js"
+			],
+			[
+				"toolmana",
+				"js/src/models/tools/ToolManager.js"
+			],
+			[
+				"router",
+				"js/src/router.js"
+			],
+			[
+				"constra",
+				"js/src/models/data/Constraint.js"
+			],
+			[
+				"constrainttoo",
+				"js/src/models/tools/ConstraintToolModel.js"
+			],
+			[
+				"layer",
+				"html/layers_ui.html"
+			],
+			[
+				"inst",
+				"js/src/models/data/Instance.js"
+			],
+			[
+				"sampler",
+				"js/src/models/behaviors/Sampler.js"
+			],
+			[
+				"listsa",
+				"js/src/models/data/ListSampler.js"
+			],
+			[
+				"sam",
+				"js/src/models/data/Sampler.js"
+			],
+			[
+				"pathsampler",
+				"js/src/models/data/PathSampler.js"
+			],
+			[
+				"basetool",
+				"js/src/models/tools/BaseToolModel.js"
+			],
+			[
+				"state",
+				"js/src/models/StateManagerModel.js"
+			],
+			[
+				"ppo",
+				"js/src/utils/PPoint.js"
+			],
+			[
+				"para.css",
+				"style/para.css"
+			],
+			[
+				"canva",
+				"js/src/views/drawing/CanvasView.js"
+			],
+			[
+				"canvasi",
+				"js/src/views/drawing/CanvasView.js"
+			],
+			[
+				"polyt",
+				"js/src/models/tools/PolyToolModel.js"
+			],
+			[
+				"pconstraint",
+				"js/src/utils/PConstraint.js"
+			],
+			[
+				"pointnode",
+				"js/src/models/data/PointNode.js"
+			],
+			[
+				"scenenode",
+				"js/src/models/data/SceneNode.js"
 			],
 			[
 				"",
+				"js/src/models/tools/SelectToolModel.js"
+			],
+			[
+				"pathnode",
+				"js/src/models/data/PathNode.js"
+			],
+			[
+				"toolview",
 				"js/src/views/drawing/ToolView.js"
+			],
+			[
+				"paperu",
+				"js/src/utils/PaperUIHelper.js"
+			],
+			[
+				"canvas",
+				"js/src/views/drawing/CanvasView.js"
+			],
+			[
+				"baset",
+				"js/src/models/tools/BaseToolModel.js"
+			],
+			[
+				"constraintto",
+				"js/src/models/tools/ConstraintToolModel.js"
+			],
+			[
+				"functionnode",
+				"js/src/models/data/functions/FunctionNode.js"
+			],
+			[
+				"polygon",
+				"js/src/models/data/PolygonNode.js"
 			]
 		],
 		"width": 0.0
@@ -1627,6 +1781,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 246.0,
+	"side_bar_width": 105.0,
 	"status_bar_visible": true
 }

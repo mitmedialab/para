@@ -42,9 +42,9 @@ define([
 			 * sets the value of the property
 			 */
 			setValue: function(v) {
-				if (v) {
+				if (v==true) {
 					this.v.setValue(1);
-				} else {
+				} else if(v==false) {
 					this.v.setValue(0);
 				}
 				this.setNull(false);
@@ -83,6 +83,13 @@ define([
 				console.log("[ALERT], trying to add boolean value");
 				//does nothing
 			},
+
+			toJSON: function() {
+				var data = {v:this.getValue()};
+				data.type = 'PBool';
+				return data;
+			},
+
 
 		});
 

@@ -62,6 +62,34 @@ define([
       return instance;
     },
 
+    toJSON: function() {
+      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+        this.nodeParent.inverseTransformRecurse([]);
+      } else {
+        this.inverseTransformSelf();
+      }
+      var data = GeometryNode.prototype.toJSON.call(this);
+      this.get('geom').data.instance = null;
+
+      data.geom = this.get('geom').exportJSON(false);
+      this.get('geom').data.instance = this;
+      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+        this.nodeParent.transformRecurse([]);
+      } else {
+        this.transformSelf();
+      }
+      return data;
+
+    },
+
+    parseJSON: function(data,manager) {
+      var geom = new paper.Path();
+      geom.importJSON(data.geom);
+      this.normalizeGeometry(geom, new paper.Matrix());
+      GeometryNode.prototype.parseJSON.call(this, data,manager);
+    },
+
+
     /*normalizeGeometry
      * generates a set of transformation data based on the matrix
      * then inverts the matrix and normalizes the path based on these values
@@ -112,16 +140,34 @@ define([
         operator: 'set'
       };
       if (path.fillColor) {
-        data.fillColor = {r:path.fillColor.red,g:path.fillColor.green,b:path.fillColor.blue,h:path.fillColor.hue,s:path.fillColor.saturation,l:path.fillColor.lightness,operator:'set'};
-      }
-      else{
-        data.fillColor = {noColor:true};
+        data.fillColor = {
+          r: path.fillColor.red,
+          g: path.fillColor.green,
+          b: path.fillColor.blue,
+          h: path.fillColor.hue,
+          s: path.fillColor.saturation,
+          l: path.fillColor.lightness,
+          operator: 'set'
+        };
+      } else {
+        data.fillColor = {
+          noColor: true
+        };
       }
       if (path.strokeColor) {
-        data.strokeColor = {r:path.strokeColor.red,g:path.strokeColor.green,b:path.strokeColor.blue,h:path.strokeColor.hue,s:path.strokeColor.saturation,l:path.strokeColor.lightness,operator:'set'};
-      }
-      else{
-        data.strokeColor={noColor:true};
+        data.strokeColor = {
+          r: path.strokeColor.red,
+          g: path.strokeColor.green,
+          b: path.strokeColor.blue,
+          h: path.strokeColor.hue,
+          s: path.strokeColor.saturation,
+          l: path.strokeColor.lightness,
+          operator: 'set'
+        };
+      } else {
+        data.strokeColor = {
+          noColor: true
+        };
       }
       data.strokeWidth = {
         v: path.strokeWidth
@@ -137,30 +183,24 @@ define([
 
       path.visible = false;
       path.selected = false;
-      path.data.nodetype = this.get('name');
-      path.data.instance = this;
-      path.data.geom = true;
-      this.set('geom', path);
-
+      this.changeGeomInheritance(path);
 
       this.setValue(data);
-
-      var pathAltered = this.get('pathAltered');
-      pathAltered.setNull(false);
-      this.setPathAltered();
       return data;
     },
 
-    generatePoints: function(path) {
+    generatePoints: function(path, clear) {
       var points = this.get('points');
+      if (clear) {
+        points.length = 0;
+      }
       if (path.segments) {
         var segments = path.segments;
         for (var j = 0; j < segments.length; j++) {
           var pointNode = new PointNode();
           pointNode.normalizeGeometry(segments[j]);
-          this.addChildNode(pointNode);
+          //this.addChildNode(pointNode);
           points.push(pointNode);
-
         }
       }
     },
@@ -227,10 +267,7 @@ define([
      */
     modifyPoints: function(data, mode, modifier, exclude) {
       var proto_node = this.get('proto_node');
-      var delta = new paper.Segment(new paper.Point(data.translationDelta.x, data.translationDelta.y), null, null);
-      var origin = new paper.Point(0, 0);
-      delta.transform(this._ri_matrix);
-      delta.transform(this._si_matrix);
+
 
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
@@ -238,8 +275,8 @@ define([
       var startHeight = geom.bounds.height;
 
       var selectedPoints = this.inheritSelectedPoints();
-      //maintains constraints on points
       var indicies = [];
+
       for (var i = 0; i < selectedPoints.length; i++) {
 
         var selectedPoint = selectedPoints[i];
@@ -278,22 +315,33 @@ define([
             selectionS.handleOut.y += data.translationDelta.y;
             break;
         }
-
       }
+
+
       var endWidth = geom.bounds.width;
       var endHeight = geom.bounds.height;
       var wDiff = (endWidth - startWidth) / 2;
       var hDiff = (endHeight - startHeight) / 2;
 
       var inheritors = this.get('inheritors').inheritors;
+      var delta;
+      var toggleClosed = false;
+      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+        this.nodeParent.toggleOpen(this.nodeParent);
+        toggleClosed = true;
+      }
+      delta = this.inverseTransformPoint(new paper.Point(data.translationDelta.x, data.translationDelta.y));
+      if (toggleClosed) {
+        this.nodeParent.toggleClosed(this.nodeParent);
+      }
+
       for (var j = 0; j < inheritors.length; j++) {
-        inheritors[j].modifyPointsByIndex(delta.point, indicies, exclude);
+        inheritors[j].modifyPointsByIndex(delta, indicies, exclude);
       }
       if (proto_node) {
-        proto_node.modifyPointsByIndex(delta.point, indicies, this);
+        proto_node.modifyPointsByIndex(delta, indicies, this);
       }
-      delta.remove();
-      delta = null;
+
     },
 
     /* modifyPointsByIndex
@@ -303,57 +351,63 @@ define([
      * which would be too memory intensive. Instead just applies transformations
      * on the prototype's geometry to those of the inheritor
      */
-    modifyPointsByIndex: function(point, indicies, exclude) {
+    modifyPointsByIndex: function(initial_delta, indicies, exclude) {
+
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
-      var bbox = this.get('bbox');
-      if (!this.get('pathAltered').getValue()) {
-        geom.transform(this._ti_matrix);
-        geom.transform(this._si_matrix);
-        geom.transform(this._ri_matrix);
-        selection_clone.transform(this._ti_matrix);
-        selection_clone.transform(this._si_matrix);
-        selection_clone.transform(this._ri_matrix);
-        bbox.transform(this._ti_matrix);
-        bbox.transform(this._si_matrix);
-        bbox.transform(this._ri_matrix);
-        this.setPathAltered();
+
+      var delta;
+      var toggleClosed = false;
+      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+        this.nodeParent.toggleOpen(this.nodeParent);
+        toggleClosed = true;
       }
+      delta = this.transformPoint(initial_delta);
 
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
+
         var selectionS = selection_clone.segments[indicies[i].index];
+
         switch (indicies[i].type) {
           case 'segment':
           case 'curve':
-            geomS.point.x += point.x;
-            geomS.point.y += point.y;
-            selectionS.point.x += point.x;
-            selectionS.point.y += point.y;
+            geomS.point.x += delta.x;
+            geomS.point.y += delta.y;
+            selectionS.point.x += delta.x;
+            selectionS.point.y += delta.y;
 
             break;
           case 'handle-in':
-            geomS.handleIn.x += point.x;
-            geomS.handleIn.y += point.y;
-            selectionS.handleIn.x += point.x;
-            selectionS.handleIn.y += point.y;
-
+            geomS.handleIn.x += delta.x;
+            geomS.handleIn.y += delta.y;
+            selectionS.handleIn.x += delta.x;
+            selectionS.handleIn.y += delta.y;
             break;
 
           case 'handle-out':
-            geomS.handleOut.x += point.x;
-            geomS.handleOut.y += point.y;
-            selectionS.handleOut.x += point.x;
-            selectionS.handleOut.y += point.y;
+            geomS.handleOut.x += delta.x;
+            geomS.handleOut.y += delta.y;
+            selectionS.handleOut.x += delta.x;
+            selectionS.handleOut.y += delta.y;
             break;
         }
+
       }
+
+      if (toggleClosed) {
+        this.nodeParent.toggleClosed(this.nodeParent);
+      }
+
       var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {
         if (!exclude || inheritors[j] != exclude) {
-          inheritors[j].modifyPointsByIndex(point, indicies);
+          inheritors[j].modifyPointsByIndex(initial_delta, indicies);
         }
       }
+
+      geom.visible = true;
+
     },
 
 

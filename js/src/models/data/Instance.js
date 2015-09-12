@@ -18,17 +18,11 @@ define([
 	'utils/PProperty',
 	'utils/PConstraint',
 	'utils/TrigFunc',
-	'utils/ColorUtils'
+	'utils/ColorUtils',
+
 ], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
-	var exporting_properties = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'v', 'name', 'type', 'visible', 'closed', 'order', 'id'
-	];
-
-	var constraints = ['position', 'translationDelta', 'scaling_origin', 'scalingDelta', 'rotation_origin',
-		'rotationDelta', 'strokeColor', 'fillColor', 'strokeWidth', 'v'
-	];
 
 	var Instance = SceneNode.extend({
 
@@ -71,17 +65,18 @@ define([
 			memberCount: null,
 			constraintSelected: null,
 			selected: null,
+			zIndex: null,
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
 			type: 'instance',
 			visible: true,
-			closed: false,
-			order: 0,
+			open: false,
 			/*==end JSON export===*/
 
 			//map of constrainable properties
 			constrain_map: {
+				constraintSelected: ['v'],
 				position: ['x', 'y'],
 				translationDelta: ['x', 'y'],
 				scaling_origin: ['x', 'y'],
@@ -92,9 +87,9 @@ define([
 				fillColor: ['r', 'g', 'b', 'a'],
 				strokeWidth: ['v'],
 				selected: ['v'],
-				constraintSelected: ['v'],
 				memberCount: ['v'],
-				pathAltered: ['v']
+				pathAltered: ['v'],
+				zIndex: ['v']
 					//inheritors: []
 			},
 
@@ -147,11 +142,11 @@ define([
 			this.set('translationDelta', translationDelta);
 
 			var scalingDelta = new PPoint(0, 0);
-			scalingDelta.setNull(true);
+			scalingDelta.setNull(false);
 			this.set('scalingDelta', scalingDelta);
 
 			var rotationDelta = new PFloat(0);
-			rotationDelta.setNull(true);
+			rotationDelta.setNull(false);
 			this.set('rotationDelta', rotationDelta);
 
 			var strokeColor = new PColor(0, 0, 0, 1);
@@ -169,22 +164,13 @@ define([
 			this.set('inheritors', new InheritorCollection(this));
 			this.get('inheritors').setNull(false);
 			this.set('v', new PProperty(0));
+			this.set('zIndex', new PFloat(0));
 
 
 			//============private properties==============//
-
-			//inverse transformation matricies
-			this._ti_matrix = undefined;
-			this._si_matrix = undefined;
-			this._ri_matrix = undefined;
-
-			this._itemp_matrix = undefined;
-			this._temp_matrix = new paper.Matrix();
+			this._matrix = new paper.Matrix();
 
 			//temporary attributes
-			this._translationDelta = new paper.Matrix();
-			this._rotationDelta = new paper.Matrix();
-			this._scalingDelta = new paper.Matrix();
 			this._fillColor = {
 				r: undefined,
 				g: undefined,
@@ -249,11 +235,34 @@ define([
 					if (property) {
 						this.listenTo(property, 'modified', this.modified);
 					}
-
 				}
 			}
 
 
+		},
+
+
+		/*deleteAllChildren
+		 * function which deletes all children
+		 */
+		deleteAllChildren: function(deleted) {
+			if (!deleted) {
+				deleted = [];
+			}
+			for (var i = this.children.length - 1; i >= 0; i--) {
+				if (this.children[i].get('name') !== 'point') {
+					deleted.push.apply(deleted, this.children[i].deleteAllChildren());
+					deleted.push(this.children[i].deleteSelf());
+				}
+				this.removeChildNode(this.children[i]);
+			}
+			return deleted;
+		},
+
+		/*deleteAllMembers
+		 * placeholder for lists member deletion */
+		deleteAllMembers: function() {
+			return [];
 		},
 
 
@@ -262,19 +271,16 @@ define([
 		 * scene graph
 		 */
 		deleteSelf: function() {
+			this.stopListening();
 			this.reset();
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
-				this.get('selection_clone').remove();
-
+				if (this.get('selection_clone')) {
+					this.get('selection_clone').remove();
+				}
 			}
 			this.clearBoundingBoxes();
-
-			for (var i = 0; i < this.children.length; i++) {
-				this.children[i].deleteSelf();
-				//this.children[i].destroy();
-			}
 			var inheritorCollection = this.get('inheritors');
 			inheritorCollection.deleteSelf();
 
@@ -282,9 +288,24 @@ define([
 			if (parent) {
 				parent.removeChildNode(this);
 			}
-			//this.trigger('delete', this);
+			var constrainMap = this.get('constrain_map');
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					var property = this.get(propertyName);
+					property.deleteSelf();
+				}
+
+			}
+
+			return this;
 		},
 
+
+		getById: function(id) {
+			if (this.get('id') == id) {
+				return this;
+			}
+		},
 
 		/*hasMember, getMember, toggleOpen, toggleClosed, addMemberToOpen
 		 * evaluation and access functions to assist in managing lists
@@ -303,9 +324,17 @@ define([
 			return null;
 		},
 
+		getMemberAt: function(index) {
+			if (index === 0) {
+				return this;
+			} else {
+				console.log('ERROR, accessing member index other than zero for non list instance');
+			}
+		},
+
 		/* getRange: function used to modify constraints mappings for lists*/
 		getRange: function() {
-			return 1; //this.get('memberXount').getValue();
+			return 1;
 		},
 
 		toggleOpen: function(item) {
@@ -326,10 +355,31 @@ define([
 			return [];
 		},
 
+		accessMemberGeom: function() {
+			return [this.get('geom')];
+		},
+
+		getBounds: function() {
+			return this.get('geom').bounds;
+		},
+
 
 
 		close: function() {
 			return this.getParentNode();
+		},
+
+		closeAllMembers: function() {
+			return this;
+		},
+
+
+		/*placeholder functions to prevent errors */
+		modifyPoints: function(data, mode, modifier, exclude) {
+
+		},
+
+		modifyPointsByIndex: function(initial_delta, indicies, exclude) {
 		},
 
 		/* create
@@ -346,6 +396,44 @@ define([
 			return instance;
 		},
 
+		addChildNode: function(node) {
+			SceneNode.prototype.addChildNode.call(this, node);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+		},
+
+		insertChild: function(index, child) {
+			SceneNode.prototype.insertChild.call(this, index, child);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+
+		},
+		removeChildNode: function(node) {
+			SceneNode.prototype.removeChildNode.call(this, node);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+		},
+
+		setChildAfter: function(child, sibling) {
+			SceneNode.prototype.setChildBefore.call(this, child, sibling);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+
+
+		},
+
+		setChildBefore: function(child, sibling) {
+			SceneNode.prototype.setChildAfter.call(this, child, sibling);
+			for (var i = 0; i < this.children.length; i++) {
+				this.children[i].get('zIndex').setValue(i);
+			}
+
+		},
+
 		addInheritor: function(instance) {
 			this.set('is_proto', true);
 			var inheritorCollection = this.get('inheritors');
@@ -354,8 +442,6 @@ define([
 			instance.reset();
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
-			instance.createSelectionClone();
-			this.addChildNode(instance);
 		},
 
 		removeInheritor: function(instance) {
@@ -391,11 +477,12 @@ define([
 		},
 
 		createSelectionClone: function() {
+			
+			var selection_clone = this.getShapeClone();
 			if (this.get('selection_clone')) {
 				this.get('selection_clone').remove();
 				this.set('selection_clone', null);
 			}
-			var selection_clone = this.getShapeClone();
 			var targetLayer = paper.project.layers.filter(function(layer) {
 				return layer.name === 'ui_layer';
 			})[0];
@@ -407,23 +494,56 @@ define([
 			this.set('selection_clone', selection_clone);
 		},
 
-		changeGeomInheritance: function(geom) {
-			if (this.get('geom')) {
-				this.get('geom').remove();
-			}
-			if (this.get('selection_clone')) {
-				this.get('selection_clone').remove();
-				this.set('selection_clone', null);
-			}
+		createBBox: function() {
 			if (this.get('bbox')) {
 				this.get('bbox').remove();
 				this.set('bbox', null);
 			}
+			var geom = this.get('geom');
+			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 
-			geom.data.instance = this;
-			geom.data.geom = true;
-			geom.data.nodetype = this.get('name');
+			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
+			bbox.data.instance = this;
+			this.set('bbox', bbox);
+			var targetLayer = paper.project.layers.filter(function(layer) {
+				return layer.name === 'ui_layer';
+			})[0];
+			targetLayer.addChild(bbox);
+
+		},
+
+		changeGeomInheritance: function(geom) {
+
+
+			if (this.get('geom')) {
+				if(this.nodeParent && this.nodeParent.get('type')=='geometry'){
+				 var index = this.get('geom').index;
+				 this.nodeParent.get('geom').insertChild(index, geom);
+				}
+				this.get('geom').remove();
+				this.set('geom', null);
+
+			}
+			
+
 			this.set('geom', geom);
+			var self = this;
+			var setChildrenData = function(child) {
+				child.data.instance = self;
+				child.data.geom = true;
+				child.data.nodetype = self.get('name');
+				if (child.children) {
+					for (var i = 0; i < child.children.length; i++) {
+						setChildrenData(child.children[i]);
+					}
+				}
+			};
+			setChildrenData(geom);
+
+		
+			
+			this.createBBox();
+			this.createSelectionClone();
 			for (var i = 0; i < this.children.length; i++) {
 				if (this.children[i].get('name') === 'point') {
 					this.children[i].deleteSelf();
@@ -432,7 +552,9 @@ define([
 				}
 
 			}
+
 			this.setPathAltered();
+
 		},
 
 		setPathAltered: function() {
@@ -453,18 +575,13 @@ define([
 			}
 
 
-
-			this._ti_matrix = this._translationDelta.inverted();
-			this._ri_matrix = this._rotationDelta.inverted();
-			this._si_matrix = this._scalingDelta.inverted();
-			this._itemp_matrix = this._temp_matrix.inverted();
-			this._temp_matrix.reset();
-			this._translationDelta.reset();
-			this._scalingDelta.reset();
-			this._rotationDelta.reset();
 		},
 
-
+		exportSVG: function() {
+			return this.get('geom').exportSVG({
+				asString: true
+			});
+		},
 
 		// sets the geom visibility to false
 		hide: function() {
@@ -507,7 +624,6 @@ define([
 		},
 
 		resetProperties: function() {
-			this.clear().set(this.defaults);
 			this.get('position').setValue({
 				x: 0,
 				y: 0
@@ -528,7 +644,6 @@ define([
 				x: 0,
 				y: 0
 			});
-			this.get('matrix').reset();
 		},
 
 
@@ -608,22 +723,46 @@ define([
 
 		toJSON: function() {
 			var data = {};
-			var target = this;
-			_.each(exporting_properties, function(property) {
-				if (_.contains(constraints, property)) {
-					data[property] = target.get(property).toJSON();
-
-				} else {
-
-					data[property] = target.get(property);
+			var constrainMap = this.get('constrain_map');
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					data[propertyName] = this.get(propertyName).toJSON();
 				}
-			});
+			}
+			data.name = this.get('name');
+			data.type = this.get('type');
+			data.id = this.get('id');
+			data.visible = this.get('visible');
+			data.open = this.get('open');
+			data.inheritors = this.get('inheritors').toJSON();
+			data.children = [];
+			for (var i = 0; i < this.children.length; i++) {
+				data.children.push(this.children[i].toJSON());
+			}
+
 			return data;
 
 		},
 
-		parseJSON: function(data) {
-			this.set(data.toJSON);
+		parseJSON: function(data,manager) {
+			console.log('manager=',manager);
+			var constrainMap = this.get('constrain_map');
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					this.get(propertyName).setValue(data[propertyName]);
+				}
+			}
+			this.set('name', data.name);
+			this.set('type', data.type);
+			this.set('id', data.id);
+			this.set('visible', data.visible);
+			this.set('open', data.open);
+			var children = data.children;
+		},
+
+		parseInheritorJSON: function(data,manager){
+			this.get('inheritors').parseJSON(data.inheritors,this,manager);
+
 		},
 
 
@@ -674,7 +813,7 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
-			
+
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
 
@@ -688,6 +827,16 @@ define([
 						p.operator = 'set';
 					}
 					if (p.operator === 'set') {
+						if (prop === 'scalingDelta') {
+							if (data[prop].x && data[prop].x === 0) {
+
+								data[prop].x = 0.01;
+							}
+							if (data[prop].y && data[prop].y === 0) {
+
+								data[prop].y = 0.01;
+							}
+						}
 						this.get(prop).setValue(p);
 					} else if (p.operator === 'add') {
 						this.get(prop).add(p);
@@ -695,9 +844,6 @@ define([
 				}
 
 			}
-		
-
-			this.setNull(false);
 		},
 
 
@@ -773,6 +919,74 @@ define([
 			return addedData;
 		},
 
+		/*isReference
+		 *recursively used to check if member is a reference object in 
+		 *order to allow edits to self-referencing constraints
+		 */
+
+		isReference: function(instance) {
+			if (this.isSelfConstrained()) {
+				var reference = this.constraintObject.get('references');
+				var hasMember = reference.hasMember(instance, true, reference);
+				if (hasMember) {
+					return true;
+				}
+				return false;
+			} else {
+				var constrainMap = this.get('constrain_map');
+				var properties = {};
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						properties[propertyName] = this.get(propertyName).isReference(instance);
+					}
+
+				}
+				return properties;
+			}
+		},
+
+
+		pause: function() {
+			if (this.isSelfConstrained()) {
+				this.constraintObject.set('paused', true);
+			} else {
+				var constrainMap = this.get('constrain_map');
+				var properties = {};
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						this.get(propertyName).pause();
+					}
+				}
+			}
+		},
+
+		resume: function() {
+			if (this.isSelfConstrained()) {
+				this.constraintObject.set('paused', false);
+
+			} else {
+				var constrainMap = this.get('constrain_map');
+				var properties = {};
+				for (var propertyName in constrainMap) {
+					if (constrainMap.hasOwnProperty(propertyName)) {
+						this.get(propertyName).resume();
+					}
+				}
+			}
+		},
+
+		destroy: function() {
+			var constrainMap = this.get('constrain_map');
+			var properties = {};
+			for (var propertyName in constrainMap) {
+				if (constrainMap.hasOwnProperty(propertyName)) {
+					this.get(propertyName).destroy();
+				}
+			}
+		},
+
+
+
 		/* getConstraint
 		 * returns an object comprised of all existing constraints in one of 3 states:
 		 *
@@ -843,15 +1057,6 @@ define([
 			}
 		},
 
-
-		//placeholder function for determining if member of a list is being used as a reference value
-		isReference: function(instance) {
-			if (this.isSelfConstrained()) {
-				var reference = this.constraintObject.get('references');
-				return reference.hasMember(instance, true, reference);
-			}
-			return false;
-		},
 
 
 		getCenter: function() {
@@ -975,52 +1180,90 @@ define([
 			var value = this.getValue();
 			this.compileTransformation(value);
 			this.compileStyle(value);
+			this.updateScreenBounds(this.get('geom'));
 		},
 
-		compileTransformation: function(value) {
 
+
+		inverseTransformSelf: function() {
+			var geom = this.get('geom');
+			var bbox = this.get('bbox');
+			var selection_clone = this.get('selection_clone');
+
+			this._invertedMatrix = this._matrix.inverted();
+			geom.transform(this._invertedMatrix);
+			bbox.transform(this._invertedMatrix);
+			selection_clone.transform(this._invertedMatrix);
+
+			return [geom];
+		},
+
+		transformSelf: function() {
+			this._matrix.reset();
+			var geom = this.get('geom');
+			var bbox = this.get('bbox');
+			var selection_clone = this.get('selection_clone');
 			var scalingDelta, rotationDelta, translationDelta;
-			var merged = this.get('merged');
-			if (!merged) {
-				scalingDelta = value.scalingDelta;
-				rotationDelta = value.rotationDelta;
-				translationDelta = value.translationDelta;
-			} else {
+			var value = this.getValue();
+			scalingDelta = value.scalingDelta;
+			rotationDelta = value.rotationDelta;
+			translationDelta = value.translationDelta;
+			this._matrix.translate(translationDelta.x, translationDelta.y);
+			this._matrix.rotate(rotationDelta, 0, 0);
+			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
+			geom.transform(this._matrix);
+			bbox.transform(this._matrix);
+			selection_clone.transform(this._matrix);
+			return [geom];
+		},
 
-				scalingDelta = merged.scalingDelta;
-				rotationDelta = merged.rotationDelta;
-				translationDelta = merged.translationDelta;
+		transformPoint: function(delta) {
+			var translationDelta = this.get('translationDelta').getValue();
+			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
+			line.transform(this._matrix);
+			var new_delta = line.segments[1].point;
+			new_delta.x -= translationDelta.x;
+			new_delta.y -= translationDelta.y;
+			line.remove();
+			return new_delta;
+		},
+
+		inverseTransformPoint: function(delta) {
+			var translationDelta = this.get('translationDelta').getValue();
+			delta.x += translationDelta.x;
+			delta.y += translationDelta.y;
+			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
+			var invertedMatrix = this._matrix.inverted();
+			line.transform(invertedMatrix);
+			var new_delta = line.segments[1].point;
+			line.remove();
+			return new_delta;
+		},
+
+
+
+		compileTransformation: function(value) {
+			var geom = this.get('geom');
+			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+				this.nodeParent.inverseTransformRecurse([]);
+			} else {
+				this.inverseTransformSelf();
 			}
 
-			this._rotation_origin = this.get('rotation_origin').toPaperPoint();
-			this._scaling_origin = this.get('scaling_origin').toPaperPoint();
-			this._position = this.get('position').toPaperPoint();
+			geom.visible = true;
+			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+				this.nodeParent.transformRecurse([]);
+			} else {
+				this.transformSelf();
 
-
-			this._scalingDelta.scale(scalingDelta.x, scalingDelta.y, this._scaling_origin);
-			this._rotationDelta.rotate(rotationDelta, this._rotation_origin);
-			this._translationDelta.translate(translationDelta.x, translationDelta.y);
-
-			this._temp_matrix.preConcatenate(this._rotationDelta);
-			this._temp_matrix.preConcatenate(this._scalingDelta);
-			this._temp_matrix.preConcatenate(this._translationDelta);
+			}
 
 		},
 
 		compileStyle: function(value) {
-
-			var merged = this.get('merged');
-			if (merged) {
-				this._fillColor = merged.fillColor;
-				this._strokeColor = merged.strokeColor;
-				this._strokeWidth = merged.strokeWidth;
-			} else {
-				this._fillColor = value.fillColor;
-				this._strokeColor = value.strokeColor;
-				this._strokeWidth = value.strokeWidth;
-			}
-
-			//TODO: consider changing visible to a constrainable property?
+			this._fillColor = value.fillColor;
+			this._strokeColor = value.strokeColor;
+			this._strokeWidth = value.strokeWidth;
 			this._visible = this.get('visible');
 		},
 
@@ -1030,16 +1273,10 @@ define([
 		render: function() {
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
-
-					var geom = this.renderGeom();
-					if (geom) {
-						this.renderStyle(geom);
-						this.renderSelection(geom);
-					}
-
+					var geom = this.get('geom');
+					this.renderStyle(geom);
+					this.renderSelection(geom);
 					this.set('rendered', true);
-
-
 				}
 				return 'root';
 			}
@@ -1047,18 +1284,20 @@ define([
 
 
 		renderStyle: function(geom) {
-			if (!this._fillColor.noColor) {
+			if (!this._fillColor.noColor && (this._fillColor.h > -1 && this._fillColor.s > -1 && this._fillColor.l > -1)) {
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
-				geom.fillColor.hue = this._fillColor.h;
-				geom.fillColor.saturation = this._fillColor.s;
-				geom.fillColor.lightness = this._fillColor.l;
-				geom.fillColor.alpha = this._fillColor.a;
+				if (this._fillColor.h) {
+					geom.fillColor.hue = this._fillColor.h;
+					geom.fillColor.saturation = this._fillColor.s;
+					geom.fillColor.lightness = this._fillColor.l;
+					geom.fillColor.alpha = this._fillColor.a;
+				}
 			} else {
 				geom.fillColor = undefined;
 			}
-			if (!this._strokeColor.noColor) {
+			if (!this._strokeColor.noColor && (this._strokeColor.h > -1 && this._strokeColor.s > -1 && this._strokeColor.l > -1)) {
 				if (!geom.fillColor) {
 					geom.strokeColor = new paper.Color(0, 0, 0);
 				}
@@ -1073,24 +1312,39 @@ define([
 
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
-
+			var zIndex = this.get('zIndex').getValue();
+			if (geom.index != zIndex) {
+				geom.parent.insertChild(zIndex, geom);
+			}
 		},
 
-		renderInheritorBoundingBox: function(geom) {
-			if (this.get('inheritor_bbox')) {
-				this.get('inheritor_bbox').remove();
+
+
+		renderSelection: function(geom) {
+			var selected = this.get('selected').getValue();
+			var constraint_selected = this.get('constraintSelected').getValue();
+			var selection_clone = this.get('selection_clone');
+			var bbox = this.get('bbox');
+			if (constraint_selected) {
+				selection_clone.visible = true;
+				selection_clone.strokeColor = this.get(constraint_selected + '_color');
+
+			} else {
+				selection_clone.visible = false;
+
 			}
-			var inheritors = this.get('inheritors').getValueFor();
-			for (var k = 0; k < inheritors.length; k++) {
-				this.updateBoundingBox(inheritors[k]);
-			}
-			var i_bbox = this.get('i_bbox');
-			if (i_bbox.bottomRight) {
-				var width = i_bbox.bottomRight.x - i_bbox.topLeft.x;
-				var height = i_bbox.bottomRight.y - i_bbox.topLeft.y;
-				var inheritor_bbox = new paper.Path.Rectangle(i_bbox.topLeft, new paper.Size(width, height));
-				this.set('inheritor_bbox', inheritor_bbox);
-				return inheritor_bbox;
+
+			if (selected) {
+				geom.selectedColor = this.getSelectionColor();
+
+				bbox.selectedColor = this.getSelectionColor();
+				bbox.selected = (constraint_selected) ? false : true;
+				bbox.visible = (constraint_selected) ? false : true;
+				geom.selected = (constraint_selected) ? false : true;
+			} else {
+				bbox.selected = false;
+				bbox.visible = false;
+				geom.selected = false;
 			}
 		},
 
@@ -1106,105 +1360,6 @@ define([
 			}
 		},
 
-		renderSelection: function(geom) {
-			var selected = this.get('selected').getValue();
-			var constraint_selected = this.get('constraintSelected').getValue();
-			var bbox;
-			var selection_clone = this.get('selection_clone');
-
-			if (constraint_selected) {
-				if (!selection_clone) {
-					this.createSelectionClone();
-					selection_clone = this.get('selection_clone');
-				}
-				selection_clone.visible = true;
-				selection_clone.strokeColor = this.get(constraint_selected + '_color');
-
-			} else {
-				selection_clone.visible = false;
-
-			}
-
-			if (selected) {
-				geom.selectedColor = this.getSelectionColor();
-				bbox = this.get('bbox');
-				bbox.selectedColor = this.getSelectionColor();
-				bbox.selected = (constraint_selected) ? false : true;
-				bbox.visible = (constraint_selected) ? false : true;
-				geom.selected = (constraint_selected) ? false : true;
-			}
-		},
-
-
-		renderGeom: function() {
-			var visible = this.get('visible');
-			var geom = this.get('geom');
-			geom.bringToFront();
-			var pathAltered = this.get('pathAltered').getValue();
-			var selection_clone = this.get('selection_clone');
-			var bbox = this.get('bbox');
-
-			if (!bbox) {
-				var size = new paper.Size(geom.bounds.width, geom.bounds.height);
-
-				bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
-				bbox.data.instance = this;
-				this.set('bbox', bbox);
-				var targetLayer = paper.project.layers.filter(function(layer) {
-					return layer.name === 'ui_layer';
-				})[0];
-				targetLayer.addChild(bbox);
-			}
-			if (!pathAltered) {
-				//geom.transform(this._itemp_matrix);
-				geom.transform(this._ti_matrix);
-				geom.transform(this._si_matrix);
-				geom.transform(this._ri_matrix);
-				selection_clone.transform(this._ti_matrix);
-				selection_clone.transform(this._si_matrix);
-				selection_clone.transform(this._ri_matrix);
-				bbox.transform(this._ti_matrix);
-				bbox.transform(this._si_matrix);
-				bbox.transform(this._ri_matrix);
-				var widthScale = geom.bounds.width / bbox.bounds.width;
-				var heightScale = geom.bounds.height / bbox.bounds.height;
-				bbox.scale(widthScale, heightScale);
-				geom.selected = false;
-				bbox.selected = false;
-
-			} else {
-				if (!selection_clone) {
-					this.createSelectionClone();
-					selection_clone = this.get('selection_clone');
-				}
-
-
-			}
-
-			var position = this.get('position').toPaperPoint();
-			geom.position = position;
-			bbox.position = position;
-			selection_clone.position = position;
-			geom.transform(this._rotationDelta);
-			geom.transform(this._scalingDelta);
-			geom.transform(this._translationDelta);
-
-			selection_clone.transform(this._rotationDelta);
-			selection_clone.transform(this._scalingDelta);
-			selection_clone.transform(this._translationDelta);
-
-			bbox.transform(this._rotationDelta);
-			bbox.transform(this._scalingDelta);
-			bbox.transform(this._translationDelta);
-
-			this.updateScreenBounds(geom);
-
-			this.get('pathAltered').setValue(false);
-			geom.visible = visible;
-			return geom;
-		},
-
-
 		copyAttributes: function(clone, deep) {
 			clone.get('position').setValue(this.get('position').getValue());
 			clone.get('translationDelta').setValue(this.get('translationDelta').clone());
@@ -1219,12 +1374,17 @@ define([
 
 		/*returns a clone of the paper js shape*/
 		getShapeClone: function(relative) {
-			var clone = this.get('geom').clone();
-			if (relative) {
-				clone.transform(this._ti_matrix);
-				clone.transform(this._ri_matrix);
-				clone.transform(this._si_matrix);
+			var toggleClosed = false;
+			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+				this.nodeParent.toggleOpen(this.nodeParent);
+				toggleClosed = true;
 			}
+			var clone = this.get('geom').clone();
+			clone.transform(this._matrix.inverted());
+			if (toggleClosed) {
+				this.nodeParent.toggleClosed(this.nodeParent);
+			}
+
 			return clone;
 		},
 

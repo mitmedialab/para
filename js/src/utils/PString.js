@@ -34,14 +34,19 @@ define([
 			/* setValue
 			 * sets the value of the property
 			 */
-			setValue: function(v) {
-				this.v.setValue(v);
+			setValue: function(data) {
+				if(data.hasOwnProperty('v')){
+					this.v.setValue(data.v);
+				}
+				else{
+					this.v.setValue(data);
+				}
 				this.setNull(false);
 			},
 
 			/* getValue
 			 * checks to see if val is constrained
-			 * and if so, returns the constraint value
+			 * and if so, returns the constrainedstraint value
 			 * otherwise just returns the current value of val.
 			 */
 			getValue: function() {
@@ -67,6 +72,14 @@ define([
 				console.log("[ALERT], trying to add string value");
 				//does nothing
 			},
+
+
+			toJSON: function() {
+				var data = {v:this.getValue()};
+				data.type = 'PString';
+				return data;
+			},
+
 
 		});
 

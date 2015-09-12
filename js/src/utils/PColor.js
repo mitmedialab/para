@@ -123,6 +123,19 @@ define([
 			setValue: function(color) {
 				if (color.noColor) {
 					this.setNoColor(color.noColor);
+					if (this.setMode === 'hsb') {
+						this.setValueHSB({
+							h: -1,
+							s: -1,
+							b: -1
+						});
+					} else {
+						this.setValueRGB({
+							r: -1,
+							g: -1,
+							b: -1
+						});
+					}
 				} else {
 					this.setNoColor(false);
 					if (color.a) {
@@ -176,20 +189,37 @@ define([
 				if (isConstrained.h || isConstrained.s || isConstrained.l) {
 					return;
 				}
+				var neg = false;
 				if (color.r) {
 					this.setR(color.r, true);
+					if (color.r < 0) {
+						neg = true;
+					}
 				}
 				if (color.g) {
 					this.setG(color.g, true);
+					if (color.g < 0) {
+						neg = true;
+					}
 				}
 				if (color.b) {
 					this.setB(color.b, true);
+					if (color.b < 0) {
+						neg = true;
+					}
 				}
-				var hsl = ColorUtils.rgbToHsl({
-					r: this.getR(),
-					g: this.getG(),
-					b: this.getB()
-				});
+				var hsl;
+				if (neg) {
+					hsl = [-1, -1, -1];
+				} else {
+					hsl = ColorUtils.rgbToHsl({
+						r: this.getR(),
+						g: this.getG(),
+						b: this.getB()
+					});
+
+				}
+
 				this.setH(hsl[0], true);
 				this.setS(hsl[1], true);
 				this.setL(hsl[2], true);
@@ -202,16 +232,32 @@ define([
 				if (isConstrained.r || isConstrained.g || isConstrained.b) {
 					return;
 				}
+				var neg = false;
 				if (color.h) {
 					this.setH(color.h, true);
+					if (color.h < 0) {
+						neg = true;
+					}
 				}
 				if (color.s) {
 					this.setS(color.s, true);
+					if (color.s < 0) {
+						neg = true;
+					}
 				}
 				if (color.l) {
 					this.setL(color.l, true);
+					if (color.l < 0) {
+						neg = true;
+					}
 				}
-				var rgb = ColorUtils.hslToRgb(this.getH(), this.getS(), this.getL());
+				var rgb;
+				if (neg) {
+					rgb = [-1, -1, -1];
+				} else {
+					rgb = ColorUtils.hslToRgb(this.getH(), this.getS(), this.getL());
+
+				}
 				this.setR(rgb[0], true);
 				this.setB(rgb[1], true);
 				this.setG(rgb[2], true);

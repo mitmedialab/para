@@ -1,19 +1,68 @@
 <!--=======================COLLECTION MAPPING WIDGET ========================-->
-<div id='collection-mapper' class='properties'>
+<div id='collection-mapper' class='properties '>
 <header>
       <h2>
-      Collection Mapper
+    Constraint Options
      </h2>
      <div class="clearfix"></div>
    </header>
+   <div class = 'constraint-properties-container'>
+    <div id="constraint-properties">
+     <script id="propertiesTemplate" type="text/x-handlebars-template">
+
+    <div class ="constraint_name"><label> name <input id="name" class="filename constraint-text" type="text" value="{{name}}"></label></div>
+     <div class="clearfix"></div>
+
+   <div id='property_buttons' class = "property_list"> 
+    {{#each properties}}
+        <button class="btn btn-default btn-tool btn-prop {{active}}" id={{name}} title={{name}}></button>
+    {{/each}}
+        <button class="btn btn-default btn-tool btn-prop" id="add_button" title="group"></button>
+
+  </div>
+  </script>
+ </div>
+
+  <div class="clearfix"></div>
+ 
+  
+   <div id="subproperties" class="tabs">
+     <script id="subpropertiesTemplate" type="text/x-handlebars-template">
+
+    {{#each subproperties}}
+       <div class="tab">
+       <input type="radio" id={{name}}  name="subprop-tabs" {{checked}} >
+       <label for={{name}}>{{name}}</label>
+        <div class = "tab_rule"></div>
+   </div>
+     {{/each}} 
+ 
+</script>
+</div>
+  <div class="clearfix"></div>
+
+<div class="indexes">
+ </button><label> relative index <input id="relative_index" class="filename constraint-text" type="number" min="" value="" max=""></label><button class="btn btn-default btn-tool btn-prop" id="exempt_button" title="exempt"> <button class="btn btn-default btn-tool btn-prop" id="reference_button" title="reference">
+</div>
+  <div class="clearfix"></div>
+
+<div class="offsets"><label>relative offset <input id="relative_offset" class="filename constraint-text" type="number"></label> </label>
+</div>
+</label>
+  <div class="clearfix"></div>
    <div class = "selectel">
   <select id="map-defaults">
-  <option value="linear">linear</option>
+  <option value="interpolate">interpolate</option>
+  <option value = "radial">radial</option>
+  <option value="random">random</option>
+  <option value="gaussian">gaussian</option>
 </select>
 </div>
-<div id="yaxis">
- <label> max <input id="max" class="filename range-text" type="text"></label>
-   <label class="min"> min <input id="min" class="filename range-text" type="text"></label>
+  <div class="clearfix"></div>
+
+<!--<div id="yaxis">
+ <label> max <input id="max" class="filename constraint-text range-text" type="number"></label>
+   <label class="min"> min <input id="min" class="filename constraint-text range-text" type="number"></label>
 </div>
 <div id="collection-container"><canvas id="collection-canvas" width="175" height="175" style="-webkit-user-select: none; touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
 
@@ -26,4 +75,6 @@
   </ul>
 </div>
 </div>
+  <div class="clearfix"></div>-->
+
 </div>

@@ -30,6 +30,39 @@
 					}
 				}
 				this.parentConstraint = false;
+				this.pauseModNotice = false;
+				this.constraintStack = [];
+			},
+
+			setPauseModifyNotice: function(status) {
+				this.pauseModNotice = status;
+			},
+
+			pause: function() {
+				if (this.isSelfConstrained()) {
+					this.constraintObject.set('paused', true);
+				} else {
+					for (var p in this) {
+						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+							this[p].pause();
+						}
+					}
+				}
+			},
+
+			resume: function() {
+				if (this.isSelfConstrained()) {
+					if (this.constraintObject.get('paused')) {
+						this.constraintObject.set('paused', false);
+					}
+					this.constraint.invalidate();
+				} else {
+					for (var p in this) {
+						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+							this[p].resume();
+						}
+					}
+				}
 			},
 
 			/* setNull
@@ -41,7 +74,13 @@
 			},
 
 			deleteSelf: function() {
-				//TODO: write cleanup delete code here.
+				this.stopListening();
+				this.removeAllConstraints();
+				for (var p in this) {
+					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
+						this[p].deleteSelf();
+					}
+				}
 			},
 
 			/* checks to see if property is null
@@ -65,11 +104,19 @@
 					this.constraint.setValue(func);
 				}
 				this.constraintObject = constraint;
+				this.constraintStack.push({
+					obj: this.constraintObject,
+					func: func,
+					constraint: this.constraint,
+				});
+
 			},
 
 			//callback triggered when a subproperty is modified externally 
 			modified: function() {
-				this.trigger('modified', this);
+				if (!this.pauseModNotice) {
+					this.trigger('modified', this);
+				}
 			},
 
 
@@ -81,18 +128,34 @@
 				if (!dimensions || dimensions.length === this.get('dimension_num')) {
 					if (this.isSelfConstrained()) {
 						var value = this.getValue();
-						this.constraint = null;
-						this.constraintObject = null;
-						this.setValue(value);
+						var deleted = this.constraintStack.pop();
+						this.stopListening(this.constraint);
+						this.constraint.deleteSelf();
+						if (this.constraintStack.length > 0) {
+							var lastConstraint = this.constraintStack.pop();
+							this.setConstraint(lastConstraint.func, lastConstraint.obj);
+						} else {
+							this.constraint.deleteSelf();
+							this.constraint = null;
+							this.constraintObject = null;
+							this.setValue(value);
+						}
 					}
 				} else {
-
 					for (var i = 0; i < dimensions.length; i++) {
 						var dimension = dimensions[i];
 						this[dimension].removeConstraint([dimensions[i]]);
 					}
 
 				}
+			},
+
+			removeAllConstraints: function(){
+				while (this.constraintStack.length > 0) {	
+						var lastConstraint = this.constraintStack.pop();
+						lastConstraint.constraint.deleteSelf();
+					}
+
 			},
 
 			/* isSelfConstrained
@@ -115,6 +178,36 @@
 				if (this.constraint) {
 					return this.constraint;
 				}
+			},
+
+
+			isReference: function(instance) {
+				if (this.isSelfConstrained()) {
+					var reference = this.constraintObject.get('references');
+					var hasMember = reference.hasMember(instance, true, reference);
+
+					if (hasMember) {
+						return true;
+					}
+					return false;
+				} else {
+					var subproperties = {};
+					var isReference = false;
+					for (var p in this) {
+						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+
+							subproperties[p] = this[p].isReference(instance);
+							if (subproperties[p]) {
+								isReference = true;
+							}
+
+						}
+					}
+					if (isReference) {
+						return subproperties;
+					}
+				}
+				return false;
 			},
 
 

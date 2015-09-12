@@ -32,8 +32,8 @@ define([
 
 			var r = 0;
 			var theta = 0;
-			var x = p2.getX() - p1.getX();
-			var y = p2.getY() - p1.getY();
+			var x = p2.x - p1.x;
+			var y = p2.y - p1.y;
 			r = Math.sqrt((x * x) + (y * y));
 
 			var type = 0;
@@ -59,19 +59,19 @@ define([
 			//Find theta
 			switch (type) {
 				case (1):
-					theta = Math.atan(y / x) * (180.0 / Math.PI);
+					theta = Math.atan(y / x);
 					break;
 				case (2):
-					theta = (Math.atan(y / x) + 2 * Math.PI) * (180.0 / Math.PI);
+					theta = (Math.atan(y / x) + 2 * Math.PI);
 					break;
 				case (3):
-					theta = (Math.atan(y / x) + Math.PI) * (180.0 / Math.PI);
+					theta = (Math.atan(y / x) + Math.PI);
 					break;
 				case (4):
-					theta = (Math.PI / 2.0) * (180.0 / Math.PI);
+					theta = (Math.PI / 2.0);
 					break;
 				case (5):
-					theta = ((3 * Math.PI) / 2.0) * (180.0 / Math.PI);
+					theta = ((3 * Math.PI) / 2.0);
 					break;
 				case (6):
 					theta = 0.0;
@@ -101,16 +101,16 @@ define([
 
 		TrigFunc.subtract = function(p1, p2) {
 			return {
-				x: p1.getX() - p2.getX(),
-				y: p1.getY() - p2.getY()
+				x: p1.x - p2.x,
+				y: p1.y - p2.y
 			};
 		};
 
 
 		TrigFunc.add = function(p1, p2) {
 			return {
-				x: p1.getX() + p2.getX(),
-				y: p1.getY() + p2.getY()
+				x: p1.x + p2.x,
+				y: p1.y + p2.y
 			};
 		};
 
@@ -135,21 +135,34 @@ define([
 
 
 		TrigFunc.distance = function(p1, p2) {
-		
+
 			var distance = Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
 			return distance;
 		};
 
 		TrigFunc.midpoint = function(p1, p2) {
-		
-			var x = (p1.getX() + p2.getX()) / 2;
-			var y = (p1.getY() + p2.getY()) / 2;
+
+			var x = (p1.x + p2.x) / 2;
+			var y = (p1.y + p2.y) / 2;
 
 			return {
 				x: x,
 				y: y
 			};
 		};
+
+		TrigFunc.centroid = function(pointList) {
+			// should check for instances of PPoint
+			var sum_point = pointList.reduce(function(point1, point2) {
+				return {x:point1.x + point2.x, y:point1.y + point2.y};
+			});
+			var centroid = {
+				x: sum_point.x / pointList.length,
+				y: sum_point.y / pointList.length
+			};
+			return centroid;
+		};
+
 
 		//determines if point is on left or right of line
 		TrigFunc.side = function(pA, pB, pM) {
@@ -207,8 +220,33 @@ define([
 							stripped[p] = target[p];
 						} else {
 							var val = TrigFunc.strip(target[p], reference[p]);
-							if(val){
+							if (val) {
 								stripped[p] = val;
+							}
+						}
+					}
+				}
+				return stripped;
+			}
+		};
+
+		TrigFunc.stripBoolean = function(target, reference, boolCompare) {
+			if (!_.isObject(reference)) {
+				return null;
+			} else {
+				var stripped = {};
+				for (var p in target) {
+					if (target.hasOwnProperty(p)) {
+						if (!reference.hasOwnProperty(p)) {
+							stripped[p] = target[p];
+						} else {
+							if (boolCompare[p] === true) {
+								stripped[p] = target[p];
+							} else {
+								var val = TrigFunc.stripBoolean(target[p], reference[p], boolCompare[p]);
+								if (val) {
+									stripped[p] = val;
+								}
 							}
 						}
 					}

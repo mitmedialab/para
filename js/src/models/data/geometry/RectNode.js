@@ -53,8 +53,7 @@ define([
           userParams[1].val = data.value;
         }
         this.set('userParams', userParams);
-        this.get('geom').remove();
-        this.set('geom', null);
+       
         var new_master;
         if (this.get('name') === 'rectangle') {
           new_master = new paper.Path.Rectangle(new paper.Point(0, 0), userParams[0].val, userParams[1].val);
@@ -65,7 +64,8 @@ define([
         new_master.data.instance = this;
         new_master.data.geom = true;
         new_master.data.nodetype = this.get('name');
-        this.set('geom', new_master);
+        this.changeGeomInheritance(new_master);
+
       }
 
     }

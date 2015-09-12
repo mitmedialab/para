@@ -8,13 +8,15 @@ define([
 	'backbone',
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
+	'models/data/geometry/Group'
 
 
-], function(_, Backbone, ConstrainableList, Duplicator) {
+
+], function(_, Backbone, ConstrainableList, Duplicator, Group) {
 
 
 	//stores para lists
-	var lists, renderQueue, duplicators;
+	var lists, renderQueue, groups;
 	var collectionView;
 	var remove = 2;
 	var search = 4;
@@ -22,8 +24,10 @@ define([
 	var CollectionManager = Backbone.Model.extend({
 		defaults: {},
 
-		initialize: function() {},
+		initialize: function() {
+			groups = [];
 
+		},
 		/* setters and getters for current lists
 		 */
 		setLists: function(l) {
@@ -76,6 +80,19 @@ define([
 				return duplicators[0];
 			}
 		},
+
+		getInternalList: function(id) {
+			var duplicators = lists.filter(function(item) {
+				return item.get('name') == 'duplicator';
+			});
+			for(var i=0;i<duplicators.length;i++){
+				var list = duplicators[i].getInternalList(id);
+				if(list){
+					return list;
+				}
+			}
+		},
+
 
 		getListsThatContain: function(object) {
 			var collections = this.getCollectionThatContains(object);
@@ -175,10 +192,21 @@ define([
 		 * and state of lists which contain those objects(open vs closed)
 		 */
 		filterSelection: function(lInstance) {
+
 			var sInstances = [];
 			var itemFound = false;
+			var item;
 			for (var i = 0; i < lists.length; i++) {
-				var item = lists[i].getMember(lInstance);
+				item = lists[i].getMember(lInstance);
+
+				if (item && item != lInstance) {
+					sInstances.push(item);
+					itemFound = true;
+				}
+			}
+
+			for (var j = 0; j < groups.length; j++) {
+				item = groups[j].getMember(lInstance);
 				if (item && item != lInstance) {
 					sInstances.push(item);
 					itemFound = true;
@@ -200,26 +228,35 @@ define([
 		 *adds a list to the closedlist array and removes any items
 		 * on the array which are members of the added list
 		 */
-		addList: function(selected) {
-			var list = new ConstrainableList();
-			list.addMember(selected);
-			if (!this.addToOpenLists(list)) {
-				for (var i = lists.length - 1; i >= 0; i--) {
-					if (list.hasMember(lists[i], true)) {
-						lists.splice(i, 1);
+		addList: function(selected, list) {
+			if (!list) {
+				list = new ConstrainableList();
+				list.addMember(selected);
+				if (!this.addToOpenLists(list)) {
+					for (var i = lists.length - 1; i >= 0; i--) {
+						if (list.hasMember(lists[i], true)) {
+							lists.splice(i, 1);
+						}
 					}
+					lists.push(list);
 				}
+			} else {
 				lists.push(list);
 			}
-
 			return list;
 		},
 
+		addListCopy: function(copy) {
+			lists.push(copy);
+		},
 
-		addDuplicator: function(object) {
-			var duplicator = new Duplicator();
 
-			duplicator.setTarget(object);
+		addDuplicator: function(object, duplicator) {
+			if (object) {
+				duplicator = new Duplicator();
+
+				duplicator.setTarget(object);
+			}
 
 			if (!this.addToOpenLists(duplicator)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
@@ -231,6 +268,20 @@ define([
 			}
 
 			return duplicator;
+		},
+
+		addGroup: function(selected, group) {
+			if (selected) {
+				group = new Group();
+
+				for (var j = 0; j < selected.length; j++) {
+					group.addMember(selected[j]);
+				}
+			}
+
+			this.addToOpenLists(group);
+			groups.push(group);
+			return group;
 		},
 
 
@@ -259,24 +310,50 @@ define([
 			}
 		},
 
-		toggleOpenLists: function(selected) {
-			this.closeAllLists();
+		toggleOpen: function(item) {
+			if (item.get('name') === 'group') {
+				this.closeAllGroups();
+				item.toggleOpen(item);
+				return {
+					toSelect: item.members,
+					toRemove: [item]
+				};
+			} else {
+				return this.toggleOpenLists(item);
+			}
+		},
+
+		toggleClosed: function(item) {
+			if (item.nodeParent && item.nodeParent.get('name') === 'group' && item.nodeParent.get('open')) {
+				item.nodeParent.toggleClosed(item);
+				return {
+					toSelect: [item.nodeParent],
+					toRemove: [item]
+				};
+			} else {
+				return this.toggleClosedLists(item);
+			}
+		},
+
+		toggleOpenLists: function(item) {
 			var openedLists = [];
 			var openedItems = [];
 			var members = [];
-			for (var j = 0; j < selected.length; j++) {
-				var item = selected[j];
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], openedLists) === -1) {
-						var r = lists[i].toggleOpen(item);
-						if (r) {
-							openedItems = openedItems.concat(r);
-							openedLists.push(lists[i]);
-						}
 
+			for (var i = 0; i < lists.length; i++) {
+				if ($.inArray(lists[i], openedLists) === -1) {
+					var r = lists[i].toggleOpen(item);
+					if (r) {
+						openedItems = openedItems.concat(r);
+						openedLists.push(lists[i]);
+					} else {
+						lists[i].toggleClosed(lists[i]);
 					}
+
 				}
+
 			}
+
 			for (var k = 0; k < openedItems.length; k++) {
 				members = members.concat(openedLists[k].members);
 
@@ -291,28 +368,24 @@ define([
 		/* toggleClosedLists
 		 * closes selected open lists
 		 */
-		toggleClosedLists: function(selected) {
+		toggleClosedLists: function(item) {
 			var toggledLists = [];
 			var returnedLists = [];
-			for (var j = 0; j < selected.length; j++) {
-				var item = selected[j];
-				for (var i = 0; i < lists.length; i++) {
-					if ($.inArray(lists[i], toggledLists) === -1) {
-						var r = lists[i].toggleClosed(item);
-						if (r) {
-							returnedLists = returnedLists.concat(r);
-							toggledLists.push(lists[i]);
-						}
+			for (var i = 0; i < lists.length; i++) {
+				if ($.inArray(lists[i], toggledLists) === -1) {
+					var r = lists[i].toggleClosed(item);
+					if (r) {
+						returnedLists = returnedLists.concat(r);
+						toggledLists.push(lists[i]);
 					}
 				}
+
 			}
 			return {
 				toSelect: returnedLists,
-				toRemove: selected
+				toRemove: [item]
 			};
 		},
-
-
 
 
 
@@ -323,7 +396,36 @@ define([
 			}
 		},
 
-		
+		closeAllGroups: function() {
+			for (var i = 0; i < groups.length; i++) {
+				groups[i].closeAllMembers();
+			}
+		},
+
+		getListJSON: function() {
+			var list_json = [];
+			for (var i = 0; i < lists.length; i++) {
+				if(lists[i].get('name')!=='duplicator'){
+					list_json.push(lists[i].toJSON());
+				}
+			}
+			return list_json;
+		},
+
+
+		deleteAll: function() {
+			var deleted = [];
+			for (var i = 0; i < lists.length; i++) {
+				if (lists[i].get('type') === 'collection') {
+					deleted.push.apply(deleted, lists[i].deleteAllMembers());
+					deleted.push(lists[i].deleteSelf());
+				}
+			}
+			lists.length = 0;
+			groups.length = 0;
+
+			return deleted;
+		}
 
 
 

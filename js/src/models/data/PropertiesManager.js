@@ -190,22 +190,6 @@ define(['jquery',
 
    
 
-     loadFile: function(file) {
-       var reader = new FileReader();
-       reader.parent = this;
-       reader.onload = (function(theFile) {
-
-         return function(e) {
-           this.parent.load(JSON.parse(e.target.result));
-           var id = this.parent.save(theFile.name);
-           this.parent.trigger('loadComplete', id, theFile.name);
-           paper.view.zoom = this.parent.zeroedZoom;
-           paper.view.center = this.parent.zeroedPan.clone();
-         };
-       })(file);
-       reader.readAsText(file);
-     },
-
      parseJSON: function(currentNode, data) {
        for (var i = 0; i < data.length; i++) {
          var type = data[i].type;

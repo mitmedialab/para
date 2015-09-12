@@ -63,7 +63,16 @@ define([
 		//invalidate all constrainable properties
 		invalidate: function() {
 			this._val.invalidate();
-		}
+		},
+
+		deleteSelf: function(){
+			this.stopListening();
+			this._val.offChange();
+			//this._val.set(0);
+			//this._val.destroy();
+		},
+
+
 
 
 		//no toJSON required

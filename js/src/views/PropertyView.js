@@ -12,7 +12,7 @@ define([
   'utils/ColorUtils'
 ], function($, _, Backbone, Handlebars, IrisColorPicker, paper, ColorUtils) {
 
-  var template, source;
+  var param_template, param_source;
   var constraintTypeMap = {};
   constraintTypeMap['more-box'] = 'more';
   constraintTypeMap['more'] = 'more';
@@ -35,8 +35,8 @@ define([
 
       this.listenTo(this.model, 'toolViewUpdate', this.update);
       this.currentPaths = [];
-      source = $('#parameterTemplate').html();
-      template = Handlebars.default.compile(source);
+      param_source = $('#parameterTemplate').html();
+      param_template = Handlebars.default.compile(param_source);
 
       $('#fillColorBlock').addClass('color-block-selected');
       $('#fillColorBlock').css('background-color', 'white');
@@ -73,12 +73,6 @@ define([
     events: {
       'stroke-change': 'strokeChange',
       'param-change': 'paramChange',
-      'change #text-filename': 'nameChange',
-      'click #save': 'save',
-      'click #saveFile': 'saveFile',
-      'click #export': 'export',
-      'change #upload': 'loadFile',
-      'change #fileselect': 'load',
       'colorChange': 'colorChange',
       'click #fillColorBlock': 'toggleFillStroke',
       'click #strokeColorBlock': 'toggleFillStroke',
@@ -237,8 +231,7 @@ define([
         if (strokeWidth) {
           $('#strokeSlider').val(strokeWidth);
         }
-
-        //this.setParams(params,id);
+        this.setParams(selected_shape.get('userParams'),selected_shape.get('id'));
         this.delegateEvents();
       } else {
         this.geometryDeselected();
@@ -315,25 +308,10 @@ define([
         };
         this.model.geometryParamsModified(data);
       }
-
     },
 
 
-    save: function() {
-
-      var filename = $('#text-filename').val();
-      if (filename != []) {
-        this.listenToOnce(this.model, 'renderComplete', function() {
-          var id = this.model.save(filename);
-          this.addSelectIndex(id, filename);
-        });
-        this.model.resetTools();
-      } else {
-        alert('please enter a name for your file');
-      }
-
-    },
-
+  
     addSelectIndex: function(id, filename) {
 
       $('#fileselect').prepend('<option value=' + id + '>' + filename + '</option>');
@@ -342,71 +320,15 @@ define([
 
     },
 
-    load: function() {
-      var id = $('#fileselect option:selected').val();
-      var filename = $('#fileselect option:selected').text();
-      this.model.loadLocal(id);
-      $('#text-filename').val(filename);
-    },
-
-    saveFile: function() {
-      var id = $('#fileselect option:selected').val();
-      var filename = $('#text-filename').val();
-      if (filename != []) {
-        this.listenToOnce(this.model, 'renderComplete', function() {
-          var newId = this.model.saveFile(id, filename);
-          if (newId != id) {
-            this.addSelectIndex(newId, filename);
-          }
-        });
-        this.model.resetTools();
-      } else {
-        alert('please enter a name for your file');
-      }
-    },
-
+  
     removeItem: function(id) {
       $('#fileselect option[value=' + id + ']').remove();
     },
 
-    enableSave: function() {
-      this.model.save($('#text-filename').val());
-    },
-
-    export: function() {
-      var filename = $('#text-filename').val();
-      if (filename != []) {
-        this.listenToOnce(this.model, 'renderComplete', this.enableExport);
-        this.model.resetTools();
-      } else {
-        alert('please enter a name for your file');
-      }
-    },
-
-    enableExport: function() {
-      this.model.export($('#text-filename').val());
-    },
-
-
-    loadFile: function(event) {
-      var file = event.target.files[0];
-
-      this.listenToOnce(this.model, 'loadComplete', function(id, fileName) {
-        this.addSelectIndex(id, fileName);
-
-      });
-      this.model.loadFile(file);
-
-    },
-
-    disableSave: function(disable) {
-      $('#save').attr('disabled', disable);
-      $('#saveFile').attr('disabled', false);
-    },
 
 
     clearParams: function() {
-      var html = template({});
+      var html = param_template({});
       var count = 0;
       $('#parameters').html(html);
     },
@@ -415,16 +337,10 @@ define([
     setParams: function(userParams, id) {
 
       var paramSliders = [];
-      var paramTexts = [];
-      var behaviorParams = [];
       var context = {};
-
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
           userParams[i].id = id;
-          if (userParams[i].type === 'text_box') {
-            paramTexts.push(userParams[i]);
-          } else {
             paramSliders.push(userParams[i]);
           }
         }
@@ -432,11 +348,9 @@ define([
 
         context = {
           paramSlider: paramSliders,
-          paramText: paramTexts
         };
-      }
-
-      var html = template(context);
+   
+      var html = param_template(context);
       var count = 0;
       $('#parameters').html(html);
       $('#parameterSliders input').each(function() {

@@ -213,6 +213,62 @@ input[type="range"]:active::-webkit-slider-thumb {
     background-position-x: 0px;
     background-position-y: 0px;
 }
+#translationDelta {
+    background-position-y: 0px;
+
+}
+#rotationDelta {
+  background-position-y: -20px;
+}
+
+#scalingDelta {
+  background-position-y: -40px;
+}
+
+#strokeWidth {
+  background-position-y: -60px;
+}
+
+#fillColor {
+  background-position-y: -80px;
+}
+
+#strokeColor {
+  background-position-y: -100px;
+}
+
+#add_button {
+  background-position-y: -120px;
+  border:none;
+}
+
+#lock_button{
+  background-position-y: -140px;
+}
+
+#reference_button{
+  background-position-y:-160px;
+}
+
+
+#exempt_button{
+  background-position-y:-180px;
+}
+
+
+
+.btn-prop{
+  width:22px;
+  height:22px;
+  background-image: url(../images/property_icons.svg);
+  background-size: 20px 200px;
+  background-repeat: no-repeat;
+  background-position-x: 0px;
+  background-position-y: 0px;
+  float:left;
+  border: solid 1px #B2B2B2;
+  margin-right:2px;
+}
 
 .btn-tool-horz{
     float:left;
@@ -387,9 +443,64 @@ select{
    left: 40px;
    z-index: 1000;
    width: 252px;
-   height: 285px;
+   height: auto;
+   bottom:auto;
    background-color: rgba(250,250,250,.95);
 }
+
+.constraint-properties-container{
+  margin-left:10px;
+  margin-right:10px;
+}
+
+.constraint-properties-container div{
+  margin-bottom: 10px;
+}
+.constraint-properties-container label{
+ float: left;
+ margin-right:3px;
+}
+
+
+.tabs {
+  position: relative;   
+  clear: both;
+  margin: 25px 0;
+}
+.tab {
+  float: left;
+ 
+}
+.tab label {
+  background: #ccc; 
+      padding: 5px 10px;
+  border: 1px solid #ccc; 
+  margin-left: -1px; 
+  position: relative;
+  left: 1px; 
+  float: none;
+}
+.tab [type=radio] {
+  display: none;   
+}
+[type=radio]:checked ~ label {
+  background: none;
+  border-bottom: 1px solid rgba(250,250,250,.85);
+  z-index: 2;
+}
+[type=radio]:checked ~ label ~ .content {
+  z-index: 1;
+ background: #ccc;
+}
+.tab_rule {
+  position: absolute;
+  top: 21px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-top: 1px solid #ccc; 
+}
+
 
 canvas#collection-canvas {
   width: 175px;
@@ -402,8 +513,7 @@ div#yaxis {
   width: 40px;
   height: 175px;
   float: left;
-    margin-left: 10px;
-    text-align: center;
+  text-align: center;
   }
 
  #xaxis ul {
@@ -442,13 +552,29 @@ text-decoration: none;
    border-radius: 0;
    height: 15px;
    }
-input[type=text].range-text {
+
+
+input[type=text].constraint-text {
+  width:150px;
+  height: 20px;
+  font-size: 14px;
+}
+
+
+input.constraint-text {
+   background-color: white;
+  text-align: center;
+  width: 45px;
+  height: 20px;
+  font-size: 14px;
+}
+
+input.range-text {
   width: 25px;
   height: 18px;
   font-size: 11px;
-  background-color: white;
-  text-align: center;
 }
+
 #yaxis label{
   display: block;
   width: 40px;
