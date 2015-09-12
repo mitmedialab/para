@@ -95,6 +95,10 @@ define([
 
         literal = path;
         instance = literal.data.instance;
+        if(instance.nodeParent && instance.nodeParent.get('name')==='group' && !instance.nodeParent.get('open')){
+          instance = instance.nodeParent;
+          literal = instance.get('geom');
+        }
         modifier = event.modifiers.command;
         this.trigger('geometrySelected', instance, null, modifier);
 
