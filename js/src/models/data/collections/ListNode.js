@@ -110,12 +110,15 @@ define([
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].hide();
       }
+      this.set('visible',false);
     },
 
     show: function() {
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].show();
       }
+      this.set('visible',true);
+
     },
 
     bringToFront: function() {
