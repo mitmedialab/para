@@ -662,6 +662,7 @@ define([
 		},
 
 		addCopy: function(selected) {
+
 			for (var i = 0; i < selected.length; i++) {
 				var copy = selected[i].create(true);
 				rootNode.addChildNode(copy);
@@ -739,6 +740,11 @@ define([
 		},
 
 		duplicatorCountModified: function(data, duplicator) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify duplicator count'
+			});
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
@@ -775,6 +781,11 @@ define([
 		},
 
 		addConstraint: function(constraint, noUpdate) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'constraint',
+				action: 'addConstraint'
+			});
 			if (!constraint.get('user_name')) {
 				constraint.set('user_name', 'constraint ' + (constraints.length + 1));
 			}
@@ -788,6 +799,7 @@ define([
 		},
 
 		removeConstraint: function(id) {
+
 			var constraint = this.getConstraintById(id);
 			if (constraint) {
 				var index = constraints.indexOf(constraint);
@@ -1037,6 +1049,11 @@ define([
 		},
 
 		modifyGeometry: function(data, modifiers) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify geometry'
+			});
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
@@ -1047,6 +1064,11 @@ define([
 
 
 		modifySegment: function(data, handle, modifiers) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify segment'
+			});
 			var instances = selected.filter(function(item) {
 				return item.get('name') != 'point';
 			});
@@ -1059,6 +1081,11 @@ define([
 		},
 
 		modifyParams: function(data) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify params'
+			});
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					selected[i].updateParams(data);
@@ -1067,6 +1094,11 @@ define([
 		},
 
 		modifyStyle: function(style_data) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify style'
+			});
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
@@ -1080,6 +1112,11 @@ define([
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function() {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'toggle open'
+			});
 			var data = collectionManager.toggleOpen(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
@@ -1091,6 +1128,11 @@ define([
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function() {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'toggle closed'
+			});
 			var data = collectionManager.toggleClosed(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
