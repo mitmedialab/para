@@ -121,7 +121,7 @@ define([
                 }
                 this.get('memberCount').setValue(memberCount);
                 this.toggleClosed(this);
-                return this;
+               
 
             },
 
