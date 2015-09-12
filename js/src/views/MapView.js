@@ -166,7 +166,6 @@ define([
 				var data = {};
 				data.properties = properties;
 				data.name = constraint.get('user_name');
-				console.log('data',data);
 				var html = propertiesTemplate(data);
 				$('#constraint-properties').html(html);
 				this.changeProperty();

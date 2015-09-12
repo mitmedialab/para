@@ -123,7 +123,6 @@ define([
         for (var i = 0; i < this.members.length; i++) {
           var data = {};
           data[prop] = constraint_values[i][prop];
-          console.log('setting value',data,prop);
           this.members[i].setValue(data);
           this.increment();
         }
@@ -182,16 +181,21 @@ define([
       },
 
       deleteSelf: function() {
+        var data =ListNode.prototype.deleteSelf.call(this);
         var ui = this.get('ui');
         ui.remove();
         ui = null;
         if(this.get('selectionClone')){
           this.get('selectionClone').remove();
         }
+        for(var i=0;i<this.members.length;i++){
+          if(this.members[i].get('type')=='collection'){
+            this.members[i].deleteSelf();
+          }
+        }
         this.members.length = 0;
         this.members = null;
-        return  ListNode.prototype.deleteSelf.call(this);
-
+        return data;
       },
 
 

@@ -51,20 +51,28 @@ define([
       this.members = [];
       var geom = new paper.Group();
       this.set('geom', geom);
-      geom.data.instance = this;
+      geom.data.instance = this;  
 
     },
 
-    parseJSON: function(data) {
+    parseJSON: function(data,manager) {
       this.deleteAllChildren();
       Instance.prototype.parseJSON.call(this, data);
       for (var i = 0; i < data.children.length; i++) {
         var name = data.children[i].name;
         var child = this.getTargetClass(name);
-        child.parseJSON(data.children[i]);
+        child.parseJSON(data.children[i],manager);
         this.addMember(child);
       }
       return this;
+    },
+
+    parseInheritorJSON: function(data,manager){
+      for (var i = 0; i <this.children.length; i++) {
+        var c_data = data.children[i];
+        var child = this.children[i];
+        child.parseInheritorJSON(c_data,manager);
+      }
     },
 
     /*returns new child instance based on string name
@@ -98,15 +106,17 @@ define([
       }
       for (var i = this.members.length - 1; i >= 0; i--) {
         deleted.push.apply(deleted, this.members[i].deleteAllChildren());
-        deleted.push(this.members[i].deleteSelf());
-        this.removeMember(this.members[i]);
+        var d = this.removeMember(this.members[i]);
+        deleted.push(d.deleteSelf());
+        
       }
       return deleted;
     },
 
     deleteSelf: function() {
+      var data= Instance.prototype.deleteSelf.call(this);
       this.members.length = 0;
-      return Instance.prototype.deleteSelf.call(this);
+      return data;
     },
 
     create: function() {
@@ -145,7 +155,7 @@ define([
     },
 
     removeMember: function(data) {
-      this.toggleOpen();
+      this.toggleOpen(this);
       var index = $.inArray(data, this.members);
       var member;
       if (index > -1) {
@@ -161,7 +171,7 @@ define([
         this.get('memberCount').setValue(memberCount);
 
       }
-      this.toggleClosed();
+      this.toggleClosed(this);
       return member;
 
     },
@@ -223,7 +233,6 @@ define([
     },
 
     toggleClosed: function(item) {
-      console.log('calling toggle closed', item.get('name'));
       if ((this === item || this.hasMember(item) || item.nodeParent === this.nodeParent) && this.get('open')) {
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].inverseTransformSelf();
@@ -248,12 +257,20 @@ define([
 
 
     calculateGroupCentroid: function() {
+      if(this.members.length>1){
       var point_list = [];
       for (var i = 0; i < this.members.length; i++) {
         point_list.push(this.members[i].get('geom').position);
       }
       var centroid = TrigFunc.centroid(point_list);
       return centroid;
+      }
+      else{
+        if(this.members>0){
+        return {x:this.members[0].get('geom').x,y:this.members[0].get('geom').y};
+        }
+      }
+      return {x:0,y:0};
     },
 
 

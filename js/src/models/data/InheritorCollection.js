@@ -26,6 +26,7 @@ define([
 
 
 			deleteSelf: function(){
+				this.stopListening();
 				this.removeAllInheritors();
 			},
 			
@@ -33,6 +34,22 @@ define([
 			addInheritor: function(inheritor) {
 				this.inheritors.push(inheritor);
 
+			},
+
+			toJSON: function(){
+				var inheritor_list = [];
+				for(var i=0;i<this.inheritors.length;i++){
+					inheritor_list.push(this.inheritors[i].get('id'));
+				}
+				return inheritor_list;
+			},
+
+			parseJSON: function(data,proto, manager){
+				for(var i=0;i<data.length;i++){
+					var instance = manager.getById(data[i]);
+					this.inheritors.push(instance);
+					instance.set('proto_node', proto);
+				}
 			},
 
 			removeInheritor: function(inheritor) {

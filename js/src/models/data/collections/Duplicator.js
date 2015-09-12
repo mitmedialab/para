@@ -86,17 +86,20 @@ define([
                 var target_index = data.target_index;
                 var target_data = data.children[target_index];
                 var target = this.getTargetClass(target_data.name);
-                target.parseJSON(target_data);
+                target.parseJSON(target_data,this);
                 this.setTarget(target);
                 var i, j, list;
                 for (i = 0; i < data.children.length; i++) {
                     if (i != target_index) {
                         var name = data.children[i].name;
                         var child = this.getTargetClass(name);
-                        child.parseJSON(data.children[i]);
+                        child.parseJSON(data.children[i],this);
                         this.addMember(child, i);
                     }
                 }
+
+                target.parseInheritorJSON(target_data,this);
+
                
                 this.internalList.parseJSON(data.internalList, this);
                 for (i = 0; i < data.group_relative.length; i++) {
@@ -117,7 +120,6 @@ define([
                     this.members[j].get('zIndex').setValue(j);
                 }
                 this.get('memberCount').setValue(memberCount);
-                console.log('member count =',this.get('memberCount').getValue());
                 this.toggleClosed(this);
                 return this;
 
@@ -334,6 +336,7 @@ define([
 
 
             deleteSelf: function() {
+                this.stopListening();
                 this.internalList.deleteSelf();
                 for (var i = 0; i < this.group_relative.length; i++) {
                     this.group_relative[i].deleteSelf();

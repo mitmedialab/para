@@ -271,15 +271,13 @@ define([
 		 * scene graph
 		 */
 		deleteSelf: function() {
+			this.stopListening();
 			this.reset();
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
 				if (this.get('selection_clone')) {
 					this.get('selection_clone').remove();
-				}
-				if (this.get('normal_geom')) {
-					this.get('normal_geom').remove();
 				}
 			}
 			this.clearBoundingBoxes();
@@ -299,7 +297,6 @@ define([
 
 			}
 
-			this.stopListening();
 			return this;
 		},
 
@@ -374,6 +371,15 @@ define([
 
 		closeAllMembers: function() {
 			return this;
+		},
+
+
+		/*placeholder functions to prevent errors */
+		modifyPoints: function(data, mode, modifier, exclude) {
+
+		},
+
+		modifyPointsByIndex: function(initial_delta, indicies, exclude) {
 		},
 
 		/* create
@@ -493,7 +499,7 @@ define([
 				this.get('bbox').remove();
 				this.set('bbox', null);
 			}
-			var geom = this.get('normal_geom');
+			var geom = this.get('geom');
 			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 
 			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
@@ -520,7 +526,6 @@ define([
 			}
 			
 
-			this.set('normal_geom', geom.clone());
 			this.set('geom', geom);
 			var self = this;
 			var setChildrenData = function(child) {
@@ -537,7 +542,6 @@ define([
 
 		
 			
-			this.get('normal_geom').visible = false;
 			this.createBBox();
 			this.createSelectionClone();
 			for (var i = 0; i < this.children.length; i++) {
@@ -548,10 +552,8 @@ define([
 				}
 
 			}
-			console.log('set inheritance', geom.position);
 
 			this.setPathAltered();
-			console.log('after path altered', geom.position);
 
 		},
 
@@ -732,7 +734,7 @@ define([
 			data.id = this.get('id');
 			data.visible = this.get('visible');
 			data.open = this.get('open');
-
+			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
 			for (var i = 0; i < this.children.length; i++) {
 				data.children.push(this.children[i].toJSON());
@@ -742,7 +744,8 @@ define([
 
 		},
 
-		parseJSON: function(data) {
+		parseJSON: function(data,manager) {
+			console.log('manager=',manager);
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
@@ -754,11 +757,12 @@ define([
 			this.set('id', data.id);
 			this.set('visible', data.visible);
 			this.set('open', data.open);
-
 			var children = data.children;
-			/*for (var i = 0; i < this.children.length; i++) {
-				data.children.push(this.children[i].toJSON());
-			}*/
+		},
+
+		parseInheritorJSON: function(data,manager){
+			this.get('inheritors').parseJSON(data.inheritors,this,manager);
+
 		},
 
 
@@ -1220,7 +1224,6 @@ define([
 			var new_delta = line.segments[1].point;
 			new_delta.x -= translationDelta.x;
 			new_delta.y -= translationDelta.y;
-			console.log(line, delta, new_delta);
 			line.remove();
 			return new_delta;
 		},
@@ -1233,7 +1236,6 @@ define([
 			var invertedMatrix = this._matrix.inverted();
 			line.transform(invertedMatrix);
 			var new_delta = line.segments[1].point;
-			console.log(line, delta, new_delta);
 			line.remove();
 			return new_delta;
 		},
@@ -1272,7 +1274,6 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.get('geom');
-					console.log('geom value', this.get('geom'));
 					this.renderStyle(geom);
 					this.renderSelection(geom);
 					this.set('rendered', true);

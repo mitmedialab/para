@@ -75,6 +75,7 @@
 
 			deleteSelf: function() {
 				this.stopListening();
+				this.removeAllConstraints();
 				for (var p in this) {
 					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
 						this[p].deleteSelf();
@@ -100,13 +101,13 @@
 					this.constraint = new PProperty(func);
 					this.listenTo(this.constraint, 'modified', this.modified);
 				} else {
-					this.constraint.deleteSelf();
 					this.constraint.setValue(func);
 				}
 				this.constraintObject = constraint;
 				this.constraintStack.push({
 					obj: this.constraintObject,
-					func: func
+					func: func,
+					constraint: this.constraint,
 				});
 
 			},
@@ -128,13 +129,12 @@
 					if (this.isSelfConstrained()) {
 						var value = this.getValue();
 						var deleted = this.constraintStack.pop();
-						
+						this.stopListening(this.constraint);
+						this.constraint.deleteSelf();
 						if (this.constraintStack.length > 0) {
-							console.log('switching to last constraint');
 							var lastConstraint = this.constraintStack.pop();
 							this.setConstraint(lastConstraint.func, lastConstraint.obj);
 						} else {
-							console.log('no longer a constraint');
 							this.constraint.deleteSelf();
 							this.constraint = null;
 							this.constraintObject = null;
@@ -148,6 +148,14 @@
 					}
 
 				}
+			},
+
+			removeAllConstraints: function(){
+				while (this.constraintStack.length > 0) {	
+						var lastConstraint = this.constraintStack.pop();
+						lastConstraint.constraint.deleteSelf();
+					}
+
 			},
 
 			/* isSelfConstrained

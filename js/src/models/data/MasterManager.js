@@ -124,7 +124,7 @@ define([
 								break;
 
 						}
-						geom.parseJSON(geometry[i]);
+						geom.parseJSON(geometry[i],this);
 						this.addShape(geom, true);
 						break;
 
@@ -360,7 +360,9 @@ define([
 			this.stopListening(target);
 			if (recurse) {
 				for (var i = 0; i < target.children.length; i++) {
-					this.removeListener(target.members[i], recurse);
+					if(target.children[i]){
+						this.removeListener(target.children[i], recurse);
+					}
 				}
 			}
 
@@ -1011,7 +1013,6 @@ define([
 		},
 
 		modifyParams: function(data) {
-			console.log('modifying param data',data);
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					selected[i].updateParams(data);

@@ -82,11 +82,11 @@ define([
 
     },
 
-    parseJSON: function(data) {
-      GeometryNode.prototype.parseJSON.call(this, data);
+    parseJSON: function(data,manager) {
       var geom = new paper.Path();
       geom.importJSON(data.geom);
-      this.changeGeomInheritance(geom);
+      this.normalizeGeometry(geom, new paper.Matrix());
+      GeometryNode.prototype.parseJSON.call(this, data,manager);
     },
 
 
@@ -353,11 +353,9 @@ define([
      */
     modifyPointsByIndex: function(initial_delta, indicies, exclude) {
 
-      console.log('modifying index', initial_delta);
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
 
-      console.log('pre_delta', initial_delta);
       var delta;
       var toggleClosed = false;
       if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
@@ -366,7 +364,6 @@ define([
       }
       delta = this.transformPoint(initial_delta);
 
-      console.log('post_delta', delta);
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
 

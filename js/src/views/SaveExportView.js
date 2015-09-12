@@ -118,7 +118,6 @@ define([
 				data = this.model.exportProjectJSON();
 			}
 			var string_data = JSON.stringify(data);
-			console.log('setting data', currentName, data);
 			localStorage.removeItem(currentName);
 			try {
 				localStorage.setItem(currentName, string_data);
@@ -127,7 +126,6 @@ define([
 				console.log(e);
 			}
 			this.disableSave();
-			//console.log('localStorageSet',localStorage);
 
 			return true;
 		},
@@ -145,7 +143,6 @@ define([
 			//this.save();
 			var data = localStorage.getItem(filename);
 			var data_obj = JSON.parse(data);
-			console.log('loading filename', filename, data_obj);
 			this.model.importProjectJSON(data_obj);
 			currentName = filename;
 		},

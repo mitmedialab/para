@@ -682,7 +682,7 @@ define([
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
       var constraintF = function() {
-        console.log('calling constraint',ref_prop_key,ref_dimension);
+        //console.log('calling constraint',ref_prop_key,ref_dimension);
         var list = [];
         if (self.get('paused')) {
           return relative.get(rel_prop_key)[rel_dimension].getValue();
@@ -1315,9 +1315,9 @@ define([
     },
 
     deleteSelf: function() {
-     
-      this.clearSelection();
       this.stopListening();
+
+      this.clearSelection();
       var relatives = this.get('relatives');
       var relative_properties = this.get('relative_properties');
       for(var j=0;j<relative_properties.length;j++){
