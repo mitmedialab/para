@@ -162,6 +162,8 @@ define([
                     constraints.push.apply(constraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
+                console.log('internal ui',  this.internalList.get('ui'));
+                 this.internalList.get('ui').remove();
                 if (this.members.length > 1) {
                     this.internalList.addMember(this.members[this.members.length - 1]);
                 }
@@ -189,7 +191,10 @@ define([
                     var relative_list = new ConstrainableList();
                     var reference_list = new ConstrainableList();
                     relative_list.set('id', 'internal' + relative_list.get('id'));
+                    relative_list.get('ui').remove();
                     reference_list.set('id', 'internal' + reference_list.get('id'));
+                    reference_list.get('ui').remove();
+
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
                     reference_list.addMember(target.members[i]);

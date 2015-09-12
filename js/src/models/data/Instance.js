@@ -378,8 +378,7 @@ define([
 
 		},
 
-		modifyPointsByIndex: function(initial_delta, indicies, exclude) {
-		},
+		modifyPointsByIndex: function(initial_delta, indicies, exclude) {},
 
 		/* create
 		 * Prototypal inheritance action:
@@ -392,7 +391,7 @@ define([
 			var value = this.getValue();
 			instance.setValue(value);
 
-			if(!noInheritor){
+			if (!noInheritor) {
 				this.addInheritor(instance);
 			}
 			var g_clone = this.getShapeClone(true);
@@ -444,7 +443,7 @@ define([
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
-			
+
 		},
 
 		removeInheritor: function(instance) {
@@ -480,7 +479,7 @@ define([
 		},
 
 		createSelectionClone: function() {
-			
+
 			var selection_clone = this.getShapeClone();
 			if (this.get('selection_clone')) {
 				this.get('selection_clone').remove();
@@ -519,15 +518,15 @@ define([
 
 
 			if (this.get('geom')) {
-				if(this.nodeParent && this.nodeParent.get('type')=='geometry'){
-				 var index = this.get('geom').index;
-				 this.nodeParent.get('geom').insertChild(index, geom);
+				if (this.nodeParent && this.nodeParent.get('type') == 'geometry') {
+					var index = this.get('geom').index;
+					this.nodeParent.get('geom').insertChild(index, geom);
 				}
 				this.get('geom').remove();
 				this.set('geom', null);
 
 			}
-			
+
 
 			this.set('geom', geom);
 			var self = this;
@@ -543,8 +542,8 @@ define([
 			};
 			setChildrenData(geom);
 
-		
-			
+
+
 			this.createBBox();
 			this.createSelectionClone();
 			for (var i = 0; i < this.children.length; i++) {
@@ -588,23 +587,23 @@ define([
 
 		// sets the geom visibility to false
 		hide: function() {
-			console.log('hide',this.get('name'));
+			console.log('hide', this.get('name'));
 			this.set('visible', false);
 			this.get('selected').setValue(false);
 			this.get('geom').visible = false; // hacky
-			if(this.get('selection_clone')){
+			if (this.get('selection_clone')) {
 				this.get('selection_clone').visible = false;
 			}
 		},
 
 		show: function() {
-			console.log('show',this.get('name'));
+			console.log('show', this.get('name'));
 			this.set('visible', true);
 			this.get('geom').visible = true;
 			if (this.get('constraintSelected').getValue()) {
-				if(this.get('selection_clone')){
-				this.get('selection_clone').visible = true;
-			}
+				if (this.get('selection_clone')) {
+					this.get('selection_clone').visible = true;
+				}
 			}
 
 		},
@@ -753,7 +752,7 @@ define([
 
 		},
 
-		parseJSON: function(data,manager) {
+		parseJSON: function(data, manager) {
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
@@ -768,8 +767,8 @@ define([
 			var children = data.children;
 		},
 
-		parseInheritorJSON: function(data,manager){
-			this.get('inheritors').parseJSON(data.inheritors,this,manager);
+		parseInheritorJSON: function(data, manager) {
+			this.get('inheritors').parseJSON(data.inheritors, this, manager);
 
 		},
 
@@ -935,9 +934,11 @@ define([
 		isReference: function(instance) {
 			if (this.isSelfConstrained()) {
 				var reference = this.constraintObject.get('references');
-				var hasMember = reference.hasMember(instance, true, reference);
-				if (hasMember) {
-					return true;
+				if (reference) {
+					var hasMember = reference.hasMember(instance, true, reference);
+					if (hasMember) {
+						return true;
+					}
 				}
 				return false;
 			} else {

@@ -184,11 +184,13 @@
 			isReference: function(instance) {
 				if (this.isSelfConstrained()) {
 					var reference = this.constraintObject.get('references');
+					if(reference){
 					var hasMember = reference.hasMember(instance, true, reference);
 
 					if (hasMember) {
 						return true;
 					}
+}
 					return false;
 				} else {
 					var subproperties = {};

@@ -189,7 +189,9 @@ define([
     },
 
     getMember: function(member) {
-
+      if(member === this){
+        return this;
+      }
       for (var i = 0; i < this.members.length; i++) {
         var m = this.members[i].getMember(member);
         if (m) {
