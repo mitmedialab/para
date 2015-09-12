@@ -64,7 +64,6 @@ define([
             },
 
             toJSON: function() {
-                console.log('TO JSON target_translation_delta',this.get('target').get('translationDelta').getValue());
 
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
@@ -88,7 +87,6 @@ define([
                 var target_data = data.children[target_index];
                 var target = this.getTargetClass(target_data.name);
                 target.parseJSON(target_data,this);
-                console.log('PARSE JSON target_translation_delta',target.get('translationDelta').getValue());
                 this.setTarget(target);
                 var i, j, list;
                 for (i = 0; i < data.children.length; i++) {
@@ -310,7 +308,6 @@ define([
             deleteMember: function(member,removeAll) {
 
                 this.removeMember(member,false, removeAll);
-                console.log('member deleted?',member.deleted);
                 member.deleteSelf();
                 var parent = member.getParentNode();
                 if (parent) {
@@ -319,6 +316,16 @@ define([
                 return member;
 
             },
+
+            // sets the geom visibility to false
+        hide: function() {
+           Instance.prototype.hide.call(this);
+        },
+
+        show: function() {
+             Instance.prototype.show.call(this);
+
+        },
 
             /*deleteAllChildren
              * function which deletes all children
@@ -357,7 +364,6 @@ define([
 
             removeMember: function(data, updateCount,fullDelete) {
                 var target = this.get('target');
-                console.log('remove member',fullDelete);
                 if (!fullDelete && this.internalList.hasMember(data, true, this)) {
                     return false;
                 }

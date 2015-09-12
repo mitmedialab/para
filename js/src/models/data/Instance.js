@@ -584,17 +584,23 @@ define([
 
 		// sets the geom visibility to false
 		hide: function() {
+			console.log('hide',this.get('name'));
 			this.set('visible', false);
 			this.get('selected').setValue(false);
 			this.get('geom').visible = false; // hacky
-			this.get('selection_clone').visible = false;
+			if(this.get('selection_clone')){
+				this.get('selection_clone').visible = false;
+			}
 		},
 
 		show: function() {
+			console.log('show',this.get('name'));
 			this.set('visible', true);
 			this.get('geom').visible = true;
 			if (this.get('constraintSelected').getValue()) {
+				if(this.get('selection_clone')){
 				this.get('selection_clone').visible = true;
+			}
 			}
 
 		},
@@ -923,7 +929,6 @@ define([
 		 */
 
 		isReference: function(instance) {
-			console.log('checking is reference');
 			if (this.isSelfConstrained()) {
 				var reference = this.constraintObject.get('references');
 				var hasMember = reference.hasMember(instance, true, reference);

@@ -45,6 +45,9 @@ define([
     },
 
     initialize: function(obj, event_bus) {
+      $( window ).scroll(function() {
+   $( window ).scrollTop(0);
+});
       $(".sub-canvas-container").resizable();
       prototypes = [];
       currentId = -1;
