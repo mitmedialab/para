@@ -66,9 +66,7 @@ define([
 			},
 
 			removeAllInheritors: function(){
-				for(var i=0;i<this.inheritors.length;i++){
-					this.inheritors[i].deleteSelf();
-				}
+				
 				this.inheritors = [];
 			},
 

@@ -147,8 +147,8 @@ define([
 				this.addConstraint(constraint, true);
 
 			}
+			
 			paper.view.draw();
-
 		},
 
 
@@ -212,10 +212,11 @@ define([
 		},
 
 		deleteAll: function() {
+			this.deleteAllConstraints();
 			this.deselectAllShapes();
 			layersView.deleteAll();
 			mapView.deactivate();
-			this.deleteAllConstraints();
+			
 
 			var deleted_collections = collectionManager.deleteAll();
 			var deleted_instances = rootNode.deleteAllChildren([]);

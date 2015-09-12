@@ -272,7 +272,6 @@ define([
 		 */
 		deleteSelf: function() {
 			this.stopListening();
-			this.reset();
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
@@ -292,11 +291,12 @@ define([
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
 					var property = this.get(propertyName);
+					console.log('deleting property',propertyName);
 					property.deleteSelf();
 				}
 
 			}
-
+			this.deleted = true;
 			return this;
 		},
 
@@ -745,7 +745,6 @@ define([
 		},
 
 		parseJSON: function(data,manager) {
-			console.log('manager=',manager);
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
@@ -925,6 +924,7 @@ define([
 		 */
 
 		isReference: function(instance) {
+			console.log('checking is reference');
 			if (this.isSelfConstrained()) {
 				var reference = this.constraintObject.get('references');
 				var hasMember = reference.hasMember(instance, true, reference);

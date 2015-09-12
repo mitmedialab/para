@@ -64,6 +64,7 @@ define([
             },
 
             toJSON: function() {
+                console.log('TO JSON target_translation_delta',this.get('target').get('translationDelta').getValue());
 
                 var data = ConstrainableList.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
@@ -87,6 +88,7 @@ define([
                 var target_data = data.children[target_index];
                 var target = this.getTargetClass(target_data.name);
                 target.parseJSON(target_data,this);
+                console.log('PARSE JSON target_translation_delta',target.get('translationDelta').getValue());
                 this.setTarget(target);
                 var i, j, list;
                 for (i = 0; i < data.children.length; i++) {
@@ -308,6 +310,7 @@ define([
             deleteMember: function(member,removeAll) {
 
                 this.removeMember(member,false, removeAll);
+                console.log('member deleted?',member.deleted);
                 member.deleteSelf();
                 var parent = member.getParentNode();
                 if (parent) {
@@ -320,12 +323,20 @@ define([
             /*deleteAllChildren
              * function which deletes all children
              */
-            deleteAllChildren: function(deleted) {
-                if (!deleted) {
-                    deleted = [];
+            deleteAllChildren: function() {
+                this.internalList.deleteSelf();
+                this.internalList = null;
+                for (var i = 0; i < this.group_relative.length; i++) {
+                    this.group_relative[i].deleteSelf();
                 }
-                for (var i = this.members.length - 1; i >= 0; i--) {
-                    deleted.push.apply(deleted, this.members[i].deleteAllChildren());
+                for (var j = 0; i < this.group_reference.length; j++) {
+                    this.group_reference[j].deleteSelf();
+                }
+                
+                 var   deleted = [];
+                
+                for (var k = this.members.length - 1; k >= 0; k--) {
+                    deleted.push.apply(deleted, this.members[k].deleteAllChildren());
                     var deleted_member = this.deleteMember(this.members[i],true);
                     deleted.push(deleted_member);
                 }
@@ -337,20 +348,17 @@ define([
 
             deleteSelf: function() {
                 this.stopListening();
-                this.internalList.deleteSelf();
-                for (var i = 0; i < this.group_relative.length; i++) {
-                    this.group_relative[i].deleteSelf();
-                }
-                for (var j = 0; i < this.group_reference.length; j++) {
-                    this.group_reference[j].deleteSelf();
-                }
-                return ConstrainableList.prototype.deleteSelf.call(this);
+                
+                var data = ConstrainableList.prototype.deleteSelf.call(this);
+               
+                return data;
             },
 
 
             removeMember: function(data, updateCount,fullDelete) {
                 var target = this.get('target');
-                if (this.internalList.hasMember(data, true, this) && !fullDelete) {
+                console.log('remove member',fullDelete);
+                if (!fullDelete && this.internalList.hasMember(data, true, this)) {
                     return false;
                 }
                 var index = $.inArray(data, this.members);

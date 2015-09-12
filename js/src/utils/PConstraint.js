@@ -77,7 +77,7 @@
 				this.stopListening();
 				this.removeAllConstraints();
 				for (var p in this) {
-					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
+					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
 						this[p].deleteSelf();
 					}
 				}
