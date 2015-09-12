@@ -59,7 +59,6 @@ define([
         }
         ids = ids.concat(this.members[i].get('id'));
       }
-      console.log('total members for', this.get('id'), ids.length, ids);
     },
 
     /* addMember, removeMember

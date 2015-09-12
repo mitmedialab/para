@@ -354,7 +354,6 @@ define([
     },
 
     setExempt: function(rel_prop_key, rel_dimension, index, status) {
-      console.log('setting exempt',index,status);
       var exempt_indicies = this.get('exempt_indicies');
       if (status === false) {
         var reference = this.get('references');
@@ -1360,7 +1359,7 @@ define([
         }
       }
 
-       /*var exempt_indicies= this.get('exempt_indicies');
+       var exempt_indicies= this.get('exempt_indicies');
       for( prop in exempt_indicies){
         if(exempt_indicies.hasOwnProperty(prop)){
           for(subprop in exempt_indicies[prop]){
@@ -1373,7 +1372,7 @@ define([
             }
           }
         }
-      }*/
+      }
       
       this.set('reference_values',null);
       this.set('expressions',null);

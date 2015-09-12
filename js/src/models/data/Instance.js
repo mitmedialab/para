@@ -291,7 +291,6 @@ define([
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
 					var property = this.get(propertyName);
-					console.log('deleting property',propertyName);
 					property.deleteSelf();
 				}
 
