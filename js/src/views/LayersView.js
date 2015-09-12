@@ -333,6 +333,7 @@ define([
 			listTree.activateKey(false);
 			if (activeNode) {
 				var shape = event.data.view.model.getById(activeNode.key);
+				console.log(activeNode.key,shape.get('name'));
 				event.data.view.deselectAllNodes('lists');
 				event.data.view.itemClicked(id, activeNode, shape);
 				event.data.view.positionConstraintIcons();

@@ -202,7 +202,11 @@ define([
 
     constraintApplyClick: function(){
       this.model.applyConstraint();
-
+analytics.log(eventType, {
+        type: eventType,
+        id: 'constraintTool',
+        action: 'constraintApplied'
+      });
     },
 
 

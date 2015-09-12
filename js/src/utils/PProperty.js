@@ -69,7 +69,7 @@ define([
 			this.stopListening();
 			this._val.offChange();
 			//this._val.set(0);
-			//this._val.destroy();
+			this._val.destroy();
 		},
 
 

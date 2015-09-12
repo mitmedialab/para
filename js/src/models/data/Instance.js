@@ -272,7 +272,6 @@ define([
 		 */
 		deleteSelf: function() {
 			this.stopListening();
-			this.reset();
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
@@ -296,7 +295,7 @@ define([
 				}
 
 			}
-
+			this.deleted = true;
 			return this;
 		},
 
@@ -388,11 +387,16 @@ define([
 		 * the parent instance.
 		 * TODO: add in checks to prevent diamond inheritance
 		 */
-		create: function() {
+		create: function(noInheritor) {
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
-			this.addInheritor(instance);
+
+			if(!noInheritor){
+				this.addInheritor(instance);
+			}
+			var g_clone = this.getShapeClone(true);
+			instance.changeGeomInheritance(g_clone);
 			return instance;
 		},
 
@@ -440,8 +444,7 @@ define([
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
 			instance.reset();
-			var g_clone = this.getShapeClone(true);
-			instance.changeGeomInheritance(g_clone);
+			
 		},
 
 		removeInheritor: function(instance) {
@@ -585,17 +588,23 @@ define([
 
 		// sets the geom visibility to false
 		hide: function() {
+			console.log('hide',this.get('name'));
 			this.set('visible', false);
 			this.get('selected').setValue(false);
 			this.get('geom').visible = false; // hacky
-			this.get('selection_clone').visible = false;
+			if(this.get('selection_clone')){
+				this.get('selection_clone').visible = false;
+			}
 		},
 
 		show: function() {
+			console.log('show',this.get('name'));
 			this.set('visible', true);
 			this.get('geom').visible = true;
 			if (this.get('constraintSelected').getValue()) {
+				if(this.get('selection_clone')){
 				this.get('selection_clone').visible = true;
+			}
 			}
 
 		},
@@ -745,7 +754,6 @@ define([
 		},
 
 		parseJSON: function(data,manager) {
-			console.log('manager=',manager);
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {

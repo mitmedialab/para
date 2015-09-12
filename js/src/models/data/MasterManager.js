@@ -26,15 +26,16 @@ define([
 	'views/MapView',
 	'views/SaveExportView',
 	'backbone.undo',
+	'utils/analytics'
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, UndoManager) {
+], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, UndoManager, analytics) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
 
 	//stores para lists
-
+	var eventType = 'state_manager';
 	var renderQueue = [];
 	var constraints = [];
 	var store = 0;
@@ -90,6 +91,11 @@ define([
 		},
 
 		importProjectJSON: function(json) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'import',
+				action: 'importJSON'
+			});
 			this.deleteAll();
 			var lists = json.lists;
 			var geometry = json.geometry.children;
@@ -124,7 +130,7 @@ define([
 								break;
 
 						}
-						geom.parseJSON(geometry[i],this);
+						geom.parseJSON(geometry[i], this);
 						this.addShape(geom, true);
 						break;
 
@@ -147,12 +153,17 @@ define([
 				this.addConstraint(constraint, true);
 
 			}
-			paper.view.draw();
 
+			paper.view.draw();
 		},
 
 
 		importSVG: function(data) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'import',
+				action: 'importSVG'
+			});
 			var start_item = new paper.Group();
 			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
 			var path, pathMatrix;
@@ -187,6 +198,11 @@ define([
 		},
 
 		exportSVG: function() {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'export',
+				action: 'exportSVG'
+			});
 			var svg_string = '<svg x="0" y="0" width="1280" height="355" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">';
 			var children = rootNode.children;
 			for (var i = 0; i < children.length; i++) {
@@ -197,6 +213,11 @@ define([
 		},
 
 		exportProjectJSON: function(json) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'export',
+				action: 'exportJSON'
+			});
 			var geometry_json = rootNode.toJSON();
 			var constraint_json = [];
 			for (var i = 0; i < constraints.length; i++) {
@@ -212,10 +233,11 @@ define([
 		},
 
 		deleteAll: function() {
+			this.deleteAllConstraints();
 			this.deselectAllShapes();
 			layersView.deleteAll();
 			mapView.deactivate();
-			this.deleteAllConstraints();
+
 
 			var deleted_collections = collectionManager.deleteAll();
 			var deleted_instances = rootNode.deleteAllChildren([]);
@@ -229,7 +251,6 @@ define([
 			//console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
 		},
 
-		
 
 
 		getById: function(id) {
@@ -360,7 +381,7 @@ define([
 			this.stopListening(target);
 			if (recurse) {
 				for (var i = 0; i < target.children.length; i++) {
-					if(target.children[i]){
+					if (target.children[i]) {
 						this.removeListener(target.children[i], recurse);
 					}
 				}
@@ -370,6 +391,11 @@ define([
 
 
 		addObject: function(object, geom) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'add',
+				action: 'add'+object
+			});
 			switch (object) {
 				case 'geometry':
 					this.addShape(geom);
@@ -402,22 +428,36 @@ define([
 
 
 		unGroup: function() {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'ungroup'
+			});
 			for (var i = 0; i < selected.length; i++) {
 				switch (selected[i].get('type')) {
 					case 'geometry':
 						if (selected[i].get('name') == 'group') {
-							var members = selected[i].deleteSelf();
+							/*var members = selected[i].ungroup();
+							console.log('members',members);
 							var parent = selected[i].getParentNode();
 							if (parent) {
 								//TODO: this is not going to work...
 								parent.removeInheritor(selected[i]);
 								parent.removeChildNode(selected[i]);
-								parent.addChildNode(members);
+								for(var k=0;k<members.length;k++){
+								parent.addChildNode(members[k]);
+								}
 							} else {
-								currentNode.addChildNode(members);
+													
+							for(var j=0;j<members.length;j++){
+								currentNode.addChildNode(members[j]);
 							}
+							}
+							layersView.removeShape(selected[i].get('id'));
+							selected[i].deleteSelf();
+
 							this.deselectAllShapes();
-							this.selectShape(members);
+							this.selectShape(members);*/
 						}
 						break;
 					case 'collection':
@@ -432,7 +472,13 @@ define([
 
 
 		removeObjectById: function(id) {
+			
 			var object = this.getById(id);
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'remove',
+				action: 'remove'+object.get('type')
+			});
 			switch (object.get('type')) {
 				case 'geometry':
 					layersView.removeShape(id);
@@ -616,8 +662,9 @@ define([
 		},
 
 		addCopy: function(selected) {
+
 			for (var i = 0; i < selected.length; i++) {
-				var copy = selected[i].create();
+				var copy = selected[i].create(true);
 				rootNode.addChildNode(copy);
 				layersView.addShape(copy.toJSON());
 				this.addListener(copy);
@@ -693,6 +740,11 @@ define([
 		},
 
 		duplicatorCountModified: function(data, duplicator) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify duplicator count'
+			});
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
@@ -729,6 +781,11 @@ define([
 		},
 
 		addConstraint: function(constraint, noUpdate) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'constraint',
+				action: 'addConstraint'
+			});
 			if (!constraint.get('user_name')) {
 				constraint.set('user_name', 'constraint ' + (constraints.length + 1));
 			}
@@ -742,21 +799,22 @@ define([
 		},
 
 		removeConstraint: function(id) {
+
 			var constraint = this.getConstraintById(id);
 			if (constraint) {
 				var index = constraints.indexOf(constraint);
-				constraints.splice(index,1);
+				constraints.splice(index, 1);
 				constraint.deleteSelf();
 				this.visualizeConstraint();
 				layersView.removeConstraint(constraint.get('id'));
 			}
 		},
 
-		deleteAllConstraints: function(){
-			for (var i=0;i<constraints.length;i++){
+		deleteAllConstraints: function() {
+			for (var i = 0; i < constraints.length; i++) {
 				constraints[i].deleteSelf();
 			}
-			constraints.length=0;
+			constraints.length = 0;
 		},
 
 
@@ -991,6 +1049,11 @@ define([
 		},
 
 		modifyGeometry: function(data, modifiers) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify geometry'
+			});
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
@@ -1001,6 +1064,11 @@ define([
 
 
 		modifySegment: function(data, handle, modifiers) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify segment'
+			});
 			var instances = selected.filter(function(item) {
 				return item.get('name') != 'point';
 			});
@@ -1013,6 +1081,11 @@ define([
 		},
 
 		modifyParams: function(data) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify params'
+			});
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					selected[i].updateParams(data);
@@ -1021,6 +1094,11 @@ define([
 		},
 
 		modifyStyle: function(style_data) {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'modify style'
+			});
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
@@ -1034,6 +1112,11 @@ define([
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function() {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'toggle open'
+			});
 			var data = collectionManager.toggleOpen(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
@@ -1045,6 +1128,11 @@ define([
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function() {
+			analytics.log(eventType, {
+				type: eventType,
+				id: 'modify',
+				action: 'toggle closed'
+			});
 			var data = collectionManager.toggleClosed(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
