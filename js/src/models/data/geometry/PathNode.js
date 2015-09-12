@@ -265,15 +265,8 @@ define([
       var startHeight = geom.bounds.height;
 
       var selectedPoints = this.inheritSelectedPoints();
-      //maintains constraints on points
       var indicies = [];
-     
-        /*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.inverseTransformRecurse([]);
-      } else {
-        this.inverseTransformSelf();
-      }*/      
-
+  
       for (var i = 0; i < selectedPoints.length; i++) {
 
         var selectedPoint = selectedPoints[i];
@@ -315,12 +308,7 @@ define([
 
       }
 
-     /* if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.transformRecurse([]);
-      } else {
-        this.transformSelf();
-
-      }*/
+   
       var endWidth = geom.bounds.width;
       var endHeight = geom.bounds.height;
       var wDiff = (endWidth - startWidth) / 2;
@@ -328,12 +316,15 @@ define([
 
       var inheritors = this.get('inheritors').inheritors;
       var delta;
-
+      var toggleClosed = false;
       if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        delta = this.nodeParent.inverseTransformRecursePoint(new paper.Point(data.translationDelta.x,data.translationDelta.y));
-      } else {
+        this.nodeParent.toggleOpen(this.nodeParent);
+        toggleClosed = true;
+      } 
         delta = this.inverseTransformPoint(new paper.Point(data.translationDelta.x,data.translationDelta.y));
-      }
+       if (toggleClosed) {
+        this.nodeParent.toggleClosed(this.nodeParent);
+      } 
 
       for (var j = 0; j < inheritors.length; j++) {
         inheritors[j].modifyPointsByIndex(delta, indicies, exclude);
@@ -352,24 +343,20 @@ define([
      * on the prototype's geometry to those of the inheritor
      */
     modifyPointsByIndex: function(initial_delta, indicies, exclude) {
-      /*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.inverseTransformRecurse([]);
-      } else {
-        this.inverseTransformSelf();
-      }*/
-
+  
+      console.log('modifying index',initial_delta);
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
-      //var startWidth = geom.bounds.width;
-      //var startHeight = geom.bounds.height;
-  //var delta = new paper.Point(data.translationDelta.x,data.translationDelta.y);
+ 
       console.log('pre_delta',initial_delta);
       var delta;
+      var toggleClosed = false;
       if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        delta = this.nodeParent.transformRecursePoint(delta);
-      } else {
+        this.nodeParent.toggleOpen(this.nodeParent);
+        toggleClosed= true;
+      } 
         delta = this.transformPoint(initial_delta);
-      }
+      
       console.log('post_delta',delta);
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
@@ -402,6 +389,10 @@ define([
 
       }
 
+      if (toggleClosed) {
+        this.nodeParent.toggleClosed(this.nodeParent);
+      } 
+
       var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {
         if (!exclude || inheritors[j] != exclude) {
@@ -410,12 +401,7 @@ define([
       }
 
       geom.visible = true;
-    /*  if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.transformRecurse([]);
-      } else {
-        this.transformSelf();
-
-      }*/
+ 
     },
 
 

@@ -223,8 +223,8 @@ define([
     },
 
     toggleClosed: function(item) {
-      console.log('calling toggle closed',item.get('name'));
-      if ((this === item || this.hasMember(item) || item.nodeParent === this.nodeParent) && this.get('open') ) {
+      console.log('calling toggle closed', item.get('name'));
+      if ((this === item || this.hasMember(item) || item.nodeParent === this.nodeParent) && this.get('open')) {
         for (var i = 0; i < this.members.length; i++) {
           this.members[i].inverseTransformSelf();
         }
@@ -324,6 +324,40 @@ define([
       }
     },
 
+
+    transformRecursePoint: function(initial_delta, id) {
+      var delta;
+      var member_translation;
+      for (var i = 0; i < this.members.length; i++) {
+        if (this.members[i].get('id') === id) {
+
+          delta = this.members[i].transformPoint(initial_delta);
+          member_translation =this.members[i].get('translationDelta').getValue();
+        }
+
+      }
+      var translationDelta = this.get('translationDelta').getValue();
+      var center = this.center;
+      console.log('delta',delta);
+      var line = new paper.Path.Line(new paper.Point(member_translation.x,member_translation.y),new paper.Point(member_translation.x+delta.x,member_translation.y+delta.y));
+      console.log('line before transform',line.segments[0].point,line.segments[1].point);
+      line.transform(this._matrix);
+      console.log('line after transform',line.segments[0].point,line.segments[1].point);
+      var final_delta = line.segments[1].point;
+      console.log('center, translation_delta, member_translation',center,translationDelta,member_translation);
+
+      console.log('final delta before subtraction',final_delta);
+      final_delta.x-=translationDelta.x;
+      final_delta.y-=translationDelta.y;
+      console.log('final delta after subtraction',final_delta);
+      console.log('=================');
+
+    // console.log('transformRecurse',line,delta,final_delta,this._matrix);
+      line.remove();
+     // console.log('transformRecurse',initial_delta,delta,final_delta);
+      return final_delta;
+    },
+
     transformSelf: function(exclude) {
 
       this._matrix.reset();
@@ -334,7 +368,7 @@ define([
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
       var center = this.calculateGroupCentroid();
-
+      this.center = center;
       this._matrix.translate(translationDelta.x, translationDelta.y);
       this._matrix.rotate(rotationDelta, new paper.Point(center.x, center.y));
       this._matrix.scale(scalingDelta.x, scalingDelta.y, new paper.Point(center.x, center.y));
@@ -344,6 +378,22 @@ define([
     inverseTransformSelf: function() {
       this._invertedMatrix = this._matrix.inverted();
       return [];
+    },
+
+    inverseTransformRecursePoint: function(initial_delta, id) {
+      var delta;
+      
+      delta = this.inverseTransformPoint(initial_delta);
+      var final_delta;
+      for (var i = 0; i < this.members.length; i++) {
+        if (this.members[i].get('id') === id) {
+          final_delta = this.members[i].inverseTransformPoint(delta);
+        }
+
+      }
+      console.log('inverseRecurse',initial_delta,delta,final_delta);
+
+      return final_delta;
     },
 
     renderSelection: function(geom) {
@@ -396,7 +446,7 @@ define([
       }
     },
 
-       createSelectionClone: function() {
+    createSelectionClone: function() {
       if (this.get('selection_clone')) {
         this.get('selection_clone').remove();
         this.set('selection_clone', null);

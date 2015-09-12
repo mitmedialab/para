@@ -193,7 +193,7 @@ define([
 			//============ end private properties==============//
 
 
-			var bounds = new paper.Rectangle(0,	 0, 1, 1);
+			var bounds = new paper.Rectangle(0, 0, 1, 1);
 			this.set('i_bbox', {
 				topLeft: null,
 				bottomRight: null,
@@ -304,8 +304,8 @@ define([
 		},
 
 
-		getById:function(id){
-			if(this.get('id')==id){
+		getById: function(id) {
+			if (this.get('id') == id) {
 				return this;
 			}
 		},
@@ -551,10 +551,10 @@ define([
 				}
 
 			}
-			console.log('set inheritance',geom.position);
+			console.log('set inheritance', geom.position);
 
 			this.setPathAltered();
-			console.log('after path altered',geom.position);
+			console.log('after path altered', geom.position);
 
 		},
 
@@ -1210,36 +1210,33 @@ define([
 			this._matrix.translate(translationDelta.x, translationDelta.y);
 			this._matrix.rotate(rotationDelta, 0, 0);
 			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
-
 			geom.transform(this._matrix);
 			bbox.transform(this._matrix);
 			selection_clone.transform(this._matrix);
 			return [geom];
 		},
 
-		transformPoint: function(delta){
+		transformPoint: function(delta) {
 			var translationDelta = this.get('translationDelta').getValue();
-			var line = new paper.Path.Line(new paper.Point(0,0),delta);
-			//delta.x-=translationDelta.x;
-			//delta.y-=translationDelta.y;
+			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
 			line.transform(this._matrix);
 			var new_delta = line.segments[1].point;
-			new_delta.x-=translationDelta.x;
-			new_delta.y-=translationDelta.y;
-			console.log(line,delta,new_delta);
+			new_delta.x -= translationDelta.x;
+			new_delta.y -= translationDelta.y;
+			console.log(line, delta, new_delta);
 			line.remove();
 			return new_delta;
 		},
 
-		inverseTransformPoint: function(delta){
+		inverseTransformPoint: function(delta) {
 			var translationDelta = this.get('translationDelta').getValue();
-			delta.x+=translationDelta.x;
-			delta.y+=translationDelta.y;
-			var line = new paper.Path.Line(new paper.Point(0,0),delta);
+			delta.x += translationDelta.x;
+			delta.y += translationDelta.y;
+			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
 			var invertedMatrix = this._matrix.inverted();
 			line.transform(invertedMatrix);
 			var new_delta = line.segments[1].point;
-			console.log(line,delta,new_delta);
+			console.log(line, delta, new_delta);
 			line.remove();
 			return new_delta;
 		},
@@ -1278,7 +1275,7 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.get('geom');
-					console.log('geom value',this.get('geom'));
+					console.log('geom value', this.get('geom'));
 					this.renderStyle(geom);
 					this.renderSelection(geom);
 					this.set('rendered', true);
@@ -1379,7 +1376,17 @@ define([
 
 		/*returns a clone of the paper js shape*/
 		getShapeClone: function(relative) {
-			var clone = this.get('normal_geom').clone();
+			var toggleClosed = false;
+			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+				this.nodeParent.toggleOpen(this.nodeParent);
+				toggleClosed = true;
+			}
+			var clone = this.get('geom').clone();
+			clone.transform(this._matrix.inverted());
+			if (toggleClosed) {
+				this.nodeParent.toggleClosed(this.nodeParent);
+			}
+
 			return clone;
 		},
 
