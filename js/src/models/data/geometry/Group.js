@@ -325,38 +325,6 @@ define([
     },
 
 
-    transformRecursePoint: function(initial_delta, id) {
-      var delta;
-      var member_translation;
-      for (var i = 0; i < this.members.length; i++) {
-        if (this.members[i].get('id') === id) {
-
-          delta = this.members[i].transformPoint(initial_delta);
-          member_translation =this.members[i].get('translationDelta').getValue();
-        }
-
-      }
-      var translationDelta = this.get('translationDelta').getValue();
-      var center = this.center;
-      console.log('delta',delta);
-      var line = new paper.Path.Line(new paper.Point(member_translation.x,member_translation.y),new paper.Point(member_translation.x+delta.x,member_translation.y+delta.y));
-      console.log('line before transform',line.segments[0].point,line.segments[1].point);
-      line.transform(this._matrix);
-      console.log('line after transform',line.segments[0].point,line.segments[1].point);
-      var final_delta = line.segments[1].point;
-      console.log('center, translation_delta, member_translation',center,translationDelta,member_translation);
-
-      console.log('final delta before subtraction',final_delta);
-      final_delta.x-=translationDelta.x;
-      final_delta.y-=translationDelta.y;
-      console.log('final delta after subtraction',final_delta);
-      console.log('=================');
-
-    // console.log('transformRecurse',line,delta,final_delta,this._matrix);
-      line.remove();
-     // console.log('transformRecurse',initial_delta,delta,final_delta);
-      return final_delta;
-    },
 
     transformSelf: function(exclude) {
 
@@ -380,22 +348,7 @@ define([
       return [];
     },
 
-    inverseTransformRecursePoint: function(initial_delta, id) {
-      var delta;
-      
-      delta = this.inverseTransformPoint(initial_delta);
-      var final_delta;
-      for (var i = 0; i < this.members.length; i++) {
-        if (this.members[i].get('id') === id) {
-          final_delta = this.members[i].inverseTransformPoint(delta);
-        }
-
-      }
-      console.log('inverseRecurse',initial_delta,delta,final_delta);
-
-      return final_delta;
-    },
-
+  
     renderSelection: function(geom) {
       var selected = this.get('selected').getValue();
       var constraint_selected = this.get('constraintSelected').getValue();

@@ -47,6 +47,11 @@ define([
         if (proto_node) {
           proto_node.updateParams(data);
         } else {
+          var toggleClosed = false;
+          if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+            this.nodeParent.toggleOpen(this.nodeParent);
+            toggleClosed = true;
+          }
           var userParams = this.get('userParams');
           userParams[0].val = data.value;
           this.set('userParams', userParams);
@@ -62,6 +67,9 @@ define([
           path.visible = false;
 
           this.transformSelf();
+          if (toggleClosed) {
+            this.nodeParent.toggleClosed(this.nodeParent);
+          }
 
           var inheritors = this.get('inheritors').inheritors;
           this.trigger('modified', this);
@@ -72,10 +80,16 @@ define([
     },
 
     updateInheritorParams: function(data) {
-    
+
       var inheritors = this.get('inheritors').inheritors;
       for (var i = 0; i < inheritors.length; i++) {
-          var path = this.get('normal_geom').clone();
+        var toggleClosed = false;
+        if (inheritors[i].nodeParent && inheritors[i].nodeParent.get('name') === 'group' && !inheritors[i].nodeParent.get('open')) {
+          inheritors[i].nodeParent.toggleOpen(inheritors[i].nodeParent);
+          toggleClosed = true;
+        }
+
+        var path = this.get('normal_geom').clone();
         var userParams = inheritors[i].get('userParams');
         userParams[0].val = data.value;
         inheritors[i].set('userParams', userParams);
@@ -89,6 +103,10 @@ define([
 
         path.visible = false;
         inheritors[i].transformSelf();
+
+        if (toggleClosed) {
+          inheritors[i].nodeParent.toggleClosed(inheritors[i].nodeParent);
+        }
         inheritors[i].trigger('modified', inheritors[i]);
       }
     }

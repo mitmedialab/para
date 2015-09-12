@@ -471,11 +471,12 @@ define([
 		},
 
 		createSelectionClone: function() {
+			
+			var selection_clone = this.getShapeClone();
 			if (this.get('selection_clone')) {
 				this.get('selection_clone').remove();
 				this.set('selection_clone', null);
 			}
-			var selection_clone = this.getShapeClone();
 			var targetLayer = paper.project.layers.filter(function(layer) {
 				return layer.name === 'ui_layer';
 			})[0];
@@ -506,26 +507,21 @@ define([
 		},
 
 		changeGeomInheritance: function(geom) {
+
+
 			if (this.get('geom')) {
+				if(this.nodeParent && this.nodeParent.get('type')=='geometry'){
+				 var index = this.get('geom').index;
+				 this.nodeParent.get('geom').insertChild(index, geom);
+				}
 				this.get('geom').remove();
 				this.set('geom', null);
 
 			}
-			if (this.get('selection_clone')) {
-				this.get('selection_clone').remove();
-				this.set('selection_clone', null);
-			}
-			if (this.get('bbox')) {
-				this.get('bbox').remove();
-				this.set('bbox', null);
-			}
-			if (this.get('normal_geom')) {
-				this.get('normal_geom').remove();
-				this.set('normal_geom', null);
-			}
+			
 
 			this.set('normal_geom', geom.clone());
-
+			this.set('geom', geom);
 			var self = this;
 			var setChildrenData = function(child) {
 				child.data.instance = self;
@@ -539,7 +535,8 @@ define([
 			};
 			setChildrenData(geom);
 
-			this.set('geom', geom);
+		
+			
 			this.get('normal_geom').visible = false;
 			this.createBBox();
 			this.createSelectionClone();
