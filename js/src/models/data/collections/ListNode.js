@@ -69,6 +69,7 @@ define([
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
           this.members.push(data[i]);
+          this.listenTo(data[i],'modified',this.modified)
 
         }
       } else {
@@ -77,6 +78,7 @@ define([
         } else {
           this.members.push(data);
         }
+        this.listenTo(data,'modified',this.modified)
 
       }
 
@@ -120,6 +122,11 @@ define([
       this.set('visible',true);
 
     },
+//callback triggered when a subproperty is modified externally 
+      modified: function() {
+        this.setNull(false);
+        this.trigger('modified', this);
+      },
 
     bringToFront: function() {
       for (var i = 0; i < this.members.length; i++) {
@@ -196,7 +203,7 @@ define([
         };
         this.get('memberCount').setValue(memberCount);
 
-        //this.stopListening(member);
+        this.stopListening(member);
         return member;
       }
 

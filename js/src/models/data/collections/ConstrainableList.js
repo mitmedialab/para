@@ -21,7 +21,8 @@ define([
       }),
 
       initialize: function() {
-        ListNode.prototype.initialize.apply(this, arguments);
+        ListNode.prototype.
+        initialize.apply(this, arguments);
         //code for creating list UI
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
         var path = new paper.Path.Rectangle(rectangle);

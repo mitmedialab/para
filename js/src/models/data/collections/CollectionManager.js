@@ -258,14 +258,14 @@ define([
 				duplicator.setTarget(object);
 			}
 
-			if (!this.addToOpenLists(duplicator)) {
+			//if (!this.addToOpenLists(duplicator)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
 					if (duplicator.hasMember(lists[i], true)) {
 						lists.splice(i, 1);
 					}
 				}
 				lists.push(duplicator);
-			}
+			//}
 
 			return duplicator;
 		},
