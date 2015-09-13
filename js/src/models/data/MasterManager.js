@@ -858,7 +858,7 @@ define([
 							if (parent.get('name') === 'group') {
 								if(parent.nodeParent.get('name')==='duplicator'){
 									return false;
-								}
+								}	
 								parent.removeMember(movedShape);
 
 							} else if (parent.get('name') === 'duplicator') {
