@@ -355,13 +355,14 @@ define([
 
     setExempt: function(rel_prop_key, rel_dimension, index, status) {
       var exempt_indicies = this.get('exempt_indicies');
-      if (status === false) {
+      /*if (status === false) {
         var reference = this.get('references');
         var relative = this.get('relatives');
-        if (!reference.hasMember(relative.getMemberAt(index), true, reference)) {
+        /*if (!reference.hasMember(relative.getMemberAt(index), true, reference)) {
           return false;
         }
-      }
+
+      }*/
       var value = 0;
       if(status ===true){
         value = 1;

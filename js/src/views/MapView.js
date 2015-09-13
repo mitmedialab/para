@@ -258,8 +258,9 @@ define([
 			var status = $('#exempt_button').hasClass('active');
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
-
 			var changed = constraint.setExempt(propName, subpropName, current_index, !status);
+						console.log('setting exempt to',!status,changed);
+
 			if (changed) {
 				if (status) {
 					$('#exempt_button').removeClass('active');
