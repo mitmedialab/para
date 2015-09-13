@@ -37,16 +37,21 @@ define([
 					focusOnClick: true,
 					preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
 					preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
-        	
+
 					dragStart: function(node, data) {
 						return true;
 					},
 					dragEnter: function(node, data) {
-						return view.checkValidDrop(data.otherNode, node, data.hitMode);
+						console.log('drag enter data', data);
+						return true;
+
 					},
 					dragDrop: function(node, data) {
-						data.otherNode.moveTo(node, data.hitMode);
-						view.dropCompleted(data.otherNode, node, data.hitMode);
+						console.log('drop data', data);
+						if (view.checkValidDrop(data.otherNode, node,data.hitMode)) {
+							data.otherNode.moveTo(node, data.hitMode);
+							view.dropCompleted(data.otherNode, node, data.hitMode);
+						}
 					}
 				}
 			});
@@ -322,7 +327,7 @@ define([
 		dropCompleted: function(nodeA, nodeB, hitMode) {
 			var stored = nodeA.data.zIndex;
 			nodeA.data.zIndex = nodeB.data.zIndex;
-			nodeB.data.zIndex= stored;
+			nodeB.data.zIndex = stored;
 		},
 
 		shapeClicked: function(event) {
@@ -333,7 +338,7 @@ define([
 			listTree.activateKey(false);
 			if (activeNode) {
 				var shape = event.data.view.model.getById(activeNode.key);
-				console.log(activeNode.key,shape.get('name'));
+				console.log(activeNode.key, shape.get('name'));
 				event.data.view.deselectAllNodes('lists');
 				event.data.view.itemClicked(id, activeNode, shape);
 				event.data.view.positionConstraintIcons();

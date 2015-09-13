@@ -400,6 +400,9 @@ define([
 		},
 
 		addChildNode: function(node) {
+			if(!node.get('geom').parent){
+				paper.project.activeLayer.addChild(node.get('geom'));
+			}
 			SceneNode.prototype.addChildNode.call(this, node);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
@@ -421,19 +424,25 @@ define([
 		},
 
 		setChildAfter: function(child, sibling) {
-			SceneNode.prototype.setChildBefore.call(this, child, sibling);
+			console.log('set child after', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
+			SceneNode.prototype.setChildAfter.call(this, child, sibling);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
+			console.log('post set child after', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
+
 
 
 		},
 
 		setChildBefore: function(child, sibling) {
-			SceneNode.prototype.setChildAfter.call(this, child, sibling);
+			console.log('set child before', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
+
+			SceneNode.prototype.setChildBefore.call(this, child, sibling);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
+			console.log('post set child before', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
 
 		},
 

@@ -828,50 +828,60 @@ define([
 		},
 
 
+
 		reorderShapes: function(movedId, relativeId, mode) {
 			var movedShape = this.getById(movedId);
 			var relativeShape = this.getById(relativeId);
 			if (movedShape && relativeShape) {
 				switch (mode) {
 					case 'over':
-						if (movedShape.nodeParent == relativeShape) {
+					
+					if (movedShape.nodeParent == relativeShape) {
 							return false;
-						}
-						if (relativeShape.get('name') === 'duplicator') {
+					}
+					if (relativeShape.get('name') === 'duplicator') {
 							return false;
-						}
-						if (relativeShape.get('name') === 'group') {
+					}
+					if (relativeShape.get('name') === 'group') {
 							relativeShape.addMember(movedShape);
 							layersView.removeChildren(relativeShape.get('id'));
 							for (var i = 0; i < relativeShape.members.length; i++) {
 								layersView.addShape(relativeShape.members[i].toJSON(), relativeShape.get('id'));
 							}
 							layersView.sortChildren(relativeShape.get('id'));
-						}
-						break;
+					}
+					break;
 					default:
+						console.log('moved shape is sibing',movedShape.isSibling(relativeShape));
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
 							if (parent.get('name') === 'group') {
+								if(parent.nodeParent.get('name')==='duplicator'){
+									return false;
+								}
 								parent.removeMember(movedShape);
+
 							} else if (parent.get('name') === 'duplicator') {
+
 								var success = parent.removeMember(movedShape, true);
 								if (!success) {
 									return false;
 								}
 
 							}
-
+							
 							currentNode.addChildNode(movedShape);
-							this.modified(movedShape);
+							
 
 						}
+
+						console.log('mode',mode);
 						switch (mode) {
 							case 'after':
-								movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
+								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
 								break;
 							case 'before':
-								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
+								movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
 								break;
 						}
 						break;
