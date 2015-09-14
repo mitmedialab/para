@@ -52,6 +52,10 @@ define([
       var geom = new paper.Group();
       this.set('geom', geom);
       geom.data.instance = this;  
+      this.get('fillColor').setNoColor(true);
+      this.get('strokeColor').setNoColor(true);
+      this.get('strokeWidth').setValue(1);  
+
 
     },
 
@@ -185,6 +189,22 @@ define([
     },
 
     setValue: function(data) {
+      if(data.fillColor || data.strokeColor || data.strokeWidth){
+        var style_data = {};
+        if(data.fillColor && !data.fillColor.noColor){
+          style_data.fillColor = data.fillColor;
+        }
+        if(data.strokeColor  && !data.strokeColor.noColor){
+          style_data.strokeColor = data.strokeColor;
+        }
+        if(data.strokeWidth){
+          style_data.strokeWidth = data.strokeWidth;
+        }
+        for(var i=0;i<this.members.length;i++){
+          this.members[i].setValue(style_data);
+        }
+
+      }
       Instance.prototype.setValue.call(this, data);
     },
 
@@ -292,6 +312,7 @@ define([
     },
 
     render: function() {
+      //this.renderStyle(this.get('geom'));
       this.renderSelection(this.get('geom'));
     },
 

@@ -198,9 +198,9 @@ define([
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
                     reference_list.addMember(target.members[i]);
-                    /*if (this.members.length > 1) {
+                    if (this.members.length > 1) {
                         reference_list.addMember(this.members[this.members.length - 1].members[i]);
-                    }*/
+                    }
                     for (var j = 0; j < this.members.length; j++) {
                         relative_list.addMember(this.members[j].members[i]);
                     }

@@ -184,9 +184,9 @@ define([
 					new_children.push(path);
 
 				}
-				if (children.length > 1) {
+				/*if (children.length > 1) {
 					this.addGroup(new_children);
-				}
+				}*/
 			} else {
 				path = new PathNode();
 				pathMatrix = new paper.Matrix();
