@@ -6,7 +6,7 @@
 define([
     'underscore',
     'backbone',
-    'utils/PConstraint',
+    'models/data/properties/PConstraint',
 
 
 

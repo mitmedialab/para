@@ -5,10 +5,10 @@
 define([
     'underscore',
     'models/data/collections/ListNode',
-    'utils/PFloat',
-    'utils/PBool',
+    'models/data/properties/PFloat',
+    'models/data/properties/PBool',
     'paper',
-    'utils/PConstraint',
+    'models/data/properties/PConstraint',
     'utils/TrigFunc',
     'models/data/Instance'
 

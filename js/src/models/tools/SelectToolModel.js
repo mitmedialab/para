@@ -6,7 +6,7 @@ define([
   'paper',
   'backbone',
   'models/tools/BaseToolModel',
-  'utils/PPoint'
+  'models/data/properties/PPoint'
 
 
 

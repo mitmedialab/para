@@ -5,7 +5,7 @@
 define([
 		'underscore',
 		'toolbox',
-		'utils/PPoint'
+		'models/data/properties/PPoint'
 
 	],
 

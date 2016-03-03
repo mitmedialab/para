@@ -14,8 +14,8 @@ define([
   'models/data/geometry/EllipseNode',
   'models/data/geometry/PolygonNode',
   'utils/TrigFunc',
-  'utils/PFloat',
-  'utils/PPoint',
+  'models/data/properties/PFloat',
+  'models/data/properties/PPoint',
 
 
 

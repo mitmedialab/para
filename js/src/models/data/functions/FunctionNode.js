@@ -7,7 +7,7 @@ define([
 		'underscore',
 		'paper',
 		'models/data/Instance',
-		'utils/PConstraint',
+		'models/data/properties/PConstraint',
 		'views/ParametersView',
 
 	],

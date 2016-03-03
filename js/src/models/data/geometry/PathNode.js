@@ -10,10 +10,10 @@ define([
   'models/data/geometry/GeometryNode',
   'models/data/geometry/PointNode',
   'utils/TrigFunc',
-  'utils/PPoint',
+  'models/data/properties/PPoint',
   'paper',
-  'utils/PFloat',
-  'utils/PColor'
+  'models/data/properties/PFloat',
+  'models/data/properties/PColor'
 
 
 ], function(_, GeometryNode, PointNode, TrigFunc, PPoint, paper, PFloat, PColor) {

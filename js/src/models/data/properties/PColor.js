@@ -11,9 +11,9 @@ define([
 		'underscore',
 		'paper',
 		'cjs',
-		'utils/PFloat',
-		'utils/PConstraint',
-		'utils/PBool',
+		'models/data/properties/PFloat',
+		'models/data/properties/PConstraint',
+		'models/data/properties/PBool',
 		'utils/ColorUtils'
 	],
 

@@ -9,7 +9,7 @@ define([
   'underscore',
   'models/data/geometry/GeometryNode',
   'utils/TrigFunc',
-  'utils/PPoint',
+  'models/data/properties/PPoint',
   'paper'
 
 ], function(_,GeometryNode,TrigFunc, PPoint, paper) {

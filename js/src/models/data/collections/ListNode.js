@@ -7,8 +7,8 @@ define([
   'underscore',
   'paper',
   'models/data/Instance',
-  'utils/PFloat',
-  'utils/PConstraint',
+  'models/data/properties/PFloat',
+  'models/data/properties/PConstraint',
   'utils/TrigFunc'
 
 ], function($, _, paper, Instance, PFloat, PConstraint, TrigFunc) {

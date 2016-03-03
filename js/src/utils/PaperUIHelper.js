@@ -12,7 +12,7 @@ define([
   'underscore',
   'paper',
   'utils/Utils',
-  'utils/PColor',
+  'models/data/properties/PColor',
   'models/data/PaperUI',
   'models/data/PaperUIItem',
 ], function($, _, paper, Utils, PColor, PaperUI, PaperUIItem) {

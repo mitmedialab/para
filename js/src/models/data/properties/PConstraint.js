@@ -7,7 +7,7 @@
 		'underscore',
 		'jquery',
 		'backbone',
-		'utils/PProperty'
+		'models/data/properties/PProperty'
 	], function(_, $, Backbone, PProperty) {
 
 		var PConstraint = Backbone.Model.extend({

@@ -10,7 +10,7 @@
 define([
   'jquery',
   'underscore',
-  'utils/PPoint'
+  'models/data/properties/PPoint'
 ], function($, _, PPoint) {
   
   var Utils = {

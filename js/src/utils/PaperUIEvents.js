@@ -9,7 +9,7 @@ define([
   'underscore',
   'paper',
   'backbone',
-  'utils/PPoint'
+  'models/data/properties/PPoint'
 ], function($, _, paper, backbone, PPoint) {
 
   var PaperUIHelperEvents = {

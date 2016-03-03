@@ -37,7 +37,7 @@ define([
   'paper',
   'backbone',
   'models/tools/BaseToolModel',
-  'utils/PPoint',
+  'models/data/properties/PPoint',
   'models/data/PaperUI',
   'utils/PaperUIHelper',
   'utils/PaperUIEvents',

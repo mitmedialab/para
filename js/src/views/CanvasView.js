@@ -6,7 +6,7 @@ define([
   'underscore',
   'backbone',
   'paper',
-  'utils/PPoint'
+  'models/data/properties/PPoint'
 
 ], function($, _, Backbone, paper, PPoint) {
 

@@ -6,8 +6,8 @@
 
 define([
 		'underscore',
-		'utils/PProperty',
-		'utils/PBool'
+		'models/data/properties/PProperty',
+		'models/data/properties/PBool'
 	],
 
 	function(_, PProperty, PBool) {

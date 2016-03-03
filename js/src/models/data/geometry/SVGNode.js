@@ -9,10 +9,10 @@ define([
   'models/data/geometry/PathNode',
   'models/data/geometry/GeometryNode',
   'utils/TrigFunc',
-  'utils/PPoint',
+  'models/data/properties/PPoint',
   'paper',
-  'utils/PFloat',
-  'utils/PColor'
+  'models/data/properties/PFloat',
+  'models/data/properties/PColor'
 
 
 ], function(_, PathNode, GeometryNode, TrigFunc, PPoint, paper, PFloat, PColor) {

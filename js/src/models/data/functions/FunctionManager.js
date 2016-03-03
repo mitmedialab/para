@@ -6,7 +6,7 @@ define([
 	'underscore',
 	'backbone',
 	'models/data/functions/FunctionNode',
-	'utils/PConstraint',
+	'models/data/properties/PConstraint',
 	'utils/Utils',
 	'models/data/Instance'
 

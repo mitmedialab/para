@@ -8,8 +8,8 @@
 define([
 		'underscore',
 		'paper',
-		'utils/PFloat',
-		'utils/PConstraint'
+		'models/data/properties/PFloat',
+		'models/data/properties/PConstraint'
 	],
 
 	function(_, paper, PFloat, PConstraint) {

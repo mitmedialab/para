@@ -563,6 +563,14 @@
 			}
 		},
 		{
+			"file": "js/src/router.js",
+			"settings":
+			{
+				"buffer_size": 3179,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "js/src/views/drawing/LayersView.js",
 			"settings":
 			{
@@ -574,7 +582,7 @@
 			"file": "js/src/models/data/InheritorCollection.js",
 			"settings":
 			{
-				"buffer_size": 2833,
+				"buffer_size": 3125,
 				"line_ending": "Unix"
 			}
 		},
@@ -590,15 +598,7 @@
 			"file": "js/src/models/data/Constraint.js",
 			"settings":
 			{
-				"buffer_size": 38201,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "js/src/router.js",
-			"settings":
-			{
-				"buffer_size": 3179,
+				"buffer_size": 46013,
 				"line_ending": "Unix"
 			}
 		},
@@ -614,7 +614,7 @@
 			"file": "js/src/utils/PBool.js",
 			"settings":
 			{
-				"buffer_size": 1795,
+				"buffer_size": 1924,
 				"line_ending": "Unix"
 			}
 		},
@@ -622,7 +622,7 @@
 			"file": "js/src/models/data/Instance.js",
 			"settings":
 			{
-				"buffer_size": 35912,
+				"buffer_size": 38017,
 				"line_ending": "Unix"
 			}
 		},
@@ -638,7 +638,7 @@
 			"file": "js/src/models/tools/SelectToolModel.js",
 			"settings":
 			{
-				"buffer_size": 8066,
+				"buffer_size": 8274,
 				"line_ending": "Unix"
 			}
 		},
@@ -842,7 +842,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 93.0,
 		"where_history":
 		[
 			"/Users/jennifermaryjacobs/Documents/work/code/para/js/src/",
@@ -1086,7 +1086,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -1129,8 +1129,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								2675,
+								2675
 							]
 						],
 						"settings":
@@ -1140,7 +1140,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1938.0,
+						"translation.y": 997.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1227,6 +1227,34 @@
 						"zoom_level": 1.0
 					},
 					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "js/src/router.js",
+					"settings":
+					{
+						"buffer_size": 3179,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3175,
+								3175
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 574.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
 				}
 			]
 		},
@@ -1235,7 +1263,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "js/src/views/drawing/LayersView.js",
 					"settings":
 					{
@@ -1262,11 +1290,11 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 7,
 					"file": "js/src/models/data/InheritorCollection.js",
 					"settings":
 					{
-						"buffer_size": 2833,
+						"buffer_size": 3125,
 						"regions":
 						{
 						},
@@ -1289,7 +1317,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 8,
 					"file": "js/src/models/tools/ConstraintToolModel.js",
 					"settings":
 					{
@@ -1317,11 +1345,11 @@
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 9,
 					"file": "js/src/models/data/Constraint.js",
 					"settings":
 					{
-						"buffer_size": 38201,
+						"buffer_size": 46013,
 						"regions":
 						{
 						},
@@ -1345,7 +1373,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 5,
 					"file": "js/src/router.js",
 					"settings":
 					{
@@ -1405,7 +1433,7 @@
 					"file": "js/src/utils/PBool.js",
 					"settings":
 					{
-						"buffer_size": 1795,
+						"buffer_size": 1924,
 						"regions":
 						{
 						},
@@ -1432,7 +1460,7 @@
 					"file": "js/src/models/data/Instance.js",
 					"settings":
 					{
-						"buffer_size": 35912,
+						"buffer_size": 38017,
 						"regions":
 						{
 						},
@@ -1486,7 +1514,7 @@
 					"file": "js/src/models/tools/SelectToolModel.js",
 					"settings":
 					{
-						"buffer_size": 8066,
+						"buffer_size": 8274,
 						"regions":
 						{
 						},
@@ -1615,6 +1643,10 @@
 		"selected_items":
 		[
 			[
+				"router",
+				"js/src/router.js"
+			],
+			[
 				"polyto",
 				"js/src/models/tools/PolyToolModel.js"
 			],
@@ -1653,10 +1685,6 @@
 			[
 				"toolmana",
 				"js/src/models/tools/ToolManager.js"
-			],
-			[
-				"router",
-				"js/src/router.js"
 			],
 			[
 				"constra",
@@ -1781,6 +1809,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 105.0,
+	"side_bar_width": 305.0,
 	"status_bar_visible": true
 }

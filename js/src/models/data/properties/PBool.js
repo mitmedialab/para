@@ -6,8 +6,8 @@
 
 define([
 		'underscore',
-		'utils/PProperty',
-		'utils/PFloat'
+		'models/data/properties/PProperty',
+		'models/data/properties/PFloat'
 	],
 
 	function(_, PProperty, PFloat) {

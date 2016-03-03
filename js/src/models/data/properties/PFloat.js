@@ -7,8 +7,8 @@
 
 define([
 		'underscore',
-		'utils/PProperty',
-		'utils/PConstraint'
+		'models/data/properties/PProperty',
+		'models/data/properties/PConstraint'
 	],
 
 	function(_, PProperty, PConstraint) {

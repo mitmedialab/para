@@ -3,7 +3,7 @@ define([
   'paper',
   'backbone',
   'models/data/paperUI/ConstraintHandles',
-  'utils/PFloat',
+  'models/data/properties/PFloat',
   'utils/TrigFunc',
   'utils/Ziggurat'
 ], function(_, paper, Backbone, ConstraintHandles, PFloat, TrigFunc, Ziggurat) {

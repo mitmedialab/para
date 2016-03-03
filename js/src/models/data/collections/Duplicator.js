@@ -11,10 +11,10 @@ define([
         'models/data/geometry/EllipseNode',
         'models/data/geometry/PolygonNode',
         'models/data/geometry/Group',
-        'utils/PFloat',
-        'utils/PBool',
+        'models/data/properties/PFloat',
+        'models/data/properties/PBool',
         'paper',
-        'utils/PConstraint',
+        'models/data/properties/PConstraint',
         'models/data/Constraint',
         'utils/TrigFunc'
 

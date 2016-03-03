@@ -4,8 +4,8 @@ constrainable property that stores an instance's inheritors
 
 define([
 		'underscore',
-		'utils/PConstraint',
-		'utils/PFloat'
+		'models/data/properties/PConstraint',
+		'models/data/properties/PFloat'
 	],
 
 	function(_, PConstraint, PFloat) {

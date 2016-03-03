@@ -8,8 +8,8 @@ define([
   'underscore',
   'paper',
   'models/data/PaperUI',
-  'utils/PPoint',
-  'utils/PFloat',
+  'models/data/properties/PPoint',
+  'models/data/properties/PFloat',
   'utils/TrigFunc'
 
 ], function(_, paper, PaperUI, PPoint, PFloat, TrigFunc) {
