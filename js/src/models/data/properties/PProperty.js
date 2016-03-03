@@ -45,7 +45,6 @@ define([
 
 		setValue: function(val) {
 			var set;
-			var curr_val = this.getValue();
 			this._val.set(val);
 			return this._val.isValid();
 		},

@@ -8,7 +8,7 @@ define([
 	'jquery',
 	'paper',
 	'models/data/SceneNode',
-	'models/data/InheritorCollection',
+	'models/data/collections/InheritorCollection',
 
 	'models/data/properties/PPoint',
 	'models/data/properties/PFloat',

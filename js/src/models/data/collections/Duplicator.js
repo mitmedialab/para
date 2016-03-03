@@ -1,5 +1,5 @@
 /*Duplicator.js
- * list which can enact iterative constraints on its members
+ * list which can enact iterative constraints on its members and declaratively update number of copies of the target..
  */
 
 define([
@@ -248,11 +248,11 @@ define([
             addMember: function(member, index) {
 
                 if (index) {
-
+                    console.log('index =',index);
                     this.members.splice(index, 0, member);
                     this.insertChild(index, member);
                     this.get('geom').insertChild(index, member.get('geom'));
-                    member.get('zIndex').setValue(index);
+                   // member.get('zIndex').setValue(index);
 
                 } else {
                     this.members.push(member);
