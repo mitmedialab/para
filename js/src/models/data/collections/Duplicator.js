@@ -252,7 +252,7 @@ define([
                     this.members.splice(index, 0, member);
                     this.insertChild(index, member);
                     this.get('geom').insertChild(index, member.get('geom'));
-                   // member.get('zIndex').setValue(index);
+                    member.get('zIndex').setValue(index);
 
                 } else {
                     this.members.push(member);
@@ -432,9 +432,9 @@ define([
                 }
 
 
-                for (var i = 0; i < this.members.length; i++) {
+                /*for (var i = 0; i < this.members.length; i++) {
                     this.members[i].get('zIndex').setValue(i);
-                }
+                }*/
                 var memberCount = {
                     v: this.members.length,
                     operator: 'set'

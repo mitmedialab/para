@@ -86,6 +86,7 @@ define([
         } else {
           var valuelist = [];
           for (var i = 0; i < this.members.length; i++) {
+            console.log('getting member at ',i);
             var value = {};
             for (var c in constraints) {
               if (constraints.hasOwnProperty(c)) {

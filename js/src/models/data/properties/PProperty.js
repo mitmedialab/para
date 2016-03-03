@@ -45,6 +45,9 @@ define([
 
 		setValue: function(val) {
 			var set;
+			
+			//this retains the constraint on an object
+			this.getValue();	
 			this._val.set(val);
 			return this._val.isValid();
 		},

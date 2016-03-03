@@ -412,6 +412,7 @@ define([
 		insertChild: function(index, child) {
 			SceneNode.prototype.insertChild.call(this, index, child);
 			for (var i = 0; i < this.children.length; i++) {
+				console.log('child',this.children[i],"value",i);
 				this.children[i].get('zIndex').setValue(i);
 			}
 
