@@ -33,6 +33,11 @@ define([
 ], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, UndoManager, analytics) {
 	//datastructure to store path functions
 	//TODO: make linked list eventually
+	//debug vars for testing framerate
+	var fps = 0,
+		now, lastUpdate = (new Date()) * 1;
+	var fpsFilter = 10;
+
 
 	//stores para lists
 	var eventType = 'state_manager';
@@ -88,7 +93,45 @@ define([
 			this.listenTo(collectionManager, 'listLengthChange', this.updateListConstraints);
 			this.listenTo(collectionManager, 'duplicatorCountModified', this.duplicatorCountModified);
 
+			var self = this;
+			/*var interval = setInterval(function() {
+				self.clearRenderQueue();
+			}, 17);*/
+
+
+			paper.view.onFrame = function() {
+				self.clearRenderQueue();
+			}
+	var items = paper.project.getItems({
+				class: paper.Path
+			});
+	console.log(items);
 		},
+
+		//debgging function
+		calculateFPS: function() {
+			var thisFrameFPS = 1000 / ((now = new Date()) - lastUpdate);
+			if (now != lastUpdate) {
+				fps += (thisFrameFPS - fps) / fpsFilter;
+				lastUpdate = now;
+			}
+			if (isNaN(fps)) {
+				fps = 1;
+			}
+			$('#fps').val(Math.round(fps).toString());
+			var items = paper.project.getItems({
+				class: paper.Path
+			});
+			var visible = paper.project.getItems({
+				class: paper.Path,
+				visible: function(visible) {
+        			return visible;
+        		}
+			});
+			$('#papernum').val(items.length);
+			$('#visiblenum').val(visible.length);
+		},
+
 
 		importProjectJSON: function(json) {
 			analytics.log(eventType, {
@@ -358,11 +401,31 @@ define([
 		},
 
 		modified: function(target) {
+
 			target.reset();
 			target.compile();
-			target.render();
+			if (renderQueue.length > 0) {
+				if (_.findWhere(renderQueue, target) == null) {
+					renderQueue.push(target);
+				}
+			} else {
+				renderQueue.push(target);
+
+			}
 			this.trigger('modified');
 		},
+
+		clearRenderQueue: function() {
+			for (var i = 0; i < renderQueue.length; i++) {
+
+				renderQueue[i].render();
+			}
+			renderQueue.length = 0;
+			this.calculateFPS();
+		},
+
+
+		
 
 		addListener: function(target, recurse) {
 			this.stopListening(target);
@@ -394,7 +457,7 @@ define([
 			analytics.log(eventType, {
 				type: eventType,
 				id: 'add',
-				action: 'add'+object
+				action: 'add' + object
 			});
 			switch (object) {
 				case 'geometry':
@@ -472,12 +535,12 @@ define([
 
 
 		removeObjectById: function(id) {
-			
+
 			var object = this.getById(id);
 			analytics.log(eventType, {
 				type: eventType,
 				id: 'remove',
-				action: 'remove'+object.get('type')
+				action: 'remove' + object.get('type')
 			});
 			switch (object.get('type')) {
 				case 'geometry':
@@ -519,12 +582,12 @@ define([
 		},
 
 		removeGeometry: function(target) {
-			if(target.get('name')==='duplicator'){
+			if (target.get('name') === 'duplicator') {
 				collectionManager.removeCollection(target);
 			}
 			var deleted = [];
 			deleted.push.apply(deleted, target.deleteAllChildren());
-			deleted.push( target.deleteSelf());
+			deleted.push(target.deleteSelf());
 
 			for (var i = 0; i < deleted.length; i++) {
 				this.stopListening(deleted[i]);
@@ -835,30 +898,30 @@ define([
 			if (movedShape && relativeShape) {
 				switch (mode) {
 					case 'over':
-					
-					if (movedShape.nodeParent == relativeShape) {
+
+						if (movedShape.nodeParent == relativeShape) {
 							return false;
-					}
-					if (relativeShape.get('name') === 'duplicator') {
+						}
+						if (relativeShape.get('name') === 'duplicator') {
 							return false;
-					}
-					if (relativeShape.get('name') === 'group') {
+						}
+						if (relativeShape.get('name') === 'group') {
 							relativeShape.addMember(movedShape);
 							layersView.removeChildren(relativeShape.get('id'));
 							for (var i = 0; i < relativeShape.members.length; i++) {
 								layersView.addShape(relativeShape.members[i].toJSON(), relativeShape.get('id'));
 							}
 							layersView.sortChildren(relativeShape.get('id'));
-					}
-					break;
+						}
+						break;
 					default:
-						console.log('moved shape is sibing',movedShape.isSibling(relativeShape));
+						console.log('moved shape is sibing', movedShape.isSibling(relativeShape));
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
 							if (parent.get('name') === 'group') {
-								if(parent.nodeParent.get('name')==='duplicator'){
+								if (parent.nodeParent.get('name') === 'duplicator') {
 									return false;
-								}	
+								}
 								parent.removeMember(movedShape);
 
 							} else if (parent.get('name') === 'duplicator') {
@@ -869,13 +932,13 @@ define([
 								}
 
 							}
-							
+
 							currentNode.addChildNode(movedShape);
-							
+
 
 						}
 
-						console.log('mode',mode);
+						console.log('mode', mode);
 						switch (mode) {
 							case 'after':
 								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
@@ -1136,6 +1199,8 @@ define([
 				id: 'modify',
 				action: 'toggle open'
 			});
+			paper.project.activeLayer.opacity = 0.25;
+
 			var data = collectionManager.toggleOpen(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {
@@ -1152,6 +1217,8 @@ define([
 				id: 'modify',
 				action: 'toggle closed'
 			});
+			paper.project.activeLayer.opacity = 1;
+
 			var data = collectionManager.toggleClosed(selected[selected.length - 1]);
 			this.deselectAllShapes();
 			if (data.toSelect && data.toSelect.length > 0) {

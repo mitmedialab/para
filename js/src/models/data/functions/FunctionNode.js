@@ -69,6 +69,13 @@ define([
 				this.selectedParam = null;
 			},
 
+			isolate: function(){
+				return null;
+			},
+
+			deIsolate: function(){
+				return null;
+			},
 
 			addParameter: function(param) {
 				param.setName('param_' + this.pcount);

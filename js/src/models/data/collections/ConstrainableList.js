@@ -86,7 +86,6 @@ define([
         } else {
           var valuelist = [];
           for (var i = 0; i < this.members.length; i++) {
-            console.log('getting member at ',i);
             var value = {};
             for (var c in constraints) {
               if (constraints.hasOwnProperty(c)) {
@@ -194,10 +193,13 @@ define([
         for(var i=0;i<this.members.length;i++){
           if(this.members[i].get('type')=='collection'){
             console.log('deleting internal list at',i.this.members[i].get('name'));
+            
             this.members[i].deleteSelf();
+
           }
         }
         this.members.length = 0;
+        this.stopListening();
         return data;
       },
 

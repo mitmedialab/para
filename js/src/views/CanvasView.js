@@ -10,6 +10,7 @@ define([
 
 ], function($, _, Backbone, paper, PPoint) {
 
+ 
   var prototypes, currentId;
   var tool;
   //booleans for keeping track of whether user is clicking on sub or main canvas
@@ -100,7 +101,7 @@ define([
       window.onbeforeunload = function() {
         return 'unsaved changes';
       };
-
+      
     },
 
     //canvas events
@@ -135,6 +136,7 @@ define([
       active = sub;
 
     },
+
 
 
     resizeCanvas: function() {

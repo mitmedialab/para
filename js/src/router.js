@@ -27,6 +27,8 @@ define([
       paper.setup(canvas);
       var geometry_layer = new paper.Layer();
       geometry_layer.name = 'geometry_layer';
+      var isolation_layer = new paper.Layer();
+      isolation_layer.name = 'isolation_layer'
       var ui_layer = new paper.Layer();
       ui_layer.name = 'ui_layer';
       geometry_layer.activate();

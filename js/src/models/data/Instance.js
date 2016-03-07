@@ -225,7 +225,15 @@ define([
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
 			this.isReturned = false;
-
+			this.on('change:open',function(){
+				if(this.get('open')){
+					this.isolate();
+				}
+				else{
+					this.deIsolate();
+				}
+			}
+			);
 			var parent = this;
 			var constrainMap = this.get('constrain_map');
 
@@ -425,7 +433,6 @@ define([
 		},
 
 		setChildAfter: function(child, sibling) {
-			console.log('set child after', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
 			SceneNode.prototype.setChildAfter.call(this, child, sibling);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
@@ -639,6 +646,18 @@ define([
 				geom.bringToFront();
 				this.get('selection_clone').bringToFront();
 			}
+		},
+
+		isolate: function(){
+		var isolationLayer = paper.project.layers.filter(function(layer) {
+				return layer.name === 'isolation_layer';
+			})[0];
+		isolationLayer.insertChild(this.get('zIndex').getValue(),this.get('geom'));
+
+		},
+
+		deIsolate: function(){
+			paper.project.activeLayer.insertChild(this.get('zIndex').getValue(),this.get('geom'));
 		},
 
 		resetProperties: function() {
