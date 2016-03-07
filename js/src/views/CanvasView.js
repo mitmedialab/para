@@ -101,7 +101,7 @@ define([
       window.onbeforeunload = function() {
         return 'unsaved changes';
       };
-      
+
     },
 
     //canvas events
@@ -140,12 +140,12 @@ define([
 
 
     resizeCanvas: function() {
+      console.log('resize canvas')
       var c = $('#canvas');
       c.attr('width', $(window).attr('innerWidth'));
       c.attr('height', $(window).attr('innerHeight'));
-
+      paper.view.update();
       paper.view.draw();
-
     },
 
     /* tool mouse event functions */

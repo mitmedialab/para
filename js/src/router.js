@@ -23,8 +23,10 @@ define([
     var app_router = new AppRouter();
 
     app_router.on('route:defaultAction', function(actions) {
-      var canvas = $('canvas').get(0);
+    
+      var canvas = document.getElementById('canvas');
       paper.setup(canvas);
+      
       var geometry_layer = new paper.Layer();
       geometry_layer.name = 'geometry_layer';
       var isolation_layer = new paper.Layer();

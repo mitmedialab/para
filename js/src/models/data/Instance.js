@@ -169,7 +169,7 @@ define([
 
 			//============private properties==============//
 			this._matrix = new paper.Matrix();
-
+			this._diffMatrix = new paper.Matrix();
 			//temporary attributes
 			this._fillColor = {
 				r: undefined,
@@ -225,15 +225,13 @@ define([
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
 			this.isReturned = false;
-			this.on('change:open',function(){
-				if(this.get('open')){
+			this.on('change:open', function() {
+				if (this.get('open')) {
 					this.isolate();
-				}
-				else{
+				} else {
 					this.deIsolate();
 				}
-			}
-			);
+			});
 			var parent = this;
 			var constrainMap = this.get('constrain_map');
 
@@ -408,7 +406,7 @@ define([
 		},
 
 		addChildNode: function(node) {
-			if(!node.get('geom').parent){
+			if (!node.get('geom').parent) {
 				paper.project.activeLayer.addChild(node.get('geom'));
 			}
 			SceneNode.prototype.addChildNode.call(this, node);
@@ -420,7 +418,7 @@ define([
 		insertChild: function(index, child) {
 			SceneNode.prototype.insertChild.call(this, index, child);
 			for (var i = 0; i < this.children.length; i++) {
-				console.log('child',this.children[i],"value",i);
+				console.log('child', this.children[i], "value", i);
 				this.children[i].get('zIndex').setValue(i);
 			}
 
@@ -583,7 +581,6 @@ define([
 
 		reset: function() {
 			this.set('rendered', false);
-			this.set('visited', false);
 
 			this.set('i_bbox', {
 				topLeft: null,
@@ -648,16 +645,16 @@ define([
 			}
 		},
 
-		isolate: function(){
-		var isolationLayer = paper.project.layers.filter(function(layer) {
+		isolate: function() {
+			var isolationLayer = paper.project.layers.filter(function(layer) {
 				return layer.name === 'isolation_layer';
 			})[0];
-		isolationLayer.insertChild(this.get('zIndex').getValue(),this.get('geom'));
+			isolationLayer.insertChild(this.get('zIndex').getValue(), this.get('geom'));
 
 		},
 
-		deIsolate: function(){
-			paper.project.activeLayer.insertChild(this.get('zIndex').getValue(),this.get('geom'));
+		deIsolate: function() {
+			paper.project.activeLayer.insertChild(this.get('zIndex').getValue(), this.get('geom'));
 		},
 
 		resetProperties: function() {
@@ -1215,10 +1212,12 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
+			this.reset();
 			var value = this.getValue();
 			this.compileTransformation(value);
 			this.compileStyle(value);
-			this.updateScreenBounds(this.get('geom'));
+			this.render();
+
 		},
 
 
@@ -1232,27 +1231,30 @@ define([
 			geom.transform(this._invertedMatrix);
 			bbox.transform(this._invertedMatrix);
 			selection_clone.transform(this._invertedMatrix);
-
+			//console.log('inverserTransformSelf matrix=', this._matrix, 'inverse matrix=', this._invertedMatrix);
 			return [geom];
 		},
 
 		transformSelf: function() {
-			this._matrix.reset();
-			var geom = this.get('geom');
-			var bbox = this.get('bbox');
-			var selection_clone = this.get('selection_clone');
+			var m2 = new paper.Matrix();
+			var m1 = this._matrix.inverted();
+			//console.log('m1=', m1.tx, m1.ty, 'original=', this._matrix.tx, this._matrix.ty);
+
+
 			var scalingDelta, rotationDelta, translationDelta;
 			var value = this.getValue();
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-			this._matrix.translate(translationDelta.x, translationDelta.y);
-			this._matrix.rotate(rotationDelta, 0, 0);
-			this._matrix.scale(scalingDelta.x, scalingDelta.y, 0, 0);
-			geom.transform(this._matrix);
-			bbox.transform(this._matrix);
-			selection_clone.transform(this._matrix);
-			return [geom];
+			m2.translate(translationDelta.x, translationDelta.y);
+			m2.rotate(rotationDelta, 0, 0);
+			m2.scale(scalingDelta.x, scalingDelta.y, 0, 0);
+			var m3 = m2.chain(m1);
+
+			//console.log('transformSelf m1=', m1.tx, m1.ty, 'm2=', m2.tx, m2.ty, 'm3=', m3.tx, m3.ty);
+			this._diffMatrix = m3;
+			this._matrix = m2;
+			return [];
 		},
 
 		transformPoint: function(delta) {
@@ -1282,19 +1284,19 @@ define([
 
 		compileTransformation: function(value) {
 			var geom = this.get('geom');
-			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+			/*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
 				this.nodeParent.inverseTransformRecurse([]);
 			} else {
 				this.inverseTransformSelf();
-			}
+			}*/
 
 			geom.visible = true;
-			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+			/*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
 				this.nodeParent.transformRecurse([]);
-			} else {
-				this.transformSelf();
+			} else {*/
+			this.transformSelf();
 
-			}
+			//}
 
 		},
 
@@ -1312,6 +1314,15 @@ define([
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
 					var geom = this.get('geom');
+					var bbox = this.get('bbox');
+					var selection_clone = this.get('selection_clone');
+					var m3 = this._diffMatrix;
+					geom.transform(m3);
+					this.updateScreenBounds(this.get('geom'));
+					bbox.transform(m3);
+					selection_clone.transform(m3);
+					
+
 					this.renderStyle(geom);
 					this.renderSelection(geom);
 					this.set('rendered', true);

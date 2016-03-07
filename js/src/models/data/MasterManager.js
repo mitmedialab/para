@@ -41,7 +41,6 @@ define([
 
 	//stores para lists
 	var eventType = 'state_manager';
-	var renderQueue = [];
 	var constraints = [];
 	var store = 0;
 	var remove = 2;
@@ -94,18 +93,18 @@ define([
 			this.listenTo(collectionManager, 'duplicatorCountModified', this.duplicatorCountModified);
 
 			var self = this;
-			/*var interval = setInterval(function() {
+			var interval = setInterval(function() {
 				self.clearRenderQueue();
-			}, 17);*/
+			}, 17);
 
 
-			paper.view.onFrame = function() {
+			/*paper.view.onFrame = function() {
 				self.clearRenderQueue();
-			}
-	var items = paper.project.getItems({
+			}*/
+			var items = paper.project.getItems({
 				class: paper.Path
 			});
-	console.log(items);
+			console.log(items);
 		},
 
 		//debgging function
@@ -125,8 +124,8 @@ define([
 			var visible = paper.project.getItems({
 				class: paper.Path,
 				visible: function(visible) {
-        			return visible;
-        		}
+					return visible;
+				}
 			});
 			$('#papernum').val(items.length);
 			$('#visiblenum').val(visible.length);
@@ -401,31 +400,16 @@ define([
 		},
 
 		modified: function(target) {
-
-			target.reset();
 			target.compile();
-			if (renderQueue.length > 0) {
-				if (_.findWhere(renderQueue, target) == null) {
-					renderQueue.push(target);
-				}
-			} else {
-				renderQueue.push(target);
-
-			}
 			this.trigger('modified');
 		},
 
 		clearRenderQueue: function() {
-			for (var i = 0; i < renderQueue.length; i++) {
-
-				renderQueue[i].render();
-			}
-			renderQueue.length = 0;
+		
 			this.calculateFPS();
 		},
 
 
-		
 
 		addListener: function(target, recurse) {
 			this.stopListening(target);

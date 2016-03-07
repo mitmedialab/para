@@ -371,6 +371,7 @@ define([
       if (this.hasMember(item, true) || this === item) {
         if (!this.get('open')) {
           this.set('open', true);
+
           return [this];
         } else {
           var toggledLists = [];
@@ -422,7 +423,7 @@ define([
 
 
     compile: function() {
-
+      this.render();
     },
 
 
