@@ -489,13 +489,7 @@ define([
                 this.get('memberCount').setValue(this.members.length);
             },
 
-            render: function() {
-              for (var i = 0; i < this.members.length; i++) {
-                    console.log('rendering member', i);
-                    this.members[i].compile();
-                    this.members[i].render();
-                }
-            }
+           
 
 
         });

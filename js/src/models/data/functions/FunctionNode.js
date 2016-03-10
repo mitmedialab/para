@@ -69,11 +69,11 @@ define([
 				this.selectedParam = null;
 			},
 
-			isolate: function(){
+			isolate: function() {
 				return null;
 			},
 
-			deIsolate: function(){
+			deIsolate: function() {
 				return null;
 			},
 
@@ -158,10 +158,9 @@ define([
 			call: function() {
 				this.set('called', true);
 				for (var i = 0; i < this.children.length; i++) {
-					if(this.children[i].isReturned ){
+					if (this.children[i].isReturned) {
 						this.children[i].show();
-					}
-					else{
+					} else {
 						this.children[i].hide();
 					}
 				}
@@ -182,44 +181,21 @@ define([
 				}
 			},
 
-			compile: function() {
-				var open = this.get('open');
-				var called = this.get('called');
-				var params = this.get('f_parameters');
-				if (!open) {
-					/*for (var i = 0; i < params.length; i++) {
-						params[i].set('visible', false);
-					}*/
-					this.children.forEach(function(child) {
-						if(!child.isReturned){
-							child.set('visible', false);
-						}
-					});
-
-				} else if (open) {
-					this.children.forEach(function(child) {
-
-						//child.set('visible', true);
-					});
+			reset: function() {
+				for (var i = 0; i < this.renderQueue.length; i++) {
+					this.renderQueue[i].reset();
 				}
 			},
 
+
 			render: function() {
-				/*var ui = this.get('ui');
-				var open = this.get('open');
-				if (!open) {
-					ui.visible = true;
-					ui.position = this.get('translationDelta').toPaperPoint();
-					this.nameText.content = this.get('f_name');
-					this.renderSelection(ui.children['box']);
-					if (this.get('called')) {
-						ui.children['eye'].visible = true;
-					} else {
-						ui.children['eye'].visible = false;
-					}
-				} else {
-					ui.visible = false;
-				}*/
+				if (this.renderQueue.length > 1) {
+					console.log('starting rendering root');
+				}
+				for (var i = 0; i < this.renderQueue.length; i++) {
+					this.renderQueue[i].render();
+				}
+				this.renderQueue = [];
 
 			},
 
@@ -230,10 +206,10 @@ define([
 				var functionParams = this.get('f_parameters');
 				var paramsList = [];
 				_.each(functionParams, function(param) {
-        			paramsList.push(param.toJSON());
-      			});
-      			data['params'] = paramsList;
-      			return data;
+					paramsList.push(param.toJSON());
+				});
+				data['params'] = paramsList;
+				return data;
 			}
 
 		});

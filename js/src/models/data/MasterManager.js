@@ -98,9 +98,10 @@ define([
 			}, 17);
 
 
-			/*paper.view.onFrame = function() {
+			paper.view.onFrame = function() {
 				self.clearRenderQueue();
-			}*/
+			}
+
 			var items = paper.project.getItems({
 				class: paper.Path
 			});
@@ -419,8 +420,8 @@ define([
 		},
 
 		clearRenderQueue: function() {
-
-			this.calculateFPS();
+			currentNode.clearRenderQueue();
+			//this.calculateFPS();
 		},
 
 
@@ -498,27 +499,8 @@ define([
 				switch (selected[i].get('type')) {
 					case 'geometry':
 						if (selected[i].get('name') == 'group') {
-							/*var members = selected[i].ungroup();
-							console.log('members',members);
-							var parent = selected[i].getParentNode();
-							if (parent) {
-								//TODO: this is not going to work...
-								parent.removeInheritor(selected[i]);
-								parent.removeChildNode(selected[i]);
-								for(var k=0;k<members.length;k++){
-								parent.addChildNode(members[k]);
-								}
-							} else {
-													
-							for(var j=0;j<members.length;j++){
-								currentNode.addChildNode(members[j]);
-							}
-							}
-							layersView.removeShape(selected[i].get('id'));
-							selected[i].deleteSelf();
+						
 
-							this.deselectAllShapes();
-							this.selectShape(members);*/
 						}
 						break;
 					case 'collection':
@@ -699,9 +681,6 @@ define([
 				this.selectShape(shape);
 			}
 
-			this.addListener(shape);
-
-
 		},
 
 		//called when creating an instance which inherits from existing shape
@@ -738,10 +717,8 @@ define([
 				var copy = selected[i].create(true);
 				rootNode.addChildNode(copy);
 				layersView.addShape(copy.toJSON());
-				this.addListener(copy);
 				this.selectShape(copy);
 				this.deselectShape(selected[i]);
-				this.addListener(copy, true);
 				if (copy.get('type') == 'collection' || copy.get('name') == 'group' || copy.get('name') == 'duplicator') {
 					collectionManager.addListCopy(copy);
 				}
@@ -758,15 +735,10 @@ define([
 				for (var i = 0; i < selected.length; i++) {
 					layersView.removeShape(selected[i].get('id'));
 				}
-			} else {
-				for (var j = 0; j < group.members.length; j++) {
-					this.addListener(group.members[j]);
-				}
-			}
+			} 
 
 			layersView.addShape(group.toJSON());
 			this.deselectAllShapes();
-			this.addListener(group);
 			this.selectShape(group);
 			return group;
 		},
@@ -776,19 +748,7 @@ define([
 			this.deselectAllShapes();
 			currentNode.addChildNode(duplicator);
 			collectionManager.addDuplicator(null, duplicator);
-
 			layersView.addShape(duplicator.toJSON());
-			this.addListener(duplicator);
-			for (var j = 0; j < duplicator.members.length; j++) {
-				if (duplicator.members[j].get('name') === 'group') {
-					for (var i = 0; i < duplicator.members[j].members.length; i++) {
-						this.addListener(duplicator.members[j].members[i]);
-
-					}
-				}
-				this.addListener(duplicator.members[j]);
-
-			}
 		},
 
 		initializeDuplicator: function(object, open) {
@@ -802,7 +762,6 @@ define([
 			this.selectShape(duplicator);
 			var data = duplicator.setCount(8);
 			this.duplicatorCountModified(data, duplicator);
-			this.addListener(duplicator);
 			var constraints = duplicator.setInternalConstraint();
 			for (var i = 0; i < constraints.length; i++) {
 				this.addConstraint(constraints[i]);
@@ -820,16 +779,9 @@ define([
 			if (data.toRemove) {
 				for (var i = 0; i < data.toRemove.length; i++) {
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
-					this.removeListener(data.toRemove[i], true);
-					//layersView.removeShape(data.toRemove[i].get('id'));
 				}
 			}
-			if (data.toAdd) {
-				for (var j = 0; j < data.toAdd.length; j++) {
-					this.addListener(data.toAdd[j], true);
-					//layersView.addShape(data.toAdd[j].toJSON(), duplicator.get('id'), data.toAdd[j].get('zIndex').getValue());
-				}
-			}
+			
 			layersView.removeChildren(duplicator.get('id'));
 			for (var k = 0; k < duplicator.members.length; k++) {
 				layersView.addShape(duplicator.members[k].toJSON(), duplicator.get('id'));

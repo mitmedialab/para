@@ -211,11 +211,11 @@ define([
       data.modes = this.get('modes');
       data.relative_properties = this.get('relative_properties');
       data.reference_properties = this.get('reference_properties');
-      if(this.get('proxy_references')){
+      if (this.get('proxy_references')) {
         data.proxy_references = this.get('proxy_references').get('id');
       }
-       if(this.get('proxy_relatives')){
-        data.proxy_relatives= this.get('proxy_relatives').get('id');
+      if (this.get('proxy_relatives')) {
+        data.proxy_relatives = this.get('proxy_relatives').get('id');
       }
 
       var prop, subprop, i, vals;
@@ -258,16 +258,16 @@ define([
     parseJSON: function(data, manager) {
       var reference = manager.getById(data.references);
       var relative = manager.getById(data.relatives);
-      this.set('references',reference);
-      this.set('relatives',relative);
+      this.set('references', reference);
+      this.set('relatives', relative);
       this.set('modes', data.modes);
       this.set('relative_properties', data.relative_properties);
       this.set('reference_properties', data.reference_properties);
-      if(data.proxy_references){
-        this.set('proxy_references',manager.getById(data.proxy_references));
+      if (data.proxy_references) {
+        this.set('proxy_references', manager.getById(data.proxy_references));
       }
-      if(data.proxy_relatives){
-        this.set('proxy_relatives',manager.getById(data.proxy_relatives));
+      if (data.proxy_relatives) {
+        this.set('proxy_relatives', manager.getById(data.proxy_relatives));
       }
 
       var prop, subprop, i, vals;
@@ -303,7 +303,7 @@ define([
       this.set('exempt_indicies', exempt_indicies);
       this.set('offsets', offsets);
       this.set('expressions', expressions);
-      this.create(data.properties,true);
+      this.create(data.properties, true);
     },
 
     setSelection: function(selected, type) {
@@ -364,7 +364,7 @@ define([
 
       }*/
       var value = 0;
-      if(status ===true){
+      if (status === true) {
         value = 1;
       }
       exempt_indicies[rel_prop_key][rel_dimension][index].setValue(value);
@@ -550,7 +550,7 @@ define([
       var reference = this.get('references');
       var relative = this.get('relatives');
 
-//      console.log('reference_positions',reference.members[0].get('translationDelta').getValue(),reference.members[1].get('translationDelta').getValue());
+      //      console.log('reference_positions',reference.members[0].get('translationDelta').getValue(),reference.members[1].get('translationDelta').getValue());
 
       var relative_range = relative.getRange();
 
@@ -601,13 +601,13 @@ define([
         }
 
         if (!setOnInstance) {
-          if (relative.get(rel_prop_key).get('dimension_num') == 1) {
+          /*if (relative.get(rel_prop_key).get('dimension_num') == 1) {
             this.setConstraintOnProperty(reference, relative, expressions[rel_prop_key], offsets[rel_prop_key], [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
-          } else {
-            for (var n = 0; n < rel_dimensions.length; n++) {
-              this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
-            }
+          } else {*/
+          for (var n = 0; n < rel_dimensions.length; n++) {
+            this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
           }
+          //}
         }
       }
       if (setOnInstance) {
@@ -685,12 +685,20 @@ define([
     //Start here, need to modify get relative at
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
+      console.log('setting sub prop constraint');
       var self = this;
+      var relative_subprop;
+      if(rel_dimension=='v'){
+        relative_subprop= relative.get(rel_prop_key);
+      } 
+      else{
+        relative_subprop= relative.get(rel_prop_key)[rel_dimension];
+      }
       var constraintF = function() {
-        //console.log('calling constraint',ref_prop_key,ref_dimension);
+        console.log('calling constraint', ref_prop_key, ref_dimension);
         var list = [];
         if (self.get('paused')) {
-          return relative.get(rel_prop_key)[rel_dimension].getValue();
+          return relative_subprop.getValue();
         } else {
           var exempt_indicies = self.get('exempt_indicies');
           var relative_range = relative.getRange();
@@ -701,8 +709,8 @@ define([
             var y;
             data[rel_prop_key] = {};
             var relative_target = relative.getMemberAt(z);
-            var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
-            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue()===1 || isReference) {
+            var isReference = relative_subprop.isReference(relative_target);
+            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue() === 1 || isReference) {
               y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
 
             } else {
@@ -721,7 +729,7 @@ define([
 
             list.push(data);
 
-            relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
+
           }
           if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             return list;
@@ -730,16 +738,24 @@ define([
           }
         }
       };
-      relative.get(rel_prop_key)[rel_dimension].setConstraint(constraintF, this);
+
+      console.log(rel_prop_key, rel_dimension);
+      
+       relative_subprop.setConstraint(constraintF, this);
+      
     },
 
     setConstraintOnProperty: function(reference, relative, expression, offset, refProperty, relProperty) {
+
+      console.log('setting prop constraint');
+
       var self = this;
       var ref_prop_key = refProperty[0];
       var rel_prop_key = relProperty[0];
       var ref_dimensions = refProperty[1];
       var constraintF = function() {
-
+        console.log('calling constraint', relative.get('id'), relative.get('name'));
+        console.trace();
         if (self.get('paused')) {
           return relative.get(rel_prop_key).getValue();
         } else {
@@ -777,10 +793,9 @@ define([
               }
 
             }
-
-            relative_target.get(rel_prop_key).setValue(data[rel_prop_key]);
-
+            //relative_target.get(rel_prop_key).setValue(data[rel_prop_key]);
             list.push(data);
+
 
           }
 
@@ -844,9 +859,6 @@ define([
               }
 
             }
-
-            relative_target.setValue(list[z]);
-
 
           }
 
@@ -1297,7 +1309,7 @@ define([
       return this.get('functionPath');
     },
 
-   
+
 
     clearSelection: function() {
       if (this.get('references')) {
@@ -1325,63 +1337,63 @@ define([
       this.clearSelection();
       var relatives = this.get('relatives');
       var relative_properties = this.get('relative_properties');
-      for(var j=0;j<relative_properties.length;j++){
-        relatives.removeConstraint(relative_properties[j][0],relative_properties[j][1]);
+      for (var j = 0; j < relative_properties.length; j++) {
+        relatives.removeConstraint(relative_properties[j][0], relative_properties[j][1]);
       }
 
-   var reference_values = this.get('reference_values');
+      var reference_values = this.get('reference_values');
       var prop, subprop, i;
-      for( prop in reference_values){
-        if(reference_values.hasOwnProperty(prop)){
-          for(subprop in reference_values[prop]){
-            if(reference_values[prop].hasOwnProperty(subprop)){
-               var ref_vals = reference_values[prop][subprop];
-                for( i=0;i<ref_vals.length;i++){
-                  ref_vals[i].deleteSelf();
-                }
-                ref_vals.length=0;
+      for (prop in reference_values) {
+        if (reference_values.hasOwnProperty(prop)) {
+          for (subprop in reference_values[prop]) {
+            if (reference_values[prop].hasOwnProperty(subprop)) {
+              var ref_vals = reference_values[prop][subprop];
+              for (i = 0; i < ref_vals.length; i++) {
+                ref_vals[i].deleteSelf();
+              }
+              ref_vals.length = 0;
             }
           }
         }
       }
 
-         var offsets = this.get('offsets');
-      for( prop in offsets){
-        if(offsets.hasOwnProperty(prop)){
-          for(subprop in offsets[prop]){
-            if(offsets[prop].hasOwnProperty(subprop)){
-               var offset_vals = offsets[prop][subprop];
-                for(i=0;i<offset_vals.length;i++){
-                  offset_vals[i].deleteSelf();
-                }
-             offset_vals.length=0;
+      var offsets = this.get('offsets');
+      for (prop in offsets) {
+        if (offsets.hasOwnProperty(prop)) {
+          for (subprop in offsets[prop]) {
+            if (offsets[prop].hasOwnProperty(subprop)) {
+              var offset_vals = offsets[prop][subprop];
+              for (i = 0; i < offset_vals.length; i++) {
+                offset_vals[i].deleteSelf();
+              }
+              offset_vals.length = 0;
             }
           }
         }
       }
 
-       var exempt_indicies= this.get('exempt_indicies');
-      for( prop in exempt_indicies){
-        if(exempt_indicies.hasOwnProperty(prop)){
-          for(subprop in exempt_indicies[prop]){
-            if(exempt_indicies[prop].hasOwnProperty(subprop)){
-                 var exempt_vals = exempt_indicies[prop][subprop];
-                for(i=0;i<exempt_vals.length;i++){
-                  exempt_vals[i].deleteSelf();
-                }
-              exempt_vals.length=0;
+      var exempt_indicies = this.get('exempt_indicies');
+      for (prop in exempt_indicies) {
+        if (exempt_indicies.hasOwnProperty(prop)) {
+          for (subprop in exempt_indicies[prop]) {
+            if (exempt_indicies[prop].hasOwnProperty(subprop)) {
+              var exempt_vals = exempt_indicies[prop][subprop];
+              for (i = 0; i < exempt_vals.length; i++) {
+                exempt_vals[i].deleteSelf();
+              }
+              exempt_vals.length = 0;
             }
           }
         }
       }
-      
-      this.set('reference_values',null);
-      this.set('expressions',null);
-      this.set('relatives',null);
-      this.set('references',null);
-      this.set('relatives',null);
-      this.set('offsets',null);
-      this.set('exempt_indicies',null);
+
+      this.set('reference_values', null);
+      this.set('expressions', null);
+      this.set('relatives', null);
+      this.set('references', null);
+      this.set('relatives', null);
+      this.set('offsets', null);
+      this.set('exempt_indicies', null);
 
     },
 

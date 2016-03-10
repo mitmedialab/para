@@ -249,6 +249,7 @@ define([
 				return layer.name === 'ui_layer';
 			})[0];
 			targetLayer.addChild(this.centerUI);
+			this.renderQueue = [];
 
 		},
 
@@ -412,21 +413,26 @@ define([
 		},
 
 		addChildNode: function(node) {
-			if (!node.get('geom').parent) {
-				paper.project.activeLayer.addChild(node.get('geom'));
-			}
-			SceneNode.prototype.addChildNode.call(this, node);
-			for (var i = 0; i < this.children.length; i++) {
-				this.children[i].get('zIndex').setValue(i);
-			}
+
+			this.insertChild(this.children.length - 1, node);
 		},
 
 		insertChild: function(index, child) {
+			if (child.nodeParent) {
+				child.nodeParent.stopListening(child);
+			}
+
+			if (!child.get('geom').parent) {
+				paper.project.activeLayer.insertChild(index, child.get('geom'));
+			}
 			SceneNode.prototype.insertChild.call(this, index, child);
 			for (var i = 0; i < this.children.length; i++) {
 				console.log('child', this.children[i], "value", i);
 				this.children[i].get('zIndex').setValue(i);
 			}
+
+			this.stopListening(child);
+			this.listenTo(child, 'modified', this.childModified);
 
 		},
 		removeChildNode: function(node) {
@@ -434,6 +440,7 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
+			this.stopListening(node);
 		},
 
 		setChildAfter: function(child, sibling) {
@@ -585,12 +592,14 @@ define([
 		},
 
 		reset: function() {
-			var geom = this.get('geom');
-			var bbox = this.get('bbox');
-			var inverted = this._matrix.inverted();
-			geom.transform(inverted);
-			bbox.transform(inverted);
-			this.set('rendered', false);
+			if (this.get('rendered')) {
+				var geom = this.get('geom');
+				var bbox = this.get('bbox');
+				var inverted = this._matrix.inverted();
+				geom.transform(inverted);
+				bbox.transform(inverted);
+				this.set('rendered', false);
+			}
 
 		},
 
@@ -841,12 +850,20 @@ define([
 			this.get(prop).removeConstraint(dimensions);
 		},
 
+
+		//callback triggered when a subproperty is modified externally 
+		modified: function() {
+			console.log('self modified', this.get('id'), this.get('name'));
+			console.trace();
+			PConstraint.prototype.modified.apply(this, arguments)
+
+		},
 		/*setValue
 		 * modifies the properties of this instance in accordance with the
 		 * data passed in
 		 */
 		setValue: function(data) {
-			console.log('setting value',this.get('id'),this.get('name'));
+			console.log('setting value', this.get('id'), this.get('name'));
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
 				//var pdelta = this.nodeParent.
@@ -905,6 +922,8 @@ define([
 		 */
 
 		getValue: function() {
+			console.log('get value', this.get('id'), this.get('name'));
+			console.trace();
 			var constrainMap = this.get('constrain_map');
 			var value = {};
 			for (var propertyName in constrainMap) {
@@ -1219,13 +1238,6 @@ define([
 		},
 
 
-		/* compile
-		computes the current properties of the instance given current 
-		constraints and inheritance */
-		compile: function() {
-			var value = this.getValue();
-			this.compileStyle(value);
-		},
 
 		transformSelf: function() {
 			this.center = this.get('geom').position;
@@ -1250,7 +1262,7 @@ define([
 			this._matrix = m2;
 
 		},
-		
+
 
 		transformPoint: function(delta) {
 			var translationDelta = this.get('translationDelta').getValue();
@@ -1276,44 +1288,53 @@ define([
 		},
 
 
+		childModified: function(child) {
+			console.log('child modified', child.get('id'), child.get('name'));
+			console.trace();
+			this.renderQueue.push(child);
 
-		compileStyle: function(value) {
-			this._fillColor = value.fillColor;
-			this._strokeColor = value.strokeColor;
-			this._strokeWidth = value.strokeWidth;
-			this._visible = this.get('visible');
+		},
+
+		clearRenderQueue: function() {	
+			this.reset();
+			this.render();
 		},
 
 		/*render
 		 * draws instance on canvas
 		 */
 		render: function() {
-			console.log('attempting to render instance', this.get('rendered'));
 
 			if (!this.get('rendered')) {
-				if (this.get('name') != 'root') {
-					this.transformSelf();
-					var geom = this.get('geom');
-					var bbox = this.get('bbox');
-					bbox.position = geom.postion;
-					this.transformSelf();
-					geom.transform(this._matrix);
-					bbox.transform(this._matrix);
+				console.log('render instance', this.get('id'), this.get('name'));
 
-					this.centerUI.position = this.center;
-					this.updateScreenBounds(geom);
+				this.transformSelf();
+				var geom = this.get('geom');
+				var bbox = this.get('bbox');
+				bbox.position = geom.postion;
+				this.transformSelf();
+				geom.transform(this._matrix);
+				bbox.transform(this._matrix);
 
-					this.renderStyle(geom);
-					this.renderSelection(geom);
+				this.centerUI.position = this.center;
+				this.updateScreenBounds(geom);
 
-					this.set('rendered', true);
-				}
-				return 'root';
+				this.renderStyle(geom);
+				this.renderSelection(geom);
+
+				this.set('rendered', true);
 			}
+
 		},
 
 
 		renderStyle: function(geom) {
+			var value = this.getValue();
+			this._fillColor = value.fillColor;
+			this._strokeColor = value.strokeColor;
+			this._strokeWidth = value.strokeWidth;
+			this._visible = this.get('visible');
+
 			if (!this._fillColor.noColor && (this._fillColor.h > -1 && this._fillColor.s > -1 && this._fillColor.l > -1)) {
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
