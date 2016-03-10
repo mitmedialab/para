@@ -3,10 +3,10 @@ define([
   'paper',
   'backbone',
   'models/data/paperUI/ConstraintHandles',
-  'models/data/properties/PVal',
+  'models/data/properties/PFloat',
   'utils/TrigFunc',
   'utils/Ziggurat'
-], function(_, paper, Backbone, ConstraintHandles, PVal, TrigFunc, Ziggurat) {
+], function(_, paper, Backbone, ConstraintHandles, PFloat, TrigFunc, Ziggurat) {
 
   var propConvMap = {
     'translationDelta:scalingDelta': 0.01,
@@ -211,11 +211,11 @@ define([
       data.modes = this.get('modes');
       data.relative_properties = this.get('relative_properties');
       data.reference_properties = this.get('reference_properties');
-      if (this.get('proxy_references')) {
+      if(this.get('proxy_references')){
         data.proxy_references = this.get('proxy_references').get('id');
       }
-      if (this.get('proxy_relatives')) {
-        data.proxy_relatives = this.get('proxy_relatives').get('id');
+       if(this.get('proxy_relatives')){
+        data.proxy_relatives= this.get('proxy_relatives').get('id');
       }
 
       var prop, subprop, i, vals;
@@ -258,16 +258,16 @@ define([
     parseJSON: function(data, manager) {
       var reference = manager.getById(data.references);
       var relative = manager.getById(data.relatives);
-      this.set('references', reference);
-      this.set('relatives', relative);
+      this.set('references',reference);
+      this.set('relatives',relative);
       this.set('modes', data.modes);
       this.set('relative_properties', data.relative_properties);
       this.set('reference_properties', data.reference_properties);
-      if (data.proxy_references) {
-        this.set('proxy_references', manager.getById(data.proxy_references));
+      if(data.proxy_references){
+        this.set('proxy_references',manager.getById(data.proxy_references));
       }
-      if (data.proxy_relatives) {
-        this.set('proxy_relatives', manager.getById(data.proxy_relatives));
+      if(data.proxy_relatives){
+        this.set('proxy_relatives',manager.getById(data.proxy_relatives));
       }
 
       var prop, subprop, i, vals;
@@ -288,11 +288,11 @@ define([
 
               vals = data.offsets[prop][subprop];
               for (i = 0; i < vals.length; i++) {
-                offsets[prop][subprop].push(new PVal(vals[i]));
+                offsets[prop][subprop].push(new PFloat(vals[i]));
               }
               vals = data.exempt_indicies[prop][subprop];
               for (i = 0; i < vals.length; i++) {
-                exempt_indicies[prop][subprop].push(new PVal(vals[i]));
+                exempt_indicies[prop][subprop].push(new PFloat(vals[i]));
               }
               expressions[prop][subprop] = data.expressions[prop][subprop];
 
@@ -303,7 +303,7 @@ define([
       this.set('exempt_indicies', exempt_indicies);
       this.set('offsets', offsets);
       this.set('expressions', expressions);
-      this.create(data.properties, true);
+      this.create(data.properties,true);
     },
 
     setSelection: function(selected, type) {
@@ -364,7 +364,7 @@ define([
 
       }*/
       var value = 0;
-      if (status === true) {
+      if(status ===true){
         value = 1;
       }
       exempt_indicies[rel_prop_key][rel_dimension][index].setValue(value);
@@ -412,15 +412,15 @@ define([
           conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]].vals[index].getValue() * convertFactor;
           if (offset[rel_dimensions[i]].length <= index) {
             if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[i]].push(new PVal(0));
+              offset[rel_dimensions[i]].push(new PFloat(0));
             } else {
-              offset[rel_dimensions[i]].push(new PVal(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
+              offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
             }
           } else {
             //offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
           }
           if (exempt_index[rel_dimensions[i]].length <= index) {
-            exempt_index[rel_dimensions[i]].push(new PVal(0));
+            exempt_index[rel_dimensions[i]].push(new PFloat(0));
           }
 
         }
@@ -437,15 +437,15 @@ define([
           conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]].vals[index].getValue() * convertFactor : refPropValue[keys[j]].vals[index].getValue() * convertFactor;
           if (offset[rel_dimensions[j]].length <= index) {
             if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[j]].push(new PVal(0));
+              offset[rel_dimensions[j]].push(new PFloat(0));
             } else {
-              offset[rel_dimensions[j]].push(new PVal(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
+              offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
             }
           } else {
             //offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
           }
           if (exempt_index[rel_dimensions[j]].length <= index) {
-            exempt_index[rel_dimensions[j]].push(new PVal(0));
+            exempt_index[rel_dimensions[j]].push(new PFloat(0));
           }
 
         }
@@ -464,15 +464,15 @@ define([
           conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]].vals[index].getValue() * convertFactor : (m < keys.length) ? refPropValue[keys[m]].vals[index].getValue() * convertFactor : refPropValue[keys[keys.length - 1]].vals[index].getValue();
           if (offset[rel_dimensions[m]].length <= index) {
             if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[m]].push(new PVal(0));
+              offset[rel_dimensions[m]].push(new PFloat(0));
             } else {
-              offset[rel_dimensions[m]].push(new PVal(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
+              offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
             }
           } else {
             //offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
           }
           if (exempt_index[rel_dimensions[m]].length <= index) {
-            exempt_index[rel_dimensions[m]].push(new PVal(0));
+            exempt_index[rel_dimensions[m]].push(new PFloat(0));
           }
 
         }
@@ -550,7 +550,7 @@ define([
       var reference = this.get('references');
       var relative = this.get('relatives');
 
-      //      console.log('reference_positions',reference.members[0].get('translationDelta').getValue(),reference.members[1].get('translationDelta').getValue());
+//      console.log('reference_positions',reference.members[0].get('translationDelta').getValue(),reference.members[1].get('translationDelta').getValue());
 
       var relative_range = relative.getRange();
 
@@ -601,13 +601,13 @@ define([
         }
 
         if (!setOnInstance) {
-          /*if (relative.get(rel_prop_key).get('dimension_num') == 1) {
+          if (relative.get(rel_prop_key).get('dimension_num') == 1) {
             this.setConstraintOnProperty(reference, relative, expressions[rel_prop_key], offsets[rel_prop_key], [ref_prop_key, ref_dimensions], [rel_prop_key, rel_dimensions]);
-          } else {*/
-          for (var n = 0; n < rel_dimensions.length; n++) {
-            this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
+          } else {
+            for (var n = 0; n < rel_dimensions.length; n++) {
+              this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
+            }
           }
-          //}
         }
       }
       if (setOnInstance) {
@@ -685,10 +685,9 @@ define([
     //Start here, need to modify get relative at
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
-      console.log('setting sub prop constraint');
       var self = this;
       var constraintF = function() {
-        console.log('calling constraint', ref_prop_key, ref_dimension);
+         console.log('calling constraint',ref_prop_key,ref_dimension);
         var list = [];
         if (self.get('paused')) {
           return relative.get(rel_prop_key)[rel_dimension].getValue();
@@ -703,11 +702,14 @@ define([
             data[rel_prop_key] = {};
             var relative_target = relative.getMemberAt(z);
             var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
-            
+            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue()===1 || isReference) {
+              y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
+
+            } else {
               var x = reference_values[ref_prop_key][ref_dimension].vals[z].getValue();
               var offsetValue = offset[z].getValue();
               eval(expression);
-            
+            }
 
             if (rel_prop_key === 'scalingDelta') {
               if (y === 0) {
@@ -719,37 +721,28 @@ define([
 
             list.push(data);
 
-
+            //relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
           }
           if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
-            console.log('returning data',list);
             return list;
           } else {
-            console.log('returning data',list[0][rel_prop_key][rel_dimension]);
             return list[0][rel_prop_key][rel_dimension];
           }
         }
       };
 
-      console.log(rel_prop_key, rel_dimension);
-      if (rel_dimension == 'v') {
-        relative.get(rel_prop_key).setConstraint(constraintF, this);
-      } else {
-        relative.get(rel_prop_key)[rel_dimension].setConstraint(constraintF, this);
-      }
+
+      relative.get(rel_prop_key)[rel_dimension].setConstraint(constraintF, this);
     },
 
     setConstraintOnProperty: function(reference, relative, expression, offset, refProperty, relProperty) {
-
-      console.log('setting prop constraint');
-
       var self = this;
       var ref_prop_key = refProperty[0];
       var rel_prop_key = relProperty[0];
       var ref_dimensions = refProperty[1];
       var constraintF = function() {
-        console.log('calling constraint', relative.get('id'), relative.get('name'));
-        console.trace();
+         console.log('calling constraint',relative.get('id'),relative.get('name'));
+
         if (self.get('paused')) {
           return relative.get(rel_prop_key).getValue();
         } else {
@@ -787,9 +780,10 @@ define([
               }
 
             }
-            //relative_target.get(rel_prop_key).setValue(data[rel_prop_key]);
-            list.push(data);
 
+            //relative_target.get(rel_prop_key).setValue(data[rel_prop_key]);
+
+            list.push(data);
 
           }
 
@@ -853,6 +847,9 @@ define([
               }
 
             }
+
+            relative_target.setValue(list[z]);
+
 
           }
 
@@ -925,10 +922,10 @@ define([
             var newItem;
             if (reference_values[ref_prop_key][target_dimension].vals.length > 0) {
               var last = reference_values[ref_prop_key][target_dimension].vals[reference_values[ref_prop_key][target_dimension].vals.length - 1];
-              newItem = new PVal(last.getValue());
+              newItem = new PFloat(last.getValue());
               newItem.setNull(true);
             } else {
-              newItem = new PVal(1);
+              newItem = new PFloat(1);
               newItem.setNull(true);
             }
 
@@ -975,7 +972,7 @@ define([
           if (reference_values[ref_dimension][m]) {
             reference_values[ref_dimension][m].setValue(-1);
           } else {
-            var newVal = new PVal(-1);
+            var newVal = new PFloat(-1);
             newVal.setNull(false);
             reference_values[ref_dimension].push(newVal);
           }
@@ -1054,7 +1051,7 @@ define([
               reference_values[ref_dimension].vals[m].add(min_offset);
             }
           } else {
-            var newVal = new PVal(y);
+            var newVal = new PFloat(y);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
@@ -1089,7 +1086,7 @@ define([
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(y_val);
           } else {
-            var newVal = new PVal(y_val);
+            var newVal = new PFloat(y_val);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
@@ -1119,7 +1116,7 @@ define([
             if (reference_values[ref_dimension].vals[m]) {
               reference_values[ref_dimension].vals[m].setValue(y);
             } else {
-              var newVal = new PVal(y);
+              var newVal = new PFloat(y);
               newVal.setNull(false);
               reference_values[ref_dimension].vals.push(newVal);
             }
@@ -1201,7 +1198,7 @@ define([
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(y);
           } else {
-            var newVal = new PVal(y);
+            var newVal = new PFloat(y);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
@@ -1286,7 +1283,7 @@ define([
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(y);
           } else {
-            var newVal = new PVal(y);
+            var newVal = new PFloat(y);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
@@ -1303,7 +1300,7 @@ define([
       return this.get('functionPath');
     },
 
-
+   
 
     clearSelection: function() {
       if (this.get('references')) {
@@ -1331,63 +1328,63 @@ define([
       this.clearSelection();
       var relatives = this.get('relatives');
       var relative_properties = this.get('relative_properties');
-      for (var j = 0; j < relative_properties.length; j++) {
-        relatives.removeConstraint(relative_properties[j][0], relative_properties[j][1]);
+      for(var j=0;j<relative_properties.length;j++){
+        relatives.removeConstraint(relative_properties[j][0],relative_properties[j][1]);
       }
 
-      var reference_values = this.get('reference_values');
+   var reference_values = this.get('reference_values');
       var prop, subprop, i;
-      for (prop in reference_values) {
-        if (reference_values.hasOwnProperty(prop)) {
-          for (subprop in reference_values[prop]) {
-            if (reference_values[prop].hasOwnProperty(subprop)) {
-              var ref_vals = reference_values[prop][subprop];
-              for (i = 0; i < ref_vals.length; i++) {
-                ref_vals[i].deleteSelf();
-              }
-              ref_vals.length = 0;
+      for( prop in reference_values){
+        if(reference_values.hasOwnProperty(prop)){
+          for(subprop in reference_values[prop]){
+            if(reference_values[prop].hasOwnProperty(subprop)){
+               var ref_vals = reference_values[prop][subprop];
+                for( i=0;i<ref_vals.length;i++){
+                  ref_vals[i].deleteSelf();
+                }
+                ref_vals.length=0;
             }
           }
         }
       }
 
-      var offsets = this.get('offsets');
-      for (prop in offsets) {
-        if (offsets.hasOwnProperty(prop)) {
-          for (subprop in offsets[prop]) {
-            if (offsets[prop].hasOwnProperty(subprop)) {
-              var offset_vals = offsets[prop][subprop];
-              for (i = 0; i < offset_vals.length; i++) {
-                offset_vals[i].deleteSelf();
-              }
-              offset_vals.length = 0;
+         var offsets = this.get('offsets');
+      for( prop in offsets){
+        if(offsets.hasOwnProperty(prop)){
+          for(subprop in offsets[prop]){
+            if(offsets[prop].hasOwnProperty(subprop)){
+               var offset_vals = offsets[prop][subprop];
+                for(i=0;i<offset_vals.length;i++){
+                  offset_vals[i].deleteSelf();
+                }
+             offset_vals.length=0;
             }
           }
         }
       }
 
-      var exempt_indicies = this.get('exempt_indicies');
-      for (prop in exempt_indicies) {
-        if (exempt_indicies.hasOwnProperty(prop)) {
-          for (subprop in exempt_indicies[prop]) {
-            if (exempt_indicies[prop].hasOwnProperty(subprop)) {
-              var exempt_vals = exempt_indicies[prop][subprop];
-              for (i = 0; i < exempt_vals.length; i++) {
-                exempt_vals[i].deleteSelf();
-              }
-              exempt_vals.length = 0;
+       var exempt_indicies= this.get('exempt_indicies');
+      for( prop in exempt_indicies){
+        if(exempt_indicies.hasOwnProperty(prop)){
+          for(subprop in exempt_indicies[prop]){
+            if(exempt_indicies[prop].hasOwnProperty(subprop)){
+                 var exempt_vals = exempt_indicies[prop][subprop];
+                for(i=0;i<exempt_vals.length;i++){
+                  exempt_vals[i].deleteSelf();
+                }
+              exempt_vals.length=0;
             }
           }
         }
       }
-
-      this.set('reference_values', null);
-      this.set('expressions', null);
-      this.set('relatives', null);
-      this.set('references', null);
-      this.set('relatives', null);
-      this.set('offsets', null);
-      this.set('exempt_indicies', null);
+      
+      this.set('reference_values',null);
+      this.set('expressions',null);
+      this.set('relatives',null);
+      this.set('references',null);
+      this.set('relatives',null);
+      this.set('offsets',null);
+      this.set('exempt_indicies',null);
 
     },
 
