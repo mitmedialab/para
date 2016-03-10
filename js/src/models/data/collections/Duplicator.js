@@ -28,9 +28,9 @@ define([
             'rectangle': RectNode,
             'group': Group
         };
-        var Duplicator = ConstrainableList.extend({
+        var Duplicator = Group.extend({
 
-            defaults: _.extend({}, ConstrainableList.prototype.defaults, {
+            defaults: _.extend({}, Group.prototype.defaults, {
                 name: 'duplicator',
                 count: null,
                 target: null,
@@ -40,17 +40,18 @@ define([
             }),
 
             initialize: function() {
-                ConstrainableList.prototype.initialize.apply(this, arguments);
-                this.set('count', new PFloat(0));
-                var geom = new paper.Group();
-                this.set('geom', geom);
-                geom.data.instance = this;
-
-                //internal constraint lists storage
-                this.group_relative = [];
-                this.group_reference = [];
+                Group.prototype.initialize.apply(this, arguments);
+                this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
+
+
+                //members of the duplicator which are constrained
+                this.group_relative = [];
+                //members of the duplicator which are acting as the reference in the constraint
+                this.group_reference = [];
+                var count = new PFloat(0);
+                this.set('count', count);
 
             },
 
@@ -67,7 +68,7 @@ define([
 
             toJSON: function() {
 
-                var data = ConstrainableList.prototype.toJSON.call(this, data);
+                var data = Group.prototype.toJSON.call(this, data);
                 data.target_index = this.members.indexOf(this.get('target'));
                 data.internalList = this.internalList.toJSON();
                 data.group_relative = [];
@@ -124,7 +125,6 @@ define([
                 this.get('memberCount').setValue(memberCount);
                 this.toggleClosed(this);
 
-
             },
 
             getById: function(id) {
@@ -170,7 +170,7 @@ define([
                 }
                 var constraint = new Constraint();
                 constraint.set('references', this.internalList);
-                constraint.set('relatives', this);
+                constraint.set('relatives', this.masterList);
                 constraint.set('proxy_references', this.get('target'));
                 var data = [
                     ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
@@ -243,6 +243,7 @@ define([
                 }
 
                 this.addMember(copy, index);
+                this.masterList.addMember(copy, index);
 
             },
 
@@ -262,7 +263,7 @@ define([
                     //member.get('zIndex').setValue(this.members.length - 1);
 
                 }
-                var diff = this.members.length - this.indexNumbers.length;
+
                 if (member.get('name') === 'group') {
                     for (var j = 0; j < member.members.length; j++) {
                         for (var i = 0; i < this.group_relative.length; i++) {
@@ -271,7 +272,7 @@ define([
                     }
                 }
 
-                this.addMemberNotation();
+                //this.addMemberNotation();
 
             },
 
@@ -332,7 +333,7 @@ define([
 
             show: function() {
                 Instance.prototype.show.call(this);
-    
+
             },
 
             /*deleteAllChildren
@@ -367,7 +368,9 @@ define([
             deleteSelf: function() {
                 console.log('calling delete self duplicator');
                 this.stopListening();
-                var data = ConstrainableList.prototype.deleteSelf.call(this);
+                this.masterList.deleteSelf();
+                this.internalList.deleteSelf();
+                var data = Group.prototype.deleteSelf.call(this);
                 return data;
             },
 
@@ -428,8 +431,8 @@ define([
                 var data = this.updateCountStandard();
 
                 for (var i = 0; i < this.members.length; i++) {
-                    if(this.members[i].get('zIndex').getValue()!=i){
-                        console.log('setting value to for',i);
+                    if (this.members[i].get('zIndex').getValue() != i) {
+                        console.log('setting value to for', i);
                         this.members[i].get('zIndex').setValue(i);
                     }
                 }
@@ -487,8 +490,11 @@ define([
             },
 
             render: function() {
-                ConstrainableList.prototype.render.call(this);
-
+              for (var i = 0; i < this.members.length; i++) {
+                    console.log('rendering member', i);
+                    this.members[i].compile();
+                    this.members[i].render();
+                }
             }
 
 

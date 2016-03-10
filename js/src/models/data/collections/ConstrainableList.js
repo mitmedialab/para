@@ -59,7 +59,7 @@ define([
     passes modifications onto members, stripped of any properties that are constrained on the list
     */
       setValue: function(data) {
-        Instance.prototype.setValue.call(this.data);
+        Instance.prototype.setValue.call(this,data);
         var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
           if (constrained_props[i]) {

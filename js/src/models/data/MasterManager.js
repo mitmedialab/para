@@ -400,15 +400,20 @@ define([
 		},
 
 		modified: function(target) {
+			if (target.get('type') == 'collection') {
+				target.reset();
+				target.compile();
+				target.render();
+			} else {
+				var t = target;
 
-			var t = target;
-
-			while (t.nodeParent.get('name') != 'root' && t.nodeParent.nodeParent) {
-				t = t.nodeParent;
+				while (t.nodeParent.get('name') != 'root' && t.nodeParent.nodeParent) {
+					t = t.nodeParent;
+				}
+				t.reset();
+				t.compile();
+				t.render();
 			}
-			t.reset();
-			t.compile();
-			t.render();
 			this.trigger('modified');
 
 		},
@@ -745,7 +750,7 @@ define([
 		},
 
 		addGroup: function(selected, group) {
-			
+
 			group = collectionManager.addGroup(selected, group);
 			currentNode.addChildNode(group);
 			if (selected) {

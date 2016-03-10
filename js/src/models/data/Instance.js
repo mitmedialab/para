@@ -407,6 +407,7 @@ define([
 			}
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
+			instance.reset();
 			return instance;
 		},
 
@@ -462,7 +463,6 @@ define([
 			var inheritorCollection = this.get('inheritors');
 			instance.set('proto_node', this);
 			inheritorCollection.addInheritor(instance);
-			instance.reset();
 
 		},
 
@@ -651,7 +651,6 @@ define([
 				return layer.name === 'isolation_layer';
 			})[0];
 			isolationLayer.insertChild(this.get('zIndex').getValue(), this.get('geom'));
-
 		},
 
 		deIsolate: function() {
@@ -847,6 +846,7 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
+			console.log('setting value',this.get('id'),this.get('name'));
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
 				//var pdelta = this.nodeParent.

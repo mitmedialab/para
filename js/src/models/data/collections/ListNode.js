@@ -69,7 +69,7 @@ define([
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
           this.members.push(data[i]);
-          this.listenTo(data[i],'modified',this.modified)
+          this.listenTo(data[i],'modified',this.modified);
 
         }
       } else {
@@ -78,7 +78,7 @@ define([
         } else {
           this.members.push(data);
         }
-        this.listenTo(data,'modified',this.modified)
+        this.listenTo(data,'modified',this.modified);
 
       }
 
@@ -87,6 +87,23 @@ define([
         operator: 'set'
       };
       this.get('memberCount').setValue(memberCount);
+    },
+
+
+    isolate: function() {
+      var isolationLayer = paper.project.layers.filter(function(layer) {
+        return layer.name === 'isolation_layer';
+      })[0];
+      for(var i=0;i<this.members.length;i++){
+          this.members[i].isolate();
+      }
+
+    },
+
+    deIsolate: function() {
+      for(var i=0;i<this.members.length;i++){
+          this.members[i].deIsolate();
+      }
     },
 
     computeCentroid: function() {
@@ -421,6 +438,9 @@ define([
       return null;
     },
 
+    reset: function(){
+
+    },
 
     compile: function() {
      
