@@ -423,7 +423,7 @@ define([
 
 
     compile: function() {
-      this.render();
+     
     },
 
 

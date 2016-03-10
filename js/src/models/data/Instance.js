@@ -243,7 +243,12 @@ define([
 					}
 				}
 			}
-
+			this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 3);
+			this.centerUI.fillColor = 'red';
+			var targetLayer = paper.project.layers.filter(function(layer) {
+				return layer.name === 'ui_layer';
+			})[0];
+			targetLayer.addChild(this.centerUI);
 
 		},
 
@@ -580,16 +585,12 @@ define([
 		},
 
 		reset: function() {
+			var geom = this.get('geom');
+			var bbox = this.get('bbox');
+			var inverted = this._matrix.inverted();
+			geom.transform(inverted);
+			bbox.transform(inverted);
 			this.set('rendered', false);
-
-			this.set('i_bbox', {
-				topLeft: null,
-				bottomRight: null,
-			});
-			if (this.get('inheritor_bbox')) {
-				this.get('inheritor_bbox').remove();
-			}
-
 
 		},
 
@@ -846,7 +847,17 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
-
+			if (data.translationDelta && this.nodeParent) {
+				var tdelta = data.translationDelta;
+				//var pdelta = this.nodeParent.
+				if (this.nodeParent.get('name') != 'root') {
+					console.log('tdelta=', tdelta);
+					var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
+					data.translationDelta.x = ndelta.x;
+					data.translationDelta.y = ndelta.y;
+					console.log('ndelta=', ndelta, this.nodeParent.get('translationDelta').getValue());
+				}
+			}
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
 
@@ -1212,50 +1223,34 @@ define([
 		computes the current properties of the instance given current 
 		constraints and inheritance */
 		compile: function() {
-			this.reset();
 			var value = this.getValue();
-			this.compileTransformation(value);
 			this.compileStyle(value);
-			this.render();
-
-		},
-
-
-
-		inverseTransformSelf: function() {
-			var geom = this.get('geom');
-			var bbox = this.get('bbox');
-			var selection_clone = this.get('selection_clone');
-
-			this._invertedMatrix = this._matrix.inverted();
-			geom.transform(this._invertedMatrix);
-			bbox.transform(this._invertedMatrix);
-			selection_clone.transform(this._invertedMatrix);
-			//console.log('inverserTransformSelf matrix=', this._matrix, 'inverse matrix=', this._invertedMatrix);
-			return [geom];
 		},
 
 		transformSelf: function() {
+			this.center = this.get('geom').position;
 			var m2 = new paper.Matrix();
-			var m1 = this._matrix.inverted();
-			//console.log('m1=', m1.tx, m1.ty, 'original=', this._matrix.tx, this._matrix.ty);
+			//var m1 = this._matrix.inverted();
 
-
-			var scalingDelta, rotationDelta, translationDelta;
 			var value = this.getValue();
+			var scalingDelta, rotationDelta, translationDelta;
+
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-			m2.translate(translationDelta.x, translationDelta.y);
-			m2.rotate(rotationDelta, 0, 0);
-			m2.scale(scalingDelta.x, scalingDelta.y, 0, 0);
-			var m3 = m2.chain(m1);
 
-			//console.log('transformSelf m1=', m1.tx, m1.ty, 'm2=', m2.tx, m2.ty, 'm3=', m3.tx, m3.ty);
-			this._diffMatrix = m3;
+
+			m2.translate(translationDelta.x, translationDelta.y);
+			m2.rotate(rotationDelta, this.center.x, this.center.y);
+			m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
+			//this.center = this.get('geom').position;
+			//var m3 = m2.chain(m1);
+
+			//this._diffMatrix = m3;
 			this._matrix = m2;
-			return [];
+
 		},
+		
 
 		transformPoint: function(delta) {
 			var translationDelta = this.get('translationDelta').getValue();
@@ -1282,24 +1277,6 @@ define([
 
 
 
-		compileTransformation: function(value) {
-			var geom = this.get('geom');
-			/*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-				this.nodeParent.inverseTransformRecurse([]);
-			} else {
-				this.inverseTransformSelf();
-			}*/
-
-			geom.visible = true;
-			/*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-				this.nodeParent.transformRecurse([]);
-			} else {*/
-			this.transformSelf();
-
-			//}
-
-		},
-
 		compileStyle: function(value) {
 			this._fillColor = value.fillColor;
 			this._strokeColor = value.strokeColor;
@@ -1311,20 +1288,24 @@ define([
 		 * draws instance on canvas
 		 */
 		render: function() {
+			console.log('attempting to render instance', this.get('rendered'));
+
 			if (!this.get('rendered')) {
 				if (this.get('name') != 'root') {
+					this.transformSelf();
 					var geom = this.get('geom');
 					var bbox = this.get('bbox');
-					var selection_clone = this.get('selection_clone');
-					var m3 = this._diffMatrix;
-					geom.transform(m3);
-					this.updateScreenBounds(this.get('geom'));
-					bbox.transform(m3);
-					selection_clone.transform(m3);
-					
+					bbox.position = geom.postion;
+					this.transformSelf();
+					geom.transform(this._matrix);
+					bbox.transform(this._matrix);
+
+					this.centerUI.position = this.center;
+					this.updateScreenBounds(geom);
 
 					this.renderStyle(geom);
 					this.renderSelection(geom);
+
 					this.set('rendered', true);
 				}
 				return 'root';
@@ -1374,14 +1355,14 @@ define([
 			var constraint_selected = this.get('constraintSelected').getValue();
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
-			if (constraint_selected) {
+			/*if (constraint_selected) {
 				selection_clone.visible = true;
 				selection_clone.strokeColor = this.get(constraint_selected + '_color');
 
 			} else {
 				selection_clone.visible = false;
 
-			}
+			}*/
 
 			if (selected) {
 				geom.selectedColor = this.getSelectionColor();

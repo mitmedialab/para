@@ -1,6 +1,6 @@
 /*Group.js
  * path object
- * extends Duplicator node (for the time being)
+ * extends Duplicar node (for the time being)
  * node with actual path in it
  */
 
@@ -51,31 +51,33 @@ define([
       this.members = [];
       var geom = new paper.Group();
       this.set('geom', geom);
-      geom.data.instance = this;  
+      geom.data.instance = this;
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
-      this.get('strokeWidth').setValue(1);  
-
-
+      this.get('strokeWidth').setValue(1);
+      this.centerUI.fillColor = 'blue';
+      this.center = geom.position;
+      this.createBBox();
+      console.log('create bbox',this.get('bbox').bounds);
     },
 
-    parseJSON: function(data,manager) {
+    parseJSON: function(data, manager) {
       this.deleteAllChildren();
       Instance.prototype.parseJSON.call(this, data);
       for (var i = 0; i < data.children.length; i++) {
         var name = data.children[i].name;
         var child = this.getTargetClass(name);
-        child.parseJSON(data.children[i],manager);
+        child.parseJSON(data.children[i], manager);
         this.addMember(child);
       }
       return this;
     },
 
-    parseInheritorJSON: function(data,manager){
-      for (var i = 0; i <this.children.length; i++) {
+    parseInheritorJSON: function(data, manager) {
+      for (var i = 0; i < this.children.length; i++) {
         var c_data = data.children[i];
         var child = this.children[i];
-        child.parseInheritorJSON(c_data,manager);
+        child.parseInheritorJSON(c_data, manager);
       }
     },
 
@@ -112,13 +114,13 @@ define([
         deleted.push.apply(deleted, this.members[i].deleteAllChildren());
         var d = this.removeMember(this.members[i]);
         deleted.push(d.deleteSelf());
-        
+
       }
       return deleted;
     },
 
     deleteSelf: function() {
-      var data= Instance.prototype.deleteSelf.call(this);
+      var data = Instance.prototype.deleteSelf.call(this);
       this.members.length = 0;
       return data;
     },
@@ -140,13 +142,14 @@ define([
         this.members.splice(index, 0, clone);
         this.insertChild(index, clone);
         this.get('geom').insertChild(index, clone.get('geom'));
+        this.get('bbox').insertChild(index,clone.get('bbox'));
         clone.get('zIndex').setValue(index);
 
       } else {
         this.members.push(clone);
         this.addChildNode(clone);
         this.get('geom').addChild(clone.get('geom'));
-
+        this.get('bbox').addChild(clone.get('bbox'));
         clone.get('zIndex').setValue(this.members.length - 1);
 
       }
@@ -155,7 +158,11 @@ define([
         operator: 'set'
       };
 
+      this.listenTo(clone, 'modified', this.modified);
+      this.center = this.get('geom').position;
+
       this.get('memberCount').setValue(memberCount);
+      this.resizeBBox();
     },
 
     removeMember: function(data) {
@@ -167,6 +174,7 @@ define([
         member = this.members.splice(index, 1)[0];
         var childIndex = member.get('geom').index;
         this.get('geom').removeChildren(childIndex, childIndex + 1);
+        this.get('bbox').removeChildren(childIndex, childIndex + 1);
         this.removeChildNode(member);
         var memberCount = {
           v: this.members.length,
@@ -175,32 +183,35 @@ define([
         this.get('memberCount').setValue(memberCount);
 
       }
+      this.stopListening(data);
       this.toggleClosed(this);
+      this.center = this.get('geom').position;
+      this.resizeBBox();
       return member;
 
     },
 
-    ungroup: function(){
+    ungroup: function() {
       var members = [];
-      for(var i=0;i<this.members.length;i++){
+      for (var i = 0; i < this.members.length; i++) {
         members.push(this.removeMember(this.members[i]));
       }
       return members;
     },
 
     setValue: function(data) {
-      if(data.fillColor || data.strokeColor || data.strokeWidth){
+      if (data.fillColor || data.strokeColor || data.strokeWidth) {
         var style_data = {};
-        if(data.fillColor && !data.fillColor.noColor){
+        if (data.fillColor && !data.fillColor.noColor) {
           style_data.fillColor = data.fillColor;
         }
-        if(data.strokeColor  && !data.strokeColor.noColor){
+        if (data.strokeColor && !data.strokeColor.noColor) {
           style_data.strokeColor = data.strokeColor;
         }
-        if(data.strokeWidth){
+        if (data.strokeWidth) {
           style_data.strokeWidth = data.strokeWidth;
         }
-        for(var i=0;i<this.members.length;i++){
+        for (var i = 0; i < this.members.length; i++) {
           this.members[i].setValue(style_data);
         }
 
@@ -209,7 +220,7 @@ define([
     },
 
     getMember: function(member) {
-      if(member === this){
+      if (member === this) {
         return this;
       }
       for (var i = 0; i < this.members.length; i++) {
@@ -250,10 +261,6 @@ define([
 
     toggleOpen: function(item) {
       if ((this === item || this.hasMember(item)) && !this.get('open')) {
-        this.inverseTransformRecurse([]);
-        for (var i = 0; i < this.members.length; i++) {
-          this.members[i].transformSelf();
-        }
         this.set('open', true);
 
         return [this];
@@ -264,10 +271,6 @@ define([
 
     toggleClosed: function(item) {
       if ((this === item || this.hasMember(item) || item.nodeParent === this.nodeParent) && this.get('open')) {
-        for (var i = 0; i < this.members.length; i++) {
-          this.members[i].inverseTransformSelf();
-        }
-        this.transformRecurse([]);
         this.set('open', false);
 
         return [this];
@@ -287,117 +290,109 @@ define([
 
 
     calculateGroupCentroid: function() {
-      if(this.members.length>1){
-      var point_list = [];
-      for (var i = 0; i < this.members.length; i++) {
-        point_list.push(this.members[i].get('geom').position);
-      }
-      var centroid = TrigFunc.centroid(point_list);
-      return centroid;
-      }
-      else{
-        if(this.members>0){
-        return {x:this.members[0].get('geom').x,y:this.members[0].get('geom').y};
+      if (this.members.length > 1) {
+        var point_list = [];
+        for (var i = 0; i < this.members.length; i++) {
+          point_list.push(this.members[i]._matrix.translation);
+        }
+        var centroid = TrigFunc.centroid(point_list);
+        return centroid;
+      } else {
+        if (this.members > 0) {
+          return {
+            x: this.members[0]._matrix.translation.x,
+            y: this.members[0]._matrix.translation.y
+          };
         }
       }
-      return {x:0,y:0};
+      return {
+        x: 0,
+        y: 0
+      };
+    },
+
+    reset: function() {
+
+
+      Instance.prototype.reset.apply(this, arguments);
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].reset();
+      }
+
     },
 
 
     compile: function() {
-      if (this.members.length > 0) {
-        this.members[0].compile();
-      }
-      this.updateScreenBounds(this.get('geom'));
+
+      /*if (this.members.length > 0) {
+        for (var i = 0; i < this.members.length; i++) {
+          this.members[i].compile();
+        }
+      }*/
     },
 
     render: function() {
       //this.renderStyle(this.get('geom'));
-      this.renderSelection(this.get('geom'));
-    },
-
-    inverseTransformRecurse: function(geom_list) {
-
-      geom_list.push.apply(geom_list, this.accessMemberGeom());
-
-      if (this.nodeParent && this.nodeParent.get('name') === 'group') {
-        this.nodeParent.inverseTransformRecurse(geom_list);
-
-      }
-
-      this.inverseTransformSelf();
-      //console.log('parent inverse transformation', this._invertedMatrix.translation, this._invertedMatrix.rotation, this._invertedMatrix.scaling);
-      //debugger;
-
-      for (var j = 0; j < geom_list.length; j++) {
-        //console.log('geom position before parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
-
-        geom_list[j].transform(this._invertedMatrix);
-        //console.log('geom position after parent inversion', geom_list[j].position, geom_list[j].data.instance.get('id'));
-        //debugger;
-      }
-
-      for (var k = 0; k < this.members.length; k++) {
-        //console.log('geom position before individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
-
-        this.members[k].inverseTransformSelf();
-        //console.log('geom position after individual inversion', this.members[k].get('geom').position, this.members[k].get('id'));
-        //debugger;
-      }
-
-    },
-
-
-    transformRecurse: function(geom_list) {
+      //
       for (var i = 0; i < this.members.length; i++) {
-        // console.log('geom position before individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
-
-        geom_list.push.apply(geom_list, this.members[i].transformSelf());
-        //console.log('geom position after individual transform', this.members[i].get('geom').position, this.members[i].get('id'));
-        //debugger;
+        console.log('rendering member', i);
+        this.members[i].compile();
+        this.members[i].render();
       }
+      Instance.prototype.render.apply(this, arguments);
 
-      this.transformSelf();
-      //console.log('parent transformation', this._matrix.translation, this._matrix.rotation, this._matrix.scaling);
-      // debugger;
-      for (var j = 0; j < geom_list.length; j++) {
-        //console.log('geom position before parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
-
-        geom_list[j].transform(this._matrix);
-        // console.log('geom position after parent transform', geom_list[j].position, geom_list[j].data.instance.get('id'));
-        //debugger;
-      }
-      if (this.nodeParent && this.nodeParent.get('name') === 'group') {
-        this.nodeParent.transformRecurse(geom_list);
-      }
     },
 
+    renderStyle: function(){
 
+    },
 
-    transformSelf: function(exclude) {
+    inverseTransformPoint: function(point) {
+      var r = this.get('rotationDelta').getValue();
+      var s = this.get('scalingDelta').getValue();
+      var delta = new paper.Point(point.x, point.y);
+      var new_delta = delta.rotate(-r, new paper.Point(0, 0));
+      new_delta = new_delta.divide(new paper.Point(s.x, s.y));
+      return new_delta;
+    },
 
-      this._matrix.reset();
+    transformPoint: function(point) {
+      var translationDelta = this.get('translationDelta').getValue();
+      var delta = new paper.Point(point.x, point.y);
+      var new_delta = this._matrix.transform(delta);
+
+      new_delta.x -= translationDelta.y;
+      new_delta.y -= translationDelta.x;
+      return new_delta;
+    },
+
+    transformSelf: function() {
+
+      var m2 = new paper.Matrix();
+      //var m1 = this._matrix.inverted();
+
       var value = this.getValue();
       var scalingDelta, rotationDelta, translationDelta;
 
       scalingDelta = value.scalingDelta;
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
-      var center = this.calculateGroupCentroid();
-      this.center = center;
-      this._matrix.translate(translationDelta.x, translationDelta.y);
-      this._matrix.rotate(rotationDelta, new paper.Point(center.x, center.y));
-      this._matrix.scale(scalingDelta.x, scalingDelta.y, new paper.Point(center.x, center.y));
-      return [];
+
+
+      m2.translate(translationDelta.x, translationDelta.y);
+      m2.rotate(rotationDelta, this.center.x, this.center.y);
+      m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
+      //this.center = this.get('geom').position;
+      //var m3 = m2.chain(m1);
+
+      //this._diffMatrix = m3;
+      this._matrix = m2;
+
     },
 
-    inverseTransformSelf: function() {
-      this._invertedMatrix = this._matrix.inverted();
-      return [];
-    },
 
-  
-    renderSelection: function(geom) {
+
+   /* renderSelection: function(geom) {
       var selected = this.get('selected').getValue();
       var constraint_selected = this.get('constraintSelected').getValue();
       var selection_clone = this.get('selection_clone');
@@ -445,7 +440,7 @@ define([
           bbox.visible = true;
         }
       }
-    },
+    },*/
 
     createSelectionClone: function() {
       if (this.get('selection_clone')) {
@@ -464,6 +459,11 @@ define([
       this.set('selection_clone', selection_clone);
     },
 
+    resizeBBox: function() {
+      this.createBBox();
+      var bbox = this.get('bbox');
+      console.log('group bbox',bbox.bounds);
+    }
 
 
   });

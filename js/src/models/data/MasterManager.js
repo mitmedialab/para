@@ -400,12 +400,21 @@ define([
 		},
 
 		modified: function(target) {
-			target.compile();
+
+			var t = target;
+
+			while (t.nodeParent.get('name') != 'root' && t.nodeParent.nodeParent) {
+				t = t.nodeParent;
+			}
+			t.reset();
+			t.compile();
+			t.render();
 			this.trigger('modified');
+
 		},
 
 		clearRenderQueue: function() {
-		
+
 			this.calculateFPS();
 		},
 
@@ -736,7 +745,9 @@ define([
 		},
 
 		addGroup: function(selected, group) {
+			
 			group = collectionManager.addGroup(selected, group);
+			currentNode.addChildNode(group);
 			if (selected) {
 
 				for (var i = 0; i < selected.length; i++) {
@@ -750,7 +761,6 @@ define([
 
 			layersView.addShape(group.toJSON());
 			this.deselectAllShapes();
-			currentNode.addChildNode(group);
 			this.addListener(group);
 			this.selectShape(group);
 			return group;
