@@ -5,10 +5,10 @@ constrainable property that stores an instance's inheritors
 define([
 		'underscore',
 		'models/data/properties/PConstraint',
-		'models/data/properties/PFloat'
+		'models/data/properties/PVal'
 	],
 
-	function(_, PConstraint, PFloat) {
+	function(_, PConstraint, PVal) {
 
 		var InheritorCollection = PConstraint.extend({
 			

@@ -3,10 +3,10 @@ define([
   'paper',
   'backbone',
   'models/data/paperUI/ConstraintHandles',
-  'models/data/properties/PFloat',
+  'models/data/properties/PVal',
   'utils/TrigFunc',
   'utils/Ziggurat'
-], function(_, paper, Backbone, ConstraintHandles, PFloat, TrigFunc, Ziggurat) {
+], function(_, paper, Backbone, ConstraintHandles, PVal, TrigFunc, Ziggurat) {
 
   var propConvMap = {
     'translationDelta:scalingDelta': 0.01,
@@ -288,11 +288,11 @@ define([
 
               vals = data.offsets[prop][subprop];
               for (i = 0; i < vals.length; i++) {
-                offsets[prop][subprop].push(new PFloat(vals[i]));
+                offsets[prop][subprop].push(new PVal(vals[i]));
               }
               vals = data.exempt_indicies[prop][subprop];
               for (i = 0; i < vals.length; i++) {
-                exempt_indicies[prop][subprop].push(new PFloat(vals[i]));
+                exempt_indicies[prop][subprop].push(new PVal(vals[i]));
               }
               expressions[prop][subprop] = data.expressions[prop][subprop];
 
@@ -412,15 +412,15 @@ define([
           conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]].vals[index].getValue() * convertFactor;
           if (offset[rel_dimensions[i]].length <= index) {
             if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[i]].push(new PFloat(0));
+              offset[rel_dimensions[i]].push(new PVal(0));
             } else {
-              offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
+              offset[rel_dimensions[i]].push(new PVal(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
             }
           } else {
             //offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
           }
           if (exempt_index[rel_dimensions[i]].length <= index) {
-            exempt_index[rel_dimensions[i]].push(new PFloat(0));
+            exempt_index[rel_dimensions[i]].push(new PVal(0));
           }
 
         }
@@ -437,15 +437,15 @@ define([
           conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]].vals[index].getValue() * convertFactor : refPropValue[keys[j]].vals[index].getValue() * convertFactor;
           if (offset[rel_dimensions[j]].length <= index) {
             if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[j]].push(new PFloat(0));
+              offset[rel_dimensions[j]].push(new PVal(0));
             } else {
-              offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
+              offset[rel_dimensions[j]].push(new PVal(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
             }
           } else {
             //offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
           }
           if (exempt_index[rel_dimensions[j]].length <= index) {
-            exempt_index[rel_dimensions[j]].push(new PFloat(0));
+            exempt_index[rel_dimensions[j]].push(new PVal(0));
           }
 
         }
@@ -464,15 +464,15 @@ define([
           conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]].vals[index].getValue() * convertFactor : (m < keys.length) ? refPropValue[keys[m]].vals[index].getValue() * convertFactor : refPropValue[keys[keys.length - 1]].vals[index].getValue();
           if (offset[rel_dimensions[m]].length <= index) {
             if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[m]].push(new PFloat(0));
+              offset[rel_dimensions[m]].push(new PVal(0));
             } else {
-              offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
+              offset[rel_dimensions[m]].push(new PVal(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
             }
           } else {
             //offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
           }
           if (exempt_index[rel_dimensions[m]].length <= index) {
-            exempt_index[rel_dimensions[m]].push(new PFloat(0));
+            exempt_index[rel_dimensions[m]].push(new PVal(0));
           }
 
         }
@@ -687,18 +687,11 @@ define([
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       console.log('setting sub prop constraint');
       var self = this;
-      var relative_subprop;
-      if(rel_dimension=='v'){
-        relative_subprop= relative.get(rel_prop_key);
-      } 
-      else{
-        relative_subprop= relative.get(rel_prop_key)[rel_dimension];
-      }
       var constraintF = function() {
         console.log('calling constraint', ref_prop_key, ref_dimension);
         var list = [];
         if (self.get('paused')) {
-          return relative_subprop.getValue();
+          return relative.get(rel_prop_key)[rel_dimension].getValue();
         } else {
           var exempt_indicies = self.get('exempt_indicies');
           var relative_range = relative.getRange();
@@ -709,15 +702,12 @@ define([
             var y;
             data[rel_prop_key] = {};
             var relative_target = relative.getMemberAt(z);
-            var isReference = relative_subprop.isReference(relative_target);
-            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue() === 1 || isReference) {
-              y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
-
-            } else {
+            var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
+            
               var x = reference_values[ref_prop_key][ref_dimension].vals[z].getValue();
               var offsetValue = offset[z].getValue();
               eval(expression);
-            }
+            
 
             if (rel_prop_key === 'scalingDelta') {
               if (y === 0) {
@@ -732,17 +722,21 @@ define([
 
           }
           if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
+            console.log('returning data',list);
             return list;
           } else {
+            console.log('returning data',list[0][rel_prop_key][rel_dimension]);
             return list[0][rel_prop_key][rel_dimension];
           }
         }
       };
 
       console.log(rel_prop_key, rel_dimension);
-      
-       relative_subprop.setConstraint(constraintF, this);
-      
+      if (rel_dimension == 'v') {
+        relative.get(rel_prop_key).setConstraint(constraintF, this);
+      } else {
+        relative.get(rel_prop_key)[rel_dimension].setConstraint(constraintF, this);
+      }
     },
 
     setConstraintOnProperty: function(reference, relative, expression, offset, refProperty, relProperty) {
@@ -931,10 +925,10 @@ define([
             var newItem;
             if (reference_values[ref_prop_key][target_dimension].vals.length > 0) {
               var last = reference_values[ref_prop_key][target_dimension].vals[reference_values[ref_prop_key][target_dimension].vals.length - 1];
-              newItem = new PFloat(last.getValue());
+              newItem = new PVal(last.getValue());
               newItem.setNull(true);
             } else {
-              newItem = new PFloat(1);
+              newItem = new PVal(1);
               newItem.setNull(true);
             }
 
@@ -981,7 +975,7 @@ define([
           if (reference_values[ref_dimension][m]) {
             reference_values[ref_dimension][m].setValue(-1);
           } else {
-            var newVal = new PFloat(-1);
+            var newVal = new PVal(-1);
             newVal.setNull(false);
             reference_values[ref_dimension].push(newVal);
           }
@@ -1060,7 +1054,7 @@ define([
               reference_values[ref_dimension].vals[m].add(min_offset);
             }
           } else {
-            var newVal = new PFloat(y);
+            var newVal = new PVal(y);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
@@ -1095,7 +1089,7 @@ define([
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(y_val);
           } else {
-            var newVal = new PFloat(y_val);
+            var newVal = new PVal(y_val);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
@@ -1125,7 +1119,7 @@ define([
             if (reference_values[ref_dimension].vals[m]) {
               reference_values[ref_dimension].vals[m].setValue(y);
             } else {
-              var newVal = new PFloat(y);
+              var newVal = new PVal(y);
               newVal.setNull(false);
               reference_values[ref_dimension].vals.push(newVal);
             }
@@ -1207,7 +1201,7 @@ define([
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(y);
           } else {
-            var newVal = new PFloat(y);
+            var newVal = new PVal(y);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
@@ -1292,7 +1286,7 @@ define([
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(y);
           } else {
-            var newVal = new PFloat(y);
+            var newVal = new PVal(y);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }

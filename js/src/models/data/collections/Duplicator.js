@@ -11,7 +11,7 @@ define([
         'models/data/geometry/EllipseNode',
         'models/data/geometry/PolygonNode',
         'models/data/geometry/Group',
-        'models/data/properties/PFloat',
+        'models/data/properties/PVal',
         'models/data/properties/PBool',
         'paper',
         'models/data/properties/PConstraint',
@@ -20,7 +20,7 @@ define([
 
     ],
 
-    function(_, Instance, ConstrainableList, PathNode, RectNode, EllipseNode, PolygonNode, Group, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
+    function(_, Instance, ConstrainableList, PathNode, RectNode, EllipseNode, PolygonNode, Group, PVal, PBool, paper, PConstraint, Constraint, TrigFunc) {
         var init_lookup = {
             'path': PathNode,
             'ellipse': EllipseNode,
@@ -50,7 +50,7 @@ define([
                 this.group_relative = [];
                 //members of the duplicator which are acting as the reference in the constraint
                 this.group_reference = [];
-                var count = new PFloat(0);
+                var count = new PVal(0);
                 this.set('count', count);
 
             },
@@ -489,7 +489,6 @@ define([
                 this.get('memberCount').setValue(this.members.length);
             },
 
-           
 
 
         });

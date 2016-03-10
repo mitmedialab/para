@@ -11,7 +11,7 @@ define([
 	'models/data/collections/InheritorCollection',
 
 	'models/data/properties/PPoint',
-	'models/data/properties/PFloat',
+	'models/data/properties/PVal',
 	'models/data/properties/PColor',
 	'models/data/properties/PBool',
 	'models/data/properties/PString',
@@ -20,7 +20,7 @@ define([
 	'utils/TrigFunc',
 	'utils/ColorUtils',
 
-], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
+], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PVal, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
 
@@ -124,8 +124,8 @@ define([
 			this.set('center', new PPoint(0, 0));
 			this.set('screen_top_left', new PPoint(0, 0));
 			this.set('screen_top_right', new PPoint(0, 0));
-			this.set('screen_height', new PFloat(0));
-			this.set('screen_width', new PFloat(0));
+			this.set('screen_height', new PVal(0));
+			this.set('screen_width', new PVal(0));
 			this.set('screen_bottom_right', new PPoint(0, 0));
 			this.set('screen_bottom_left', new PPoint(0, 0));
 			this.set('screen_bottom_left', new PPoint(0, 0));
@@ -133,10 +133,10 @@ define([
 			this.set('screen_right_center', new PPoint(0, 0));
 			this.set('screen_top_center', new PPoint(0, 0));
 			this.set('screen_bottom_center', new PPoint(0, 0));
-			this.set('area', new PFloat(0));
+			this.set('area', new PVal(0));
 			this.set('scaling_origin', new PPoint(0, 0));
 			this.set('rotation_origin', new PPoint(0, 0));
-			this.set('alpha', new PFloat(1));
+			this.set('alpha', new PVal(1));
 			var translationDelta = new PPoint(0, 0);
 			translationDelta.setNull(true);
 			this.set('translationDelta', translationDelta);
@@ -145,7 +145,7 @@ define([
 			scalingDelta.setNull(false);
 			this.set('scalingDelta', scalingDelta);
 
-			var rotationDelta = new PFloat(0);
+			var rotationDelta = new PVal(0);
 			rotationDelta.setNull(false);
 			this.set('rotationDelta', rotationDelta);
 
@@ -157,14 +157,14 @@ define([
 			fillColor.setNull(true);
 			this.set('fillColor', fillColor);
 
-			var strokeWidth = new PFloat(0);
+			var strokeWidth = new PVal(0);
 			strokeWidth.setNull(true);
 			this.set('strokeWidth', strokeWidth);
 			this.set('sibling_instances', []);
 			this.set('inheritors', new InheritorCollection(this));
 			this.get('inheritors').setNull(false);
 			this.set('v', new PProperty(0));
-			this.set('zIndex', new PFloat(0));
+			this.set('zIndex', new PVal(0));
 
 
 			//============private properties==============//
@@ -203,11 +203,11 @@ define([
 			pathAltered.setNull(true);
 			this.set('pathAltered', pathAltered);
 
-			var index = new PFloat(0);
+			var index = new PVal(0);
 			index.setNull(false);
 			this.set('index', index);
 
-			var memberCount = new PFloat(1);
+			var memberCount = new PVal(1);
 			memberCount.setNull(false);
 
 			var selected = new PBool(false);
@@ -855,7 +855,7 @@ define([
 		modified: function() {
 			console.log('self modified', this.get('id'), this.get('name'));
 			console.trace();
-			PConstraint.prototype.modified.apply(this, arguments)
+			PConstraint.prototype.modified.apply(this, arguments);
 
 		},
 		/*setValue
@@ -1245,6 +1245,7 @@ define([
 			//var m1 = this._matrix.inverted();
 
 			var value = this.getValue();
+			console.log('rotation delta =',value.rotationDelta);
 			var scalingDelta, rotationDelta, translationDelta;
 
 			scalingDelta = value.scalingDelta;

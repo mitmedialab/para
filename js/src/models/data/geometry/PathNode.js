@@ -12,11 +12,11 @@ define([
   'utils/TrigFunc',
   'models/data/properties/PPoint',
   'paper',
-  'models/data/properties/PFloat',
+  'models/data/properties/PVal',
   'models/data/properties/PColor'
 
 
-], function(_, GeometryNode, PointNode, TrigFunc, PPoint, paper, PFloat, PColor) {
+], function(_, GeometryNode, PointNode, TrigFunc, PPoint, paper, PVal, PColor) {
   //drawable paper.js path object that is stored in the pathnode
   var PathNode = GeometryNode.extend({
 

@@ -116,7 +116,7 @@
 			modified: function() {
 				if (!this.pauseModNotice) {
 					this.trigger('modified', this);
-					
+
 				}
 			},
 

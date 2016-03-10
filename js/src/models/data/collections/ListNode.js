@@ -7,11 +7,11 @@ define([
   'underscore',
   'paper',
   'models/data/Instance',
-  'models/data/properties/PFloat',
+  'models/data/properties/PVal',
   'models/data/properties/PConstraint',
   'utils/TrigFunc'
 
-], function($, _, paper, Instance, PFloat, PConstraint, TrigFunc) {
+], function($, _, paper, Instance, PVal, PConstraint, TrigFunc) {
 
   var ListNode = Instance.extend({
     defaults: _.extend({}, Instance.prototype.defaults, {
@@ -26,7 +26,7 @@ define([
       this.members = [];
       this.offsets = [];
 
-      var memberCount = new PFloat(0);
+      var memberCount = new PVal(0);
       memberCount.setNull(false);
       this.set('memberCount', memberCount);
 

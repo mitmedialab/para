@@ -14,12 +14,12 @@ define([
   'models/data/geometry/EllipseNode',
   'models/data/geometry/PolygonNode',
   'utils/TrigFunc',
-  'models/data/properties/PFloat',
+  'models/data/properties/PVal',
   'models/data/properties/PPoint',
 
 
 
-], function(_, paper, Instance, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
+], function(_, paper, Instance, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PVal, PPoint) {
   var init_lookup = {
     'path': PathNode,
     'ellipse': EllipseNode,
@@ -40,7 +40,7 @@ define([
     initialize: function() {
       Instance.prototype.initialize.apply(this, arguments);
       this.resetProperties();
-      var memberCount = new PFloat(0);
+      var memberCount = new PVal(0);
       memberCount.setNull(false);
       this.set('memberCount', memberCount);
       this.get('scalingDelta').setValue({
