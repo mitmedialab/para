@@ -721,7 +721,7 @@ define([
 
             list.push(data);
 
-            //relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
+            relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
           }
           if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
             return list;
@@ -780,8 +780,8 @@ define([
               }
 
             }
-
-            //relative_target.get(rel_prop_key).setValue(data[rel_prop_key]);
+           
+            relative_target.get(rel_prop_key).setValue(data[rel_prop_key]);
 
             list.push(data);
 

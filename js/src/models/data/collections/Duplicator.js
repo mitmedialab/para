@@ -44,8 +44,8 @@ define([
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
-
-
+                this.listenTo(this.masterList,'modified',this.modified);
+                this.listenTo(this.internalList,'modified',this.modified);
                 //members of the duplicator which are constrained
                 this.group_relative = [];
                 //members of the duplicator which are acting as the reference in the constraint
@@ -249,21 +249,7 @@ define([
 
             addMember: function(member, index) {
 
-                if (index) {
-                    this.members.splice(index, 0, member);
-                    this.insertChild(index, member);
-                    this.get('geom').insertChild(index, member.get('geom'));
-                    //member.get('zIndex').setValue(index);
-
-                } else {
-                    this.members.push(member);
-                    this.get('geom').addChild(member.get('geom'));
-                    this.addChildNode(member);
-
-                    //member.get('zIndex').setValue(this.members.length - 1);
-
-                }
-
+                Group.prototype.addMember.call(this,member,index);
                 if (member.get('name') === 'group') {
                     for (var j = 0; j < member.members.length; j++) {
                         for (var i = 0; i < this.group_relative.length; i++) {
@@ -424,6 +410,7 @@ define([
 
 
             },
+           
 
 
             setCount: function(count) {
@@ -451,7 +438,7 @@ define([
             updateCountStandard: function() {
                 var count = this.get('count').getValue();
                 var range = this.getRange();
-                var diff = count - range;
+                var diff = count - this.children.length;
                 var target = this.get('target');
 
                 var toRemove = [];

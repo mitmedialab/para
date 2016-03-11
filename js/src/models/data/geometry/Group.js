@@ -248,7 +248,9 @@ define([
         }
       }
     },
-
+    getRange: function() {
+      return this.children.length;
+    },
 
     accessMemberGeom: function() {
       var geom_list = [];

@@ -408,7 +408,6 @@ define([
 			}
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
-			instance.reset();
 			return instance;
 		},
 
