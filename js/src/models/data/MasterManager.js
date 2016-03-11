@@ -94,7 +94,7 @@ define([
 
 			var self = this;
 			var interval = setInterval(function() {
-				self.clearRenderQueue();
+				self.calculateFPS();
 			}, 17);
 
 

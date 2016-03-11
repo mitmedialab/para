@@ -780,9 +780,9 @@ define([
               }
 
             }
-           
+            
             relative_target.get(rel_prop_key).setValue(data[rel_prop_key]);
-
+            
             list.push(data);
 
           }
