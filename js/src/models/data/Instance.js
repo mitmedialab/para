@@ -400,6 +400,7 @@ define([
 		 * TODO: add in checks to prevent diamond inheritance
 		 */
 		create: function(noInheritor) {
+			
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
@@ -409,6 +410,7 @@ define([
 			}
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
+			instance.render();
 			return instance;
 		},
 

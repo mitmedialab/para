@@ -44,8 +44,8 @@ define([
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
-                this.listenTo(this.masterList,'modified',this.modified);
-                this.listenTo(this.internalList,'modified',this.modified);
+                this.listenTo(this.masterList, 'modified', this.modified);
+                this.listenTo(this.internalList, 'modified', this.modified);
                 //members of the duplicator which are constrained
                 this.group_relative = [];
                 //members of the duplicator which are acting as the reference in the constraint
@@ -224,32 +224,11 @@ define([
                 return member_constraints;
             },
 
-            addRelativeMember: function(copy, index) {
-
-                if (this.members.length > 1) {
-
-                    copy.setValue(this.members[this.members.length - 2].getValue());
-
-                    if (!index) {
-                        index = this.members.length - 1;
-                    }
-                } else {
-
-                    copy.setValue(this.members[0].getValue());
-
-                    if (!index) {
-                        index = 1;
-                    }
-                }
-
-                this.addMember(copy, index);
-                this.masterList.addMember(copy, index);
-
-            },
+         
 
             addMember: function(member, index) {
 
-                Group.prototype.addMember.call(this,member,index);
+                Group.prototype.addMember.call(this, member, index);
                 if (member.get('name') === 'group') {
                     for (var j = 0; j < member.members.length; j++) {
                         for (var i = 0; i < this.group_relative.length; i++) {
@@ -291,6 +270,7 @@ define([
                 var data = this.members[this.members.length - 2];
                 if (data) {
                     this.removeMember(data);
+                    this.masterList.removeMember(data);
                     data.deleteSelf();
                     var parent = data.getParentNode();
                     if (parent) {
@@ -385,7 +365,6 @@ define([
                         }
                     }
                 }
-                this.removeMemberNotation();
                 if (updateCount) {
                     for (var k = 0; k < this.members.length; k++) {
                         this.members[k].get('zIndex').setValue(k);
@@ -410,34 +389,33 @@ define([
 
 
             },
-           
 
+            addRelativeMember: function(copy, index) {
 
-            setCount: function(count) {
-                
-                this.get('count').setValue(count);
-                var data = this.updateCountStandard();
+                if (this.members.length > 1) {
 
-                for (var i = 0; i < this.members.length; i++) {
-                    if (this.members[i].get('zIndex').getValue() != i) {
-                        console.log('setting value to for', i);
-                        this.members[i].get('zIndex').setValue(i);
+                    copy.setValue(this.members[this.members.length - 2].getValue());
+
+                    if (!index) {
+                        index = this.members.length - 1;
+                    }
+                } else {
+
+                    copy.setValue(this.members[0].getValue());
+
+                    if (!index) {
+                        index = 1;
                     }
                 }
-                var memberCount = {
-                    v: this.members.length,
-                    operator: 'set'
-                };
-                this.get('memberCount').setValue(memberCount);
-                return data;
+
+                this.addMember(copy, index);
+                this.masterList.addMember(copy, index);
+
             },
 
-            getCountValue: function() {
-                return this.get('count').getValue();
-            },
+            setCount: function(count) {
 
-            updateCountStandard: function() {
-                var count = this.get('count').getValue();
+                this.get('count').setValue(count);
                 var range = this.getRange();
                 var diff = count - this.children.length;
                 var target = this.get('target');
@@ -459,11 +437,29 @@ define([
                         }
                     }
                 }
-                return {
+                var data = {
                     toAdd: toAdd,
                     toRemove: toRemove
                 };
+
+                for (var i = 0; i < this.members.length; i++) {
+                    if (this.members[i].get('zIndex').getValue() != i) {
+                        console.log('setting value to for', i);
+                        this.members[i].get('zIndex').setValue(i);
+                    }
+                }
+                var memberCount = {
+                    v: this.members.length,
+                    operator: 'set'
+                };
+                this.get('memberCount').setValue(memberCount);
+                return data;
             },
+
+            getCountValue: function() {
+                return this.get('count').getValue();
+            },
+
 
             setTarget: function(target) {
                 if (target) {
@@ -474,10 +470,10 @@ define([
                 } else {
                     this.set('target', null);
                 }
+                this.masterList.addMember(target, 0);
                 this.get('memberCount').setValue(this.members.length);
             },
 
-           
 
 
         });

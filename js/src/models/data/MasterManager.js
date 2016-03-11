@@ -760,7 +760,7 @@ define([
 			layersView.removeShape(object.get('id'));
 			layersView.addShape(duplicator.toJSON());
 			this.selectShape(duplicator);
-			var data = duplicator.setCount(8);
+			var data = duplicator.setCount(3);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
 			for (var i = 0; i < constraints.length; i++) {

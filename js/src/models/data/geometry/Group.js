@@ -313,22 +313,25 @@ define([
     },
 
     reset: function() {
-      Instance.prototype.reset.apply(this, arguments);
-      for (var i = 0; i < this.renderQueue.length; i++) {
-        this.renderQueue[i].reset();
+      if (this.get('rendered')) {
+        Instance.prototype.reset.apply(this, arguments);
+        for (var i = 0; i < this.renderQueue.length; i++) {
+          this.renderQueue[i].reset();
+        }
       }
 
     },
 
 
     render: function() {
-    
-      for (var i = 0; i < this.renderQueue.length; i++) {
-        this.renderQueue[i].render();
-      }
-      this.renderQueue = [];
+      if (!this.get('rendered')) {
+        for (var i = 0; i < this.renderQueue.length; i++) {
+          this.renderQueue[i].render();
+        }
+        this.renderQueue = [];
 
-      Instance.prototype.render.apply(this, arguments);
+        Instance.prototype.render.apply(this, arguments);
+      }
     },
 
     renderStyle: function() {
@@ -450,7 +453,7 @@ define([
     resizeBBox: function() {
       this.createBBox();
       var bbox = this.get('bbox');
-     
+
     }
 
 
