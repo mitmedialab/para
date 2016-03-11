@@ -12,6 +12,7 @@ define([
 
 	'models/data/properties/PPoint',
 	'models/data/properties/PFloat',
+	'models/data/properties/PVal',
 	'models/data/properties/PColor',
 	'models/data/properties/PBool',
 	'models/data/properties/PString',
@@ -20,7 +21,7 @@ define([
 	'utils/TrigFunc',
 	'utils/ColorUtils',
 
-], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
+], function(_, $, paper, SceneNode, InheritorCollection, PPoint, PFloat, PVal, PColor, PBool, PString, PProperty, PConstraint, TrigFunc, ColorUtils) {
 
 
 
@@ -145,7 +146,7 @@ define([
 			scalingDelta.setNull(false);
 			this.set('scalingDelta', scalingDelta);
 
-			var rotationDelta = new PFloat(0);
+			var rotationDelta = new PVal(0);
 			rotationDelta.setNull(false);
 			this.set('rotationDelta', rotationDelta);
 
@@ -157,7 +158,7 @@ define([
 			fillColor.setNull(true);
 			this.set('fillColor', fillColor);
 
-			var strokeWidth = new PFloat(0);
+			var strokeWidth = new PVal(0);
 			strokeWidth.setNull(true);
 			this.set('strokeWidth', strokeWidth);
 			this.set('sibling_instances', []);
@@ -426,7 +427,6 @@ define([
 			}
 			SceneNode.prototype.insertChild.call(this, index, child);
 			for (var i = 0; i < this.children.length; i++) {
-				console.log('child', this.children[i], "value", i);
 				this.children[i].get('zIndex').setValue(i);
 			}
 
@@ -447,20 +447,17 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
-			console.log('post set child after', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
 
 
 
 		},
 
 		setChildBefore: function(child, sibling) {
-			console.log('set child before', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
 
 			SceneNode.prototype.setChildBefore.call(this, child, sibling);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
-			console.log('post set child before', child.get('zIndex').getValue(), sibling.get('zIndex').getValue());
 
 		},
 
@@ -610,7 +607,6 @@ define([
 
 		// sets the geom visibility to false
 		hide: function() {
-			console.log('hide', this.get('name'));
 			this.set('visible', false);
 			this.get('selected').setValue(false);
 			this.get('geom').visible = false; // hacky
@@ -620,7 +616,6 @@ define([
 		},
 
 		show: function() {
-			console.log('show', this.get('name'));
 			this.set('visible', true);
 			this.get('geom').visible = true;
 			if (this.get('constraintSelected').getValue()) {
@@ -852,8 +847,6 @@ define([
 
 		//callback triggered when a subproperty is modified externally 
 		modified: function() {
-			console.log('self modified', this.get('id'), this.get('name'));
-			console.trace();
 			PConstraint.prototype.modified.apply(this, arguments);
 
 		},
@@ -862,16 +855,13 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
-			console.log('setting value', this.get('id'), this.get('name'));
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
 				//var pdelta = this.nodeParent.
 				if (this.nodeParent.get('name') != 'root') {
-					console.log('tdelta=', tdelta);
 					var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
 					data.translationDelta.x = ndelta.x;
 					data.translationDelta.y = ndelta.y;
-					console.log('ndelta=', ndelta, this.nodeParent.get('translationDelta').getValue());
 				}
 			}
 			for (var prop in data) {
@@ -921,8 +911,6 @@ define([
 		 */
 
 		getValue: function() {
-			console.log('get value', this.get('id'), this.get('name'));
-			console.trace();
 			var constrainMap = this.get('constrain_map');
 			var value = {};
 			for (var propertyName in constrainMap) {
@@ -1244,7 +1232,6 @@ define([
 			//var m1 = this._matrix.inverted();
 
 			var value = this.getValue();
-			console.log('rotation delta =',value.rotationDelta);
 			var scalingDelta, rotationDelta, translationDelta;
 
 			scalingDelta = value.scalingDelta;
@@ -1289,8 +1276,6 @@ define([
 
 
 		childModified: function(child) {
-			console.log('child modified', child.get('id'), child.get('name'));
-			console.trace();
 			this.renderQueue.push(child);
 
 		},
@@ -1306,7 +1291,6 @@ define([
 		render: function() {
 
 			if (!this.get('rendered')) {
-				console.log('render instance', this.get('id'), this.get('name'));
 
 				this.transformSelf();
 				var geom = this.get('geom');

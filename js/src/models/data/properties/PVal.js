@@ -61,6 +61,7 @@ define([
 					if (v) {
 						data.v = v;
 					}
+					return data;
 				}
 
 			},

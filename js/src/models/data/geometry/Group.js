@@ -58,7 +58,6 @@ define([
       this.centerUI.fillColor = 'blue';
       this.center = geom.position;
       this.createBBox();
-      console.log('create bbox', this.get('bbox').bounds);
     },
 
     parseJSON: function(data, manager) {
@@ -323,9 +322,7 @@ define([
 
 
     render: function() {
-      if (this.renderQueue.length > 1) {
-        console.log('starting rendering group');
-      }
+    
       for (var i = 0; i < this.renderQueue.length; i++) {
         this.renderQueue[i].render();
       }
@@ -453,7 +450,7 @@ define([
     resizeBBox: function() {
       this.createBBox();
       var bbox = this.get('bbox');
-      console.log('group bbox', bbox.bounds);
+     
     }
 
 

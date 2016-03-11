@@ -189,9 +189,7 @@ define([
 
 
 			render: function() {
-				if (this.renderQueue.length > 1) {
-					console.log('starting rendering root');
-				}
+				
 				for (var i = 0; i < this.renderQueue.length; i++) {
 					this.renderQueue[i].render();
 				}

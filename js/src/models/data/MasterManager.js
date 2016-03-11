@@ -866,7 +866,7 @@ define([
 						}
 						break;
 					default:
-						console.log('moved shape is sibing', movedShape.isSibling(relativeShape));
+						//console.log('moved shape is sibing', movedShape.isSibling(relativeShape));
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
 							if (parent.get('name') === 'group') {
@@ -889,7 +889,7 @@ define([
 
 						}
 
-						console.log('mode', mode);
+						//console.log('mode', mode);
 						switch (mode) {
 							case 'after':
 								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);

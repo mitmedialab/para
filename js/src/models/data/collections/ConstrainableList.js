@@ -14,7 +14,7 @@ define([
 
   ],
 
-  function(_, ListNode, PFloat, PBool, paper, PConstraint, TrigFunc, Instance) {
+  function(_, ListNode, PVal, PBool, paper, PConstraint, TrigFunc, Instance) {
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'list',
@@ -97,6 +97,7 @@ define([
                     value[c] = cValue;
                   }
                 } else {
+
                   value[c] = {};
                   for (var v in constraints[c]) {
                     if (constraints[c].hasOwnProperty(v)) {

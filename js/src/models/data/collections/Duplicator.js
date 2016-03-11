@@ -414,6 +414,7 @@ define([
 
 
             setCount: function(count) {
+                
                 this.get('count').setValue(count);
                 var data = this.updateCountStandard();
 
