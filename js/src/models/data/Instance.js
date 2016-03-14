@@ -400,7 +400,7 @@ define([
 		 * TODO: add in checks to prevent diamond inheritance
 		 */
 		create: function(noInheritor) {
-			
+
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
@@ -530,6 +530,7 @@ define([
 			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 
 			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
+
 			bbox.data.instance = this;
 			this.set('bbox', bbox);
 			var targetLayer = paper.project.layers.filter(function(layer) {
@@ -593,9 +594,11 @@ define([
 			if (this.get('rendered')) {
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
+				var selection_clone = this.get('selection_clone');
 				var inverted = this._matrix.inverted();
 				geom.transform(inverted);
 				bbox.transform(inverted);
+				selection_clone.transform(inverted);
 				this.set('rendered', false);
 			}
 
@@ -1278,11 +1281,14 @@ define([
 
 
 		childModified: function(child) {
-			this.renderQueue.push(child);
+			if (!_.contains(this.renderQueue, child)) {
+				this.renderQueue.push(child);
+			}
+
 
 		},
 
-		clearRenderQueue: function() {	
+		clearRenderQueue: function() {
 			this.reset();
 			this.render();
 		},
@@ -1293,16 +1299,21 @@ define([
 		render: function() {
 
 			if (!this.get('rendered')) {
-
-				this.transformSelf();
+				
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
-				bbox.position = geom.postion;
+				var selection_clone = this.get('selection_clone');
+				bbox.position = geom.position;
+				
+				selection_clone.position = geom.position
 				this.transformSelf();
 				geom.transform(this._matrix);
+				selection_clone.transform(this._matrix);
 				bbox.transform(this._matrix);
+				
+				//console.log('selection_clone pre transform', selection_clone.position);
+				//console.log('selection_clone post transform', selection_clone.position);
 
-				this.centerUI.position = this.center;
 				this.updateScreenBounds(geom);
 
 				this.renderStyle(geom);
@@ -1349,10 +1360,7 @@ define([
 
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
-			var zIndex = this.get('zIndex').getValue();
-			if (geom.index != zIndex) {
-				geom.parent.insertChild(zIndex, geom);
-			}
+
 		},
 
 
@@ -1362,14 +1370,14 @@ define([
 			var constraint_selected = this.get('constraintSelected').getValue();
 			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
-			/*if (constraint_selected) {
+			if (constraint_selected) {
 				selection_clone.visible = true;
 				selection_clone.strokeColor = this.get(constraint_selected + '_color');
 
 			} else {
 				selection_clone.visible = false;
 
-			}*/
+			}
 
 			if (selected) {
 				geom.selectedColor = this.getSelectionColor();
