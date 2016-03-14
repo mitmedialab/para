@@ -52,6 +52,9 @@ define([
       toolCollection = new Backbone.Collection({});
       this.set('tool_collection', toolCollection);
       this.listenTo(toolCollection, 'geometryAdded', this.geometryAdded);
+      this.listenTo(toolCollection,'modificationEnded',function() {
+        self.trigger('modificationEnded');
+      });
       this.listenTo(toolCollection, 'compileRequest', function() {
         self.trigger('compileRequest');
       });
@@ -193,6 +196,15 @@ define([
 
     createParams: function() {
       this.trigger('addObject', 'param');
+    },
+
+    undo: function() {
+      this.trigger('undo');
+    },
+
+
+    redo: function() {
+      this.trigger('redo');
     },
 
     modifyStyle: function(style_data) {

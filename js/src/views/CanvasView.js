@@ -29,6 +29,8 @@ define([
   var rightArrow = 39; // right arrow
   var leftArrow = 37; // left arrow
   var pan, alt, cmd, shift = false;
+  var undo_key = 90;
+  var redo_key = 86;
 
   // explore ensuring key combinations (e.g. shift-click selects but shift advances)
   var advanceKey = 78; // n EXPERIMENTAL
@@ -182,6 +184,12 @@ define([
         this.model.save();
       }*/
 
+      if(event.keyCode == undo_key){
+        this.model.undo();
+      }
+      if(event.keyCode == redo_key){
+        this.model.redo();
+      }
       if (event.keyCode == functionKey) {
         //this.model.createFunction();
       }

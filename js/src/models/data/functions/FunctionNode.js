@@ -32,32 +32,7 @@ define([
 				Instance.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
 				this.get('translationDelta').setNull(false);
-				/*var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 100));
-				var path = new paper.Path.Rectangle(rectangle);
-				path.strokeColor = this.get('primary_selection_color');
-				path.fillColor = 'black';
-				path.name = 'box';
-				var eye = new paper.Group();
-				eye.importSVG(svgstring);
-				eye.position.x = 15;
-				eye.position.y = 90;
-				eye.name = 'eye';
-				this.nameText = new paper.PointText({
-					point: new paper.Point(5, 13),
-					content: 'foo',
-					justification: 'left',
-					fontSize: 12,
-					fontFamily: 'Source Sans Pro',
-					fillColor: this.get('primary_selection_color')
-				});*/
-
-				/*var ui = new paper.Group();
-				ui.addChild(path);
-				ui.addChild(eye);
-				ui.addChild(this.nameText);
-				ui.visible = false;
-				this.nameText.data.instance = ui.data.instance = path.data.instance = eye.data.instance = this;
-				this.set('ui', ui);*/
+			
 				this.lists = [];
 				this.selected = [];
 				this.functions = [];

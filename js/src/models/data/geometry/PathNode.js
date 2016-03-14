@@ -63,30 +63,24 @@ define([
     },
 
     toJSON: function() {
-      /*if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.inverseTransformRecurse([]);
-      } else {
-        this.inverseTransformSelf();
-      }*/
       var data = GeometryNode.prototype.toJSON.call(this);
-      this.get('geom').data.instance = null;
+    
+        this.get('geom').data.instance = null;
 
-      data.geom = this.get('geom').exportJSON(false);
-      this.get('geom').data.instance = this;
-    /* if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.transformRecurse([]);
-      } else {
-        this.transformSelf();
-      }*/
+        data.geom = this.get('geom').exportJSON(false);
+
+        this.get('geom').data.instance = this;
+      
+
       return data;
 
     },
 
-    parseJSON: function(data,manager) {
+    parseJSON: function(data, manager) {
       var geom = new paper.Path();
       geom.importJSON(data.geom);
       this.normalizeGeometry(geom, new paper.Matrix());
-      GeometryNode.prototype.parseJSON.call(this, data,manager);
+      GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
 
 
@@ -179,7 +173,7 @@ define([
       this.set('width', path.bounds.width);
       this.set('height', path.bounds.height);
 
-      
+
       path.visible = false;
       path.selected = false;
       this.changeGeomInheritance(path);
@@ -188,9 +182,9 @@ define([
       return data;
     },
 
-    changeGeomInheritance:function(path){
-      GeometryNode.prototype.changeGeomInheritance.call(this,path);
-      this.generatePoints(path,true);
+    changeGeomInheritance: function(path) {
+      GeometryNode.prototype.changeGeomInheritance.call(this, path);
+      this.generatePoints(path, true);
 
     },
 
@@ -320,7 +314,7 @@ define([
             selectionS.handleOut.y += data.translationDelta.y;
             break;
         }
-        this.trigger('modified',this);
+        this.trigger('modified', this);
       }
 
 
@@ -413,7 +407,7 @@ define([
       }
 
       geom.visible = true;
-        this.trigger('modified',this);
+      this.trigger('modified', this);
 
     },
 

@@ -116,6 +116,7 @@ define([
 			// EXPERIMENTAL
 			selection_palette: ['#A5FF00', '#0D7C1F', '#FF4D4D', '#33D6FF', '#E698D2'],
 			sel_palette_index: 0,
+			isChanging: false
 
 		}),
 
@@ -251,6 +252,8 @@ define([
 			})[0];
 			targetLayer.addChild(this.centerUI);
 			this.renderQueue = [];
+			this.properties = {};
+			this.previousProperties = {};
 
 		},
 
@@ -582,6 +585,8 @@ define([
 			}
 
 			this.setPathAltered();
+			this.toJSON();
+			this.toJSON()
 
 		},
 
@@ -781,12 +786,14 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				data.children.push(this.children[i].toJSON());
 			}
-
+			this.previousProperties = this.properties;
+			this.properties = data;
 			return data;
 
 		},
 
 		parseJSON: function(data, manager) {
+			console.log('parsing json',data);
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
@@ -798,7 +805,6 @@ define([
 			this.set('id', data.id);
 			this.set('visible', data.visible);
 			this.set('open', data.open);
-			var children = data.children;
 		},
 
 		parseInheritorJSON: function(data, manager) {
@@ -860,6 +866,11 @@ define([
 		 * data passed in
 		 */
 		setValue: function(data) {
+			if(!this.get('isChanging')){
+				this.set('isChanging',true)
+				this.trigger('valueSet',this)
+			}
+			
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
 				//var pdelta = this.nodeParent.
@@ -1299,21 +1310,17 @@ define([
 		render: function() {
 
 			if (!this.get('rendered')) {
-				
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
 				var selection_clone = this.get('selection_clone');
 				bbox.position = geom.position;
 				
-				selection_clone.position = geom.position
+				selection_clone.position = geom.position;
 				this.transformSelf();
 				geom.transform(this._matrix);
 				selection_clone.transform(this._matrix);
 				bbox.transform(this._matrix);
 				
-				//console.log('selection_clone pre transform', selection_clone.position);
-				//console.log('selection_clone post transform', selection_clone.position);
-
 				this.updateScreenBounds(geom);
 
 				this.renderStyle(geom);

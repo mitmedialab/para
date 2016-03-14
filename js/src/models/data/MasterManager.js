@@ -7,6 +7,7 @@ define([
 	'underscore',
 	'paper',
 	'backbone',
+	'backbone.undo',
 	'models/data/Instance',
 	'models/data/geometry/Group',
 	'models/data/geometry/PathNode',
@@ -26,19 +27,49 @@ define([
 	'views/MapView',
 	'views/SaveExportView',
 	'backbone.undo',
-	'utils/analytics'
+	'utils/analytics',
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, UndoManager, analytics) {
-	//datastructure to store path functions
-	//TODO: make linked list eventually
+], function(_, paper, Backbone, BackboneUndo, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, UndoManager, analytics) {
+	var beforeCache;
+	var type = {
+
+		"on": function(model, isChanging, options) {
+
+			if (isChanging) {
+				console.log('is changing is true');
+				beforeCache = model.toJSON();
+			} else {
+				console.log('is changing is false',model.get('id'));
+				return {
+					"object": model, // The plane's model
+					"before": beforeCache, // Its data from before the resize / move
+					"after": model.toJSON() // Its current data / after the action
+				};
+			}
+
+		},
+		"undo": function(model, before, after, options) {
+			model.reset();
+			model.parseJSON(before);
+			model.render();
+		},
+
+		"redo": function(model, before, after, options) {
+			
+			model.parseJSON(after);
+			model.trigger('modified');
+		}
+
+	};
+
 	//debug vars for testing framerate
 	var fps = 0,
 		now, lastUpdate = (new Date()) * 1;
 	var fpsFilter = 10;
 
-
+	var undoManager;
 	//stores para lists
 	var eventType = 'state_manager';
 	var constraints = [];
@@ -61,7 +92,11 @@ define([
 
 		initialize: function() {
 			//setup root node
+			//
+
 			rootNode = new FunctionNode();
+
+
 			rootNode.open();
 			selected = rootNode.selected;
 			rootNode.set('name', 'root');
@@ -100,12 +135,47 @@ define([
 
 			paper.view.onFrame = function() {
 				self.clearRenderQueue();
-			}
+			};
 
-			var items = paper.project.getItems({
-				class: paper.Path
+
+
+			undoManager = new Backbone.UndoManager;
+			undoManager.removeUndoType("change");
+			var before;
+			undoManager.addUndoType("valueSet:isChanging", {
+				"on": function (model, isChanging, options) {
+					if (model.get('isChanging')){
+						before = model.toJSON();
+					} else {
+						return {
+							"object": model,
+							"before": before,
+							"after": model.toJSON()
+						};
+					}
+				},
+				"undo": function (model, before, after, options) {
+					model.parseJSON(before);
+				},
+				"redo": function (model, before, after, options) {
+					model.parseJSON(after);
+				}
 			});
-			console.log(items);
+
+
+			undoManager.startTracking();
+
+
+		},
+
+		undo: function(event) {
+			console.log('undo', undoManager.isAvailable("undo"), undoManager);
+			undoManager.undo();
+		},
+
+		redo: function() {
+			console.log('redo');
+			undoManager.redo();
 		},
 
 		//debgging function
@@ -259,7 +329,7 @@ define([
 			analytics.log(eventType, {
 				type: eventType,
 				id: 'export',
-				action: 'exportJSON'
+				action: 'Ï'
 			});
 			var geometry_json = rootNode.toJSON();
 			var constraint_json = [];
@@ -458,12 +528,13 @@ define([
 				id: 'add',
 				action: 'add' + object
 			});
+			var added;
 			switch (object) {
 				case 'geometry':
-					this.addShape(geom);
+					added = this.addShape(geom);
 					break;
 				case 'instance':
-					this.addCopy(selected);
+					added = this.addCopy(selected);
 					break;
 				case 'list':
 					var list = collectionManager.addList(selected);
@@ -472,19 +543,23 @@ define([
 						layersView.addList(list.toJSON());
 						this.selectShape(list);
 						this.addListener(list);
+						added = list;
 					}
 					break;
 				case 'group':
-					this.addGroup(selected);
+					added = this.addGroup(selected);
 					break;
 				case 'duplicator':
 					if (selected[0]) {
-						this.initializeDuplicator(selected[0]);
+						added = this.initializeDuplicator(selected[0]);
 
 					}
 					break;
 			}
-			this.trigger('modified');
+			if (added) {
+				undoManager.register(added);
+				this.trigger('modified');
+			}
 
 		},
 
@@ -499,7 +574,7 @@ define([
 				switch (selected[i].get('type')) {
 					case 'geometry':
 						if (selected[i].get('name') == 'group') {
-						
+
 
 						}
 						break;
@@ -680,6 +755,7 @@ define([
 			if (!noSelect) {
 				this.selectShape(shape);
 			}
+			return shape;
 
 		},
 
@@ -724,18 +800,20 @@ define([
 				}
 
 			}
+			return selected;
 		},
 
 		addGroup: function(selected, group) {
 
 			group = collectionManager.addGroup(selected, group);
 			currentNode.addChildNode(group);
+
 			if (selected) {
 
 				for (var i = 0; i < selected.length; i++) {
 					layersView.removeShape(selected[i].get('id'));
 				}
-			} 
+			}
 
 			layersView.addShape(group.toJSON());
 			this.deselectAllShapes();
@@ -749,6 +827,7 @@ define([
 			currentNode.addChildNode(duplicator);
 			collectionManager.addDuplicator(null, duplicator);
 			layersView.addShape(duplicator.toJSON());
+			return duplicator;
 		},
 
 		initializeDuplicator: function(object, open) {
@@ -781,7 +860,7 @@ define([
 					collectionManager.removeObjectFromLists(data.toRemove[i]);
 				}
 			}
-			
+
 			layersView.removeChildren(duplicator.get('id'));
 			for (var k = 0; k < duplicator.members.length; k++) {
 				layersView.addShape(duplicator.members[k].toJSON(), duplicator.get('id'));
@@ -1078,6 +1157,17 @@ define([
 			} else {
 				shape.show();
 				this.selectShape(shape);
+			}
+		},
+
+		modificationEnded: function(){
+			console.log('modificationEnded');
+			if (selected.length > 0) {
+				for (var i = 0; i < selected.length; i++) {
+					var instance = selected[i];
+					instance.set('isChanging', false);
+					instance.trigger('valueSet',instance);
+				}
 			}
 		},
 

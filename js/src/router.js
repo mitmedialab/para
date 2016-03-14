@@ -23,10 +23,10 @@ define([
     var app_router = new AppRouter();
 
     app_router.on('route:defaultAction', function(actions) {
-    
+
       var canvas = document.getElementById('canvas');
       paper.setup(canvas);
-      
+
       var geometry_layer = new paper.Layer();
       geometry_layer.name = 'geometry_layer';
       var isolation_layer = new paper.Layer();
@@ -52,7 +52,11 @@ define([
       /* event listener registers */
 
 
-      masterManager.listenTo(toolManager, 'compileRequest', masterManager.compile);
+      masterManager.listenTo(toolManager, 'undo', masterManager.undo);
+      masterManager.listenTo(toolManager, 'redo', masterManager.redo);
+      masterManager.listenTo(toolManager, 'modificationEnded', masterManager.modificationEnded);
+
+
       masterManager.listenTo(toolManager, 'removeShape', masterManager.removeObject);
       masterManager.listenTo(toolManager, 'addObject', masterManager.addObject);
 
@@ -78,7 +82,7 @@ define([
         el: '#tool-elements',
         model: toolManager
       });
-     
+
 
       var propertyView = new PropertyView({
         el: '#prop-menu',

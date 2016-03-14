@@ -57,6 +57,13 @@ define([
       this.get('strokeWidth').setValue(1);
       this.centerUI.fillColor = 'blue';
       this.center = geom.position;
+      var ui_group = new paper.Group();
+      var targetLayer = paper.project.layers.filter(function(layer) {
+        return layer.name === 'ui_layer';
+      })[0];
+      targetLayer.addChild(ui_group);
+      this.set('bbox', ui_group);
+      this.createBBox();
     },
 
 
@@ -142,13 +149,14 @@ define([
         this.members.splice(index, 0, clone);
         this.insertChild(index, clone);
         this.get('geom').insertChild(index, clone.get('geom'));
-
+        this.get('bbox').insertChild(index, clone.get('bbox'));
         clone.get('zIndex').setValue(index);
 
       } else {
         this.members.push(clone);
         this.addChildNode(clone);
         this.get('geom').addChild(clone.get('geom'));
+        this.get('bbox').addChild(clone.get('bbox'));
         clone.get('zIndex').setValue(this.members.length - 1);
 
       }
@@ -164,6 +172,7 @@ define([
       this.createBBox();
 
       this.createSelectionClone();
+      this.trigger('modified', this);
     },
 
     removeMember: function(data) {
@@ -188,6 +197,8 @@ define([
       this.center = this.get('geom').position;
       this.createBBox();
       this.createSelectionClone();
+      this.trigger('modified', this);
+
       return member;
 
     },
@@ -330,24 +341,50 @@ define([
     },
 
 
+
     render: function() {
 
       if (!this.get('rendered')) {
-        console.log('render geom position =', this.get('geom').position, "bbox=", this.get('bbox').position, "sclone=", this.get('selection_clone').position);
-        console.log( this.renderQueue);
+        console.log(this.renderQueue);
         for (var i = 0; i < this.renderQueue.length; i++) {
           this.renderQueue[i].render();
         }
-        this.renderQueue = [];
-
+        this.createBBox();
         Instance.prototype.render.apply(this, arguments);
-        console.log('after render geom position =', this.get('geom').position, "bbox=", this.get('bbox').position, "sclone=", this.get('selection_clone').position);
 
       }
     },
 
     renderStyle: function() {
 
+    },
+
+    renderSelection: function() {
+      var selected = this.get('selected').getValue();
+      var constraint_selected = this.get('constraintSelected').getValue();
+      var selection_clone = this.get('selection_clone');
+      var bbox = this.get('bbox').children.filter(function(child) {
+        return child.name == 'bbox';
+      })[0];
+      if (constraint_selected) {
+        selection_clone.visible = true;
+        selection_clone.strokeColor = this.get(constraint_selected + '_color');
+
+      } else {
+        selection_clone.visible = false;
+
+      }
+
+      if (selected) {
+
+
+        bbox.selectedColor = this.getSelectionColor();
+        bbox.selected = (constraint_selected) ? false : true;
+        bbox.visible = (constraint_selected) ? false : true;
+      } else {
+        bbox.selected = false;
+        bbox.visible = false;
+      }
     },
 
     inverseTransformPoint: function(point) {
@@ -408,6 +445,34 @@ define([
       this.set('selection_clone', selection_clone);
     },
 
+
+    createBBox: function() {
+      var ui_group = this.get('bbox');
+      var bboxes = ui_group.children.filter(function(child) {
+        return child.name == 'bbox';
+      });
+      var geom = this.get('geom');
+      var size = new paper.Size(geom.bounds.width, geom.bounds.height);
+      var bbox;
+      if (size.isZero()) {
+        size = new paper.Size(1, 1);
+      }
+      if (bboxes.length < 1) {
+
+
+        bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
+
+        bbox.data.instance = this;
+        bbox.name = 'bbox';
+        ui_group.addChild(bbox);
+      } else {
+        bbox = bboxes[0];
+        var bounds = bbox.bounds;
+        bbox.scale(size.width / bounds.width, size.height / bounds.height);
+      }
+
+
+    },
 
 
   });

@@ -56,6 +56,8 @@ define([
 				this.setNull(false);
 			},
 
+			
+
 			/* isConstrained
 			 * returns object with booleans for each property based on constraint status
 			 */

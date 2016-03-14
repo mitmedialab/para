@@ -16,6 +16,7 @@ define([
   var handle;
   var segmentMod = false;
   var copyReset = true;
+  var modified = false;
   //keeps track of when a copy was released to set correct position data for the new instance
   var copyInitialized = false;
   var startPoint, startDist, startWidth, startHeight = null;
@@ -167,6 +168,7 @@ define([
     //mouse drag event
     mouseDrag: function(event) {
       if (literal && literal.data.instance) {
+        modified = true;
         switch (this.get('mode')) {
           case 'select':
             this.selectDrag(event);
@@ -290,7 +292,10 @@ define([
 
     //mouse up event
     mouseUp: function(event) {
-
+      if(modified){
+        this.trigger('modificationEnded');
+      }
+      
       if (copyInitialized) {
         copyInitialized = false;
       }
@@ -300,6 +305,7 @@ define([
       handle = null;
       copyReset = true;
 
+      modified = false;
     },
 
 
