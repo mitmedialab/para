@@ -76,11 +76,34 @@ define([
     },
 
     parseJSON: function(data, manager) {
-      for (var i = 0; i < data.children.length; i++) {
-        if (this.children[i]) {
-          this.children[i].parseJSON(data.children[i]);
+      var memberClone = this.members.slice(0, this.members.length);
+      console.log('members starting',memberClone);
+      console.log('data starting',data.children);
+
+      for (var i = 0; i < this.children.length; i++) {
+        var target_id = this.children[i].get('id');
+        var target_data = _.find(data.children, function(item) {
+          return item.id == target_id;
+        });
+        //if the child currently exists in the group
+        if (target_data) {
+          this.children[i].parseJSON(target_data);
+          memberClone = _.filter(memberClone, function(child) {
+            return child.get('id') != target_id;
+          })
+        }
+        //if the child does not currently exist
+        else {
+
         }
       }
+      console.log('members not matched',memberClone);
+
+      for (var j = 0; j < memberClone.length; j++) {
+        var removed = this.removeMember(memberClone[i]);
+        removed.deleteSelf();
+      }
+
       GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
 

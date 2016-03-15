@@ -710,7 +710,9 @@ define([
 
 		addShape: function(shape, noSelect) {
 			if (!shape.nodeParent) {
-				currentNode.addChildNode(shape);
+				currentNode.addChildNode(shape,!stateStored);
+				this.addToUndoStack([currentNode]);
+				this.modificationEnded([currentNode]);
 			}
 			//collectionManager.addToOpenLists(shape);
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
@@ -1124,11 +1126,18 @@ define([
 			}
 		},
 
-		modificationEnded: function() {
+		modificationEnded: function(objects) {
 			console.log('modificationEnded');
-			if (selected.length > 0) {
-				for (var i = 0; i < selected.length; i++) {
-					var instance = selected[i];
+			var targets;
+			if(objects){
+				targets = objects;
+			}
+			else{
+				targets = selected;
+			}
+			if (targets.length > 0) {
+				for (var i = 0; i <targets.length; i++) {
+					var instance = targets[i];
 					instance.setValueEnded();
 				}
 			}

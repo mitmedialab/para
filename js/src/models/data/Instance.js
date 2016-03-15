@@ -419,7 +419,14 @@ define([
 			return instance;
 		},
 
-		addChildNode: function(node) {
+		addChildNode: function(node, registerUndo) {
+			if (registerUndo) {
+				if (!this.stateStored) {
+					this.previousStates.push(this.toJSON());
+					this.stateStored = true;
+					console.log('instance stored state', this.previousStates);
+				}
+			}
 
 			this.insertChild(this.children.length - 1, node);
 		},
@@ -767,13 +774,11 @@ define([
 			data._matrix = this._matrix.values;
 			this.previousProperties = this.properties;
 			this.properties = data;
-			console.log('to json for', this.get('name'), data);
 			return data;
 
 		},
 
 		parseJSON: function(data, manager) {
-			console.log('parsing json for', this.get('name'), data);
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
@@ -786,7 +791,6 @@ define([
 			this.set('visible', data.visible);
 			this.set('open', data.open);
 			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
-			console.log('matrix data', data._matrix, 'matrix', this._matrix);
 
 		},
 
@@ -848,6 +852,7 @@ define([
 		//undo to last state
 		undo: function() {
 			if (this.previousStates.length > 0) {
+				console.log('calling undo on',this.get('name'));
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
@@ -859,6 +864,7 @@ define([
 
 		redo: function() {
 			if (this.futureStates.length > 0) {
+				console.log('calling redo on',this.get('name'));
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
