@@ -750,8 +750,6 @@ define([
 
 
 		toJSON: function() {
-
-
 			var data = {};
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
@@ -767,9 +765,6 @@ define([
 			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
 			data._matrix = this._matrix.values;
-			for (var i = 0; i < this.children.length; i++) {
-				data.children.push(this.children[i].toJSON());
-			}
 			this.previousProperties = this.properties;
 			this.properties = data;
 			console.log('to json for', this.get('name'), data);

@@ -292,7 +292,15 @@ define([
     /* modifyPoints
      * called when segment in geometry is modified
      */
-    modifyPoints: function(data, mode, modifier, exclude) {
+    modifyPoints: function(data, mode, modifier, exclude, registerUndo) {
+      
+    if (registerUndo) {
+        if (!this.stateStored) {
+          this.previousStates.push(this.toJSON());
+          this.stateStored = true;
+          console.log('instance stored state', this.previousStates);
+        }
+      }
       var proto_node = this.get('proto_node');
 
 

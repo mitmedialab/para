@@ -75,10 +75,10 @@ define([
       return data;
     },
 
-     parseJSON: function(data, manager) {
-     for (var i = 0; i < data.children.length; i++) {
-        if(this.children[i]){
-         this.children[i].parseJSON(data.children[i]);
+    parseJSON: function(data, manager) {
+      for (var i = 0; i < data.children.length; i++) {
+        if (this.children[i]) {
+          this.children[i].parseJSON(data.children[i]);
         }
       }
       Instance.prototype.parseJSON.call(this, data, manager);
@@ -217,7 +217,7 @@ define([
       return members;
     },
 
-    setValue: function(data,registerUndo) {
+    setValue: function(data, registerUndo) {
       if (data.fillColor || data.strokeColor || data.strokeWidth) {
         var style_data = {};
         if (data.fillColor && !data.fillColor.noColor) {
@@ -230,11 +230,11 @@ define([
           style_data.strokeWidth = data.strokeWidth;
         }
         for (var i = 0; i < this.members.length; i++) {
-          this.members[i].setValue(style_data,registerUndo);
+          this.members[i].setValue(style_data, registerUndo);
         }
 
       }
-      Instance.prototype.setValue.call(this, data,registerUndo);
+      Instance.prototype.setValue.call(this, data, registerUndo);
     },
 
     //returns all non-group members

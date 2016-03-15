@@ -113,7 +113,7 @@ define([
 			if (!stateStored) {
 				undoStack.push(selected.slice(0, selected.length));
 				stateStored = true;
-				console.log('succesfully added to undo stack',undoStack)
+				console.log('succesfully added to undo stack',undoStack);
 
 			}
 		},
@@ -1165,8 +1165,9 @@ define([
 			if (instances.length > 0) {
 				for (var i = 0; i < instances.length; i++) {
 					var instance = instances[i];
-					instance.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'));
+					instance.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'), null, !stateStored);
 				}
+				this.addToUndoStack(selected);
 			}
 		},
 
