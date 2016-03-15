@@ -13,6 +13,7 @@ define([
 ], function($, _, Backbone, Handlebars, IrisColorPicker, paper, ColorUtils) {
 
   var param_template, param_source;
+  var stateSet = false;
   var constraintTypeMap = {};
   constraintTypeMap['more-box'] = 'more';
   constraintTypeMap['more'] = 'more';
@@ -81,6 +82,7 @@ define([
       'click #no-color': 'clearColor',
       'click .behaviorRemove': 'removeBehavior',
       'click #scaffold': 'setScaffold',
+      'mouseup' : 'modificationEnded'
       // testing
     },
 
@@ -134,6 +136,8 @@ define([
       data[(id + "_color")] = ColorUtils.hexToRGB(color);
       this.model.modifyStyle(data);
 
+      stateSet = true;
+
     },
 
     colorChange: function(event, ui) {
@@ -149,7 +153,6 @@ define([
         this.model.modifyStyle(data);
 
 
-
       } else {
         $('#strokeColorBlock').removeClass('remove-color');
         $('#strokeColorBlock').css('background-color', color);
@@ -161,6 +164,7 @@ define([
 
       }
 
+      stateSet = true;
 
     },
 
@@ -270,6 +274,8 @@ define([
         }
       };
       this.model.modifyStyle(data);
+
+      stateSet = true;
     },
 
     // TESTING
@@ -283,6 +289,7 @@ define([
       var element = $(event.target);
       var elementId = element.attr('id');
       this.model.setConstraintType(constraintTypeMap[elementId]);
+
       // this.model.passEvent(tool, 'setConstraintType');
     },
 
@@ -307,6 +314,8 @@ define([
           property_name: property_name
         };
         this.model.geometryParamsModified(data);
+
+        stateSet = true;
       }
     },
 
@@ -375,13 +384,19 @@ define([
       });
 
 
-
     },
 
     clearParameters: function() {
       this.currentPaths = [];
       $('#parameters').empty();
 
+    },
+
+    modificationEnded: function(){
+      if(stateSet){
+        this.model.modificationEnded();
+        stateSet = false;
+      }
     }
 
   });

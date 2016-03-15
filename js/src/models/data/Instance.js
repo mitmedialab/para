@@ -252,9 +252,11 @@ define([
 			})[0];
 			targetLayer.addChild(this.centerUI);
 			this.renderQueue = [];
-			this.properties = {};
-			this.previousProperties = {};
 
+			//undo redo variables
+			this.previousStates = [];
+			this.futureStates = [];
+			this.stateStored = false;
 		},
 
 
@@ -388,6 +390,9 @@ define([
 			return this;
 		},
 
+		 getInstanceMembers: function(){
+		 	return [this];
+		 },
 
 		/*placeholder functions to prevent errors */
 		modifyPoints: function(data, mode, modifier, exclude) {
@@ -585,9 +590,6 @@ define([
 			}
 
 			this.setPathAltered();
-			this.toJSON();
-			this.toJSON()
-
 		},
 
 		setPathAltered: function() {
@@ -861,19 +863,44 @@ define([
 			PConstraint.prototype.modified.apply(this, arguments);
 
 		},
+
+		//undo to last state
+		undo: function() {
+			if (this.previousStates.length > 0) {
+				var state = this.previousStates.pop();
+				var currentState = this.toJSON();
+				this.futureStates.push(currentState);
+				this.parseJSON(state);
+				this.trigger('modified', this)
+
+			}
+		},
+
+		redo: function() {
+			if (this.futureStates.length > 0) {
+				var state = this.futureStates.pop();
+				var currentState = this.toJSON();
+				this.previousStates.push(currentState);
+				this.parseJSON(state);
+				this.trigger('modified', this)
+			}
+
+		},
 		/*setValue
 		 * modifies the properties of this instance in accordance with the
 		 * data passed in
+		 * @data: data that contains updated values
+		 * @registerUndo: boolean that determines if setting is stored as an undo.
 		 */
-		setValue: function(data) {
-			if(!this.get('isChanging')){
-				this.set('isChanging',true)
-				this.trigger('valueSet',this)
+		setValue: function(data, registerUndo) {
+			if (registerUndo) {
+				if (!this.stateStored) {
+					this.previousStates.push(this.toJSON());
+					this.stateStored = true;
+				}
 			}
-			
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
-				//var pdelta = this.nodeParent.
 				if (this.nodeParent.get('name') != 'root') {
 					var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
 					data.translationDelta.x = ndelta.x;
@@ -912,6 +939,16 @@ define([
 			}
 		},
 
+
+		/*setValueEnded
+		 * called when a manual adujstment is ended
+		 * such as on a mouse up event
+		 * sets stateStored to false, enabling the next
+		 * state of an object to be saved
+		 */
+		setValueEnded: function() {
+			this.stateStored = false;
+		},
 
 
 		getLiteralSubprops: function(key, subprop) {
@@ -1314,13 +1351,13 @@ define([
 				var bbox = this.get('bbox');
 				var selection_clone = this.get('selection_clone');
 				bbox.position = geom.position;
-				
+
 				selection_clone.position = geom.position;
 				this.transformSelf();
 				geom.transform(this._matrix);
 				selection_clone.transform(this._matrix);
 				bbox.transform(this._matrix);
-				
+
 				this.updateScreenBounds(geom);
 
 				this.renderStyle(geom);

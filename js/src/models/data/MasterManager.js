@@ -7,12 +7,10 @@ define([
 	'underscore',
 	'paper',
 	'backbone',
-	'backbone.undo',
 	'models/data/Instance',
 	'models/data/geometry/Group',
 	'models/data/geometry/PathNode',
 	'models/data/geometry/SVGNode',
-
 	'models/data/geometry/RectNode',
 	'models/data/geometry/EllipseNode',
 	'models/data/geometry/PolygonNode',
@@ -26,44 +24,11 @@ define([
 	'views/CollectionView',
 	'views/MapView',
 	'views/SaveExportView',
-	'backbone.undo',
 	'utils/analytics',
 
 
 
-], function(_, paper, Backbone, BackboneUndo, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, UndoManager, analytics) {
-	var beforeCache;
-	var type = {
-
-		"on": function(model, isChanging, options) {
-
-			if (isChanging) {
-				console.log('is changing is true');
-				beforeCache = model.toJSON();
-			} else {
-				console.log('is changing is false',model.get('id'));
-				return {
-					"object": model, // The plane's model
-					"before": beforeCache, // Its data from before the resize / move
-					"after": model.toJSON() // Its current data / after the action
-				};
-			}
-
-		},
-		"undo": function(model, before, after, options) {
-			model.reset();
-			model.parseJSON(before);
-			model.render();
-		},
-
-		"redo": function(model, before, after, options) {
-			
-			model.parseJSON(after);
-			model.trigger('modified');
-		}
-
-	};
-
+], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, analytics) {
 	//debug vars for testing framerate
 	var fps = 0,
 		now, lastUpdate = (new Date()) * 1;
@@ -86,6 +51,10 @@ define([
 		'fill': 'fillColor',
 		'stroke': 'strokeColor'
 	};
+	var undoStack = [];
+	var redoStack = [];
+	var stateStored = false;
+
 
 	var MasterManager = Backbone.Model.extend({
 		defaults: {},
@@ -138,44 +107,40 @@ define([
 			};
 
 
-
-			undoManager = new Backbone.UndoManager;
-			undoManager.removeUndoType("change");
-			var before;
-			undoManager.addUndoType("valueSet:isChanging", {
-				"on": function (model, isChanging, options) {
-					if (model.get('isChanging')){
-						before = model.toJSON();
-					} else {
-						return {
-							"object": model,
-							"before": before,
-							"after": model.toJSON()
-						};
-					}
-				},
-				"undo": function (model, before, after, options) {
-					model.parseJSON(before);
-				},
-				"redo": function (model, before, after, options) {
-					model.parseJSON(after);
-				}
-			});
-
-
-			undoManager.startTracking();
-
-
+		},
+		
+		addToUndoStack:function(selected){
+			if (!stateStored) {
+				undoStack.push(selected.slice(0, selected.length));
+				stateStored = true;
+			}
 		},
 
 		undo: function(event) {
-			console.log('undo', undoManager.isAvailable("undo"), undoManager);
-			undoManager.undo();
+			console.log('undo', undoStack);
+			if (undoStack.length > 0) {
+				var toUndo = undoStack.pop();
+				toUndo.forEach(function(item) {
+					console.log('item x,y',item.get('translationDelta').getValue());
+					item.undo();
+					console.log('item x,y',item.get('translationDelta').getValue());
+
+				});
+				redoStack.push(toUndo);
+			}
+
+
 		},
 
 		redo: function() {
-			console.log('redo');
-			undoManager.redo();
+			console.log('redo', redoStack);
+			if (redoStack.length > 0) {
+				var toRedo = redoStack.pop();
+				toRedo.forEach(function(item) {
+					item.redo();
+				});
+				undoStack.push(toRedo);
+			}
 		},
 
 		//debgging function
@@ -556,10 +521,9 @@ define([
 					}
 					break;
 			}
-			if (added) {
-				undoManager.register(added);
-				this.trigger('modified');
-			}
+
+
+			this.trigger('modified');
 
 		},
 
@@ -1160,15 +1124,15 @@ define([
 			}
 		},
 
-		modificationEnded: function(){
+		modificationEnded: function() {
 			console.log('modificationEnded');
 			if (selected.length > 0) {
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					instance.set('isChanging', false);
-					instance.trigger('valueSet',instance);
+					instance.setValueEnded();
 				}
 			}
+			stateStored = false;
 		},
 
 		modifyGeometry: function(data, modifiers) {
@@ -1178,10 +1142,13 @@ define([
 				action: 'modify geometry'
 			});
 			if (selected.length > 0) {
+
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					instance.setValue(data);
+					instance.setValue(data,!stateStored);
 				}
+				this.addToUndoStack(selected);
+
 			}
 		},
 
@@ -1223,10 +1190,13 @@ define([
 				action: 'modify style'
 			});
 			if (selected.length > 0) {
+				var non_group_selected= [];
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					instance.setValue(style_data);
+					instance.setValue(style_data,!stateStored);
+					non_group_selected.push.apply(non_group_selected,instance.getInstanceMembers());
 				}
+				this.addToUndoStack(non_group_selected);
 			}
 		},
 

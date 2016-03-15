@@ -64,22 +64,19 @@ define([
 
     toJSON: function() {
       var data = GeometryNode.prototype.toJSON.call(this);
-    
-        this.get('geom').data.instance = null;
-
-        data.geom = this.get('geom').exportJSON(false);
-
-        this.get('geom').data.instance = this;
-      
-
+      this.get('geom').data.instance = null;
+      data.geom = this.get('geom').exportJSON(false);
+      this.get('geom').data.instance = this;
       return data;
 
     },
 
     parseJSON: function(data, manager) {
-      var geom = new paper.Path();
-      geom.importJSON(data.geom);
-      this.normalizeGeometry(geom, new paper.Matrix());
+      if (!this.get('geom')) {
+        var geom = new paper.Path();
+        geom.importJSON(data.geom);
+        this.normalizeGeometry(geom, new paper.Matrix());
+      }
       GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
 

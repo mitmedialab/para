@@ -52,9 +52,7 @@ define([
       toolCollection = new Backbone.Collection({});
       this.set('tool_collection', toolCollection);
       this.listenTo(toolCollection, 'geometryAdded', this.geometryAdded);
-      this.listenTo(toolCollection,'modificationEnded',function() {
-        self.trigger('modificationEnded');
-      });
+      this.listenTo(toolCollection,'modificationEnded',this.modificationEnded);
       this.listenTo(toolCollection, 'compileRequest', function() {
         self.trigger('compileRequest');
       });
@@ -205,6 +203,11 @@ define([
 
     redo: function() {
       this.trigger('redo');
+    },
+
+    modificationEnded: function(){
+
+        this.trigger('modificationEnded');
     },
 
     modifyStyle: function(style_data) {

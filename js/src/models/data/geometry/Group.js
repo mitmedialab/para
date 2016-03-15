@@ -68,7 +68,7 @@ define([
 
 
 
-    parseJSON: function(data, manager) {
+   /* parseJSON: function(data, manager) {
       this.deleteAllChildren();
       Instance.prototype.parseJSON.call(this, data);
       for (var i = 0; i < data.children.length; i++) {
@@ -78,7 +78,7 @@ define([
         this.addMember(child);
       }
       return this;
-    },
+    },*/
 
     parseInheritorJSON: function(data, manager) {
       for (var i = 0; i < this.children.length; i++) {
@@ -211,7 +211,7 @@ define([
       return members;
     },
 
-    setValue: function(data) {
+    setValue: function(data,registerUndo) {
       if (data.fillColor || data.strokeColor || data.strokeWidth) {
         var style_data = {};
         if (data.fillColor && !data.fillColor.noColor) {
@@ -224,12 +224,29 @@ define([
           style_data.strokeWidth = data.strokeWidth;
         }
         for (var i = 0; i < this.members.length; i++) {
-          this.members[i].setValue(style_data);
+          this.members[i].setValue(style_data,registerUndo);
         }
 
       }
-      Instance.prototype.setValue.call(this, data);
+      Instance.prototype.setValue.call(this, data,registerUndo);
     },
+
+    //returns all non-group members
+    getInstanceMembers: function(memberList) {
+      if (!memberList) {
+        memberList = [];
+      }
+      for (var i = 0; i < this.members.length; i++) {
+        if (this.members[i].get('type') !== 'group') {
+          memberList.push(this.members[i]);
+        } else {
+          this.members[i].getInstanceMembers(memberList);
+        }
+
+      }
+      return memberList;
+    },
+
 
     getMember: function(member) {
       if (member === this) {
@@ -328,13 +345,11 @@ define([
     reset: function() {
 
       if (this.get('rendered')) {
-        console.log('reset geom position =', this.get('geom').position, "bbox=", this.get('bbox').position, "sclone=", this.get('selection_clone').position);
 
         Instance.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
           this.renderQueue[i].reset();
         }
-        console.log('after reset geom position =', this.get('geom').position, "bbox=", this.get('bbox').position, "sclone=", this.get('selection_clone').position);
 
       }
 
@@ -345,7 +360,6 @@ define([
     render: function() {
 
       if (!this.get('rendered')) {
-        console.log(this.renderQueue);
         for (var i = 0; i < this.renderQueue.length; i++) {
           this.renderQueue[i].render();
         }
