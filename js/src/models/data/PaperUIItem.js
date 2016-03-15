@@ -62,9 +62,7 @@ define([
         }
       }
       this.set(data);
-      var pathAltered = this.get('pathAltered');
-      pathAltered.setNull(false);
-      this.setPathAltered();
+     
 
       return data;
     },
@@ -141,9 +139,7 @@ define([
         }
       }
       this.set(data);
-      var pathAltered = this.get('pathAltered');
-      pathAltered.setNull(false);
-      this.setPathAltered();
+    
 
       return data;
     },
@@ -165,13 +161,12 @@ define([
     renderGeomo: function() {
       var geom = this.get('geom');
 
-      var pathAltered = this.get('pathAltered').getValue();
-      if (!pathAltered && geom) {
+      if (geom) {
               geom.selected = false;
       } else {
-              if (!geom) {
-                geom = paper.project.activeLayer.importJSON(this.getValueFor('master_path'));
-              }
+              
+           geom = paper.project.activeLayer.importJSON(this.getValueFor('master_path'));
+              
       }
       geom.data.instance = this;
 
@@ -193,9 +188,7 @@ define([
       });
 
       this.set('geom', geom);
-      var p_altered = this.get('pathAltered');
-      p_altered.setValue(false);
-      this.set('pathAltered', p_altered);
+      
 
       return geom;
 

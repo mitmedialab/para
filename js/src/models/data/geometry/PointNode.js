@@ -46,6 +46,10 @@ define([
       return data;
     },
 
+    deleteSelf: function(){
+      
+    },
+
     render: function(){
       return 'point';
     },

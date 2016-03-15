@@ -62,23 +62,55 @@ define([
       return instance;
     },
 
+
+    deleteSelf: function() {
+     
+      GeometryNode.prototype.deleteSelf.apply(this, arguments);
+    },
+
+
+    /*returns a clone of the paper js shape*/
+    getShapeClone: function(relative) {
+      var toggleClosed = false;
+      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
+        this.nodeParent.toggleOpen(this.nodeParent);
+        toggleClosed = true;
+      }
+      var clone = this.get('geom').clone();
+      if (toggleClosed) {
+        this.nodeParent.toggleClosed(this.nodeParent);
+      }
+
+      return clone;
+    },
+
     toJSON: function() {
       var data = GeometryNode.prototype.toJSON.call(this);
       this.get('geom').data.instance = null;
       data.geom = this.get('geom').exportJSON(false);
       this.get('geom').data.instance = this;
-      return data;
 
+      return data;
     },
+
 
     parseJSON: function(data, manager) {
-      if (!this.get('geom')) {
-        var geom = new paper.Path();
-        geom.importJSON(data.geom);
-        this.normalizeGeometry(geom, new paper.Matrix());
-      }
+
+      //if (!this.get('geom')) {
+      var geom = new paper.Path();
+      geom.importJSON(data.geom);
+
+      this.changeGeomInheritance(geom);
       GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
+
+
+    changeGeomInheritance: function(path) {
+      GeometryNode.prototype.changeGeomInheritance.call(this, path);
+      this.generatePoints(path, true);
+
+    },
+
 
 
     /*normalizeGeometry
@@ -173,6 +205,7 @@ define([
 
       path.visible = false;
       path.selected = false;
+
       this.changeGeomInheritance(path);
 
       this.setValue(data);
@@ -181,11 +214,7 @@ define([
       return data;
     },
 
-    changeGeomInheritance: function(path) {
-      GeometryNode.prototype.changeGeomInheritance.call(this, path);
-      this.generatePoints(path, true);
 
-    },
 
     generatePoints: function(path, clear) {
       var points = this.get('points');

@@ -67,18 +67,24 @@ define([
     },
 
 
-
-   /* parseJSON: function(data, manager) {
-      this.deleteAllChildren();
-      Instance.prototype.parseJSON.call(this, data);
-      for (var i = 0; i < data.children.length; i++) {
-        var name = data.children[i].name;
-        var child = this.getTargetClass(name);
-        child.parseJSON(data.children[i], manager);
-        this.addMember(child);
+    toJSON: function() {
+      var data = Instance.prototype.toJSON.call(this);
+      for (var i = 0; i < this.children.length; i++) {
+        data.children.push(this.children[i].toJSON());
       }
-      return this;
-    },*/
+      return data;
+    },
+
+     parseJSON: function(data, manager) {
+     for (var i = 0; i < data.children.length; i++) {
+        if(this.children[i]){
+         this.children[i].parseJSON(data.children[i]);
+        }
+      }
+      Instance.prototype.parseJSON.call(this, data, manager);
+    },
+
+
 
     parseInheritorJSON: function(data, manager) {
       for (var i = 0; i < this.children.length; i++) {
@@ -366,6 +372,8 @@ define([
         this.createBBox();
         Instance.prototype.render.apply(this, arguments);
 
+
+
       }
     },
 
@@ -437,6 +445,7 @@ define([
       m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
 
       this._matrix = m2;
+
 
     },
 

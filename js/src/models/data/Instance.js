@@ -60,7 +60,6 @@ define([
 			strokeColor: null,
 			fillColor: null,
 			strokeWidth: null,
-			pathAltered: null,
 			v: null,
 			index: null,
 			memberCount: null,
@@ -89,7 +88,6 @@ define([
 				strokeWidth: ['v'],
 				selected: ['v'],
 				memberCount: ['v'],
-				pathAltered: ['v'],
 				zIndex: ['v']
 					//inheritors: []
 			},
@@ -201,9 +199,6 @@ define([
 				bottomRight: null,
 			});
 
-			var pathAltered = new PBool(false);
-			pathAltered.setNull(true);
-			this.set('pathAltered', pathAltered);
 
 			var index = new PFloat(0);
 			index.setNull(false);
@@ -293,8 +288,10 @@ define([
 			var geom = this.get('geom');
 			if (geom) {
 				geom.remove();
+				geom.data = null;
 				if (this.get('selection_clone')) {
 					this.get('selection_clone').remove();
+					this.get('selection_clone').data = null;
 				}
 			}
 			this.clearBoundingBoxes();
@@ -390,9 +387,9 @@ define([
 			return this;
 		},
 
-		 getInstanceMembers: function(){
-		 	return [this];
-		 },
+		getInstanceMembers: function() {
+			return [this];
+		},
 
 		/*placeholder functions to prevent errors */
 		modifyPoints: function(data, mode, modifier, exclude) {
@@ -552,12 +549,14 @@ define([
 
 
 			if (this.get('geom')) {
-				if (this.nodeParent && this.nodeParent.get('type') == 'geometry') {
-					var index = this.get('geom').index;
-					this.nodeParent.get('geom').insertChild(index, geom);
+				var ok = (geom && geom.insertBelow(this.get('geom')));
+				if (ok) {
+
+					this.get('geom').remove();
 				}
-				this.get('geom').remove();
+				this.get('geom').data = null;
 				this.set('geom', null);
+				console.log('geom replaced = ', ok);
 
 			}
 
@@ -568,34 +567,14 @@ define([
 				child.data.instance = self;
 				child.data.geom = true;
 				child.data.nodetype = self.get('name');
-				if (child.children) {
-					for (var i = 0; i < child.children.length; i++) {
-						setChildrenData(child.children[i]);
-					}
-				}
 			};
 			setChildrenData(geom);
 
-
-
 			this.createBBox();
 			this.createSelectionClone();
-			for (var i = 0; i < this.children.length; i++) {
-				if (this.children[i].get('name') === 'point') {
-					this.children[i].deleteSelf();
-				} else {
-					this.children[i].changeGeomInheritance(geom.clone());
-				}
 
-			}
-
-			this.setPathAltered();
 		},
 
-		setPathAltered: function() {
-			var pathAltered = this.get('pathAltered');
-			pathAltered.setValue(true);
-		},
 
 		reset: function() {
 			if (this.get('rendered')) {
@@ -771,6 +750,8 @@ define([
 
 
 		toJSON: function() {
+
+
 			var data = {};
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
@@ -785,17 +766,19 @@ define([
 			data.open = this.get('open');
 			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
+			data._matrix = this._matrix.values;
 			for (var i = 0; i < this.children.length; i++) {
 				data.children.push(this.children[i].toJSON());
 			}
 			this.previousProperties = this.properties;
 			this.properties = data;
+			console.log('to json for', this.get('name'), data);
 			return data;
 
 		},
 
 		parseJSON: function(data, manager) {
-			console.log('parsing json',data);
+			console.log('parsing json for', this.get('name'), data);
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
@@ -807,6 +790,9 @@ define([
 			this.set('id', data.id);
 			this.set('visible', data.visible);
 			this.set('open', data.open);
+			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
+			console.log('matrix data', data._matrix, 'matrix', this._matrix);
+
 		},
 
 		parseInheritorJSON: function(data, manager) {
@@ -871,7 +857,7 @@ define([
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
 				this.parseJSON(state);
-				this.trigger('modified', this)
+				this.trigger('modified', this);
 
 			}
 		},
@@ -882,7 +868,7 @@ define([
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
 				this.parseJSON(state);
-				this.trigger('modified', this)
+				this.trigger('modified', this);
 			}
 
 		},
@@ -897,7 +883,7 @@ define([
 				if (!this.stateStored) {
 					this.previousStates.push(this.toJSON());
 					this.stateStored = true;
-					console.log('instance stored state',this.previousStates);
+					console.log('instance stored state', this.previousStates);
 				}
 			}
 			if (data.translationDelta && this.nodeParent) {
@@ -1358,7 +1344,6 @@ define([
 				geom.transform(this._matrix);
 				selection_clone.transform(this._matrix);
 				bbox.transform(this._matrix);
-
 				this.updateScreenBounds(geom);
 
 				this.renderStyle(geom);
@@ -1381,14 +1366,14 @@ define([
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
-				
-					geom.fillColor.hue = this._fillColor.h;
-					geom.fillColor.saturation = this._fillColor.s;
-					geom.fillColor.lightness = this._fillColor.l;
-					geom.fillColor.alpha = this._fillColor.a;
-				
 
-				
+				geom.fillColor.hue = this._fillColor.h;
+				geom.fillColor.saturation = this._fillColor.s;
+				geom.fillColor.lightness = this._fillColor.l;
+				geom.fillColor.alpha = this._fillColor.a;
+
+
+
 			} else {
 				geom.fillColor = undefined;
 			}
@@ -1443,10 +1428,12 @@ define([
 		clearBoundingBoxes: function() {
 			if (this.get('bbox')) {
 				this.get('bbox').remove();
+				this.get('bbox').data = null;
 				this.set('bbox', null);
 			}
 			if (this.get('inheritor_bbox')) {
 				this.get('inheritor_bbox').remove();
+				this.get('inheritor_bbox').data = null;
 				this.set('inheritor_bbox', null);
 
 			}
@@ -1471,7 +1458,7 @@ define([
 				this.nodeParent.toggleOpen(this.nodeParent);
 				toggleClosed = true;
 			}
-			var clone = this.get('geom').clone();
+			var clone = this.get('bbox').clone();
 			clone.transform(this._matrix.inverted());
 			if (toggleClosed) {
 				this.nodeParent.toggleClosed(this.nodeParent);
