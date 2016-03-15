@@ -7,18 +7,19 @@ define([
 		'underscore',
 		'paper',
 		'models/data/Instance',
+		'models/data/geometry/Group',
 		'models/data/properties/PConstraint',
 		'views/ParametersView',
 
 	],
 
 
-	function(_, paper, Instance, PConstraint, ParametersView) {
+	function(_, paper, Instance, Group, PConstraint, ParametersView) {
 		var svgstring = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 792" enable-background="new 0 0 612 792" xml:space="preserve"><g><path fill="none" stroke="#76787B" stroke-width="1.6375" stroke-miterlimit="10" d="M10,1.9c0,0-3.7,4-10,4s-10-4-10-4 s3.7-7.7,10-7.7S10,1.9,10,1.9z"/><ellipse fill="#76787B" cx="-0.3" cy="-0.9" rx="4.8" ry="5"/></g></svg>';
-		var FunctionNode = Instance.extend({
+		var FunctionNode = Group.extend({
 
 
-			defaults: _.extend({}, Instance.prototype.defaults, {
+			defaults: _.extend({}, Group.prototype.defaults, {
 				name: 'function',
 				type: 'function',
 				f_name: '',
@@ -29,7 +30,7 @@ define([
 			}),
 
 			initialize: function() {
-				Instance.prototype.initialize.apply(this, arguments);
+				Group.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
 				this.get('translationDelta').setNull(false);
 			
@@ -175,7 +176,7 @@ define([
 			toJSON: function() {
 				// // call prototype
 				// // creates params, adds list of all params toJSON
-				var data = Instance.prototype.toJSON.call(this, arguments);
+				var data = Group.prototype.toJSON.call(this, arguments);
 				var functionParams = this.get('f_parameters');
 				var paramsList = [];
 				_.each(functionParams, function(param) {

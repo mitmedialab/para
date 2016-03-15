@@ -8,7 +8,7 @@
 define([
   'underscore',
   'paper',
-  'models/data/Instance',
+  'models/data/geometry/GeometryNode',
   'models/data/geometry/PathNode',
   'models/data/geometry/RectNode',
   'models/data/geometry/EllipseNode',
@@ -19,16 +19,16 @@ define([
 
 
 
-], function(_, paper, Instance, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
+], function(_, paper, GeometryNode, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
   var init_lookup = {
     'path': PathNode,
     'ellipse': EllipseNode,
     'polygon': PolygonNode,
     'rectangle': RectNode,
   };
-  var Group = Instance.extend({
+  var Group = GeometryNode.extend({
 
-    defaults: _.extend({}, Instance.prototype.defaults, {
+    defaults: _.extend({}, GeometryNode.prototype.defaults, {
 
       name: 'group',
       type: 'geometry',
@@ -38,7 +38,7 @@ define([
     }),
 
     initialize: function() {
-      Instance.prototype.initialize.apply(this, arguments);
+      GeometryNode.prototype.initialize.apply(this, arguments);
       this.resetProperties();
       var memberCount = new PFloat(0);
       memberCount.setNull(false);
@@ -68,7 +68,7 @@ define([
 
 
     toJSON: function() {
-      var data = Instance.prototype.toJSON.call(this);
+      var data = GeometryNode.prototype.toJSON.call(this);
       for (var i = 0; i < this.children.length; i++) {
         data.children.push(this.children[i].toJSON());
       }
@@ -81,7 +81,7 @@ define([
           this.children[i].parseJSON(data.children[i]);
         }
       }
-      Instance.prototype.parseJSON.call(this, data, manager);
+      GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
 
 
@@ -133,7 +133,7 @@ define([
     },
 
     deleteSelf: function() {
-      var data = Instance.prototype.deleteSelf.call(this);
+      var data = GeometryNode.prototype.deleteSelf.call(this);
       this.members.length = 0;
       return data;
     },
@@ -234,7 +234,7 @@ define([
         }
 
       }
-      Instance.prototype.setValue.call(this, data, registerUndo);
+      GeometryNode.prototype.setValue.call(this, data, registerUndo);
     },
 
     //returns all non-group members
@@ -352,7 +352,7 @@ define([
 
       if (this.get('rendered')) {
 
-        Instance.prototype.reset.apply(this, arguments);
+        GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
           this.renderQueue[i].reset();
         }
@@ -370,7 +370,7 @@ define([
           this.renderQueue[i].render();
         }
         this.createBBox();
-        Instance.prototype.render.apply(this, arguments);
+        GeometryNode.prototype.render.apply(this, arguments);
 
 
 
