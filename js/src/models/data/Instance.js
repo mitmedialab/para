@@ -140,7 +140,7 @@ define([
 			this.set('rotation_origin', new PPoint(0, 0));
 			this.set('alpha', new PFloat(1));
 			var translationDelta = new PPoint(0, 0);
-			translationDelta.setNull(true);
+			translationDelta.setNull(false);
 			this.set('translationDelta', translationDelta);
 
 			var scalingDelta = new PPoint(0, 0);
@@ -156,7 +156,7 @@ define([
 			this.set('strokeColor', strokeColor);
 
 			var fillColor = new PColor(0, 0, 0, 1);
-			fillColor.setNull(true);
+			fillColor.setNull(false);
 			this.set('fillColor', fillColor);
 
 			var strokeWidth = new PVal(0);
@@ -897,6 +897,7 @@ define([
 				if (!this.stateStored) {
 					this.previousStates.push(this.toJSON());
 					this.stateStored = true;
+					console.log('instance stored state',this.previousStates);
 				}
 			}
 			if (data.translationDelta && this.nodeParent) {
@@ -1380,12 +1381,14 @@ define([
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
-				if (this._fillColor.h) {
+				
 					geom.fillColor.hue = this._fillColor.h;
 					geom.fillColor.saturation = this._fillColor.s;
 					geom.fillColor.lightness = this._fillColor.l;
 					geom.fillColor.alpha = this._fillColor.a;
-				}
+				
+
+				
 			} else {
 				geom.fillColor = undefined;
 			}

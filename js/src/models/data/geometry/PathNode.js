@@ -176,6 +176,8 @@ define([
       this.changeGeomInheritance(path);
 
       this.setValue(data);
+      this.get('strokeColor').setNull(false);
+      this.get('fillColor').setNull(false);
       return data;
     },
 

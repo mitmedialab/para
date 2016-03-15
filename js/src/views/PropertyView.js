@@ -14,6 +14,8 @@ define([
 
   var param_template, param_source;
   var stateSet = false;
+  var handlerActive = true;
+  var timeout;
   var constraintTypeMap = {};
   constraintTypeMap['more-box'] = 'more';
   constraintTypeMap['more'] = 'more';
@@ -38,16 +40,20 @@ define([
       this.currentPaths = [];
       param_source = $('#parameterTemplate').html();
       param_template = Handlebars.default.compile(param_source);
-
+    var self = this;
       $('#fillColorBlock').addClass('color-block-selected');
       $('#fillColorBlock').css('background-color', 'white');
       $('#fill').val('#ffffff');
       $('#strokeColorBlock').css('background-color', 'black');
       $('#stroke').val('#000000');
       $('#strokeSlider').on('change mousemove', function() {
+        window.clearTimeout(timeout);
+        timeout = window.setTimeout(self.modificationEnded, 500 ,self);
         $('#strokeSlider').trigger('stroke-change');
       });
 
+
+    
       $('#color-window').each(function() {
         $(this).iris({
           palettes: ['#fff',
@@ -63,8 +69,13 @@ define([
           ],
           hide: false,
           color: '#fff',
+       
           change: function(event, ui) {
-            $(this).trigger('colorChange', event, ui);
+            if (handlerActive) {
+              window.clearTimeout(timeout);
+              timeout = window.setTimeout(self.modificationEnded, 500 ,self);
+              $(this).trigger('colorChange', event, ui);
+            }
           }
         });
       });
@@ -72,18 +83,17 @@ define([
     },
 
     events: {
+
+      'click #fillColorBlock': 'toggleFillStroke',
+      'click #strokeColorBlock': 'toggleFillStroke',
+      'click #no-color': 'clearColor',
+      'change #fill': 'colorInputChange',
+      'change #stroke': 'colorInputChange',
       'stroke-change': 'strokeChange',
       'param-change': 'paramChange',
       'colorChange': 'colorChange',
-      'click #fillColorBlock': 'toggleFillStroke',
-      'click #strokeColorBlock': 'toggleFillStroke',
-      'change #fill': 'colorInputChange',
-      'change #stroke': 'colorInputChange',
-      'click #no-color': 'clearColor',
-      'click .behaviorRemove': 'removeBehavior',
-      'click #scaffold': 'setScaffold',
-      'mouseup' : 'modificationEnded'
-      // testing
+      'mousedown #color-window': 'modificationStarted',
+        // testing
     },
 
     removeBehavior: function(event) {
@@ -101,7 +111,9 @@ define([
         $('#fillColorBlock').addClass('remove-color');
         $('#fill').val("#");
         data = {
-          fillColor:{noColor:true}
+          fillColor: {
+            noColor: true
+          }
         };
         this.model.modifyStyle(data);
 
@@ -109,14 +121,17 @@ define([
         $('#strokeColorBlock').addClass('remove-color');
         $('#stroke').val("#");
         data = {
-          strokeColor:{noColor:true}
+          strokeColor: {
+            noColor: true
+          }
         };
         this.model.modifyStyle(data);
       }
+      stateSet = true;
+      this.modificationEnded(this);
     },
 
     colorInputChange: function(event) {
-
       var color = $(event.target).val();
       var id = $(event.target).attr('id');
       if (id == 'fill') {
@@ -137,7 +152,7 @@ define([
       this.model.modifyStyle(data);
 
       stateSet = true;
-
+      this.modificationEnded();
     },
 
     colorChange: function(event, ui) {
@@ -163,9 +178,6 @@ define([
         this.model.modifyStyle(data);
 
       }
-
-      stateSet = true;
-
     },
 
     update: function(view, data) {
@@ -235,7 +247,7 @@ define([
         if (strokeWidth) {
           $('#strokeSlider').val(strokeWidth);
         }
-        this.setParams(selected_shape.get('userParams'),selected_shape.get('id'));
+        this.setParams(selected_shape.get('userParams'), selected_shape.get('id'));
         this.delegateEvents();
       } else {
         this.geometryDeselected();
@@ -249,6 +261,7 @@ define([
     },
 
     toggleFillStroke: function(event) {
+      handlerActive = false;
       var id = event.target.id;
       if (id == 'fillColorBlock') {
         $('#strokeColorBlock').removeClass('color-block-selected');
@@ -263,6 +276,7 @@ define([
           $('#color-window').iris('color', $('#strokeColorBlock').css('background-color'));
         }
       }
+      handlerActive = true;
     },
 
     strokeChange: function(event) {
@@ -320,7 +334,7 @@ define([
     },
 
 
-  
+
     addSelectIndex: function(id, filename) {
 
       $('#fileselect').prepend('<option value=' + id + '>' + filename + '</option>');
@@ -329,7 +343,7 @@ define([
 
     },
 
-  
+
     removeItem: function(id) {
       $('#fileselect option[value=' + id + ']').remove();
     },
@@ -350,15 +364,15 @@ define([
       if (userParams) {
         for (var i = 0; i < userParams.length; i++) {
           userParams[i].id = id;
-            paramSliders.push(userParams[i]);
-          }
+          paramSliders.push(userParams[i]);
         }
+      }
 
 
-        context = {
-          paramSlider: paramSliders,
-        };
-   
+      context = {
+        paramSlider: paramSliders,
+      };
+
       var html = param_template(context);
       var count = 0;
       $('#parameters').html(html);
@@ -392,11 +406,15 @@ define([
 
     },
 
-    modificationEnded: function(){
-      if(stateSet){
-        this.model.modificationEnded();
+    modificationEnded: function(self) {
+      if (stateSet) {
+        self.model.modificationEnded();
         stateSet = false;
       }
+    },
+
+     modificationStarted: function() {
+      stateSet = true;
     }
 
   });

@@ -113,6 +113,8 @@ define([
 			if (!stateStored) {
 				undoStack.push(selected.slice(0, selected.length));
 				stateStored = true;
+				console.log('succesfully added to undo stack',undoStack)
+
 			}
 		},
 
@@ -121,9 +123,7 @@ define([
 			if (undoStack.length > 0) {
 				var toUndo = undoStack.pop();
 				toUndo.forEach(function(item) {
-					console.log('item x,y',item.get('translationDelta').getValue());
 					item.undo();
-					console.log('item x,y',item.get('translationDelta').getValue());
 
 				});
 				redoStack.push(toUndo);

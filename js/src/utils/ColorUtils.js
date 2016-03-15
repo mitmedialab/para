@@ -20,6 +20,7 @@ define([
 			var b = color.b;
 
 			var pcolor = new paper.Color(r,g,b);
+
 			return [pcolor.hue,pcolor.saturation,pcolor.lightness];
 		};
 
@@ -67,6 +68,7 @@ define([
 		};
 
 		ColorUtils.hexToRGB = function(hex){
+
 			var rgb = {r:this.hexToR(hex),g:this.hexToG(hex),b:this.hexToB(hex)};
 			var hsl = this.rgbToHsl(rgb);
 			var data = {r:rgb.r,g:rgb.g,b:rgb.b,h:hsl[0],s:hsl[1],l:hsl[2],operator:'set'};
