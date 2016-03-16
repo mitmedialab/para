@@ -985,11 +985,10 @@ define([
 			} else {
 				this._selectSingleShape(data, segments);
 			}
-			this.updateLayers();
 			if (!constraintMode) {
 				collectionView.toggleCollectionButtons(selected);
 			}
-
+			this.updateLayers();
 		},
 
 
