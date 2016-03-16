@@ -171,10 +171,17 @@ define([
 					if (node.get('id') === state_data.id) {
 						return node;
 					} else {
-						for (var l = 0; l < node.members.length; l++) {
-							member = node.members[l];
+						var types;
+						if(node.members){
+							types = node.members;
+						}
+						else{
+							types = node.children;
+						}
+						for (var l = 0; l < types.length; l++) {
+							member = types[l];
 							if (member.get('type') === 'collection') {
-								var match = node.members[l].visit(this, 'visit', node, state_data);
+								var match = types[l].visit(this, 'visit', node, state_data);
 								if (match) {
 									return match;
 								}
@@ -197,7 +204,12 @@ define([
 			var itemFound = false;
 			var item;
 			for (var i = 0; i < lists.length; i++) {
-				item = lists[i].getMember(lInstance);
+				if(lists[i].get('type')=='collection'){
+					item = lists[i].getMember(lInstance);
+				}
+				else{
+					item = lists[i].getChild(lInstance);
+				}
 
 				if (item && item != lInstance) {
 					sInstances.push(item);
@@ -206,7 +218,7 @@ define([
 			}
 
 			for (var j = 0; j < groups.length; j++) {
-				item = groups[j].getMember(lInstance);
+				item = groups[j].getChild(lInstance);
 				if (item && item != lInstance) {
 					sInstances.push(item);
 					itemFound = true;
@@ -275,7 +287,7 @@ define([
 				group = new Group();
 
 				for (var j = 0; j < selected.length; j++) {
-					group.addMember(selected[j]);
+					group.addChildNode(selected[j]);
 				}
 			}
 
@@ -311,7 +323,7 @@ define([
 		},
 
 		toggleOpen: function(item) {
-			if (item.get('name') === 'group') {
+			if (item.get('type') === 'geometry') {
 				this.closeAllGroups();
 				item.toggleOpen(item);
 				return {
@@ -398,7 +410,7 @@ define([
 
 		closeAllGroups: function() {
 			for (var i = 0; i < groups.length; i++) {
-				groups[i].closeAllMembers();
+				groups[i].closeAllChildren();
 			}
 		},
 

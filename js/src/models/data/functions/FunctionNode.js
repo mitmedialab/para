@@ -33,7 +33,7 @@ define([
 				Group.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
 				this.get('translationDelta').setNull(false);
-			
+
 				this.lists = [];
 				this.selected = [];
 				this.functions = [];
@@ -159,15 +159,20 @@ define([
 
 			reset: function() {
 				for (var i = 0; i < this.renderQueue.length; i++) {
-					this.renderQueue[i].reset();
+
+					if (!this.renderQueue[i].deleted) {
+						this.renderQueue[i].reset();
+					}
 				}
 			},
 
 
 			render: function() {
-				
+
 				for (var i = 0; i < this.renderQueue.length; i++) {
-					this.renderQueue[i].render();
+					if (!this.renderQueue[i].deleted) {
+						this.renderQueue[i].render();
+					}
 				}
 				this.renderQueue = [];
 

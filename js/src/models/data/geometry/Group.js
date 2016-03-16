@@ -40,15 +40,11 @@ define([
     initialize: function() {
       GeometryNode.prototype.initialize.apply(this, arguments);
       this.resetProperties();
-      var memberCount = new PFloat(0);
-      memberCount.setNull(false);
-      this.set('memberCount', memberCount);
       this.get('scalingDelta').setValue({
         x: 1,
         y: 1,
         operator: 'set'
       });
-      this.members = [];
       var geom = new paper.Group();
       this.set('geom', geom);
       geom.data.instance = this;
@@ -76,9 +72,9 @@ define([
     },
 
     parseJSON: function(data, manager) {
-      var memberClone = this.members.slice(0, this.members.length);
-      console.log('members starting',memberClone);
-      console.log('data starting',data.children);
+      var childClone = this.children.slice(0, this.children.length);
+      console.log('children starting', childClone);
+      console.log('data starting', data.children);
 
       for (var i = 0; i < this.children.length; i++) {
         var target_id = this.children[i].get('id');
@@ -88,19 +84,19 @@ define([
         //if the child currently exists in the group
         if (target_data) {
           this.children[i].parseJSON(target_data);
-          memberClone = _.filter(memberClone, function(child) {
+          childClone = _.filter(childClone, function(child) {
             return child.get('id') != target_id;
-          })
+          });
         }
         //if the child does not currently exist
         else {
 
         }
       }
-      console.log('members not matched',memberClone);
+      console.log('children not matched', childClone);
 
-      for (var j = 0; j < memberClone.length; j++) {
-        var removed = this.removeMember(memberClone[i]);
+      for (var j = 0; j < childClone.length; j++) {
+        var removed = this.removeChildNode(childClone[i]);
         removed.deleteSelf();
       }
 
@@ -129,8 +125,8 @@ define([
       if (this.get('id') == id) {
         return this;
       } else {
-        for (var i = 0; i < this.members.length; i++) {
-          var match = this.members[i].getById(id);
+        for (var i = 0; i < this.children.length; i++) {
+          var match = this.children[i].getById(id);
           if (match) {
             return match;
           }
@@ -146,9 +142,9 @@ define([
       if (!deleted) {
         deleted = [];
       }
-      for (var i = this.members.length - 1; i >= 0; i--) {
-        deleted.push.apply(deleted, this.members[i].deleteAllChildren());
-        var d = this.removeMember(this.members[i]);
+      for (var i = this.children.length - 1; i >= 0; i--) {
+        deleted.push.apply(deleted, this.children[i].deleteAllChildren());
+        var d = this.removeChildNode(this.children[i]);
         deleted.push(d.deleteSelf());
 
       }
@@ -157,7 +153,7 @@ define([
 
     deleteSelf: function() {
       var data = GeometryNode.prototype.deleteSelf.call(this);
-      this.members.length = 0;
+      this.children.length = 0;
       return data;
     },
 
@@ -165,79 +161,46 @@ define([
       var instance = new this.constructor();
       var value = this.getValue();
       instance.setValue(value);
-      for (var i = 0; i < this.members.length; i++) {
-        var clone = this.members[i].create();
-        instance.addMember(clone);
+      for (var i = 0; i < this.children.length; i++) {
+        var clone = this.children[i].create();
+        instance.addChildNode(clone);
       }
       return instance;
     },
 
-    addMember: function(clone, index) {
-
-      if (index) {
-        this.members.splice(index, 0, clone);
-        this.insertChild(index, clone);
-        this.get('geom').insertChild(index, clone.get('geom'));
-        this.get('bbox').insertChild(index, clone.get('bbox'));
-        clone.get('zIndex').setValue(index);
-
-      } else {
-        this.members.push(clone);
-        this.addChildNode(clone);
-        this.get('geom').addChild(clone.get('geom'));
-        this.get('bbox').addChild(clone.get('bbox'));
-        clone.get('zIndex').setValue(this.members.length - 1);
-
-      }
-      var memberCount = {
-        v: this.members.length,
-        operator: 'set'
-      };
-
-      this.listenTo(clone, 'modified', this.modified);
+    insertChild: function(index, child, registerUndo) {
+      console.log('inserting child at', index, this.get('name'));
+      GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
+      this.get('geom').insertChild(index, child.get('geom'));
+      this.get('bbox').insertChild(index, child.get('bbox'));
       this.center = this.get('geom').position;
-
-      this.get('memberCount').setValue(memberCount);
       this.createBBox();
-
       this.createSelectionClone();
+      this.listenTo(child, 'modified', this.modified);
       this.trigger('modified', this);
     },
 
-    removeMember: function(data) {
-      this.toggleOpen(this);
-      var index = $.inArray(data, this.members);
-      var member;
-      if (index > -1) {
+    removeChildNode: function(node, registerUndo) {
+      var removed = GeometryNode.prototype.removeChildNode.call(this, node, registerUndo);
+      if (removed) {
+        removed.get('geom').remove();
+        this.center = this.get('geom').position;
+        this.createBBox();
+        this.createSelectionClone();
+        this.stopListening(removed);
 
-        member = this.members.splice(index, 1)[0];
-        var childIndex = member.get('geom').index;
-        this.get('geom').removeChildren(childIndex, childIndex + 1);
-        this.removeChildNode(member);
-        var memberCount = {
-          v: this.members.length,
-          operator: 'set'
-        };
-        this.get('memberCount').setValue(memberCount);
-
+        this.trigger('modified', this);
+        return removed;
       }
-      this.stopListening(data);
-      this.toggleClosed(this);
-      this.center = this.get('geom').position;
-      this.createBBox();
-      this.createSelectionClone();
-      this.trigger('modified', this);
-
-      return member;
-
     },
 
     ungroup: function() {
-      var members = [];
-      for (var i = 0; i < this.members.length; i++) {
-        members.push(this.removeMember(this.members[i]));
+      var childClone = this.children.slice(0, this.children.length);
+      var removedChildren = [];
+      for (var i = 0; i < childClone.length; i++) {
+        removedChildren.push(this.removeChildNode(childClone[i]));
       }
-      return members;
+      return removedChildren;
     },
 
     setValue: function(data, registerUndo) {
@@ -252,37 +215,37 @@ define([
         if (data.strokeWidth) {
           style_data.strokeWidth = data.strokeWidth;
         }
-        for (var i = 0; i < this.members.length; i++) {
-          this.members[i].setValue(style_data, registerUndo);
+        for (var i = 0; i < this.children.length; i++) {
+          this.children[i].setValue(style_data, registerUndo);
         }
 
       }
       GeometryNode.prototype.setValue.call(this, data, registerUndo);
     },
 
-    //returns all non-group members
-    getInstanceMembers: function(memberList) {
-      if (!memberList) {
-        memberList = [];
+    //returns all non-group children
+    getInstanceChildren: function(list) {
+      if (!list) {
+        list = [];
       }
-      for (var i = 0; i < this.members.length; i++) {
-        if (this.members[i].get('type') !== 'group') {
-          memberList.push(this.members[i]);
+      for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].get('type') !== 'group') {
+          list.push(this.children[i]);
         } else {
-          this.members[i].getInstanceMembers(memberList);
+          this.children[i].getInstanceChildren(list);
         }
 
       }
-      return memberList;
+      return list;
     },
 
 
-    getMember: function(member) {
-      if (member === this) {
+    getChild: function(child) {
+      if (child === this) {
         return this;
       }
-      for (var i = 0; i < this.members.length; i++) {
-        var m = this.members[i].getMember(member);
+      for (var i = 0; i < this.children.length; i++) {
+        var m = this.children[i].getChild(child);
         if (m) {
           if (this.get('open')) {
             return m;
@@ -293,34 +256,30 @@ define([
       }
       return null;
     },
-    hasMember: function(member, top, last) {
+
+
+    hasChild: function(child, top, last) {
       if (!top) {
-        if (this === member) {
+        if (this === child) {
           return last;
         }
       }
-      for (var i = 0; i < this.members.length; i++) {
-        var member_found = this.members[i].hasMember(member, false, this);
-        if (member_found) {
-          return member_found;
+      for (var i = 0; i < this.children.length; i++) {
+        var child_found = this.children[i].hasChild(child, false, this);
+        if (child_found) {
+          return child_found;
         }
       }
     },
+
     getRange: function() {
       return this.children.length;
     },
 
-    accessMemberGeom: function() {
-      var geom_list = [];
-      for (var i = 0; i < this.members.length; i++) {
-        geom_list.push.apply(geom_list, this.members[i].accessMemberGeom());
-      }
-      return geom_list;
-    },
 
 
     toggleOpen: function(item) {
-      if ((this === item || this.hasMember(item)) && !this.get('open')) {
+      if ((this === item || this.hasChild(item)) && !this.get('open')) {
         this.set('open', true);
 
         return [this];
@@ -330,7 +289,7 @@ define([
     },
 
     toggleClosed: function(item) {
-      if ((this === item || this.hasMember(item) || item.nodeParent === this.nodeParent) && this.get('open')) {
+      if ((this === item || this.hasChild(item) || item.nodeParent === this.nodeParent) && this.get('open')) {
         this.set('open', false);
 
         return [this];
@@ -338,38 +297,13 @@ define([
 
     },
 
-    closeAllMembers: function() {
+    closeAllChildren: function() {
       this.toggleClosed(this);
-      for (var i = 0; i < this.members.length; i++) {
-        this.members[i].closeAllMembers();
-
-
+      for (var i = 0; i < this.children.length; i++) {
+        this.children[i].closeAllChildren();
       }
     },
 
-
-
-    calculateGroupCentroid: function() {
-      if (this.members.length > 1) {
-        var point_list = [];
-        for (var i = 0; i < this.members.length; i++) {
-          point_list.push(this.members[i]._matrix.translation);
-        }
-        var centroid = TrigFunc.centroid(point_list);
-        return centroid;
-      } else {
-        if (this.members > 0) {
-          return {
-            x: this.members[0]._matrix.translation.x,
-            y: this.members[0]._matrix.translation.y
-          };
-        }
-      }
-      return {
-        x: 0,
-        y: 0
-      };
-    },
 
     reset: function() {
 
@@ -377,7 +311,9 @@ define([
 
         GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
-          this.renderQueue[i].reset();
+          if (!this.renderQueue[i].deleted) {
+            this.renderQueue[i].reset();
+          }
         }
 
       }
@@ -390,7 +326,9 @@ define([
 
       if (!this.get('rendered')) {
         for (var i = 0; i < this.renderQueue.length; i++) {
-          this.renderQueue[i].render();
+         if (!this.renderQueue[i].deleted) {
+            this.renderQueue[i].render();
+          }
         }
         this.createBBox();
         GeometryNode.prototype.render.apply(this, arguments);

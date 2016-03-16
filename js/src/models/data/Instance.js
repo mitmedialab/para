@@ -114,12 +114,13 @@ define([
 			// EXPERIMENTAL
 			selection_palette: ['#A5FF00', '#0D7C1F', '#FF4D4D', '#33D6FF', '#E698D2'],
 			sel_palette_index: 0,
-			isChanging: false
+			isChanging: false,
+			rendered: false,
 
 		}),
 
 		initialize: function() {
-
+			this.deleted = false;
 			this.set('position', new PPoint(0, 0));
 			this.set('center', new PPoint(0, 0));
 			this.set('screen_top_left', new PPoint(0, 0));
@@ -346,6 +347,27 @@ define([
 			}
 		},
 
+		hasChild: function(child, top, last) {
+			if (child === this) {
+				return last;
+			}
+		},
+
+		getChild: function(child) {
+			if (child === this) {
+				return this;
+			}
+			return null;
+		},
+
+		getChildAt: function(index) {
+			if (index === 0) {
+				return this;
+			} else {
+				console.log('ERROR, accessing child index other than zero for non group instance');
+			}
+		},
+
 		/* getRange: function used to modify constraints mappings for lists*/
 		getRange: function() {
 			return 1;
@@ -369,10 +391,6 @@ define([
 			return [];
 		},
 
-		accessMemberGeom: function() {
-			return [this.get('geom')];
-		},
-
 		getBounds: function() {
 			return this.get('geom').bounds;
 		},
@@ -387,9 +405,18 @@ define([
 			return this;
 		},
 
+		closeAllChildren: function() {
+			return this;
+		},
+
 		getInstanceMembers: function() {
 			return [this];
 		},
+
+		getInstanceChildren: function() {
+			return [this];
+		},
+
 
 		/*placeholder functions to prevent errors */
 		modifyPoints: function(data, mode, modifier, exclude) {
@@ -415,23 +442,24 @@ define([
 			}
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
+			instance.set('rendered',true);
+			instance._matrix = this._matrix.clone();
+			instance.reset()
 			instance.render();
 			return instance;
 		},
 
 		addChildNode: function(node, registerUndo) {
-			if (registerUndo) {
-				if (!this.stateStored) {
-					this.previousStates.push(this.toJSON());
-					this.stateStored = true;
-					console.log('instance stored state', this.previousStates);
-				}
-			}
-
-			this.insertChild(this.children.length - 1, node);
+			this.insertChild(this.children.length, node, registerUndo);
 		},
 
-		insertChild: function(index, child) {
+		insertChild: function(index, child, registerUndo) {
+			if (registerUndo) {
+				this.previousStates.push(this.toJSON());
+				console.log('instance stored state', this.previousStates);
+
+			}
+
 			if (child.nodeParent) {
 				child.nodeParent.stopListening(child);
 			}
@@ -441,19 +469,34 @@ define([
 			}
 			SceneNode.prototype.insertChild.call(this, index, child);
 			for (var i = 0; i < this.children.length; i++) {
-				this.children[i].get('zIndex').setValue(i);
+				if (this.children[i].get('zIndex').getValue() != i) {
+					this.children[i].get('zIndex').setValue(i);
+				}
 			}
 
 			this.stopListening(child);
 			this.listenTo(child, 'modified', this.childModified);
 
 		},
-		removeChildNode: function(node) {
-			SceneNode.prototype.removeChildNode.call(this, node);
-			for (var i = 0; i < this.children.length; i++) {
-				this.children[i].get('zIndex').setValue(i);
+
+		removeChildNode: function(node, registerUndo) {
+			if (registerUndo) {
+				this.previousStates.push(this.toJSON());
+				console.log('instance stored state', this.previousStates);
+
 			}
-			this.stopListening(node);
+
+			var removed = SceneNode.prototype.removeChildNode.call(this, node);
+			if (removed) {
+				for (var i = 0; i < this.children.length; i++) {
+					if (this.children[i].get('zIndex').getValue() != i) {
+						this.children[i].get('zIndex').setValue(i);
+					}
+				}
+				this.stopListening(removed);
+				return removed;
+			}
+
 		},
 
 		setChildAfter: function(child, sibling) {
@@ -563,7 +606,6 @@ define([
 				}
 				this.get('geom').data = null;
 				this.set('geom', null);
-				console.log('geom replaced = ', ok);
 
 			}
 
@@ -585,6 +627,7 @@ define([
 
 		reset: function() {
 			if (this.get('rendered')) {
+				//console.log('resetting', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
 				var selection_clone = this.get('selection_clone');
@@ -852,7 +895,7 @@ define([
 		//undo to last state
 		undo: function() {
 			if (this.previousStates.length > 0) {
-				console.log('calling undo on',this.get('name'));
+				console.log('calling undo on', this.get('name'));
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
@@ -864,7 +907,7 @@ define([
 
 		redo: function() {
 			if (this.futureStates.length > 0) {
-				console.log('calling redo on',this.get('name'));
+				console.log('calling redo on', this.get('name'));
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
@@ -1335,6 +1378,7 @@ define([
 		render: function() {
 
 			if (!this.get('rendered')) {
+				//console.log('rendering', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
 				var selection_clone = this.get('selection_clone');

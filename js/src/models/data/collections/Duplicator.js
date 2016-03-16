@@ -36,20 +36,23 @@ define([
                 target: null,
                 mode: 'standard',
                 type: 'geometry',
-                exception_count: null
+                exception_count: null,
             }),
 
             initialize: function() {
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
+
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
                 this.listenTo(this.masterList, 'modified', this.modified);
                 this.listenTo(this.internalList, 'modified', this.modified);
+
                 //members of the duplicator which are constrained
                 this.group_relative = [];
                 //members of the duplicator which are acting as the reference in the constraint
                 this.group_reference = [];
+
                 var count = new PFloat(0);
                 this.set('count', count);
 
@@ -69,8 +72,9 @@ define([
             toJSON: function() {
 
                 var data = Group.prototype.toJSON.call(this, data);
-                data.target_index = this.members.indexOf(this.get('target'));
+                data.target_index = this.children.indexOf(this.get('target'));
                 data.internalList = this.internalList.toJSON();
+                data.masterList = this.masterList.toJSON();
                 data.group_relative = [];
                 data.group_reference = [];
                 for (var i = 0; i < this.group_relative.length; i++) {
@@ -97,7 +101,7 @@ define([
                         var name = data.children[i].name;
                         var child = this.getTargetClass(name);
                         child.parseJSON(data.children[i], this);
-                        this.addMember(child, i);
+                        this.insertChild(i, child);
                     }
                 }
 
@@ -105,6 +109,7 @@ define([
 
 
                 this.internalList.parseJSON(data.internalList, this);
+                this.masterList.parseJSON(data.masterList, this);
                 for (i = 0; i < data.group_relative.length; i++) {
                     list = new ConstrainableList();
                     list.parseJSON(data.group_relative[i], this);
@@ -115,25 +120,10 @@ define([
                     list.parseJSON(data.group_reference[j], this);
                     this.group_reference.push(list);
                 }
-                var memberCount = {
-                    v: this.members.length,
-                    operator: 'set'
-                };
-                for (j = 0; j < this.members.length; j++) {
-                    this.members[j].get('zIndex').setValue(j);
-                }
-                this.get('memberCount').setValue(memberCount);
+
+
                 this.toggleClosed(this);
 
-            },
-
-            getById: function(id) {
-                for (var i = 0; i < this.members.length; i++) {
-                    var match = this.members[i].getById(id);
-                    if (match) {
-                        return match;
-                    }
-                }
             },
 
             /*returns new child instance based on string name
@@ -163,10 +153,9 @@ define([
                     constraints.push.apply(constraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
-                console.log('internal ui', this.internalList.get('ui'));
                 this.internalList.get('ui').remove();
-                if (this.members.length > 1) {
-                    this.internalList.addMember(this.members[this.members.length - 1]);
+                if (this.masterList.members.length > 1) {
+                    this.internalList.addMember(this.masterList.members[this.masterList.members.length - 1]);
                 }
                 var constraint = new Constraint();
                 constraint.set('references', this.internalList);
@@ -188,7 +177,7 @@ define([
             setInternalGroupConstraint: function() {
                 var member_constraints = [];
                 var target = this.get('target');
-                for (var i = 0; i < target.members.length; i++) {
+                for (var i = 0; i < target.children.length; i++) {
                     var relative_list = new ConstrainableList();
                     var reference_list = new ConstrainableList();
                     relative_list.set('id', 'internal' + relative_list.get('id'));
@@ -198,18 +187,18 @@ define([
 
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
-                    reference_list.addMember(target.members[i]);
-                    if (this.members.length > 1) {
-                        reference_list.addMember(this.members[this.members.length - 1].members[i]);
+                    reference_list.addMember(target.children[i]);
+                    if (this.masterList.members.length > 1) {
+                        reference_list.addMember(this.masterList.members[this.masterList.members.length - 1].children[i]);
                     }
-                    for (var j = 0; j < this.members.length; j++) {
-                        relative_list.addMember(this.members[j].members[i]);
+                    for (var j = 0; j < this.masterList.members.length; j++) {
+                        relative_list.addMember(this.masterList.members[j].children[i]);
                     }
                     var constraint = new Constraint();
                     constraint.set('references', reference_list);
                     constraint.set('relatives', relative_list);
-                    constraint.set('proxy_references', target.members[i]);
-                    constraint.set('proxy_relatives', this.members[1].members[i]);
+                    constraint.set('proxy_references', target.children[i]);
+                    constraint.set('proxy_relatives', this.masterList.members[1].children[i]);
                     var data = [
                         ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
                         ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
@@ -224,65 +213,101 @@ define([
                 return member_constraints;
             },
 
-         
-
-            addMember: function(member, index) {
-
-                Group.prototype.addMember.call(this, member, index);
-                if (member.get('name') === 'group') {
-                    for (var j = 0; j < member.members.length; j++) {
-                        for (var i = 0; i < this.group_relative.length; i++) {
-                            this.group_relative[j].addMember(member.members[j], index);
-                        }
+            setTarget: function(target) {
+                if (target) {
+                    this.set('target', target);
+                    if (_.indexOf(this.children, target) < 0) {
+                        this.addChildNode(target);
                     }
+                } else {
+                    this.set('target', null);
                 }
-
-                //this.addMemberNotation();
-
+                this.masterList.addMember(target, 0);
             },
 
 
+            addRelativeMember: function(copy, index) {
+                if (this.masterList.members.length > 1) {
 
-            addMemberToOpen: function(data) {
-                if (this.get('open')) {
-                    var addedToList = false;
-                    for (var i = 0; i < this.members.length; i++) {
-                        var added = this.members[i].addMemberToOpen(data);
-                        if (added) {
-                            addedToList = true;
-                        }
+                    copy.setValue(this.masterList.members[this.masterList.members.length - 2].getValue());
+
+                    if (!index) {
+                        index = this.masterList.members.length - 1;
                     }
-                    if (addedToList) {
-                        if (data.get('type') === 'collection') {
-                            for (var j = 0; j < data.members.length; j++) {
-                                var removed = this.removeMember(data.members[j]);
-                            }
-                        }
-                        return true;
+                } else {
+
+                    copy.setValue(this.masterList.members[0].getValue());
+
+                    if (!index) {
+                        index = 1;
                     }
                 }
-                return false;
+
+                this.insertChild(index, copy);
+
+                this.masterList.addMember(copy, index);
+
             },
-
-
 
             deleteRelativeMember: function() {
-                var data = this.members[this.members.length - 2];
+                var data = this.masterList.members[this.masterList.members.length - 2];
                 if (data) {
-                    this.removeMember(data);
+                    this.removeChildNode(data);
                     this.masterList.removeMember(data);
                     data.deleteSelf();
-                    var parent = data.getParentNode();
-                    if (parent) {
-                        parent.removeChildNode(data);
-                    }
                     return data;
                 }
             },
 
+
+
+           insertChild: function(index, child, registerUndo) {
+              Group.prototype.insertChild.call(this, index, child, registerUndo);
+                if (child.get('name') === 'group') {
+                    for (var j = 0; j < child.children.length; j++) {
+                        for (var i = 0; i < this.group_relative.length; i++) {
+                            this.group_relative[j].addMember(child.children[j], index);
+                        }
+                    }
+                }
+            },
+
+            removeChildNode: function(node, updateCount, fullDelete) {
+                var target = this.get('target');
+                if (!fullDelete && this.internalList.hasMember(node, true, this)) {
+                    return false;
+                }
+                var index = $.inArray(node, this.children);
+                var child;
+
+                if (index > -1) {
+
+                    child = this.children.splice(index, 1)[0];
+                    var childIndex = child.get('geom').index;
+                    this.get('geom').removeChildren(childIndex, childIndex + 1);
+                    Group.prototype.removeChildNode.call(this, child);
+
+                }
+                if (node.get('name') === 'group') {
+                    for (var j = 0; j < node.members.length; j++) {
+                        for (var i = 0; i < this.group_relative.length; i++) {
+                            this.group_relative[j].removeMember(node.members[j]);
+                        }
+                    }
+                }
+                if (updateCount) {
+                    for (var k = 0; k < this.children.length; k++) {
+                        this.children[k].get('zIndex').setValue(k);
+                    }
+                    this.get('memberCount').setValue(this.members.length);
+                }
+                return child;
+            },
+
+
             deleteMember: function(member, removeAll) {
 
-                this.removeMember(member, false, removeAll);
+                this.removeChildNode(member, false, removeAll);
                 member.deleteSelf();
                 var parent = member.getParentNode();
                 if (parent) {
@@ -319,14 +344,14 @@ define([
 
                 var deleted = [];
 
-                for (var k = this.members.length - 1; k >= 0; k--) {
+                for (var k = this.children.length - 1; k >= 0; k--) {
                     console.log('deleting member at', i, this.members.length);
-                    deleted.push.apply(deleted, this.members[k].deleteAllChildren());
-                    var deleted_member = this.deleteMember(this.members[k], true);
+                    deleted.push.apply(deleted, this.children[k].deleteAllChildren());
+                    var deleted_member = this.removeChildNode(this.members[k], true);
                     deleted.push(deleted_member);
                 }
-                this.members.length = 0;
                 this.children.length = 0;
+                this.masterList.length = 0;
                 return deleted;
             },
 
@@ -341,38 +366,6 @@ define([
             },
 
 
-            removeMember: function(data, updateCount, fullDelete) {
-                console.log('data', data);
-                var target = this.get('target');
-                if (!fullDelete && this.internalList.hasMember(data, true, this)) {
-                    return false;
-                }
-                var index = $.inArray(data, this.members);
-                var member;
-
-                if (index > -1) {
-
-                    member = this.members.splice(index, 1)[0];
-                    var childIndex = member.get('geom').index;
-                    this.get('geom').removeChildren(childIndex, childIndex + 1);
-                    this.removeChildNode(member);
-
-                }
-                if (data.get('name') === 'group') {
-                    for (var j = 0; j < data.members.length; j++) {
-                        for (var i = 0; i < this.group_relative.length; i++) {
-                            this.group_relative[j].removeMember(data.members[j]);
-                        }
-                    }
-                }
-                if (updateCount) {
-                    for (var k = 0; k < this.members.length; k++) {
-                        this.members[k].get('zIndex').setValue(k);
-                    }
-                    this.get('memberCount').setValue(this.members.length);
-                }
-                return member;
-            },
 
             shiftTarget: function(index) {
                 var old_target = this.get('target');
@@ -386,37 +379,13 @@ define([
                 }
                 this.internalList.addMember(this.get('target'), 0);
                 //this.internalList.removeMember(this.get('target'));
-
-
             },
 
-            addRelativeMember: function(copy, index) {
 
-                if (this.members.length > 1) {
-
-                    copy.setValue(this.members[this.members.length - 2].getValue());
-
-                    if (!index) {
-                        index = this.members.length - 1;
-                    }
-                } else {
-
-                    copy.setValue(this.members[0].getValue());
-
-                    if (!index) {
-                        index = 1;
-                    }
-                }
-
-                this.addMember(copy, index);
-                this.masterList.addMember(copy, index);
-
-            },
 
             setCount: function(count) {
 
                 this.get('count').setValue(count);
-                var range = this.getRange();
                 var diff = count - this.children.length;
                 var target = this.get('target');
 
@@ -442,36 +411,13 @@ define([
                     toRemove: toRemove
                 };
 
-                for (var i = 0; i < this.members.length; i++) {
-                    if (this.members[i].get('zIndex').getValue() != i) {
-                        console.log('setting value to for', i);
-                        this.members[i].get('zIndex').setValue(i);
-                    }
-                }
-                var memberCount = {
-                    v: this.members.length,
-                    operator: 'set'
-                };
-                this.get('memberCount').setValue(memberCount);
+              
+
                 return data;
             },
 
             getCountValue: function() {
                 return this.get('count').getValue();
-            },
-
-
-            setTarget: function(target) {
-                if (target) {
-                    this.set('target', target);
-                    if (_.indexOf(this.members, target) < 0) {
-                        this.addMember(target);
-                    }
-                } else {
-                    this.set('target', null);
-                }
-                this.masterList.addMember(target, 0);
-                this.get('memberCount').setValue(this.members.length);
             },
 
 

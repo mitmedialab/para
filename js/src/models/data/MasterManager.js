@@ -801,11 +801,11 @@ define([
 			var index = object.index;
 			object.nodeParent.removeChildNode(object);
 			var duplicator = collectionManager.addDuplicator(object);
+			var data = duplicator.setCount(3);
 			currentNode.insertChild(index, duplicator);
 			layersView.removeShape(object.get('id'));
 			layersView.addShape(duplicator.toJSON());
 			this.selectShape(duplicator);
-			var data = duplicator.setCount(3);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
 			for (var i = 0; i < constraints.length; i++) {
@@ -828,8 +828,8 @@ define([
 			}
 
 			layersView.removeChildren(duplicator.get('id'));
-			for (var k = 0; k < duplicator.members.length; k++) {
-				layersView.addShape(duplicator.members[k].toJSON(), duplicator.get('id'));
+			for (var k = 0; k < duplicator.children.length; k++) {
+				layersView.addShape(duplicator.children[k].toJSON(), duplicator.get('id'));
 			}
 			layersView.sortChildren(duplicator.get('id'));
 			this.updateListConstraints(duplicator);
@@ -902,7 +902,7 @@ define([
 							return false;
 						}
 						if (relativeShape.get('name') === 'group') {
-							relativeShape.addMember(movedShape);
+							relativeShape.addChildNode(movedShape);
 							layersView.removeChildren(relativeShape.get('id'));
 							for (var i = 0; i < relativeShape.members.length; i++) {
 								layersView.addShape(relativeShape.members[i].toJSON(), relativeShape.get('id'));
@@ -918,11 +918,11 @@ define([
 								if (parent.nodeParent.get('name') === 'duplicator') {
 									return false;
 								}
-								parent.removeMember(movedShape);
+								parent.removeChildNode(movedShape);
 
 							} else if (parent.get('name') === 'duplicator') {
 
-								var success = parent.removeMember(movedShape, true);
+								var success = parent.removeChildNode(movedShape, true);
 								if (!success) {
 									return false;
 								}
@@ -1204,7 +1204,7 @@ define([
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
 					instance.setValue(style_data,!stateStored);
-					non_group_selected.push.apply(non_group_selected,instance.getInstanceMembers());
+					non_group_selected.push.apply(non_group_selected,instance.getInstanceChildren());
 				}
 				this.addToUndoStack(non_group_selected);
 			}
