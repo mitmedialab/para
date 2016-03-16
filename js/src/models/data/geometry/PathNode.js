@@ -295,12 +295,8 @@ define([
     modifyPoints: function(data, mode, modifier, exclude, registerUndo) {
       
     if (registerUndo) {
-        if (!this.stateStored) {
-          this.previousStates.push(this.toJSON());
-          this.stateStored = true;
-          console.log('instance stored state', this.previousStates);
-        }
-      }
+        this.addToUndoStack();
+    }
       var proto_node = this.get('proto_node');
 
 

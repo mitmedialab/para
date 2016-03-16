@@ -21,13 +21,7 @@ define([
     ],
 
     function(_, Instance, ConstrainableList, PathNode, RectNode, EllipseNode, PolygonNode, Group, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
-        var init_lookup = {
-            'path': PathNode,
-            'ellipse': EllipseNode,
-            'polygon': PolygonNode,
-            'rectangle': RectNode,
-            'group': Group
-        };
+      
         var Duplicator = Group.extend({
 
             defaults: _.extend({}, Group.prototype.defaults, {
@@ -126,14 +120,7 @@ define([
 
             },
 
-            /*returns new child instance based on string name
-             */
-            getTargetClass: function(name) {
-                var target_class = init_lookup[name];
-                var child = new target_class();
-                return child;
-            },
-
+           
             getInternalList: function(id) {
                 if (this.internalList.get('id') === id) {
                     return this.internalList;

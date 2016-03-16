@@ -51,8 +51,8 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-      this.centerUI.fillColor = 'blue';
-      this.center = geom.position;
+     // this.centerUI.fillColor = 'blue';
+     // this.center = geom.position;
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'ui_layer';
@@ -71,8 +71,18 @@ define([
       return data;
     },
 
+    /*returns new child instance based on string name
+     */
+    getTargetClass: function(name) {
+      var target_class = init_lookup[name];
+      var child = new target_class();
+      return child;
+    },
+
+
     parseJSON: function(data, manager) {
       var childClone = this.children.slice(0, this.children.length);
+      var dataClone = data.children.slice(0,data.children.length);
       console.log('children starting', childClone);
       console.log('data starting', data.children);
 
@@ -87,17 +97,52 @@ define([
           childClone = _.filter(childClone, function(child) {
             return child.get('id') != target_id;
           });
-        }
-        //if the child does not currently exist
-        else {
-
+          dataClone = _.filter(dataClone, function(data) {
+            return data.id != target_id;
+          });
         }
       }
       console.log('children not matched', childClone);
 
+
+      //remove children not in JSON
       for (var j = 0; j < childClone.length; j++) {
-        var removed = this.removeChildNode(childClone[i]);
+        console.log('unmatched at', i, childClone[j]);
+        console.log('removing child,states',childClone[j].futureStates,childClone[j].previousStates);
+        var currentFuture = this.futureStates[this.futureStates.length-1];
+        var currentPast = this.previousStates[this.previousStates.length-1];
+        if(currentFuture){
+          var targetFuture = _.find(currentFuture.children, function(item) {
+            return item.id == childClone[j].get('id');
+          });
+          if(targetFuture){
+            console.log('target future found');
+            targetFuture.futureStates = childClone[j].futureStates;
+            targetFuture.previousStates = childClone[j].previousStates;
+          }
+        }
+        if(currentPast){
+          var targetPast = _.find(currentPast.children, function(item) {
+            return item.id == childClone[j].get('id');
+          });
+          if(targetPast){
+             console.log('target past found');
+            targetPast.futureStates = childClone[j].futureStates;
+            targetPast.previousStates = childClone[j].previousStates;
+          }
+        }
+
+        var removed = this.removeChildNode(childClone[j]);
         removed.deleteSelf();
+      }
+
+      //addChildren in JSON that didn't already exist
+      for (var k = 0;k < dataClone.length; k++) {
+        var newChild = this.getTargetClass(dataClone[k].name);
+        newChild.parseJSON(dataClone[k]);
+        newChild.previousStates = dataClone[k].previousStates;
+        newChild.futureStates = dataClone[k].futureStates;
+        this.insertChild(dataClone[k].zIndex,newChild);
       }
 
       GeometryNode.prototype.parseJSON.call(this, data, manager);
@@ -113,13 +158,7 @@ define([
       }
     },
 
-    /*returns new child instance based on string name
-     */
-    getTargetClass: function(name) {
-      var target_class = init_lookup[name];
-      var child = new target_class();
-      return child;
-    },
+   
 
     getById: function(id) {
       if (this.get('id') == id) {
@@ -326,7 +365,7 @@ define([
 
       if (!this.get('rendered')) {
         for (var i = 0; i < this.renderQueue.length; i++) {
-         if (!this.renderQueue[i].deleted) {
+          if (!this.renderQueue[i].deleted) {
             this.renderQueue[i].render();
           }
         }

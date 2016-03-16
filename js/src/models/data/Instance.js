@@ -241,12 +241,12 @@ define([
 					}
 				}
 			}
-			this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 3);
-			this.centerUI.fillColor = 'red';
-			var targetLayer = paper.project.layers.filter(function(layer) {
-				return layer.name === 'ui_layer';
-			})[0];
-			targetLayer.addChild(this.centerUI);
+			//this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 3);
+			//this.centerUI.fillColor = 'red';
+			//var targetLayer = paper.project.layers.filter(function(layer) {
+			//	return layer.name === 'ui_layer';
+			//})[0];
+			//targetLayer.addChild(this.centerUI);
 			this.renderQueue = [];
 
 			//undo redo variables
@@ -444,7 +444,7 @@ define([
 			instance.changeGeomInheritance(g_clone);
 			instance.set('rendered',true);
 			instance._matrix = this._matrix.clone();
-			instance.reset()
+			instance.reset();
 			instance.render();
 			return instance;
 		},
@@ -455,9 +455,7 @@ define([
 
 		insertChild: function(index, child, registerUndo) {
 			if (registerUndo) {
-				this.previousStates.push(this.toJSON());
-				console.log('instance stored state', this.previousStates);
-
+				this.addToUndoStack();
 			}
 
 			if (child.nodeParent) {
@@ -481,12 +479,12 @@ define([
 
 		removeChildNode: function(node, registerUndo) {
 			if (registerUndo) {
-				this.previousStates.push(this.toJSON());
-				console.log('instance stored state', this.previousStates);
+				this.addToUndoStack();
 
 			}
 
 			var removed = SceneNode.prototype.removeChildNode.call(this, node);
+			console.log('removed',removed);
 			if (removed) {
 				for (var i = 0; i < this.children.length; i++) {
 					if (this.children[i].get('zIndex').getValue() != i) {
@@ -505,17 +503,13 @@ define([
 				this.children[i].get('zIndex').setValue(i);
 			}
 
-
-
 		},
 
 		setChildBefore: function(child, sibling) {
-
 			SceneNode.prototype.setChildBefore.call(this, child, sibling);
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
-
 		},
 
 		addInheritor: function(instance) {
@@ -815,8 +809,11 @@ define([
 			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
 			data._matrix = this._matrix.values;
+			data.rendered = this.get('rendered');
+			data.stateStored = this.stateStored;
 			this.previousProperties = this.properties;
 			this.properties = data;
+
 			return data;
 
 		},
@@ -833,6 +830,7 @@ define([
 			this.set('id', data.id);
 			this.set('visible', data.visible);
 			this.set('open', data.open);
+			this.set('rendered',data.rendered);
 			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
 
 		},
@@ -894,6 +892,7 @@ define([
 
 		//undo to last state
 		undo: function() {
+			console.log('previous states',this.previousStates);
 			if (this.previousStates.length > 0) {
 				console.log('calling undo on', this.get('name'));
 				var state = this.previousStates.pop();
@@ -906,6 +905,7 @@ define([
 		},
 
 		redo: function() {
+			console.log('future states',this.futureStates);
 			if (this.futureStates.length > 0) {
 				console.log('calling redo on', this.get('name'));
 				var state = this.futureStates.pop();
@@ -916,6 +916,15 @@ define([
 			}
 
 		},
+
+		addToUndoStack:function(){
+			if (!this.stateStored) {
+				this.previousStates.push(this.toJSON());
+				this.stateStored = true;
+				this.futureStates = [];
+				console.log('instance stored state', this.previousStates);
+			}
+		},
 		/*setValue
 		 * modifies the properties of this instance in accordance with the
 		 * data passed in
@@ -924,11 +933,7 @@ define([
 		 */
 		setValue: function(data, registerUndo) {
 			if (registerUndo) {
-				if (!this.stateStored) {
-					this.previousStates.push(this.toJSON());
-					this.stateStored = true;
-					console.log('instance stored state', this.previousStates);
-				}
+				this.addToUndoStack();
 			}
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;

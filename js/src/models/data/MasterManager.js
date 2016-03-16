@@ -111,9 +111,14 @@ define([
 		
 		addToUndoStack:function(selected){
 			if (!stateStored) {
-				undoStack.push(selected.slice(0, selected.length));
+				var selected_ids = [];
+				for(var i=0;i<selected.length;i++){
+					selected_ids.push(selected[i].get('id'));
+				}
+				undoStack.push(selected_ids);
 				stateStored = true;
 				console.log('succesfully added to undo stack',undoStack);
+				redoStack = [];
 
 			}
 		},
@@ -122,7 +127,9 @@ define([
 			console.log('undo', undoStack);
 			if (undoStack.length > 0) {
 				var toUndo = undoStack.pop();
-				toUndo.forEach(function(item) {
+				var self = this;
+				toUndo.forEach(function(id) {
+					var item = self.getById(id);
 					item.undo();
 
 				});
@@ -136,7 +143,10 @@ define([
 			console.log('redo', redoStack);
 			if (redoStack.length > 0) {
 				var toRedo = redoStack.pop();
-				toRedo.forEach(function(item) {
+				var self = this;
+				toRedo.forEach(function(id) {
+					var item = self.getById(id);
+					console.log('item found',item);
 					item.redo();
 				});
 				undoStack.push(toRedo);
