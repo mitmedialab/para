@@ -25,10 +25,11 @@ define([
 	'views/MapView',
 	'views/SaveExportView',
 	'utils/analytics',
+	'utils/GeometryGenerator'
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, analytics) {
+], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, analytics, GeometryGenerator) {
 	//debug vars for testing framerate
 	var fps = 0,
 		now, lastUpdate = (new Date()) * 1;
@@ -63,7 +64,9 @@ define([
 			//setup root node
 			//
 
-			rootNode = new FunctionNode();
+			rootNode = new FunctionNode({}, {
+				geometryGenerator: GeometryGenerator
+			});
 
 
 			rootNode.open();
@@ -150,7 +153,6 @@ define([
 				var self = this;
 				toRedo.forEach(function(id) {
 					var item = self.getById(id);
-					console.log('item found', item);
 					item.redo();
 				});
 				this.deselectAllShapes();
@@ -198,12 +200,16 @@ define([
 				switch (geometry[i].name) {
 
 					case 'duplicator':
-						var duplicator = new Duplicator();
+						var duplicator = new Duplicator({}, {
+							geometryGenerator: GeometryGenerator
+						});
 						duplicator.parseJSON(geometry[i]);
 						this.addDuplicator(duplicator);
 						break;
 					case 'group':
-						var group = new Group();
+						var group = new Group({}, {
+							geometryGenerator: GeometryGenerator
+						});
 						group.parseJSON(geometry[i]);
 						this.addGroup(null, group);
 						break;
@@ -549,11 +555,12 @@ define([
 				id: 'modify',
 				action: 'ungroup'
 			});
+			var parents = [];
 			for (var i = 0; i < selected.length; i++) {
+
 				switch (selected[i].get('type')) {
 					case 'geometry':
 						if (selected[i].get('name') == 'group') {
-
 
 						}
 						break;
@@ -788,7 +795,9 @@ define([
 
 		addGroup: function(selected, group) {
 			if (selected) {
-				group = new Group();
+				group = new Group({}, {
+					geometryGenerator: GeometryGenerator
+				});
 				currentNode.addChildNode(group, !stateStored);
 				for (var j = 0; j < selected.length; j++) {
 					group.addChildNode(selected[j]);
@@ -831,7 +840,11 @@ define([
 			object.nodeParent.removeChildNode(object);
 			var duplicator = collectionManager.addDuplicator(object);
 			var data = duplicator.setCount(3);
-			currentNode.insertChild(index, duplicator);
+
+			currentNode.insertChild(index, duplicator, !stateStored);
+			this.addToUndoStack([currentNode]);
+			this.modificationEnded([currentNode]);
+
 			layersView.removeShape(object.get('id'));
 			layersView.addShape(duplicator.toJSON());
 			this.selectShape(duplicator);
@@ -872,9 +885,11 @@ define([
 				this.duplicatorCountModified(data, duplicator);
 			} else {
 				for (var i = 0; i < selected.length; i++) {
-					data = selected[i].setCount(value);
+					data = selected[i].setCount(value, !stateStored);
 					this.duplicatorCountModified(data, selected[i]);
 				}
+				this.addToUndoStack(selected);
+				this.modificationEnded(selected);
 			}
 		},
 
@@ -931,7 +946,7 @@ define([
 							return false;
 						}
 						if (relativeShape.get('name') === 'group') {
-							relativeShape.addChildNode(movedShape,!stateStored);
+							relativeShape.addChildNode(movedShape, !stateStored);
 							this.addToUndoStack([relativeShape]);
 							this.modificationEnded([relativeShape]);
 
@@ -950,10 +965,10 @@ define([
 								if (parent.nodeParent.get('name') === 'duplicator') {
 									return false;
 								}
-									parent.removeChildNode(movedShape, !stateStored);
-									this.addToUndoStack([parent]);
-									this.modificationEnded([parent]);
-							
+								parent.removeChildNode(movedShape, !stateStored);
+								this.addToUndoStack([parent]);
+								this.modificationEnded([parent]);
+
 
 							} else if (parent.get('name') === 'duplicator') {
 

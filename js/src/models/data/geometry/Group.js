@@ -9,17 +9,13 @@ define([
   'underscore',
   'paper',
   'models/data/geometry/GeometryNode',
-  'models/data/geometry/PathNode',
-  'models/data/geometry/RectNode',
-  'models/data/geometry/EllipseNode',
-  'models/data/geometry/PolygonNode',
   'utils/TrigFunc',
   'models/data/properties/PFloat',
   'models/data/properties/PPoint',
 
 
 
-], function(_, paper, GeometryNode, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
+], function(_, paper, GeometryNode, TrigFunc, PFloat, PPoint) {
 
   var Group = GeometryNode.extend({
 
@@ -32,7 +28,7 @@ define([
 
     }),
 
-    initialize: function() {
+    initialize: function(attributes, options) {
       GeometryNode.prototype.initialize.apply(this, arguments);
       this.resetProperties();
       this.get('scalingDelta').setValue({
@@ -55,6 +51,7 @@ define([
       targetLayer.addChild(ui_group);
       this.set('bbox', ui_group);
       this.createBBox();
+      this.geometryGenerator = options.geometryGenerator;
     },
 
 
@@ -66,13 +63,6 @@ define([
       return data;
     },
 
-    /*returns new child instance based on string name
-     */
-    getTargetClass: function(name) {
-      var target_class = init_lookup[name];
-      var child = new target_class();
-      return child;
-    },
 
 
     parseJSON: function(data, manager) {
@@ -89,7 +79,6 @@ define([
         //if the child currently exists in the group
         if (target_data) {
           this.children[i].parseJSON(target_data);
-          //this.children[i].trigger('modified', this.children[i]);
           childClone = _.filter(childClone, function(child) {
             return child.get('id') != target_id;
           });
@@ -130,14 +119,14 @@ define([
 
       //addChildren in JSON that didn't already exist
       for (var k = 0; k < dataClone.length; k++) {
-        var newChild = this.getTargetClass(dataClone[k].name);
+        var newChild = this.geometryGenerator.getTargetClass(dataClone[k].name);
         newChild.parseJSON(dataClone[k]);
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
         this.insertChild(dataClone[k].zIndex, newChild);
         newChild.trigger('modified', newChild);
       }
-      
+
       GeometryNode.prototype.parseJSON.call(this, data, manager);
 
     },
@@ -492,12 +481,6 @@ define([
 
 
   });
-  var init_lookup = {
-    'path': PathNode,
-    'ellipse': EllipseNode,
-    'polygon': PolygonNode,
-    'rectangle': RectNode,
-    'group': Group
-  };
+
   return Group;
 });

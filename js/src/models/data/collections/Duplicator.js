@@ -6,22 +6,18 @@ define([
         'underscore',
         'models/data/Instance',
         'models/data/collections/ConstrainableList',
-        'models/data/geometry/PathNode',
-        'models/data/geometry/RectNode',
-        'models/data/geometry/EllipseNode',
-        'models/data/geometry/PolygonNode',
         'models/data/geometry/Group',
         'models/data/properties/PFloat',
         'models/data/properties/PBool',
         'paper',
         'models/data/properties/PConstraint',
         'models/data/Constraint',
-        'utils/TrigFunc'
+        'utils/TrigFunc',
 
     ],
 
-    function(_, Instance, ConstrainableList, PathNode, RectNode, EllipseNode, PolygonNode, Group, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
-      
+    function(_, Instance, ConstrainableList, Group, PFloat, PBool, paper, PConstraint, Constraint, TrigFunc) {
+
         var Duplicator = Group.extend({
 
             defaults: _.extend({}, Group.prototype.defaults, {
@@ -33,7 +29,7 @@ define([
                 exception_count: null,
             }),
 
-            initialize: function() {
+            initialize: function(attributes, options) {
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
@@ -65,12 +61,22 @@ define([
 
             toJSON: function() {
 
-                var data = Group.prototype.toJSON.call(this, data);
+                var data = Group.prototype.toJSON.call(this);
                 data.target_index = this.children.indexOf(this.get('target'));
+                data.targetID = this.get('target').get('id');
                 data.internalList = this.internalList.toJSON();
                 data.masterList = this.masterList.toJSON();
+               /* data.internalList = [];
+                this.internalList.forEach(function(member){
+                    data.internalList.push(member.get('id'));
+                });
+                data.masterList = []
+                this.masterList.forEach(function(member){
+                    data.masterList.push(member.get('id'));
+                });*/
                 data.group_relative = [];
                 data.group_reference = [];
+                data.count = this.get('count').getValue();
                 for (var i = 0; i < this.group_relative.length; i++) {
                     data.group_relative.push(this.group_relative[i].toJSON());
                 }
@@ -83,27 +89,24 @@ define([
 
 
             parseJSON: function(data) {
-                Instance.prototype.parseJSON.call(this, data);
+                Group.prototype.parseJSON.call(this, data);
+                if (!this.get('target') || this.get('target').get('id') != data.targetID) {
+                    this.setTarget(_.find(this.children, function(child) {
+                        return child.get('id') == data.targetID;
+                    }));
+                }
                 var target_index = data.target_index;
                 var target_data = data.children[target_index];
-                var target = this.getTargetClass(target_data.name);
-                target.parseJSON(target_data, this);
-                this.setTarget(target);
+                var target = this.get('target');
                 var i, j, list;
-                for (i = 0; i < data.children.length; i++) {
-                    if (i != target_index) {
-                        var name = data.children[i].name;
-                        var child = this.getTargetClass(name);
-                        child.parseJSON(data.children[i], this);
-                        this.insertChild(i, child);
-                    }
-                }
-
+                this.get('count').setValue(data.count);
+                console.log('child num==count', data.count == this.children.length,data.count,this.children.length);
                 target.parseInheritorJSON(target_data, this);
-
+                console.log('child num==count', data.count == this.children.length,data.count,this.children.length);
 
                 this.internalList.parseJSON(data.internalList, this);
                 this.masterList.parseJSON(data.masterList, this);
+
                 for (i = 0; i < data.group_relative.length; i++) {
                     list = new ConstrainableList();
                     list.parseJSON(data.group_relative[i], this);
@@ -114,13 +117,9 @@ define([
                     list.parseJSON(data.group_reference[j], this);
                     this.group_reference.push(list);
                 }
-
-
-                this.toggleClosed(this);
-
             },
 
-           
+
             getInternalList: function(id) {
                 if (this.internalList.get('id') === id) {
                     return this.internalList;
@@ -209,7 +208,9 @@ define([
                 } else {
                     this.set('target', null);
                 }
-                this.masterList.addMember(target, 0);
+                if (!this.masterList.hasMember(target, true)) {
+                    this.masterList.addMember(target, 0);
+                }
             },
 
 
@@ -248,8 +249,8 @@ define([
 
 
 
-           insertChild: function(index, child, registerUndo) {
-              Group.prototype.insertChild.call(this, index, child, registerUndo);
+            insertChild: function(index, child, registerUndo) {
+                Group.prototype.insertChild.call(this, index, child, registerUndo);
                 if (child.get('name') === 'group') {
                     for (var j = 0; j < child.children.length; j++) {
                         for (var i = 0; i < this.group_relative.length; i++) {
@@ -370,8 +371,10 @@ define([
 
 
 
-            setCount: function(count) {
-
+            setCount: function(count, registerUndo) {
+                if (registerUndo) {
+                    this.addToUndoStack();
+                }
                 this.get('count').setValue(count);
                 var diff = count - this.children.length;
                 var target = this.get('target');
@@ -398,7 +401,7 @@ define([
                     toRemove: toRemove
                 };
 
-              
+
 
                 return data;
             },

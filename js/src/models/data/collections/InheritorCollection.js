@@ -45,6 +45,7 @@ define([
 			},
 
 			parseJSON: function(data,proto, manager){
+				this.inheritors = [];
 				for(var i=0;i<data.length;i++){
 					var instance = manager.getById(data[i]);
 					this.inheritors.push(instance);

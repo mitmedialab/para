@@ -69,7 +69,7 @@ define([
       if (data instanceof Array) {
         for (var i = 0; i < data.length; i++) {
           this.members.push(data[i]);
-          this.listenTo(data[i],'modified',this.modified);
+          this.listenTo(data[i], 'modified', this.modified);
 
         }
       } else {
@@ -78,7 +78,7 @@ define([
         } else {
           this.members.push(data);
         }
-        this.listenTo(data,'modified',this.modified);
+        this.listenTo(data, 'modified', this.modified);
 
       }
 
@@ -94,15 +94,15 @@ define([
       var isolationLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'isolation_layer';
       })[0];
-      for(var i=0;i<this.members.length;i++){
-          this.members[i].isolate();
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].isolate();
       }
 
     },
 
     deIsolate: function() {
-      for(var i=0;i<this.members.length;i++){
-          this.members[i].deIsolate();
+      for (var i = 0; i < this.members.length; i++) {
+        this.members[i].deIsolate();
       }
     },
 
@@ -129,21 +129,21 @@ define([
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].hide();
       }
-      this.set('visible',false);
+      this.set('visible', false);
     },
 
     show: function() {
       for (var i = 0; i < this.members.length; i++) {
         this.members[i].show();
       }
-      this.set('visible',true);
+      this.set('visible', true);
 
     },
-//callback triggered when a subproperty is modified externally 
-      modified: function() {
-        this.setNull(false);
-        this.trigger('modified', this);
-      },
+    //callback triggered when a subproperty is modified externally 
+    modified: function() {
+      this.setNull(false);
+      this.trigger('modified', this);
+    },
 
     bringToFront: function() {
       for (var i = 0; i < this.members.length; i++) {
@@ -191,13 +191,13 @@ define([
     },
 
 
-    deleteAllMembers: function(deleted){
-       if(!deleted){
+    deleteAllMembers: function(deleted) {
+      if (!deleted) {
         deleted = [];
       }
-      for(var i=this.members.length-1;i>=0;i--){
-        deleted.push.apply(deleted,this.members[i].deleteAllMembers());
-        if(this.members[i].get('type')==='collection'){
+      for (var i = this.members.length - 1; i >= 0; i--) {
+        deleted.push.apply(deleted, this.members[i].deleteAllMembers());
+        if (this.members[i].get('type') === 'collection') {
           this.members[i].deleteSelf();
           deleted.push(this.members[i]);
         }
@@ -438,12 +438,12 @@ define([
       return null;
     },
 
-    reset: function(){
+    reset: function() {
 
     },
 
     compile: function() {
-     
+
     },
 
 
@@ -559,25 +559,80 @@ define([
       return data;
     },
 
-    parseJSON: function(data,manager){
-      Instance.prototype.parseJSON.call(this, data);
-      var members = data.members;
-      var collection_members = [];
-      for(var i=0;i<members.length;i++){
-        var member;
-        if(members[i].type ==='collection'){
-          member = new this.constructor();  
-          collection_members.push.apply(collection_members,member.parseJSON(members[i],manager));
-        }
-        else{
-          member = manager.getById(members[i].id);
-        }
-        this.addMember(member,i);
-      }
-      collection_members.push(this);
-      return collection_members;
-    },
+    parseJSON: function(data, manager) {
 
+      var memberClone = this.members.slice(0, this.members.length);
+      var dataClone = data.members.slice(0, data.members.length);
+
+      for (var i = 0; i < this.members.length; i++) {
+        var target_id = this.members[i].get('id');
+        var target_data = _.find(data.members, function(item) {
+          return item.id == target_id;
+        });
+        //if the member currently exists in the group
+        if (target_data) {
+          //only parse json if it's a list inside a list
+          if (this.members[i].get('type') == 'collection') {
+            this.members[i].parseJSON(target_data);
+          }
+
+          memberClone = _.filter(memberClone, function(member) {
+            return member.get('id') != target_id;
+          });
+          dataClone = _.filter(dataClone, function(data) {
+            return data.id != target_id;
+          });
+        }
+      }
+
+      //remove members not in JSON
+      for (var j = 0; j < memberClone.length; j++) {
+
+        /*var currentFuture = this.futureStates[this.futureStates.length - 1];
+        var currentPast = this.previousStates[this.previousStates.length - 1];
+        if (currentFuture) {
+          var targetFuture = _.find(currentFuture.children, function(item) {
+            return item.id == childClone[j].get('id');
+          });
+          if (targetFuture) {
+            targetFuture.futureStates = childClone[j].futureStates;
+            targetFuture.previousStates = childClone[j].previousStates;
+          }
+        }
+        if (currentPast) {
+          var targetPast = _.find(currentPast.children, function(item) {
+            return item.id == childClone[j].get('id');
+          });
+          if (targetPast) {
+            targetPast.futureStates = childClone[j].futureStates;
+            targetPast.previousStates = childClone[j].previousStates;
+          }
+        }*/
+
+        var removed = this.removeMember(memberClone[j]);
+      }
+
+      //addChildren in JSON that didn't already exist
+      for (var k = 0; k < dataClone.length; k++) {
+        var member;
+        if (dataClone[k].type == 'collection') {
+          member = new this.constructor();
+          member.previousStates = dataClone[k].previousStates;
+          member.futureStates = dataClone[k].futureStates;
+        } else {
+          member = manager.getById(dataClone[k].id);
+        }
+
+        this.addMember(member, dataClone[k].zIndex);
+
+        member.trigger('modified', member);
+
+      }
+
+      Instance.prototype.parseJSON.call(this, data, manager);
+
+
+    },
     getShapeClone: function() {
       var clone = new paper.Group(this.members.map(function(instance) {
         return instance.getShapeClone();

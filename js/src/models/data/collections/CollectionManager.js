@@ -8,11 +8,13 @@ define([
 	'backbone',
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
-	'models/data/geometry/Group'
+	'models/data/geometry/Group',
+		'utils/GeometryGenerator'
 
 
 
-], function(_, Backbone, ConstrainableList, Duplicator, Group) {
+
+], function(_, Backbone, ConstrainableList, Duplicator, Group, GeometryGenerator) {
 
 
 	//stores para lists
@@ -271,7 +273,7 @@ define([
 
 		addDuplicator: function(object, duplicator) {
 			if (object) {
-				duplicator = new Duplicator();
+				duplicator = new Duplicator({},{geometryGenerator:GeometryGenerator});
 
 				duplicator.setTarget(object);
 			}
