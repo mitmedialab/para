@@ -76,6 +76,7 @@ define([
 
 
     parseJSON: function(data, manager) {
+
       var childClone = this.children.slice(0, this.children.length);
       var dataClone = data.children.slice(0, data.children.length);
 
@@ -88,7 +89,7 @@ define([
         //if the child currently exists in the group
         if (target_data) {
           this.children[i].parseJSON(target_data);
-          this.children[i].trigger('modified', this.children[i]);
+          //this.children[i].trigger('modified', this.children[i]);
           childClone = _.filter(childClone, function(child) {
             return child.get('id') != target_id;
           });
@@ -136,8 +137,9 @@ define([
         this.insertChild(dataClone[k].zIndex, newChild);
         newChild.trigger('modified', newChild);
       }
-
+      
       GeometryNode.prototype.parseJSON.call(this, data, manager);
+
     },
 
 

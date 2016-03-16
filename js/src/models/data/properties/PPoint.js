@@ -77,10 +77,10 @@ define([
 			 */
 			setValue: function(point) {
 				var xSet, ySet;
-				if (point.x) {
+				if (point.x!==undefined) {
 					xSet = this.setX(point.x);
 				}
-				if (point.y) {
+				if (point.y!==undefined) {
 					ySet = this.setY(point.y);
 				}
 				this.setNull(false);

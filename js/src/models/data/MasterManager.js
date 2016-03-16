@@ -118,6 +118,7 @@ define([
 				undoStack.push(selected_ids);
 				stateStored = true;
 				console.log('succesfully added to undo stack', undoStack);
+				console.trace();
 				redoStack = [];
 
 			}
@@ -628,8 +629,8 @@ define([
 
 			if (parent) {
 				parent.removeChildNode(target, !stateStored);
-				this.addToUndoStack([currentNode]);
-				this.modificationEnded([currentNode]);
+				this.addToUndoStack([parent]);
+				this.modificationEnded([parent]);
 			}
 
 			target.deleteSelf();
@@ -930,10 +931,13 @@ define([
 							return false;
 						}
 						if (relativeShape.get('name') === 'group') {
-							relativeShape.addChildNode(movedShape);
+							relativeShape.addChildNode(movedShape,!stateStored);
+							this.addToUndoStack([relativeShape]);
+							this.modificationEnded([relativeShape]);
+
 							layersView.removeChildren(relativeShape.get('id'));
-							for (var i = 0; i < relativeShape.members.length; i++) {
-								layersView.addShape(relativeShape.members[i].toJSON(), relativeShape.get('id'));
+							for (var i = 0; i < relativeShape.children.length; i++) {
+								layersView.addShape(relativeShape.children[i].toJSON(), relativeShape.get('id'));
 							}
 							layersView.sortChildren(relativeShape.get('id'));
 						}
@@ -946,11 +950,16 @@ define([
 								if (parent.nodeParent.get('name') === 'duplicator') {
 									return false;
 								}
-								parent.removeChildNode(movedShape);
+									parent.removeChildNode(movedShape, !stateStored);
+									this.addToUndoStack([parent]);
+									this.modificationEnded([parent]);
+							
 
 							} else if (parent.get('name') === 'duplicator') {
 
-								var success = parent.removeChildNode(movedShape, true);
+								var success = parent.removeChildNode(movedShape, true, !stateStored);
+								this.addToUndoStack([parent]);
+								this.modificationEnded([parent]);
 								if (!success) {
 									return false;
 								}

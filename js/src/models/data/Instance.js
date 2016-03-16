@@ -833,7 +833,7 @@ define([
 			this.set('open', data.open);
 			this.set('rendered',data.rendered);
 			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
-
+			this.trigger('modified',this);
 		},
 
 		parseInheritorJSON: function(data, manager) {
@@ -893,27 +893,26 @@ define([
 
 		//undo to last state
 		undo: function() {
-			//console.log('previous states',this.previousStates);
+			
 			if (this.previousStates.length > 0) {
-				//console.log('calling undo on', this.get('name'));
+				console.log('calling undo on', this.get('name'));
+
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
 				this.parseJSON(state);
-				this.trigger('modified', this);
+				
 
 			}
 		},
 
 		redo: function() {
-			//console.log('future states',this.futureStates);
 			if (this.futureStates.length > 0) {
-				//console.log('calling redo on', this.get('name'));
+				console.log('calling redo on', this.get('name'));
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
 				this.parseJSON(state);
-				this.trigger('modified', this);
 			}
 
 		},
@@ -923,7 +922,7 @@ define([
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;
 				this.futureStates = [];
-				console.log('instance stored state', this.previousStates);
+				//console.log('instance stored state', this.previousStates);
 			}
 		},
 		/*setValue
@@ -1366,6 +1365,7 @@ define([
 
 
 		childModified: function(child) {
+			//console.log(child.get('name'), 'of',this.get('name'),'modified');
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 			}
