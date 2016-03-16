@@ -83,8 +83,7 @@ define([
     parseJSON: function(data, manager) {
       var childClone = this.children.slice(0, this.children.length);
       var dataClone = data.children.slice(0,data.children.length);
-      console.log('children starting', childClone);
-      console.log('data starting', data.children);
+  
 
       for (var i = 0; i < this.children.length; i++) {
         var target_id = this.children[i].get('id');
@@ -94,6 +93,7 @@ define([
         //if the child currently exists in the group
         if (target_data) {
           this.children[i].parseJSON(target_data);
+          this.children[i].trigger('modified', this.children[i]);
           childClone = _.filter(childClone, function(child) {
             return child.get('id') != target_id;
           });
@@ -102,13 +102,11 @@ define([
           });
         }
       }
-      console.log('children not matched', childClone);
 
 
       //remove children not in JSON
       for (var j = 0; j < childClone.length; j++) {
-        console.log('unmatched at', i, childClone[j]);
-        console.log('removing child,states',childClone[j].futureStates,childClone[j].previousStates);
+      
         var currentFuture = this.futureStates[this.futureStates.length-1];
         var currentPast = this.previousStates[this.previousStates.length-1];
         if(currentFuture){
@@ -116,7 +114,6 @@ define([
             return item.id == childClone[j].get('id');
           });
           if(targetFuture){
-            console.log('target future found');
             targetFuture.futureStates = childClone[j].futureStates;
             targetFuture.previousStates = childClone[j].previousStates;
           }
@@ -126,7 +123,6 @@ define([
             return item.id == childClone[j].get('id');
           });
           if(targetPast){
-             console.log('target past found');
             targetPast.futureStates = childClone[j].futureStates;
             targetPast.previousStates = childClone[j].previousStates;
           }
@@ -143,6 +139,7 @@ define([
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
         this.insertChild(dataClone[k].zIndex,newChild);
+        newChild.trigger('modified',newChild);
       }
 
       GeometryNode.prototype.parseJSON.call(this, data, manager);
@@ -208,7 +205,6 @@ define([
     },
 
     insertChild: function(index, child, registerUndo) {
-      console.log('inserting child at', index, this.get('name'));
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
@@ -350,7 +346,7 @@ define([
 
         GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
-          if (!this.renderQueue[i].deleted) {
+         if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].reset();
           }
         }
@@ -365,7 +361,7 @@ define([
 
       if (!this.get('rendered')) {
         for (var i = 0; i < this.renderQueue.length; i++) {
-          if (!this.renderQueue[i].deleted) {
+        if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].render();
           }
         }

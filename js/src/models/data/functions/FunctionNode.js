@@ -160,7 +160,7 @@ define([
 			reset: function() {
 				for (var i = 0; i < this.renderQueue.length; i++) {
 
-					if (!this.renderQueue[i].deleted) {
+					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
 						this.renderQueue[i].reset();
 					}
 				}
@@ -170,7 +170,7 @@ define([
 			render: function() {
 
 				for (var i = 0; i < this.renderQueue.length; i++) {
-					if (!this.renderQueue[i].deleted) {
+					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
 						this.renderQueue[i].render();
 					}
 				}

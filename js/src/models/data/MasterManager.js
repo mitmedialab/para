@@ -126,13 +126,15 @@ define([
 		undo: function(event) {
 			console.log('undo', undoStack);
 			if (undoStack.length > 0) {
+			
 				var toUndo = undoStack.pop();
 				var self = this;
 				toUndo.forEach(function(id) {
 					var item = self.getById(id);
 					item.undo();
 
-				});
+				});	
+				this.deselectAllShapes();
 				redoStack.push(toUndo);
 			}
 
@@ -142,6 +144,7 @@ define([
 		redo: function() {
 			console.log('redo', redoStack);
 			if (redoStack.length > 0) {
+			
 				var toRedo = redoStack.pop();
 				var self = this;
 				toRedo.forEach(function(id) {
@@ -149,6 +152,7 @@ define([
 					console.log('item found',item);
 					item.redo();
 				});
+				this.deselectAllShapes();
 				undoStack.push(toRedo);
 			}
 		},
@@ -590,6 +594,10 @@ define([
 		},
 
 		removeObject: function() {
+
+			
+				
+			
 			for (var i = 0; i < selected.length; i++) {
 				collectionManager.removeObjectFromLists(selected[i]);
 				switch (selected[i].get('type')) {
@@ -608,25 +616,24 @@ define([
 				this.stopListening(selected[i]);
 
 			}
+
+			
 		},
 
 		removeGeometry: function(target) {
 			if (target.get('name') === 'duplicator') {
 				collectionManager.removeCollection(target);
 			}
-			var deleted = [];
-			deleted.push.apply(deleted, target.deleteAllChildren());
-			deleted.push(target.deleteSelf());
-
-			for (var i = 0; i < deleted.length; i++) {
-				this.stopListening(deleted[i]);
-			}
+			
 			var parent = target.getParentNode();
+
 			if (parent) {
-				parent.removeInheritor(target);
-				parent.removeChildNode(target);
+				parent.removeChildNode(target,!stateStored);
+				this.addToUndoStack([currentNode]);
+				this.modificationEnded([currentNode]);
 			}
 
+			target.deleteSelf();
 		},
 
 		removeCollection: function(target) {

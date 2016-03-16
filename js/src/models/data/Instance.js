@@ -482,9 +482,8 @@ define([
 				this.addToUndoStack();
 
 			}
-
+			this.removeInheritor(node);
 			var removed = SceneNode.prototype.removeChildNode.call(this, node);
-			console.log('removed',removed);
 			if (removed) {
 				for (var i = 0; i < this.children.length; i++) {
 					if (this.children[i].get('zIndex').getValue() != i) {
@@ -811,6 +810,8 @@ define([
 			data._matrix = this._matrix.values;
 			data.rendered = this.get('rendered');
 			data.stateStored = this.stateStored;
+			data.previousStates = this.previousStates.slice(0,this.previousStates.length);
+			data.futureStates = this.futureStates.slice(0,this.futureStates.length);
 			this.previousProperties = this.properties;
 			this.properties = data;
 
@@ -892,9 +893,9 @@ define([
 
 		//undo to last state
 		undo: function() {
-			console.log('previous states',this.previousStates);
+			//console.log('previous states',this.previousStates);
 			if (this.previousStates.length > 0) {
-				console.log('calling undo on', this.get('name'));
+				//console.log('calling undo on', this.get('name'));
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
@@ -905,9 +906,9 @@ define([
 		},
 
 		redo: function() {
-			console.log('future states',this.futureStates);
+			//console.log('future states',this.futureStates);
 			if (this.futureStates.length > 0) {
-				console.log('calling redo on', this.get('name'));
+				//console.log('calling redo on', this.get('name'));
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
