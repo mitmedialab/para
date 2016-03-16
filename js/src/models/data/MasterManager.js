@@ -108,16 +108,16 @@ define([
 
 
 		},
-		
-		addToUndoStack:function(selected){
+
+		addToUndoStack: function(selected) {
 			if (!stateStored) {
 				var selected_ids = [];
-				for(var i=0;i<selected.length;i++){
+				for (var i = 0; i < selected.length; i++) {
 					selected_ids.push(selected[i].get('id'));
 				}
 				undoStack.push(selected_ids);
 				stateStored = true;
-				console.log('succesfully added to undo stack',undoStack);
+				console.log('succesfully added to undo stack', undoStack);
 				redoStack = [];
 
 			}
@@ -126,14 +126,14 @@ define([
 		undo: function(event) {
 			console.log('undo', undoStack);
 			if (undoStack.length > 0) {
-			
+
 				var toUndo = undoStack.pop();
 				var self = this;
 				toUndo.forEach(function(id) {
 					var item = self.getById(id);
 					item.undo();
 
-				});	
+				});
 				this.deselectAllShapes();
 				redoStack.push(toUndo);
 			}
@@ -144,12 +144,12 @@ define([
 		redo: function() {
 			console.log('redo', redoStack);
 			if (redoStack.length > 0) {
-			
+
 				var toRedo = redoStack.pop();
 				var self = this;
 				toRedo.forEach(function(id) {
 					var item = self.getById(id);
-					console.log('item found',item);
+					console.log('item found', item);
 					item.redo();
 				});
 				this.deselectAllShapes();
@@ -595,9 +595,8 @@ define([
 
 		removeObject: function() {
 
-			
-				
-			
+
+
 			for (var i = 0; i < selected.length; i++) {
 				collectionManager.removeObjectFromLists(selected[i]);
 				switch (selected[i].get('type')) {
@@ -617,18 +616,18 @@ define([
 
 			}
 
-			
+
 		},
 
 		removeGeometry: function(target) {
 			if (target.get('name') === 'duplicator') {
 				collectionManager.removeCollection(target);
 			}
-			
+
 			var parent = target.getParentNode();
 
 			if (parent) {
-				parent.removeChildNode(target,!stateStored);
+				parent.removeChildNode(target, !stateStored);
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
 			}
@@ -727,7 +726,7 @@ define([
 
 		addShape: function(shape, noSelect) {
 			if (!shape.nodeParent) {
-				currentNode.addChildNode(shape,!stateStored);
+				currentNode.addChildNode(shape, !stateStored);
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
 			}
@@ -787,11 +786,22 @@ define([
 		},
 
 		addGroup: function(selected, group) {
-
-			group = collectionManager.addGroup(selected, group);
-			currentNode.addChildNode(group);
-
 			if (selected) {
+				group = new Group();
+				currentNode.addChildNode(group, !stateStored);
+				for (var j = 0; j < selected.length; j++) {
+					group.addChildNode(selected[j]);
+				}
+
+
+				collectionManager.addToOpenLists(group);
+				collectionManager.addGroup(group);
+
+
+				this.addToUndoStack([currentNode]);
+				this.modificationEnded([currentNode]);
+
+
 
 				for (var i = 0; i < selected.length; i++) {
 					layersView.removeShape(selected[i].get('id'));
@@ -802,6 +812,7 @@ define([
 			this.deselectAllShapes();
 			this.selectShape(group);
 			return group;
+
 		},
 
 		//called when duplicator is loaded in via JSON
@@ -1146,14 +1157,13 @@ define([
 		modificationEnded: function(objects) {
 			console.log('modificationEnded');
 			var targets;
-			if(objects){
+			if (objects) {
 				targets = objects;
-			}
-			else{
+			} else {
 				targets = selected;
 			}
 			if (targets.length > 0) {
-				for (var i = 0; i <targets.length; i++) {
+				for (var i = 0; i < targets.length; i++) {
 					var instance = targets[i];
 					instance.setValueEnded();
 				}
@@ -1171,7 +1181,7 @@ define([
 
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					instance.setValue(data,!stateStored);
+					instance.setValue(data, !stateStored);
 				}
 				this.addToUndoStack(selected);
 
@@ -1217,11 +1227,11 @@ define([
 				action: 'modify style'
 			});
 			if (selected.length > 0) {
-				var non_group_selected= [];
+				var non_group_selected = [];
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					instance.setValue(style_data,!stateStored);
-					non_group_selected.push.apply(non_group_selected,instance.getInstanceChildren());
+					instance.setValue(style_data, !stateStored);
+					non_group_selected.push.apply(non_group_selected, instance.getInstanceChildren());
 				}
 				this.addToUndoStack(non_group_selected);
 			}

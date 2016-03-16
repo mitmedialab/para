@@ -20,12 +20,7 @@ define([
 
 
 ], function(_, paper, GeometryNode, PathNode, RectNode, EllipseNode, PolygonNode, TrigFunc, PFloat, PPoint) {
-  var init_lookup = {
-    'path': PathNode,
-    'ellipse': EllipseNode,
-    'polygon': PolygonNode,
-    'rectangle': RectNode,
-  };
+
   var Group = GeometryNode.extend({
 
     defaults: _.extend({}, GeometryNode.prototype.defaults, {
@@ -51,8 +46,8 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-     // this.centerUI.fillColor = 'blue';
-     // this.center = geom.position;
+      // this.centerUI.fillColor = 'blue';
+      // this.center = geom.position;
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'ui_layer';
@@ -82,8 +77,8 @@ define([
 
     parseJSON: function(data, manager) {
       var childClone = this.children.slice(0, this.children.length);
-      var dataClone = data.children.slice(0,data.children.length);
-  
+      var dataClone = data.children.slice(0, data.children.length);
+
 
       for (var i = 0; i < this.children.length; i++) {
         var target_id = this.children[i].get('id');
@@ -106,23 +101,23 @@ define([
 
       //remove children not in JSON
       for (var j = 0; j < childClone.length; j++) {
-      
-        var currentFuture = this.futureStates[this.futureStates.length-1];
-        var currentPast = this.previousStates[this.previousStates.length-1];
-        if(currentFuture){
+
+        var currentFuture = this.futureStates[this.futureStates.length - 1];
+        var currentPast = this.previousStates[this.previousStates.length - 1];
+        if (currentFuture) {
           var targetFuture = _.find(currentFuture.children, function(item) {
             return item.id == childClone[j].get('id');
           });
-          if(targetFuture){
+          if (targetFuture) {
             targetFuture.futureStates = childClone[j].futureStates;
             targetFuture.previousStates = childClone[j].previousStates;
           }
         }
-        if(currentPast){
+        if (currentPast) {
           var targetPast = _.find(currentPast.children, function(item) {
             return item.id == childClone[j].get('id');
           });
-          if(targetPast){
+          if (targetPast) {
             targetPast.futureStates = childClone[j].futureStates;
             targetPast.previousStates = childClone[j].previousStates;
           }
@@ -133,13 +128,13 @@ define([
       }
 
       //addChildren in JSON that didn't already exist
-      for (var k = 0;k < dataClone.length; k++) {
+      for (var k = 0; k < dataClone.length; k++) {
         var newChild = this.getTargetClass(dataClone[k].name);
         newChild.parseJSON(dataClone[k]);
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
-        this.insertChild(dataClone[k].zIndex,newChild);
-        newChild.trigger('modified',newChild);
+        this.insertChild(dataClone[k].zIndex, newChild);
+        newChild.trigger('modified', newChild);
       }
 
       GeometryNode.prototype.parseJSON.call(this, data, manager);
@@ -155,7 +150,7 @@ define([
       }
     },
 
-   
+
 
     getById: function(id) {
       if (this.get('id') == id) {
@@ -346,7 +341,7 @@ define([
 
         GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
-         if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+          if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].reset();
           }
         }
@@ -361,7 +356,7 @@ define([
 
       if (!this.get('rendered')) {
         for (var i = 0; i < this.renderQueue.length; i++) {
-        if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+          if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].render();
           }
         }
@@ -495,5 +490,12 @@ define([
 
 
   });
+  var init_lookup = {
+    'path': PathNode,
+    'ellipse': EllipseNode,
+    'polygon': PolygonNode,
+    'rectangle': RectNode,
+    'group': Group
+  };
   return Group;
 });

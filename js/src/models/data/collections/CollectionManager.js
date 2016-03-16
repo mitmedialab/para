@@ -118,6 +118,12 @@ define([
 
 		},
 
+		//TODO: this should dissapear when groups are 
+		//migrated out of the control of the collection manager
+		addGroup: function(group){
+			groups.push(group);
+		},
+
 
 		/*removeObjectFromLists
 		 * called when object is being deletetd
@@ -281,21 +287,6 @@ define([
 
 			return duplicator;
 		},
-
-		addGroup: function(selected, group) {
-			if (selected) {
-				group = new Group();
-
-				for (var j = 0; j < selected.length; j++) {
-					group.addChildNode(selected[j]);
-				}
-			}
-
-			this.addToOpenLists(group);
-			groups.push(group);
-			return group;
-		},
-
 
 		/* addToOpenLists
 		 * attempts to add a newly created instance to any open lists
