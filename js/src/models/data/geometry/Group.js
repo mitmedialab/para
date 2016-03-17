@@ -66,7 +66,7 @@ define([
 
 
     parseJSON: function(data, manager) {
-
+      var changed = GeometryNode.prototype.parseJSON.call(this, data, manager);
       var childClone = this.children.slice(0, this.children.length);
       var dataClone = data.children.slice(0, data.children.length);
 
@@ -78,7 +78,9 @@ define([
         });
         //if the child currently exists in the group
         if (target_data) {
-          this.children[i].parseJSON(target_data);
+          var mI = this.children[i].parseJSON(target_data);
+          changed.toRemove.push.apply(changed,mI.toRemove);
+            changed.toAdd.push.apply(changed,mI.toAdd);
           childClone = _.filter(childClone, function(child) {
             return child.get('id') != target_id;
           });
@@ -114,12 +116,14 @@ define([
         }
 
         var removed = this.removeChildNode(childClone[j]);
+        changed.toRemove.push(removed);
         removed.deleteSelf();
       }
 
       //addChildren in JSON that didn't already exist
       for (var k = 0; k < dataClone.length; k++) {
         var newChild = this.geometryGenerator.getTargetClass(dataClone[k].name);
+        changed.toAdd.push(newChild);
         newChild.parseJSON(dataClone[k]);
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
@@ -127,7 +131,8 @@ define([
         newChild.trigger('modified', newChild);
       }
 
-      GeometryNode.prototype.parseJSON.call(this, data, manager);
+      console.log('changed = ',changed);
+     return changed;
 
     },
 

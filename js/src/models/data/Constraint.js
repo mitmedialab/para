@@ -309,6 +309,7 @@ define([
       this.set('expressions', expressions);
       console.log('reference id',this.get('references').get('id'),'relative id',this.get('relatives').get('id'));
       this.create(data.properties, true);
+      return {toRemove:[],toAdd:[]};
     },
 
     setSelection: function(selected, type) {

@@ -101,7 +101,7 @@ define([
       geom.importJSON(data.geom);
 
       this.changeGeomInheritance(geom);
-      GeometryNode.prototype.parseJSON.call(this, data, manager);
+      return GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
 
 

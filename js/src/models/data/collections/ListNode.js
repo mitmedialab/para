@@ -560,7 +560,7 @@ define([
     },
 
     parseJSON: function(data, manager) {
-
+      var changed = Instance.prototype.parseJSON.call(this, data, manager);
       var memberClone = this.members.slice(0, this.members.length);
       var dataClone = data.members.slice(0, data.members.length);
 
@@ -573,7 +573,9 @@ define([
         if (target_data) {
           //only parse json if it's a list inside a list
           if (this.members[i].get('type') == 'collection') {
-            this.members[i].parseJSON(target_data);
+            var mI = this.members[i].parseJSON(target_data);
+            changed.toRemove.push.apply(changed,mI.toRemove);
+            changed.toAdd.push.apply(changed,mI.toAdd);
           }
 
           memberClone = _.filter(memberClone, function(member) {
@@ -587,29 +589,8 @@ define([
 
       //remove members not in JSON
       for (var j = 0; j < memberClone.length; j++) {
-
-        /*var currentFuture = this.futureStates[this.futureStates.length - 1];
-        var currentPast = this.previousStates[this.previousStates.length - 1];
-        if (currentFuture) {
-          var targetFuture = _.find(currentFuture.children, function(item) {
-            return item.id == childClone[j].get('id');
-          });
-          if (targetFuture) {
-            targetFuture.futureStates = childClone[j].futureStates;
-            targetFuture.previousStates = childClone[j].previousStates;
-          }
-        }
-        if (currentPast) {
-          var targetPast = _.find(currentPast.children, function(item) {
-            return item.id == childClone[j].get('id');
-          });
-          if (targetPast) {
-            targetPast.futureStates = childClone[j].futureStates;
-            targetPast.previousStates = childClone[j].previousStates;
-          }
-        }*/
-
         var removed = this.removeMember(memberClone[j]);
+        changed.toRemove.push(removed);
       }
 
       //addChildren in JSON that didn't already exist
@@ -618,6 +599,7 @@ define([
         var member;
         if (dataClone[k].type == 'collection') {
           member = new this.constructor();
+          changed.toAdd.push(member);
           member.previousStates = dataClone[k].previousStates;
           member.futureStates = dataClone[k].futureStates;
         } else {
@@ -630,11 +612,9 @@ define([
         member.trigger('modified', member);
 
       }
-
-      Instance.prototype.parseJSON.call(this, data, manager);
-
-
+      return changed;
     },
+
     getShapeClone: function() {
       var clone = new paper.Group(this.members.map(function(instance) {
         return instance.getShapeClone();

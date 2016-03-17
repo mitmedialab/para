@@ -83,7 +83,7 @@ define([
 
 
             parseJSON: function(data) {
-                Group.prototype.parseJSON.call(this, data);
+                var changed =  Group.prototype.parseJSON.call(this, data);
                 if (!this.get('target') || this.get('target').get('id') != data.targetID) {
                     this.setTarget(_.find(this.children, function(child) {
                         return child.get('id') == data.targetID;
@@ -98,9 +98,13 @@ define([
                 target.parseInheritorJSON(target_data, this);
                 console.log('child num==count', data.count == this.children.length,data.count,this.children.length);
 
-                this.internalList.parseJSON(data.internalList, this);
-                this.masterList.parseJSON(data.masterList, this);
-            
+                var cI = this.internalList.parseJSON(data.internalList, this);
+                var mI = this.masterList.parseJSON(data.masterList, this);
+                changed.toRemove.push.apply(changed,cI.toRemove);
+                changed.toAdd.push.apply(changed,cI.toAdd);
+                changed.toRemove.push.apply(changed,mI.toRemove);
+                changed.toAdd.push.apply(changed,mI.toAdd);
+
                 for (i = 0; i < data.group_relative.length; i++) {
                     list = new ConstrainableList();
                     list.parseJSON(data.group_relative[i], this);
@@ -111,9 +115,10 @@ define([
                     list.parseJSON(data.group_reference[j], this);
                     this.group_reference.push(list);
                 }
-                console.log('internal list',this.internalList.length,this.internalList.get('id'),this.internalList.members);
-                console.log('master list',this.masterList.length,this.masterList.get('id'),this.masterList.members);
+                console.log('internal list',this.internalList.members.length,this.internalList.get('id'),this.internalList.members);
+                console.log('master list',this.masterList.members.length,this.masterList.get('id'),this.masterList.members);
 
+                return changed;
             },
 
 

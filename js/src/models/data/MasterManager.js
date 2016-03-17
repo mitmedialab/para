@@ -133,53 +133,84 @@ define([
 
 		undo: function(event) {
 			console.log('undo', undoStack);
+
 			if (undoStack.length > 0) {
 
 				var toUndo = undoStack.pop();
 				var self = this;
 				toUndo.forEach(function(id) {
 					var item;
-					if(id=="constraint_manager"){
+					var toRemove = [];
+					var toAdd = [];
+					if (id == "constraint_manager") {
 						item = constraintManager;
+					} else {
+						item = self.getById(id);
 					}
-					else{
-					 item = self.getById(id);
-					}
-					item.undo(self);
+					var changed = item.undo(self);
+					if (changed) {
+						toRemove.push.apply(toRemove, changed.toRemove);
+						toAdd.push.apply(toAdd, changed.toAdd);
+						self.cleanUp(toRemove, toAdd);
 
+					}
 				});
+
 				this.deselectAllShapes();
+
 				redoStack.push(toUndo);
 			}
 		},
 
 		redo: function() {
 			console.log('redo', redoStack);
+
 			if (redoStack.length > 0) {
 
 				var toRedo = redoStack.pop();
 				var ci = toRedo.indexOf("constraint_manager");
-				console.log('ci',ci);
-				if(ci>=0){
-					var cm = toRedo.splice(ci,1)[0];
+				console.log('ci', ci);
+				if (ci >= 0) {
+					var cm = toRedo.splice(ci, 1)[0];
 					toRedo.push(cm);
 				}
 				var self = this;
 				toRedo.forEach(function(id) {
 					var item;
-					if(id=="constraint_manager"){
+					var toRemove = [];
+					var toAdd = [];
+					if (id == "constraint_manager") {
 						item = constraintManager;
+					} else {
+						item = self.getById(id);
 					}
-					else{
-					 item = self.getById(id);
+					var changed = item.redo(self);
+					if (changed) {
+						toRemove.push.apply(toRemove, changed.toRemove);
+						toAdd.push.apply(toAdd, changed.toAdd);
+						self.cleanUp(toRemove, toAdd);
 					}
 
-					item.redo(self);
-					console.log(item);
-					debugger;
+
 				});
+
 				this.deselectAllShapes();
+
 				undoStack.push(toRedo);
+			}
+		},
+
+		cleanUp: function(toRemove, toAdd) {
+			console.log('clean up', toRemove, toAdd);
+			for (var i = 0; i < toRemove.length; i++) {
+				if (toRemove[i].get('name') == 'duplicator') {
+					collectionManager.removeCollection(toRemove[i]);
+				}
+			}
+			for (var j = 0; j < toAdd.length; j++) {
+				if (toAdd[j].get('name') == 'duplicator') {
+					collectionManager.addDuplicator(null,toAdd[j]);
+				}
 			}
 		},
 
@@ -855,22 +886,22 @@ define([
 			var data = duplicator.setCount(3);
 
 			currentNode.insertChild(index, duplicator);
-			
+
 
 			layersView.removeShape(object.get('id'));
 			layersView.addShape(duplicator.toJSON());
 			this.selectShape(duplicator);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
-			constraintManager.addConstraintArray(constraints,!stateStored);
+			constraintManager.addConstraintArray(constraints, !stateStored);
 
-			this.addToUndoStack([constraintManager,nodeParent]);
-			this.modificationEnded([constraintManager,nodeParent]);
-			
+			this.addToUndoStack([constraintManager, nodeParent]);
+			this.modificationEnded([constraintManager, nodeParent]);
+
 			for (var i = 0; i < constraints.length; i++) {
 
 				layersView.addConstraint(constraints[i]);
-				
+
 			}
 			return duplicator;
 		},
@@ -917,8 +948,8 @@ define([
 				id: 'constraint',
 				action: 'addConstraint'
 			});
-			
-				
+
+
 			constraintManager.addConstraint(constraint, !stateStored);
 			this.addToUndoStack([constraintManager]);
 			this.modificationEnded([constraintManager]);
@@ -1200,7 +1231,7 @@ define([
 			if (targets.length > 0) {
 				for (var i = 0; i < targets.length; i++) {
 					var instance = targets[i];
-					console.log('instance',instance);
+					console.log('instance', instance);
 					instance.setValueEnded();
 				}
 			}

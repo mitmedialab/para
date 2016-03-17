@@ -442,7 +442,7 @@ define([
 			}
 			var g_clone = this.getShapeClone(true);
 			instance.changeGeomInheritance(g_clone);
-			instance.set('rendered',true);
+			instance.set('rendered', true);
 			instance._matrix = this._matrix.clone();
 			instance.reset();
 			instance.render();
@@ -810,8 +810,8 @@ define([
 			data._matrix = this._matrix.values;
 			data.rendered = this.get('rendered');
 			data.stateStored = this.stateStored;
-			data.previousStates = this.previousStates.slice(0,this.previousStates.length);
-			data.futureStates = this.futureStates.slice(0,this.futureStates.length);
+			data.previousStates = this.previousStates.slice(0, this.previousStates.length);
+			data.futureStates = this.futureStates.slice(0, this.futureStates.length);
 			this.previousProperties = this.properties;
 			this.properties = data;
 
@@ -831,9 +831,10 @@ define([
 			this.set('id', data.id);
 			this.set('visible', data.visible);
 			this.set('open', data.open);
-			this.set('rendered',data.rendered);
+			this.set('rendered', data.rendered);
 			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
-			this.trigger('modified',this);
+			this.trigger('modified', this);
+			return {toRemove:[],toAdd:[]};
 		},
 
 		parseInheritorJSON: function(data, manager) {
@@ -893,36 +894,46 @@ define([
 
 		//undo to last state
 		undo: function() {
-			
+
 			if (this.previousStates.length > 0) {
+				var toRemove = [];
+				var toAdd = [];
 				console.log('calling undo on', this.get('name'));
 
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
-				this.parseJSON(state);
-				
+				var changed = this.parseJSON(state);
 
+				toRemove.push.apply(toRemove, changed.toRemove);
+				toAdd.push.apply(toAdd, changed.toAdd);
+				return {toRemove:toRemove,toAdd:toAdd};
 			}
 		},
 
 		redo: function() {
 			if (this.futureStates.length > 0) {
+				var toRemove = [];
+				var toAdd = [];
 				console.log('calling redo on', this.get('name'));
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
-				this.parseJSON(state);
+				var changed = this.parseJSON(state);
+
+				toRemove.push.apply(toRemove, changed.toRemove);
+				toAdd.push.apply(toAdd, changed.toAdd);
+				return {toRemove:toRemove,toAdd:toAdd};
 			}
 
 		},
 
-		addToUndoStack:function(){
+		addToUndoStack: function() {
 			if (!this.stateStored) {
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;
 				this.futureStates = [];
-				console.log(this.get('name'),' stored state', this.previousStates);
+				console.log(this.get('name'), ' stored state', this.previousStates);
 			}
 		},
 		/*setValue

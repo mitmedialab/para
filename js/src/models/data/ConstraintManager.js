@@ -21,8 +21,8 @@ define([
 			this.previousStates = [];
 			this.futureStates = [];
 			this.stateStored = false;
-			this.set('id',"constraint_manager");
-			this.set('name',"constraint_manager");
+			this.set('id', "constraint_manager");
+			this.set('name', "constraint_manager");
 		},
 
 		//undo to last state
@@ -34,7 +34,7 @@ define([
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
-				this.parseJSON(state,manager);
+				this.parseJSON(state, manager);
 
 
 			}
@@ -46,7 +46,7 @@ define([
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
-				this.parseJSON(state,manager);
+				this.parseJSON(state, manager);
 			}
 
 		},
@@ -81,6 +81,10 @@ define([
 		},
 
 		parseJSON: function(data, manager) {
+			var changed = {
+				toRemove: [],
+				toAdd: []
+			};
 			var constraintClone = this.constraints.slice(0, this.constraints.length);
 			var dataClone = data.slice(0, data.length);
 
@@ -91,7 +95,9 @@ define([
 				});
 				//if the child currently exists in the group
 				if (target_data) {
-					this.constraints[i].parseJSON(target_data,manager);
+					var mI = this.constraints[i].parseJSON(target_data, manager);
+					changed.toRemove.push.apply(changed, mI.toRemove);
+					changed.toAdd.push.apply(changed, mI.toAdd);
 					constraintClone = _.filter(constraintClone, function(constraint) {
 						return constraint.get('id') != target_id;
 					});
@@ -128,17 +134,21 @@ define([
 				}
 
 				var removed = this.removeConstraint(constraintClone[j].get('id'));
+				changed.toRemove.push(removed);
 			}
 
 			//addChildren in JSON that didn't already exist
 			for (var k = 0; k < dataClone.length; k++) {
 				var newConstraint = new Constraint();
-				newConstraint.parseJSON(dataClone[k],manager);
+				changed.toAdd.push(newConstraint);
+
+				newConstraint.parseJSON(dataClone[k], manager);
 				newConstraint.previousStates = dataClone[k].previousStates;
 				newConstraint.futureStates = dataClone[k].futureStates;
 				this.insertConstraint(dataClone[k].index, newConstraint);
 
 			}
+			return changed;
 
 		},
 
@@ -163,20 +173,20 @@ define([
 			return ref_constraints;
 		},
 
-		addConstraint: function(constraint,registerUndo) {
-			this.insertConstraint(this.constraints.length, constraint,registerUndo);
+		addConstraint: function(constraint, registerUndo) {
+			this.insertConstraint(this.constraints.length, constraint, registerUndo);
 		},
 
-		addConstraintArray: function(constraints,registerUndo){
+		addConstraintArray: function(constraints, registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
-			for(var i=0;i<constraints.length;i++){
+			for (var i = 0; i < constraints.length; i++) {
 				this.insertConstraint(this.constraints.length, constraints[i]);
 			}
 		},
 
-		insertConstraint: function(index, constraint,registerUndo) {
+		insertConstraint: function(index, constraint, registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
@@ -186,7 +196,7 @@ define([
 			}
 		},
 
-		removeConstraint: function(id,registerUndo) {
+		removeConstraint: function(id, registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
