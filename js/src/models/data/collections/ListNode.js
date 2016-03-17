@@ -594,7 +594,6 @@ define([
       }
 
       //addChildren in JSON that didn't already exist
-      console.log('remaining members to add',dataClone);
       for (var k = 0; k < dataClone.length; k++) {
         var member;
         if (dataClone[k].type == 'collection') {
@@ -604,7 +603,6 @@ define([
           member.futureStates = dataClone[k].futureStates;
         } else {
           member = manager.getById(dataClone[k].id);
-          console.log('found member',member);
         }
 
         this.addMember(member, dataClone[k].zIndex);

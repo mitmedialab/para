@@ -94,9 +94,7 @@ define([
                 var target = this.get('target');
                 var i, j, list;
                 this.get('count').setValue(data.count);
-                console.log('child num==count', data.count == this.children.length,data.count,this.children.length);
                 target.parseInheritorJSON(target_data, this);
-                console.log('child num==count', data.count == this.children.length,data.count,this.children.length);
 
                 var cI = this.internalList.parseJSON(data.internalList, this);
                 var mI = this.masterList.parseJSON(data.masterList, this);
@@ -115,8 +113,6 @@ define([
                     list.parseJSON(data.group_reference[j], this);
                     this.group_reference.push(list);
                 }
-                console.log('internal list',this.internalList.members.length,this.internalList.get('id'),this.internalList.members);
-                console.log('master list',this.masterList.members.length,this.masterList.get('id'),this.masterList.members);
 
                 return changed;
             },
@@ -326,7 +322,7 @@ define([
              */
             deleteAllChildren: function() {
 
-                console.log('calling delete children duplicator');
+                //console.log('calling delete children duplicator');
                 this.internalList.deleteSelf();
                 this.internalList = null;
                 for (var i = 0; i < this.group_relative.length; i++) {
@@ -339,7 +335,7 @@ define([
                 var deleted = [];
 
                 for (var k = this.children.length - 1; k >= 0; k--) {
-                    console.log('deleting member at', i, this.members.length);
+                    //console.log('deleting member at', i, this.members.length);
                     deleted.push.apply(deleted, this.children[k].deleteAllChildren());
                     var deleted_member = this.removeChildNode(this.members[k], true);
                     deleted.push(deleted_member);
@@ -351,7 +347,7 @@ define([
 
 
             deleteSelf: function() {
-                console.log('calling delete self duplicator');
+               // console.log('calling delete self duplicator');
                 this.stopListening();
                 this.masterList.deleteSelf();
                 this.internalList.deleteSelf();

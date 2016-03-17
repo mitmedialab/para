@@ -56,7 +56,7 @@ define([
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;
 				this.futureStates = [];
-				console.log(this.get('name'), ' stored state', this.previousStates);
+				//console.log(this.get('name'), ' stored state', this.previousStates);
 			}
 		},
 

@@ -8,32 +8,30 @@ define([
 	'backbone',
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
-	'models/data/geometry/Group',
 	'utils/GeometryGenerator',
 	'models/data/ConstraintManager'
 
 
 
-], function(_, Backbone, ConstrainableList, Duplicator, Group, GeometryGenerator, ConstraintManager) {
+], function(_, Backbone, ConstrainableList, Duplicator, GeometryGenerator, ConstraintManager) {
 
 
 	//stores para lists
-	var lists, renderQueue, groups;
+	var lists, renderQueue;
 	var collectionView;
 	var remove = 2;
 	var search = 4;
 
-	var CollectionManager = ConstraintManager.Model.extend({
-		
+	var CollectionManager = ConstraintManager.extend({
+
 		initialize: function() {
-			ConstraintManager.prototype.initialize.apply(this,arguments);
-			groups = [];
+			ConstraintManager.prototype.initialize.apply(this, arguments);
 			this.set('id', "collection_manager");
 			this.set('name', "collection_manager");
 
 		},
 
-toJSON: function() {
+		toJSON: function() {
 			var list_json = [];
 			for (var i = 0; i < lists.length; i++) {
 				var data = lists[i].toJSON();
@@ -43,12 +41,12 @@ toJSON: function() {
 			return list_json;
 		},
 
-		parseJSON: function(data, manager) {
+		/*parseJSON: function(data, manager) {
 			var changed = {
 				toRemove: [],
 				toAdd: []
 			};
-			var constraintClone = this.constraints.slice(0, this.constraints.length);
+			var listClone = this.lists.slice(0, this.constraints.length);
 			var dataClone = data.slice(0, data.length);
 
 			for (var i = 0; i < this.constraints.length; i++) {
@@ -114,7 +112,7 @@ toJSON: function() {
 			return changed;
 
 		},
-
+*/
 
 		/* setters and getters for current lists
 		 */
@@ -206,13 +204,7 @@ toJSON: function() {
 
 		},
 
-		//TODO: this should dissapear when groups are 
-		//migrated out of the control of the collection manager
-		addGroup: function(group) {
-			groups.push(group);
-		},
-
-
+	
 		/*removeObjectFromLists
 		 * called when object is being deletetd
 		 * ensures a reference of it is no longer stored in the lists
@@ -309,13 +301,7 @@ toJSON: function() {
 				}
 			}
 
-			for (var j = 0; j < groups.length; j++) {
-				item = groups[j].getChild(lInstance);
-				if (item && item != lInstance) {
-					sInstances.push(item);
-					itemFound = true;
-				}
-			}
+			
 			//add in originally selected index if no lists have been added
 			if (itemFound) {
 				return {
@@ -404,10 +390,9 @@ toJSON: function() {
 
 		toggleOpen: function(item) {
 			if (item.get('type') === 'geometry') {
-				this.closeAllGroups();
 				item.toggleOpen(item);
 				return {
-					toSelect: item.members,
+					toSelect: item.children,
 					toRemove: [item]
 				};
 			} else {
@@ -488,11 +473,7 @@ toJSON: function() {
 			}
 		},
 
-		closeAllGroups: function() {
-			for (var i = 0; i < groups.length; i++) {
-				groups[i].closeAllChildren();
-			}
-		},
+		
 
 		getListJSON: function() {
 			var list_json = [];
@@ -514,7 +495,6 @@ toJSON: function() {
 				}
 			}
 			lists.length = 0;
-			groups.length = 0;
 
 			return deleted;
 		}

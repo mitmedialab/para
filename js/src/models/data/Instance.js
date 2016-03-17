@@ -425,6 +425,15 @@ define([
 
 		modifyPointsByIndex: function(initial_delta, indicies, exclude) {},
 
+		filterSelection: function(){
+			if(this.nodeParent.get('open')){
+				return this;
+			}
+			else{
+				return this.nodeParent.filterSelection();
+			}
+		},
+
 		/* create
 		 * Prototypal inheritance action:
 		 * creates a new instance which inherits from

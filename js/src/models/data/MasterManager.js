@@ -139,12 +139,10 @@ define([
 				var toUndo = undoStack.pop();
 				if (toUndo.length > 1) {
 					var ci = toUndo.indexOf("constraint_manager");
-					console.log('ci', ci,toUndo[0],toUndo[1],toUndo);
 					if (ci > 0) {
 						var cm = toUndo.splice(ci, 1)[0];
 						toUndo.unshift(cm);
 					}
-					console.log('after', toUndo[0],toUndo[1],toUndo);
 				}
 				var self = this;
 				toUndo.forEach(function(id) {
@@ -179,12 +177,10 @@ define([
 				var toRedo = redoStack.pop();
 				if (toRedo.length > 1) {
 					var ci = toRedo.indexOf("constraint_manager");
-					console.log('ci', ci,toRedo[0],toRedo[1]);
 					if (ci >= 0 && ci<toRedo.length-1) {
 						var cm = toRedo.splice(ci, 1)[0];
 						toRedo.push(cm);
 					}
-					console.log('after', ci,toRedo[0],toRedo[1]);
 				}
 				var self = this;
 				toRedo.forEach(function(id) {
@@ -859,8 +855,7 @@ define([
 
 
 				collectionManager.addToOpenLists(group);
-				collectionManager.addGroup(group);
-
+				
 
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
@@ -1073,7 +1068,7 @@ define([
 
 
 		_selectSingleShape: function(instance, segments) {
-
+			var instance = instance.filterSelection();
 			var data = collectionManager.filterSelection(instance);
 			if (data) {
 				this.deselectShape(data.toRemove);
