@@ -131,7 +131,6 @@ define([
         newChild.trigger('modified', newChild);
       }
 
-      console.log('changed = ',changed);
      return changed;
 
     },

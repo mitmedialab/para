@@ -820,7 +820,7 @@ define([
 		},
 
 		parseJSON: function(data, manager) {
-			
+
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {
@@ -934,7 +934,7 @@ define([
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;
 				this.futureStates = [];
-				console.log(this.get('name'), ' stored state', this.previousStates);
+				//console.log(this.get('name'), ' stored state', this.previousStates);
 			}
 		},
 		/*setValue

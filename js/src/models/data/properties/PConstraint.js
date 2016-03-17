@@ -127,7 +127,6 @@
 			 */
 			removeConstraint: function(dimensions) {
 				console.trace();
-				console.log('removing constraint on', this.get('name'),dimensions);
 				if (!dimensions) {
 					for (var p in this) {
 						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
@@ -138,7 +137,6 @@
 					for (var i = 0; i < dimensions.length; i++) {
 						var dimension = dimensions[i];
 						this[dimension].removeConstraint([dimension]);
-						console.log('removing constraint dimension', dimension);
 					}
 				}
 			},

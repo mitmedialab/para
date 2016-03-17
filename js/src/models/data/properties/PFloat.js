@@ -36,7 +36,6 @@ define([
 
 			removeConstraint: function() {
 				if (this.isSelfConstrained()) {
-					console.log('deleting constraint on', this.get('name'));
 					var value = this.getValue();
 					var deleted = this.constraintStack.pop();
 					this.stopListening(this.constraint);

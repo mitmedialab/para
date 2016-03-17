@@ -9,11 +9,12 @@ define([
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
 	'models/data/geometry/Group',
-	'utils/GeometryGenerator'
+	'utils/GeometryGenerator',
+	'models/data/ConstraintManager'
 
 
 
-], function(_, Backbone, ConstrainableList, Duplicator, Group, GeometryGenerator) {
+], function(_, Backbone, ConstrainableList, Duplicator, Group, GeometryGenerator, ConstraintManager) {
 
 
 	//stores para lists
@@ -22,13 +23,99 @@ define([
 	var remove = 2;
 	var search = 4;
 
-	var CollectionManager = Backbone.Model.extend({
-		defaults: {},
-
+	var CollectionManager = ConstraintManager.Model.extend({
+		
 		initialize: function() {
+			ConstraintManager.prototype.initialize.apply(this,arguments);
 			groups = [];
+			this.set('id', "collection_manager");
+			this.set('name', "collection_manager");
 
 		},
+
+toJSON: function() {
+			var list_json = [];
+			for (var i = 0; i < lists.length; i++) {
+				var data = lists[i].toJSON();
+				data.index = i;
+				list_json.push(data);
+			}
+			return list_json;
+		},
+
+		parseJSON: function(data, manager) {
+			var changed = {
+				toRemove: [],
+				toAdd: []
+			};
+			var constraintClone = this.constraints.slice(0, this.constraints.length);
+			var dataClone = data.slice(0, data.length);
+
+			for (var i = 0; i < this.constraints.length; i++) {
+				var target_id = this.constraints[i].get('id');
+				var target_data = _.find(data, function(item) {
+					return item.id == target_id;
+				});
+				//if the child currently exists in the group
+				if (target_data) {
+					var mI = this.constraints[i].parseJSON(target_data, manager);
+					changed.toRemove.push.apply(changed, mI.toRemove);
+					changed.toAdd.push.apply(changed, mI.toAdd);
+					constraintClone = _.filter(constraintClone, function(constraint) {
+						return constraint.get('id') != target_id;
+					});
+					dataClone = _.filter(dataClone, function(data) {
+						return data.id != target_id;
+					});
+				}
+			}
+
+
+			//remove children not in JSON
+			for (var j = 0; j < constraintClone.length; j++) {
+
+				var currentFuture = this.futureStates[this.futureStates.length - 1];
+				var currentPast = this.previousStates[this.previousStates.length - 1];
+
+				if (currentFuture) {
+					var targetFuture = _.find(currentFuture, function(item) {
+						return item.id == constraintClone[j].get('id');
+					});
+					if (targetFuture) {
+						targetFuture.futureStates = constraintClone[j].futureStates;
+						targetFuture.previousStates = constraintClone[j].previousStates;
+					}
+				}
+				if (currentPast) {
+					var targetPast = _.find(currentPast, function(item) {
+						return item.id == constraintClone[j].get('id');
+					});
+					if (targetPast) {
+						targetPast.futureStates = constraintClone[j].futureStates;
+						targetPast.previousStates = constraintClone[j].previousStates;
+					}
+				}
+
+				var removed = this.removeConstraint(constraintClone[j].get('id'));
+				changed.toRemove.push(removed);
+			}
+
+			//addChildren in JSON that didn't already exist
+			for (var k = 0; k < dataClone.length; k++) {
+				var newConstraint = new Constraint();
+				changed.toAdd.push(newConstraint);
+
+				newConstraint.parseJSON(dataClone[k], manager);
+				newConstraint.previousStates = dataClone[k].previousStates;
+				newConstraint.futureStates = dataClone[k].futureStates;
+				this.insertConstraint(dataClone[k].index, newConstraint);
+
+			}
+			return changed;
+
+		},
+
+
 		/* setters and getters for current lists
 		 */
 		setLists: function(l) {

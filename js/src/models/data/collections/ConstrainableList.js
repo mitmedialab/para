@@ -166,7 +166,6 @@ define([
       },
 
       removeMemberNotation: function() {
-        console.log('member length',this.get('name'),this.members);
         var diff = this.indexNumbers.length - this.members.length;
         for (var i = 0; i < diff; i++) {
           var numText = this.indexNumbers.pop();
@@ -193,7 +192,6 @@ define([
         }
         for(var i=0;i<this.members.length;i++){
           if(this.members[i].get('type')=='collection'){
-            console.log('deleting internal list at',i.this.members[i].get('name'));
             
             this.members[i].deleteSelf();
 
