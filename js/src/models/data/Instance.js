@@ -820,6 +820,7 @@ define([
 		},
 
 		parseJSON: function(data, manager) {
+			
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
 				if (constrainMap.hasOwnProperty(propertyName)) {

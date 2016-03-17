@@ -137,6 +137,12 @@ define([
 			if (undoStack.length > 0) {
 
 				var toUndo = undoStack.pop();
+				var ci = toUndo.indexOf("constraint_manager");
+				console.log('ci', ci);
+				if (ci >= 0) {
+					var cm = toUndo.splice(ci, 1)[0];
+					toUndo.shift(cm);
+				}
 				var self = this;
 				toUndo.forEach(function(id) {
 					var item;
@@ -209,7 +215,7 @@ define([
 			}
 			for (var j = 0; j < toAdd.length; j++) {
 				if (toAdd[j].get('name') == 'duplicator') {
-					collectionManager.addDuplicator(null,toAdd[j]);
+					collectionManager.addDuplicator(null, toAdd[j]);
 				}
 			}
 		},
@@ -880,7 +886,7 @@ define([
 			this.deselectAllShapes();
 			var index = object.index;
 			var nodeParent = object.nodeParent;
-			nodeParent.removeChildNode(object,!stateStored);
+			nodeParent.removeChildNode(object, !stateStored);
 			var duplicator = collectionManager.addDuplicator(object);
 
 			var data = duplicator.setCount(3);

@@ -9,8 +9,7 @@ define([
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
 	'models/data/geometry/Group',
-		'utils/GeometryGenerator'
-
+	'utils/GeometryGenerator'
 
 
 
@@ -87,9 +86,9 @@ define([
 			var duplicators = lists.filter(function(item) {
 				return item.get('name') == 'duplicator';
 			});
-			for(var i=0;i<duplicators.length;i++){
+			for (var i = 0; i < duplicators.length; i++) {
 				var list = duplicators[i].getInternalList(id);
-				if(list){
+				if (list) {
 					return list;
 				}
 			}
@@ -122,7 +121,7 @@ define([
 
 		//TODO: this should dissapear when groups are 
 		//migrated out of the control of the collection manager
-		addGroup: function(group){
+		addGroup: function(group) {
 			groups.push(group);
 		},
 
@@ -180,10 +179,9 @@ define([
 						return node;
 					} else {
 						var types;
-						if(node.members){
+						if (node.members) {
 							types = node.members;
-						}
-						else{
+						} else {
 							types = node.children;
 						}
 						for (var l = 0; l < types.length; l++) {
@@ -212,10 +210,9 @@ define([
 			var itemFound = false;
 			var item;
 			for (var i = 0; i < lists.length; i++) {
-				if(lists[i].get('type')=='collection'){
+				if (lists[i].get('type') == 'collection') {
 					item = lists[i].getMember(lInstance);
-				}
-				else{
+				} else {
 					item = lists[i].getChild(lInstance);
 				}
 
@@ -273,18 +270,20 @@ define([
 
 		addDuplicator: function(object, duplicator) {
 			if (object) {
-				duplicator = new Duplicator({},{geometryGenerator:GeometryGenerator});
+				duplicator = new Duplicator({}, {
+					geometryGenerator: GeometryGenerator
+				});
 
 				duplicator.setTarget(object);
 			}
 
 			//if (!this.addToOpenLists(duplicator)) {
-				/*for (var i = lists.length - 1; i >= 0; i--) {
-					if (duplicator.hasMember(lists[i], true)) {
-						lists.splice(i, 1);
-					}
-				}*/
-				lists.push(duplicator);
+			/*for (var i = lists.length - 1; i >= 0; i--) {
+				if (duplicator.hasMember(lists[i], true)) {
+					lists.splice(i, 1);
+				}
+			}*/
+			lists.push(duplicator);
 
 			//}
 
@@ -411,7 +410,7 @@ define([
 		getListJSON: function() {
 			var list_json = [];
 			for (var i = 0; i < lists.length; i++) {
-				if(lists[i].get('name')!=='duplicator'){
+				if (lists[i].get('name') !== 'duplicator') {
 					list_json.push(lists[i].toJSON());
 				}
 			}

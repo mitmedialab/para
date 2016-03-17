@@ -29,7 +29,7 @@ define([
 		undo: function(manager) {
 
 			if (this.previousStates.length > 0) {
-				console.log('calling undo on', this.get('name'));
+				console.log('calling undo on', this.get('name'),this.futureStates);
 
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
@@ -42,7 +42,7 @@ define([
 
 		redo: function(manager) {
 			if (this.futureStates.length > 0) {
-				console.log('calling redo on', this.get('name'));
+				console.log('calling redo on', this.get('name'),this.futureStates);
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);

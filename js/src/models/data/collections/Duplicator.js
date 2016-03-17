@@ -139,7 +139,8 @@ define([
             },
 
             setInternalConstraint: function() {
-               
+
+              
                 if (this.get('target').get('name') == 'group') {
                      this.internalConstraints.push.apply( this.internalConstraints, this.setInternalGroupConstraint());
                 }
