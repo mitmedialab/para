@@ -1,5 +1,5 @@
 /*Collection Manager
- * manager that keeps track of all lists and duplicators
+ * manager that keeps track of all lists and duplicators - NOTE, need to refactor it so that duplicators are not managed here
  */
 
 
@@ -41,26 +41,26 @@ define([
 			return list_json;
 		},
 
-		/*parseJSON: function(data, manager) {
+		parseJSON: function(data, manager) {
 			var changed = {
 				toRemove: [],
 				toAdd: []
 			};
-			var listClone = this.lists.slice(0, this.constraints.length);
+			var listClone = lists.slice(0, lists.length);
 			var dataClone = data.slice(0, data.length);
 
-			for (var i = 0; i < this.constraints.length; i++) {
-				var target_id = this.constraints[i].get('id');
+			for (var i = 0; i < lists.length; i++) {
+				var target_id = lists[i].get('id');
 				var target_data = _.find(data, function(item) {
 					return item.id == target_id;
 				});
 				//if the child currently exists in the group
 				if (target_data) {
-					var mI = this.constraints[i].parseJSON(target_data, manager);
+					var mI = lists[i].parseJSON(target_data, manager);
 					changed.toRemove.push.apply(changed, mI.toRemove);
 					changed.toAdd.push.apply(changed, mI.toAdd);
-					constraintClone = _.filter(constraintClone, function(constraint) {
-						return constraint.get('id') != target_id;
+					listClone = _.filter(listClone, function(list) {
+						return list.get('id') != target_id;
 					});
 					dataClone = _.filter(dataClone, function(data) {
 						return data.id != target_id;
@@ -70,49 +70,54 @@ define([
 
 
 			//remove children not in JSON
-			for (var j = 0; j < constraintClone.length; j++) {
+			for (var j = 0; j < listClone.length; j++) {
 
 				var currentFuture = this.futureStates[this.futureStates.length - 1];
 				var currentPast = this.previousStates[this.previousStates.length - 1];
 
 				if (currentFuture) {
 					var targetFuture = _.find(currentFuture, function(item) {
-						return item.id == constraintClone[j].get('id');
+						return item.id == listClone[j].get('id');
 					});
 					if (targetFuture) {
-						targetFuture.futureStates = constraintClone[j].futureStates;
-						targetFuture.previousStates = constraintClone[j].previousStates;
+						targetFuture.futureStates = listClone[j].futureStates;
+						targetFuture.previousStates = listClone[j].previousStates;
 					}
 				}
 				if (currentPast) {
 					var targetPast = _.find(currentPast, function(item) {
-						return item.id == constraintClone[j].get('id');
+						return item.id == listClone[j].get('id');
 					});
 					if (targetPast) {
-						targetPast.futureStates = constraintClone[j].futureStates;
-						targetPast.previousStates = constraintClone[j].previousStates;
+						targetPast.futureStates = listClone[j].futureStates;
+						targetPast.previousStates = listClone[j].previousStates;
 					}
 				}
 
-				var removed = this.removeConstraint(constraintClone[j].get('id'));
+				var removed = this.removeList(listClone[j]);
 				changed.toRemove.push(removed);
 			}
 
 			//addChildren in JSON that didn't already exist
 			for (var k = 0; k < dataClone.length; k++) {
-				var newConstraint = new Constraint();
-				changed.toAdd.push(newConstraint);
+				var newList;
+				if (dataClone[k].type == 'collection') {
+					newList = new ConstrainableList();
+					changed.toAdd.push(newList);
 
-				newConstraint.parseJSON(dataClone[k], manager);
-				newConstraint.previousStates = dataClone[k].previousStates;
-				newConstraint.futureStates = dataClone[k].futureStates;
-				this.insertConstraint(dataClone[k].index, newConstraint);
+					newList.parseJSON(dataClone[k], manager);
+					newList.previousStates = dataClone[k].previousStates;
+					newList.futureStates = dataClone[k].futureStates;
+				} else {
+					newList = manager.getById(dataClone[k].id);
+				}
+				lists.splice(dataClone[k].index, 0, newList);
 
 			}
 			return changed;
 
 		},
-*/
+
 
 		/* setters and getters for current lists
 		 */
@@ -204,7 +209,7 @@ define([
 
 		},
 
-	
+
 		/*removeObjectFromLists
 		 * called when object is being deletetd
 		 * ensures a reference of it is no longer stored in the lists
@@ -301,7 +306,7 @@ define([
 				}
 			}
 
-			
+
 			//add in originally selected index if no lists have been added
 			if (itemFound) {
 				return {
@@ -473,7 +478,7 @@ define([
 			}
 		},
 
-		
+
 
 		getListJSON: function() {
 			var list_json = [];
