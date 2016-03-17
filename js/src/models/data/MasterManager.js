@@ -25,25 +25,24 @@ define([
 	'views/MapView',
 	'views/SaveExportView',
 	'utils/analytics',
-	'utils/GeometryGenerator'
+	'utils/GeometryGenerator',
+	'models/data/ConstraintManager'
 
 
 
-], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, analytics, GeometryGenerator) {
+], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, analytics, GeometryGenerator, ConstraintManager) {
 	//debug vars for testing framerate
 	var fps = 0,
 		now, lastUpdate = (new Date()) * 1;
 	var fpsFilter = 10;
 
-	var undoManager;
 	//stores para lists
 	var eventType = 'state_manager';
-	var constraints = [];
 	var store = 0;
 	var remove = 2;
 	var visit = 3;
 	var search = 4;
-	var rootNode, currentNode, layersView, collectionView, mapView, functionManager, collectionManager, selected, currentSelectionIndex;
+	var rootNode, currentNode, layersView, collectionView, mapView, functionManager, collectionManager, selected, currentSelectionIndex, constraintManager;
 	var constraintMode = false;
 	var constraintPropMap = {
 		'position': 'translationDelta',
@@ -75,8 +74,13 @@ define([
 			currentNode = rootNode;
 			functionManager = new FunctionManager();
 			functionManager.selected = selected;
+
+			constraintManager = new ConstraintManager();
+
 			collectionManager = new CollectionManager();
 			collectionManager.setLists(rootNode.lists);
+
+
 			collectionView = new CollectionView({
 				el: '#collectionToolbar',
 				model: this
@@ -134,8 +138,14 @@ define([
 				var toUndo = undoStack.pop();
 				var self = this;
 				toUndo.forEach(function(id) {
-					var item = self.getById(id);
-					item.undo();
+					var item;
+					if(id=="constraint_manager"){
+						item = constraintManager;
+					}
+					else{
+					 item = self.getById(id);
+					}
+					item.undo(self);
 
 				});
 				this.deselectAllShapes();
@@ -153,7 +163,7 @@ define([
 				var self = this;
 				toRedo.forEach(function(id) {
 					var item = self.getById(id);
-					item.redo();
+					item.redo(self);
 				});
 				this.deselectAllShapes();
 				undoStack.push(toRedo);
@@ -318,10 +328,7 @@ define([
 				action: 'Ï'
 			});
 			var geometry_json = rootNode.toJSON();
-			var constraint_json = [];
-			for (var i = 0; i < constraints.length; i++) {
-				constraint_json.push(constraints[i].toJSON());
-			}
+			var constraint_json = constraintManager.toJSON();
 			var list_json = collectionManager.getListJSON();
 			var project_json = {
 				geometry: geometry_json,
@@ -394,24 +401,15 @@ define([
 
 		//TODO: move to constraint manager
 		getConstraintById: function(id) {
-			var constraint = constraints.filter(function(constraint) {
-				return constraint.get('id') === id;
-			})[0];
-			return constraint;
+			return constraintManager.getConstraintById(id);
 		},
 
 		getConstraintsByRelative: function(relative) {
-			var rel_constraints = constraints.filter(function(constraint) {
-				return constraint.get('relatives') === relative;
-			});
-			return rel_constraints;
+			return constraintManager.getConstraintsByRelative(relative);
 		},
 
 		getConstraintsByReference: function(reference) {
-			var ref_constraints = constraints.filter(function(constraint) {
-				return constraint.get('references') === reference;
-			});
-			return ref_constraints;
+			return constraintManager.getConstraintsByReference(reference);
 		},
 
 		constraintModeChanged: function(active) {
@@ -899,10 +897,11 @@ define([
 				id: 'constraint',
 				action: 'addConstraint'
 			});
-			if (!constraint.get('user_name')) {
-				constraint.set('user_name', 'constraint ' + (constraints.length + 1));
-			}
-			constraints.push(constraint);
+			
+				
+			constraintManager.addConstraint(constraint, !stateStored);
+			this.addToUndoStack([constraintManager]);
+			this.modificationEnded([constraintManager]);
 			layersView.addConstraint(constraint);
 			if (!noUpdate) {
 				this.updateMapView(constraint.get('id'));
@@ -912,25 +911,18 @@ define([
 		},
 
 		removeConstraint: function(id) {
-
-			var constraint = this.getConstraintById(id);
-			if (constraint) {
-				var index = constraints.indexOf(constraint);
-				constraints.splice(index, 1);
-				constraint.deleteSelf();
+			var removed = constraintManager.removeConstraint(id, !stateStored);
+			if (removed) {
+				this.addToUndoStack([constraintManager]);
+				this.modificationEnded([constraintManager]);
 				this.visualizeConstraint();
-				layersView.removeConstraint(constraint.get('id'));
+				layersView.removeConstraint(id);
 			}
 		},
 
 		deleteAllConstraints: function() {
-			for (var i = 0; i < constraints.length; i++) {
-				constraints[i].deleteSelf();
-			}
-			constraints.length = 0;
+			constraintManager.deleteAllConstraints();
 		},
-
-
 
 		reorderShapes: function(movedId, relativeId, mode) {
 			var movedShape = this.getById(movedId);
@@ -1188,6 +1180,7 @@ define([
 			if (targets.length > 0) {
 				for (var i = 0; i < targets.length; i++) {
 					var instance = targets[i];
+					console.log('instance',instance);
 					instance.setValueEnded();
 				}
 			}

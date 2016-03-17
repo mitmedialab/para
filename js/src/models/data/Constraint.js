@@ -205,6 +205,7 @@ define([
 
     toJSON: function() {
       var data = {};
+      data.id = this.get('id');
       data.properties = this.get('properties');
       data.references = this.get('references').get('id');
       data.relatives = this.get('relatives').get('id');
@@ -258,6 +259,7 @@ define([
     parseJSON: function(data, manager) {
       var reference = manager.getById(data.references);
       var relative = manager.getById(data.relatives);
+      this.set('id',data.id);
       this.set('references', reference);
       this.set('relatives', relative);
       this.set('modes', data.modes);
@@ -1188,7 +1190,8 @@ define([
       var relatives = this.get('relatives');
       var relative_properties = this.get('relative_properties');
       for (var j = 0; j < relative_properties.length; j++) {
-        relatives.removeConstraint(relative_properties[j][0], relative_properties[j][1]);
+        var rprop = relative_properties[j][1].split("");
+        relatives.removeConstraint(relative_properties[j][0], rprop);
       }
 
       var reference_values = this.get('reference_values');

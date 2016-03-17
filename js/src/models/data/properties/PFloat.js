@@ -1,4 +1,3 @@
-
 /*PFloat.js*
  * constrainable float class
  * for para instance properties
@@ -35,6 +34,25 @@ define([
 				//this.on('constraint_set',this.messageConstraint);
 			},
 
+			removeConstraint: function() {
+				if (this.isSelfConstrained()) {
+					console.log('deleting constraint on', this.get('name'));
+					var value = this.getValue();
+					var deleted = this.constraintStack.pop();
+					this.stopListening(this.constraint);
+
+					if (this.constraintStack.length > 0) {
+						var lastConstraint = this.constraintStack.pop();
+						this.setConstraint(lastConstraint.func, lastConstraint.obj);
+					} else {
+
+						this.constraint = null;
+						this.constraintObject = null;
+						this.setValue(value);
+					}
+				}
+
+			},
 
 			/* isConstrained
 			 * returns object with booleans for each property based on constraint status
@@ -51,7 +69,7 @@ define([
 			 */
 			getConstraint: function() {
 				var data;
-				
+
 				if (this.isSelfConstrained()) {
 					data = this.getSelfConstraint();
 					return data;
@@ -66,7 +84,7 @@ define([
 					set = this.v.setValue(data.v);
 					this.setNull(false);
 				} else if (typeof data === "number") {
-					set =this.v.setValue(data);
+					set = this.v.setValue(data);
 					this.setNull(false);
 				}
 				return set;

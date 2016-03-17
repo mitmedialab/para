@@ -66,14 +66,7 @@ define([
                 data.targetID = this.get('target').get('id');
                 data.internalList = this.internalList.toJSON();
                 data.masterList = this.masterList.toJSON();
-               /* data.internalList = [];
-                this.internalList.forEach(function(member){
-                    data.internalList.push(member.get('id'));
-                });
-                data.masterList = []
-                this.masterList.forEach(function(member){
-                    data.masterList.push(member.get('id'));
-                });*/
+       
                 data.group_relative = [];
                 data.group_reference = [];
                 data.count = this.get('count').getValue();

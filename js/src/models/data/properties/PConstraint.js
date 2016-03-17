@@ -126,36 +126,28 @@
 			 * removes the constraint of this property
 			 */
 			removeConstraint: function(dimensions) {
-				if (!dimensions || dimensions.length === this.get('dimension_num')) {
-					if (this.isSelfConstrained()) {
-						var value = this.getValue();
-						var deleted = this.constraintStack.pop();
-						this.stopListening(this.constraint);
-						this.constraint.deleteSelf();
-						if (this.constraintStack.length > 0) {
-							var lastConstraint = this.constraintStack.pop();
-							this.setConstraint(lastConstraint.func, lastConstraint.obj);
-						} else {
-							this.constraint.deleteSelf();
-							this.constraint = null;
-							this.constraintObject = null;
-							this.setValue(value);
+				console.trace();
+				console.log('removing constraint on', this.get('name'),dimensions);
+				if (!dimensions) {
+					for (var p in this) {
+						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
+							this[p].removeConstraint();
 						}
 					}
 				} else {
 					for (var i = 0; i < dimensions.length; i++) {
 						var dimension = dimensions[i];
-						this[dimension].removeConstraint([dimensions[i]]);
+						this[dimension].removeConstraint([dimension]);
+						console.log('removing constraint dimension', dimension);
 					}
-
 				}
 			},
 
-			removeAllConstraints: function(){
-				while (this.constraintStack.length > 0) {	
-						var lastConstraint = this.constraintStack.pop();
-						lastConstraint.constraint.deleteSelf();
-					}
+			removeAllConstraints: function() {
+				while (this.constraintStack.length > 0) {
+					var lastConstraint = this.constraintStack.pop();
+					lastConstraint.constraint.deleteSelf();
+				}
 
 			},
 
@@ -185,13 +177,13 @@
 			isReference: function(instance) {
 				if (this.isSelfConstrained()) {
 					var reference = this.constraintObject.get('references');
-					if(reference){
-					var hasMember = reference.hasMember(instance, true, reference);
+					if (reference) {
+						var hasMember = reference.hasMember(instance, true, reference);
 
-					if (hasMember) {
-						return true;
+						if (hasMember) {
+							return true;
+						}
 					}
-}
 					return false;
 				} else {
 					var subproperties = {};
