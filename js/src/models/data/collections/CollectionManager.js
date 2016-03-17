@@ -285,6 +285,7 @@ define([
 					}
 				}
 				lists.push(duplicator);
+
 			//}
 
 			return duplicator;

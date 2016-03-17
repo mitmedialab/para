@@ -259,6 +259,8 @@ define([
     parseJSON: function(data, manager) {
       var reference = manager.getById(data.references);
       var relative = manager.getById(data.relatives);
+      console.log('reference list',reference.members.length,reference.get('id'),reference.members);
+      console.log('relative list',relative.members.length,relative.get('id'),relative.members);
       this.set('id',data.id);
       this.set('references', reference);
       this.set('relatives', relative);
@@ -305,6 +307,7 @@ define([
       this.set('exempt_indicies', exempt_indicies);
       this.set('offsets', offsets);
       this.set('expressions', expressions);
+      console.log('reference id',this.get('references').get('id'),'relative id',this.get('relatives').get('id'));
       this.create(data.properties, true);
     },
 
@@ -587,7 +590,6 @@ define([
             }
           }
         }
-
         this.setReferenceValues(ref_prop_key, ref_dimensions);
         if (!json_loaded) {
           for (var g = 0; g < relative_range; g++) {
@@ -1073,6 +1075,7 @@ define([
       var reference = this.get('references');
       if (reference) {
         var members;
+          console.log('ref',reference.get('type'),reference.members.length,reference.get('id'));
         if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
         } else {
@@ -1081,6 +1084,7 @@ define([
         var reference_points = [];
         var points = [];
         var min, max;
+
         for (var i = 0; i < members.length; i++) {
 
           var point;
@@ -1113,7 +1117,7 @@ define([
           reference_points.push(points);
         }
         var polynomial, expression;
-
+        console.log('points',points,members.length);
         if (points.length < 2) {
 
           polynomial = [points[0].y];

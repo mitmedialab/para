@@ -33,8 +33,9 @@ define([
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
-
+                this.internalConstraints = [];
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
+                this.masterList.set('id', 'internal' + this.masterList.get('id'));
                 this.listenTo(this.masterList, 'modified', this.modified);
                 this.listenTo(this.internalList, 'modified', this.modified);
 
@@ -99,7 +100,7 @@ define([
 
                 this.internalList.parseJSON(data.internalList, this);
                 this.masterList.parseJSON(data.masterList, this);
-
+            
                 for (i = 0; i < data.group_relative.length; i++) {
                     list = new ConstrainableList();
                     list.parseJSON(data.group_relative[i], this);
@@ -110,12 +111,18 @@ define([
                     list.parseJSON(data.group_reference[j], this);
                     this.group_reference.push(list);
                 }
+                console.log('internal list',this.internalList.length,this.internalList.get('id'),this.internalList.members);
+                console.log('master list',this.masterList.length,this.masterList.get('id'),this.masterList.members);
+
             },
 
 
             getInternalList: function(id) {
                 if (this.internalList.get('id') === id) {
                     return this.internalList;
+                }
+                 if (this.masterList.get('id') === id) {
+                    return this.masterList;
                 }
                 for (var i = 0; i < this.group_relative.length; i++) {
                     if (this.group_relative[i].get('id') === id) {
@@ -127,9 +134,9 @@ define([
             },
 
             setInternalConstraint: function() {
-                var constraints = [];
+               
                 if (this.get('target').get('name') == 'group') {
-                    constraints.push.apply(constraints, this.setInternalGroupConstraint());
+                     this.internalConstraints.push.apply( this.internalConstraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
@@ -149,8 +156,8 @@ define([
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
                 constraint.create(data);
-                constraints.push(constraint);
-                return constraints;
+                this.internalConstraints.push(constraint);
+                return this.internalConstraints;
             },
 
             setInternalGroupConstraint: function() {

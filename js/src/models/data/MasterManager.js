@@ -151,8 +151,6 @@ define([
 				this.deselectAllShapes();
 				redoStack.push(toUndo);
 			}
-
-
 		},
 
 		redo: function() {
@@ -160,10 +158,25 @@ define([
 			if (redoStack.length > 0) {
 
 				var toRedo = redoStack.pop();
+				var ci = toRedo.indexOf("constraint_manager");
+				console.log('ci',ci);
+				if(ci>=0){
+					var cm = toRedo.splice(ci,1)[0];
+					toRedo.push(cm);
+				}
 				var self = this;
 				toRedo.forEach(function(id) {
-					var item = self.getById(id);
+					var item;
+					if(id=="constraint_manager"){
+						item = constraintManager;
+					}
+					else{
+					 item = self.getById(id);
+					}
+
 					item.redo(self);
+					console.log(item);
+					debugger;
 				});
 				this.deselectAllShapes();
 				undoStack.push(toRedo);
@@ -835,24 +848,31 @@ define([
 		initializeDuplicator: function(object, open) {
 			this.deselectAllShapes();
 			var index = object.index;
-			object.nodeParent.removeChildNode(object);
+			var nodeParent = object.nodeParent;
+			nodeParent.removeChildNode(object,!stateStored);
 			var duplicator = collectionManager.addDuplicator(object);
+
 			var data = duplicator.setCount(3);
 
-			currentNode.insertChild(index, duplicator, !stateStored);
-			this.addToUndoStack([currentNode]);
-			this.modificationEnded([currentNode]);
+			currentNode.insertChild(index, duplicator);
+			
 
 			layersView.removeShape(object.get('id'));
 			layersView.addShape(duplicator.toJSON());
 			this.selectShape(duplicator);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
+			constraintManager.addConstraintArray(constraints,!stateStored);
+
+			this.addToUndoStack([constraintManager,nodeParent]);
+			this.modificationEnded([constraintManager,nodeParent]);
+			
 			for (var i = 0; i < constraints.length; i++) {
-				this.addConstraint(constraints[i]);
+
+				layersView.addConstraint(constraints[i]);
+				
 			}
 			return duplicator;
-
 		},
 
 		duplicatorCountModified: function(data, duplicator) {

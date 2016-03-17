@@ -167,6 +167,15 @@ define([
 			this.insertConstraint(this.constraints.length, constraint,registerUndo);
 		},
 
+		addConstraintArray: function(constraints,registerUndo){
+			if (registerUndo) {
+				this.addToUndoStack();
+			}
+			for(var i=0;i<constraints.length;i++){
+				this.insertConstraint(this.constraints.length, constraints[i]);
+			}
+		},
+
 		insertConstraint: function(index, constraint,registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();
