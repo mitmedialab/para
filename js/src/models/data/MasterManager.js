@@ -177,7 +177,7 @@ define([
 				var toRedo = redoStack.pop();
 				if (toRedo.length > 1) {
 					var ci = toRedo.indexOf("constraint_manager");
-					if (ci >= 0 && ci<toRedo.length-1) {
+					if (ci >= 0 && ci < toRedo.length - 1) {
 						var cm = toRedo.splice(ci, 1)[0];
 						toRedo.push(cm);
 					}
@@ -305,7 +305,7 @@ define([
 					layersView.addList(toAdd[k].toJSON());
 					this.addListener(toAdd[k]);
 				}
-				collectionManager.addList(null, list);
+				collectionManager.addList(list);
 			}
 
 			for (var m = 0; m < constraints.length; m++) {
@@ -573,14 +573,7 @@ define([
 					added = this.addCopy(selected);
 					break;
 				case 'list':
-					var list = collectionManager.addList(selected);
-					this.deselectAllShapes();
-					if (list) {
-						layersView.addList(list.toJSON());
-						this.selectShape(list);
-						this.addListener(list);
-						added = list;
-					}
+					added = this.addList(selected);
 					break;
 				case 'group':
 					added = this.addGroup(selected);
@@ -782,13 +775,27 @@ define([
 			}
 		},
 
+		addList: function(selected) {
+
+			var list = collectionManager.initializeList(selected,!stateStored);
+			this.deselectAllShapes();
+			if (list) {
+				this.addToUndoStack([collectionManager]);
+				this.modificationEnded([collectionManager]);
+				layersView.addList(list.toJSON());
+				this.selectShape(list);
+				this.addListener(list);
+
+				return list;
+			}
+		},
+
 		addShape: function(shape, noSelect) {
 			if (!shape.nodeParent) {
 				currentNode.addChildNode(shape, !stateStored);
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
 			}
-			//collectionManager.addToOpenLists(shape);
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				layersView.addShape(shape.toJSON());
 			}
@@ -836,7 +843,7 @@ define([
 				this.selectShape(copy);
 				this.deselectShape(selected[i]);
 				if (copy.get('type') == 'collection' || copy.get('name') == 'group' || copy.get('name') == 'duplicator') {
-					collectionManager.addListCopy(copy);
+					collectionManager.addList(copy);
 				}
 
 			}
@@ -852,10 +859,6 @@ define([
 				for (var j = 0; j < selected.length; j++) {
 					group.addChildNode(selected[j]);
 				}
-
-
-				collectionManager.addToOpenLists(group);
-				
 
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);

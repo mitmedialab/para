@@ -319,30 +319,31 @@ define([
 
 		//=======list heirarchy managment methods==========//
 
-		/*addList
+		/*initializeList
 		 *adds a list to the closedlist array and removes any items
 		 * on the array which are members of the added list
 		 */
-		addList: function(selected, list) {
-			if (!list) {
-				list = new ConstrainableList();
-				list.addMember(selected);
-				if (!this.addToOpenLists(list)) {
-					for (var i = lists.length - 1; i >= 0; i--) {
-						if (list.hasMember(lists[i], true)) {
-							lists.splice(i, 1);
-						}
-					}
-					lists.push(list);
-				}
-			} else {
-				lists.push(list);
-			}
+		addList: function(selected, registerUndo) {
+
+			var list = new ConstrainableList();
+			list.addMember(selected);
+			this.insertList(lists.length, list, registerUndo);
 			return list;
 		},
 
-		addListCopy: function(copy) {
-			lists.push(copy);
+
+		insertList: function(index, list, registerUndo) {
+			if (registerUndo) {
+				this.addToUndoStack();
+			}
+			if (!this.addToOpenLists(list)) {
+				for (var i = lists.length - 1; i >= 0; i--) {
+					if (list.hasMember(lists[i], true)) {
+						lists.splice(i, 1);
+					}
+				}
+			}
+			lists.splice(index, 0, list);
 		},
 
 
@@ -355,16 +356,8 @@ define([
 				duplicator.setTarget(object);
 			}
 
-			//if (!this.addToOpenLists(duplicator)) {
-			/*for (var i = lists.length - 1; i >= 0; i--) {
-				if (duplicator.hasMember(lists[i], true)) {
-					lists.splice(i, 1);
-				}
-			}*/
 			lists.push(duplicator);
-
-			//}
-
+			
 			return duplicator;
 		},
 
