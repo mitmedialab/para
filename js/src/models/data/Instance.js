@@ -120,6 +120,7 @@ define([
 		}),
 
 		initialize: function() {
+
 			this.deleted = false;
 			this.set('position', new PPoint(0, 0));
 			this.set('center', new PPoint(0, 0));
@@ -446,7 +447,7 @@ define([
 		 */
 		create: function(noInheritor) {
 
-			var instance = new this.constructor({},{geometryGenerator:this.geometryGenerator});
+			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
 
@@ -905,6 +906,7 @@ define([
 
 		//callback triggered when a subproperty is modified externally 
 		modified: function() {
+			console.log('modified',this.get('name'));
 			PConstraint.prototype.modified.apply(this, arguments);
 
 		},

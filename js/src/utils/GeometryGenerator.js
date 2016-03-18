@@ -6,7 +6,8 @@ define([
 	'models/data/geometry/PolygonNode',
 	'models/data/geometry/Group',
 	'models/data/collections/Duplicator',
-], function(PathNode, RectNode, EllipseNode, PolygonNode, Group, Duplicator) {
+	'models/data/collections/ConstrainableList',
+], function(PathNode, RectNode, EllipseNode, PolygonNode, Group, Duplicator,ConstrainableList) {
 
 	var init_lookup = {
 			'path': PathNode,
@@ -14,7 +15,8 @@ define([
 			'polygon': PolygonNode,
 			'rectangle': RectNode,
 			'group': Group,
-			'duplicator': Duplicator
+			'duplicator': Duplicator,
+			'list': ConstrainableList
 		};
 
 	var GeometryGenerator = {

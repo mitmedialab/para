@@ -29,8 +29,8 @@ define([
     }),
 
     initialize: function(attributes, options) {
+      this.geometryGenerator = options.geometryGenerator;
       GeometryNode.prototype.initialize.apply(this, arguments);
-      this.resetProperties();
       this.get('scalingDelta').setValue({
         x: 1,
         y: 1,
@@ -51,10 +51,9 @@ define([
       targetLayer.addChild(ui_group);
       this.set('bbox', ui_group);
       this.createBBox();
-      this.geometryGenerator = options.geometryGenerator;
     },
 
-
+  
     toJSON: function() {
       var data = GeometryNode.prototype.toJSON.call(this);
       for (var i = 0; i < this.children.length; i++) {
@@ -194,7 +193,7 @@ define([
     },
 
     create: function() {
-      var instance = new this.constructor();
+      var instance =  this.geometryGenerator.getTargetClass(this.get('name'));
       var value = this.getValue();
       instance.setValue(value);
       for (var i = 0; i < this.children.length; i++) {
@@ -307,9 +306,7 @@ define([
       }
     },
 
-    getRange: function() {
-      return this.children.length;
-    },
+
 
 
 

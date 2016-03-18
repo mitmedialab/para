@@ -412,6 +412,10 @@ define([
                 return this.get('count').getValue();
             },
 
+                getRange: function() {
+                return this.masterList.getRange();
+            },
+
 
 
         });

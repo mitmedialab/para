@@ -19,7 +19,7 @@ define([
       userParams: null,
     }),
 
-    initialize: function(data) {
+    initialize: function() {
       PolygonNode.prototype.initialize.apply(this, arguments);
       this.set('userParams', [{
         label: 'width',

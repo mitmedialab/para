@@ -28,7 +28,7 @@ define([
     }),
 
 
-    initialize: function(data) {
+    initialize: function() {
       GeometryNode.prototype.initialize.apply(this, arguments);
       this.set('points', []);
     },
@@ -224,7 +224,7 @@ define([
       if (path.segments) {
         var segments = path.segments;
         for (var j = 0; j < segments.length; j++) {
-          var pointNode = new PointNode();
+          var pointNode = new PointNode({}, {geometryGenerator: this.geometryGenerator});
           pointNode.normalizeGeometry(segments[j]);
           //this.addChildNode(pointNode);
           points.push(pointNode);

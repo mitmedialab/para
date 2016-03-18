@@ -29,7 +29,7 @@ define([
 				showLayers: 'visible',
 			}),
 
-			initialize: function(attributes,options) {
+			initialize: function() {
 				Group.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
 				this.get('translationDelta').setNull(false);

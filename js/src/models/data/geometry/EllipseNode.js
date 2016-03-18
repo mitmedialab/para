@@ -17,7 +17,7 @@ define([
       name: 'ellipse'
     }),
 
-    initialize: function(data) {
+    initialize: function() {
       RectNode.prototype.initialize.apply(this, arguments);
     },
 

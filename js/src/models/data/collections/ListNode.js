@@ -605,6 +605,7 @@ define([
         var member;
         if (dataClone[k].type == 'collection') {
           member = new this.constructor();
+          member.parseJSON(dataClone[k]);
           changed.toAdd.push(member);
           member.previousStates = dataClone[k].previousStates;
           member.futureStates = dataClone[k].futureStates;

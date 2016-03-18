@@ -26,7 +26,7 @@ define([
     }),
 
 
-    initialize: function(data) {
+    initialize: function() {
      GeometryNode.prototype.initialize.apply(this, arguments);
       var handleIn = new PPoint(0,0,0);
       handleIn.setNull(true);

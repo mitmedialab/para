@@ -20,7 +20,7 @@ define([
       userParams: null
     }),
 
-    initialize: function(data) {
+    initialize: function() {
       PathNode.prototype.initialize.apply(this, arguments);
       this.set('userParams', [{
         label: 'points',
