@@ -225,32 +225,7 @@ define([
 			}
 		},
 
-		/*removeCollection
-		 * removes the reference to the collection and deletes it
-		 * without deleting its members
-		 */
-		removeCollection: function(collection) {
-			var removedLists, members;
-			for (var j = 0; j < lists.length; j++) {
-				if (lists[j] === collection) {
-					lists.splice(j, 1);
-					members = collection.removeAllMembers();
-					removedLists = members.filter(function(item) {
-						return item.get('type') == 'collection';
-					});
-
-					lists.push.apply(lists, removedLists);
-
-					break;
-				} else {
-					var removed_data = lists[j].recRemoveMember(collection);
-					members = removed_data.orphans;
-				}
-			}
-
-			collection.deleteSelf();
-			return members;
-		},
+	
 
 		/* visit funciton for lists */
 		visit: function(node, departure_node, state_data) {
@@ -348,6 +323,35 @@ define([
 			lists.splice(index, 0, list);
 		},
 
+			/*removeCollection
+		 * removes the reference to the collection and deletes it
+		 * without deleting its members
+		 */
+		removeCollection: function(collection, registerUndo) {
+			if (registerUndo) {
+				this.addToUndoStack();
+			}
+			var removedLists, members;
+			for (var j = 0; j < lists.length; j++) {
+				if (lists[j] === collection) {
+					lists.splice(j, 1);
+					members = collection.removeAllMembers();
+					removedLists = members.filter(function(item) {
+						return item.get('type') == 'collection';
+					});
+
+					lists.push.apply(lists, removedLists);
+
+					break;
+				} else {
+					var removed_data = lists[j].recRemoveMember(collection);
+					members = removed_data.orphans;
+				}
+			}
+
+			collection.deleteSelf();
+			return members;
+		},
 
 		/* addToOpenLists
 		 * attempts to add a newly created instance to any open lists
