@@ -382,7 +382,7 @@ define([
 		},
 
 		toggleClosed: function(item) {
-			if (item.nodeParent && item.nodeParent.get('name') === 'group' && item.nodeParent.get('open')) {
+			if (item.get('type') == 'geometry' && item.nodeParent.get('open')) {
 				item.nodeParent.toggleClosed(item);
 				return {
 					toSelect: [item.nodeParent],

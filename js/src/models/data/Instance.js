@@ -446,7 +446,7 @@ define([
 		 */
 		create: function(noInheritor) {
 
-			var instance = new this.constructor();
+			var instance = new this.constructor({},{geometryGenerator:this.geometryGenerator});
 			var value = this.getValue();
 			instance.setValue(value);
 
