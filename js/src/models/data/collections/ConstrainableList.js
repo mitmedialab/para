@@ -21,7 +21,7 @@ define([
       }),
 
       initialize: function() {
-         console.log('list initialize');
+        console.log('list initialize');
         ListNode.prototype.
         initialize.apply(this, arguments);
         //code for creating list UI
@@ -56,23 +56,31 @@ define([
         this.count = 0;
       },
 
-    /*setValue
-    passes modifications onto members, stripped of any properties that are constrained on the list
-    */
-      setValue: function(data) {
-        Instance.prototype.setValue.call(this,data);
+      /*setValue
+      passes modifications onto members, stripped of any properties that are constrained on the list
+      */
+      setValue: function(data, registerUndo) {
+        Instance.prototype.setValue.call(this, data, registerUndo);
         var constrained_props = this.getConstraintValues();
         for (var i = 0; i < this.members.length; i++) {
           if (constrained_props[i]) {
             var reference_status = this.isReference(this.members[i]);
             var set_data = this.members[i].getAddedValueFor(data);
             var stripped_data = TrigFunc.stripBoolean(set_data, constrained_props[i], reference_status);
-            this.members[i].setValue(stripped_data);
+            this.members[i].setValue(stripped_data, registerUndo);
           } else {
-            this.members[i].setValue(data);
+            this.members[i].setValue(data,registerUndo);
           }
         }
         this.trigger('modified', this);
+      },
+
+
+      setValueEnded: function() {
+        this.stateStored = false;
+        for (var i = 0; i < this.members.length; i++) {
+          this.members[i].setValueEnded();
+        }
       },
 
       /* getConstraintValues
@@ -184,16 +192,16 @@ define([
       },
 
       deleteSelf: function() {
-        var data =ListNode.prototype.deleteSelf.call(this);
+        var data = ListNode.prototype.deleteSelf.call(this);
         var ui = this.get('ui');
         ui.remove();
         ui = null;
-        if(this.get('selectionClone')){
+        if (this.get('selectionClone')) {
           this.get('selectionClone').remove();
         }
-        for(var i=0;i<this.members.length;i++){
-          if(this.members[i].get('type')=='collection'){
-            
+        for (var i = 0; i < this.members.length; i++) {
+          if (this.members[i].get('type') == 'collection') {
+
             this.members[i].deleteSelf();
 
           }

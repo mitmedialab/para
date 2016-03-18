@@ -120,6 +120,13 @@ define([
 			if (!stateStored) {
 				var selected_ids = [];
 				for (var i = 0; i < selected.length; i++) {
+					if(selected[i].get('type')=='collection'){
+						var geom = selected[i].getAllMembers();
+						geom.forEach(function(g){
+							selected_ids.push(g.get('id'));
+						});
+
+					}
 					selected_ids.push(selected[i].get('id'));
 				}
 				undoStack.push(selected_ids);

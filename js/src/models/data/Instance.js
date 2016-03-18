@@ -952,6 +952,7 @@ define([
 		},
 
 		addToUndoStack: function() {
+			console.log('addToUndoStack',this.get('name'),this.stateStored);
 			if (!this.stateStored) {
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;

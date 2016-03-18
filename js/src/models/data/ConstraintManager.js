@@ -237,6 +237,7 @@ define([
 				var index = this.constraints.indexOf(constraint);
 				this.constraints.splice(index, 1);
 				constraint.deleteSelf();
+				return constraint;
 			}
 		},
 

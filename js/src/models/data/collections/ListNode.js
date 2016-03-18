@@ -38,18 +38,6 @@ define([
       this.get('strokeWidth').setNull(false);
     },
 
-    /*setValue
-    passes modifications onto members
-     */
-    setValue: function(data, mode, modifier) {
-
-      for (var i = 0; i < this.members.length; i++) {
-        this.members[i].setValue(data, mode, modifier);
-      }
-      this.setNull(false);
-    },
-
-
     printMembers: function() {
       var ids = [];
       for (var i = 0; i < this.members.length; i++) {
@@ -342,6 +330,24 @@ define([
       return memberList;
     },
 
+     //returns all members and sub-members
+    getAllMembers: function(memberList) {
+      if (!memberList) {
+        memberList = [];
+      }
+      for (var i = 0; i < this.members.length; i++) {
+        if (this.members[i].get('type') !== 'collection') {
+          memberList.push(this.members[i]);
+        } else {
+          this.members[i].getAllMembers(memberList);
+           memberList.push(this.members[i]);
+        }
+
+
+      }
+      return memberList;
+    },
+
 
     propertyModified: function(event) {
       for (var i = 0; i < this.members.length; i++) {
@@ -479,7 +485,7 @@ define([
         var y = bbox_dimensions.topLeft.y + height / 2;
 
         var bbox = this.get('bbox');
-        
+
         if (!bbox) {
 
           bbox = new paper.Path.Rectangle(bbox_dimensions.topLeft, new paper.Size(width, height));
