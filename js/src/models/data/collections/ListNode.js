@@ -479,6 +479,7 @@ define([
         var y = bbox_dimensions.topLeft.y + height / 2;
 
         var bbox = this.get('bbox');
+        
         if (!bbox) {
 
           bbox = new paper.Path.Rectangle(bbox_dimensions.topLeft, new paper.Size(width, height));
@@ -604,7 +605,7 @@ define([
         } else {
           member = manager.getById(dataClone[k].id);
         }
-
+        console.log('adding member from parse',member,dataClone[k].id);
         this.addMember(member, dataClone[k].zIndex);
 
         member.trigger('modified', member);

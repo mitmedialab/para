@@ -30,7 +30,6 @@ define([
             }),
 
             initialize: function(attributes, options) {
-                console.log('duplicator initialize');
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();

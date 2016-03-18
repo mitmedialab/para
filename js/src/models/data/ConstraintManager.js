@@ -29,24 +29,39 @@ define([
 		undo: function(manager) {
 
 			if (this.previousStates.length > 0) {
-				console.log('calling undo on', this.get('name'),this.futureStates);
+				var toRemove = [];
+				var toAdd = [];
+				console.log('calling undo on', this.get('name'), this.previousStates);
 
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
 				this.futureStates.push(currentState);
-				this.parseJSON(state, manager);
-
+				var changed = this.parseJSON(state, manager);
+				toRemove.push.apply(toRemove, changed.toRemove);
+				toAdd.push.apply(toAdd, changed.toAdd);
+				return {
+					toRemove: toRemove,
+					toAdd: toAdd
+				};
 
 			}
 		},
 
 		redo: function(manager) {
 			if (this.futureStates.length > 0) {
-				console.log('calling redo on', this.get('name'),this.futureStates);
+				var toRemove = [];
+				var toAdd = [];
+				console.log('calling redo on', this.get('name'), this.futureStates);
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
-				this.parseJSON(state, manager);
+				var changed = this.parseJSON(state, manager);
+				toRemove.push.apply(toRemove, changed.toRemove);
+				toAdd.push.apply(toAdd, changed.toAdd);
+				return {
+					toRemove: toRemove,
+					toAdd: toAdd
+				};
 			}
 
 		},
@@ -56,7 +71,7 @@ define([
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;
 				this.futureStates = [];
-				//console.log(this.get('name'), ' stored state', this.previousStates);
+				console.log(this.get('name'), ' stored state', this.previousStates);
 			}
 		},
 
@@ -197,15 +212,15 @@ define([
 		},
 
 		//removes all constraints on a given target on a given target
-		removeConstraintsOn: function(target,registerUndo){
+		removeConstraintsOn: function(target, registerUndo) {
 			var constraints = this.getConstraintsByRelative(target);
-			constraints.push.apply(constraints,this.getConstraintsByReference(target));
-			if(constraints.length>0){
+			constraints.push.apply(constraints, this.getConstraintsByReference(target));
+			if (constraints.length > 0) {
 				if (registerUndo) {
 					this.addToUndoStack();
 				}
 				var self = this;
-				constraints.forEach(function(constraint){
+				constraints.forEach(function(constraint) {
 					self.removeConstraint(constraint.get('id'));
 				});
 				return constraints;

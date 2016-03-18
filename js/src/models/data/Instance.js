@@ -348,9 +348,9 @@ define([
 		},
 
 		//used for finding internal lists in duplicators
-		 getInternalList: function(id) {
-		 	return false;
-		 },
+		getInternalList: function(id) {
+			return false;
+		},
 
 		hasChild: function(child, top, last) {
 			if (child === this) {
@@ -430,11 +430,10 @@ define([
 
 		modifyPointsByIndex: function(initial_delta, indicies, exclude) {},
 
-		filterSelection: function(){
-			if(this.nodeParent.get('open')){
+		filterSelection: function() {
+			if (this.nodeParent.get('open')) {
 				return this;
-			}
-			else{
+			} else {
 				return this.nodeParent.filterSelection();
 			}
 		},
@@ -849,7 +848,10 @@ define([
 			this.set('rendered', data.rendered);
 			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
 			this.trigger('modified', this);
-			return {toRemove:[],toAdd:[]};
+			return {
+				toRemove: [],
+				toAdd: []
+			};
 		},
 
 		parseInheritorJSON: function(data, manager) {
@@ -922,7 +924,10 @@ define([
 
 				toRemove.push.apply(toRemove, changed.toRemove);
 				toAdd.push.apply(toAdd, changed.toAdd);
-				return {toRemove:toRemove,toAdd:toAdd};
+				return {
+					toRemove: toRemove,
+					toAdd: toAdd
+				};
 			}
 		},
 
@@ -938,7 +943,10 @@ define([
 
 				toRemove.push.apply(toRemove, changed.toRemove);
 				toAdd.push.apply(toAdd, changed.toAdd);
-				return {toRemove:toRemove,toAdd:toAdd};
+				return {
+					toRemove: toRemove,
+					toAdd: toAdd
+				};
 			}
 
 		},

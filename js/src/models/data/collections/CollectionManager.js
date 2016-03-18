@@ -42,13 +42,14 @@ define([
 		},
 
 		parseJSON: function(data, manager) {
+			console.log('data to parse', data);
 			var changed = {
 				toRemove: [],
 				toAdd: []
 			};
 			var listClone = lists.slice(0, lists.length);
 			var dataClone = data.slice(0, data.length);
-
+			var self = this;
 			for (var i = 0; i < lists.length; i++) {
 				var target_id = lists[i].get('id');
 				var target_data = _.find(data, function(item) {
@@ -68,7 +69,7 @@ define([
 				}
 			}
 
-
+			console.log('to remove', listClone);
 			//remove children not in JSON
 			for (var j = 0; j < listClone.length; j++) {
 
@@ -94,26 +95,27 @@ define([
 					}
 				}
 
-				var removed = this.removeList(listClone[j]);
-				changed.toRemove.push(removed);
+				var members = this.removeCollection(listClone[j]);
+				members.forEach(function(member) {
+					if (member.get('type') == 'collection') {
+						self.insertList(member.previousStates[member.previousStates.length - 1].index, member);
+					}
+				});
+
+				changed.toRemove.push(listClone[j]);
 			}
 
 			//addChildren in JSON that didn't already exist
 			for (var k = 0; k < dataClone.length; k++) {
 				var newList;
-				if (dataClone[k].type == 'collection') {
-					newList = new ConstrainableList();
-					changed.toAdd.push(newList);
-
-					newList.parseJSON(dataClone[k], manager);
-					newList.previousStates = dataClone[k].previousStates;
-					newList.futureStates = dataClone[k].futureStates;
-				} else {
-					newList = manager.getById(dataClone[k].id);
-				}
-				lists.splice(dataClone[k].index, 0, newList);
-
+				newList = new ConstrainableList();
+				changed.toAdd.push(newList);
+				newList.parseJSON(dataClone[k], manager);
+				newList.previousStates = dataClone[k].previousStates;
+				newList.futureStates = dataClone[k].futureStates;
+				this.insertList(dataClone[k].index, newList);
 			}
+			console.log('changed', changed);
 			return changed;
 
 		},
@@ -172,9 +174,9 @@ define([
 			}
 		},
 
-		getInternalList: function(id,node) {
-			 var list;
-			for(var i=0;i<node.children.length;i++){
+		getInternalList: function(id, node) {
+			var list;
+			for (var i = 0; i < node.children.length; i++) {
 				list = node.children[i].getInternalList(id);
 				if (list) {
 					return list;
@@ -320,7 +322,7 @@ define([
 		 *adds a list to the closedlist array and removes any items
 		 * on the array which are members of the added list
 		 */
-		addList: function(selected, registerUndo) {
+		initializeList: function(selected, registerUndo) {
 
 			var list = new ConstrainableList();
 			list.addMember(selected);
@@ -328,6 +330,9 @@ define([
 			return list;
 		},
 
+		addList: function(list, registerUndo) {
+			this.insertList(lists.length, list, registerUndo);
+		},
 
 		insertList: function(index, list, registerUndo) {
 			if (registerUndo) {
@@ -359,15 +364,6 @@ define([
 			return addedToList;
 		},
 
-		/*removeList
-		 *removes list item recursively checking sublists
-		 */
-		removeList: function(list) {
-			for (var i = 0; i < lists.length; i++) {
-				lists[i].recRemoveMember(list);
-
-			}
-		},
 
 		toggleOpen: function(item) {
 			if (item.get('type') === 'geometry') {

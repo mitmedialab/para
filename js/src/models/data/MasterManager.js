@@ -149,11 +149,7 @@ define([
 					var item;
 					var toRemove = [];
 					var toAdd = [];
-					if (id == "constraint_manager") {
-						item = constraintManager;
-					} else {
-						item = self.getById(id);
-					}
+					item = self.getById(id);
 					var changed = item.undo(self);
 					if (changed) {
 						toRemove.push.apply(toRemove, changed.toRemove);
@@ -187,11 +183,7 @@ define([
 					var item;
 					var toRemove = [];
 					var toAdd = [];
-					if (id == "constraint_manager") {
-						item = constraintManager;
-					} else {
-						item = self.getById(id);
-					}
+					item = self.getById(id);
 					var changed = item.redo(self);
 					if (changed) {
 						toRemove.push.apply(toRemove, changed.toRemove);
@@ -211,14 +203,15 @@ define([
 		cleanUp: function(toRemove, toAdd) {
 			console.log('clean up', toRemove, toAdd);
 			for (var i = 0; i < toRemove.length; i++) {
-				/*if (toRemove[i].get('name') == 'duplicator') {
-					collectionManager.removeCollection(toRemove[i]);
-				}*/
+				if (toRemove[i].get('type') == 'collection') {
+					this.removeListener(toRemove[i]);
+
+				}
 			}
 			for (var j = 0; j < toAdd.length; j++) {
-				/*if (toAdd[j].get('name') == 'duplicator') {
-					collectionManager.addDuplicator(null, toAdd[j]);
-				}*/
+				if (toAdd[j].get('type') == 'collection') {
+					this.addListener(toAdd[j]);
+				}
 			}
 		},
 
@@ -412,24 +405,29 @@ define([
 
 
 		getById: function(id) {
-			var prefix = id.split('_')[0];
-			var obj;
-			switch (prefix) {
-				case 'collection':
-					obj = collectionManager.getCollectionById(id);
-					break;
-				case 'internalcollection':
-					obj = collectionManager.getInternalList(id,rootNode);
-					console.log('internal collection search',obj,id);
-					break;
-				case 'constraint':
-					obj = this.getConstraintById(id);
-					break;
-				default:
-					obj = this._getGeomById(id);
-					break;
+			if (id == "constraint_manager") {
+				return constraintManager;
+			} else if (id == "collection_manager") {
+				return collectionManager;
+			} else {
+				var prefix = id.split('_')[0];
+				var obj;
+				switch (prefix) {
+					case 'collection':
+						obj = collectionManager.getCollectionById(id);
+						break;
+					case 'internalcollection':
+						obj = collectionManager.getInternalList(id, rootNode);
+						break;
+					case 'constraint':
+						obj = this.getConstraintById(id);
+						break;
+					default:
+						obj = this._getGeomById(id);
+						break;
+				}
+				return obj;
 			}
-			return obj;
 		},
 
 		/* getGeomById 
@@ -534,6 +532,7 @@ define([
 
 
 		addListener: function(target, recurse) {
+			console.log('adding listener to target',target,target.get('name'));
 			this.stopListening(target);
 			target.compile();
 			target.render();
@@ -629,13 +628,11 @@ define([
 			});
 			switch (object.get('type')) {
 				case 'geometry':
-					layersView.removeShape(id);
 					this.removeGeometry(object);
 					break;
 				case 'function':
 					//functionManager.removeFunction(selected[i]);
 					break;
-					//TODO: this replicates functionality in the ungroup function, should this function differently?
 				case 'collection':
 					this.removeCollection(object);
 					break;
@@ -672,7 +669,7 @@ define([
 			var constraints = constraintManager.removeConstraintsOn(target, !stateStored);
 			if (constraints) {
 				undoQueue.push(constraintManager);
-				constraints.forEach(function(constraint){
+				constraints.forEach(function(constraint) {
 					layersView.removeConstraint(constraint.get('id'));
 				});
 			}
@@ -692,7 +689,7 @@ define([
 			var constraints = constraintManager.removeConstraintsOn(target, !stateStored);
 			if (constraints) {
 				undoQueue.push(constraintManager);
-				constraints.forEach(function(constraint){
+				constraints.forEach(function(constraint) {
 					layersView.removeConstraint(constraint.get('id'));
 				});
 			}
@@ -1087,7 +1084,9 @@ define([
 
 
 		_selectSingleShape: function(instance, segments) {
-			instance = instance.filterSelection();
+			if (instance.get('type') == 'geometry') {
+				instance = instance.filterSelection();
+			}
 			var data = collectionManager.filterSelection(instance);
 			if (data) {
 				this.deselectShape(data.toRemove);
