@@ -196,6 +196,23 @@ define([
 			}
 		},
 
+		//removes all constraints on a given target on a given target
+		removeConstraintsOn: function(target,registerUndo){
+			var constraints = this.getConstraintsByRelative(target);
+			constraints.push.apply(constraints,this.getConstraintsByReference(target));
+			if(constraints.length>0){
+				if (registerUndo) {
+					this.addToUndoStack();
+				}
+				var self = this;
+				constraints.forEach(function(constraint){
+					self.removeConstraint(constraint.get('id'));
+				});
+				return constraints;
+			}
+
+		},
+
 		removeConstraint: function(id, registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();

@@ -137,13 +137,13 @@ define([
 			if (undoStack.length > 0) {
 
 				var toUndo = undoStack.pop();
-				if (toUndo.length > 1) {
+				/*if (toUndo.length > 1) {
 					var ci = toUndo.indexOf("constraint_manager");
 					if (ci > 0) {
 						var cm = toUndo.splice(ci, 1)[0];
 						toUndo.unshift(cm);
 					}
-				}
+				}*/
 				var self = this;
 				toUndo.forEach(function(id) {
 					var item;
@@ -165,7 +165,7 @@ define([
 
 				this.deselectAllShapes();
 
-				redoStack.push(toUndo);
+				redoStack.push(toUndo.reverse());
 			}
 		},
 
@@ -175,13 +175,13 @@ define([
 			if (redoStack.length > 0) {
 
 				var toRedo = redoStack.pop();
-				if (toRedo.length > 1) {
+				/*if (toRedo.length > 1) {
 					var ci = toRedo.indexOf("constraint_manager");
 					if (ci >= 0 && ci < toRedo.length - 1) {
 						var cm = toRedo.splice(ci, 1)[0];
 						toRedo.push(cm);
 					}
-				}
+				}*/
 				var self = this;
 				toRedo.forEach(function(id) {
 					var item;
@@ -204,21 +204,21 @@ define([
 
 				this.deselectAllShapes();
 
-				undoStack.push(toRedo);
+				undoStack.push(toRedo.reverse());
 			}
 		},
 
 		cleanUp: function(toRemove, toAdd) {
 			console.log('clean up', toRemove, toAdd);
 			for (var i = 0; i < toRemove.length; i++) {
-				if (toRemove[i].get('name') == 'duplicator') {
+				/*if (toRemove[i].get('name') == 'duplicator') {
 					collectionManager.removeCollection(toRemove[i]);
-				}
+				}*/
 			}
 			for (var j = 0; j < toAdd.length; j++) {
-				if (toAdd[j].get('name') == 'duplicator') {
+				/*if (toAdd[j].get('name') == 'duplicator') {
 					collectionManager.addDuplicator(null, toAdd[j]);
-				}
+				}*/
 			}
 		},
 
@@ -419,7 +419,8 @@ define([
 					obj = collectionManager.getCollectionById(id);
 					break;
 				case 'internalcollection':
-					obj = collectionManager.getInternalList(id);
+					obj = collectionManager.getInternalList(id,rootNode);
+					console.log('internal collection search',obj,id);
 					break;
 				case 'constraint':
 					obj = this.getConstraintById(id);
@@ -645,14 +646,10 @@ define([
 		},
 
 		removeObject: function() {
-
-
-
 			for (var i = 0; i < selected.length; i++) {
 				collectionManager.removeObjectFromLists(selected[i]);
 				switch (selected[i].get('type')) {
 					case 'geometry':
-						layersView.removeShape(selected[i].get('id'));
 						this.removeGeometry(selected[i]);
 						break;
 					case 'function':
@@ -671,24 +668,39 @@ define([
 		},
 
 		removeGeometry: function(target) {
-			if (target.get('name') === 'duplicator') {
-				collectionManager.removeCollection(target);
+			var undoQueue = [];
+			var constraints = constraintManager.removeConstraintsOn(target, !stateStored);
+			if (constraints) {
+				undoQueue.push(constraintManager);
+				constraints.forEach(function(constraint){
+					layersView.removeConstraint(constraint.get('id'));
+				});
 			}
 
 			var parent = target.getParentNode();
-
-			if (parent) {
-				parent.removeChildNode(target, !stateStored);
-				this.addToUndoStack([parent]);
-				this.modificationEnded([parent]);
-			}
+			undoQueue.unshift(parent);
+			parent.removeChildNode(target, !stateStored);
+			this.addToUndoStack(undoQueue);
+			this.modificationEnded(undoQueue);
+			layersView.removeShape(target.get('id'));
 
 			target.deleteSelf();
 		},
 
 		removeCollection: function(target) {
+			var undoQueue = [];
+			var constraints = constraintManager.removeConstraintsOn(target, !stateStored);
+			if (constraints) {
+				undoQueue.push(constraintManager);
+				constraints.forEach(function(constraint){
+					layersView.removeConstraint(constraint.get('id'));
+				});
+			}
 			layersView.removeCollection(target.get('id'));
-			var removedItems = collectionManager.removeCollection(target);
+			var removedItems = collectionManager.removeCollection(target, !stateStored);
+			undoQueue.unshift(collectionManager);
+			this.addToUndoStack(undoQueue);
+			this.modificationEnded(undoQueue);
 			this.deselectAllShapes();
 			this.selectShape(removedItems);
 		},
@@ -777,7 +789,7 @@ define([
 
 		addList: function(selected) {
 
-			var list = collectionManager.initializeList(selected,!stateStored);
+			var list = collectionManager.initializeList(selected, !stateStored);
 			this.deselectAllShapes();
 			if (list) {
 				this.addToUndoStack([collectionManager]);
@@ -891,7 +903,11 @@ define([
 			var index = object.index;
 			var nodeParent = object.nodeParent;
 			nodeParent.removeChildNode(object, !stateStored);
-			var duplicator = collectionManager.addDuplicator(object);
+			var duplicator = new Duplicator({}, {
+				geometryGenerator: GeometryGenerator
+			});
+
+			duplicator.setTarget(object);
 
 			var data = duplicator.setCount(3);
 
@@ -1071,7 +1087,7 @@ define([
 
 
 		_selectSingleShape: function(instance, segments) {
-			var instance = instance.filterSelection();
+			instance = instance.filterSelection();
 			var data = collectionManager.filterSelection(instance);
 			if (data) {
 				this.deselectShape(data.toRemove);

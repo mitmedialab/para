@@ -153,6 +153,7 @@ define([
     },
 
     initialize: function() {
+      console.log('constraint initialize');
       var self = this;
 
       this.set('ref_handle', new ConstraintHandles({

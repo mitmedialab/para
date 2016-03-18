@@ -21,6 +21,7 @@ define([
       }),
 
       initialize: function() {
+         console.log('list initialize');
         ListNode.prototype.
         initialize.apply(this, arguments);
         //code for creating list UI

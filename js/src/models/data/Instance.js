@@ -347,6 +347,11 @@ define([
 			}
 		},
 
+		//used for finding internal lists in duplicators
+		 getInternalList: function(id) {
+		 	return false;
+		 },
+
 		hasChild: function(child, top, last) {
 			if (child === this) {
 				return last;

@@ -172,12 +172,10 @@ define([
 			}
 		},
 
-		getInternalList: function(id) {
-			var duplicators = lists.filter(function(item) {
-				return item.get('name') == 'duplicator';
-			});
-			for (var i = 0; i < duplicators.length; i++) {
-				var list = duplicators[i].getInternalList(id);
+		getInternalList: function(id,node) {
+			 var list;
+			for(var i=0;i<node.children.length;i++){
+				list = node.children[i].getInternalList(id);
 				if (list) {
 					return list;
 				}
@@ -249,7 +247,6 @@ define([
 			}
 
 			collection.deleteSelf();
-
 			return members;
 		},
 
@@ -346,20 +343,6 @@ define([
 			lists.splice(index, 0, list);
 		},
 
-
-		addDuplicator: function(object, duplicator) {
-			if (object) {
-				duplicator = new Duplicator({}, {
-					geometryGenerator: GeometryGenerator
-				});
-
-				duplicator.setTarget(object);
-			}
-
-			lists.push(duplicator);
-			
-			return duplicator;
-		},
 
 		/* addToOpenLists
 		 * attempts to add a newly created instance to any open lists

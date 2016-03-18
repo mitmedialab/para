@@ -79,8 +79,8 @@ define([
         //if the child currently exists in the group
         if (target_data) {
           var mI = this.children[i].parseJSON(target_data);
-          changed.toRemove.push.apply(changed,mI.toRemove);
-            changed.toAdd.push.apply(changed,mI.toAdd);
+          changed.toRemove.push.apply(changed, mI.toRemove);
+          changed.toAdd.push.apply(changed, mI.toAdd);
           childClone = _.filter(childClone, function(child) {
             return child.get('id') != target_id;
           });
@@ -131,7 +131,7 @@ define([
         newChild.trigger('modified', newChild);
       }
 
-     return changed;
+      return changed;
 
     },
 
@@ -160,6 +160,16 @@ define([
       }
     },
 
+
+    getInternalList: function(id) {
+      var list;
+      for (var i = 0; i < this.children.length; i++) {
+        list = this.children[i].getInternalList(id);
+        if (list) {
+          return list;
+        }
+      }
+    },
 
     /*deleteAllChildren
      * function which deletes all children
