@@ -210,12 +210,31 @@ define([
 			for (var i = 0; i < toRemove.length; i++) {
 				if (toRemove[i].get('type') == 'collection') {
 					this.removeListener(toRemove[i]);
+					layersView.removeCollection(toRemove[i].get('id'));
+				}
+				if (toRemove[i].get('type') == 'constraint') {
+					layersView.removeConstraint(toRemove[i].get('id'));
 
 				}
+				if (toRemove[i].get('type') == 'geometry') {
+					layersView.removeShape(toRemove[i].get('id'));
+
+				}
+
 			}
 			for (var j = 0; j < toAdd.length; j++) {
 				if (toAdd[j].get('type') == 'collection') {
 					this.addListener(toAdd[j]);
+					layersView.addList(toAdd[j].toJSON());
+
+				}
+				if (toAdd[j].get('type') == 'constraint') {
+					layersView.addConstraint(toAdd[j]);
+
+				}
+				if (toAdd[j].get('type') == 'geometry') {
+					layersView.addShape(toAdd[j].toJSON());
+
 				}
 			}
 		},
