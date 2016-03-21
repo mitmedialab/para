@@ -30,8 +30,8 @@ define([
 				showLayers: 'visible',
 			}),
 
-			initialize: function() {
-				GeometryNode.prototype.initialize.apply(this, arguments);
+			initialize: function(attributes, options) {
+				Group.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
 				this.get('translationDelta').setNull(false);
 

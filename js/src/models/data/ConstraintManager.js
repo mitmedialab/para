@@ -188,6 +188,16 @@ define([
 			return ref_constraints;
 		},
 
+		//returns true if instance is reference or relative in a constraint
+		inConstraint: function(instance){
+			var ref = this.getConstraintsByReference(instance);
+			var rel = this.getConstraintsByRelative(instance);
+			if(ref.length>0|| rel.length>0){
+				return true;
+			}
+			return false;
+		},
+		
 		addConstraint: function(constraint, registerUndo) {
 			this.insertConstraint(this.constraints.length, constraint, registerUndo);
 		},

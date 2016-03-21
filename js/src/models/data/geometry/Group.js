@@ -206,7 +206,7 @@ define([
         var clone = this.children[i].create(noInheritor);
         instance.addChildNode(clone);
       }
-      
+
       return instance;
     },
 
@@ -235,12 +235,14 @@ define([
       }
     },
 
-    ungroup: function() {
+    unGroup: function() {
+
       var childClone = this.children.slice(0, this.children.length);
       var removedChildren = [];
       for (var i = 0; i < childClone.length; i++) {
         removedChildren.push(this.removeChildNode(childClone[i]));
       }
+
       return removedChildren;
     },
 
