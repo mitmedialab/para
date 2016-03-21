@@ -448,9 +448,8 @@ define([
 
 		addShape: function(shape, parentId) {
 			var index = shape.zIndex;
-			if (!index) {
-				index = 0;
-			}
+			console.log('adding shape, zindex',index);
+			
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var s = {
@@ -470,6 +469,11 @@ define([
 			} else {
 				node = parentNode.addChildren(s);
 			}
+			parentNode.sortChildren(function(a,b){
+				var sort= b.data.zIndex-a.data.zIndex;
+				console.log('sort=',sort);
+				return sort;
+			});
 			this.selectNode(node);
 			this.resetConstraintHeight();
 			for (var i = 0; i < shape.children.length; i++) {
@@ -477,6 +481,7 @@ define([
 					this.addShape(shape.children[i], shape.id);
 				}
 			}
+
 
 
 

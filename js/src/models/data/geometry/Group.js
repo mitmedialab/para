@@ -211,6 +211,7 @@ define([
     },
 
     insertChild: function(index, child, registerUndo) {
+      console.log('inserting child at index',index);
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));

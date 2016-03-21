@@ -66,7 +66,7 @@ define([
 			},
 
 			insertChild: function(index, child, registerUndo) {
-				GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
+				Group.prototype.insertChild.call(this, index, child, registerUndo);
 
 				this.listenTo(child, 'modified', this.modified);
 				this.trigger('modified', this);
