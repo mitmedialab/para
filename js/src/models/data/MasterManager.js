@@ -271,66 +271,7 @@ define([
 				action: 'importJSON'
 			});
 			this.deleteAll();
-			var lists = json.lists;
-			var geometry = json.geometry.children;
-			var constraints = json.constraints;
-			for (var i = 0; i < geometry.length; i++) {
-				var geom;
-				switch (geometry[i].name) {
-
-					case 'duplicator':
-						var duplicator = new Duplicator({}, {
-							geometryGenerator: GeometryGenerator
-						});
-						duplicator.parseJSON(geometry[i]);
-						this.addDuplicator(duplicator);
-						break;
-					case 'group':
-						var group = new Group({}, {
-							geometryGenerator: GeometryGenerator
-						});
-						group.parseJSON(geometry[i]);
-						this.addGroup(null, group);
-						break;
-					default:
-						switch (geometry[i].name) {
-							case 'path':
-								geom = new PathNode();
-								break;
-							case 'rectangle':
-								geom = new RectNode();
-								break;
-							case 'ellipse':
-								geom = new EllipseNode();
-								break;
-							case 'polygon':
-								geom = new PolygonNode();
-								break;
-
-						}
-						geom.parseJSON(geometry[i], this);
-						this.addShape(geom, true);
-						break;
-
-				}
-			}
-
-			for (var j = 0; j < lists.length; j++) {
-				var list = new ConstrainableList();
-				var toAdd = list.parseJSON(lists[j], this);
-				for (var k = 0; k < toAdd.length; k++) {
-					layersView.addList(toAdd[k].toJSON());
-					this.addListener(toAdd[k]);
-				}
-				collectionManager.addList(list);
-			}
-
-			for (var m = 0; m < constraints.length; m++) {
-				var constraint = new Constraint();
-				constraint.parseJSON(constraints[m], this);
-				this.addConstraint(constraint, true);
-
-			}
+			
 
 			paper.view.draw();
 		},
@@ -591,20 +532,20 @@ define([
 			var added;
 			switch (object) {
 				case 'geometry':
-					added = this.addShape(geom);
+					added = this.addShape(geom,true);
 					break;
-				case 'instance':
-					added = this.addCopy(selected);
+				case 'copy':
+					added = this.addCopy(selected,true);
 					break;
 				case 'list':
-					added = this.addList(selected);
+					added = this.addList(selected,true);
 					break;
 				case 'group':
-					added = this.addGroup(selected);
+					added = this.addGroup(selected,true);
 					break;
 				case 'duplicator':
 					if (selected[0]) {
-						added = this.initializeDuplicator(selected[0]);
+						added = this.initializeDuplicator(selected[0],true);
 
 					}
 					break;
@@ -627,16 +568,16 @@ define([
 			});
 			switch (object.get('type')) {
 				case 'geometry':
-					this.removeGeometry(object);
+					this.removeGeometry(object,true);
 					break;
 				case 'function':
 					//functionManager.removeFunction(selected[i]);
 					break;
 				case 'collection':
-					this.removeCollection(object);
+					this.removeCollection(object,true);
 					break;
 				case 'constraint':
-					this.removeConstraint(id);
+					this.removeConstraint(id,true);
 					break;
 			}
 		},
@@ -676,8 +617,10 @@ define([
 
 			undoQueue.unshift(parent);
 			parent.removeChildNode(target, registerUndo);
+			if(registerUndo){
 			this.addToUndoStack(undoQueue);
 			this.modificationEnded(undoQueue);
+			}
 
 
 			layersView.removeShape(target.get('id'));
@@ -699,8 +642,10 @@ define([
 
 			removedItems = collectionManager.removeCollection(target, registerUndo);
 			undoQueue.unshift(collectionManager);
+			if(registerUndo){
 			this.addToUndoStack(undoQueue);
 			this.modificationEnded(undoQueue);
+			}
 			this.deselectAllShapes();
 			this.selectShape(removedItems);
 		},
@@ -787,13 +732,15 @@ define([
 			}
 		},
 
-		addList: function(selected) {
+		addList: function(selected,registerUndo) {
 
-			var list = collectionManager.initializeList(selected, !stateStored);
+			var list = collectionManager.initializeList(selected, registerUndo);
 			this.deselectAllShapes();
 			if (list) {
+				if(registerUndo){
 				this.addToUndoStack([collectionManager]);
 				this.modificationEnded([collectionManager]);
+				}
 				layersView.addList(list.toJSON());
 				this.selectShape(list);
 				this.addListener(list);
@@ -803,35 +750,7 @@ define([
 		},
 
 
-		//called when creating an instance which inherits from existing shape
-		addInstance: function() {
-			var parent = this.getLastSelected();
-			if (parent) {
-				var duplicator = collectionManager.getDuplicatorThatContains(parent);
-
-				var lastInstance;
-				if (duplicator) {
-					this.setDuplicatorCount(duplicator.getCountValue() + 1, duplicator);
-					lastInstance = duplicator.getLastMember();
-					lastInstance.get('translationDelta').setValue(parent.get('translationDelta').getValue());
-					duplicator.setIndex(duplicator.getMemberIndex(parent), lastInstance);
-				} else {
-					duplicator = this.addDuplicator(parent);
-					this.deselectShape(duplicator);
-					collectionManager.toggleOpenLists([duplicator]);
-
-					this.setDuplicatorCount(2, duplicator);
-
-					lastInstance = duplicator.getLastMember();
-				}
-				this.deselectShape(parent);
-
-				this.selectShape(lastInstance);
-
-			}
-		},
-
-		unGroup: function() {
+		unGroup: function(registerUndo) {
 			analytics.log(eventType, {
 				type: eventType,
 				id: 'modify',
@@ -842,6 +761,7 @@ define([
 			var removed_list = [];
 			var modified = [];
 			console.log('currentNode children',currentNode.children.length);
+			if(registerUndo){
 			for(var m=0;m<selected.length;m++){
 				var constrained = constraintManager.inConstraint(selected[m]);
 				if (constrained) {
@@ -865,6 +785,7 @@ define([
 				currentNode.addToUndoStack();
 				modified.push(currentNode);
 			}
+		}
 
 
 			for (var i = 0; i < selected.length; i++) {
@@ -896,15 +817,16 @@ define([
 				}
 				currentNode.addMultipleChildren(removed_geom);
 			}
-			
+			if(registerUndo){
 			this.addToUndoStack(modified);
 			this.modificationEnded(modified);
+			}
 			this.deselectAllShapes();
 			this.selectShape(removed);
 		},
 
 
-		addCopy: function(selected) {
+		addCopy: function(selected, registerUndo) {
 			var geom_copy = [];
 			var list_copy = [];
 			var list_geom = [];
@@ -934,42 +856,42 @@ define([
 				for (var j = 0; j < geom_copy.length; j++) {
 					layersView.addShape(geom_copy[j].toJSON());
 				}
-				currentNode.addMultipleChildren(geom_copy, !stateStored);
+				currentNode.addMultipleChildren(geom_copy, registerUndo);
 				modified.push(currentNode);
 
 			}
 			if (list_copy.length > 0) {
-				collectionManager.addMultipleLists(list_copy, !stateStored);
+				collectionManager.addMultipleLists(list_copy, registerUndo);
 				modified.push(collectionManager);
 
 			}
+			if(registerUndo){
 			this.addToUndoStack(modified);
 			this.modificationEnded(modified);
+			}
 			this.selectShape(copies);
 			return selected;
 		},
 
-		addShape: function(shape, noSelect) {
+		addShape: function(shape, registerUndo) {
 			if (!shape.nodeParent) {
-				currentNode.addChildNode(shape, !stateStored);
+				currentNode.addChildNode(shape, registerUndo);
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
 			}
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				layersView.addShape(shape.toJSON());
 			}
-			if (!noSelect) {
-				this.selectShape(shape);
-			}
+			this.selectShape(shape);
+			
 			return shape;
 
 		},
 
 
-		addGroup: function(selected, group) {
-			if (selected) {
-				group = new Group({},{geometryGenerator:GeometryGenerator});
-				currentNode.addChildNode(group, !stateStored);
+		addGroup: function(selected, registerUndo) {
+			var group = new Group({},{geometryGenerator:GeometryGenerator});
+				currentNode.addChildNode(group, true);
 				selected.sort(function(a, b) {
 					return a.get('zIndex').getValue() - b.get('zIndex').getValue();
 				});
@@ -985,7 +907,7 @@ define([
 				for (var i = 0; i < selected.length; i++) {
 					layersView.removeShape(selected[i].get('id'));
 				}
-			}
+			
 
 			layersView.addShape(group.toJSON());
 			this.deselectAllShapes();
@@ -1003,11 +925,11 @@ define([
 			return duplicator;
 		},
 
-		initializeDuplicator: function(object, open) {
+		initializeDuplicator: function(object, registerUndo) {
 			this.deselectAllShapes();
 			var index = object.index;
 			var nodeParent = object.nodeParent;
-			nodeParent.removeChildNode(object, !stateStored);
+			nodeParent.removeChildNode(object, registerUndo);
 			var duplicator = new Duplicator({}, {
 				geometryGenerator: GeometryGenerator
 			});
@@ -1024,7 +946,7 @@ define([
 			this.selectShape(duplicator);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
-			constraintManager.addConstraintArray(constraints, !stateStored);
+			constraintManager.addConstraintArray(constraints, registerUndo);
 
 			this.addToUndoStack([constraintManager, nodeParent]);
 			this.modificationEnded([constraintManager, nodeParent]);
@@ -1068,8 +990,10 @@ define([
 					data = selected[i].setCount(value, !stateStored);
 					this.duplicatorCountModified(data, selected[i]);
 				}
-				this.addToUndoStack(selected);
-				this.modificationEnded(selected);
+				
+					this.addToUndoStack(selected);
+					this.modificationEnded(selected);
+				
 			}
 		},
 
@@ -1092,11 +1016,13 @@ define([
 			this.trigger('modified');
 		},
 
-		removeConstraint: function(id) {
-			var removed = constraintManager.removeConstraint(id, !stateStored);
+		removeConstraint: function(id,registerUndo) {
+			var removed = constraintManager.removeConstraint(id, registerUndo);
 			if (removed) {
+				if(registerUndo){
 				this.addToUndoStack([constraintManager]);
 				this.modificationEnded([constraintManager]);
+				}
 				this.visualizeConstraint();
 				layersView.removeConstraint(id);
 			}

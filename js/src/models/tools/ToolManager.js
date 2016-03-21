@@ -66,7 +66,7 @@ define([
       this.listenTo(toolCollection, 'delegateMethod', this.delegateMethod);
       this.listenTo(toolCollection, 'constraintPending', this.constraintPending);
       this.listenTo(toolCollection, 'constraintReset', this.constraintReset);
-      this.listenTo(toolCollection, 'addInstance', this.addInstance);
+      this.listenTo(toolCollection, 'addCopy', this.addCopy);
       this.listenTo(toolCollection, 'selectionRequest', this.selectionRequest);
 
       this.get('tool_collection').add([selectTool, polyTool, constraintTool]);
@@ -135,8 +135,8 @@ define([
       this.trigger('addObject', 'geometry', geom);
     },
 
-    addInstance: function(instance) {
-      this.trigger('addObject','instance');
+    addCopy: function(instance) {
+      this.trigger('addObject','copy');
     },
 
     applyConstraint: function() {

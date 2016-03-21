@@ -190,7 +190,7 @@ define([
       if (event.modifiers.option && copyReset) {
         copyReset = false;
         copyInitialized = true;
-        this.trigger('addInstance');
+        this.trigger('addCopy');
       }
 
       var data = {};
