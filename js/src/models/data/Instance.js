@@ -571,11 +571,12 @@ define([
 
 		createSelectionClone: function() {
 
-			var selection_clone = this.getShapeClone();
 			if (this.get('selection_clone')) {
 				this.get('selection_clone').remove();
 				this.set('selection_clone', null);
 			}
+			var selection_clone = this.getShapeClone();
+
 			var targetLayer = paper.project.layers.filter(function(layer) {
 				return layer.name === 'ui_layer';
 			})[0];

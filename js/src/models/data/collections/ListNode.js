@@ -97,22 +97,23 @@ define([
     /* create
       creates a clone of this list
      */
-    create: function(noInheritor) {
+    create: function(noInheritor,geom_members) {
 
       var instance = new this.constructor();
       var value = this.getValue();
       instance.setValue(value);
-
-      if (!noInheritor) {
-        this.addInheritor(instance);
-      }
-      
-
-
       instance.set('rendered', true);
       instance._matrix = this._matrix.clone();
-     // instance.reset();
-      //instance.render();
+      
+    for (var i = 0; i < this.members.length; i++) {
+       
+        var member =  this.members[i].create(noInheritor,geom_members);
+
+        if(member.get('type')=='geometry'){
+          geom_members.push(member);
+        }
+        instance.addMember(member);
+      }
       return instance;
     },
 

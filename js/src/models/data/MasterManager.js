@@ -838,29 +838,41 @@ define([
 		addCopy: function(selected) {
 			var geom_copy = [];
 			var list_copy = [];
+			var list_geom = [];
 			var copies = [];
 			var modified = [];
 			for (var i = 0; i < selected.length; i++) {
-				var copy = selected[i].create(true);
-				if (copy.get('type') == 'collection') {
+				var copy;
+				if (selected[i].get('type') == 'collection') {
+					copy = selected[i].create(true,list_geom);
 					list_copy.push(copy);
+					layersView.addList(copy.toJSON());
+
 				}
 				else{
+					copy =  selected[i].create(true);
 					geom_copy.push(copy);
+					
 				}
 				copies.push(copy);
-				layersView.addShape(copy.toJSON());
+				
 				
 			}
 			this.deselectAllShapes();
+
+			geom_copy.push.apply(geom_copy,list_geom);
+
 			if(geom_copy.length>0){
+				for(var j=0;j<geom_copy.length;j++){
+					layersView.addShape(geom_copy[j].toJSON());
+				}
 				currentNode.addMultipleChildren(geom_copy, !stateStored);
 				modified.push(currentNode);
 
 			}
 			if(list_copy.length>0){
 				collectionManager.addMultipleLists(list_copy,!stateStored);
-				modified.push(list_copy);
+				modified.push(collectionManager);
 
 			}
 			this.modificationEnded(modified);
