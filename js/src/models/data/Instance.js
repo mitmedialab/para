@@ -453,8 +453,8 @@ define([
 			instance.changeGeomInheritance(g_clone);
 			instance.set('rendered', true);
 			instance._matrix = this._matrix.clone();
-			instance.reset();
-			instance.render();
+			//instance.reset();
+			//instance.render();
 			return instance;
 		},
 

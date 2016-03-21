@@ -891,6 +891,9 @@ define([
 					geometryGenerator: GeometryGenerator
 				});
 				currentNode.addChildNode(group, !stateStored);
+				selected.sort(function(a,b){
+					return a.get('zIndex').getValue()-b.get('zIndex').getValue();
+				});
 				for (var j = 0; j < selected.length; j++) {
 					group.addChildNode(selected[j]);
 				}

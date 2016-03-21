@@ -94,6 +94,28 @@ define([
       }
     },
 
+    /* create
+      creates a clone of this list
+     */
+    create: function(noInheritor) {
+
+      var instance = new this.constructor();
+      var value = this.getValue();
+      instance.setValue(value);
+
+      if (!noInheritor) {
+        this.addInheritor(instance);
+      }
+      
+
+
+      instance.set('rendered', true);
+      instance._matrix = this._matrix.clone();
+     // instance.reset();
+      //instance.render();
+      return instance;
+    },
+
     computeCentroid: function() {
       var sumX = 0;
       var sumY = 0;

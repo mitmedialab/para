@@ -195,14 +195,18 @@ define([
       return data;
     },
 
-    create: function() {
+    create: function(noInheritor) {
       var instance =  this.geometryGenerator.getTargetClass(this.get('name'));
       var value = this.getValue();
       instance.setValue(value);
+      instance.set('rendered', true);
+      instance._matrix = this._matrix.clone();
+      
       for (var i = 0; i < this.children.length; i++) {
-        var clone = this.children[i].create();
+        var clone = this.children[i].create(noInheritor);
         instance.addChildNode(clone);
       }
+      
       return instance;
     },
 
