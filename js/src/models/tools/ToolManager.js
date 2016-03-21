@@ -283,6 +283,7 @@ define([
 
     changeZoom: function(oldZoom, delta, c, p) {
       var newZoom = this.calcZoom(oldZoom, delta);
+
       var beta = oldZoom / newZoom;
       var pc = p.subtract(c);
       var a = p.subtract(pc.multiply(beta)).subtract(c);
@@ -305,7 +306,7 @@ define([
     canvasMouseWheel: function(event, pan, modify) {
       var delta = event.originalEvent.wheelDelta; //paper.view.center
 
-      if (pan) {
+      if (pan && delta!=0) {
 
         var mousePos = new paper.Point(event.offsetX, event.offsetY);
         var viewPosition = paper.view.viewToProject(mousePos);

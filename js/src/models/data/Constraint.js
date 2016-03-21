@@ -153,7 +153,6 @@ define([
     },
 
     initialize: function() {
-      console.log('constraint initialize');
       var self = this;
 
       this.set('ref_handle', new ConstraintHandles({
@@ -644,7 +643,7 @@ define([
         for (var j = 0; j < relative_properties[i][1].length; j++) {
           var ref_vals = reference_values[relative_properties[i][0]][relative_properties[i][1][j]];
           var rel_vals = [];
-          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
+          if (relative.get('type') === 'collection') {
             for (var k = 0; k < relative.members.length; k++) {
               rel_vals.push(relative.members[k].get(relative_properties[i][0])[relative_properties[i][1][j]]);
             }
@@ -675,7 +674,9 @@ define([
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
+      console.log('setting constraint on',relative.getRange(),relative.get('name'),relative.get('id'),relative.getMemberAt(0).get('name'),relative.getMemberAt(0).get('id'),expression,offset,ref_prop_key, ref_dimension, rel_prop_key, rel_dimension);
       var constraintF = function() {
+        console.log('calling constraint function',self.get('paused'));
         var list = [];
         if (self.get('paused')) {
           return relative.get(rel_prop_key)[rel_dimension].getValue();
@@ -710,10 +711,12 @@ define([
             list.push(data);
 
             relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
+            relative_target.get(rel_prop_key)[rel_dimension].getValue();
           }
-          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
+          if (relative.get('type') == 'collection') {
             return list;
           } else {
+            console.log('data being set',list[0][rel_prop_key][rel_dimension]);
             return list[0][rel_prop_key][rel_dimension];
           }
         }

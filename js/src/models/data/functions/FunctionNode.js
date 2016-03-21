@@ -8,13 +8,14 @@ define([
 		'paper',
 		'models/data/Instance',
 		'models/data/geometry/Group',
+		'models/data/geometry/GeometryNode',
 		'models/data/properties/PConstraint',
 		'views/ParametersView',
 
 	],
 
 
-	function(_, paper, Instance, Group, PConstraint, ParametersView) {
+	function(_, paper, Instance, Group, GeometryNode, PConstraint, ParametersView) {
 		var svgstring = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612 792" enable-background="new 0 0 612 792" xml:space="preserve"><g><path fill="none" stroke="#76787B" stroke-width="1.6375" stroke-miterlimit="10" d="M10,1.9c0,0-3.7,4-10,4s-10-4-10-4 s3.7-7.7,10-7.7S10,1.9,10,1.9z"/><ellipse fill="#76787B" cx="-0.3" cy="-0.9" rx="4.8" ry="5"/></g></svg>';
 		var FunctionNode = Group.extend({
 
@@ -30,7 +31,7 @@ define([
 			}),
 
 			initialize: function() {
-				Group.prototype.initialize.apply(this, arguments);
+				GeometryNode.prototype.initialize.apply(this, arguments);
 				this.set('f_parameters', []);
 				this.get('translationDelta').setNull(false);
 
@@ -62,6 +63,25 @@ define([
 					this.addChildNode(param);
 				}
 				this.trigger('change:f_parameters');
+			},
+
+			insertChild: function(index, child, registerUndo) {
+				GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
+
+				this.listenTo(child, 'modified', this.modified);
+				this.trigger('modified', this);
+			},
+
+
+			removeChildNode: function(node, registerUndo) {
+				var removed = GeometryNode.prototype.removeChildNode.call(this, node, registerUndo);
+				if (removed) {
+
+					this.stopListening(removed);
+
+					this.trigger('modified', this);
+					return removed;
+				}
 			},
 
 			removeParameter: function(param) {

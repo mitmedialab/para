@@ -539,7 +539,7 @@ define([
 
 
 		addListener: function(target, recurse) {
-			console.log('adding listener to target',target,target.get('name'));
+			//console.log('adding listener to target',target,target.get('name'));
 			this.stopListening(target);
 			target.compile();
 			target.render();
@@ -806,22 +806,7 @@ define([
 			}
 		},
 
-		addShape: function(shape, noSelect) {
-			if (!shape.nodeParent) {
-				currentNode.addChildNode(shape, !stateStored);
-				this.addToUndoStack([currentNode]);
-				this.modificationEnded([currentNode]);
-			}
-			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
-				layersView.addShape(shape.toJSON());
-			}
-			if (!noSelect) {
-				this.selectShape(shape);
-			}
-			return shape;
-
-		},
-
+	
 		//called when creating an instance which inherits from existing shape
 		addInstance: function() {
 			var parent = this.getLastSelected();
@@ -865,6 +850,23 @@ define([
 			}
 			return selected;
 		},
+
+		addShape: function(shape, noSelect) {
+			if (!shape.nodeParent) {
+				currentNode.addChildNode(shape, !stateStored);
+				this.addToUndoStack([currentNode]);
+				this.modificationEnded([currentNode]);
+			}
+			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
+				layersView.addShape(shape.toJSON());
+			}
+			if (!noSelect) {
+				this.selectShape(shape);
+			}
+			return shape;
+
+		},
+
 
 		addGroup: function(selected, group) {
 			if (selected) {
@@ -1253,7 +1255,6 @@ define([
 		},
 
 		modificationEnded: function(objects) {
-			console.log('modificationEnded');
 			var targets;
 			if (objects) {
 				targets = objects;

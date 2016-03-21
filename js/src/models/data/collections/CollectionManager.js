@@ -42,7 +42,6 @@ define([
 		},
 
 		parseJSON: function(data, manager) {
-			console.log('data to parse', data);
 			var changed = {
 				toRemove: [],
 				toAdd: []
@@ -115,7 +114,6 @@ define([
 				newList.futureStates = dataClone[k].futureStates;
 				this.insertList(dataClone[k].index, newList);
 			}
-			console.log('changed', changed);
 			return changed;
 
 		},

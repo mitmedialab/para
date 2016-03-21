@@ -29,8 +29,8 @@ define([
     }),
 
     initialize: function(attributes, options) {
-      this.geometryGenerator = options.geometryGenerator;
       GeometryNode.prototype.initialize.apply(this, arguments);
+      this.geometryGenerator = options.geometryGenerator;
       this.get('scalingDelta').setValue({
         x: 1,
         y: 1,
@@ -39,6 +39,8 @@ define([
       var geom = new paper.Group();
       this.set('geom', geom);
       geom.data.instance = this;
+      geom.data.geom = true;
+      geom.data.nodetype = this.get('name');
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
@@ -54,6 +56,7 @@ define([
     },
 
   
+    
     toJSON: function() {
       var data = GeometryNode.prototype.toJSON.call(this);
       for (var i = 0; i < this.children.length; i++) {
@@ -346,7 +349,9 @@ define([
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].reset();
           }
-        }
+        }        
+
+
 
       }
 
@@ -364,9 +369,6 @@ define([
         }
         this.createBBox();
         GeometryNode.prototype.render.apply(this, arguments);
-
-
-
       }
     },
 

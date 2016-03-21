@@ -242,12 +242,7 @@ define([
 					}
 				}
 			}
-			//this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 3);
-			//this.centerUI.fillColor = 'red';
-			//var targetLayer = paper.project.layers.filter(function(layer) {
-			//	return layer.name === 'ui_layer';
-			//})[0];
-			//targetLayer.addChild(this.centerUI);
+			
 			this.renderQueue = [];
 
 			//undo redo variables
@@ -618,14 +613,11 @@ define([
 
 
 			this.set('geom', geom);
-			var self = this;
-			var setChildrenData = function(child) {
-				child.data.instance = self;
-				child.data.geom = true;
-				child.data.nodetype = self.get('name');
-			};
-			setChildrenData(geom);
-
+			
+			geom.data.instance = this;
+			geom.data.geom = true;
+			geom.data.nodetype = this.get('name');
+			
 			this.createBBox();
 			this.createSelectionClone();
 
@@ -906,9 +898,8 @@ define([
 
 		//callback triggered when a subproperty is modified externally 
 		modified: function() {
-			console.log('modified',this.get('name'));
+			//console.log('modified',this.get('name'));
 			PConstraint.prototype.modified.apply(this, arguments);
-
 		},
 
 		//undo to last state
