@@ -303,6 +303,15 @@ define([
 			return list;
 		},
 
+		addMultipleLists: function(lists,registerUndo){
+			if (registerUndo) {
+				this.addToUndoStack();
+			}
+			for(var i=0;i<lists.length;i++){
+				this.addList(lists[i]);
+			}
+		},
+
 		addList: function(list, registerUndo) {
 			this.insertList(lists.length, list, registerUndo);
 		},

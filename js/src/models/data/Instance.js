@@ -462,6 +462,15 @@ define([
 			this.insertChild(this.children.length, node, registerUndo);
 		},
 
+		addMultipleChildren: function(nodes,registerUndo){
+			if (registerUndo) {
+				this.addToUndoStack();
+			}
+			for(var i=0;i<nodes.length;i++){
+				this.addChildNode(nodes[i]);
+			}
+		},
+
 		insertChild: function(index, child, registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();

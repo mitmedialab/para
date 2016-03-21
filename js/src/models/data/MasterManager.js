@@ -836,18 +836,35 @@ define([
 		},
 
 		addCopy: function(selected) {
-
+			var geom_copy = [];
+			var list_copy = [];
+			var copies = [];
+			var modified = [];
 			for (var i = 0; i < selected.length; i++) {
 				var copy = selected[i].create(true);
-				rootNode.addChildNode(copy);
-				layersView.addShape(copy.toJSON());
-				this.selectShape(copy);
-				this.deselectShape(selected[i]);
-				if (copy.get('type') == 'collection' || copy.get('name') == 'group' || copy.get('name') == 'duplicator') {
-					collectionManager.addList(copy);
+				if (copy.get('type') == 'collection') {
+					list_copy.push(copy);
 				}
+				else{
+					geom_copy.push(copy);
+				}
+				copies.push(copy);
+				layersView.addShape(copy.toJSON());
+				
+			}
+			this.deselectAllShapes();
+			if(geom_copy.length>0){
+				currentNode.addMultipleChildren(geom_copy, !stateStored);
+				modified.push(currentNode);
 
 			}
+			if(list_copy.length>0){
+				collectionManager.addMultipleLists(list_copy,!stateStored);
+				modified.push(list_copy);
+
+			}
+			this.modificationEnded(modified);
+			this.selectShape(copies);
 			return selected;
 		},
 
