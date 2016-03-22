@@ -10,7 +10,7 @@ define([
 
 ], function($, _, Backbone, paper, PPoint) {
 
- 
+
   var prototypes, currentId;
   var tool;
   //booleans for keeping track of whether user is clicking on sub or main canvas
@@ -23,7 +23,7 @@ define([
   var groupKey = 71; // g
   var functionKey = 70; //f
   var deleteKey = 67; // c
-  var paramKey = 80;// p
+  var paramKey = 80; // p
   var upArrow = 38; // up arrow
   var downArrow = 40; // down arrow
   var rightArrow = 39; // right arrow
@@ -47,10 +47,10 @@ define([
 
     },
 
-    initialize: function(obj, event_bus) {
-      $( window ).scroll(function() {
-   $( window ).scrollTop(0);
-});
+    initialize: function() {
+      $(window).scroll(function() {
+        $(window).scrollTop(0);
+      });
       $(".sub-canvas-container").resizable();
       prototypes = [];
       currentId = -1;
@@ -66,7 +66,6 @@ define([
       active = main;
 
 
-      this.event_bus = event_bus;
 
       //TODO: this is a hacky way to to detect key events
       _.bindAll(this, "canvasKeydown");
@@ -74,6 +73,7 @@ define([
 
       $(document).bind('keydown', this.canvasKeydown);
       $(document).bind('keyup', this.canvasKeyup);
+
       $(window).bind('focus', this.setFocus);
       $(window).on("resize", this.resizeCanvas);
 
@@ -122,6 +122,16 @@ define([
       alt = false;
     },
 
+    pauseKeyListeners: function(){
+      $(document).unbind('keydown');
+      $(document).unbind('keyup');
+    },
+
+    unpauseKeyListeners: function(){
+      $(document).bind('keydown', this.canvasKeydown);
+      $(document).bind('keyup', this.canvasKeyup);
+    },
+
     /* sets main canvas as active 
      * by setting inactive to subDown
      */
@@ -142,7 +152,7 @@ define([
 
 
     resizeCanvas: function() {
-      console.log('resize canvas')
+      console.log('resize canvas');
       var c = $('#canvas');
       c.attr('width', $(window).attr('innerWidth'));
       c.attr('height', $(window).attr('innerHeight'));
@@ -184,10 +194,10 @@ define([
         this.model.save();
       }*/
 
-      if(event.keyCode == undo_key){
+      if (event.keyCode == undo_key) {
         this.model.undo();
       }
-      if(event.keyCode == redo_key){
+      if (event.keyCode == redo_key) {
         this.model.redo();
       }
       if (event.keyCode == functionKey) {
@@ -219,8 +229,7 @@ define([
       if (event.shiftKey) {
         shift = true;
       }
-      if (event.keyCode === rootKey) {
-      }
+      if (event.keyCode === rootKey) {}
       if (event.keyCode === groupKey) {
         this.model.createList();
       }
@@ -293,7 +302,6 @@ define([
 
 
     canvasMouseMove: function(event) {
-      //this.event_bus.trigger('canvasMouseMove', event);
 
       if (active) {
         var delta = {

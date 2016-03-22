@@ -35,19 +35,20 @@ define([
       ui_layer.name = 'ui_layer';
       geometry_layer.activate();
 
-      //event bus for passing events between views
-      var event_bus = _({}).extend(Backbone.Events);
       var toolManager = new ToolManager();
       //setup the canvas view
       var canvasView = new CanvasView({
         el: '#canvas-container',
         model: toolManager
-      }, event_bus);
+      });
+
+    
 
       //setup masterManager and function manager
       var masterManager = new MasterManager();
 
-
+      canvasView.listenTo(masterManager,'pauseKeyListeners',canvasView.pauseKeyListeners);
+      canvasView.listenTo(masterManager,'unpauseKeyListeners',canvasView.unpauseKeyListeners);
       /* event listener registers */
 
 

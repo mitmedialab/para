@@ -3,14 +3,19 @@
  */
 define([
 	'jquery',
+	'jquery-ui',
 	'underscore',
 	'backbone',
 	'handlebars',
-	'filesaver'
+	'filesaver',
+	'utils/analytics',
+	"text!html/ui_dialog.html"
 
-], function($, _, Backbone, Handlebars, FileSaver) {
+], function($, ui, _, Backbone, Handlebars, FileSaver, analytics, ui_html) {
 
-	var currentName, unsavedChanges;
+
+	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer;
+	var SAMPLE_INTERVAL = 3000;//120000; // starts at 2 minutes
 	var SaveExportView = Backbone.View.extend({
 
 		events: {
@@ -32,8 +37,74 @@ define([
 			this.enable('import');
 			this.enable('uploadFile');
 			this.listenTo(this.model, 'modified', this.enableSave);
-			$('#uploadFile').on('click', function() { $('#uploadFile').val(''); });
+			$('#uploadFile').on('click', function() {
+				$('#uploadFile').val('');
+			});
+			$("body").append(ui_html);
+			self = this;
 
+			working = $("#working");
+			difficult = $("#difficult");
+			allFields = $([]).add(working).add(difficult);
+			ui_form = $("#dialog-form").dialog({
+				autoOpen: false,
+				height: 400,
+				width: 500,
+				modal: true,
+				buttons: {
+					"submit": self.addSample
+				},
+				close: function() {
+					allFields.removeClass("ui-state-error");
+					self.calculateSampleInterval();
+
+					sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
+				}
+
+			});
+			sampleTimer = setTimeout(this.triggerSampleDialog, SAMPLE_INTERVAL);
+		},
+
+		triggerSampleDialog: function() {
+			clearTimeout(sampleTimer);
+			ui_form.dialog("open");
+			self.model.trigger('pauseKeyListeners');
+
+
+		},
+
+		addSample: function() {
+			var valid = true;
+			allFields.removeClass("ui-state-error");
+
+			if (valid) {
+				var time = new Date();
+				var exp_data = {};
+				exp_data.workingOn = working.val();
+				exp_data.difficult = difficult.val();
+				exp_data.file = self.model.exportProjectJSON();
+
+				ui_form.dialog("close");
+				self.model.trigger('unpauseKeyListeners');
+				console.log('exp_data=', exp_data);
+				self.calculateSampleInterval();
+				sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
+				analytics.log('experience_sample', {
+					type: 'experience_sample',
+					id: 'experience_sample' + time.getTime(),
+					action: 'auto_sample_response',
+					data: exp_data
+				});
+
+
+			}
+
+
+		},
+
+
+		calculateSampleInterval: function() {
+			SAMPLE_INTERVAL = (Math.random() * 600000 * 2) + 600000;
 		},
 
 		enableSave: function() {
@@ -125,11 +196,11 @@ define([
 				return true;
 
 			} catch (e) {
-				console.log("LIMIT REACHED:",e);
+				console.log("LIMIT REACHED:", e);
 				console.trace();
 				return false;
 			}
-			
+
 		},
 
 		saveAs: function(event, data) {
@@ -222,7 +293,7 @@ define([
 
 			this.listenToOnce(this, 'loadComplete', function(result) {
 				var r = JSON.parse(result);
-				if(r){
+				if (r) {
 					this.loadJSON(r);
 				}
 
