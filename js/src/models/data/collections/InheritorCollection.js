@@ -47,9 +47,12 @@ define([
 			parseJSON: function(data,proto, manager){
 				this.inheritors = [];
 				for(var i=0;i<data.length;i++){
+
 					var instance = manager.getById(data[i]);
+					console.log("instance found for inheritor=",instance,i,data[i]);
 					this.inheritors.push(instance);
 					instance.set('proto_node', proto);
+					
 				}
 			},
 
@@ -57,7 +60,7 @@ define([
 			
 				var index = _.indexOf(this.inheritors, inheritor);
 				if(index>-1){
-					
+					console.log('removed inheritor at',index);
 					return this.inheritors.splice(index, 1)[0];
 				}
 				else{

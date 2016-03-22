@@ -94,6 +94,7 @@ define([
                 var target = this.get('target');
                 var i, j, list;
                 this.get('count').setValue(data.count);
+                console.log('number of target inheritors',target_data.inheritors.length);
                 target.parseInheritorJSON(target_data, this);
 
                 var cI = this.internalList.parseJSON(data.internalList, this);
@@ -261,6 +262,7 @@ define([
                 if (data) {
                     this.removeChildNode(data);
                     this.masterList.removeMember(data);
+                   this.get('target').removeInheritor(data);
                     data.deleteSelf();
                     return data;
                 }

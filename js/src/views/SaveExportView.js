@@ -57,7 +57,7 @@ define([
 				close: function() {
 					allFields.removeClass("ui-state-error");
 					self.calculateSampleInterval();
-
+					self.model.trigger('unpauseKeyListeners');
 					sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
 				}
 
@@ -69,8 +69,6 @@ define([
 			clearTimeout(sampleTimer);
 			ui_form.dialog("open");
 			self.model.trigger('pauseKeyListeners');
-
-
 		},
 
 		addSample: function() {
