@@ -274,7 +274,6 @@ define([
 
 			var geomChanged = rootNode.parseJSON(json.geometry, this);
 			var listChanged = collectionManager.parseJSON(json.lists, this);
-			console.log('listChanged',listChanged)
 			var constraintChanged = constraintManager.parseJSON(json.constraints, this);
 			this.cleanUp(geomChanged.toRemove, geomChanged.toAdd);
 			this.cleanUp(listChanged.toRemove, listChanged.toAdd);
