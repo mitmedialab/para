@@ -15,7 +15,7 @@ define([
 
 
 	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer;
-	var SAMPLE_INTERVAL = 3000;//120000; // starts at 2 minutes
+	var SAMPLE_INTERVAL = 100;//120000; // starts at 2 minutes
 	var SaveExportView = Backbone.View.extend({
 
 		events: {

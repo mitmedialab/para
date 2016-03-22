@@ -259,7 +259,7 @@ define([
     parseJSON: function(data, manager) {
       var reference = manager.getById(data.references);
       var relative = manager.getById(data.relatives);
-      this.set('id',data.id);
+      this.set('id', data.id);
       this.set('references', reference);
       this.set('relatives', relative);
       this.set('modes', data.modes);
@@ -306,7 +306,10 @@ define([
       this.set('offsets', offsets);
       this.set('expressions', expressions);
       this.create(data.properties, true);
-      return {toRemove:[],toAdd:[]};
+      return {
+        toRemove: [],
+        toAdd: []
+      };
     },
 
     setSelection: function(selected, type) {
@@ -674,9 +677,9 @@ define([
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
-      console.log('setting constraint on',relative.getRange(),relative.get('name'),relative.get('id'),relative.getMemberAt(0).get('name'),relative.getMemberAt(0).get('id'),expression,offset,ref_prop_key, ref_dimension, rel_prop_key, rel_dimension);
+      console.log('setting constraint on', relative.getRange(), relative.get('name'), relative.get('id'), relative.getMemberAt(0).get('name'), relative.getMemberAt(0).get('id'), expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension);
       var constraintF = function() {
-        console.log('calling constraint function',self.get('paused'));
+        console.log('calling constraint function', self.get('paused'));
         var list = [];
         if (self.get('paused')) {
           return relative.get(rel_prop_key)[rel_dimension].getValue();
@@ -716,7 +719,7 @@ define([
           if (relative.get('type') == 'collection') {
             return list;
           } else {
-            console.log('data being set',list[0][rel_prop_key][rel_dimension]);
+            console.log('data being set', list[0][rel_prop_key][rel_dimension]);
             return list[0][rel_prop_key][rel_dimension];
           }
         }
@@ -962,7 +965,7 @@ define([
 
     calculateReferenceValuesRadial: function(ref_prop_key, ref_dimension, reference_values) {
       if (ref_prop_key === 'translationDelta') {
-        this.calculateReferenceValuesRadialCartesian(ref_prop_key, ref_dimension, reference_values);
+        this.calculateReferenceValuesPolar(ref_prop_key, ref_dimension, reference_values);
       } else {
         var reference = this.get('references');
         if (reference) {
@@ -976,36 +979,52 @@ define([
 
           var range = this.get('relatives').getRange();
           var increment = diff / range;
-          for (var m = 0; m < range; m++) {
+          var vals = [];
+          vals.length = range;
+
+          for (var m = 0; m < range; m += 2) {
             var y = members[0].get(ref_prop_key)[ref_dimension].getValue() + m * increment;
+            vals[m] = y;
+          }
+          for (var m = 1; m < range; m += 2) {
+            var y = members[members.length - 1].get(ref_prop_key)[ref_dimension].getValue() + ((m + 1) * increment);
+
+            vals[m] = y;
+          }
+          for (var m = 0; m < range; m++) {
+
             if (reference_values[ref_dimension].vals[m]) {
-              reference_values[ref_dimension].vals[m].setValue(y);
+              reference_values[ref_dimension].vals[m].setValue(vals[m]);
             } else {
-              var newVal = new PFloat(y);
+              var newVal = new PFloat(vals[m]);
               newVal.setNull(false);
               reference_values[ref_dimension].vals.push(newVal);
             }
           }
+
         }
       }
 
     },
 
-    calculateReferenceValuesRadialCartesian: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValuesPolar: function(ref_prop_key, ref_dimension, reference_values) {
       var reference = this.get('references');
       if (reference) {
         var members;
-        if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
+        if (reference.get('type') == 'collection') {
           members = reference.members;
         } else {
           members = [reference, reference];
         }
         var reference_points = [];
+        var min, max;
         var points = [];
-        var min, max, rad, center;
         var minPoint = {};
         var maxPoint = {};
-
+        var origin = {
+          x: 0,
+          y: 0
+        };
         if (ref_dimension === 'x' || ref_dimension === 'y') {
           min = {
             x: members[0].getValue()[ref_prop_key]['x'],
@@ -1027,57 +1046,66 @@ define([
           };
         }
 
-        rad = {
-          x: Math.abs(max.x - min.x) / 2,
-          y: Math.abs(max.y - min.y) / 2
-        };
-        center = TrigFunc.midpoint(min, max);
-
-
-
-        reference_points.push(min);
-        reference_points.push(max);
-
+        var center = TrigFunc.midpoint(min, max);
+        var polar_min = TrigFunc.cartToPolar(center, min);
+        var polar_max = TrigFunc.cartToPolar(center, max);
 
         var range = this.get('relatives').getRange();
-        var theta_increment = (2 * Math.PI) / range;
-        var start = TrigFunc.cartToPolar(center, min);
-        var start_theta = start.theta;
-        var end_theta = start_theta + Math.PI;
-        var resulting_rad = start.rad;
-        for (var m = 0; m < range; m++) {
+        var theta_increment = Math.PI / (range);
+        var vals = [];
+        vals.length = range;
+        for (var m = 0; m < range; m += 2) {
           var y;
           var angle;
-          angle = start_theta + theta_increment * (m);
-          if (angle == end_theta) {
-            angle = start_theta + theta_increment * (range - 1);
-          }
+          angle = polar_min.theta + (theta_increment * m);
+
           if (ref_dimension == 'y') {
-            y = (Math.sin(angle) * resulting_rad) + center.y;
+            y = (Math.sin(angle) * polar_min.rad) + center.y;
           } else {
-            y = (Math.cos(angle) * resulting_rad) + center.x;
+            y = (Math.cos(angle) * polar_min.rad) + center.x;
 
           }
+          vals[m] = y;
+        }
 
+        for (var m = 1; m < range; m += 2) {
+          var y;
+          var angle;
+          angle = polar_max.theta + (theta_increment * (m + 1));
+
+          if (ref_dimension == 'y') {
+            y = (Math.sin(angle) * polar_min.rad) + center.y;
+          } else {
+            y = (Math.cos(angle) * polar_min.rad) + center.x;
+
+          }
+          vals[m] = y;
+
+        }
+
+        for (var m = 0; m < range; m++) {
 
           if (reference_values[ref_dimension].vals[m]) {
-            reference_values[ref_dimension].vals[m].setValue(y);
+            reference_values[ref_dimension].vals[m].setValue(vals[m]);
           } else {
-            var newVal = new PFloat(y);
+            var newVal = new PFloat(vals[m]);
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }
         }
 
+
       }
 
     },
+
+
 
     calculateReferenceValuesInterpolate: function(ref_prop_key, ref_dimension, reference_values) {
       var reference = this.get('references');
       if (reference) {
         var members;
-        if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
+        if (reference.get('type') == 'collection') {
           members = reference.members;
         } else {
           members = [reference, reference];
