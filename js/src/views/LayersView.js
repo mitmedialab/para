@@ -172,9 +172,15 @@ define([
 		positionConstraintIcons: function(checkVisible) {
 			this.toggleConstraintsForAllNodes();
 			if (currentRef && currentRel) {
+				console.log('currentRef,currentRel',currentRef,currentRel,currentRel.split('_'));
+				if(currentRel.split('_')[0] == 'internalcollection'){
+					currentRel = this.model.getInternalListOwner(currentRel).get('id');
+					console.log('currentRel internal',currentRel);
+
+				}
 				var ref = shapeTree.getNodeByKey(currentRef);
 				var rel = shapeTree.getNodeByKey(currentRel);
-
+				
 				if (!ref) {
 					ref = listTree.getNodeByKey(currentRef);
 				}
@@ -475,7 +481,7 @@ define([
 				return sort;
 			});
 			this.selectNode(node);
-			this.resetConstraintHeight();
+			this.resetConstraintHeight();	
 			for (var i = 0; i < shape.children.length; i++) {
 				if (shape.children[i].name != 'point') {
 					this.addShape(shape.children[i], shape.id);

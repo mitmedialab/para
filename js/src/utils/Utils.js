@@ -127,6 +127,7 @@ define([
 
     // make sure we're not passing events for things like UI to canvas
     validateEvent: function( event ) {
+      console.log('validating event on',event,event.item);
       return (!event.item || event.item.name != 'ui');
     }
   };

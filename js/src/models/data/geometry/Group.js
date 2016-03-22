@@ -57,15 +57,22 @@ define([
 
   
     
-    toJSON: function() {
-      var data = GeometryNode.prototype.toJSON.call(this);
+    toJSON: function(noUndoCache) {
+      var data = GeometryNode.prototype.toJSON.call(this,noUndoCache);
       for (var i = 0; i < this.children.length; i++) {
-        data.children.push(this.children[i].toJSON());
+        data.children.push(this.children[i].toJSON(noUndoCache));
       }
       return data;
     },
 
 
+
+    clearUndoCache: function(){
+      for(var i=0;i<this.children.length;i++){
+        this.children[i].clearUndoCache();
+      }
+      GeometryNode.prototype.clearUndoCache.call(this);
+    },
 
     parseJSON: function(data, manager) {
       var changed = GeometryNode.prototype.parseJSON.call(this, data, manager);
@@ -172,6 +179,17 @@ define([
         }
       }
     },
+
+    getInternalListOwner: function(id) {
+      var owner;
+      for (var i = 0; i < this.children.length; i++) {
+         owner = this.children[i].getInternalListOwner(id);
+        if (owner) {
+          return owner;
+        }
+      }
+    },
+
 
     /*deleteAllChildren
      * function which deletes all children

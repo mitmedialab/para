@@ -25,6 +25,18 @@ define([
 			this.set('name', "constraint_manager");
 		},
 
+		deleteAll: function(manager){
+			this.clearUndoCache();
+			return this.parseJSON([]);
+		},
+
+		clearUndoCache: function(){
+			this.previousStates = [];
+			this.futureStates = [];
+			this.stateStored = false;
+
+		},
+
 		//undo to last state
 		undo: function(manager) {
 
@@ -85,10 +97,10 @@ define([
 			this.stateStored = false;
 		},
 
-		toJSON: function() {
+		toJSON: function(noUndoCache) {
 			var constraint_json = [];
 			for (var i = 0; i < this.constraints.length; i++) {
-				var data = this.constraints[i].toJSON();
+				var data = this.constraints[i].toJSON(noUndoCache);
 				data.index = i;
 				constraint_json.push(data);
 			}
@@ -251,12 +263,7 @@ define([
 			}
 		},
 
-		deleteAllConstraints: function() {
-			for (var i = 0; i < this.constraints.length; i++) {
-				this.constraints[i].deleteSelf();
-			}
-			this.constraints.length = 0;
-		}
+		
 
 	});
 

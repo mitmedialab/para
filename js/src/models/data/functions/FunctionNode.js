@@ -46,6 +46,21 @@ define([
 				this.selectedParam = null;
 			},
 
+			deleteAll: function() {
+				this.clearUndoCache();
+				var data = {};
+				data.name = this.get('name');
+				data.type = this.get('type');
+				data.id = this.get('id');
+				data.visible = this.get('visible');
+				data.open = this.get('open');
+				data.children = [];
+				data.rendered = this.get('rendered');
+				data._matrix = this._matrix.values;
+				return this.parseJSON(data);
+			},
+
+
 			isolate: function() {
 				return null;
 			},
@@ -198,16 +213,16 @@ define([
 
 			},
 
-			toJSON: function() {
+			toJSON: function(noUndoCache) {
 				// // call prototype
 				// // creates params, adds list of all params toJSON
-				var data = Group.prototype.toJSON.call(this, arguments);
-				var functionParams = this.get('f_parameters');
+				var data = Group.prototype.toJSON.call(this, noUndoCache);
+				/*var functionParams = this.get('f_parameters');
 				var paramsList = [];
 				_.each(functionParams, function(param) {
-					paramsList.push(param.toJSON());
+					paramsList.push(param.toJSON(noUndoCache));
 				});
-				data['params'] = paramsList;
+				data['params'] = paramsList;*/
 				return data;
 			}
 

@@ -57,9 +57,9 @@ define([
 		},
 
 	
-		toJSON: function() {
+		toJSON: function(noUndoCache) {
 			// adds argument property id
-			var data = Instance.prototype.toJSON.call(this, arguments);
+			var data = Instance.prototype.toJSON.call(this, noUndoCache);
 			// data.argument = this.get('f_argument').get('id');
 			data.param_name = this.get('param_name');
 			return data;

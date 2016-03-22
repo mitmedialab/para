@@ -193,6 +193,12 @@ define([
 			}
 		},
 
+		clearUndoCache: function(){
+			this.undoStack= [];
+			this.redoStack = [];
+			this.stateStored = false;
+		},
+
 		cleanUp: function(toRemove, toAdd) {
 			console.log('clean up', toRemove, toAdd);
 			for (var i = 0; i < toRemove.length; i++) {
@@ -260,41 +266,45 @@ define([
 			});
 
 			this.deleteAll();
+			console.log("deleted all",rootNode.toJSON());
 
+			paper.view.draw();
+			console.log('number of paper instances', paper.project.layers[0].children.length, paper.project.layers[1]);
+			//paper.project.layers[1].removeChildren();
+
+			debugger;
 			var geomChanged = rootNode.parseJSON(json.geometry, this);
 			var listChanged = collectionManager.parseJSON(json.lists, this);
 			var constraintChanged = constraintManager.parseJSON(json.constraints, this);
 			this.cleanUp(geomChanged.toRemove, geomChanged.toAdd);
 			this.cleanUp(listChanged.toRemove, listChanged.toAdd);
 			this.cleanUp(constraintChanged.toRemove, constraintChanged.toAdd);
-			paper.view.draw();
 		},
 
 		exportProjectJSON: function(json) {
 
-			var geometry_json = rootNode.toJSON();
-			var constraint_json = constraintManager.toJSON();
-			var list_json = collectionManager.toJSON();
+			var geometry_json = rootNode.toJSON(true);
+			var constraint_json = constraintManager.toJSON(true);
+			var list_json = collectionManager.toJSON(true);
 			var project_json = {
 				geometry: geometry_json,
 				constraints: constraint_json,
 				lists: list_json
 			};
+			console.log('exporting JSON',project_json);
 			return project_json;
 		},
 
 
 		deleteAll: function() {
-			var rootJSON = rootNode.toJSON();
-			rootJSON.children = [];
-			var geomChanged = rootNode.parseJSON(rootJSON, this);
-			var listChanged = collectionManager.parseJSON([], this);
-			var constraintChanged = constraintManager.parseJSON([], this);
+			this.clearUndoCache();
+
+			var constraintChanged = constraintManager.deleteAll();
+			var listChanged = collectionManager.deleteAll();
+			var geomChanged = rootNode.deleteAll();
 			this.cleanUp(geomChanged.toRemove, geomChanged.toAdd);
 			this.cleanUp(listChanged.toRemove, listChanged.toAdd);
 			this.cleanUp(constraintChanged.toRemove, constraintChanged.toAdd);
-			mapView.deactivate();
-			console.log('number of paper instances',paper.project.layers[0].children.length,paper.project.layers[1].children.length);
 		},
 
 
@@ -366,7 +376,7 @@ define([
 						obj = collectionManager.getCollectionById(id);
 						break;
 					case 'internalcollection':
-						obj = collectionManager.getInternalList(id, rootNode);
+						obj = this.getInternalList(id);
 						break;
 					case 'constraint':
 						obj = this.getConstraintById(id);
@@ -376,6 +386,26 @@ define([
 						break;
 				}
 				return obj;
+			}
+		},
+
+		getInternalList: function(id) {
+			var list;
+			for (var i = 0; i < rootNode.children.length; i++) {
+				list = rootNode.children[i].getInternalList(id);
+				if (list) {
+					return list;
+				}
+			}
+		},
+
+		getInternalListOwner: function(id) {
+			var owner;
+			for (var i = 0; i < rootNode.children.length; i++) {
+				owner = rootNode.children[i].getInternalListOwner(id);
+				if (owner) {
+					return owner;
+				}
 			}
 		},
 
@@ -1013,7 +1043,7 @@ define([
 			}
 		},
 
-		
+
 
 		reorderShapes: function(movedId, relativeId, mode) {
 			var movedShape = this.getById(movedId);

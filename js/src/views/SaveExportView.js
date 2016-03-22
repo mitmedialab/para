@@ -121,13 +121,15 @@ define([
 			localStorage.removeItem(currentName);
 			try {
 				localStorage.setItem(currentName, string_data);
-			} catch (e) {
-				console.log("LIMIT REACHED:", string_data);
-				console.log(e);
-			}
-			this.disableSave();
+				this.disableSave();
+				return true;
 
-			return true;
+			} catch (e) {
+				console.log("LIMIT REACHED:",e);
+				console.trace();
+				return false;
+			}
+			
 		},
 
 		saveAs: function(event, data) {
@@ -143,8 +145,14 @@ define([
 			//this.save();
 			var data = localStorage.getItem(filename);
 			var data_obj = JSON.parse(data);
-			this.model.importProjectJSON(data_obj);
+			//console.log('data, data_obj',data,data_obj);
+
+			this.loadJSON(data_obj);
 			currentName = filename;
+		},
+
+		loadJSON: function(data_obj) {
+			this.model.importProjectJSON(data_obj);
 		},
 
 
@@ -213,9 +221,9 @@ define([
 			var file = event.target.files[0];
 
 			this.listenToOnce(this, 'loadComplete', function(result) {
-				var saved = this.saveAs(null, JSON.parse(result));
-				if(saved){
-					this.load(currentName);
+				var r = JSON.parse(result);
+				if(r){
+					this.loadJSON(r);
 				}
 
 

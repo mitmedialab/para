@@ -84,8 +84,8 @@ define([
       return clone;
     },
 
-    toJSON: function() {
-      var data = GeometryNode.prototype.toJSON.call(this);
+    toJSON: function(noUndoCache) {
+      var data = GeometryNode.prototype.toJSON.call(this,noUndoCache);
       this.get('geom').data.instance = null;
       data.geom = this.get('geom').exportJSON(false);
       this.get('geom').data.instance = this;

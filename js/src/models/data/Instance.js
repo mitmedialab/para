@@ -348,6 +348,11 @@ define([
 			return false;
 		},
 
+		//used for finding duplicator parent of internal list
+		getInternalListOwner: function(id) {
+			return null;
+		},
+
 		hasChild: function(child, top, last) {
 			if (child === this) {
 				return last;
@@ -809,7 +814,7 @@ define([
 		},
 
 
-		toJSON: function() {
+		toJSON: function(noUndoCache) {
 			var data = {};
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
@@ -826,10 +831,12 @@ define([
 			data.children = [];
 			data._matrix = this._matrix.values;
 			data.rendered = this.get('rendered');
-			data.stateStored = this.stateStored;
-			data.previousStates = this.previousStates.slice(0, this.previousStates.length);
-			data.futureStates = this.futureStates.slice(0, this.futureStates.length);
-			this.previousProperties = this.properties;
+			if(noUndoCache){
+				data.stateStored = this.stateStored;
+				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
+				data.futureStates = this.futureStates.slice(0, this.futureStates.length);
+				this.previousProperties = this.properties;
+			}
 			this.properties = data;
 
 			return data;
@@ -840,7 +847,7 @@ define([
 
 			var constrainMap = this.get('constrain_map');
 			for (var propertyName in constrainMap) {
-				if (constrainMap.hasOwnProperty(propertyName)) {
+				if (constrainMap.hasOwnProperty(propertyName) && data[propertyName]) {
 					this.get(propertyName).setValue(data[propertyName]);
 				}
 			}
@@ -911,6 +918,13 @@ define([
 		modified: function() {
 			//console.log('modified',this.get('name'));
 			PConstraint.prototype.modified.apply(this, arguments);
+		},
+
+
+		clearUndoCache: function(){
+			this.previousStates = [];
+			this.futureStates = [];
+			this.stateStored = false;
 		},
 
 		//undo to last state

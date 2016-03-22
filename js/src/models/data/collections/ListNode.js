@@ -579,15 +579,24 @@ define([
       return this.get('bbox').bounds;
     },
 
-    toJSON: function() {
-      var data = Instance.prototype.toJSON.call(this, arguments);
+     clearUndoCache: function(){
+      for(var i=0;i<this.members.length;i++){
+        this.members[i].clearUndoCache();
+      }
+      Instance.prototype.clearUndoCache.call(this);
+    },
+
+    toJSON: function(noUndoCache) {
+      var data = Instance.prototype.toJSON.call(this,noUndoCache);
       var members = [];
       _.each(this.members, function(item) {
-        members.push(item.toJSON());
+        members.push(item.toJSON(noUndoCache));
       });
       data.members = members;
       return data;
     },
+
+
 
     parseJSON: function(data, manager) {
       var changed = Instance.prototype.parseJSON.call(this, data, manager);

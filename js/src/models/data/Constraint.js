@@ -203,7 +203,7 @@ define([
 
     },
 
-    toJSON: function() {
+    toJSON: function(noUndoCache) {
       var data = {};
       data.id = this.get('id');
       data.properties = this.get('properties');

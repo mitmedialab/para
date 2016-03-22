@@ -7,11 +7,10 @@ define([
   'views/CanvasView',
   'views/ToolView',
   'views/PropertyView',
-  'models/data/PropertiesManager',
   'models/tools/ToolManager',
   'models/data/MasterManager',
 
-], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, PropertiesManager, ToolManager, MasterManager) {
+], function($, _, Backbone, paper, CanvasView, ToolView, PropertyView, ToolManager, MasterManager) {
   var masterScope;
   var AppRouter = Backbone.Router.extend({
     routes: { // Default
@@ -36,7 +35,6 @@ define([
       ui_layer.name = 'ui_layer';
       geometry_layer.activate();
 
-      var propertiesManager = new PropertiesManager();
       //event bus for passing events between views
       var event_bus = _({}).extend(Backbone.Events);
       var toolManager = new ToolManager();

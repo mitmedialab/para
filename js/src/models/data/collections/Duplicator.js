@@ -60,22 +60,22 @@ define([
                 });
             },
 
-            toJSON: function() {
+            toJSON: function(noUndoCache) {
 
-                var data = Group.prototype.toJSON.call(this);
+                var data = Group.prototype.toJSON.call(this,noUndoCache);
                 data.target_index = this.children.indexOf(this.get('target'));
                 data.targetID = this.get('target').get('id');
-                data.internalList = this.internalList.toJSON();
-                data.masterList = this.masterList.toJSON();
-       
+                data.internalList = this.internalList.toJSON(noUndoCache);
+                data.masterList = this.masterList.toJSON(noUndoCache);
+
                 data.group_relative = [];
                 data.group_reference = [];
                 data.count = this.get('count').getValue();
                 for (var i = 0; i < this.group_relative.length; i++) {
-                    data.group_relative.push(this.group_relative[i].toJSON());
+                    data.group_relative.push(this.group_relative[i].toJSON(noUndoCache));
                 }
                 for (var j = 0; j < this.group_reference.length; j++) {
-                    data.group_reference.push(this.group_reference[j].toJSON());
+                    data.group_reference.push(this.group_reference[j].toJSON(noUndoCache));
                 }
 
                 return data;
@@ -83,7 +83,7 @@ define([
 
 
             parseJSON: function(data) {
-                var changed =  Group.prototype.parseJSON.call(this, data);
+                var changed = Group.prototype.parseJSON.call(this, data);
                 if (!this.get('target') || this.get('target').get('id') != data.targetID) {
                     this.setTarget(_.find(this.children, function(child) {
                         return child.get('id') == data.targetID;
@@ -98,10 +98,10 @@ define([
 
                 var cI = this.internalList.parseJSON(data.internalList, this);
                 var mI = this.masterList.parseJSON(data.masterList, this);
-                changed.toRemove.push.apply(changed,cI.toRemove);
-                changed.toAdd.push.apply(changed,cI.toAdd);
-                changed.toRemove.push.apply(changed,mI.toRemove);
-                changed.toAdd.push.apply(changed,mI.toAdd);
+                changed.toRemove.push.apply(changed, cI.toRemove);
+                changed.toAdd.push.apply(changed, cI.toAdd);
+                changed.toRemove.push.apply(changed, mI.toRemove);
+                changed.toAdd.push.apply(changed, mI.toAdd);
 
                 for (i = 0; i < data.group_relative.length; i++) {
                     list = new ConstrainableList();
@@ -122,7 +122,7 @@ define([
                 if (this.internalList.get('id') === id) {
                     return this.internalList;
                 }
-                 if (this.masterList.get('id') === id) {
+                if (this.masterList.get('id') === id) {
                     return this.masterList;
                 }
                 for (var i = 0; i < this.group_relative.length; i++) {
@@ -134,11 +134,28 @@ define([
                 }
             },
 
+            getInternalListOwner: function(id) {
+                if (this.internalList.get('id') === id) {
+                    return this;
+                }
+                if (this.masterList.get('id') === id) {
+                    return this;
+                }
+                for (var i = 0; i < this.group_relative.length; i++) {
+                    if (this.group_relative[i].get('id') === id) {
+                        return this;
+                    } else if (this.group_reference[i].get('id') === id) {
+                        return this;
+                    }
+                }
+                return Group.prototype.getInternalListOwner.call(this, id);
+            },
+
             setInternalConstraint: function() {
 
-              
+
                 if (this.get('target').get('name') == 'group') {
-                     this.internalConstraints.push.apply( this.internalConstraints, this.setInternalGroupConstraint());
+                    this.internalConstraints.push.apply(this.internalConstraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
@@ -347,7 +364,7 @@ define([
 
 
             deleteSelf: function() {
-               // console.log('calling delete self duplicator');
+                // console.log('calling delete self duplicator');
                 this.stopListening();
                 this.masterList.deleteSelf();
                 this.internalList.deleteSelf();
@@ -412,7 +429,7 @@ define([
                 return this.get('count').getValue();
             },
 
-                getRange: function() {
+            getRange: function() {
                 return this.masterList.getRange();
             },
 

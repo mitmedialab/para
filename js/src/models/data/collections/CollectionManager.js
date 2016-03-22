@@ -31,10 +31,23 @@ define([
 
 		},
 
-		toJSON: function() {
+
+		deleteAll: function() {
+			this.clearUndoCache();
+			return this.parseJSON([]);
+		},
+
+		clearUndoCache: function(){
+			this.previousStates = [];
+			this.futureStates = [];
+			this.stateStored = false;
+
+		},
+
+		toJSON: function(noUndoCache) {
 			var list_json = [];
 			for (var i = 0; i < lists.length; i++) {
-				var data = lists[i].toJSON();
+				var data = lists[i].toJSON(noUndoCache);
 				data.index = i;
 				list_json.push(data);
 			}
@@ -172,15 +185,7 @@ define([
 			}
 		},
 
-		getInternalList: function(id, node) {
-			var list;
-			for (var i = 0; i < node.children.length; i++) {
-				list = node.children[i].getInternalList(id);
-				if (list) {
-					return list;
-				}
-			}
-		},
+		
 
 
 		getListsThatContain: function(object) {
@@ -474,18 +479,6 @@ define([
 		},
 
 
-		deleteAll: function() {
-			var deleted = [];
-			for (var i = 0; i < lists.length; i++) {
-				if (lists[i].get('type') === 'collection') {
-					deleted.push.apply(deleted, lists[i].deleteAllMembers());
-					deleted.push(lists[i].deleteSelf());
-				}
-			}
-			lists.length = 0;
-
-			return deleted;
-		}
 
 
 
