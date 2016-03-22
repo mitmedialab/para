@@ -15,7 +15,7 @@ define([
 
 
 	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer;
-	var SAMPLE_INTERVAL = 100;//120000; // starts at 2 minutes
+	var SAMPLE_INTERVAL = 120000; // starts at 2 minutes
 	var SaveExportView = Backbone.View.extend({
 
 		events: {
@@ -42,7 +42,7 @@ define([
 			});
 			$("body").append(ui_html);
 			self = this;
-
+			$('#sample_button').on( "click",this.triggerSampleDialog);
 			working = $("#working");
 			difficult = $("#difficult");
 			allFields = $([]).add(working).add(difficult);
@@ -58,11 +58,11 @@ define([
 					allFields.removeClass("ui-state-error");
 					self.calculateSampleInterval();
 					self.model.trigger('unpauseKeyListeners');
-					sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
+					//sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
 				}
 
 			});
-			sampleTimer = setTimeout(this.triggerSampleDialog, SAMPLE_INTERVAL);
+			//sampleTimer = setTimeout(this.triggerSampleDialog, SAMPLE_INTERVAL);
 		},
 
 		triggerSampleDialog: function() {
@@ -86,7 +86,7 @@ define([
 				self.model.trigger('unpauseKeyListeners');
 				console.log('exp_data=', exp_data);
 				self.calculateSampleInterval();
-				sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
+				//sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
 				analytics.log('experience_sample', {
 					type: 'experience_sample',
 					id: 'experience_sample' + time.getTime(),

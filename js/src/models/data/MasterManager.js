@@ -850,7 +850,7 @@ define([
 					layersView.addList(copy.toJSON());
 
 				} else {
-					copy = selected[i].create(true);
+					copy = selected[i].create();
 					geom_copy.push(copy);
 
 				}
