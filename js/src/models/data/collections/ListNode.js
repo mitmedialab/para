@@ -507,6 +507,12 @@ define([
         var x = bbox_dimensions.topLeft.x + width / 2;
         var y = bbox_dimensions.topLeft.y + height / 2;
 
+        if(width<1){
+          width=1;
+        }
+        if(height<1){
+          height=1;
+        }
         var bbox = this.get('bbox');
 
         if (!bbox) {
@@ -650,6 +656,8 @@ define([
         member.trigger('modified', member);
 
       }
+      this.renderBoundingBox();
+
       return changed;
     },
 

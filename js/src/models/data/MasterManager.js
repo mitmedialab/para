@@ -272,9 +272,9 @@ define([
 			console.log('number of paper instances', paper.project.layers[0].children.length, paper.project.layers[1]);
 			//paper.project.layers[1].removeChildren();
 
-			debugger;
 			var geomChanged = rootNode.parseJSON(json.geometry, this);
 			var listChanged = collectionManager.parseJSON(json.lists, this);
+			console.log('listChanged',listChanged)
 			var constraintChanged = constraintManager.parseJSON(json.constraints, this);
 			this.cleanUp(geomChanged.toRemove, geomChanged.toAdd);
 			this.cleanUp(listChanged.toRemove, listChanged.toAdd);
@@ -512,8 +512,6 @@ define([
 		addListener: function(target, recurse) {
 			//console.log('adding listener to target',target,target.get('name'));
 			this.stopListening(target);
-			target.compile();
-			target.render();
 			this.listenTo(target, 'modified', this.modified);
 			if (recurse) {
 				for (var i = 0; i < target.children.length; i++) {
