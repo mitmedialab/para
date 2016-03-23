@@ -61,7 +61,7 @@ define([
 
         }
       } else {
-        if (index!==undefined) {
+        if (index !== undefined) {
           this.members.splice(index, 0, data);
         } else {
           this.members.push(data);
@@ -97,19 +97,19 @@ define([
     /* create
       creates a clone of this list
      */
-    create: function(noInheritor,geom_members) {
+    create: function(noInheritor, geom_members) {
 
       var instance = new this.constructor();
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
       instance._matrix = this._matrix.clone();
-      
-    for (var i = 0; i < this.members.length; i++) {
-       
-        var member =  this.members[i].create(noInheritor,geom_members);
 
-        if(member.get('type')=='geometry'){
+      for (var i = 0; i < this.members.length; i++) {
+
+        var member = this.members[i].create(noInheritor, geom_members);
+
+        if (member.get('type') == 'geometry') {
           geom_members.push(member);
         }
         instance.addMember(member);
@@ -328,6 +328,14 @@ define([
       }
     },
 
+    getMemberById: function(id) {
+      var member = _.find(this.members, function(member) {
+        return member.get('id') == id;
+      });
+      return member;
+    },
+
+   
     /* getListMembers
      * returns all members of this list which are themselves lists
      */
@@ -353,7 +361,7 @@ define([
       return memberList;
     },
 
-     //returns all members and sub-members
+    //returns all members and sub-members
     getAllMembers: function(memberList) {
       if (!memberList) {
         memberList = [];
@@ -363,7 +371,7 @@ define([
           memberList.push(this.members[i]);
         } else {
           this.members[i].getAllMembers(memberList);
-           memberList.push(this.members[i]);
+          memberList.push(this.members[i]);
         }
 
 
@@ -385,7 +393,10 @@ define([
     },
 
     getMemberIndex: function(member) {
-      return _.indexOf(this.members, member);
+      var index=  _.indexOf(this.members, member);
+      if(index>-1){
+        return index;
+      }
     },
 
     setIndex: function(index, member) {
@@ -507,11 +518,11 @@ define([
         var x = bbox_dimensions.topLeft.x + width / 2;
         var y = bbox_dimensions.topLeft.y + height / 2;
 
-        if(width<1){
-          width=1;
+        if (width < 1) {
+          width = 1;
         }
-        if(height<1){
-          height=1;
+        if (height < 1) {
+          height = 1;
         }
         var bbox = this.get('bbox');
 
@@ -585,18 +596,22 @@ define([
       return this.get('bbox').bounds;
     },
 
-     clearUndoCache: function(){
-      for(var i=0;i<this.members.length;i++){
+    clearUndoCache: function() {
+      for (var i = 0; i < this.members.length; i++) {
         this.members[i].clearUndoCache();
       }
       Instance.prototype.clearUndoCache.call(this);
     },
 
     toJSON: function(noUndoCache) {
-      var data = Instance.prototype.toJSON.call(this,noUndoCache);
+      var data = Instance.prototype.toJSON.call(this, noUndoCache);
       var members = [];
+      var index = 0;
       _.each(this.members, function(item) {
-        members.push(item.toJSON(noUndoCache));
+        var member_json = item.toJSON(noUndoCache);
+          member_json.list_index = index;
+          members.push(member_json);
+          index++;
       });
       data.members = members;
       return data;
@@ -619,8 +634,8 @@ define([
           //only parse json if it's a list inside a list
           if (this.members[i].get('type') == 'collection') {
             var mI = this.members[i].parseJSON(target_data);
-            changed.toRemove.push.apply(changed,mI.toRemove);
-            changed.toAdd.push.apply(changed,mI.toAdd);
+            changed.toRemove.push.apply(changed, mI.toRemove);
+            changed.toAdd.push.apply(changed, mI.toAdd);
           }
 
           memberClone = _.filter(memberClone, function(member) {
@@ -650,7 +665,7 @@ define([
         } else {
           member = manager.getById(dataClone[k].id);
         }
-        this.addMember(member, dataClone[k].zIndex);
+        this.addMember(member, dataClone[k].listIndex);
 
         member.trigger('modified', member);
 

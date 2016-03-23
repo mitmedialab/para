@@ -237,15 +237,17 @@ define([
           for (subprop in offsets[prop]) {
             if (offsets[prop].hasOwnProperty(subprop)) {
               data.offsets[prop][subprop] = [];
-              data.exempt_indicies[prop][subprop] = [];
+              data.exempt_indicies[prop][subprop] = {};
 
               vals = offsets[prop][subprop];
               for (i = 0; i < vals.length; i++) {
                 data.offsets[prop][subprop].push(vals[i].toJSON());
               }
               vals = exempt_indicies[prop][subprop];
-              for (i = 0; i < vals.length; i++) {
-                data.exempt_indicies[prop][subprop].push(vals[i].toJSON());
+              for (var id in vals) {
+                if(vals.hasOwnProperty(id)){
+                  data.exempt_indicies[prop][subprop][id]= vals[id].toJSON();
+                }
               }
               data.expressions[prop][subprop] = expressions[prop][subprop];
 
@@ -286,15 +288,18 @@ define([
           for (subprop in data.offsets[prop]) {
             if (data.offsets[prop].hasOwnProperty(subprop)) {
               offsets[prop][subprop] = [];
-              exempt_indicies[prop][subprop] = [];
+              exempt_indicies[prop][subprop] = {};
 
               vals = data.offsets[prop][subprop];
               for (i = 0; i < vals.length; i++) {
                 offsets[prop][subprop].push(new PFloat(vals[i]));
               }
               vals = data.exempt_indicies[prop][subprop];
-              for (i = 0; i < vals.length; i++) {
-                exempt_indicies[prop][subprop].push(new PFloat(vals[i]));
+              console.log('parsing exempt',vals);
+              for (var id in vals) {
+                if(vals.hasOwnProperty(id)){
+                exempt_indicies[prop][subprop][id] = new PFloat(vals[id]);
+                }
               }
               expressions[prop][subprop] = data.expressions[prop][subprop];
 
@@ -361,18 +366,23 @@ define([
       this.get('offsets')[rel_prop_key][rel_dimension][index].setValue(value);
     },
 
-    setExempt: function(rel_prop_key, rel_dimension, index, status) {
+    setExempt: function(rel_prop_key, rel_dimension, id, status) {
       var exempt_indicies = this.get('exempt_indicies');
 
       var value = 0;
       if (status === true) {
         value = 1;
       }
-      exempt_indicies[rel_prop_key][rel_dimension][index].setValue(value);
+      if( exempt_indicies[rel_prop_key][rel_dimension][id]){
+        exempt_indicies[rel_prop_key][rel_dimension][id].setValue(value);
+      }
+      else{
+        exempt_indicies[rel_prop_key][rel_dimension][id] = new PFloat(value);
+      }
       return true;
     },
 
-    setExemptForAll: function(index, status) {
+    setExemptForAll: function(id, status) {
       var value = 0;
       if (status === true) {
         value = 1;
@@ -383,7 +393,7 @@ define([
         if (exempt_indicies.hasOwnProperty(rel_prop)) {
           for (var rel_dimension in exempt_indicies[rel_prop]) {
             if (exempt_indicies[rel_prop].hasOwnProperty(rel_dimension)) {
-              exempt_indicies[rel_prop][rel_dimension][index].setValue(value);
+              exempt_indicies[rel_prop][rel_dimension][id].setValue(value);
 
             }
           }
@@ -394,7 +404,7 @@ define([
 
 
 
-    createOffsetAt: function(index, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions) {
+    createOffsetFor: function(id, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions) {
       var convertFactor = propConvMap[ref_prop_key + ':' + rel_prop_key];
       var reference_values = this.get('reference_values');
       var relPropValue;
@@ -418,55 +428,52 @@ define([
       var relative = this.get('relatives');
       var keys;
       var instance;
+      var index = 0
       var relativeRange = relative.getRange();
-
       if (ref_dimensions.length === rel_dimensions.length) {
 
         for (var i = 0; i < rel_dimensions.length; i++) {
           offset[rel_dimensions[i]] = offset[rel_dimensions[i]] ? offset[rel_dimensions[i]] : [];
-          exempt_index[rel_dimensions[i]] = exempt_index[rel_dimensions[i]] ? exempt_index[rel_dimensions[i]] : [];
+          exempt_index[rel_dimensions[i]] = exempt_index[rel_dimensions[i]] ? exempt_index[rel_dimensions[i]] : {};
           instance = relative;
-          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
-            instance = instance.members[index];
+          if (relative.get('type') === 'collection') {
+            instance = instance.getMemberById(id);
+            index = relative.getMemberIndex(instance);
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
           conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]].vals[index].getValue() * convertFactor;
           if (offset[rel_dimensions[i]].length <= index) {
-            if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[i]].push(new PFloat(0));
-            } else {
+             
               offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
-            }
+            
           } else {
             //offset[rel_dimensions[i]][index].setValue(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]);
           }
-          if (exempt_index[rel_dimensions[i]].length <= index) {
-            exempt_index[rel_dimensions[i]].push(new PFloat(0));
+          if (!exempt_index[rel_dimensions[i]][id]) {
+            exempt_index[rel_dimensions[i]][id]=new PFloat(0);
           }
 
         }
       } else if (ref_dimensions.length > rel_dimensions.length) {
         for (var j = 0; j < rel_dimensions.length; j++) {
           offset[rel_dimensions[j]] = offset[rel_dimensions[j]] ? offset[rel_dimensions[j]] : [];
-          exempt_index[rel_dimensions[j]] = exempt_index[rel_dimensions[j]] ? exempt_index[rel_dimensions[j]] : [];
+          exempt_index[rel_dimensions[j]] = exempt_index[rel_dimensions[j]] ? exempt_index[rel_dimensions[j]] : {};
 
           instance = relative;
-          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
-            instance = instance.members[index];
+          if (relative.get('type') === 'collection') {
+            instance = instance.getMemberById(id);
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
           conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]].vals[index].getValue() * convertFactor : refPropValue[keys[j]].vals[index].getValue() * convertFactor;
           if (offset[rel_dimensions[j]].length <= index) {
-            if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[j]].push(new PFloat(0));
-            } else {
+            
               offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
-            }
+            
           } else {
             //offset[rel_dimensions[j]][index].setValue(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]);
           }
-          if (exempt_index[rel_dimensions[j]].length <= index) {
-            exempt_index[rel_dimensions[j]].push(new PFloat(0));
+         if (!exempt_index[rel_dimensions[j]][id]) {
+            exempt_index[rel_dimensions[j]][id]=new PFloat(0);
           }
 
         }
@@ -475,25 +482,22 @@ define([
         keys = Object.keys(refPropValue);
         for (var m = 0; m < rel_dimensions.length; m++) {
           offset[rel_dimensions[m]] = offset[rel_dimensions[m]] ? offset[rel_dimensions[m]] : [];
-          exempt_index[rel_dimensions[m]] = exempt_index[rel_dimensions[m]] ? exempt_index[rel_dimensions[m]] : [];
+          exempt_index[rel_dimensions[m]] = exempt_index[rel_dimensions[m]] ? exempt_index[rel_dimensions[m]] : {};
 
           instance = relative;
-          if (relative.get('type') === 'collection' || relative.get('name') === 'duplicator') {
-            instance = instance.members[index];
+          if (relative.get('type') === 'collection') {
+            instance = instance.getMemberById(id);
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
           conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]].vals[index].getValue() * convertFactor : (m < keys.length) ? refPropValue[keys[m]].vals[index].getValue() * convertFactor : refPropValue[keys[keys.length - 1]].vals[index].getValue();
           if (offset[rel_dimensions[m]].length <= index) {
-            if (relative.get('name') === 'duplicator') {
-              offset[rel_dimensions[m]].push(new PFloat(0));
-            } else {
               offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
-            }
+            
           } else {
             //offset[rel_dimensions[m]][index].setValue(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]);
           }
-          if (exempt_index[rel_dimensions[m]].length <= index) {
-            exempt_index[rel_dimensions[m]].push(new PFloat(0));
+          if (!exempt_index[rel_dimensions[m]][id]) {
+            exempt_index[rel_dimensions[m]][id]=new PFloat(0);
           }
 
         }
@@ -614,16 +618,12 @@ define([
 
         if (!json_loaded) {
           for (var g = 0; g < relative_range; g++) {
-            this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
+            var id = relative.getMemberAt(g).get('id');
+            this.createOffsetFor(id, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
 
           }
         }
         for (var n = 0; n < rel_dimensions.length; n++) {
-          if (exempt_list) {
-            for (var h = 0; h < exempt_list.length; h++) {
-              this.setExempt(rel_prop_key, rel_dimensions[n], exempt_list[h], true);
-            }
-          }
           this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
         }
       }
@@ -646,7 +646,8 @@ define([
           (
             function(rpk, rd, rlpk, rld) {
               for (var g = 0; g < relative.get('memberCount').getValue(); g++) {
-                self.createOffsetAt(g, rpk, rd, rlpk, rld);
+                var id = relative.getMemberAt(g).get('id');
+                self.createOffsetFor(id, rpk, rd, rlpk, rld);
               }
             }(refProperties[i][0], refProperties[i][1], relProperties[i][0], relProperties[i][1])
           );
@@ -703,10 +704,10 @@ define([
       var self = this;
       var constraintF = function() {
         var list = [];
-        if (self.get('paused')) {
-          return relative.get(rel_prop_key)[rel_dimension].getValue();
-        } else {
+
+        
           var exempt_indicies = self.get('exempt_indicies');
+            console.log('exempt_indicies',exempt_indicies);
 
           var relative_range = relative.getRange();
           var reference_values = self.get('reference_values');
@@ -716,9 +717,9 @@ define([
             var y;
             data[rel_prop_key] = {};
             var relative_target = relative.getMemberAt(z);
+            var relative_id = relative_target.get('id');
             //var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
-            console.log("is exempt ", z, exempt_indicies[rel_prop_key][rel_dimension][z].getValue());
-            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue() === 1) {
+            if (exempt_indicies[rel_prop_key][rel_dimension][relative_id].getValue() === 1 || self.get('paused')) {
               y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
 
             } else {
@@ -747,7 +748,7 @@ define([
           } else {
             return list[0][rel_prop_key][rel_dimension];
           }
-        }
+        
       };
 
       relative.get(rel_prop_key)[rel_dimension].setConstraint(constraintF, this);

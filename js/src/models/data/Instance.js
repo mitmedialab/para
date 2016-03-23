@@ -242,7 +242,7 @@ define([
 					}
 				}
 			}
-			
+
 			this.renderQueue = [];
 
 			//undo redo variables
@@ -340,6 +340,13 @@ define([
 				return this;
 			} else {
 				console.log('ERROR, accessing member index other than zero for non list instance');
+			}
+		},
+
+
+		getMemberById: function(id) {
+			if (id == this.get('id')) {
+				return this;
 			}
 		},
 
@@ -467,11 +474,11 @@ define([
 			this.insertChild(this.children.length, node, registerUndo);
 		},
 
-		addMultipleChildren: function(nodes,registerUndo){
+		addMultipleChildren: function(nodes, registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
-			for(var i=0;i<nodes.length;i++){
+			for (var i = 0; i < nodes.length; i++) {
 				this.addChildNode(nodes[i]);
 			}
 		},
@@ -628,11 +635,11 @@ define([
 
 
 			this.set('geom', geom);
-			
+
 			geom.data.instance = this;
 			geom.data.geom = true;
 			geom.data.nodetype = this.get('name');
-			
+
 			this.createBBox();
 			this.createSelectionClone();
 
@@ -830,7 +837,7 @@ define([
 			data.children = [];
 			data._matrix = this._matrix.values;
 			data.rendered = this.get('rendered');
-			if(noUndoCache){
+			if (noUndoCache) {
 				data.stateStored = this.stateStored;
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
 				data.futureStates = this.futureStates.slice(0, this.futureStates.length);
@@ -920,7 +927,7 @@ define([
 		},
 
 
-		clearUndoCache: function(){
+		clearUndoCache: function() {
 			this.previousStates = [];
 			this.futureStates = [];
 			this.stateStored = false;
@@ -969,10 +976,9 @@ define([
 		},
 
 		addToUndoStack: function() {
-			console.log('addToUndoStack',this.get('name'),this.stateStored);
 			if (!this.stateStored) {
 				this.previousStates.push(this.toJSON());
-				console.log(this.previousStates[this.previousStates.length-1]);
+				console.log(this.previousStates[this.previousStates.length - 1]);
 				this.stateStored = true;
 				this.futureStates = [];
 				//console.log(this.get('name'), ' stored state', this.previousStates);

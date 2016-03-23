@@ -162,31 +162,25 @@ define([
                 if (this.masterList.members.length > 1) {
                     this.internalList.addMember(this.masterList.members[this.masterList.members.length - 1]);
                 }
+                var targetId = this.get('target').get('id');
+                var lastId = this.masterList.members[this.masterList.members.length - 1].get('id');
+
                 var constraint = new Constraint();
                 constraint.set('references', this.internalList);
                 constraint.set('relatives', this.masterList);
                 constraint.set('proxy_references', this.get('target'));
                 var data = [
-                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate'],
-                        [0, this.masterList.members.length - 1]
-                    ],
-                    ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate'],
-                        [0, this.masterList.members.length - 1]
-                    ],
-                    ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate'],
-                        [0, this.masterList.members.length - 1]
-                    ],
-                    ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate'],
-                        [0, this.masterList.members.length - 1]
-                    ],
-                    ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate'],
-                        [0, this.masterList.members.length - 1]
-                    ],
-                    ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate'],
-                        [0, this.masterList.members.length - 1]
-                    ]
+                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
+                    ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
+                    ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                    ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                    ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
+                    ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
                 constraint.create(data);
+                constraint.setExemptForAll(targetId,true);
+                constraint.setExemptForAll(lastId,true);
+
                 this.internalConstraints.push(constraint);
                 return this.internalConstraints;
             },
@@ -217,22 +211,12 @@ define([
                     constraint.set('proxy_references', target.children[i]);
                     constraint.set('proxy_relatives', this.masterList.members[1].children[i]);
                     var data = [
-                        ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate'],
-                            [0, relative_list.length - 1]
-                        ],
+                        ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
                         ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
-                        ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate'],
-                            [0, relative_list.length - 1]
-                        ],
-                        ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate'],
-                            [0, relative_list.length - 1]
-                        ],
-                        ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate'],
-                            [0, relative_list.length - 1]
-                        ],
-                        ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate'],
-                            [0, relative_list.length - 1]
-                        ]
+                        ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                        ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                        ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
+                        ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                     ];
                     constraint.create(data);
                     member_constraints.push(constraint);
@@ -271,7 +255,7 @@ define([
                         index = 1;
                     }
                 }
-
+                console.log('inserting new member at',index,'of',this.children.length);
                 this.insertChild(index, copy);
 
                 this.masterList.addMember(copy, index);
@@ -289,12 +273,7 @@ define([
                 }
             },
 
-            updateExemption: function(formerIndex, currentIndex) {
-                for (var i = 0; i < this.internalConstraints.length; i++) {
-                    this.internalConstraints[i].setExemptForAll(formerIndex, false);
-                    this.internalConstraints[i].setExemptForAll(currentIndex, true);
-                }
-            },
+
 
             insertChild: function(index, child, registerUndo) {
                 Group.prototype.insertChild.call(this, index, child, registerUndo);
@@ -422,12 +401,15 @@ define([
                 if (registerUndo) {
                     this.addToUndoStack();
                 }
+
+
                 this.get('count').setValue(count);
                 var diff = count - this.children.length;
                 var target = this.get('target');
                 var starting_length = this.getRange();
                 var toRemove = [];
                 var toAdd = [];
+                var currentLast = this.masterList.members[this.masterList.members.length - 1].getValue();
                 if (diff > 0) {
                     for (var i = 0; i < diff; i++) {
                         var member = target.create();
@@ -436,14 +418,15 @@ define([
 
                     }
                 } else if (diff < 0) {
+
                     for (var j = 0; j < 0 - diff; j++) {
                         var d_member = this.deleteRelativeMember();
                         if (d_member) {
                             toRemove.push(d_member);
                         }
                     }
+
                 }
-                this.updateExemption(starting_length - 1, this.getRange() - 1);
                 var data = {
                     toAdd: toAdd,
                     toRemove: toRemove

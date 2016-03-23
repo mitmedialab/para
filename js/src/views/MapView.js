@@ -233,7 +233,8 @@ define([
 			current_index = $('#relative_index').val() - 1;
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
-			var exempt = constraint.get('exempt_indicies')[propName][subpropName][current_index].getValue();
+			var id = constraint.get('relatives').getMemberAt(current_index).get('id');
+			var exempt = constraint.get('exempt_indicies')[propName][subpropName][id].getValue();
 			var status = $('#exempt_button').hasClass('active');
 			if (exempt && !status) {
 				$('#exempt_button').addClass('active');
