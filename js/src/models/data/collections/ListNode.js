@@ -606,12 +606,8 @@ define([
     toJSON: function(noUndoCache) {
       var data = Instance.prototype.toJSON.call(this, noUndoCache);
       var members = [];
-      var index = 0;
       _.each(this.members, function(item) {
-        var member_json = item.toJSON(noUndoCache);
-          member_json.list_index = index;
-          members.push(member_json);
-          index++;
+        members.push(item.toJSON(noUndoCache));
       });
       data.members = members;
       return data;
@@ -665,7 +661,7 @@ define([
         } else {
           member = manager.getById(dataClone[k].id);
         }
-        this.addMember(member, dataClone[k].listIndex);
+        this.addMember(member, dataClone[k].zIndex);
 
         member.trigger('modified', member);
 

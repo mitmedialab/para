@@ -710,6 +710,7 @@ define([
             console.log('exempt_indicies',exempt_indicies);
 
           var relative_range = relative.getRange();
+          console.log('relative range =',relative_range);
           var reference_values = self.get('reference_values');
 
           for (var z = 0; z < relative_range; z++) {

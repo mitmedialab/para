@@ -837,7 +837,7 @@ define([
 			data.children = [];
 			data._matrix = this._matrix.values;
 			data.rendered = this.get('rendered');
-			if (noUndoCache) {
+			if (!noUndoCache) {
 				data.stateStored = this.stateStored;
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
 				data.futureStates = this.futureStates.slice(0, this.futureStates.length);
