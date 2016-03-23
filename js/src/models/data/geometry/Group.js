@@ -134,7 +134,6 @@ define([
         var newChild = this.geometryGenerator.getTargetClass(dataClone[k].name);
         changed.toAdd.push(newChild);
         newChild.parseJSON(dataClone[k]);
-        console.log('previous states of clone',dataClone[k].previousStates);
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
         this.insertChild(dataClone[k].zIndex, newChild);

@@ -54,7 +54,7 @@ define([
 	var undoStack = [];
 	var redoStack = [];
 	var stateStored = false;
-
+	var undo_limit;
 
 	var MasterManager = Backbone.Model.extend({
 		defaults: {},
@@ -69,6 +69,7 @@ define([
 
 
 			rootNode.open();
+			undo_limit = rootNode.get('undo_limit');
 			selected = rootNode.selected;
 			rootNode.set('name', 'root');
 			currentNode = rootNode;
@@ -130,6 +131,17 @@ define([
 					selected_ids.push(selected[i].get('id'));
 				}
 				undoStack.push(selected_ids);
+				while (undoStack.length > undo_limit) {
+					var self = this;
+					console.log('cutting undo stack');
+					var shifted = undoStack.shift();
+					shifted.forEach(function(id) {
+						var item = self.getById(id);
+						item.trimUndoStack();
+
+					});
+
+				}
 				stateStored = true;
 				redoStack = [];
 
@@ -160,6 +172,16 @@ define([
 				this.deselectAllShapes();
 
 				redoStack.push(toUndo.reverse());
+				while (redoStack.length > undo_limit) {
+					console.log('cutting undo stack');
+					var shifted = redoStack.shift();
+					shifted.forEach(function(id) {
+						var item = self.getById(id);
+						item.trimRedoStack();
+
+					});
+
+				}
 			}
 		},
 
@@ -188,11 +210,21 @@ define([
 				this.deselectAllShapes();
 
 				undoStack.push(toRedo.reverse());
+				while (undoStack.length > undo_limit) {
+					console.log('cutting undo stack');
+					var shifted = undoStack.shift();
+					shifted.forEach(function(id) {
+						var item = self.getById(id);
+						item.trimUndoStack();
+
+					});
+
+				}
 			}
 		},
 
-		clearUndoCache: function(){
-			this.undoStack= [];
+		clearUndoCache: function() {
+			this.undoStack = [];
 			this.redoStack = [];
 			this.stateStored = false;
 		},

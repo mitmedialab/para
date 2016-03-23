@@ -295,7 +295,6 @@ define([
                 offsets[prop][subprop].push(new PFloat(vals[i]));
               }
               vals = data.exempt_indicies[prop][subprop];
-              console.log('parsing exempt',vals);
               for (var id in vals) {
                 if(vals.hasOwnProperty(id)){
                 exempt_indicies[prop][subprop][id] = new PFloat(vals[id]);
@@ -707,10 +706,8 @@ define([
 
         
           var exempt_indicies = self.get('exempt_indicies');
-            console.log('exempt_indicies',exempt_indicies);
 
           var relative_range = relative.getRange();
-          console.log('relative range =',relative_range);
           var reference_values = self.get('reference_values');
 
           for (var z = 0; z < relative_range; z++) {

@@ -116,6 +116,7 @@ define([
 			sel_palette_index: 0,
 			isChanging: false,
 			rendered: false,
+			undo_limit: 10,
 
 		}),
 
@@ -939,7 +940,7 @@ define([
 			if (this.previousStates.length > 0) {
 				var toRemove = [];
 				var toAdd = [];
-				console.log('calling undo on', this.get('name'));
+				//console.log('calling undo on', this.get('name'));
 
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
@@ -955,11 +956,19 @@ define([
 			}
 		},
 
+		trimUndoStack:function(){
+			this.previousStates.shift();
+		},
+
+		trimRedoStack: function(){
+			this.futureStates.shift();
+		},
+
 		redo: function() {
 			if (this.futureStates.length > 0) {
 				var toRemove = [];
 				var toAdd = [];
-				console.log('calling redo on', this.get('name'));
+				//console.log('calling redo on', this.get('name'));
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);

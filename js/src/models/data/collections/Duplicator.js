@@ -255,7 +255,6 @@ define([
                         index = 1;
                     }
                 }
-                console.log('inserting new member at',index,'of',this.children.length);
                 this.insertChild(index, copy);
 
                 this.masterList.addMember(copy, index);
