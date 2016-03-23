@@ -137,7 +137,6 @@ define([
 		},
 
 		undo: function(event) {
-			console.log('undo', undoStack);
 
 			if (undoStack.length > 0) {
 
@@ -165,7 +164,6 @@ define([
 		},
 
 		redo: function() {
-			console.log('redo', redoStack);
 
 			if (redoStack.length > 0) {
 
@@ -200,7 +198,6 @@ define([
 		},
 
 		cleanUp: function(toRemove, toAdd) {
-			console.log('clean up', toRemove, toAdd);
 			for (var i = 0; i < toRemove.length; i++) {
 				if (toRemove[i].get('type') == 'collection') {
 					this.removeListener(toRemove[i]);
@@ -266,7 +263,6 @@ define([
 			});
 
 			this.deleteAll();
-			console.log("deleted all",rootNode.toJSON());
 
 			paper.view.draw();
 			console.log('number of paper instances', paper.project.layers[0].children.length, paper.project.layers[1]);
@@ -290,7 +286,6 @@ define([
 				constraints: constraint_json,
 				lists: list_json
 			};
-			console.log('exporting JSON',project_json);
 			return project_json;
 		},
 
@@ -770,7 +765,6 @@ define([
 			var removed = [];
 			var removed_list = [];
 			var modified = [];
-			console.log('currentNode children', currentNode.children.length);
 			if (registerUndo) {
 				for (var m = 0; m < selected.length; m++) {
 					var constrained = constraintManager.inConstraint(selected[m]);
@@ -819,7 +813,6 @@ define([
 						break;
 				}
 			}
-			console.log('removed geom', removed_geom);
 
 			if (removed_geom.length > 0) {
 				for (var j = 0; j < removed_geom.length; j++) {
@@ -1299,7 +1292,6 @@ define([
 			if (targets.length > 0) {
 				for (var i = 0; i < targets.length; i++) {
 					var instance = targets[i];
-					console.log('instance', instance);
 					instance.setValueEnded();
 				}
 			}

@@ -81,7 +81,7 @@ define([
 				}
 			}
 
-			console.log('to remove', listClone);
+			
 			//remove children not in JSON
 			for (var j = 0; j < listClone.length; j++) {
 

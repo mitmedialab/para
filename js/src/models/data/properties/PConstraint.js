@@ -126,7 +126,6 @@
 			 * removes the constraint of this property
 			 */
 			removeConstraint: function(dimensions) {
-				console.trace();
 				if (!dimensions) {
 					for (var p in this) {
 						if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {

@@ -61,7 +61,7 @@ define([
 
         }
       } else {
-        if (index) {
+        if (index!==undefined) {
           this.members.splice(index, 0, data);
         } else {
           this.members.push(data);
@@ -650,7 +650,6 @@ define([
         } else {
           member = manager.getById(dataClone[k].id);
         }
-        console.log('adding member from parse',member,dataClone[k].id);
         this.addMember(member, dataClone[k].zIndex);
 
         member.trigger('modified', member);

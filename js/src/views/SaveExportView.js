@@ -195,7 +195,6 @@ define([
 
 			} catch (e) {
 				console.log("LIMIT REACHED:", e);
-				console.trace();
 				return false;
 			}
 

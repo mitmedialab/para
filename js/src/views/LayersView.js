@@ -42,12 +42,10 @@ define([
 						return true;
 					},
 					dragEnter: function(node, data) {
-						console.log('drag enter data', data);
 						return true;
 
 					},
 					dragDrop: function(node, data) {
-						console.log('drop data', data);
 						if (view.checkValidDrop(data.otherNode, node,data.hitMode)) {
 							data.otherNode.moveTo(node, data.hitMode);
 							view.dropCompleted(data.otherNode, node, data.hitMode);
@@ -172,10 +170,8 @@ define([
 		positionConstraintIcons: function(checkVisible) {
 			this.toggleConstraintsForAllNodes();
 			if (currentRef && currentRel) {
-				console.log('currentRef,currentRel',currentRef,currentRel,currentRel.split('_'));
 				if(currentRel.split('_')[0] == 'internalcollection'){
 					currentRel = this.model.getInternalListOwner(currentRel).get('id');
-					console.log('currentRel internal',currentRel);
 
 				}
 				var ref = shapeTree.getNodeByKey(currentRef);
@@ -344,7 +340,6 @@ define([
 			listTree.activateKey(false);
 			if (activeNode) {
 				var shape = event.data.view.model.getById(activeNode.key);
-				console.log(activeNode.key, shape.get('name'));
 				event.data.view.deselectAllNodes('lists');
 				event.data.view.itemClicked(id, activeNode, shape);
 				event.data.view.positionConstraintIcons();
@@ -454,7 +449,6 @@ define([
 
 		addShape: function(shape, parentId) {
 			var index = shape.zIndex;
-			console.log('adding shape, zindex',index);
 			
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
@@ -477,7 +471,6 @@ define([
 			}
 			parentNode.sortChildren(function(a,b){
 				var sort= b.data.zIndex-a.data.zIndex;
-				console.log('sort=',sort);
 				return sort;
 			});
 			this.selectNode(node);

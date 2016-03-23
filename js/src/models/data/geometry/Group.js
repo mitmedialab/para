@@ -157,7 +157,6 @@ define([
 
 
     getById: function(id) {
-      console.trace();
       if (this.get('id') == id) {
         return this;
       } else {

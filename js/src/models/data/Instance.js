@@ -514,7 +514,6 @@ define([
 					}
 				}
 				this.stopListening(removed);
-				console.log('removing child',removed);
 				return removed;
 			}
 
@@ -972,7 +971,6 @@ define([
 		addToUndoStack: function() {
 			console.log('addToUndoStack',this.get('name'),this.stateStored);
 			if (!this.stateStored) {
-				console.trace();
 				this.previousStates.push(this.toJSON());
 				console.log(this.previousStates[this.previousStates.length-1]);
 				this.stateStored = true;

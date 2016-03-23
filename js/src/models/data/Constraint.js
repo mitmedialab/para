@@ -305,7 +305,9 @@ define([
       this.set('exempt_indicies', exempt_indicies);
       this.set('offsets', offsets);
       this.set('expressions', expressions);
+
       this.create(data.properties, true);
+
       return {
         toRemove: [],
         toAdd: []
@@ -361,20 +363,33 @@ define([
 
     setExempt: function(rel_prop_key, rel_dimension, index, status) {
       var exempt_indicies = this.get('exempt_indicies');
-      /*if (status === false) {
-        var reference = this.get('references');
-        var relative = this.get('relatives');
-        /*if (!reference.hasMember(relative.getMemberAt(index), true, reference)) {
-          return false;
-        }
 
-      }*/
       var value = 0;
       if (status === true) {
         value = 1;
       }
       exempt_indicies[rel_prop_key][rel_dimension][index].setValue(value);
       return true;
+    },
+
+    setExemptForAll: function(index, status) {
+      var value = 0;
+      if (status === true) {
+        value = 1;
+      }
+
+      var exempt_indicies = this.get('exempt_indicies');
+      for (var rel_prop in exempt_indicies) {
+        if (exempt_indicies.hasOwnProperty(rel_prop)) {
+          for (var rel_dimension in exempt_indicies[rel_prop]) {
+            if (exempt_indicies[rel_prop].hasOwnProperty(rel_dimension)) {
+              exempt_indicies[rel_prop][rel_dimension][index].setValue(value);
+
+            }
+          }
+        }
+      }
+
     },
 
 
@@ -527,6 +542,7 @@ define([
      * [[translationDelta_y,rotationDelta_v],[translationDelta_x,rotationDelta_v]]
      */
     create: function(properties, json_loaded) {
+      console.trace();
       this.stopListening();
       this.set('properties', properties);
       var offsets = {};
@@ -573,6 +589,7 @@ define([
         var ref_prop = properties[j][0];
         var rel_prop = properties[j][1];
         var mode_list = properties[j][2];
+        var exempt_list = properties[j][3];
         var refSplit = ref_prop.split('_');
         var ref_dimensions = refSplit[1];
         var ref_prop_key = refSplit[0];
@@ -589,17 +606,24 @@ define([
             } else {
               modes[ref_prop_key + '_' + ref_dimensions[m]] = 'interpolate';
             }
+
+
           }
         }
         this.setReferenceValues(ref_prop_key, ref_dimensions);
+
         if (!json_loaded) {
           for (var g = 0; g < relative_range; g++) {
             this.createOffsetAt(g, ref_prop_key, ref_dimensions, rel_prop_key, rel_dimensions);
 
           }
         }
-
         for (var n = 0; n < rel_dimensions.length; n++) {
+          if (exempt_list) {
+            for (var h = 0; h < exempt_list.length; h++) {
+              this.setExempt(rel_prop_key, rel_dimensions[n], exempt_list[h], true);
+            }
+          }
           this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
         }
       }
@@ -677,14 +701,13 @@ define([
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
-      console.log('setting constraint on', relative.getRange(), relative.get('name'), relative.get('id'), relative.getMemberAt(0).get('name'), relative.getMemberAt(0).get('id'), expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension);
       var constraintF = function() {
-        console.log('calling constraint function', self.get('paused'));
         var list = [];
         if (self.get('paused')) {
           return relative.get(rel_prop_key)[rel_dimension].getValue();
         } else {
           var exempt_indicies = self.get('exempt_indicies');
+
           var relative_range = relative.getRange();
           var reference_values = self.get('reference_values');
 
@@ -693,8 +716,9 @@ define([
             var y;
             data[rel_prop_key] = {};
             var relative_target = relative.getMemberAt(z);
-            var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
-            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue() === 1 || isReference) {
+            //var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
+            console.log("is exempt ", z, exempt_indicies[rel_prop_key][rel_dimension][z].getValue());
+            if (exempt_indicies[rel_prop_key][rel_dimension][z].getValue() === 1) {
               y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
 
             } else {
@@ -715,11 +739,12 @@ define([
 
             relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
             relative_target.get(rel_prop_key)[rel_dimension].getValue();
+
+
           }
           if (relative.get('type') == 'collection') {
             return list;
           } else {
-            console.log('data being set', list[0][rel_prop_key][rel_dimension]);
             return list[0][rel_prop_key][rel_dimension];
           }
         }

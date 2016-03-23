@@ -43,7 +43,6 @@ define([
 			if (this.previousStates.length > 0) {
 				var toRemove = [];
 				var toAdd = [];
-				console.log('calling undo on', this.get('name'), this.previousStates);
 
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
