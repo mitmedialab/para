@@ -16,13 +16,19 @@ require.config({
         "jquery-cookie" : "../../bower_components/jquery-cookie/jquery.cookie",
         "html": "../../html",
         "cjs": "../../bower_components/constraintjs/build/cjs.min" ,
-        "fancytree": "../../bower_components/fancytree/dist/jquery.fancytree-all.min"
+        "fancytree": "../../bower_components/fancytree/dist/jquery.fancytree-all.min",
+        "aws-sdk-js": "../../bower_components/aws-sdk-js/dist/aws-sdk.min"
     },
   
     shim: {       
         "toolbox": {
             exports: "Toolbox"
         },
+
+        "aws-sdk-js": {
+            exports: "AWS"
+        },
+
         "cjs":{
             exports: "cjs",
             init: function(){

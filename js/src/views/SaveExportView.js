@@ -5,16 +5,17 @@ define([
 	'jquery',
 	'jquery-ui',
 	'underscore',
+	'aws-sdk-js',
 	'backbone',
 	'handlebars',
 	'filesaver',
 	'utils/analytics',
 	"text!html/ui_dialog.html"
 
-], function($, ui, _, Backbone, Handlebars, FileSaver, analytics, ui_html) {
+], function($, ui, _, AWS, Backbone, Handlebars, FileSaver, analytics, ui_html) {
 
 
-	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer;
+	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer, bucket;
 	var SAMPLE_INTERVAL = 120000; // starts at 2 minutes
 	var SaveExportView = Backbone.View.extend({
 
@@ -62,6 +63,26 @@ define([
 				}
 
 			});
+
+			AWS.config.region = 'us-east-1'; // Region
+			var creds = new AWS.CognitoIdentityCredentials({
+				IdentityPoolId: 'us-east-1:60d2d4f9-df27-47b2-bf73-c8b01736c9f4'
+			});
+			AWS.config.credentials = creds;
+			
+			new AWS.S3().listObjects({
+				Bucket: 'kimpara'
+			}, function(error, data) {
+				if (error) {
+					console.log(error); // an error occurred
+				} else {
+					console.log(data); // request succeeded
+				}
+			});
+
+			bucket = new AWS.S3({params: {Bucket: 'kimpara'}});
+
+			
 			//sampleTimer = setTimeout(this.triggerSampleDialog, SAMPLE_INTERVAL);
 		},
 
@@ -81,6 +102,10 @@ define([
 				exp_data.workingOn = working.val();
 				exp_data.difficult = difficult.val();
 				exp_data.file = self.model.exportProjectJSON();
+				var sample_responses = {};
+				sample_responses.work =  working.val();
+				sample_responses.difficult =  difficult.val();
+
 
 				ui_form.dialog("close");
 				self.model.trigger('unpauseKeyListeners');
@@ -94,9 +119,25 @@ define([
 					data: exp_data
 				});
 
+				var sample_file = {
+				Key: 'stored_data/sample_'+time.getTime()+'.txt',
+				Body: JSON.stringify(sample_responses)
+			};
+			var drawing_file = {
+				Key: 'stored_data/file_'+time.getTime()+'.txt',
+				Body: JSON.stringify(exp_data.file)
+			};
+			bucket.upload(sample_file, function(err, data) {
+				var results = err ? 'ERROR!' : 'SAVED.';
+				console.log(results);
+			});
+
+			bucket.upload(drawing_file, function(err, data) {
+				var results = err ? 'ERROR!' : 'SAVED.';
+				console.log(results);
+			});
 
 			}
-
 
 		},
 

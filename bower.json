@@ -33,7 +33,9 @@
     "jquery-cookie": "~1.4.1",
     "requirejs-text": "~2.0.12",
     "constraintjs" : "git://github.com/soney/constraintjs.git",
-    "fancytree" : "git://github.com/pixelmaid/fancytree.git#master"
+    "fancytree" : "git://github.com/pixelmaid/fancytree.git#master",
+    "aws-sdk-js" : "git://github.com/aws/aws-sdk-js"
+
   },
   "resolutions": {
     "backbone": "1.1.2",

@@ -288,8 +288,8 @@ define([
      * returns the actual value for a given property
      */
     getValueFor: function(property_name) {
-      if (property_name== 'strokeColor' || property_name == 'fillColor' || property_name == 'strokeWidth' ) {
-        return this.children[this.children.length-1].getValueFor(property_name);
+      if (property_name == 'strokeColor' || property_name == 'fillColor' || property_name == 'strokeWidth') {
+        return this.children[this.children.length - 1].getValueFor(property_name);
       } else {
         var property = this.get(property_name);
         return this.getValue()[property_name];
@@ -390,7 +390,7 @@ define([
 
     renderStyle: function() {
       if (!this.get('inFocus')) {
-        console.log("target is out of focus",this.get('id'), this.get('name'));
+        console.log("target is out of focus", this.get('id'), this.get('name'));
         this.get('geom').opacity = 0.5;
       } else {
         console.log("target is in focus", this.get('id'), this.get('name'));

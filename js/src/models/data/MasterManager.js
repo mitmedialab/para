@@ -61,7 +61,8 @@ define([
 
 		initialize: function() {
 			//setup root node
-			//
+			// Initialize the Amazon Cognito credentials provider
+
 
 			rootNode = new FunctionNode({}, {
 				geometryGenerator: GeometryGenerator
@@ -927,8 +928,8 @@ define([
 				geometryGenerator: GeometryGenerator
 			});
 			var highestIndex = selected.sort(function(a, b) {
-  				return b.get('zIndex').getValue() - a.get('zIndex').getValue();
-				});
+				return b.get('zIndex').getValue() - a.get('zIndex').getValue();
+			});
 
 			currentNode.insertChild(highestIndex[0].get('zIndex').getValue(), group, true);
 			selected.sort(function(a, b) {
@@ -1138,7 +1139,7 @@ define([
 			return true;
 		},
 
-	
+
 
 		deselectShape: function(data) {
 			if (typeof data === 'string') {
@@ -1368,7 +1369,7 @@ define([
 		},
 
 
-	selectShape: function(data, segments) {
+		selectShape: function(data, segments) {
 
 			if (data instanceof Array) {
 				data = _.filter(data, function(item) {
@@ -1380,9 +1381,8 @@ define([
 			} else {
 				if (currentNode.descendantOf(data)) {
 					this._selectSingleShape(data, segments);
-				}
-				else{
-					console.log(data.get('id'),data.get('name'),'is not descendant',currentNode.get('id'),currentNode.get('name'));
+				} else {
+					console.log(data.get('id'), data.get('name'), 'is not descendant', currentNode.get('id'), currentNode.get('name'));
 				}
 			}
 			if (!constraintMode) {
@@ -1417,16 +1417,16 @@ define([
 		toggleOpen: function() {
 
 			var target = selected[selected.length - 1];
-			console.log('target id', target.get('id'),target.get('name'));
+			console.log('target id', target.get('id'), target.get('name'));
 			if (target.get('name') == 'duplicator' || target.get('name') == 'group') {
 				this.deselectAllShapes();
 
 				var siblings = target.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting out of focus', item.get('id'),item.get('name'));
+					console.log('sibling setting out of focus', item.get('id'), item.get('name'));
 					item.toggleClosed();
-					item.set('inFocus',false);
-					item.trigger('modified',item);
+					item.set('inFocus', false);
+					item.trigger('modified', item);
 				});
 				target.toggleOpen();
 				target.get('geom').bringToFront();
@@ -1445,17 +1445,17 @@ define([
 			this.deselectAllShapes();
 
 			if (currentNode != rootNode) {
-				console.log('closing', currentNode.get('id'),currentNode.get('name'));
+				console.log('closing', currentNode.get('id'), currentNode.get('name'));
 				currentNode.toggleClosed();
-				
+
 				var siblings = currentNode.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting in focus', item.get('id'),item.get('name'));
-					item.set('inFocus',true);
-					item.trigger('modified',item);
+					console.log('sibling setting in focus', item.get('id'), item.get('name'));
+					item.set('inFocus', true);
+					item.trigger('modified', item);
 				});
 				currentNode = currentNode.nodeParent;
-				console.log('currentNode =', currentNode.get('id'),currentNode.get('name'));
+				console.log('currentNode =', currentNode.get('id'), currentNode.get('name'));
 				currentNode.reorderGeom();
 
 			}
