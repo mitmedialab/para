@@ -33,7 +33,6 @@ define([
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
-                this.internalConstraints = [];
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
                 this.masterList.set('id', 'internal' + this.masterList.get('id'));
                 this.listenTo(this.masterList, 'modified', this.modified);
@@ -153,9 +152,9 @@ define([
 
             setInternalConstraint: function() {
 
-
+                var internalConstraints = []
                 if (this.get('target').get('name') == 'group') {
-                    this.internalConstraints.push.apply(this.internalConstraints, this.setInternalGroupConstraint());
+                   internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
@@ -181,8 +180,8 @@ define([
                 constraint.setExemptForAll(targetId,true);
                 constraint.setExemptForAll(lastId,true);
 
-                this.internalConstraints.push(constraint);
-                return this.internalConstraints;
+                internalConstraints.push(constraint);
+                return internalConstraints;
             },
 
             setInternalGroupConstraint: function() {
@@ -199,8 +198,11 @@ define([
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
                     reference_list.addMember(target.children[i]);
+                     var targetId = target.children[i].get('id');
+                   var lastId;
                     if (this.masterList.members.length > 1) {
                         reference_list.addMember(this.masterList.members[this.masterList.members.length - 1].children[i]);
+                        lastId = this.masterList.members[this.masterList.members.length - 1].children[i].get('id');
                     }
                     for (var j = 0; j < this.masterList.members.length; j++) {
                         relative_list.addMember(this.masterList.members[j].children[i]);
@@ -219,6 +221,10 @@ define([
                         ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                     ];
                     constraint.create(data);
+                    constraint.setExemptForAll(targetId,true);
+                    if(lastId){
+                        constraint.setExemptForAll(lastId,true);
+                    }
                     member_constraints.push(constraint);
                 }
                 return member_constraints;

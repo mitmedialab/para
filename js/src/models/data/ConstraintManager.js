@@ -37,6 +37,15 @@ define([
 
 		},
 
+		trimUndoStack:function(){
+			this.previousStates.shift();
+		},
+
+		trimRedoStack: function(){
+			this.futureStates.shift();
+		},
+
+
 		//undo to last state
 		undo: function(manager) {
 

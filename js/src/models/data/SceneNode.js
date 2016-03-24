@@ -163,9 +163,9 @@ define([
         },
         //returns other nodes with the same parent
         getSiblings: function() {
-            var index = this.getChildIndex();
-            var siblings = this.nodeParent.getChildren();
-            var cut = siblings.splice(index, 1);
+            var siblings = this.nodeParent.getChildren().slice();
+            var index = siblings.indexOf(this);
+            var cut = siblings.splice(index, 1)[0];
 
             if (cut == this) {
                 return siblings;
@@ -217,7 +217,7 @@ define([
 
         descendantOf: function(node) {
             for (var i = 0; i < this.children.length; i++) {
-                if (this.children[i] === node || this.children[i].descendantOf(node)) {
+                if (this.children[i] == node || this.children[i].descendantOf(node)) {
                     return true;
                 }
             }

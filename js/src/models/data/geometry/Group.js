@@ -55,10 +55,10 @@ define([
       this.createBBox();
     },
 
-  
-    
+
+
     toJSON: function(noUndoCache) {
-      var data = GeometryNode.prototype.toJSON.call(this,noUndoCache);
+      var data = GeometryNode.prototype.toJSON.call(this, noUndoCache);
       for (var i = 0; i < this.children.length; i++) {
         data.children.push(this.children[i].toJSON(noUndoCache));
       }
@@ -67,8 +67,8 @@ define([
 
 
 
-    clearUndoCache: function(){
-      for(var i=0;i<this.children.length;i++){
+    clearUndoCache: function() {
+      for (var i = 0; i < this.children.length; i++) {
         this.children[i].clearUndoCache();
       }
       GeometryNode.prototype.clearUndoCache.call(this);
@@ -183,7 +183,7 @@ define([
     getInternalListOwner: function(id) {
       var owner;
       for (var i = 0; i < this.children.length; i++) {
-         owner = this.children[i].getInternalListOwner(id);
+        owner = this.children[i].getInternalListOwner(id);
         if (owner) {
           return owner;
         }
@@ -214,12 +214,12 @@ define([
     },
 
     create: function(noInheritor) {
-      var instance =  this.geometryGenerator.getTargetClass(this.get('name'));
+      var instance = this.geometryGenerator.getTargetClass(this.get('name'));
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
       instance._matrix = this._matrix.clone();
-      
+
       for (var i = 0; i < this.children.length; i++) {
         var clone = this.children[i].create(noInheritor);
         instance.addChildNode(clone);
@@ -333,50 +333,29 @@ define([
       }
     },
 
-
-
-
-
-    toggleOpen: function(item) {
-      if ((this === item || this.hasChild(item)) && !this.get('open')) {
-        this.set('open', true);
-
-        return [this];
-      }
-
+    toggleOpen: function() {
+      this.set('open', true);
 
     },
 
-    toggleClosed: function(item) {
-      if ((this === item || this.hasChild(item) || item.nodeParent === this.nodeParent) && this.get('open')) {
-        this.set('open', false);
-
-        return [this];
-      }
-
-    },
-
-    closeAllChildren: function() {
-      this.toggleClosed(this);
+    toggleClosed: function() {
       for (var i = 0; i < this.children.length; i++) {
-        this.children[i].closeAllChildren();
+        this.children[i].toggleClosed();
       }
-    },
+      this.set('open', false);
 
+
+    },
 
     reset: function() {
 
       if (this.get('rendered')) {
-
         GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].reset();
           }
-        }        
-
-
-
+        }
       }
 
     },
@@ -397,7 +376,14 @@ define([
     },
 
     renderStyle: function() {
+      if (!this.get('inFocus')) {
+        console.log("target is out of focus",this.get('id'), this.get('name'));
+        this.get('geom').opacity = 0.5;
+      } else {
+        console.log("target is in focus", this.get('id'), this.get('name'));
 
+        this.get('geom').opacity = 1;
+      }
     },
 
     renderSelection: function() {

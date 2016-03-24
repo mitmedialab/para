@@ -133,7 +133,6 @@ define([
 				undoStack.push(selected_ids);
 				while (undoStack.length > undo_limit) {
 					var self = this;
-					console.log('cutting undo stack');
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
@@ -173,7 +172,6 @@ define([
 
 				redoStack.push(toUndo.reverse());
 				while (redoStack.length > undo_limit) {
-					console.log('cutting undo stack');
 					var shifted = redoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
@@ -211,10 +209,10 @@ define([
 
 				undoStack.push(toRedo.reverse());
 				while (undoStack.length > undo_limit) {
-					console.log('cutting undo stack');
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
+
 						item.trimUndoStack();
 
 					});
@@ -530,7 +528,7 @@ define([
 		},
 
 		clearRenderQueue: function() {
-			currentNode.clearRenderQueue();
+			rootNode.clearRenderQueue();
 			//this.calculateFPS();
 		},
 
@@ -928,7 +926,11 @@ define([
 			var group = new Group({}, {
 				geometryGenerator: GeometryGenerator
 			});
-			currentNode.addChildNode(group, true);
+			var highestIndex = selected.sort(function(a, b) {
+  				return b.get('zIndex').getValue() - a.get('zIndex').getValue();
+				});
+
+			currentNode.insertChild(highestIndex[0].get('zIndex').getValue(), group, true);
 			selected.sort(function(a, b) {
 				return a.get('zIndex').getValue() - b.get('zIndex').getValue();
 			});
@@ -973,7 +975,7 @@ define([
 
 			duplicator.setTarget(object);
 
-			var data = duplicator.setCount(3);
+			var data = duplicator.setCount(8);
 
 			currentNode.insertChild(index, duplicator);
 
@@ -1136,38 +1138,7 @@ define([
 			return true;
 		},
 
-		selectShape: function(data, segments) {
-			if (data instanceof Array) {
-				for (var i = 0; i < data.length; i++) {
-					this._selectSingleShape(data[i], segments);
-				}
-			} else {
-				this._selectSingleShape(data, segments);
-			}
-			if (!constraintMode) {
-				collectionView.toggleCollectionButtons(selected);
-			}
-			this.updateLayers();
-		},
-
-
-
-		_selectSingleShape: function(instance, segments) {
-			if (instance.get('type') == 'geometry') {
-				instance = instance.filterSelection();
-			}
-			var data = collectionManager.filterSelection(instance);
-			if (data) {
-				this.deselectShape(data.toRemove);
-				this.selectShape(data.toAdd);
-			} else {
-				if (!_.contains(selected, instance)) {
-					selected.push(instance);
-				}
-				instance.select(segments);
-			}
-
-		},
+	
 
 		deselectShape: function(data) {
 			if (typeof data === 'string') {
@@ -1397,41 +1368,106 @@ define([
 		},
 
 
+	selectShape: function(data, segments) {
+
+			if (data instanceof Array) {
+				data = _.filter(data, function(item) {
+					return (currentNode.descendantOf(item));
+				});
+				for (var i = 0; i < data.length; i++) {
+					this._selectSingleShape(data[i], segments);
+				}
+			} else {
+				if (currentNode.descendantOf(data)) {
+					this._selectSingleShape(data, segments);
+				}
+				else{
+					console.log(data.get('id'),data.get('name'),'is not descendant',currentNode.get('id'),currentNode.get('name'));
+				}
+			}
+			if (!constraintMode) {
+				collectionView.toggleCollectionButtons(selected);
+			}
+			this.updateLayers();
+		},
+
+
+
+		_selectSingleShape: function(instance, segments) {
+			if (instance.get('type') == 'geometry') {
+				instance = instance.filterSelection();
+			}
+			var data = collectionManager.filterSelection(instance);
+			if (data) {
+				this.deselectShape(data.toRemove);
+				this.selectShape(data.toAdd);
+			} else {
+				if (!_.contains(selected, instance)) {
+					selected.push(instance);
+				}
+				instance.select(segments);
+			}
+
+		},
+
+
 		/* toggleOpen
 		 * returns children of opened function or members of opened lists
 		 */
 		toggleOpen: function() {
-			analytics.log(eventType, {
-				type: eventType,
-				id: 'modify',
-				action: 'toggle open'
-			});
-			paper.project.activeLayer.opacity = 0.25;
 
-			var data = collectionManager.toggleOpen(selected[selected.length - 1]);
-			this.deselectAllShapes();
-			if (data.toSelect && data.toSelect.length > 0) {
-				this.selectShape(data.toSelect);
+			var target = selected[selected.length - 1];
+			console.log('target id', target.get('id'),target.get('name'));
+			if (target.get('name') == 'duplicator' || target.get('name') == 'group') {
+				this.deselectAllShapes();
+
+				var siblings = target.getSiblings();
+				_.each(siblings, function(item) {
+					console.log('sibling setting out of focus', item.get('id'),item.get('name'));
+					item.toggleClosed();
+					item.set('inFocus',false);
+					item.trigger('modified',item);
+				});
+				target.toggleOpen();
+				target.get('geom').bringToFront();
+				currentNode = target;
+
+
 			}
+			//var data = collectionManager.toggleOpen(selected[selected.length - 1]);
+			//this.deselectAllShapes();
 		},
 
 		/* toggleClosed
 		 * closes open functions or selected open lists
 		 */
 		toggleClosed: function() {
-			analytics.log(eventType, {
-				type: eventType,
-				id: 'modify',
-				action: 'toggle closed'
-			});
-			paper.project.activeLayer.opacity = 1;
-
-			var data = collectionManager.toggleClosed(selected[selected.length - 1]);
 			this.deselectAllShapes();
-			if (data.toSelect && data.toSelect.length > 0) {
-				this.selectShape(data.toSelect);
-				//TODO: some issue here with correctly selecting shapes when list is toggled closed.
+
+			if (currentNode != rootNode) {
+				console.log('closing', currentNode.get('id'),currentNode.get('name'));
+				currentNode.toggleClosed();
+				
+				var siblings = currentNode.getSiblings();
+				_.each(siblings, function(item) {
+					console.log('sibling setting in focus', item.get('id'),item.get('name'));
+					item.set('inFocus',true);
+					item.trigger('modified',item);
+				});
+				currentNode = currentNode.nodeParent;
+				console.log('currentNode =', currentNode.get('id'),currentNode.get('name'));
+				currentNode.reorderGeom();
+
 			}
+
+			if (currentNode == rootNode) {
+				console.log('back to root');
+				paper.project.activeLayer.opacity = 1;
+			}
+
+			//var data = collectionManager.toggleClosed(selected[selected.length - 1]);
+			//this.deselectAllShapes();
+
 		},
 
 

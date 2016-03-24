@@ -44,6 +44,15 @@ define([
 
 		},
 
+		trimUndoStack:function(){
+			this.previousStates.shift();
+		},
+
+		trimRedoStack: function(){
+			this.futureStates.shift();
+		},
+
+
 		toJSON: function(noUndoCache) {
 			var list_json = [];
 			for (var i = 0; i < lists.length; i++) {

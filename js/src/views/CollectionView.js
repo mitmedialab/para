@@ -135,7 +135,7 @@ define([
 					return (item.get('name') == 'duplicator');
 				});
 				var geometry = selected.filter(function(item) {
-					return (item.get('type') == 'geometry' && item.get('name') != 'group');
+					return (item.get('type') == 'geometry');
 				});
 				if (selected.length > 1) {
 					this.setCount();

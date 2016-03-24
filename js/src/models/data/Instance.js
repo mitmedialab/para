@@ -72,6 +72,7 @@ define([
 			type: 'instance',
 			visible: true,
 			open: false,
+			inFocus: true,
 			/*==end JSON export===*/
 
 			//map of constrainable properties
@@ -225,13 +226,8 @@ define([
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
 			this.isReturned = false;
-			this.on('change:open', function() {
-				if (this.get('open')) {
-					this.isolate();
-				} else {
-					this.deIsolate();
-				}
-			});
+			
+				
 			var parent = this;
 			var constrainMap = this.get('constrain_map');
 
@@ -387,12 +383,10 @@ define([
 			return 1;
 		},
 
-		toggleOpen: function(item) {
-			return null;
+		toggleOpen: function() {
 		},
 
-		toggleClosed: function(item) {
-			return null;
+		toggleClosed: function() {
 		},
 
 		addMemberToOpen: function(data, added_bool) {
@@ -416,10 +410,6 @@ define([
 		},
 
 		closeAllMembers: function() {
-			return this;
-		},
-
-		closeAllChildren: function() {
 			return this;
 		},
 
@@ -506,6 +496,19 @@ define([
 			this.stopListening(child);
 			this.listenTo(child, 'modified', this.childModified);
 
+		},
+
+		reorderGeom: function(){
+			for (var i = 0; i < this.children.length; i++) {
+				if (this.children[i].get('zIndex').getValue() != i) {
+					this.children[i].get('zIndex').setValue(i);
+				}
+				this.get('geom').appendTop(this.children[i].get('geom'));
+			}
+			for (var i = 0; i < this.children.length; i++) {
+				
+				console.log('actual index for',this.children[i].get('name'),'=',this.children[i].get('geom').index,this.children[i].get('zIndex').getValue());
+			}
 		},
 
 		removeChildNode: function(node, registerUndo) {
@@ -712,16 +715,8 @@ define([
 			}
 		},
 
-		isolate: function() {
-			var isolationLayer = paper.project.layers.filter(function(layer) {
-				return layer.name === 'isolation_layer';
-			})[0];
-			isolationLayer.insertChild(this.get('zIndex').getValue(), this.get('geom'));
-		},
-
-		deIsolate: function() {
-			paper.project.activeLayer.insertChild(this.get('zIndex').getValue(), this.get('geom'));
-		},
+		
+		
 
 		resetProperties: function() {
 			this.get('position').setValue({
@@ -843,6 +838,12 @@ define([
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
 				data.futureStates = this.futureStates.slice(0, this.futureStates.length);
 				this.previousProperties = this.properties;
+			}
+			else{
+			data.stateStored = false;
+			data.previousStates=[];
+			data.futureStates = [];
+			data.previousProperties = {};
 			}
 			this.properties = data;
 
@@ -987,7 +988,6 @@ define([
 		addToUndoStack: function() {
 			if (!this.stateStored) {
 				this.previousStates.push(this.toJSON());
-				console.log(this.previousStates[this.previousStates.length - 1]);
 				this.stateStored = true;
 				this.futureStates = [];
 				//console.log(this.get('name'), ' stored state', this.previousStates);
@@ -1433,7 +1433,7 @@ define([
 
 
 		childModified: function(child) {
-			//console.log(child.get('name'), 'of',this.get('name'),'modified');
+			console.log(child.get('name'), 'of',this.get('name'),'modified');
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 			}
@@ -1511,6 +1511,15 @@ define([
 
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
+			if(!this.get('inFocus')){
+				console.log("target is out of focus",this.get('id'),this.get('name'));
+				geom.opacity = 0.5;
+			}
+			else{
+				console.log("target is in focus",this.get('id'),this.get('name'));
+
+				geom.opacity = 1;
+			}
 
 		},
 

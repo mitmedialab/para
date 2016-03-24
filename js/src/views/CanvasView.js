@@ -99,7 +99,7 @@ define([
       this.listenTo(this.model, 'centerGeom', this.centerGeom);
 
       paper.view.parent = this;
-      paper.view.on('frame', this.animate);
+      
       window.onbeforeunload = function() {
         return 'unsaved changes';
       };
@@ -184,10 +184,7 @@ define([
       this.parent.model.toolMouseMove(event);
     },
 
-    animate: function(event) {
-      //this.parent.model.animate();
-    },
-
+   
     /* canvas event functions */
     canvasKeydown: function(event) {
       /*if (event.keyCode == saveKey) {
