@@ -284,6 +284,19 @@ define([
       GeometryNode.prototype.setValue.call(this, data, registerUndo);
     },
 
+    /* getValueFor
+     * returns the actual value for a given property
+     */
+    getValueFor: function(property_name) {
+      if (property_name== 'strokeColor' || property_name == 'fillColor' || property_name == 'strokeWidth' ) {
+        return this.children[this.children.length-1].getValueFor(property_name);
+      } else {
+        var property = this.get(property_name);
+        return this.getValue()[property_name];
+      }
+    },
+
+
     //returns all non-group children
     getInstanceChildren: function(list) {
       if (!list) {

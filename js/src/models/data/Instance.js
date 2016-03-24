@@ -505,10 +505,10 @@ define([
 				}
 				this.get('geom').appendTop(this.children[i].get('geom'));
 			}
-			for (var i = 0; i < this.children.length; i++) {
+			/*for (var i = 0; i < this.children.length; i++) {
 				
 				console.log('actual index for',this.children[i].get('name'),'=',this.children[i].get('geom').index,this.children[i].get('zIndex').getValue());
-			}
+			}*/
 		},
 
 		removeChildNode: function(node, registerUndo) {
