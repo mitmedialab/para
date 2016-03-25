@@ -1369,16 +1369,18 @@ define([
 
 			if (data instanceof Array) {
 				data = _.filter(data, function(item) {
-					return (currentNode.descendantOf(item));
+					if (item.get('type') == 'geometry') {
+						return (currentNode.descendantOf(item));
+					} else {
+						return true;
+					}
 				});
 				for (var i = 0; i < data.length; i++) {
 					this._selectSingleShape(data[i], segments);
 				}
 			} else {
-				if (currentNode.descendantOf(data)) {
+				if (currentNode.get('type') != 'geometry' || currentNode.descendantOf(data)) {
 					this._selectSingleShape(data, segments);
-				} else {
-					console.log(data.get('id'), data.get('name'), 'is not descendant', currentNode.get('id'), currentNode.get('name'));
 				}
 			}
 			if (!constraintMode) {
@@ -1405,10 +1407,41 @@ define([
 			}
 
 		},
+		
+		toggleItem: function() {
+
+			if (selected.length === 0) {
+				this.toggleClosed();
+			} else if (selected[selected.length - 1].get('type') == 'geometry') {
+				this.toggleOpen();
+			} else {
+				if (selected[selected.length - 1].get('open')) {
+					this.toggleClosedList();
+				} else {
+					this.toggleOpenList();
+				}
+			}
+		},
+
+		toggleOpenList: function() {
+			var target = selected[selected.length - 1];
+			if (target.get('type') == 'collection') {
+				this.deselectAllShapes();
+				collectionManager.toggleOpen(target);
+			}
+		},
+
+		toggleClosedList: function() {
+			var target = selected[selected.length - 1];
+			if (target.get('type') == 'collection') {
+				this.deselectAllShapes();
+				collectionManager.toggleClosed(target);
+			}
+		},
 
 
 		/* toggleOpen
-		 * returns children of opened function or members of opened lists
+		 * moves down a level in the geometery heirarchy based on selection
 		 */
 		toggleOpen: function() {
 
@@ -1427,15 +1460,14 @@ define([
 				target.toggleOpen();
 				target.get('geom').bringToFront();
 				currentNode = target;
-
-
 			}
-			//var data = collectionManager.toggleOpen(selected[selected.length - 1]);
-			//this.deselectAllShapes();
+
 		},
 
+
+
 		/* toggleClosed
-		 * closes open functions or selected open lists
+		 * moves up a level in the geometery heirarchy
 		 */
 		toggleClosed: function() {
 			this.deselectAllShapes();

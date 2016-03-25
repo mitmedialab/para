@@ -34,7 +34,9 @@ define([
     fill: true,
     bounds: true,
     center: true,
-    tolerance: 2
+    segments: true,
+    curves: true,
+    tolerance: 2,
   };
 
   var SelectToolModel = BaseToolModel.extend({
@@ -83,12 +85,14 @@ define([
       //automaticall deselect all on mousedown if shift modifier is not enabled
       var instance = null;
       var modifier = null;
-      if (!event.modifiers.shift) {
+     
+      var hitResult = paper.project.hitTest(event.point, hitOptions);
+      console.log(hitResult);
+       if (!event.modifiers.shift) {
         if (!noDeselect) {
           this.trigger('deselectAll');
         }
       }
-      var hitResult = paper.project.hitTest(event.point, hitOptions);
       // make sure that a true instance is selected
       if (hitResult && hitResult.item.data.instance) {
 
@@ -96,6 +100,7 @@ define([
 
         literal = path;
         instance = literal.data.instance;
+        console.log(instance,literal);
         if(instance.nodeParent && instance.nodeParent.get('name')==='group' && !instance.nodeParent.get('open')){
           instance = instance.nodeParent;
           literal = instance.get('geom');
@@ -280,15 +285,6 @@ define([
       }
       return null;
     },
-
-    dblClick: function(event) {
-      if (this.currentPaths.length > 0) {
-        this.trigger('moveDownNode', this.currentPaths[this.currentPaths.length - 1]);
-      } else {
-        this.trigger('moveUpNode');
-      }
-    },
-
 
     //mouse up event
     mouseUp: function(event) {

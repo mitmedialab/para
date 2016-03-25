@@ -390,31 +390,9 @@ define([
 		},
 
 
+		
+	
 		toggleOpen: function(item) {
-			if (item.get('type') === 'geometry') {
-				item.toggleOpen(item);
-				return {
-					toSelect: item.children,
-					toRemove: [item]
-				};
-			} else {
-				return this.toggleOpenLists(item);
-			}
-		},
-
-		toggleClosed: function(item) {
-			if (item.get('type') == 'geometry' && item.nodeParent.get('open')) {
-				item.nodeParent.toggleClosed(item);
-				return {
-					toSelect: [item.nodeParent],
-					toRemove: [item]
-				};
-			} else {
-				return this.toggleClosedLists(item);
-			}
-		},
-
-		toggleOpenLists: function(item) {
 			var openedLists = [];
 			var openedItems = [];
 			var members = [];
@@ -444,10 +422,10 @@ define([
 		},
 
 
-		/* toggleClosedLists
+		/* toggleClosed
 		 * closes selected open lists
 		 */
-		toggleClosedLists: function(item) {
+		toggleClosed: function(item) {
 			var toggledLists = [];
 			var returnedLists = [];
 			for (var i = 0; i < lists.length; i++) {

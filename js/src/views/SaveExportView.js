@@ -117,8 +117,8 @@ define([
 				ui_form.dialog("close");
 				self.model.trigger('unpauseKeyListeners');
 				console.log('exp_data=', exp_data);
-				sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
 				clearTimeout(delayTimer);
+				sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
 				analytics.log('experience_sample', {
 					type: 'experience_sample',
 					id: 'experience_sample' + time.getTime(),

@@ -27,7 +27,7 @@ define([
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
         var path = new paper.Path.Rectangle(rectangle);
         path.strokeColor = this.get('primary_selection_color');
-
+        path.fillColor = 'black';
         this.startText = new paper.PointText({
           point: new paper.Point(5, 13),
           content: 'range:',

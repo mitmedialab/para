@@ -64,7 +64,7 @@ define([
       masterManager.listenTo(toolManager, 'constraintModeChanged', masterManager.constraintModeChanged);
       masterManager.listenTo(toolManager, 'toggleOpen', masterManager.toggleOpen);
       masterManager.listenTo(toolManager, 'toggleClosed', masterManager.toggleClosed);
-
+      masterManager.listenTo(toolManager, 'doubleClick', masterManager.toggleItem);
 
       masterManager.listenTo(toolManager, 'deselectAll', masterManager.deselectAllShapes);
       masterManager.listenTo(toolManager, 'selectShape', masterManager.selectShape);

@@ -68,7 +68,6 @@ define([
       this.listenTo(toolCollection, 'constraintReset', this.constraintReset);
       this.listenTo(toolCollection, 'addCopy', this.addCopy);
       this.listenTo(toolCollection, 'selectionRequest', this.selectionRequest);
-
       this.get('tool_collection').add([selectTool, polyTool, constraintTool]);
       //setup user tool managers
       toolNameMap = {
@@ -306,7 +305,7 @@ define([
     canvasMouseWheel: function(event, pan, modify) {
       var delta = event.originalEvent.wheelDelta; //paper.view.center
 
-      if (pan && delta!=0) {
+      if (pan && delta!==0) {
 
         var mousePos = new paper.Point(event.offsetX, event.offsetY);
         var viewPosition = paper.view.viewToProject(mousePos);
@@ -319,7 +318,9 @@ define([
     },
 
     canvasDblclick: function(event) {
+            console.log('dblClick');
 
+        this.trigger('doubleClick')
     },
 
   });
