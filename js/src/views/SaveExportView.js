@@ -15,8 +15,9 @@ define([
 ], function($, ui, _, AWS, Backbone, Handlebars, FileSaver, analytics, ui_html) {
 
 
-	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer, bucket;
-	var SAMPLE_INTERVAL = 120000; // starts at 2 minutes
+	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer,delayTimer, bucket;
+	var SAMPLE_INTERVAL = 600000*2; // starts at 20 minutes
+	var DELAY_INTERVAL = 300000; //delay interval of 5 minutes
 	var SaveExportView = Backbone.View.extend({
 
 		events: {
@@ -57,13 +58,12 @@ define([
 				},
 				close: function() {
 					allFields.removeClass("ui-state-error");
-					self.calculateSampleInterval();
 					self.model.trigger('unpauseKeyListeners');
-					//sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
+					delayTimer = setTimeout(self.triggerSampleDialog, DELAY_INTERVAL);
 				}
 
 			});
-
+			sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
 			AWS.config.region = 'us-east-1'; // Region
 			var creds = new AWS.CognitoIdentityCredentials({
 				IdentityPoolId: 'us-east-1:60d2d4f9-df27-47b2-bf73-c8b01736c9f4'
@@ -81,15 +81,22 @@ define([
 			});
 
 			bucket = new AWS.S3({params: {Bucket: 'kimpara'}});
-
-			
-			//sampleTimer = setTimeout(this.triggerSampleDialog, SAMPLE_INTERVAL);
 		},
 
 		triggerSampleDialog: function() {
+			console.log('trigger sample');
 			clearTimeout(sampleTimer);
+			clearTimeout(delayTimer);
+			$('#sample_button').removeClass('animation');
 			ui_form.dialog("open");
 			self.model.trigger('pauseKeyListeners');
+		},
+
+		startDelay: function(){
+			console.log('start delay');
+			$('#sample_button').addClass('animation');
+			console.log(this.triggerSampleDialog,DELAY_INTERVAL);
+			delayTimer = setTimeout(self.triggerSampleDialog, DELAY_INTERVAL);
 		},
 
 		addSample: function() {
@@ -110,8 +117,8 @@ define([
 				ui_form.dialog("close");
 				self.model.trigger('unpauseKeyListeners');
 				console.log('exp_data=', exp_data);
-				self.calculateSampleInterval();
-				//sampleTimer = setTimeout(self.triggerSampleDialog, SAMPLE_INTERVAL);
+				sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
+				clearTimeout(delayTimer);
 				analytics.log('experience_sample', {
 					type: 'experience_sample',
 					id: 'experience_sample' + time.getTime(),
@@ -141,10 +148,6 @@ define([
 
 		},
 
-
-		calculateSampleInterval: function() {
-			SAMPLE_INTERVAL = (Math.random() * 600000 * 2) + 600000;
-		},
 
 		enableSave: function() {
 			this.enable('save');

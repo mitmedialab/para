@@ -61,13 +61,9 @@ define([
 
 		initialize: function() {
 			//setup root node
-			// Initialize the Amazon Cognito credentials provider
-
-
 			rootNode = new FunctionNode({}, {
 				geometryGenerator: GeometryGenerator
 			});
-
 
 			rootNode.open();
 			undo_limit = rootNode.get('undo_limit');
