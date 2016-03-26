@@ -152,6 +152,9 @@ define([
 		};
 
 		TrigFunc.centroid = function(pointList) {
+			if(pointList.length===0){
+				return {x:0,y:0};
+			}
 			// should check for instances of PPoint
 			var sum_point = pointList.reduce(function(point1, point2) {
 				return {x:point1.x + point2.x, y:point1.y + point2.y};

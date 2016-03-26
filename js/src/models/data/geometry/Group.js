@@ -44,8 +44,9 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-      // this.centerUI.fillColor = 'blue';
-      // this.center = geom.position;
+
+      this.centerUI.fillColor = 'blue';
+      this.center = geom.position;
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'ui_layer';
@@ -228,15 +229,75 @@ define([
       return instance;
     },
 
+
+
+    recalculateOrigin: function(added) {
+      var pointList = [];
+      for(var i=0;i<this.children.length;i++) {
+        if(this.children[i]!=added){
+          pointList.push(this.children[i].getAbsoluteOrigin());
+        }
+      }
+      if(added){
+         pointList.push(added.get('translationDelta').getValue());
+      }
+
+      var centroid_curr = this.get('translationDelta').getValue();
+      var centroid_new = TrigFunc.centroid(pointList);
+      var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
+      
+      console.log('centroid changes', centroid_curr, centroid_new, centroid_diff);
+      if(added){
+         added.transformAbsoluteCoordinates(centroid_new);
+      }
+      for (var i = 0; i < this.children.length; i++) {
+        if(this.children[i]!=added){
+          this.children[i].transformRelativeCoordinates(centroid_diff);
+        }
+      }
+      this.get('translationDelta').setValue(centroid_new);
+    },
+
     insertChild: function(index, child, registerUndo) {
+      if(this.nodeParent){
+        this.nodeParent.stopListening(this);
+      }
+      this.listenTo(child, 'modified', this.modified);
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
+
+      if (this.get('name') !== 'root') {
+        /*console.log('child rendered?',child.get('rendered'),'origin',child.get('geom').position,'tdelta',child.get('translationDelta').getValue());
+        console.log('group tdelta',this.get('translationDelta').getValue());
+       var pointList = _.map(this.children, function(child) {
+          return child.getAbsoluteOrigin();
+        });
+
+        pointList.push(child.get('translationDelta').getValue());
+        var centroid_curr = this.get('translationDelta').getValue();
+        var centroid_new = TrigFunc.centroid(pointList);
+        var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
+        console.log('centroid changes', centroid_curr, centroid_new, centroid_diff);
+        child.transformAbsoluteCoordinates(centroid_new);
+        for (var i = 0; i < this.children.length; i++) {
+          this.children[i].transformRelativeCoordinates(centroid_diff);
+        }
+        this.get('translationDelta').setValue(centroid_new);*/
+
+        this.recalculateOrigin(child);
+      }
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
-      this.center = this.get('geom').position;
+
       this.createBBox();
       this.createSelectionClone();
-      this.listenTo(child, 'modified', this.modified);
+
+      if(this.nodeParent){
+        this.nodeParent.listenTo(this, 'modified', this.nodeParent.childModified);
+        this.nodeParent.listenTo(this,'modified', this.nodeParent.modified);
+      }
       this.trigger('modified', this);
+
+
     },
 
     removeChildNode: function(node, registerUndo) {
@@ -247,11 +308,18 @@ define([
         this.createBBox();
         this.createSelectionClone();
         this.stopListening(removed);
-
+        this.recalculateCenter();
         this.trigger('modified', this);
         return removed;
       }
     },
+
+
+    childModified: function(child) {
+      //this.recalculateOrigin()
+      GeometryNode.prototype.childModified.call(this, child);
+    },
+
 
     unGroup: function() {
 
@@ -295,6 +363,7 @@ define([
         return this.getValue()[property_name];
       }
     },
+
 
 
     //returns all non-group children
@@ -366,6 +435,8 @@ define([
         GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+              console.log(this.get('name'),' resetting', this.renderQueue[i].get('name'));
+            
             this.renderQueue[i].reset();
           }
         }
@@ -380,6 +451,9 @@ define([
       if (!this.get('rendered')) {
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+            
+              console.log(this.get('name'),' rendering',this.renderQueue[i].get('name'));
+            
             this.renderQueue[i].render();
           }
         }
@@ -390,11 +464,8 @@ define([
 
     renderStyle: function() {
       if (!this.get('inFocus')) {
-        console.log("target is out of focus", this.get('id'), this.get('name'));
         this.get('geom').opacity = 0.5;
       } else {
-        console.log("target is in focus", this.get('id'), this.get('name'));
-
         this.get('geom').opacity = 1;
       }
     },
@@ -463,8 +534,6 @@ define([
       m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
 
       this._matrix = m2;
-
-
     },
 
 

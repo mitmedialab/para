@@ -137,16 +137,17 @@ define([
 				var geometry = selected.filter(function(item) {
 					return (item.get('type') == 'geometry');
 				});
-				if (selected.length > 1) {
+				if (geometry.length == selected.length) {
+						this.enable('group');
+					}
+				else if (selected.length > 1) {
 					this.setCount();
 					if (collections.length == selected.length) {
 						this.enable('ungroup');
 					} else {
 						this.disable('ungroup');
 					}
-					if (geometry.length == selected.length) {
-						this.enable('group');
-					}
+					
 					this.disable('duplicator');
 					this.enable('list');
 				} else {

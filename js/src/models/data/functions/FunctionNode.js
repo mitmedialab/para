@@ -99,6 +99,15 @@ define([
 				}
 			},
 
+
+			recalculateOrigin:function(){
+
+			},
+
+			getAbsoluteOrigin: function(){
+				return {x:0,y:0};
+			},
+
 			removeParameter: function(param) {
 				var params = this.get('f_parameters');
 				var index = $.inArray(param, params);
@@ -196,6 +205,8 @@ define([
 				for (var i = 0; i < this.renderQueue.length; i++) {
 
 					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+						              console.log(this.get('name'),' rendering', this.renderQueue[i].get('name'));
+						
 						this.renderQueue[i].reset();
 					}
 				}
@@ -206,6 +217,9 @@ define([
 
 				for (var i = 0; i < this.renderQueue.length; i++) {
 					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+					
+						              console.log(this.get('name'),' rendering', this.renderQueue[i].get('name'));
+
 						this.renderQueue[i].render();
 					}
 				}

@@ -1080,15 +1080,16 @@ define([
 							return false;
 						}
 						if (relativeShape.get('name') === 'group') {
-							relativeShape.addChildNode(movedShape, !stateStored);
-							this.addToUndoStack([relativeShape]);
+							console.log('adding in relative shape to group',movedShape.get('name'));
+							relativeShape.addChildNode(movedShape);
+							/*this.addToUndoStack([relativeShape]);
 							this.modificationEnded([relativeShape]);
 
 							layersView.removeChildren(relativeShape.get('id'));
 							for (var i = 0; i < relativeShape.children.length; i++) {
 								layersView.addShape(relativeShape.children[i].toJSON(), relativeShape.get('id'));
 							}
-							layersView.sortChildren(relativeShape.get('id'));
+							layersView.sortChildren(relativeShape.get('id'));*/
 						}
 						break;
 					default:
@@ -1132,6 +1133,8 @@ define([
 						break;
 				}
 			}
+						this.trigger('modified');
+
 			return true;
 		},
 
@@ -1407,7 +1410,7 @@ define([
 			}
 
 		},
-		
+
 		toggleItem: function() {
 
 			if (selected.length === 0) {

@@ -87,7 +87,6 @@ define([
       var modifier = null;
      
       var hitResult = paper.project.hitTest(event.point, hitOptions);
-      console.log(hitResult);
        if (!event.modifiers.shift) {
         if (!noDeselect) {
           this.trigger('deselectAll');
@@ -100,7 +99,6 @@ define([
 
         literal = path;
         instance = literal.data.instance;
-        console.log(instance,literal);
         if(instance.nodeParent && instance.nodeParent.get('name')==='group' && !instance.nodeParent.get('open')){
           instance = instance.nodeParent;
           literal = instance.get('geom');

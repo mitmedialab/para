@@ -246,6 +246,13 @@ define([
 			this.previousStates = [];
 			this.futureStates = [];
 			this.stateStored = false;
+			this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 10);
+			this.centerUI.fillColor = 'red';
+			var targetLayer = paper.project.layers.filter(function(layer) {
+				return layer.name === 'ui_layer';
+			})[0];
+			targetLayer.addChild(this.centerUI);
+
 		},
 
 
@@ -505,16 +512,16 @@ define([
 				}
 				this.get('geom').appendTop(this.children[i].get('geom'));
 			}
-			/*for (var i = 0; i < this.children.length; i++) {
-				
-				console.log('actual index for',this.children[i].get('name'),'=',this.children[i].get('geom').index,this.children[i].get('zIndex').getValue());
-			}*/
 		},
 
 		removeChildNode: function(node, registerUndo) {
 			if (registerUndo) {
 				this.addToUndoStack();
 
+			}
+			var rI = this.renderQueue.indexOf(node);
+			if(rI>-1){
+				this.renderQueue.splice(rI,1);
 			}
 			this.removeInheritor(node);
 			var removed = SceneNode.prototype.removeChildNode.call(this, node);
@@ -659,6 +666,7 @@ define([
 				var inverted = this._matrix.inverted();
 				geom.transform(inverted);
 				bbox.transform(inverted);
+				this.centerUI.transform(inverted);
 				selection_clone.transform(inverted);
 				this.set('rendered', false);
 			}
@@ -925,6 +933,10 @@ define([
 		//callback triggered when a subproperty is modified externally 
 		modified: function() {
 			//console.log('modified',this.get('name'));
+			/*if(this.nodeParent){
+			this.nodeParent.transformRelativeCoordinates();
+			}*/
+
 			PConstraint.prototype.modified.apply(this, arguments);
 		},
 
@@ -1381,6 +1393,32 @@ define([
 			return color_palette[color_ind];
 		},
 
+		getAbsoluteOrigin: function(){
+			var td = this.get('translationDelta').getValue();
+			if(!this.nodeParent){
+				return td;
+			}
+			var pdt = this.nodeParent.getAbsoluteOrigin();
+			return TrigFunc.add(td,pdt);
+		},
+		
+
+		transformAbsoluteCoordinates: function(origin){
+			var absolute = this.get('translationDelta').getValue();
+			var nX = absolute.x-origin.x;
+			var nY = absolute.y-origin.y;
+			console.log("absolute transform for",this.get('name'),": nx,ny",nX,nY,'absolute:',absolute,"origin:",origin);
+			this.get('translationDelta').setValue({x:nX,y:nY});
+		},
+
+		transformRelativeCoordinates: function(offset){
+			var relative = this.get('translationDelta').getValue();
+			var nX = relative.x-offset.x;
+			var nY = relative.y-offset.y;
+			console.log("relative transform: nx,ny",nX,nY,'relative','offset',offset);
+			this.get('translationDelta').setValue({x:nX,y:nY});
+		},
+
 
 
 		transformSelf: function() {
@@ -1433,7 +1471,7 @@ define([
 
 
 		childModified: function(child) {
-			console.log(child.get('name'), 'of',this.get('name'),'modified');
+			//console.log(child.get('name'), 'of',this.get('name'),'modified');
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 			}
@@ -1461,6 +1499,7 @@ define([
 				selection_clone.position = geom.position;
 				this.transformSelf();
 				geom.transform(this._matrix);
+				this.centerUI.transform(this._matrix);
 				selection_clone.transform(this._matrix);
 				bbox.transform(this._matrix);
 				this.updateScreenBounds(geom);
@@ -1512,12 +1551,9 @@ define([
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
 			if(!this.get('inFocus')){
-				console.log("target is out of focus",this.get('id'),this.get('name'));
 				geom.opacity = 0.5;
 			}
 			else{
-				console.log("target is in focus",this.get('id'),this.get('name'));
-
 				geom.opacity = 1;
 			}
 

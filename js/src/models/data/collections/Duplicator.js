@@ -153,9 +153,9 @@ define([
             setInternalConstraint: function() {
 
                 var internalConstraints = []
-                if (this.get('target').get('name') == 'group') {
+                /*if (this.get('target').get('name') == 'group') {
                    internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
-                }
+                }*/
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
                 if (this.masterList.members.length > 1) {
