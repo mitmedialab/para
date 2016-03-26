@@ -243,7 +243,7 @@ define([
         console.log("centroid is in correct place");
         return;
       }*/
-      console.log('centroid changes', centroid_curr, centroid_new, centroid_diff);
+   //   console.log('centroid changes', centroid_curr, centroid_new, centroid_diff);
       if (added) {
         added.transformAbsoluteCoordinates(centroid_new);
         added.reset();
@@ -257,7 +257,7 @@ define([
 
 
     recalculateOrigin: function() {
-      console.log('recalculateOrigin for',this.get('name'),this.get('id'));
+     // console.log('recalculateOrigin for',this.get('name'),this.get('id'));
 
        var pointList = _.map(this.children, function(child) {
         return child.getAbsoluteOrigin();
@@ -266,9 +266,9 @@ define([
       var centroid_curr = this.get('translationDelta').getValue();
       var centroid_new = TrigFunc.centroid(pointList);
       var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
-      console.log('centroid_diff',centroid_diff);
+     // console.log('centroid_diff',centroid_diff);
       if(centroid_diff.x===0 && centroid_diff.y===0 ){
-        console.log('no origin change');
+        //console.log('no origin change');
         return false;
       }
 
@@ -297,8 +297,6 @@ define([
       this.createSelectionClone();
       var listeningTo = this._listeningTo || (this._listeningTo = {});
 
-      console.log('group is listening to after insert',listeningTo);
-
       this.trigger('modified', this);
 
     },
@@ -319,25 +317,25 @@ define([
 
 
     childModified: function(child) {
-      console.log(this.get('name'),'modified child',child.get('name'), child.get('id'),'root');
-      console.log(this.get('name'),'nolonger listening to ',child.get('name'),child.get('id'));
+      //console.log(this.get('name'),'modified child',child.get('name'), child.get('id'),'root');
+      //console.log(this.get('name'),'nolonger listening to ',child.get('name'),child.get('id'));
 
-      console.trace();
+     // console.trace();
       GeometryNode.prototype.childModified.call(this, child);
-      console.log('render queue for',this.get('name'),this.renderQueue,this.nodeParent.renderQueue,this.nodeParent._listeningTo,'root');
+      //console.log('render queue for',this.get('name'),this.renderQueue,this.nodeParent.renderQueue,this.nodeParent._listeningTo,'root');
       this.stopListening(child);
-      var parentlisteningTo = this.nodeParent._listeningTo;
+      //var parentlisteningTo = this.nodeParent._listeningTo;
 
       if(!this.recalculateOrigin()){
         this.listenTo(child,'modified',this.get('childModified'));
-          console.log('no centroid change, parent is listening to',parentlisteningTo);
+          //console.log('no centroid change, parent is listening to',parentlisteningTo);
       }
       else{
-        console.log('centroid change, parent is listening to',parentlisteningTo);
+       // console.log('centroid change, parent is listening to',parentlisteningTo);
 
       }
-      var listeningTo = this._listeningTo;
-      console.log('group is listening to after modifiy',listeningTo);
+      //var listeningTo = this._listeningTo;
+      //console.log('group is listening to after modifiy',listeningTo);
       this.trigger('modified',this);
 
     },
@@ -440,7 +438,6 @@ define([
     toggleOpen: function() {
       this.set('open', true);
        var listeningTo = this._listeningTo || (this._listeningTo = {});
-      console.log('group is listening to after toggle open',listeningTo);
 
     },
 
@@ -475,7 +472,7 @@ define([
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].render();
            if(this.children.indexOf(this.renderQueue[i])>-1){
-            console.log(this.get('name'),'restoring rendering to ',this.renderQueue[i].get('name'),'root');
+           // console.log(this.get('name'),'restoring rendering to ',this.renderQueue[i].get('name'),'root');
             this.listenTo(this.renderQueue[i],"modified",this.childModified);
            }
           }

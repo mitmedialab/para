@@ -216,7 +216,7 @@ define([
 
 			childModified: function(child) {
 
-				console.log(this.get('name'),'modified child',child.get('name'), child.get('id'));
+				//console.log(this.get('name'),'modified child',child.get('name'), child.get('id'));
 				GeometryNode.prototype.childModified.call(this, child);
 				this.stopListening(child);
 
@@ -233,7 +233,7 @@ define([
 					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
 						this.renderQueue[i].render();
 						if(this.children.indexOf(this.renderQueue[i])>-1){
-             			  console.log(this.get('name'),'restoring rendering to ',this.renderQueue[i].get('name'));
+             			 // console.log(this.get('name'),'restoring rendering to ',this.renderQueue[i].get('name'));
              			  this.listenTo(this.renderQueue[i],"modified",this.childModified);
            				}
 					}

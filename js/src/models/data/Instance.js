@@ -1403,7 +1403,6 @@ define([
 			var absolute = this.get('geom').position;
 			var nX = absolute.x - origin.x;
 			var nY = absolute.y - origin.y;
-			console.log("absolute transform for", this.get('name'), ": nx,ny", nX, nY, 'absolute:', absolute, "origin:", origin);
 			this.get('translationDelta').setValue({
 				x: nX,
 				y: nY
@@ -1411,7 +1410,6 @@ define([
 		},
 
 		setRelativeOrigin: function(offset) {
-			console.log('set relative origin for',this.get('name'),this.get('id'));
 
 			var relative = this.get('translationDelta').getValue();
 			var nX = relative.x - offset.x;
