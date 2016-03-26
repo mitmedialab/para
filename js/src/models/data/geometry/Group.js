@@ -231,72 +231,75 @@ define([
 
 
 
-    recalculateOrigin: function(added) {
-      var pointList = [];
-      for(var i=0;i<this.children.length;i++) {
-        if(this.children[i]!=added){
-          pointList.push(this.children[i].getAbsoluteOrigin());
-        }
-      }
-      if(added){
-         pointList.push(added.get('translationDelta').getValue());
-      }
+    moveOrigin: function(added) {
+      var pointList = _.map(this.children, function(child) {
+        return child.getAbsoluteOrigin();
+      });
 
       var centroid_curr = this.get('translationDelta').getValue();
       var centroid_new = TrigFunc.centroid(pointList);
       var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
-      
+      /*if(centroid_diff.x<0.00001 && centroid_diff.y<0.00001){
+        console.log("centroid is in correct place");
+        return;
+      }*/
       console.log('centroid changes', centroid_curr, centroid_new, centroid_diff);
-      if(added){
-         added.transformAbsoluteCoordinates(centroid_new);
+      if (added) {
+        added.transformAbsoluteCoordinates(centroid_new);
+        added.reset();
       }
       for (var i = 0; i < this.children.length; i++) {
-        if(this.children[i]!=added){
-          this.children[i].transformRelativeCoordinates(centroid_diff);
-        }
+        this.children[i].setRelativeOrigin(centroid_diff);
       }
       this.get('translationDelta').setValue(centroid_new);
+
     },
 
-    insertChild: function(index, child, registerUndo) {
-      if(this.nodeParent){
-        this.nodeParent.stopListening(this);
+
+    recalculateOrigin: function() {
+      console.log('recalculateOrigin for',this.get('name'),this.get('id'));
+
+       var pointList = _.map(this.children, function(child) {
+        return child.getAbsoluteOrigin();
+      });
+
+      var centroid_curr = this.get('translationDelta').getValue();
+      var centroid_new = TrigFunc.centroid(pointList);
+      var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
+      console.log('centroid_diff',centroid_diff);
+      if(centroid_diff.x===0 && centroid_diff.y===0 ){
+        console.log('no origin change');
+        return false;
       }
-      this.listenTo(child, 'modified', this.modified);
+
+      for (var i = 0; i < this.children.length; i++) {
+        this.children[i].setRelativeOrigin(centroid_diff);
+      }
+      this.get('translationDelta').setValue(centroid_new);
+      return true;
+
+      // var centroid_curr = this.get('translationDelta').getValue();
+
+    },
+
+
+
+    insertChild: function(index, child, registerUndo) {
+      if (this.get('name') !== 'root') {       
+        this.moveOrigin(child);
+      }
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
 
-      if (this.get('name') !== 'root') {
-        /*console.log('child rendered?',child.get('rendered'),'origin',child.get('geom').position,'tdelta',child.get('translationDelta').getValue());
-        console.log('group tdelta',this.get('translationDelta').getValue());
-       var pointList = _.map(this.children, function(child) {
-          return child.getAbsoluteOrigin();
-        });
-
-        pointList.push(child.get('translationDelta').getValue());
-        var centroid_curr = this.get('translationDelta').getValue();
-        var centroid_new = TrigFunc.centroid(pointList);
-        var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
-        console.log('centroid changes', centroid_curr, centroid_new, centroid_diff);
-        child.transformAbsoluteCoordinates(centroid_new);
-        for (var i = 0; i < this.children.length; i++) {
-          this.children[i].transformRelativeCoordinates(centroid_diff);
-        }
-        this.get('translationDelta').setValue(centroid_new);*/
-
-        this.recalculateOrigin(child);
-      }
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
 
       this.createBBox();
       this.createSelectionClone();
+      var listeningTo = this._listeningTo || (this._listeningTo = {});
 
-      if(this.nodeParent){
-        this.nodeParent.listenTo(this, 'modified', this.nodeParent.childModified);
-        this.nodeParent.listenTo(this,'modified', this.nodeParent.modified);
-      }
+      console.log('group is listening to after insert',listeningTo);
+
       this.trigger('modified', this);
-
 
     },
 
@@ -316,8 +319,27 @@ define([
 
 
     childModified: function(child) {
-      //this.recalculateOrigin()
+      console.log(this.get('name'),'modified child',child.get('name'), child.get('id'),'root');
+      console.log(this.get('name'),'nolonger listening to ',child.get('name'),child.get('id'));
+
+      console.trace();
       GeometryNode.prototype.childModified.call(this, child);
+      console.log('render queue for',this.get('name'),this.renderQueue,this.nodeParent.renderQueue,this.nodeParent._listeningTo,'root');
+      this.stopListening(child);
+      var parentlisteningTo = this.nodeParent._listeningTo;
+
+      if(!this.recalculateOrigin()){
+        this.listenTo(child,'modified',this.get('childModified'));
+          console.log('no centroid change, parent is listening to',parentlisteningTo);
+      }
+      else{
+        console.log('centroid change, parent is listening to',parentlisteningTo);
+
+      }
+      var listeningTo = this._listeningTo;
+      console.log('group is listening to after modifiy',listeningTo);
+      this.trigger('modified',this);
+
     },
 
 
@@ -417,6 +439,8 @@ define([
 
     toggleOpen: function() {
       this.set('open', true);
+       var listeningTo = this._listeningTo || (this._listeningTo = {});
+      console.log('group is listening to after toggle open',listeningTo);
 
     },
 
@@ -435,8 +459,6 @@ define([
         GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-              console.log(this.get('name'),' resetting', this.renderQueue[i].get('name'));
-            
             this.renderQueue[i].reset();
           }
         }
@@ -451,10 +473,11 @@ define([
       if (!this.get('rendered')) {
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-            
-              console.log(this.get('name'),' rendering',this.renderQueue[i].get('name'));
-            
             this.renderQueue[i].render();
+           if(this.children.indexOf(this.renderQueue[i])>-1){
+            console.log(this.get('name'),'restoring rendering to ',this.renderQueue[i].get('name'),'root');
+            this.listenTo(this.renderQueue[i],"modified",this.childModified);
+           }
           }
         }
         this.createBBox();

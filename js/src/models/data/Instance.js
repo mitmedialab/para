@@ -226,8 +226,8 @@ define([
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
 			this.isReturned = false;
-			
-				
+
+
 			var parent = this;
 			var constrainMap = this.get('constrain_map');
 
@@ -390,11 +390,9 @@ define([
 			return 1;
 		},
 
-		toggleOpen: function() {
-		},
+		toggleOpen: function() {},
 
-		toggleClosed: function() {
-		},
+		toggleClosed: function() {},
 
 		addMemberToOpen: function(data, added_bool) {
 			return false;
@@ -505,7 +503,7 @@ define([
 
 		},
 
-		reorderGeom: function(){
+		reorderGeom: function() {
 			for (var i = 0; i < this.children.length; i++) {
 				if (this.children[i].get('zIndex').getValue() != i) {
 					this.children[i].get('zIndex').setValue(i);
@@ -723,8 +721,7 @@ define([
 			}
 		},
 
-		
-		
+
 
 		resetProperties: function() {
 			this.get('position').setValue({
@@ -846,12 +843,11 @@ define([
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
 				data.futureStates = this.futureStates.slice(0, this.futureStates.length);
 				this.previousProperties = this.properties;
-			}
-			else{
-			data.stateStored = false;
-			data.previousStates=[];
-			data.futureStates = [];
-			data.previousProperties = {};
+			} else {
+				data.stateStored = false;
+				data.previousStates = [];
+				data.futureStates = [];
+				data.previousProperties = {};
 			}
 			this.properties = data;
 
@@ -969,11 +965,11 @@ define([
 			}
 		},
 
-		trimUndoStack:function(){
+		trimUndoStack: function() {
 			this.previousStates.shift();
 		},
 
-		trimRedoStack: function(){
+		trimRedoStack: function() {
 			this.futureStates.shift();
 		},
 
@@ -1393,30 +1389,37 @@ define([
 			return color_palette[color_ind];
 		},
 
-		getAbsoluteOrigin: function(){
+		getAbsoluteOrigin: function() {
 			var td = this.get('translationDelta').getValue();
-			if(!this.nodeParent){
+			if (!this.nodeParent) {
 				return td;
 			}
 			var pdt = this.nodeParent.getAbsoluteOrigin();
-			return TrigFunc.add(td,pdt);
-		},
-		
-
-		transformAbsoluteCoordinates: function(origin){
-			var absolute = this.get('translationDelta').getValue();
-			var nX = absolute.x-origin.x;
-			var nY = absolute.y-origin.y;
-			console.log("absolute transform for",this.get('name'),": nx,ny",nX,nY,'absolute:',absolute,"origin:",origin);
-			this.get('translationDelta').setValue({x:nX,y:nY});
+			return TrigFunc.add(td, pdt);
 		},
 
-		transformRelativeCoordinates: function(offset){
+
+		transformAbsoluteCoordinates: function(origin) {
+			var absolute = this.get('geom').position;
+			var nX = absolute.x - origin.x;
+			var nY = absolute.y - origin.y;
+			console.log("absolute transform for", this.get('name'), ": nx,ny", nX, nY, 'absolute:', absolute, "origin:", origin);
+			this.get('translationDelta').setValue({
+				x: nX,
+				y: nY
+			});
+		},
+
+		setRelativeOrigin: function(offset) {
+			console.log('set relative origin for',this.get('name'),this.get('id'));
+
 			var relative = this.get('translationDelta').getValue();
-			var nX = relative.x-offset.x;
-			var nY = relative.y-offset.y;
-			console.log("relative transform: nx,ny",nX,nY,'relative','offset',offset);
-			this.get('translationDelta').setValue({x:nX,y:nY});
+			var nX = relative.x - offset.x;
+			var nY = relative.y - offset.y;
+			this.get('translationDelta').setValue({
+				x: nX,
+				y: nY
+			});
 		},
 
 
@@ -1471,6 +1474,8 @@ define([
 
 
 		childModified: function(child) {
+
+
 			//console.log(child.get('name'), 'of',this.get('name'),'modified');
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
@@ -1479,11 +1484,7 @@ define([
 
 		},
 
-		clearRenderQueue: function() {
-			this.reset();
-			this.render();
-		},
-
+	
 		/*render
 		 * draws instance on canvas
 		 */
@@ -1550,10 +1551,9 @@ define([
 
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
-			if(!this.get('inFocus')){
+			if (!this.get('inFocus')) {
 				geom.opacity = 0.5;
-			}
-			else{
+			} else {
 				geom.opacity = 1;
 			}
 
