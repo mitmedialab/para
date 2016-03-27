@@ -44,8 +44,8 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-      // this.centerUI.fillColor = 'blue';
-      // this.center = geom.position;
+      this.centerUI.fillColor = 'blue';
+      this.center = {x:0,y:0};
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'ui_layer';
@@ -53,6 +53,8 @@ define([
       targetLayer.addChild(ui_group);
       this.set('bbox', ui_group);
       this.createBBox();
+      this.currentBounds = new paper.Rectangle(0,0,0,0);
+      this.originChange = new paper.Point(0,0);
     },
 
 
@@ -232,9 +234,11 @@ define([
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
-      this.center = this.get('geom').position;
+      this.center.x=this.get('geom').position.x;
+      this.center.y=this.get('geom').position.y;
       this.createBBox();
       this.createSelectionClone();
+       this.currentBounds = this.get('geom').bounds;
       this.listenTo(child, 'modified', this.modified);
       this.trigger('modified', this);
     },
@@ -243,7 +247,10 @@ define([
       var removed = GeometryNode.prototype.removeChildNode.call(this, node, registerUndo);
       if (removed) {
         removed.get('geom').remove();
-        this.center = this.get('geom').position;
+        this.currentBounds = this.get('geom').bounds;
+
+        this.center.x=this.get('geom').position.x;
+        this.center.y=this.get('geom').position.y;
         this.createBBox();
         this.createSelectionClone();
         this.stopListening(removed);
@@ -356,14 +363,33 @@ define([
         this.children[i].toggleClosed();
       }
       this.set('open', false);
+      var old_center = this.center;
+      var new_center = this.get('geom').position;
+      var r = this.get('rotationDelta').getValue();    
+      var inverse = this._matrix.inverted();
+      new_center = inverse.transform(new_center);
+      //var old_t_center = inverse.transform(old_center);
+      //var r_center = new_center.rotate(r,old_center);
+      
+      this.center = new_center;
+      console.log('new_center',new_center,'old_center',old_center,'actual',this.get('geom').position,'r',r);
+
+     },
 
 
+    childModified: function(child) {
+      for(var i=0;i<this.children.length;i++){
+          GeometryNode.prototype.childModified.call(this, this.children[i]);
+      }
     },
+
+
 
     reset: function() {
 
       if (this.get('rendered')) {
         GeometryNode.prototype.reset.apply(this, arguments);
+        
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].reset();
@@ -378,22 +404,23 @@ define([
     render: function() {
 
       if (!this.get('rendered')) {
+        console.log('rendering',this.renderQueue);
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].render();
           }
         }
         this.createBBox();
+       
         GeometryNode.prototype.render.apply(this, arguments);
+        
       }
     },
 
     renderStyle: function() {
       if (!this.get('inFocus')) {
-        console.log("target is out of focus", this.get('id'), this.get('name'));
         this.get('geom').opacity = 0.5;
       } else {
-        console.log("target is in focus", this.get('id'), this.get('name'));
 
         this.get('geom').opacity = 1;
       }
@@ -437,33 +464,30 @@ define([
     },
 
     transformPoint: function(point) {
-      var translationDelta = this.get('translationDelta').getValue();
+      var r = this.get('rotationDelta').getValue();
+      var s = this.get('scalingDelta').getValue();
       var delta = new paper.Point(point.x, point.y);
-      var new_delta = this._matrix.transform(delta);
-
-      new_delta.x -= translationDelta.y;
-      new_delta.y -= translationDelta.x;
+      var new_delta = delta.rotate(r, new paper.Point(0, 0));
+      new_delta = new_delta.multiply(new paper.Point(s.x, s.y));
       return new_delta;
     },
 
     transformSelf: function() {
-
+      console.log('center position',this.center);
       var m2 = new paper.Matrix();
-
       var value = this.getValue();
       var scalingDelta, rotationDelta, translationDelta;
 
       scalingDelta = value.scalingDelta;
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
-
-
-      m2.translate(translationDelta.x, translationDelta.y);
+       m2.translate(translationDelta.x, translationDelta.y);
       m2.rotate(rotationDelta, this.center.x, this.center.y);
       m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
-
       this._matrix = m2;
-
+      this.centerUI.position.x=this.center.x;
+      this.centerUI.position.y=this.center.y;
+      this.centerUI.transform(this._matrix);
 
     },
 

@@ -43,6 +43,8 @@ define([
 					model: this,
 				});
 				this.pcount = 1;
+				 this.centerUI.fillColor = 'green';
+
 				this.selectedParam = null;
 			},
 
@@ -192,6 +194,11 @@ define([
 				}
 			},
 
+
+			childModified: function(child) {
+				GeometryNode.prototype.childModified.call(this, child);
+			},
+			
 			reset: function() {
 				for (var i = 0; i < this.renderQueue.length; i++) {
 
@@ -201,7 +208,7 @@ define([
 				}
 			},
 
-
+ 
 			render: function() {
 
 				for (var i = 0; i < this.renderQueue.length; i++) {

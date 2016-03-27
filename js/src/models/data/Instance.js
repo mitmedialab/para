@@ -246,6 +246,8 @@ define([
 			this.previousStates = [];
 			this.futureStates = [];
 			this.stateStored = false;
+			this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
+			this.centerUI.fillColor = 'red';
 		},
 
 
@@ -659,6 +661,8 @@ define([
 				var inverted = this._matrix.inverted();
 				geom.transform(inverted);
 				bbox.transform(inverted);
+				this.centerUI.transform(inverted);
+
 				selection_clone.transform(inverted);
 				this.set('rendered', false);
 			}
@@ -1005,6 +1009,7 @@ define([
 			}
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
+
 				if (this.nodeParent.get('name') != 'root') {
 					var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
 					data.translationDelta.x = ndelta.x;
@@ -1395,7 +1400,6 @@ define([
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
 
-
 			m2.translate(translationDelta.x, translationDelta.y);
 			m2.rotate(rotationDelta, this.center.x, this.center.y);
 			m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
@@ -1404,6 +1408,8 @@ define([
 
 			//this._diffMatrix = m3;
 			this._matrix = m2;
+			this.centerUI.transform(this._matrix);
+
 
 		},
 
@@ -1433,7 +1439,7 @@ define([
 
 
 		childModified: function(child) {
-			console.log(child.get('name'), 'of',this.get('name'),'modified');
+		//	console.log(child.get('name'), 'of',this.get('name'),'modified');
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 			}
@@ -1512,12 +1518,9 @@ define([
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
 			if(!this.get('inFocus')){
-				console.log("target is out of focus",this.get('id'),this.get('name'));
 				geom.opacity = 0.5;
 			}
 			else{
-				console.log("target is in focus",this.get('id'),this.get('name'));
-
 				geom.opacity = 1;
 			}
 
