@@ -97,6 +97,7 @@ define([
 					Bucket: 'kimpara'
 				}
 			});
+			this.addUntitled();
 		},
 
 		triggerSampleDialog: function() {
@@ -224,7 +225,17 @@ define([
 
 		},
 
+		removeUntitled: function(){
+			$("#fileselect option[value='untitled']").remove();
+		},
+
+		addUntitled: function(){
+			this.removeUntitled();
+			$("#fileselect").prepend("<option value='untitled'>untitiled</option>").val('untitled');
+		},
+
 		save: function(event, data) {
+			this.removeUntitled();
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
@@ -274,6 +285,7 @@ define([
 
 			//this.save();
 			//
+			this.removeUntitled();
 			var self = this;
 			console.log('key = ',filename);
 			var params = {Bucket: 'kimpara', Key: filename};
@@ -368,6 +380,7 @@ define([
 			this.listenToOnce(this, 'loadComplete', function(result) {
 				var r = JSON.parse(result);
 				if (r) {
+					this.addUntitled();
 					this.loadJSON(r);
 				}
 

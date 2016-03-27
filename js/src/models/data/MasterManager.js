@@ -116,6 +116,8 @@ define([
 
 		addToUndoStack: function(selected) {
 			if (!stateStored) {
+				this.trigger('modified');
+
 				var selected_ids = [];
 				for (var i = 0; i < selected.length; i++) {
 					if (selected[i].get('type') == 'collection') {
@@ -584,7 +586,6 @@ define([
 			}
 
 
-			this.trigger('modified');
 
 		},
 
@@ -1049,7 +1050,6 @@ define([
 				this.updateMapView(constraint.get('id'));
 			}
 
-			this.trigger('modified');
 		},
 
 		removeConstraint: function(id, registerUndo) {
@@ -1455,7 +1455,6 @@ define([
 					console.log('sibling setting out of focus', item.get('id'), item.get('name'));
 					item.toggleClosed();
 					item.set('inFocus', false);
-					item.trigger('modified', item);
 				});
 				target.toggleOpen();
 				target.get('geom').bringToFront();
