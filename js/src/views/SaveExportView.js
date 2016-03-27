@@ -15,8 +15,8 @@ define([
 ], function($, ui, _, AWS, Backbone, Handlebars, FileSaver, analytics, ui_html) {
 
 
-	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer,delayTimer, bucket;
-	var SAMPLE_INTERVAL = 600000*2; // starts at 20 minutes
+	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer, delayTimer, bucket, saved_params, s3;
+	var SAMPLE_INTERVAL = 600000 * 2; // starts at 20 minutes
 	var DELAY_INTERVAL = 300000; //delay interval of 5 minutes
 	var SaveExportView = Backbone.View.extend({
 
@@ -44,7 +44,7 @@ define([
 			});
 			$("body").append(ui_html);
 			self = this;
-			$('#sample_button').on( "click",this.triggerSampleDialog);
+			$('#sample_button').on("click", this.triggerSampleDialog);
 			working = $("#working");
 			difficult = $("#difficult");
 			allFields = $([]).add(working).add(difficult);
@@ -69,18 +69,34 @@ define([
 				IdentityPoolId: 'us-east-1:60d2d4f9-df27-47b2-bf73-c8b01736c9f4'
 			});
 			AWS.config.credentials = creds;
-			
-			new AWS.S3().listObjects({
-				Bucket: 'kimpara'
-			}, function(error, data) {
+
+
+			saved_params = {
+				Bucket: 'kimpara',
+				Delimiter: '/',
+				Prefix: 'saved_files/'
+			};
+			s3 = new AWS.S3();
+			s3.listObjects(saved_params, function(error, data) {
 				if (error) {
 					console.log(error); // an error occurred
+
 				} else {
-					console.log(data); // request succeeded
+					console.log('data', data);
+					for (var i = 0; i < data.Contents.length; i++) {
+						var key = data.Contents[i].Key.split('/')[1].split('.txt')[0];
+						self.addFileToSelect(key, data.Contents[i].Key);
+					}
 				}
 			});
 
-			bucket = new AWS.S3({params: {Bucket: 'kimpara'}});
+
+
+			bucket = new AWS.S3({
+				params: {
+					Bucket: 'kimpara'
+				}
+			});
 		},
 
 		triggerSampleDialog: function() {
@@ -92,10 +108,10 @@ define([
 			self.model.trigger('pauseKeyListeners');
 		},
 
-		startDelay: function(){
+		startDelay: function() {
 			console.log('start delay');
 			$('#sample_button').addClass('animation');
-			console.log(this.triggerSampleDialog,DELAY_INTERVAL);
+			console.log(this.triggerSampleDialog, DELAY_INTERVAL);
 			delayTimer = setTimeout(self.triggerSampleDialog, DELAY_INTERVAL);
 		},
 
@@ -110,8 +126,8 @@ define([
 				exp_data.difficult = difficult.val();
 				exp_data.file = self.model.exportProjectJSON();
 				var sample_responses = {};
-				sample_responses.work =  working.val();
-				sample_responses.difficult =  difficult.val();
+				sample_responses.work = working.val();
+				sample_responses.difficult = difficult.val();
 
 
 				ui_form.dialog("close");
@@ -127,22 +143,22 @@ define([
 				});
 
 				var sample_file = {
-				Key: 'stored_data/sample_'+time.getTime()+'.txt',
-				Body: JSON.stringify(sample_responses)
-			};
-			var drawing_file = {
-				Key: 'stored_data/file_'+time.getTime()+'.txt',
-				Body: JSON.stringify(exp_data.file)
-			};
-			bucket.upload(sample_file, function(err, data) {
-				var results = err ? 'ERROR!' : 'SAVED.';
-				console.log(results);
-			});
+					Key: 'stored_data/sample_' + time.getTime() + '.txt',
+					Body: JSON.stringify(sample_responses)
+				};
+				var drawing_file = {
+					Key: 'stored_data/file_' + time.getTime() + '.txt',
+					Body: JSON.stringify(exp_data.file)
+				};
+				bucket.upload(sample_file, function(err, data) {
+					var results = err ? 'ERROR!' : 'SAVED.';
+					console.log(results);
+				});
 
-			bucket.upload(drawing_file, function(err, data) {
-				var results = err ? 'ERROR!' : 'SAVED.';
-				console.log(results);
-			});
+				bucket.upload(drawing_file, function(err, data) {
+					var results = err ? 'ERROR!' : 'SAVED.';
+					console.log(results);
+				});
 
 			}
 
@@ -186,7 +202,7 @@ define([
 			}
 		},
 
-		addFileToSelect: function(filename) {
+		addFileToSelect: function(filename, etag) {
 			var select = $("#fileselect");
 
 			var exists = false;
@@ -198,7 +214,7 @@ define([
 			});
 			if (!exists) {
 				select.append($('<option>', {
-					value: filename,
+					value: etag,
 					text: filename
 				}));
 				return true;
@@ -214,7 +230,7 @@ define([
 				if (!name) {
 					return;
 				} else {
-					var added = this.addFileToSelect(name);
+					var added = this.addFileToSelect(name,'saved_files/'+name+'.txt');
 					if (!added) {
 						if (!confirm("this will overwrite the file " + name)) {
 							return;
@@ -231,16 +247,19 @@ define([
 				data = this.model.exportProjectJSON();
 			}
 			var string_data = JSON.stringify(data);
-			localStorage.removeItem(currentName);
-			try {
-				localStorage.setItem(currentName, string_data);
-				this.disableSave();
-				return true;
 
-			} catch (e) {
-				console.log("LIMIT REACHED:", e);
-				return false;
-			}
+			var drawing_file = {
+				Key: 'saved_files/' + currentName + '.txt',
+				Body: JSON.stringify(data),
+				ACL: 'public-read-write'
+
+			};
+			bucket.upload(drawing_file, function(err, data) {
+				var results = err ? 'ERROR!' : 'SAVED.';
+				console.log(results);
+			});
+			this.disableSave();
+			return true;
 
 		},
 
@@ -251,16 +270,30 @@ define([
 		},
 
 
-
 		load: function(filename) {
 
 			//this.save();
-			var data = localStorage.getItem(filename);
-			var data_obj = JSON.parse(data);
-			//console.log('data, data_obj',data,data_obj);
+			//
+			var self = this;
+			console.log('key = ',filename);
+			var params = {Bucket: 'kimpara', Key: filename};
+			s3.getObject(params, function(error, data) {
+				if (error) {
+					console.log(error); // an error occurred
 
-			this.loadJSON(data_obj);
-			currentName = filename;
+				} else {
+					console.log('loading data', filename,data);
+					
+					var data_obj = JSON.parse(data.Body.toString());
+					console.log('data found', data_obj);
+
+					self.loadJSON(data_obj);
+					currentName = filename;
+				}
+			});
+
+
+
 		},
 
 		loadJSON: function(data_obj) {
