@@ -43,7 +43,7 @@ define([
 					model: this,
 				});
 				this.pcount = 1;
-				 this.centerUI.fillColor = 'green';
+				 //.centerUI.fillColor = 'green';
 
 				this.selectedParam = null;
 			},

@@ -165,7 +165,7 @@ define([
 						this.disable('count');
 					}
 					//TODO: right now can only create duplicator on geometry
-					if (selected[0].get('type') === 'geometry') {
+					if (selected[0].get('type') === 'geometry' && selected[0].get('name')!='duplicator') {
 						this.enable('duplicator');
 					} else {
 						this.disable('duplicator');

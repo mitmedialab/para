@@ -135,7 +135,9 @@ define([
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-						item.trimUndoStack();
+						if(item){
+							item.trimUndoStack();
+						}
 
 					});
 
@@ -149,7 +151,9 @@ define([
 		undo: function(event) {
 
 			if (undoStack.length > 0) {
-
+				while(currentNode!=rootNode){
+					this.toggleClosed();
+				}
 				var toUndo = undoStack.pop();
 
 				var self = this;
@@ -174,7 +178,9 @@ define([
 					var shifted = redoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
+						if(item){
 						item.trimRedoStack();
+						}
 
 					});
 
@@ -185,7 +191,9 @@ define([
 		redo: function() {
 
 			if (redoStack.length > 0) {
-
+while(currentNode!=rootNode){
+					this.toggleClosed();
+				}
 				var toRedo = redoStack.pop();
 
 				var self = this;
@@ -211,8 +219,9 @@ define([
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-
+						if(item){
 						item.trimUndoStack();
+						}
 
 					});
 
@@ -338,35 +347,20 @@ define([
 				id: 'import',
 				action: 'importSVG'
 			});
+
 			var start_item = new paper.Group();
 			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
-			var path, pathMatrix;
-			if (item.children) {
-				var children = item.removeChildren();
-				paper.project.activeLayer.addChildren(children);
-				var new_children = [];
-				for (var i = 0; i < children.length; i++) {
-					if (children[i].children) {
-						path = new SVGNode();
-					} else {
-						path = new PathNode();
-					}
-					pathMatrix = new paper.Matrix();
-					pathMatrix.translate(children[i].bounds.center.x, children[i].bounds.center.y);
-					path.normalizeGeometry(children[i], pathMatrix);
-					this.addShape(path, true);
-					new_children.push(path);
-
-				}
-
-			} else {
-				path = new PathNode();
-				pathMatrix = new paper.Matrix();
-				pathMatrix.translate(item.bounds.center.x, item.bounds.center.y);
-				path.normalizeGeometry(item, pathMatrix);
-				this.addShape(path, true);
-			}
-
+			
+			var position = item.position;
+			console.log('svg position',position);
+			var svgNode = new SVGNode({}, {
+				geometryGenerator: GeometryGenerator
+			});
+			svgNode.get('translationDelta').setValue({x:position.x,y:position.y});
+			svgNode.get('scalingDelta').setValue({x:1,y:1});
+			item.position.x=item.position.y=0;
+			svgNode.changeGeomInheritance(item);
+			this.addShape(svgNode,true);
 		},
 
 		exportSVG: function() {
@@ -616,21 +610,24 @@ define([
 		},
 
 		removeObject: function() {
-			for (var i = 0; i < selected.length; i++) {
+			var s = selected.slice(0);
+			this.deselectAllShapes();
+
+			for (var i = 0; i < s.length; i++) {
 				collectionManager.removeObjectFromLists(selected[i]);
-				switch (selected[i].get('type')) {
+				switch (s[i].get('type')) {
 					case 'geometry':
-						this.removeGeometry(selected[i], true);
+						this.removeGeometry(s[i], true);
 						break;
 					case 'function':
 						//functionManager.removeFunction(selected[i]);
 						break;
 						//TODO: this replicates functionality in the ungroup function, should this function differently?
 					case 'collection':
-						this.removeCollection(selected[i], true);
+						this.removeCollection(s[i], true);
 						break;
 				}
-				this.stopListening(selected[i]);
+				this.stopListening(s[i]);
 
 			}
 
@@ -1392,6 +1389,7 @@ define([
 
 
 		_selectSingleShape: function(instance, segments) {
+			console.log('instance',instance);
 			if (instance.get('type') == 'geometry') {
 				instance = instance.filterSelection();
 			}
@@ -1455,6 +1453,7 @@ define([
 					console.log('sibling setting out of focus', item.get('id'), item.get('name'));
 					item.toggleClosed();
 					item.set('inFocus', false);
+					item.trigger('modified',item);
 				});
 				target.toggleOpen();
 				target.get('geom').bringToFront();

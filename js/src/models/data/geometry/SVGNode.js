@@ -6,6 +6,7 @@
 
 define([
   'underscore',
+  'models/data/geometry/Group',
   'models/data/geometry/PathNode',
   'models/data/geometry/GeometryNode',
   'utils/TrigFunc',
@@ -15,11 +16,11 @@ define([
   'models/data/properties/PColor'
 
 
-], function(_, PathNode, GeometryNode, TrigFunc, PPoint, paper, PFloat, PColor) {
+], function(_, Group, PathNode, GeometryNode, TrigFunc, PPoint, paper, PFloat, PColor) {
   //drawable paper.js path object that is stored in the pathnode
-  var SVGNode = PathNode.extend({
+  var SVGNode = Group.extend({
 
-    defaults: _.extend({}, PathNode.prototype.defaults, {
+    defaults: _.extend({}, Group.prototype.defaults, {
 
       name: 'svg',
       type: 'geometry',
@@ -28,120 +29,121 @@ define([
 
 
     initialize: function(data) {
-      PathNode.prototype.initialize.apply(this, arguments);
+      Group.prototype.initialize.apply(this, arguments);
+      this.get('strokeWidth').setValue(1);
+      this.get('fillColor').setValue({h:1,s:0,b:0});
+      this.get('strokeColor').setValue({h:1,s:0,b:0});
+    },
+
+    changeGeomInheritance: function(geom) {
+
+
+      if (this.get('geom')) {
+        var ok = (geom && geom.insertBelow(this.get('geom')));
+        if (ok) {
+
+          this.get('geom').remove();
+        }
+        this.get('geom').data = null;
+        this.set('geom', null);
+
+      }
+
+
+      this.set('geom', geom);
+
+      this.setData(geom);
+      this.createBBox();
+      this.createSelectionClone();
 
     },
 
-
-    /*normalizeGeometry
-     * generates a set of transformation data based on the matrix
-     * then inverts the matrix and normalizes the path based on these values
-     * returns the transformation data
-     */
-    normalizeGeometry: function(path, matrix) {
-      var data = {};
-      // TODO: make some normalizations util function
-      var rotationDelta;
-      if (matrix.rotation < 0) {
-        rotationDelta = 360 + matrix.rotation;
-      } else {
-        rotationDelta = matrix.rotation;
+    setData: function(geom){
+       geom.data.instance = this;
+      geom.data.geom = true;
+      geom.data.nodetype = this.get('name');
+      if(geom.children){
+        for(var i=0;i<geom.children.length;i++){
+          this.setData(geom.children[i]);
+        }
       }
-      data.rotationDelta = {
-        v: rotationDelta
-      };
-
-      data.scalingDelta = {
-        x: matrix.scaling.x,
-        y: matrix.scaling.y,
-        operator: 'add'
-      };
-
-      var translationDelta = {
-        x: matrix.translation.x,
-        y: matrix.translation.y,
-        operator: 'add'
-      };
-      var position = {
-        x: 0,
-        y: 0,
-        operator: 'set'
-      };
-
-      data.translationDelta = translationDelta;
-      data.position = position;
-
-      data.rotation_origin = {
-        x: 0,
-        y: 0,
-        operator: 'set'
-      };
-      data.scaling_origin = {
-        x: 0,
-        y: 0,
-        operator: 'set'
-      };
-      if (path.fillColor) {
-        data.fillColor = {
-          r: path.fillColor.red,
-          g: path.fillColor.green,
-          b: path.fillColor.blue,
-          h: path.fillColor.hue,
-          s: path.fillColor.saturation,
-          l: path.fillColor.lightness,
-          operator: 'set'
-        };
-      } else {
-        data.fillColor = {
-          noColor: true
-        };
-      }
-      if (path.strokeColor) {
-        data.strokeColor = {
-          r: path.strokeColor.red,
-          g: path.strokeColor.green,
-          b: path.strokeColor.blue,
-          h: path.strokeColor.hue,
-          s: path.strokeColor.saturation,
-          l: path.strokeColor.lightness,
-          operator: 'set'
-        };
-      } else {
-        data.strokeColor = {
-          noColor: true
-        };
-      }
-      data.strokeWidth = {
-        v: path.strokeWidth
-      };
-
-      var imatrix = matrix.inverted();
-      path.transform(imatrix);
-      this.set('width', path.bounds.width);
-      this.set('height', path.bounds.height);
-
-      path.visible = false;
-      path.selected = false;
-      this.changeGeomInheritance(path);
-
-      this.setValue(data);
-      
-    
-      return data;
     },
 
-  renderSelection: function(geom) {
-      GeometryNode.prototype.renderSelection.call(this, geom);
+    toggleOpen: function() {
+      return;
+    },
+
+    toggleClosed: function() {
+      return;
+    },
+
+    transformSelf: function(){
+      GeometryNode.prototype.transformSelf.call(this);
+    },
+    render: function() {
+
+      if (!this.get('rendered')) {
+        var geom = this.get('geom');
+        console.log('svg translation delta',this.get('translationDelta').getValue());
+        this.transformSelf();
+        geom.transform(this._matrix);
+        this.renderStyle(geom);
+        this.renderSelection(geom);
+
+        this.set('rendered', true);
+      }
+
+      //GeometryNode.prototype.render.apply(this, arguments);
 
     },
+    reset: function() {
+      GeometryNode.prototype.reset.apply(this, arguments);
+
+    },
+
+     create: function(noInheritor) {
+      var instance = this.geometryGenerator.getTargetClass(this.get('name'));
+      var value = this.getValue();
+      instance.setValue(value);
+      var g_clone = this.getShapeClone(true);
+      instance.changeGeomInheritance(g_clone);
+      instance.set('rendered', true);
+      instance._matrix = this._matrix.clone();
+      this.get('selection_clone').visible = false;
+      instance.createBBox();
+      instance.createSelectionClone();
+      return instance;
+    },
+
+    getShapeClone: function(){
+      return PathNode.prototype.getShapeClone.call(this);
+    },
+
 
     renderStyle: function(geom) {
+      this._visible = this.get('visible');
       geom.visible = this._visible;
-      var zIndex = this.get('zIndex').getValue();
-      if (geom.index != zIndex) {
-        geom.parent.insertChild(zIndex, geom);
+      if(!this.get('inFocus')){
+        geom.opacity = 0.5;
+      }
+      else{
+        geom.opacity = 1;
       }
     },
+
+    getValueFor: function(property_name) {
+
+      var property = this.get(property_name);
+      return this.getValue()[property_name];
+
+    },
+
+
+    renderSelection: function(geom) {
+      Group.prototype.renderSelection.call(this, geom);
+
+    },
+
 
   });
   return SVGNode;

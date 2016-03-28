@@ -246,8 +246,8 @@ define([
 			this.previousStates = [];
 			this.futureStates = [];
 			this.stateStored = false;
-			this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
-			this.centerUI.fillColor = 'red';
+			//this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
+			//this.centerUI.fillColor = 'red';
 		},
 
 
@@ -432,6 +432,7 @@ define([
 		modifyPointsByIndex: function(initial_delta, indicies, exclude) {},
 
 		filterSelection: function() {
+			console.log(this.get('name'));
 			if (this.nodeParent.get('open')) {
 				return this;
 			} else {
@@ -458,6 +459,7 @@ define([
 			instance.changeGeomInheritance(g_clone);
 			instance.set('rendered', true);
 			instance._matrix = this._matrix.clone();
+			this.get('selection_clone').visible = false;
 			//instance.reset();
 			//instance.render();
 			return instance;
@@ -661,7 +663,7 @@ define([
 				var inverted = this._matrix.inverted();
 				geom.transform(inverted);
 				bbox.transform(inverted);
-				this.centerUI.transform(inverted);
+				//this.centerUI.transform(inverted);
 
 				selection_clone.transform(inverted);
 				this.set('rendered', false);
@@ -842,7 +844,9 @@ define([
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
 				data.futureStates = this.futureStates.slice(0, this.futureStates.length);
 				this.previousProperties = this.properties;
+				data.open = false;
 			}
+
 			else{
 			data.stateStored = false;
 			data.previousStates=[];
@@ -871,6 +875,9 @@ define([
 			this.set('rendered', data.rendered);
 			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
 			this.trigger('modified', this);
+			if(this.get('name')=='root'){
+				this.set('open',true);
+			}
 			return {
 				toRemove: [],
 				toAdd: []
@@ -1408,7 +1415,7 @@ define([
 
 			//this._diffMatrix = m3;
 			this._matrix = m2;
-			this.centerUI.transform(this._matrix);
+			//this.centerUI.transform(this._matrix);
 
 
 		},

@@ -44,7 +44,7 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-      this.centerUI.fillColor = 'blue';
+      //this.centerUI.fillColor = 'blue';
       this.center = {x:0,y:0};
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
@@ -363,7 +363,7 @@ define([
         this.children[i].toggleClosed();
       }
       this.set('open', false);
-      var old_center = this.center;
+      /*var old_center = this.center;
       var new_center = this.get('geom').position;
       var r = this.get('rotationDelta').getValue();    
       var inverse = this._matrix.inverted();
@@ -373,7 +373,7 @@ define([
       
       this.center = new_center;
       console.log('new_center',new_center,'old_center',old_center,'actual',this.get('geom').position,'r',r);
-
+      */
      },
 
 
@@ -485,9 +485,9 @@ define([
       m2.rotate(rotationDelta, this.center.x, this.center.y);
       m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
       this._matrix = m2;
-      this.centerUI.position.x=this.center.x;
-      this.centerUI.position.y=this.center.y;
-      this.centerUI.transform(this._matrix);
+     // this.centerUI.position.x=this.center.x;
+      //this.centerUI.position.y=this.center.y;
+      //this.centerUI.transform(this._matrix);
 
     },
 
