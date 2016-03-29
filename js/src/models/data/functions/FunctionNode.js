@@ -44,6 +44,7 @@ define([
 				});
 				this.pcount = 1;
 				 //.centerUI.fillColor = 'green';
+      		this.centroidUI.fillColor ='pink';
 
 				this.selectedParam = null;
 			},
@@ -199,26 +200,6 @@ define([
 				GeometryNode.prototype.childModified.call(this, child);
 			},
 			
-			reset: function() {
-				for (var i = 0; i < this.renderQueue.length; i++) {
-
-					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-						this.renderQueue[i].reset();
-					}
-				}
-			},
-
- 
-			render: function() {
-
-				for (var i = 0; i < this.renderQueue.length; i++) {
-					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-						this.renderQueue[i].render();
-					}
-				}
-				this.renderQueue = [];
-
-			},
 
 			toJSON: function(noUndoCache) {
 				// // call prototype

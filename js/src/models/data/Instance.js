@@ -225,8 +225,8 @@ define([
 			this.extend(PConstraint);
 			SceneNode.prototype.initialize.apply(this, arguments);
 			this.isReturned = false;
-			
-				
+
+
 			var parent = this;
 			var constrainMap = this.get('constrain_map');
 
@@ -245,8 +245,8 @@ define([
 			this.previousStates = [];
 			this.futureStates = [];
 			this.stateStored = false;
-			//this.centerUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
-			//this.centerUI.fillColor = 'red';
+			  this.centroidUI = new paper.Path.Circle(new paper.Point(0,0),10);
+      this.centroidUI.fillColor ='blue';
 		},
 
 
@@ -284,7 +284,7 @@ define([
 			if (geom) {
 				geom.remove();
 				geom.data = null;
-				
+
 			}
 			this.clearBoundingBoxes();
 			var inheritorCollection = this.get('inheritors');
@@ -381,11 +381,9 @@ define([
 			return 1;
 		},
 
-		toggleOpen: function() {
-		},
+		toggleOpen: function() {},
 
-		toggleClosed: function() {
-		},
+		toggleClosed: function() {},
 
 		addMemberToOpen: function(data, added_bool) {
 			return false;
@@ -497,7 +495,7 @@ define([
 
 		},
 
-		reorderGeom: function(){
+		reorderGeom: function() {
 			for (var i = 0; i < this.children.length; i++) {
 				if (this.children[i].get('zIndex').getValue() != i) {
 					this.children[i].get('zIndex').setValue(i);
@@ -637,7 +635,7 @@ define([
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
 				var inverted = this._matrix.inverted();
-				geom.transform(inverted);
+				geom.transform(geom.matrix.inverted());
 				bbox.transform(inverted);
 				//this.centerUI.transform(inverted);
 
@@ -657,14 +655,14 @@ define([
 			this.set('visible', false);
 			this.get('selected').setValue(false);
 			this.get('geom').visible = false; // hacky
-			
+
 		},
 
 		show: function() {
 			this.set('visible', true);
 			this.get('geom').visible = true;
 			if (this.get('constraintSelected').getValue()) {
-				
+
 			}
 
 		},
@@ -691,8 +689,7 @@ define([
 			}
 		},
 
-		
-		
+
 
 		resetProperties: function() {
 			this.get('position').setValue({
@@ -815,13 +812,11 @@ define([
 				data.futureStates = this.futureStates.slice(0, this.futureStates.length);
 				this.previousProperties = this.properties;
 				data.open = false;
-			}
-
-			else{
-			data.stateStored = false;
-			data.previousStates=[];
-			data.futureStates = [];
-			data.previousProperties = {};
+			} else {
+				data.stateStored = false;
+				data.previousStates = [];
+				data.futureStates = [];
+				data.previousProperties = {};
 			}
 			this.properties = data;
 
@@ -845,8 +840,8 @@ define([
 			this.set('rendered', data.rendered);
 			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
 			this.trigger('modified', this);
-			if(this.get('name')=='root'){
-				this.set('open',true);
+			if (this.get('name') == 'root') {
+				this.set('open', true);
 			}
 			return {
 				toRemove: [],
@@ -938,11 +933,11 @@ define([
 			}
 		},
 
-		trimUndoStack:function(){
+		trimUndoStack: function() {
 			this.previousStates.shift();
 		},
 
-		trimRedoStack: function(){
+		trimRedoStack: function() {
 			this.futureStates.shift();
 		},
 
@@ -1366,29 +1361,33 @@ define([
 
 
 		transformSelf: function() {
-			this.center = this.get('geom').position;
 			var m2 = new paper.Matrix();
 			//var m1 = this._matrix.inverted();
-
+			console.log('current geom position',this.get('geom').position);
 			var value = this.getValue();
 			var scalingDelta, rotationDelta, translationDelta;
 
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-
-			m2.translate(translationDelta.x, translationDelta.y);
-			m2.rotate(rotationDelta, this.center.x, this.center.y);
-			m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
+			var geom= this.get('geom');
+			
+			geom.rotate(rotationDelta);
+			geom.scale(scalingDelta.x, scalingDelta.y);
+			geom.translate(translationDelta.x, translationDelta.y);
 			//this.center = this.get('geom').position;
 			//var m3 = m2.chain(m1);
 
 			//this._diffMatrix = m3;
-			this._matrix = m2;
+			//this._matrix = m2;
 			//this.centerUI.transform(this._matrix);
 
 
 		},
+
+		calculateTranslationCentroid: function(){
+      		return this.get('geom').position;
+    	},
 
 
 		transformPoint: function(delta) {
@@ -1416,7 +1415,7 @@ define([
 
 
 		childModified: function(child) {
-		//	console.log(child.get('name'), 'of',this.get('name'),'modified');
+			//	console.log(child.get('name'), 'of',this.get('name'),'modified');
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 			}
@@ -1425,8 +1424,30 @@ define([
 		},
 
 		clearRenderQueue: function() {
-			this.reset();
-			this.render();
+			for(var i=0;i<this.children.length;i++){
+				this.children[i].clearRenderQueue();
+			}
+			this.resetChildren();
+			this.renderChildren();	
+		},
+
+		resetChildren: function() {
+			for (var i = 0; i < this.renderQueue.length; i++) {
+				if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+					this.renderQueue[i].reset();
+				}
+			}
+
+		},
+
+		renderChildren: function() {
+			for (var i = 0; i < this.renderQueue.length; i++) {
+				if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
+					this.renderQueue[i].render();
+				}
+			}
+			  this.centroidUI.position = this.get('geom').position;
+			this.renderQueue = [];
 		},
 
 		/*render
@@ -1435,7 +1456,7 @@ define([
 		render: function() {
 
 			if (!this.get('rendered')) {
-				//console.log('rendering', this.get('name'), this.get('id'));
+				console.log('rendering', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
 				bbox.position = geom.position;
@@ -1491,10 +1512,9 @@ define([
 
 			geom.strokeWidth = this._strokeWidth;
 			geom.visible = this._visible;
-			if(!this.get('inFocus')){
+			if (!this.get('inFocus')) {
 				geom.opacity = 0.5;
-			}
-			else{
+			} else {
 				geom.opacity = 1;
 			}
 
@@ -1506,14 +1526,14 @@ define([
 			var selected = this.get('selected').getValue();
 			var constraint_selected = this.get('constraintSelected').getValue();
 			var bbox = this.get('bbox');
-			
+
 
 			if (selected || constraint_selected) {
 				geom.selectedColor = this.getSelectionColor();
 
-				bbox.selectedColor = (constraint_selected) ? this.get(constraint_selected + '_color'):this.getSelectionColor();
-				bbox.selected =  true;
-				bbox.visible =  true;
+				bbox.selectedColor = (constraint_selected) ? this.get(constraint_selected + '_color') : this.getSelectionColor();
+				bbox.selected = true;
+				bbox.visible = true;
 				geom.selected = (constraint_selected) ? false : true;
 			} else {
 				bbox.selected = false;

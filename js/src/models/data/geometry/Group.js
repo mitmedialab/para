@@ -37,6 +37,7 @@ define([
         operator: 'set'
       });
       var geom = new paper.Group();
+      geom.applyMatrix = false;
       this.set('geom', geom);
       geom.data.instance = this;
       geom.data.geom = true;
@@ -55,6 +56,11 @@ define([
       this.createBBox();
       this.currentBounds = new paper.Rectangle(0,0,0,0);
       this.originChange = new paper.Point(0,0);
+      this.startingUI = new paper.Path.Circle(new paper.Point(0,0),10);
+      this.startingUI.fillColor = 'green';
+      this.endingUI = this.startingUI.clone();
+      this.endingUI.fillColor = 'red';
+
     },
 
 
@@ -238,8 +244,6 @@ define([
       this.center.y=this.get('geom').position.y;
       this.createBBox();
        this.currentBounds = this.get('geom').bounds;
-      this.listenTo(child, 'modified', this.modified);
-      this.trigger('modified', this);
     },
 
     removeChildNode: function(node, registerUndo) {
@@ -253,7 +257,6 @@ define([
         this.createBBox();
         this.stopListening(removed);
 
-        this.trigger('modified', this);
         return removed;
       }
     },
@@ -352,6 +355,9 @@ define([
     },
 
     toggleOpen: function() {
+      this.startingPosition = this.get('geom').position;
+      this.startingUI.position = this.startingPosition;
+      console.log("open=",this.startingPosition,this.get('translationDelta').getValue(),TrigFunc.subtract(this.startingPosition,this.get('translationDelta').getValue()));
       this.set('open', true);
 
     },
@@ -360,6 +366,14 @@ define([
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].toggleClosed();
       }
+      var closingPosition = this.get('geom').position;
+      //this.get('geom').position = this.startingPosition;
+      var diff = this.startingPosition.subtract(closingPosition);
+      console.log("closed=",diff,closingPosition,this.get('translationDelta').getValue(),TrigFunc.subtract(closingPosition,this.get('translationDelta').getValue()));
+      this.endingUI.position = closingPosition;
+      //this.get('translationDelta').setValue({x:diff.x,y:diff.y});
+      this.trigger('modified');
+      console.log('diff',diff);
       this.set('open', false);
      },
 
@@ -371,38 +385,6 @@ define([
     },
 
 
-
-    reset: function() {
-
-      if (this.get('rendered')) {
-        GeometryNode.prototype.reset.apply(this, arguments);
-        
-        for (var i = 0; i < this.renderQueue.length; i++) {
-          if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-            this.renderQueue[i].reset();
-          }
-        }
-      }
-
-    },
-
-
-
-    render: function() {
-
-      if (!this.get('rendered')) {
-        console.log('rendering',this.renderQueue);
-        for (var i = 0; i < this.renderQueue.length; i++) {
-          if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-            this.renderQueue[i].render();
-          }
-        }
-        //this.createBBox();
-       
-        GeometryNode.prototype.render.apply(this, arguments);
-        
-      }
-    },
 
     renderStyle: function() {
       if (!this.get('inFocus')) {
@@ -456,16 +438,27 @@ define([
       var m2 = new paper.Matrix();
       var value = this.getValue();
       var scalingDelta, rotationDelta, translationDelta;
-
+      var rOrigin = this.calculateTranslationCentroid();
+      console.log('rOrigin',rOrigin);
       scalingDelta = value.scalingDelta;
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
-      m2.rotate(rotationDelta, this.center.x, this.center.y);
-      m2.translate(translationDelta.x, translationDelta.y);
-      m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
+      var geom= this.get('geom');
+      
+      geom.rotate(rotationDelta);
+      geom.scale(scalingDelta.x, scalingDelta.y);
+      geom.translate(translationDelta.x, translationDelta.y);
 
       this._matrix = m2;
   
+    },
+
+    calculateTranslationCentroid: function(){
+      var pointList = [];
+      for(var i=0;i<this.children.length;i++){
+        pointList.push(this.children[i].calculateTranslationCentroid());
+      }
+      return TrigFunc.centroid(pointList);
     },
 
 
