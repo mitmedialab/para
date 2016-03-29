@@ -389,8 +389,12 @@ define([
 
             render: function() {
                 Group.prototype.render.apply(this, arguments);
-                this.masterList.get('ui').position = this.get('geom').position;
                 this.masterList.render();
+                this.masterList.get('bbox').position = this.get('geom').position;
+                var ui = this.masterList.get('ui');
+                ui.position.x = this.masterList.get('bbox').bounds.bottomLeft.x+ui.bounds.width/2;
+                ui.position.y = this.masterList.get('bbox').bounds.bottomLeft.y+ui.bounds.height/2;
+
             },
 
             reset: function() {

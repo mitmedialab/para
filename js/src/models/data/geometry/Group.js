@@ -237,7 +237,6 @@ define([
       this.center.x=this.get('geom').position.x;
       this.center.y=this.get('geom').position.y;
       this.createBBox();
-      this.createSelectionClone();
        this.currentBounds = this.get('geom').bounds;
       this.listenTo(child, 'modified', this.modified);
       this.trigger('modified', this);
@@ -252,7 +251,6 @@ define([
         this.center.x=this.get('geom').position.x;
         this.center.y=this.get('geom').position.y;
         this.createBBox();
-        this.createSelectionClone();
         this.stopListening(removed);
 
         this.trigger('modified', this);
@@ -418,28 +416,20 @@ define([
     renderSelection: function() {
       var selected = this.get('selected').getValue();
       var constraint_selected = this.get('constraintSelected').getValue();
-      var selection_clone = this.get('selection_clone');
+      var geom = this.get('geom');
       var bbox = this.get('bbox').children.filter(function(child) {
         return child.name == 'bbox';
       })[0];
-      if (constraint_selected) {
-        selection_clone.visible = true;
-        selection_clone.strokeColor = this.get(constraint_selected + '_color');
-
-      } else {
-        selection_clone.visible = false;
-
-      }
-
-      if (selected) {
-
-
-        bbox.selectedColor = this.getSelectionColor();
-        bbox.selected = (constraint_selected) ? false : true;
-        bbox.visible = (constraint_selected) ? false : true;
+     if (selected || constraint_selected) {
+        geom.selectedColor = this.getSelectionColor();
+        bbox.selectedColor = (constraint_selected) ? this.get(constraint_selected + '_color'):this.getSelectionColor();
+        bbox.selected =  true;
+        bbox.visible =  true;
+        geom.selected = (constraint_selected) ? false : true;
       } else {
         bbox.selected = false;
         bbox.visible = false;
+        geom.selected = false;
       }
     },
 
@@ -470,35 +460,17 @@ define([
       scalingDelta = value.scalingDelta;
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
-       m2.translate(translationDelta.x, translationDelta.y);
       m2.rotate(rotationDelta, this.center.x, this.center.y);
+      m2.translate(translationDelta.x, translationDelta.y);
       m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
+
       this._matrix = m2;
-     // this.centerUI.position.x=this.center.x;
-      //this.centerUI.position.y=this.center.y;
-      //this.centerUI.transform(this._matrix);
-
+  
     },
 
 
 
-    createSelectionClone: function() {
-      if (this.get('selection_clone')) {
-        this.get('selection_clone').remove();
-        this.set('selection_clone', null);
-      }
-      var selection_clone = this.get('bbox').clone();
-      var targetLayer = paper.project.layers.filter(function(layer) {
-        return layer.name === 'ui_layer';
-      })[0];
-      targetLayer.addChild(selection_clone);
-      selection_clone.data.instance = this;
-      selection_clone.fillColor = null;
-      selection_clone.strokeWidth = 3;
-      selection_clone.selected = false;
-      this.set('selection_clone', selection_clone);
-    },
-
+   
 
     createBBox: function() {
       var ui_group = this.get('bbox');

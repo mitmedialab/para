@@ -38,14 +38,10 @@ define([
       this.setPathAltered();
       var geom = this.get('geom');
       var bbox = this.get('bbox');
-      var selection_clone = this.get('selection_clone');
 
       geom.transform(this._ti_matrix);
       geom.transform(this._si_matrix);
       geom.transform(this._ri_matrix);
-      selection_clone.transform(this._ti_matrix);
-      selection_clone.transform(this._si_matrix);
-      selection_clone.transform(this._ri_matrix);
       bbox.transform(this._ti_matrix);
       bbox.transform(this._si_matrix);
       bbox.transform(this._ri_matrix);
@@ -301,7 +297,6 @@ define([
 
 
       var geom = this.get('geom');
-      var selection_clone = this.get('selection_clone');
       var startWidth = geom.bounds.width;
       var startHeight = geom.bounds.height;
 
@@ -312,7 +307,6 @@ define([
 
         var selectedPoint = selectedPoints[i];
         var geomS = geom.segments[selectedPoint.get('index')];
-        var selectionS = selection_clone.segments[selectedPoint.get('index')];
         indicies.push({
           index: selectedPoint.get('index'),
           type: selectedPoint.get('selection_type')
@@ -324,8 +318,6 @@ define([
             p.add(data.translationDelta);
             geomS.point.x += data.translationDelta.x;
             geomS.point.y += data.translationDelta.y;
-            selectionS.point.x += data.translationDelta.x;
-            selectionS.point.y += data.translationDelta.y;
 
             break;
           case 'handle-in':
@@ -333,8 +325,6 @@ define([
             hi.add(data.translationDelta);
             geomS.handleIn.x += data.translationDelta.x;
             geomS.handleIn.y += data.translationDelta.y;
-            selectionS.handleIn.x += data.translationDelta.x;
-            selectionS.handleIn.y += data.translationDelta.y;
             break;
 
           case 'handle-out':
@@ -342,8 +332,6 @@ define([
             ho.add(data.translationDelta);
             geomS.handleOut.x += data.translationDelta.x;
             geomS.handleOut.y += data.translationDelta.y;
-            selectionS.handleOut.x += data.translationDelta.x;
-            selectionS.handleOut.y += data.translationDelta.y;
             break;
         }
         this.trigger('modified', this);
@@ -386,7 +374,6 @@ define([
     modifyPointsByIndex: function(initial_delta, indicies, exclude) {
 
       var geom = this.get('geom');
-      var selection_clone = this.get('selection_clone');
 
       var delta;
       var toggleClosed = false;
@@ -399,29 +386,24 @@ define([
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
 
-        var selectionS = selection_clone.segments[indicies[i].index];
 
         switch (indicies[i].type) {
           case 'segment':
           case 'curve':
             geomS.point.x += delta.x;
             geomS.point.y += delta.y;
-            selectionS.point.x += delta.x;
-            selectionS.point.y += delta.y;
-
+          
             break;
           case 'handle-in':
             geomS.handleIn.x += delta.x;
             geomS.handleIn.y += delta.y;
-            selectionS.handleIn.x += delta.x;
-            selectionS.handleIn.y += delta.y;
+         
             break;
 
           case 'handle-out':
             geomS.handleOut.x += delta.x;
             geomS.handleOut.y += delta.y;
-            selectionS.handleOut.x += delta.x;
-            selectionS.handleOut.y += delta.y;
+            
             break;
         }
 

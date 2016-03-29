@@ -97,7 +97,6 @@ define([
 
 			reset: false,
 			geom: null,
-			selection_clone: null,
 			inheritors: null,
 			sibling_instances: null,
 			is_proto: false,
@@ -285,10 +284,7 @@ define([
 			if (geom) {
 				geom.remove();
 				geom.data = null;
-				if (this.get('selection_clone')) {
-					this.get('selection_clone').remove();
-					this.get('selection_clone').data = null;
-				}
+				
 			}
 			this.clearBoundingBoxes();
 			var inheritorCollection = this.get('inheritors');
@@ -459,7 +455,6 @@ define([
 			instance.changeGeomInheritance(g_clone);
 			instance.set('rendered', true);
 			instance._matrix = this._matrix.clone();
-			this.get('selection_clone').visible = false;
 			//instance.reset();
 			//instance.render();
 			return instance;
@@ -589,24 +584,7 @@ define([
 			}
 		},
 
-		createSelectionClone: function() {
 
-			if (this.get('selection_clone')) {
-				this.get('selection_clone').remove();
-				this.set('selection_clone', null);
-			}
-			var selection_clone = this.getShapeClone();
-
-			var targetLayer = paper.project.layers.filter(function(layer) {
-				return layer.name === 'ui_layer';
-			})[0];
-			targetLayer.addChild(selection_clone);
-			selection_clone.data.instance = this;
-			selection_clone.fillColor = null;
-			selection_clone.strokeWidth = 3;
-			selection_clone.selected = false;
-			this.set('selection_clone', selection_clone);
-		},
 
 		createBBox: function() {
 			if (this.get('bbox')) {
@@ -649,7 +627,6 @@ define([
 			geom.data.nodetype = this.get('name');
 			geom.applyMatrix = false;
 			this.createBBox();
-			this.createSelectionClone();
 
 		},
 
@@ -659,13 +636,11 @@ define([
 				//console.log('resetting', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
-				var selection_clone = this.get('selection_clone');
 				var inverted = this._matrix.inverted();
 				geom.transform(inverted);
 				bbox.transform(inverted);
 				//this.centerUI.transform(inverted);
 
-				selection_clone.transform(inverted);
 				this.set('rendered', false);
 			}
 
@@ -682,18 +657,14 @@ define([
 			this.set('visible', false);
 			this.get('selected').setValue(false);
 			this.get('geom').visible = false; // hacky
-			if (this.get('selection_clone')) {
-				this.get('selection_clone').visible = false;
-			}
+			
 		},
 
 		show: function() {
 			this.set('visible', true);
 			this.get('geom').visible = true;
 			if (this.get('constraintSelected').getValue()) {
-				if (this.get('selection_clone')) {
-					this.get('selection_clone').visible = true;
-				}
+				
 			}
 
 		},
@@ -717,7 +688,6 @@ define([
 			var geom = this.get('geom');
 			if (geom) {
 				geom.bringToFront();
-				this.get('selection_clone').bringToFront();
 			}
 		},
 
@@ -1468,13 +1438,10 @@ define([
 				//console.log('rendering', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
-				var selection_clone = this.get('selection_clone');
 				bbox.position = geom.position;
 
-				selection_clone.position = geom.position;
 				this.transformSelf();
 				geom.transform(this._matrix);
-				selection_clone.transform(this._matrix);
 				bbox.transform(this._matrix);
 				this.updateScreenBounds(geom);
 
@@ -1538,29 +1505,22 @@ define([
 		renderSelection: function(geom) {
 			var selected = this.get('selected').getValue();
 			var constraint_selected = this.get('constraintSelected').getValue();
-			var selection_clone = this.get('selection_clone');
 			var bbox = this.get('bbox');
-			if (constraint_selected) {
-				selection_clone.visible = true;
-				selection_clone.strokeColor = this.get(constraint_selected + '_color');
+			
 
-			} else {
-				selection_clone.visible = false;
-
-			}
-
-			if (selected) {
+			if (selected || constraint_selected) {
 				geom.selectedColor = this.getSelectionColor();
 
-				bbox.selectedColor = this.getSelectionColor();
-				bbox.selected = (constraint_selected) ? false : true;
-				bbox.visible = (constraint_selected) ? false : true;
+				bbox.selectedColor = (constraint_selected) ? this.get(constraint_selected + '_color'):this.getSelectionColor();
+				bbox.selected =  true;
+				bbox.visible =  true;
 				geom.selected = (constraint_selected) ? false : true;
 			} else {
 				bbox.selected = false;
 				bbox.visible = false;
 				geom.selected = false;
 			}
+
 		},
 
 		clearBoundingBoxes: function() {

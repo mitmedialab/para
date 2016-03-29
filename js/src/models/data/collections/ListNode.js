@@ -545,16 +545,8 @@ define([
 
 
         }
-        var selection_clone = this.get('selection_clone');
 
-        if (!selection_clone) {
-          this.createSelectionClone();
-          selection_clone = this.get('selection_clone');
-        } else {
-          selection_clone.scale(width / selection_clone.bounds.width, height / selection_clone.bounds.height);
-          selection_clone.position.x = x;
-          selection_clone.position.y = y;
-        }
+      
 
         this.updateScreenBounds(bbox);
       }
@@ -678,22 +670,6 @@ define([
       return clone;
     },
 
-    createSelectionClone: function() {
-      if (this.get('selection_clone')) {
-        this.get('selection_clone').remove();
-        this.set('selection_clone', null);
-      }
-      var selection_clone = this.get('bbox').clone();
-      var targetLayer = paper.project.layers.filter(function(layer) {
-        return layer.name === 'ui_layer';
-      })[0];
-      targetLayer.addChild(selection_clone);
-      selection_clone.data.instance = this;
-      selection_clone.fillColor = null;
-      selection_clone.strokeWidth = 3;
-      selection_clone.selected = false;
-      this.set('selection_clone', selection_clone);
-    },
 
     getRange: function() {
       return this.get('memberCount').getValue();

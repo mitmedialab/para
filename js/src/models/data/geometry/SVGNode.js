@@ -54,7 +54,6 @@ define([
 
       this.setData(geom);
       this.createBBox();
-      this.createSelectionClone();
 
     },
 
@@ -109,9 +108,7 @@ define([
       instance.changeGeomInheritance(g_clone);
       instance.set('rendered', true);
       instance._matrix = this._matrix.clone();
-      this.get('selection_clone').visible = false;
       instance.createBBox();
-      instance.createSelectionClone();
       return instance;
     },
 
