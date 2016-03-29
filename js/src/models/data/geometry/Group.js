@@ -418,7 +418,7 @@ define([
     renderSelection: function() {
       var selected = this.get('selected').getValue();
       var constraint_selected = this.get('constraintSelected').getValue();
-     
+      var selection_clone = this.get('selection_clone');
       var bbox = this.get('bbox').children.filter(function(child) {
         return child.name == 'bbox';
       })[0];
