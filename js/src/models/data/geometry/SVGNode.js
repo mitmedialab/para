@@ -31,11 +31,54 @@ define([
     initialize: function(data) {
       Group.prototype.initialize.apply(this, arguments);
       this.get('strokeWidth').setValue(1);
-      this.get('fillColor').setValue({h:1,s:0,b:0});
-      this.get('strokeColor').setValue({h:1,s:0,b:0});
+      this.get('fillColor').setValue({
+        h: 1,
+        s: 0,
+        b: 0
+      });
+      this.get('strokeColor').setValue({
+        h: 1,
+        s: 0,
+        b: 0
+      });
+      this.set('geom',null);
     },
 
-    changeGeomInheritance: function(geom) {
+    toJSON: function(noUndoCache) {
+      var data = GeometryNode.prototype.toJSON.call(this, noUndoCache);
+      data.svg_data = this.svg_data;
+      return data;
+    },
+
+    parseJSON: function(data, manager) {
+      console.log('calling parse json for svg', this.get('translationDelta').getValue(),data.translationDelta);
+      if (!this.get('geom')) {
+        var geom = new paper.Group();
+        var item = geom.importSVG(data.svg_data);
+        item.position.x = 0;
+        item.position.y = 0;
+        this.changeGeomInheritance(item, data.svg_data);
+        console.log('imported svg', item);
+      }
+      return GeometryNode.prototype.parseJSON.call(this, data, manager);
+    },
+
+    deleteSelf: function() {
+      var geom = this.get('geom');
+      if (geom) {
+        geom.remove();
+        this.setDataNull(geom);
+      }
+      return GeometryNode.prototype.deleteSelf.call(this);
+    },
+
+    setValue: function(data, registerUndo) {
+      console.log('setting value for svg',registerUndo);
+      GeometryNode.prototype.setValue.call(this, data, registerUndo);
+    },
+
+
+    changeGeomInheritance: function(geom, data) {
 
 
       if (this.get('geom')) {
@@ -44,7 +87,7 @@ define([
 
           this.get('geom').remove();
         }
-        this.get('geom').data = null;
+        this.setDataNull(this.get('geom'));
         this.set('geom', null);
 
       }
@@ -54,16 +97,25 @@ define([
 
       this.setData(geom);
       this.createBBox();
-
+      this.svg_data = data;
     },
 
-    setData: function(geom){
-       geom.data.instance = this;
+    setData: function(geom) {
+      geom.data.instance = this;
       geom.data.geom = true;
       geom.data.nodetype = this.get('name');
-      if(geom.children){
-        for(var i=0;i<geom.children.length;i++){
+      if (geom.children) {
+        for (var i = 0; i < geom.children.length; i++) {
           this.setData(geom.children[i]);
+        }
+      }
+    },
+
+    setDataNull: function(geom) {
+      geom.data.instance = null;
+      if (geom.children) {
+        for (var i = 0; i < geom.children.length; i++) {
+          this.setDataNull(geom.children[i]);
         }
       }
     },
@@ -76,14 +128,14 @@ define([
       return;
     },
 
-    transformSelf: function(){
+    transformSelf: function() {
       GeometryNode.prototype.transformSelf.call(this);
     },
     render: function() {
 
       if (!this.get('rendered')) {
         var geom = this.get('geom');
-        console.log('svg translation delta',this.get('translationDelta').getValue());
+        console.log('svg translation delta', this.get('translationDelta').getValue());
         this.transformSelf();
         geom.transform(this._matrix);
         this.renderStyle(geom);
@@ -100,7 +152,9 @@ define([
 
     },
 
-     create: function(noInheritor) {
+
+
+    create: function(noInheritor) {
       var instance = this.geometryGenerator.getTargetClass(this.get('name'));
       var value = this.getValue();
       instance.setValue(value);
@@ -112,7 +166,7 @@ define([
       return instance;
     },
 
-    getShapeClone: function(){
+    getShapeClone: function() {
       return PathNode.prototype.getShapeClone.call(this);
     },
 
@@ -120,10 +174,9 @@ define([
     renderStyle: function(geom) {
       this._visible = this.get('visible');
       geom.visible = this._visible;
-      if(!this.get('inFocus')){
+      if (!this.get('inFocus')) {
         geom.opacity = 0.5;
-      }
-      else{
+      } else {
         geom.opacity = 1;
       }
     },

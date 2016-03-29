@@ -359,7 +359,7 @@ while(currentNode!=rootNode){
 			svgNode.get('translationDelta').setValue({x:position.x,y:position.y});
 			svgNode.get('scalingDelta').setValue({x:1,y:1});
 			item.position.x=item.position.y=0;
-			svgNode.changeGeomInheritance(item);
+			svgNode.changeGeomInheritance(item,data);
 			this.addShape(svgNode,true);
 		},
 
@@ -903,6 +903,7 @@ while(currentNode!=rootNode){
 
 		addShape: function(shape, registerUndo) {
 			if (!shape.nodeParent) {
+				console.log('adding',shape.get('name'),registerUndo);
 				currentNode.addChildNode(shape, registerUndo);
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
@@ -1305,6 +1306,8 @@ while(currentNode!=rootNode){
 
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
+					console.log('modifying',instance.get('name'),!stateStored);
+
 					instance.setValue(data, !stateStored);
 				}
 				this.addToUndoStack(selected);
@@ -1414,6 +1417,7 @@ while(currentNode!=rootNode){
 				this.toggleOpen();
 			} else {
 				if (selected[selected.length - 1].get('open')) {
+					console.log('toggling list closed');
 					this.toggleClosedList();
 				} else {
 					this.toggleOpenList();
