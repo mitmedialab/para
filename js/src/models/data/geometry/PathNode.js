@@ -68,7 +68,6 @@ define([
       GeometryNode.prototype.deleteSelf.apply(this, arguments);
     },
 
-
     /*returns a clone of the paper js shape*/
     getShapeClone: function(relative) {
       var toggleClosed = false;
@@ -299,7 +298,7 @@ define([
     }
       var proto_node = this.get('proto_node');
 
-
+      console.log('master modification',data.translationDelta);
       var geom = this.get('geom');
       var selection_clone = this.get('selection_clone');
       var startWidth = geom.bounds.width;
@@ -307,7 +306,10 @@ define([
 
       var selectedPoints = this.inheritSelectedPoints();
       var indicies = [];
-
+      var inheritor_delta = {x:data.translationDelta.x,y:data.translationDelta.y};
+      var delta = this.inverseTransformPoint(data.translationDelta);
+      data.translationDelta.x = delta.x;
+      data.translationDelta.y = delta.y;
       for (var i = 0; i < selectedPoints.length; i++) {
 
         var selectedPoint = selectedPoints[i];
@@ -356,22 +358,21 @@ define([
       var hDiff = (endHeight - startHeight) / 2;
 
       var inheritors = this.get('inheritors').inheritors;
-      var delta;
       var toggleClosed = false;
       if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
         this.nodeParent.toggleOpen(this.nodeParent);
         toggleClosed = true;
       }
-      delta = this.inverseTransformPoint(new paper.Point(data.translationDelta.x, data.translationDelta.y));
+      //delta = this.inverseTransformPoint(new paper.Point(data.translationDelta.x, data.translationDelta.y));
       if (toggleClosed) {
         this.nodeParent.toggleClosed(this.nodeParent);
       }
 
       for (var j = 0; j < inheritors.length; j++) {
-        inheritors[j].modifyPointsByIndex(delta, indicies, exclude);
+       inheritors[j].modifyPointsByIndex({x:delta.x,y:delta.y}, indicies, exclude);
       }
       if (proto_node) {
-        proto_node.modifyPointsByIndex(delta, indicies, this);
+        proto_node.modifyPointsByIndex({x:delta.x,y:delta.y}, indicies, this);
       }
 
     },
@@ -394,8 +395,9 @@ define([
         this.nodeParent.toggleOpen(this.nodeParent);
         toggleClosed = true;
       }
-      delta = this.transformPoint(initial_delta);
+            console.log('initial_delta before',initial_delta);
 
+      delta ={x:initial_delta.x,y:initial_delta.y};
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
 
@@ -430,6 +432,7 @@ define([
       if (toggleClosed) {
         this.nodeParent.toggleClosed(this.nodeParent);
       }
+      console.log('initial_delta after',initial_delta);
 
       var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {

@@ -37,6 +37,7 @@ define([
         operator: 'set'
       });
       var geom = new paper.Group();
+      geom.applyMatrix = false;
       this.set('geom', geom);
       geom.data.instance = this;
       geom.data.geom = true;
@@ -44,7 +45,12 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-      //this.centerUI.fillColor = 'blue';
+      this.origin = new paper.Path.Circle(new paper.Point(0,0),5);
+      this.origin.fillColor = 'blue';
+      this.centroidPoint = this.origin.clone();
+      this.centroidPoint.fillColor = 'red';
+      this.rotationPoint = this.origin.clone();
+      this.rotationPoint.fillColor = 'green';
       this.center = {x:0,y:0};
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
@@ -234,8 +240,14 @@ define([
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
-      this.center.x=this.get('geom').position.x;
-      this.center.y=this.get('geom').position.y;
+        console.log('center position', this.get('geom').position);
+      var pointList = [];
+      for(var i=0;i<this.children.length;i++){
+        pointList.push(this.children[i].get('geom').position);
+      }
+      var centroid = TrigFunc.centroid(pointList);
+      this.center.x = centroid.x;
+      this.center.y = centroid.y;
       this.createBBox();
       this.createSelectionClone();
        this.currentBounds = this.get('geom').bounds;
@@ -356,6 +368,7 @@ define([
     toggleOpen: function() {
       this.set('open', true);
 
+
     },
 
     toggleClosed: function() {
@@ -378,33 +391,34 @@ define([
 
 
     childModified: function(child) {
+
       for(var i=0;i<this.children.length;i++){
           GeometryNode.prototype.childModified.call(this, this.children[i]);
       }
+
     },
 
 
 
     reset: function() {
-
       if (this.get('rendered')) {
-        GeometryNode.prototype.reset.apply(this, arguments);
+        
         
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].reset();
           }
         }
+        GeometryNode.prototype.reset.apply(this, arguments);
       }
 
     },
-
-
 
     render: function() {
 
       if (!this.get('rendered')) {
         console.log('rendering',this.renderQueue);
+         GeometryNode.prototype.render.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].render();
@@ -412,7 +426,7 @@ define([
         }
         this.createBBox();
        
-        GeometryNode.prototype.render.apply(this, arguments);
+       
         
       }
     },
@@ -473,7 +487,9 @@ define([
     },
 
     transformSelf: function() {
-      console.log('center position',this.center);
+       var geom = this.get('geom');
+      console.log('center position',geom.position);
+
       var m2 = new paper.Matrix();
       var value = this.getValue();
       var scalingDelta, rotationDelta, translationDelta;
@@ -481,9 +497,24 @@ define([
       scalingDelta = value.scalingDelta;
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
-       m2.translate(translationDelta.x, translationDelta.y);
-      m2.rotate(rotationDelta, this.center.x, this.center.y);
-      m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
+      //m2.translate(translationDelta.x, translationDelta.y);
+      this.origin.position.x = translationDelta.x;
+      this.origin.position.y = translationDelta.y;
+     
+     var pointList = [];
+      for(var i=0;i<this.children.length;i++){
+        pointList.push(this.children[i].get('geom').position);
+      }
+    
+      var centroid = TrigFunc.centroid(pointList);
+      this.centroidPoint.position.x=centroid.x;
+      this.centroidPoint.position.y = centroid.y;
+      this.rotationPoint.position.x = centroid.x;
+      this.rotationPoint.position.y = centroid.y;
+      geom.rotate(rotationDelta);
+      geom.scale(scalingDelta.x, scalingDelta.y);
+      geom.translate(translationDelta.x,translationDelta.y);
+      //m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
       this._matrix = m2;
      // this.centerUI.position.x=this.center.x;
       //this.centerUI.position.y=this.center.y;

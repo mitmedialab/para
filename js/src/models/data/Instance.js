@@ -643,7 +643,7 @@ define([
 
 
 			this.set('geom', geom);
-
+			geom.applyMatrix = false;
 			geom.data.instance = this;
 			geom.data.geom = true;
 			geom.data.nodetype = this.get('name');
@@ -656,16 +656,18 @@ define([
 
 		reset: function() {
 			if (this.get('rendered')) {
+
 				//console.log('resetting', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
+				
 				var bbox = this.get('bbox');
 				var selection_clone = this.get('selection_clone');
-				var inverted = this._matrix.inverted();
-				geom.transform(inverted);
-				bbox.transform(inverted);
+				var matrix = geom.matrix.clone().inverted();
+				geom.transform(matrix);
+				bbox.transform(matrix);
 				//this.centerUI.transform(inverted);
 
-				selection_clone.transform(inverted);
+				selection_clone.transform(matrix);
 				this.set('rendered', false);
 			}
 
@@ -1396,10 +1398,10 @@ define([
 
 
 		transformSelf: function() {
-			this.center = this.get('geom').position;
+			//this.center = this.get('geom').position;
 			var m2 = new paper.Matrix();
 			//var m1 = this._matrix.inverted();
-
+			var geom = this.get('geom');
 			var value = this.getValue();
 			var scalingDelta, rotationDelta, translationDelta;
 
@@ -1407,9 +1409,10 @@ define([
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
 
-			m2.translate(translationDelta.x, translationDelta.y);
-			m2.rotate(rotationDelta, this.center.x, this.center.y);
-			m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
+			geom.rotate(rotationDelta, 0, 0);
+			geom.scale(scalingDelta.x, scalingDelta.y, 0,0);
+			geom.translate(translationDelta.x, translationDelta.y);
+
 			//this.center = this.get('geom').position;
 			//var m3 = m2.chain(m1);
 
@@ -1424,7 +1427,7 @@ define([
 		transformPoint: function(delta) {
 			var translationDelta = this.get('translationDelta').getValue();
 			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
-			line.transform(this._matrix);
+			line.transform(this.get('geom').matrix);
 			var new_delta = line.segments[1].point;
 			new_delta.x -= translationDelta.x;
 			new_delta.y -= translationDelta.y;
@@ -1437,7 +1440,7 @@ define([
 			delta.x += translationDelta.x;
 			delta.y += translationDelta.y;
 			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
-			var invertedMatrix = this._matrix.inverted();
+			var invertedMatrix = this.get('geom').matrix.clone().inverted();
 			line.transform(invertedMatrix);
 			var new_delta = line.segments[1].point;
 			line.remove();
@@ -1473,7 +1476,7 @@ define([
 
 				selection_clone.position = geom.position;
 				this.transformSelf();
-				geom.transform(this._matrix);
+				//geom.transform(this._matrix);
 				selection_clone.transform(this._matrix);
 				bbox.transform(this._matrix);
 				this.updateScreenBounds(geom);

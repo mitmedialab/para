@@ -135,7 +135,7 @@ define([
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-						if(item){
+						if (item) {
 							item.trimUndoStack();
 						}
 
@@ -151,7 +151,7 @@ define([
 		undo: function(event) {
 
 			if (undoStack.length > 0) {
-				while(currentNode!=rootNode){
+				while (currentNode != rootNode) {
 					this.toggleClosed();
 				}
 				var toUndo = undoStack.pop();
@@ -178,8 +178,8 @@ define([
 					var shifted = redoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-						if(item){
-						item.trimRedoStack();
+						if (item) {
+							item.trimRedoStack();
 						}
 
 					});
@@ -191,7 +191,7 @@ define([
 		redo: function() {
 
 			if (redoStack.length > 0) {
-while(currentNode!=rootNode){
+				while (currentNode != rootNode) {
 					this.toggleClosed();
 				}
 				var toRedo = redoStack.pop();
@@ -219,8 +219,8 @@ while(currentNode!=rootNode){
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-						if(item){
-						item.trimUndoStack();
+						if (item) {
+							item.trimUndoStack();
 						}
 
 					});
@@ -350,17 +350,23 @@ while(currentNode!=rootNode){
 
 			var start_item = new paper.Group();
 			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
-			
+
 			var position = item.position;
-			console.log('svg position',position);
+			console.log('svg position', position);
 			var svgNode = new SVGNode({}, {
 				geometryGenerator: GeometryGenerator
 			});
-			svgNode.get('translationDelta').setValue({x:position.x,y:position.y});
-			svgNode.get('scalingDelta').setValue({x:1,y:1});
-			item.position.x=item.position.y=0;
+			svgNode.get('translationDelta').setValue({
+				x: position.x,
+				y: position.y
+			});
+			svgNode.get('scalingDelta').setValue({
+				x: 1,
+				y: 1
+			});
+			item.position.x = item.position.y = 0;
 			svgNode.changeGeomInheritance(item);
-			this.addShape(svgNode,true);
+			this.addShape(svgNode, true);
 		},
 
 		exportSVG: function() {
@@ -1389,7 +1395,7 @@ while(currentNode!=rootNode){
 
 
 		_selectSingleShape: function(instance, segments) {
-			console.log('instance',instance);
+			console.log('instance', instance);
 			if (instance.get('type') == 'geometry') {
 				instance = instance.filterSelection();
 			}
@@ -1405,7 +1411,7 @@ while(currentNode!=rootNode){
 			}
 
 		},
-		
+
 		toggleItem: function() {
 
 			if (selected.length === 0) {
@@ -1453,7 +1459,7 @@ while(currentNode!=rootNode){
 					console.log('sibling setting out of focus', item.get('id'), item.get('name'));
 					item.toggleClosed();
 					item.set('inFocus', false);
-					item.trigger('modified',item);
+					item.trigger('modified', item);
 				});
 				target.toggleOpen();
 				target.get('geom').bringToFront();
