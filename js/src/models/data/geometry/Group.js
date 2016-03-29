@@ -226,8 +226,6 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
-      instance._matrix = this._matrix.clone();
-
       for (var i = 0; i < this.children.length; i++) {
         var clone = this.children[i].create(noInheritor);
         instance.addChildNode(clone);
@@ -240,7 +238,7 @@ define([
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
-        console.log('center position', this.get('geom').position);
+
       var pointList = [];
       for(var i=0;i<this.children.length;i++){
         pointList.push(this.children[i].get('geom').position);
@@ -376,17 +374,6 @@ define([
         this.children[i].toggleClosed();
       }
       this.set('open', false);
-      /*var old_center = this.center;
-      var new_center = this.get('geom').position;
-      var r = this.get('rotationDelta').getValue();    
-      var inverse = this._matrix.inverted();
-      new_center = inverse.transform(new_center);
-      //var old_t_center = inverse.transform(old_center);
-      //var r_center = new_center.rotate(r,old_center);
-      
-      this.center = new_center;
-      console.log('new_center',new_center,'old_center',old_center,'actual',this.get('geom').position,'r',r);
-      */
      },
 
 
@@ -403,13 +390,13 @@ define([
     reset: function() {
       if (this.get('rendered')) {
         
-        
+           GeometryNode.prototype.reset.apply(this, arguments);
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].reset();
           }
         }
-        GeometryNode.prototype.reset.apply(this, arguments);
+     
       }
 
     },
@@ -418,12 +405,13 @@ define([
 
       if (!this.get('rendered')) {
         console.log('rendering',this.renderQueue);
-         GeometryNode.prototype.render.apply(this, arguments);
+        
         for (var i = 0; i < this.renderQueue.length; i++) {
           if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
             this.renderQueue[i].render();
           }
         }
+         GeometryNode.prototype.render.apply(this, arguments);
         this.createBBox();
        
        
@@ -487,17 +475,15 @@ define([
     },
 
     transformSelf: function() {
-       var geom = this.get('geom');
+      var geom = this.get('geom');
       console.log('center position',geom.position);
 
-      var m2 = new paper.Matrix();
       var value = this.getValue();
       var scalingDelta, rotationDelta, translationDelta;
 
       scalingDelta = value.scalingDelta;
       rotationDelta = value.rotationDelta;
       translationDelta = value.translationDelta;
-      //m2.translate(translationDelta.x, translationDelta.y);
       this.origin.position.x = translationDelta.x;
       this.origin.position.y = translationDelta.y;
      
@@ -511,14 +497,11 @@ define([
       this.centroidPoint.position.y = centroid.y;
       this.rotationPoint.position.x = centroid.x;
       this.rotationPoint.position.y = centroid.y;
-      geom.rotate(rotationDelta);
-      geom.scale(scalingDelta.x, scalingDelta.y);
+
+      geom.rotate(rotationDelta,centroid.x,centroid.y);
+      geom.scale(scalingDelta.x, scalingDelta.y,centroid.x,centroid.y);
       geom.translate(translationDelta.x,translationDelta.y);
-      //m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
-      this._matrix = m2;
-     // this.centerUI.position.x=this.center.x;
-      //this.centerUI.position.y=this.center.y;
-      //this.centerUI.transform(this._matrix);
+   
 
     },
 

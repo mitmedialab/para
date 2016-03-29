@@ -49,7 +49,7 @@ define([
 
       }
 
-
+      geom.applyMatrix = false;
       this.set('geom', geom);
 
       this.setData(geom);
@@ -84,9 +84,7 @@ define([
 
       if (!this.get('rendered')) {
         var geom = this.get('geom');
-        console.log('svg translation delta',this.get('translationDelta').getValue());
         this.transformSelf();
-        geom.transform(this._matrix);
         this.renderStyle(geom);
         this.renderSelection(geom);
 
@@ -108,7 +106,6 @@ define([
       var g_clone = this.getShapeClone(true);
       instance.changeGeomInheritance(g_clone);
       instance.set('rendered', true);
-      instance._matrix = this._matrix.clone();
       this.get('selection_clone').visible = false;
       instance.createBBox();
       instance.createSelectionClone();

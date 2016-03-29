@@ -364,7 +364,7 @@ define([
 				x: 1,
 				y: 1
 			});
-			item.position.x = item.position.y = 0;
+			item.position = new paper.Point(0,0);
 			svgNode.changeGeomInheritance(item);
 			this.addShape(svgNode, true);
 		},

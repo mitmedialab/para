@@ -103,7 +103,7 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
-      instance._matrix = this._matrix.clone();
+     
 
       for (var i = 0; i < this.members.length; i++) {
 
