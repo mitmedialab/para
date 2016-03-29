@@ -647,7 +647,7 @@ define([
 			geom.data.instance = this;
 			geom.data.geom = true;
 			geom.data.nodetype = this.get('name');
-
+			geom.applyMatrix = false;
 			this.createBBox();
 			this.createSelectionClone();
 

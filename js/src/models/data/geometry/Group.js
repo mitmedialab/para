@@ -363,17 +363,6 @@ define([
         this.children[i].toggleClosed();
       }
       this.set('open', false);
-      /*var old_center = this.center;
-      var new_center = this.get('geom').position;
-      var r = this.get('rotationDelta').getValue();    
-      var inverse = this._matrix.inverted();
-      new_center = inverse.transform(new_center);
-      //var old_t_center = inverse.transform(old_center);
-      //var r_center = new_center.rotate(r,old_center);
-      
-      this.center = new_center;
-      console.log('new_center',new_center,'old_center',old_center,'actual',this.get('geom').position,'r',r);
-      */
      },
 
 
@@ -410,7 +399,7 @@ define([
             this.renderQueue[i].render();
           }
         }
-        this.createBBox();
+        //this.createBBox();
        
         GeometryNode.prototype.render.apply(this, arguments);
         
@@ -429,7 +418,7 @@ define([
     renderSelection: function() {
       var selected = this.get('selected').getValue();
       var constraint_selected = this.get('constraintSelected').getValue();
-      var selection_clone = this.get('selection_clone');
+     
       var bbox = this.get('bbox').children.filter(function(child) {
         return child.name == 'bbox';
       })[0];

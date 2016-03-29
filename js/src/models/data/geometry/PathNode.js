@@ -368,10 +368,10 @@ define([
       }
 
       for (var j = 0; j < inheritors.length; j++) {
-        inheritors[j].modifyPointsByIndex(delta, indicies, exclude);
+        inheritors[j].modifyPointsByIndex({x:delta.x, y:delta.y}, indicies, exclude);
       }
       if (proto_node) {
-        proto_node.modifyPointsByIndex(delta, indicies, this);
+        proto_node.modifyPointsByIndex({x:delta.x, y:delta.y}, indicies, this);
       }
 
     },
@@ -394,7 +394,7 @@ define([
         this.nodeParent.toggleOpen(this.nodeParent);
         toggleClosed = true;
       }
-      delta = this.transformPoint(initial_delta);
+      delta = this.transformPoint({x:initial_delta.x,y:initial_delta.y});
 
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];

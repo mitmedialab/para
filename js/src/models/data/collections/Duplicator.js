@@ -33,6 +33,9 @@ define([
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
+                // this.internalList.get('ui').remove();
+                //this.masterList.get('ui').remove();
+
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
                 this.masterList.set('id', 'internal' + this.masterList.get('id'));
                 this.listenTo(this.masterList, 'modified', this.modified);
@@ -154,7 +157,7 @@ define([
 
                 var internalConstraints = []
                 if (this.get('target').get('name') == 'group') {
-                   internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
+                    internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
@@ -177,8 +180,8 @@ define([
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
                 constraint.create(data);
-                constraint.setExemptForAll(targetId,true);
-                constraint.setExemptForAll(lastId,true);
+                constraint.setExemptForAll(targetId, true);
+                constraint.setExemptForAll(lastId, true);
 
                 internalConstraints.push(constraint);
                 return internalConstraints;
@@ -198,8 +201,8 @@ define([
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
                     reference_list.addMember(target.children[i]);
-                     var targetId = target.children[i].get('id');
-                   var lastId;
+                    var targetId = target.children[i].get('id');
+                    var lastId;
                     if (this.masterList.members.length > 1) {
                         reference_list.addMember(this.masterList.members[this.masterList.members.length - 1].children[i]);
                         lastId = this.masterList.members[this.masterList.members.length - 1].children[i].get('id');
@@ -221,9 +224,9 @@ define([
                         ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                     ];
                     constraint.create(data);
-                    constraint.setExemptForAll(targetId,true);
-                    if(lastId){
-                        constraint.setExemptForAll(lastId,true);
+                    constraint.setExemptForAll(targetId, true);
+                    if (lastId) {
+                        constraint.setExemptForAll(lastId, true);
                     }
                     member_constraints.push(constraint);
                 }
@@ -382,6 +385,29 @@ define([
                 this.internalList.deleteSelf();
                 var data = Group.prototype.deleteSelf.call(this);
                 return data;
+            },
+
+            render: function() {
+                Group.prototype.render.apply(this, arguments);
+                this.masterList.get('ui').position = this.get('geom').position;
+                this.masterList.render();
+            },
+
+            reset: function() {
+                Group.prototype.reset.apply(this, arguments);
+            },
+
+            toggleOpen: function() {
+                Group.prototype.toggleOpen.apply(this, arguments);
+                this.masterList.get('selected').setValue(true);
+
+
+            },
+
+            toggleClosed: function() {
+                Group.prototype.toggleClosed.apply(this, arguments);
+                this.masterList.get('selected').setValue(false);
+
             },
 
 
