@@ -86,7 +86,6 @@ define([
 				Group.prototype.insertChild.call(this, index, child, registerUndo);
 
 				this.listenTo(child, 'modified', this.modified);
-				this.trigger('modified', this);
 			},
 
 
@@ -96,7 +95,6 @@ define([
 
 					this.stopListening(removed);
 
-					this.trigger('modified', this);
 					return removed;
 				}
 			},
@@ -196,6 +194,11 @@ define([
 
 
 			childModified: function(child) {
+				if(child.get('name')=='duplicator'){
+					console.log('duplicator modified');
+					console.trace();
+
+				}
 				GeometryNode.prototype.childModified.call(this, child);
 			},
 			

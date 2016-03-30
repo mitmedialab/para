@@ -969,10 +969,15 @@ while(currentNode!=rootNode){
 				geometryGenerator: GeometryGenerator
 			});
 
+			//todo: not sure why this is needed since listeners are never assigned...
+			duplicator.stopListening(duplicator.masterList);
+			duplicator.stopListening(duplicator.internalList);
+	
 			duplicator.setTarget(object);
+		
 
 			var data = duplicator.setCount(8);
-
+ 
 			currentNode.insertChild(index, duplicator);
 
 
@@ -981,6 +986,7 @@ while(currentNode!=rootNode){
 			this.selectShape(duplicator);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
+		
 			constraintManager.addConstraintArray(constraints, registerUndo);
 
 			this.addToUndoStack([constraintManager, nodeParent]);
@@ -991,6 +997,7 @@ while(currentNode!=rootNode){
 				layersView.addConstraint(constraints[i]);
 
 			}
+			
 			return duplicator;
 		},
 
@@ -1306,8 +1313,6 @@ while(currentNode!=rootNode){
 
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					console.log('modifying',instance.get('name'),!stateStored);
-
 					instance.setValue(data, !stateStored);
 				}
 				this.addToUndoStack(selected);

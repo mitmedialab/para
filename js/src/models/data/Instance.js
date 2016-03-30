@@ -455,20 +455,38 @@ define([
 		 * TODO: add in checks to prevent diamond inheritance
 		 */
 		create: function(noInheritor) {
-
+			console.log('calling create');
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
+			instance.resetTransforms.center = this.resetTransforms.center.clone();
+			instance.resetTransforms.translationDelta.x = this.resetTransforms.translationDelta.x;
+			instance.resetTransforms.translationDelta.y = this.resetTransforms.translationDelta.y;
+			instance.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
+			instance.resetTransforms.scalingDelta.x = this.resetTransforms.scalingDelta.x;
+			instance.resetTransforms.scalingDelta.y = this.resetTransforms.scalingDelta.y;
+
 
 			if (!noInheritor) {
 				this.addInheritor(instance);
 			}
-			var g_clone = this.get('geom').clone();
+			console.log('before clone');
+			console.log('clone');
+			var g_clone = this.getShapeClone();
+			console.log('after clone');
 			instance.changeGeomInheritance(g_clone);
 			
 			instance.set('rendered', true);
 			console.log('created instance',instance,instance.get('geom'));
 			return instance;
+		},
+
+		/*returns a clone of the paper js shape*/
+		getShapeClone: function(relative) {
+			this.get('geom').data.instance = null;
+			var clone = this.get('geom').clone();
+			this.get('geom').data.instance = this;
+			return clone;
 		},
 
 		addChildNode: function(node, registerUndo) {
@@ -1412,12 +1430,9 @@ define([
 
 
 		childModified: function(child) {
-			//	console.log(child.get('name'), 'of',this.get('name'),'modified');
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 			}
-
-
 		},
 
 		clearRenderQueue: function() {
@@ -1564,21 +1579,7 @@ define([
 			return clone;
 		},
 
-		/*returns a clone of the paper js shape*/
-		getShapeClone: function(relative) {
-			var toggleClosed = false;
-			if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-				this.nodeParent.toggleOpen(this.nodeParent);
-				toggleClosed = true;
-			}
-			var clone = this.get('bbox').clone();
-			clone.transform(this.get('geom').matrix.inverted());
-			if (toggleClosed) {
-				this.nodeParent.toggleClosed(this.nodeParent);
-			}
-
-			return clone;
-		},
+		
 
 		animateAlpha: function(levels, property, mode, modifier, curlevel) {
 			var inheritors = this.get('inheritors').getValueFor();

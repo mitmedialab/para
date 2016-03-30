@@ -47,22 +47,6 @@ define([
       GeometryNode.prototype.deleteSelf.apply(this, arguments);
     },
 
-
-    /*returns a clone of the paper js shape*/
-    getShapeClone: function(relative) {
-      var toggleClosed = false;
-      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.toggleOpen(this.nodeParent);
-        toggleClosed = true;
-      }
-      var clone = this.get('geom').clone();
-      if (toggleClosed) {
-        this.nodeParent.toggleClosed(this.nodeParent);
-      }
-
-      return clone;
-    },
-
     toJSON: function(noUndoCache) {
       var data = GeometryNode.prototype.toJSON.call(this,noUndoCache);
       this.get('geom').data.instance = null;

@@ -224,7 +224,12 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
-
+      instance.resetTransforms.center = this.resetTransforms.center.clone();
+      instance.resetTransforms.translationDelta.x = this.resetTransforms.translationDelta.x;
+      instance.resetTransforms.translationDelta.y = this.resetTransforms.translationDelta.y;
+      instance.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
+      instance.resetTransforms.scalingDelta.x = this.resetTransforms.scalingDelta.x;
+      instance.resetTransforms.scalingDelta.y = this.resetTransforms.scalingDelta.y;
       for (var i = 0; i < this.children.length; i++) {
         var clone = this.children[i].create(noInheritor);
         instance.addChildNode(clone);
@@ -352,7 +357,6 @@ define([
 
     toggleOpen: function() {
       this.startingPosition = this.get('geom').position;
-      this.startingUI.position = this.startingPosition;
       console.log("open=",this.startingPosition,this.get('translationDelta').getValue(),TrigFunc.subtract(this.startingPosition,this.get('translationDelta').getValue()));
       this.set('open', true);
 
@@ -363,22 +367,11 @@ define([
         this.children[i].toggleClosed();
       }
       var closingPosition = this.get('geom').position;
-      //this.get('geom').position = this.startingPosition;
-      var diff = this.startingPosition.subtract(closingPosition);
-      console.log("closed=",diff,closingPosition,this.get('translationDelta').getValue(),TrigFunc.subtract(closingPosition,this.get('translationDelta').getValue()));
       this.endingUI.position = closingPosition;
       this.get('translationDelta').setValue(this.get('geom').position);
 
-      console.log('diff',diff);
       this.set('open', false);
      },
-
-
-    childModified: function(child) {
-      for(var i=0;i<this.children.length;i++){
-          GeometryNode.prototype.childModified.call(this, this.children[i]);
-      }
-    },
 
 
 

@@ -30,16 +30,14 @@ define([
             }),
 
             initialize: function(attributes, options) {
+                 console.log('duplicator listeners 1',this._listeningTo);
                 Group.prototype.initialize.apply(this, arguments);
+                  console.log('duplicator listeners 2',this._listeningTo);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
-                // this.internalList.get('ui').remove();
-                //this.masterList.get('ui').remove();
 
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
                 this.masterList.set('id', 'internal' + this.masterList.get('id'));
-                this.listenTo(this.masterList, 'modified', this.modified);
-                this.listenTo(this.internalList, 'modified', this.modified);
 
                 //members of the duplicator which are constrained
                 this.group_relative = [];
@@ -83,6 +81,7 @@ define([
                 return data;
             },
 
+            
 
             parseJSON: function(data) {
                 var changed = Group.prototype.parseJSON.call(this, data);
@@ -154,8 +153,8 @@ define([
             },
 
             setInternalConstraint: function() {
-
-                var internalConstraints = []
+               
+                var internalConstraints = [];
                 if (this.get('target').get('name') == 'group') {
                     internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
                 }
@@ -179,11 +178,13 @@ define([
                     ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
+                
                 constraint.create(data);
                 constraint.setExemptForAll(targetId, true);
                 constraint.setExemptForAll(lastId, true);
 
                 internalConstraints.push(constraint);
+               
                 return internalConstraints;
             },
 
@@ -207,9 +208,11 @@ define([
                         reference_list.addMember(this.masterList.members[this.masterList.members.length - 1].children[i]);
                         lastId = this.masterList.members[this.masterList.members.length - 1].children[i].get('id');
                     }
+
                     for (var j = 0; j < this.masterList.members.length; j++) {
                         relative_list.addMember(this.masterList.members[j].children[i]);
                     }
+
                     var constraint = new Constraint();
                     constraint.set('references', reference_list);
                     constraint.set('relatives', relative_list);
@@ -387,7 +390,7 @@ define([
                 return data;
             },
 
-            render: function() {
+           /* render: function() {
                 Group.prototype.render.apply(this, arguments);
                 this.masterList.render();
                 this.masterList.get('bbox').position = this.get('geom').position;
@@ -412,7 +415,7 @@ define([
                 Group.prototype.toggleClosed.apply(this, arguments);
                 this.masterList.get('selected').setValue(false);
 
-            },
+            },*/
 
 
 
