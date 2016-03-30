@@ -628,7 +628,19 @@ define([
 				this.stopListening(s[i]);
 
 			}
-
+			var items = paper.project.getItems({
+				class: paper.Path
+			});
+			var names = items.map(function(item){
+				if(item.data.instance){
+					return [item.className,item.name,item.data.instance.get('name')];
+				}
+				else{
+					return [item.className,item.name];
+				}
+				
+			});
+			console.log('remaining items',names);
 
 		},
 
@@ -652,7 +664,7 @@ define([
 
 
 			layersView.removeShape(target.get('id'));
-
+			target.deleteAllChildren();
 			target.deleteSelf();
 		},
 

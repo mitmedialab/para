@@ -339,9 +339,9 @@ define([
 
                 }
                 if (node.get('name') === 'group') {
-                    for (var j = 0; j < node.members.length; j++) {
+                    for (var j = 0; j < node.children.length; j++) {
                         for (var i = 0; i < this.group_relative.length; i++) {
-                            this.group_relative[j].removeMember(node.members[j]);
+                            this.group_relative[j].removeMember(node.children[j]);
                         }
                     }
                 }
@@ -349,7 +349,6 @@ define([
                     for (var k = 0; k < this.children.length; k++) {
                         this.children[k].get('zIndex').setValue(k);
                     }
-                    this.get('memberCount').setValue(this.members.length);
                 }
                 return child;
             },
@@ -377,35 +376,14 @@ define([
 
             },
 
-            /*deleteAllChildren
-             * function which deletes all children
-             */
-            deleteAllChildren: function() {
-
-                this.internalList.deleteSelf();
-                this.internalList = null;
-                for (var i = 0; i < this.group_relative.length; i++) {
+            deleteSelf: function() {
+                this.stopListening();
+                 for (var i = 0; i < this.group_relative.length; i++) {
                     this.group_relative[i].deleteSelf();
                 }
                 for (var j = 0; i < this.group_reference.length; j++) {
                     this.group_reference[j].deleteSelf();
                 }
-
-                var deleted = [];
-
-                for (var k = this.children.length - 1; k >= 0; k--) {
-                    deleted.push.apply(deleted, this.children[k].deleteAllChildren());
-                    var deleted_member = this.removeChildNode(this.members[k], true);
-                    deleted.push(deleted_member);
-                }
-                this.children.length = 0;
-                this.masterList.length = 0;
-                return deleted;
-            },
-
-
-            deleteSelf: function() {
-                this.stopListening();
                 this.masterList.deleteSelf();
                 this.internalList.deleteSelf();
                 var data = Group.prototype.deleteSelf.call(this);
@@ -414,20 +392,7 @@ define([
 
 
 
-            shiftTarget: function(index) {
-                var old_target = this.get('target');
-
-                var newTarget = this.members[index];
-                this.set('target', newTarget);
-                for (var i = 0; i < this.members.length; i++) {
-                    if (i != index) {
-                        this.members[i].changeGeomInheritance(newTarget.getShapeClone(true));
-                    }
-                }
-                this.internalList.addMember(this.get('target'), 0);
-                //this.internalList.removeMember(this.get('target'));
-            },
-
+          
 
 
             setCount: function(count, registerUndo) {

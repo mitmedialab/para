@@ -53,11 +53,11 @@ define([
       this.set('bbox', ui_group);
       this.createBBox();
       this.currentBounds = new paper.Rectangle(0,0,0,0);
-      this.originChange = new paper.Point(0,0);
+      /*
       this.startingUI = new paper.Path.Circle(new paper.Point(0,0),10);
       this.startingUI.fillColor = 'green';
       this.endingUI = this.startingUI.clone();
-      this.endingUI.fillColor = 'red';
+      this.endingUI.fillColor = 'red';*/
       this.bboxInvalid = false;
     },
 
@@ -205,8 +205,12 @@ define([
         deleted = [];
       } for (var i = this.children.length - 1; i >= 0; i--) {
         deleted.push.apply(deleted, this.children[i].deleteAllChildren());
-        var d = this.removeChildNode(this.children[i]);
-        deleted.push(d.deleteSelf());
+
+        var d = this.removeChildNode(this.children[i],false,true);
+        console.log('d',d);
+        if(d){
+          deleted.push(d.deleteSelf());
+        }
 
       }
       return deleted;
@@ -367,8 +371,8 @@ define([
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].toggleClosed();
       }
-      var closingPosition = this.get('geom').position;
-      this.endingUI.position = closingPosition;
+      //var closingPosition = this.get('geom').position;
+      //this.endingUI.position = closingPosition;
       this.get('translationDelta').setValue(this.get('geom').position);
 
       this.set('open', false);

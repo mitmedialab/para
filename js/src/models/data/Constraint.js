@@ -1232,8 +1232,12 @@ define([
 
 
     clearUI: function() {
-      this.get('ref_handle').remove();
-      this.get('rel_handle').remove();
+      if(this.get('ref_handle')){
+        this.get('ref_handle').remove();
+      }
+      if(this.get('rel_handle')){
+        this.get('rel_handle').remove();
+      }
       this.set('ref_handle', null);
       this.set('rel_handle', null);
 
@@ -1241,7 +1245,7 @@ define([
 
     deleteSelf: function() {
       this.stopListening();
-
+      this.clearUI();
       this.clearSelection();
       var relatives = this.get('relatives');
       var relative_properties = this.get('relative_properties');

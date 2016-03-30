@@ -27,7 +27,7 @@ define([
       var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
       var path = new paper.Path.Rectangle(rectangle);
       path.fillColor = 'white';
-      path.name = 'back';
+      path.name = 'foo';
       this.tipText = new paper.Group();
       this.tipText.addChild(path);
       this.tipText.addChild(text);
@@ -579,6 +579,7 @@ define([
     },
 
     remove: function(event) {
+      console.log('removing constraints');
       var geometry = this.get('geometry');
       if (geometry) {
         geometry.remove();

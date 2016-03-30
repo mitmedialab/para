@@ -241,7 +241,14 @@ define([
 
 		//removes all constraints on a given target on a given target
 		removeConstraintsOn: function(target, registerUndo) {
-			var constraints = this.getConstraintsByRelative(target);
+			var constraints = [];
+			if(target.get('name') == 'duplicator'){
+				constraints.push.apply(constraints,this.removeConstraintsOn(target.masterList));
+				for(var i=0;i<target.group_relative.length;i++){
+					constraints.push.apply(constraints,this.removeConstraintsOn(target.group_relative[i]));
+				}
+			}
+			constraints.push.apply(constraints,this.getConstraintsByRelative(target));
 			constraints.push.apply(constraints, this.getConstraintsByReference(target));
 			if (constraints.length > 0) {
 				if (registerUndo) {
