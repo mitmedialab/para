@@ -30,7 +30,7 @@ define([
             }),
 
             initialize: function(attributes, options) {
-                
+
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
@@ -80,7 +80,7 @@ define([
                 return data;
             },
 
-            
+
 
             parseJSON: function(data) {
                 var changed = Group.prototype.parseJSON.call(this, data);
@@ -151,8 +151,32 @@ define([
                 return Group.prototype.getInternalListOwner.call(this, id);
             },
 
+
+            //TODO: Duplicator creation in progress
+            create: function(noInheritor) {
+                var instance = Group.prototype.create.call(this, noInheritor);
+                var target_index = this.children.indexOf(this.get('target'));
+                var target = instance.children[target_index];
+
+                instance.get('count').setValue(this.get('count'));
+
+                for (var i = 0; i < instance.children.length; i++) {
+                    instance.masterList.addMember(instance.children[i]);
+                }
+
+                instance.internalList.addMember(target);
+                instance.internalList.get('ui').remove();
+                if (instance.masterList.members.length > 1) {
+                    instance.internalList.addMember(instance.masterList.members[instance.masterList.members.length - 1]);
+                }
+                instance.setTarget(target);
+                instance.stopListening(instance.internalList);
+                instance.stopListening(instance.masterList);
+                return instance;
+            },
+
             setInternalConstraint: function() {
-               
+
                 var internalConstraints = [];
                 if (this.get('target').get('name') == 'group') {
                     internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
@@ -177,13 +201,13 @@ define([
                     ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
-                
+
                 constraint.create(data);
                 constraint.setExemptForAll(targetId, true);
                 constraint.setExemptForAll(lastId, true);
 
                 internalConstraints.push(constraint);
-               
+
                 return internalConstraints;
             },
 
@@ -247,6 +271,7 @@ define([
                 if (!this.masterList.hasMember(target, true)) {
                     this.masterList.addMember(target, 0);
                 }
+                console.log('duplicator target', this.get('target'));
             },
 
 
@@ -385,33 +410,6 @@ define([
                 var data = Group.prototype.deleteSelf.call(this);
                 return data;
             },
-
-           /* render: function() {
-                Group.prototype.render.apply(this, arguments);
-                this.masterList.render();
-                this.masterList.get('bbox').position = this.get('geom').position;
-                var ui = this.masterList.get('ui');
-                ui.position.x = this.masterList.get('bbox').bounds.bottomLeft.x+ui.bounds.width/2;
-                ui.position.y = this.masterList.get('bbox').bounds.bottomLeft.y+ui.bounds.height/2;
-
-            },
-
-            reset: function() {
-                Group.prototype.reset.apply(this, arguments);
-            },
-
-            toggleOpen: function() {
-                Group.prototype.toggleOpen.apply(this, arguments);
-                this.masterList.get('selected').setValue(true);
-
-
-            },
-
-            toggleClosed: function() {
-                Group.prototype.toggleClosed.apply(this, arguments);
-                this.masterList.get('selected').setValue(false);
-
-            },*/
 
 
 
