@@ -71,7 +71,6 @@ define([
 			if (this.futureStates.length > 0) {
 				var toRemove = [];
 				var toAdd = [];
-				console.log('calling redo on', this.get('name'), this.futureStates);
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
@@ -91,7 +90,6 @@ define([
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;
 				this.futureStates = [];
-				//console.log(this.get('name'), ' stored state', this.previousStates);
 			}
 		},
 

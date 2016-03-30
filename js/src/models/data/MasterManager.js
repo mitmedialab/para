@@ -303,8 +303,6 @@ define([
 			this.deleteAll();
 
 			paper.view.draw();
-			console.log('number of paper instances', paper.project.layers[0].children.length, paper.project.layers[1]);
-			//paper.project.layers[1].removeChildren();
 
 			var geomChanged = rootNode.parseJSON(json.geometry, this);
 			var listChanged = collectionManager.parseJSON(json.lists, this);
@@ -352,21 +350,16 @@ define([
 			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
 
 			var position = item.position;
-			console.log('svg position', position);
+
 			var svgNode = new SVGNode({}, {
 				geometryGenerator: GeometryGenerator
 			});
-			svgNode.get('translationDelta').setValue({
-				x: position.x,
-				y: position.y
-			});
-			svgNode.get('scalingDelta').setValue({
-				x: 1,
-				y: 1
-			});
-			item.position = new paper.Point(0,0);
-			svgNode.changeGeomInheritance(item);
-			this.addShape(svgNode, true);
+			svgNode.get('translationDelta').setValue({x:position.x,y:position.y});
+			svgNode.get('scalingDelta').setValue({x:1,y:1});
+			item.position.x=item.position.y=0;
+			svgNode.changeGeomInheritance(item,data);
+			this.addShape(svgNode,true);
+
 		},
 
 		exportSVG: function() {
@@ -533,7 +526,6 @@ define([
 
 
 		addListener: function(target, recurse) {
-			//console.log('adding listener to target',target,target.get('name'));
 			this.stopListening(target);
 			this.listenTo(target, 'modified', this.modified);
 			if (recurse) {
@@ -974,10 +966,15 @@ define([
 				geometryGenerator: GeometryGenerator
 			});
 
+			//todo: not sure why this is needed since listeners are never assigned...
+			duplicator.stopListening(duplicator.masterList);
+			duplicator.stopListening(duplicator.internalList);
+	
 			duplicator.setTarget(object);
+		
 
 			var data = duplicator.setCount(8);
-
+ 
 			currentNode.insertChild(index, duplicator);
 
 
@@ -986,6 +983,7 @@ define([
 			this.selectShape(duplicator);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
+		
 			constraintManager.addConstraintArray(constraints, registerUndo);
 
 			this.addToUndoStack([constraintManager, nodeParent]);
@@ -996,6 +994,7 @@ define([
 				layersView.addConstraint(constraints[i]);
 
 			}
+			
 			return duplicator;
 		},
 
@@ -1095,7 +1094,6 @@ define([
 						}
 						break;
 					default:
-						//console.log('moved shape is sibing', movedShape.isSibling(relativeShape));
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
 							if (parent.get('name') === 'group') {
@@ -1123,7 +1121,6 @@ define([
 
 						}
 
-						//console.log('mode', mode);
 						switch (mode) {
 							case 'after':
 								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
@@ -1395,7 +1392,6 @@ define([
 
 
 		_selectSingleShape: function(instance, segments) {
-			console.log('instance', instance);
 			if (instance.get('type') == 'geometry') {
 				instance = instance.filterSelection();
 			}
@@ -1450,13 +1446,11 @@ define([
 		toggleOpen: function() {
 
 			var target = selected[selected.length - 1];
-			console.log('target id', target.get('id'), target.get('name'));
 			if (target.get('name') == 'duplicator' || target.get('name') == 'group') {
 				this.deselectAllShapes();
 
 				var siblings = target.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting out of focus', item.get('id'), item.get('name'));
 					item.toggleClosed();
 					item.set('inFocus', false);
 					item.trigger('modified', item);
@@ -1477,23 +1471,19 @@ define([
 			this.deselectAllShapes();
 
 			if (currentNode != rootNode) {
-				console.log('closing', currentNode.get('id'), currentNode.get('name'));
 				currentNode.toggleClosed();
 
 				var siblings = currentNode.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting in focus', item.get('id'), item.get('name'));
 					item.set('inFocus', true);
 					item.trigger('modified', item);
 				});
 				currentNode = currentNode.nodeParent;
-				console.log('currentNode =', currentNode.get('id'), currentNode.get('name'));
 				currentNode.reorderGeom();
 
 			}
 
 			if (currentNode == rootNode) {
-				console.log('back to root');
 				paper.project.activeLayer.opacity = 1;
 			}
 

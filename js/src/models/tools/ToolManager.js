@@ -318,8 +318,6 @@ define([
     },
 
     canvasDblclick: function(event) {
-            console.log('dblClick');
-
         this.trigger('doubleClick')
     },
 

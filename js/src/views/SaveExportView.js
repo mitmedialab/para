@@ -82,7 +82,6 @@ define([
 					console.log(error); // an error occurred
 
 				} else {
-					console.log('data', data);
 					for (var i = 0; i < data.Contents.length; i++) {
 						var key = data.Contents[i].Key.split('/')[1].split('.txt')[0];
 						self.addFileToSelect(key, data.Contents[i].Key);
@@ -101,7 +100,6 @@ define([
 		},
 
 		triggerSampleDialog: function() {
-			console.log('trigger sample');
 			clearTimeout(sampleTimer);
 			clearTimeout(delayTimer);
 			$('#sample_button').removeClass('animation');
@@ -110,9 +108,7 @@ define([
 		},
 
 		startDelay: function() {
-			console.log('start delay');
 			$('#sample_button').addClass('animation');
-			console.log(this.triggerSampleDialog, DELAY_INTERVAL);
 			delayTimer = setTimeout(self.triggerSampleDialog, DELAY_INTERVAL);
 		},
 
@@ -133,7 +129,6 @@ define([
 
 				ui_form.dialog("close");
 				self.model.trigger('unpauseKeyListeners');
-				console.log('exp_data=', exp_data);
 				clearTimeout(delayTimer);
 				sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
 				analytics.log('experience_sample', {
@@ -153,12 +148,10 @@ define([
 				};
 				bucket.upload(sample_file, function(err, data) {
 					var results = err ? 'ERROR!' : 'SAVED.';
-					console.log(results);
 				});
 
 				bucket.upload(drawing_file, function(err, data) {
 					var results = err ? 'ERROR!' : 'SAVED.';
-					console.log(results);
 				});
 
 			}
@@ -267,7 +260,6 @@ define([
 			};
 			bucket.upload(drawing_file, function(err, data) {
 				var results = err ? 'ERROR!' : 'SAVED.';
-				console.log(results);
 			});
 			this.disableSave();
 			return true;
@@ -287,17 +279,14 @@ define([
 			//
 			this.removeUntitled();
 			var self = this;
-			console.log('key = ',filename);
 			var params = {Bucket: 'kimpara', Key: filename};
 			s3.getObject(params, function(error, data) {
 				if (error) {
 					console.log(error); // an error occurred
 
 				} else {
-					console.log('loading data', filename,data);
 					
 					var data_obj = JSON.parse(data.Body.toString());
-					console.log('data found', data_obj);
 
 					self.loadJSON(data_obj);
 					currentName = filename;

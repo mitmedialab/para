@@ -103,7 +103,6 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
-     
 
       for (var i = 0; i < this.members.length; i++) {
 
@@ -117,24 +116,7 @@ define([
       return instance;
     },
 
-    computeCentroid: function() {
-      var sumX = 0;
-      var sumY = 0;
-      this.members.forEach(function(m) {
-        var pos = m._temp_matrix.translation;
-
-
-        sumX += pos.x;
-        sumY += pos.y;
-      });
-
-      return {
-        x: sumX / this.members.length,
-        y: sumY / this.members.length
-      };
-
-    },
-
+  
     // sets the geom visibility to false
     hide: function() {
       for (var i = 0; i < this.members.length; i++) {
@@ -545,16 +527,8 @@ define([
 
 
         }
-        var selection_clone = this.get('selection_clone');
 
-        if (!selection_clone) {
-          this.createSelectionClone();
-          selection_clone = this.get('selection_clone');
-        } else {
-          selection_clone.scale(width / selection_clone.bounds.width, height / selection_clone.bounds.height);
-          selection_clone.position.x = x;
-          selection_clone.position.y = y;
-        }
+      
 
         this.updateScreenBounds(bbox);
       }
@@ -678,22 +652,6 @@ define([
       return clone;
     },
 
-    createSelectionClone: function() {
-      if (this.get('selection_clone')) {
-        this.get('selection_clone').remove();
-        this.set('selection_clone', null);
-      }
-      var selection_clone = this.get('bbox').clone();
-      var targetLayer = paper.project.layers.filter(function(layer) {
-        return layer.name === 'ui_layer';
-      })[0];
-      targetLayer.addChild(selection_clone);
-      selection_clone.data.instance = this;
-      selection_clone.fillColor = null;
-      selection_clone.strokeWidth = 3;
-      selection_clone.selected = false;
-      this.set('selection_clone', selection_clone);
-    },
 
     getRange: function() {
       return this.get('memberCount').getValue();

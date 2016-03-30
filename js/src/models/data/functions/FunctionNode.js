@@ -44,6 +44,7 @@ define([
 				});
 				this.pcount = 1;
 				 //.centerUI.fillColor = 'green';
+      		this.centroidUI.fillColor ='pink';
 
 				this.selectedParam = null;
 			},
@@ -85,7 +86,6 @@ define([
 				Group.prototype.insertChild.call(this, index, child, registerUndo);
 
 				this.listenTo(child, 'modified', this.modified);
-				this.trigger('modified', this);
 			},
 
 
@@ -95,7 +95,6 @@ define([
 
 					this.stopListening(removed);
 
-					this.trigger('modified', this);
 					return removed;
 				}
 			},
@@ -198,26 +197,6 @@ define([
 				GeometryNode.prototype.childModified.call(this, child);
 			},
 			
-			reset: function() {
-				for (var i = 0; i < this.renderQueue.length; i++) {
-
-					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-						this.renderQueue[i].reset();
-					}
-				}
-			},
-
- 
-			render: function() {
-
-				for (var i = 0; i < this.renderQueue.length; i++) {
-					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-						this.renderQueue[i].render();
-					}
-				}
-				this.renderQueue = [];
-
-			},
 
 			toJSON: function(noUndoCache) {
 				// // call prototype

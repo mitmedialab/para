@@ -30,13 +30,13 @@ define([
             }),
 
             initialize: function(attributes, options) {
+                
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
+
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
                 this.masterList.set('id', 'internal' + this.masterList.get('id'));
-                this.listenTo(this.masterList, 'modified', this.modified);
-                this.listenTo(this.internalList, 'modified', this.modified);
 
                 //members of the duplicator which are constrained
                 this.group_relative = [];
@@ -80,6 +80,7 @@ define([
                 return data;
             },
 
+            
 
             parseJSON: function(data) {
                 var changed = Group.prototype.parseJSON.call(this, data);
@@ -151,10 +152,10 @@ define([
             },
 
             setInternalConstraint: function() {
-
-                var internalConstraints = []
+               
+                var internalConstraints = [];
                 if (this.get('target').get('name') == 'group') {
-                   internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
+                    internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
                 }
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
@@ -176,11 +177,13 @@ define([
                     ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
+                
                 constraint.create(data);
-                constraint.setExemptForAll(targetId,true);
-                constraint.setExemptForAll(lastId,true);
+                constraint.setExemptForAll(targetId, true);
+                constraint.setExemptForAll(lastId, true);
 
                 internalConstraints.push(constraint);
+               
                 return internalConstraints;
             },
 
@@ -198,15 +201,17 @@ define([
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
                     reference_list.addMember(target.children[i]);
-                     var targetId = target.children[i].get('id');
-                   var lastId;
+                    var targetId = target.children[i].get('id');
+                    var lastId;
                     if (this.masterList.members.length > 1) {
                         reference_list.addMember(this.masterList.members[this.masterList.members.length - 1].children[i]);
                         lastId = this.masterList.members[this.masterList.members.length - 1].children[i].get('id');
                     }
+
                     for (var j = 0; j < this.masterList.members.length; j++) {
                         relative_list.addMember(this.masterList.members[j].children[i]);
                     }
+
                     var constraint = new Constraint();
                     constraint.set('references', reference_list);
                     constraint.set('relatives', relative_list);
@@ -221,9 +226,9 @@ define([
                         ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                     ];
                     constraint.create(data);
-                    constraint.setExemptForAll(targetId,true);
-                    if(lastId){
-                        constraint.setExemptForAll(lastId,true);
+                    constraint.setExemptForAll(targetId, true);
+                    if (lastId) {
+                        constraint.setExemptForAll(lastId, true);
                     }
                     member_constraints.push(constraint);
                 }
@@ -351,7 +356,6 @@ define([
              */
             deleteAllChildren: function() {
 
-                //console.log('calling delete children duplicator');
                 this.internalList.deleteSelf();
                 this.internalList = null;
                 for (var i = 0; i < this.group_relative.length; i++) {
@@ -364,7 +368,6 @@ define([
                 var deleted = [];
 
                 for (var k = this.children.length - 1; k >= 0; k--) {
-                    //console.log('deleting member at', i, this.members.length);
                     deleted.push.apply(deleted, this.children[k].deleteAllChildren());
                     var deleted_member = this.removeChildNode(this.members[k], true);
                     deleted.push(deleted_member);
@@ -376,13 +379,39 @@ define([
 
 
             deleteSelf: function() {
-                // console.log('calling delete self duplicator');
                 this.stopListening();
                 this.masterList.deleteSelf();
                 this.internalList.deleteSelf();
                 var data = Group.prototype.deleteSelf.call(this);
                 return data;
             },
+
+           /* render: function() {
+                Group.prototype.render.apply(this, arguments);
+                this.masterList.render();
+                this.masterList.get('bbox').position = this.get('geom').position;
+                var ui = this.masterList.get('ui');
+                ui.position.x = this.masterList.get('bbox').bounds.bottomLeft.x+ui.bounds.width/2;
+                ui.position.y = this.masterList.get('bbox').bounds.bottomLeft.y+ui.bounds.height/2;
+
+            },
+
+            reset: function() {
+                Group.prototype.reset.apply(this, arguments);
+            },
+
+            toggleOpen: function() {
+                Group.prototype.toggleOpen.apply(this, arguments);
+                this.masterList.get('selected').setValue(true);
+
+
+            },
+
+            toggleClosed: function() {
+                Group.prototype.toggleClosed.apply(this, arguments);
+                this.masterList.get('selected').setValue(false);
+
+            },*/
 
 
 

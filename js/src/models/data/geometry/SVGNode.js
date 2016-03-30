@@ -31,11 +31,51 @@ define([
     initialize: function(data) {
       Group.prototype.initialize.apply(this, arguments);
       this.get('strokeWidth').setValue(1);
-      this.get('fillColor').setValue({h:1,s:0,b:0});
-      this.get('strokeColor').setValue({h:1,s:0,b:0});
+      this.get('fillColor').setValue({
+        h: 1,
+        s: 0,
+        b: 0
+      });
+      this.get('strokeColor').setValue({
+        h: 1,
+        s: 0,
+        b: 0
+      });
+      this.set('geom',null);
     },
 
-    changeGeomInheritance: function(geom) {
+    toJSON: function(noUndoCache) {
+      var data = GeometryNode.prototype.toJSON.call(this, noUndoCache);
+      data.svg_data = this.svg_data;
+      return data;
+    },
+
+    parseJSON: function(data, manager) {
+      if (!this.get('geom')) {
+        var geom = new paper.Group();
+        var item = geom.importSVG(data.svg_data);
+        item.position.x = 0;
+        item.position.y = 0;
+        this.changeGeomInheritance(item, data.svg_data);
+      }
+      return GeometryNode.prototype.parseJSON.call(this, data, manager);
+    },
+
+    deleteSelf: function() {
+      var geom = this.get('geom');
+      if (geom) {
+        geom.remove();
+        this.setDataNull(geom);
+      }
+      return GeometryNode.prototype.deleteSelf.call(this);
+    },
+
+    setValue: function(data, registerUndo) {
+      GeometryNode.prototype.setValue.call(this, data, registerUndo);
+    },
+
+
+    changeGeomInheritance: function(geom, data) {
 
 
       if (this.get('geom')) {
@@ -44,7 +84,7 @@ define([
 
           this.get('geom').remove();
         }
-        this.get('geom').data = null;
+        this.setDataNull(this.get('geom'));
         this.set('geom', null);
 
       }
@@ -54,17 +94,25 @@ define([
 
       this.setData(geom);
       this.createBBox();
-      this.createSelectionClone();
-
+      this.svg_data = data;
     },
 
-    setData: function(geom){
-       geom.data.instance = this;
+    setData: function(geom) {
+      geom.data.instance = this;
       geom.data.geom = true;
       geom.data.nodetype = this.get('name');
-      if(geom.children){
-        for(var i=0;i<geom.children.length;i++){
+      if (geom.children) {
+        for (var i = 0; i < geom.children.length; i++) {
           this.setData(geom.children[i]);
+        }
+      }
+    },
+
+    setDataNull: function(geom) {
+      geom.data.instance = null;
+      if (geom.children) {
+        for (var i = 0; i < geom.children.length; i++) {
+          this.setDataNull(geom.children[i]);
         }
       }
     },
@@ -77,11 +125,10 @@ define([
       return;
     },
 
-    transformSelf: function(){
+    transformSelf: function() {
       GeometryNode.prototype.transformSelf.call(this);
     },
     render: function() {
-
       if (!this.get('rendered')) {
         var geom = this.get('geom');
         this.transformSelf();
@@ -90,29 +137,28 @@ define([
 
         this.set('rendered', true);
       }
-
-      //GeometryNode.prototype.render.apply(this, arguments);
-
     },
+
+
     reset: function() {
       GeometryNode.prototype.reset.apply(this, arguments);
 
     },
 
-     create: function(noInheritor) {
+
+
+    create: function(noInheritor) {
       var instance = this.geometryGenerator.getTargetClass(this.get('name'));
       var value = this.getValue();
       instance.setValue(value);
       var g_clone = this.getShapeClone(true);
       instance.changeGeomInheritance(g_clone);
       instance.set('rendered', true);
-      this.get('selection_clone').visible = false;
       instance.createBBox();
-      instance.createSelectionClone();
       return instance;
     },
 
-    getShapeClone: function(){
+    getShapeClone: function() {
       return PathNode.prototype.getShapeClone.call(this);
     },
 
@@ -120,10 +166,9 @@ define([
     renderStyle: function(geom) {
       this._visible = this.get('visible');
       geom.visible = this._visible;
-      if(!this.get('inFocus')){
+      if (!this.get('inFocus')) {
         geom.opacity = 0.5;
-      }
-      else{
+      } else {
         geom.opacity = 1;
       }
     },
