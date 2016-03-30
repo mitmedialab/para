@@ -33,24 +33,7 @@ define([
       this.set('points', []);
     },
 
-    removePrototype: function() {
-      GeometryNode.prototype.removePrototype.apply(this, arguments);
-      this.setPathAltered();
-      var geom = this.get('geom');
-      var bbox = this.get('bbox');
-
-      geom.transform(this._ti_matrix);
-      geom.transform(this._si_matrix);
-      geom.transform(this._ri_matrix);
-      bbox.transform(this._ti_matrix);
-      bbox.transform(this._si_matrix);
-      bbox.transform(this._ri_matrix);
-      geom.selected = false;
-      bbox.selected = false;
-
-      this.generatePoints(geom);
-
-    },
+    
 
     create: function() {
       var instance = GeometryNode.prototype.create.apply(this, arguments);

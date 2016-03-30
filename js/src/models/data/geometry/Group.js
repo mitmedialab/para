@@ -45,8 +45,6 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-      //this.centerUI.fillColor = 'blue';
-      this.center = {x:0,y:0};
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'ui_layer';
@@ -226,7 +224,6 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
-      instance._matrix = this._matrix.clone();
 
       for (var i = 0; i < this.children.length; i++) {
         var clone = this.children[i].create(noInheritor);
@@ -240,10 +237,10 @@ define([
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
-      this.center.x=this.get('geom').position.x;
-      this.center.y=this.get('geom').position.y;
+    
+      this.get('translationDelta').setValue(this.get('geom').position);
       this.createBBox();
-       this.currentBounds = this.get('geom').bounds;
+      this.currentBounds = this.get('geom').bounds;
     },
 
     removeChildNode: function(node, registerUndo) {
@@ -251,9 +248,8 @@ define([
       if (removed) {
         removed.get('geom').remove();
         this.currentBounds = this.get('geom').bounds;
+        this.get('translationDelta').setValue(this.get('geom').position);
 
-        this.center.x=this.get('geom').position.x;
-        this.center.y=this.get('geom').position.y;
         this.createBBox();
         this.stopListening(removed);
 
@@ -371,8 +367,8 @@ define([
       var diff = this.startingPosition.subtract(closingPosition);
       console.log("closed=",diff,closingPosition,this.get('translationDelta').getValue(),TrigFunc.subtract(closingPosition,this.get('translationDelta').getValue()));
       this.endingUI.position = closingPosition;
-      //this.get('translationDelta').setValue({x:diff.x,y:diff.y});
-      this.trigger('modified');
+      this.get('translationDelta').setValue(this.get('geom').position);
+
       console.log('diff',diff);
       this.set('open', false);
      },
@@ -433,25 +429,6 @@ define([
       return new_delta;
     },
 
-    transformSelf: function() {
-      console.log('center position',this.center);
-      var m2 = new paper.Matrix();
-      var value = this.getValue();
-      var scalingDelta, rotationDelta, translationDelta;
-      var rOrigin = this.calculateTranslationCentroid();
-      console.log('rOrigin',rOrigin);
-      scalingDelta = value.scalingDelta;
-      rotationDelta = value.rotationDelta;
-      translationDelta = value.translationDelta;
-      var geom= this.get('geom');
-      
-      geom.rotate(rotationDelta);
-      geom.scale(scalingDelta.x, scalingDelta.y);
-      geom.translate(translationDelta.x, translationDelta.y);
-
-      this._matrix = m2;
-  
-    },
 
     calculateTranslationCentroid: function(){
       var pointList = [];

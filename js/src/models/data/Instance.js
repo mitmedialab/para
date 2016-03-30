@@ -171,8 +171,6 @@ define([
 
 
 			//============private properties==============//
-			this._matrix = new paper.Matrix();
-			this._diffMatrix = new paper.Matrix();
 			//temporary attributes
 			this._fillColor = {
 				r: undefined,
@@ -244,9 +242,25 @@ define([
 			//undo redo variables
 			this.previousStates = [];
 			this.futureStates = [];
+			this.resetTransforms = {
+				translationDelta: {
+					x: 0,
+					y: 0
+				},
+				scalingDelta: {
+					x: 0,
+					y: 0
+				},
+				rotationDelta: 0
+			};
 			this.stateStored = false;
-			  this.centroidUI = new paper.Path.Circle(new paper.Point(0,0),10);
-      this.centroidUI.fillColor ='blue';
+			this.centroidUI = new paper.Path.Circle(new paper.Point(0, 0), 10);
+			this.centroidUI.fillColor = 'blue';
+			this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
+			this.originUI.fillColor = 'yellow';
+			this.rotationUI = new paper.Path(new paper.Point(0,0),new paper.Point(100,0));
+			this.rotationUI.strokeColor='red';
+			this.rotationUI.strokeWidth = 2;
 		},
 
 
@@ -449,12 +463,11 @@ define([
 			if (!noInheritor) {
 				this.addInheritor(instance);
 			}
-			var g_clone = this.getShapeClone(true);
+			var g_clone = this.get('geom').clone();
 			instance.changeGeomInheritance(g_clone);
+			
 			instance.set('rendered', true);
-			instance._matrix = this._matrix.clone();
-			//instance.reset();
-			//instance.render();
+			console.log('created instance',instance,instance.get('geom'));
 			return instance;
 		},
 
@@ -564,25 +577,6 @@ define([
 
 		},
 
-		removePrototype: function() {
-			var proto_node = this.get('proto_node');
-			if (proto_node) {
-				proto_node.removeInheritor(this);
-				var proto_vals = proto_node.getValue();
-				var constrainMap = this.get('constrain_map');
-				for (var property_name in constrainMap) {
-					if (constrainMap.hasOwnProperty(property_name)) {
-						if (this.get(property_name).isNull()) {
-							this.get(property_name).setNull(false);
-							this.get(property_name).setValue(proto_vals[property_name]);
-						}
-					}
-				}
-				this.set('proto_node', null);
-			}
-		},
-
-
 
 		createBBox: function() {
 			if (this.get('bbox')) {
@@ -629,20 +623,6 @@ define([
 		},
 
 
-		reset: function() {
-			if (this.get('rendered')) {
-				//console.log('resetting', this.get('name'), this.get('id'));
-				var geom = this.get('geom');
-				var bbox = this.get('bbox');
-				var inverted = this._matrix.inverted();
-				geom.transform(geom.matrix.inverted());
-				bbox.transform(inverted);
-				//this.centerUI.transform(inverted);
-
-				this.set('rendered', false);
-			}
-
-		},
 
 		exportSVG: function() {
 			return this.get('geom').exportSVG({
@@ -804,7 +784,6 @@ define([
 			data.open = this.get('open');
 			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
-			data._matrix = this._matrix.values;
 			data.rendered = this.get('rendered');
 			if (!noUndoCache) {
 				data.stateStored = this.stateStored;
@@ -838,7 +817,6 @@ define([
 			this.set('visible', data.visible);
 			this.set('open', data.open);
 			this.set('rendered', data.rendered);
-			this._matrix.set(data._matrix[0], data._matrix[1], data._matrix[2], data._matrix[3], data._matrix[4], data._matrix[5]);
 			this.trigger('modified', this);
 			if (this.get('name') == 'root') {
 				this.set('open', true);
@@ -1360,40 +1338,59 @@ define([
 
 
 
+		reset: function() {
+			if (this.get('rendered')) {
+				var geom = this.get('geom');
+				var bbox = this.get('bbox');
+
+				geom.translate(0-this.resetTransforms.translationDelta.x, 0-this.resetTransforms.translationDelta.y);
+				geom.rotate(0-this.resetTransforms.rotationDelta,this.resetTransforms.center);
+				geom.scale(1 / this.resetTransforms.scalingDelta.x, 1 / this.resetTransforms.scalingDelta.y,this.resetTransforms.center);
+				this.rotationUI.rotate(0-this.resetTransforms.rotationDelta,this.rotationUI.firstSegment.point);
+				this.set('rendered', false);
+				console.log('resetting', this.get('name'), this.get('id'), geom.position);
+
+
+			}
+
+		},
+
 		transformSelf: function() {
-			var m2 = new paper.Matrix();
-			//var m1 = this._matrix.inverted();
-			console.log('current geom position',this.get('geom').position);
+			var geom = this.get('geom');
+			geom.position = new paper.Point(0,0);
+			var center = geom.position;
+
+			this.originUI.position = geom.position;
 			var value = this.getValue();
 			var scalingDelta, rotationDelta, translationDelta;
 
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-			var geom= this.get('geom');
-			
-			geom.rotate(rotationDelta);
-			geom.scale(scalingDelta.x, scalingDelta.y);
-			geom.translate(translationDelta.x, translationDelta.y);
-			//this.center = this.get('geom').position;
-			//var m3 = m2.chain(m1);
+		
 
-			//this._diffMatrix = m3;
-			//this._matrix = m2;
-			//this.centerUI.transform(this._matrix);
+			this.resetTransforms.translationDelta = translationDelta;
+			this.resetTransforms.scalingDelta = scalingDelta;
+			this.resetTransforms.rotationDelta = rotationDelta;
+			this.resetTransforms.center = center;
 
-
+			geom.scale(scalingDelta.x, scalingDelta.y,center);
+			geom.rotate(rotationDelta,center);
+			geom.translate(translationDelta.x,translationDelta.y);
+			this.rotationUI.position = geom.position;
+			this.rotationUI.position.x+=this.rotationUI.bounds.width/2;
+			this.rotationUI.rotate(rotationDelta,this.rotationUI.firstSegment.point);
 		},
 
-		calculateTranslationCentroid: function(){
-      		return this.get('geom').position;
-    	},
+		calculateTranslationCentroid: function() {
+			return this.get('geom').position;
+		},
 
 
 		transformPoint: function(delta) {
 			var translationDelta = this.get('translationDelta').getValue();
 			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
-			line.transform(this._matrix);
+			line.transform(this.get('geom').matrix);
 			var new_delta = line.segments[1].point;
 			new_delta.x -= translationDelta.x;
 			new_delta.y -= translationDelta.y;
@@ -1406,7 +1403,7 @@ define([
 			delta.x += translationDelta.x;
 			delta.y += translationDelta.y;
 			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
-			var invertedMatrix = this._matrix.inverted();
+			var invertedMatrix = this.get('geom').matrix.inverted();
 			line.transform(invertedMatrix);
 			var new_delta = line.segments[1].point;
 			line.remove();
@@ -1424,11 +1421,11 @@ define([
 		},
 
 		clearRenderQueue: function() {
-			for(var i=0;i<this.children.length;i++){
+			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].clearRenderQueue();
 			}
 			this.resetChildren();
-			this.renderChildren();	
+			this.renderChildren();
 		},
 
 		resetChildren: function() {
@@ -1446,7 +1443,7 @@ define([
 					this.renderQueue[i].render();
 				}
 			}
-			  this.centroidUI.position = this.get('geom').position;
+			this.centroidUI.position = this.get('geom').position;
 			this.renderQueue = [];
 		},
 
@@ -1459,15 +1456,13 @@ define([
 				console.log('rendering', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
-				bbox.position = geom.position;
+				//bbox.position = geom.position;
 
 				this.transformSelf();
-				geom.transform(this._matrix);
-				bbox.transform(this._matrix);
-				this.updateScreenBounds(geom);
+				//this.updateScreenBounds(geom);
 
 				this.renderStyle(geom);
-				this.renderSelection(geom);
+				//this.renderSelection(geom);
 
 				this.set('rendered', true);
 			}
@@ -1577,7 +1572,7 @@ define([
 				toggleClosed = true;
 			}
 			var clone = this.get('bbox').clone();
-			clone.transform(this._matrix.inverted());
+			clone.transform(this.get('geom').matrix.inverted());
 			if (toggleClosed) {
 				this.nodeParent.toggleClosed(this.nodeParent);
 			}

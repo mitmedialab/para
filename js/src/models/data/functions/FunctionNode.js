@@ -59,7 +59,6 @@ define([
 				data.open = this.get('open');
 				data.children = [];
 				data.rendered = this.get('rendered');
-				data._matrix = this._matrix.values;
 				return this.parseJSON(data);
 			},
 

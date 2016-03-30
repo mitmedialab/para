@@ -103,7 +103,6 @@ define([
       var value = this.getValue();
       instance.setValue(value);
       instance.set('rendered', true);
-      instance._matrix = this._matrix.clone();
 
       for (var i = 0; i < this.members.length; i++) {
 
@@ -117,24 +116,7 @@ define([
       return instance;
     },
 
-    computeCentroid: function() {
-      var sumX = 0;
-      var sumY = 0;
-      this.members.forEach(function(m) {
-        var pos = m._temp_matrix.translation;
-
-
-        sumX += pos.x;
-        sumY += pos.y;
-      });
-
-      return {
-        x: sumX / this.members.length,
-        y: sumY / this.members.length
-      };
-
-    },
-
+  
     // sets the geom visibility to false
     hide: function() {
       for (var i = 0; i < this.members.length; i++) {

@@ -137,7 +137,6 @@ define([
         var geom = this.get('geom');
         console.log('svg translation delta', this.get('translationDelta').getValue());
         this.transformSelf();
-        geom.transform(this._matrix);
         this.renderStyle(geom);
         this.renderSelection(geom);
 
@@ -161,7 +160,6 @@ define([
       var g_clone = this.getShapeClone(true);
       instance.changeGeomInheritance(g_clone);
       instance.set('rendered', true);
-      instance._matrix = this._matrix.clone();
       instance.createBBox();
       return instance;
     },
