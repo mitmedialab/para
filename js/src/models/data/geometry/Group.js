@@ -58,7 +58,7 @@ define([
       this.startingUI.fillColor = 'green';
       this.endingUI = this.startingUI.clone();
       this.endingUI.fillColor = 'red';
-
+      this.bboxInvalid = false;
     },
 
 
@@ -242,12 +242,11 @@ define([
 
     
     insertChild: function(index, child, registerUndo) {
-      
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
-
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('translationDelta').setValue(this.get('geom').position);
       this.currentBounds = this.get('geom').bounds;
+      this.bboxInvalid = true;
     },
 
     removeChildNode: function(node, registerUndo) {
@@ -256,8 +255,8 @@ define([
         removed.get('geom').remove();
         this.currentBounds = this.get('geom').bounds;
         this.get('translationDelta').setValue(this.get('geom').position);
-
         this.stopListening(removed);
+         this.bboxInvalid = true;
         return removed;
       }
     },
@@ -385,25 +384,12 @@ define([
       }
     },
 
-    /*renderSelection: function() {
-      var selected = this.get('selected').getValue();
-      var constraint_selected = this.get('constraintSelected').getValue();
-      var geom = this.get('geom');
-      var bbox = this.get('bbox').children.filter(function(child) {
-        return child.name == 'bbox';
-      })[0];
-     if (selected || constraint_selected) {
-        geom.selectedColor = this.getSelectionColor();
-        bbox.selectedColor = (constraint_selected) ? this.get(constraint_selected + '_color'):this.getSelectionColor();
-        bbox.selected =  true;
-        bbox.visible =  true;
-        geom.selected = (constraint_selected) ? false : true;
-      } else {
-        bbox.selected = false;
-        bbox.visible = false;
-        geom.selected = false;
-      }
-    },*/
+    renderSelection: function(geom) {
+     if(this.bboxInvalid){
+      this.createBBox();
+     }
+     GeometryNode.prototype.renderSelection.call(this,geom);
+    },
 
     inverseTransformPoint: function(point) {
       var r = this.get('rotationDelta').getValue();
@@ -434,34 +420,7 @@ define([
 
     },
 
-    createBBox: function() {
-      var ui_group = this.get('bbox');
-      var bboxes = ui_group.children.filter(function(child) {
-        return child.name == 'bbox';
-      });
-      var geom = this.get('geom');
-      var size = new paper.Size(geom.bounds.width, geom.bounds.height);
-      var bbox;
-      if (size.isZero()) {
-        size = new paper.Size(1, 1);
-      }
-      if (bboxes.length < 1) {
-
-
-        bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
-
-        bbox.data.instance = this;
-        bbox.name = 'bbox';
-        ui_group.addChild(bbox);
-      } else {
-        bbox = bboxes[0];
-        var bounds = bbox.bounds;
-        bbox.scale(size.width / bounds.width, size.height / bounds.height);
-      }
-
-
-    },
-
+   
 
   });
 

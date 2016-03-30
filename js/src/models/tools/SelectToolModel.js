@@ -63,7 +63,7 @@ define([
         case 'rotate':
         case 'scale':
           this.rotateDown(event);
-          startDist = event.point.subtract(literal.position);
+          startDist = event.point.subtract(literal.parent.localToGlobal(literal.position));
 
           startWidth = literal.bounds.width;
           startHeight = literal.bounds.height;
@@ -265,7 +265,7 @@ define([
 
       if (literal) {
 
-        return literal.position;
+        return literal.parent.localToGlobal(literal.position);
       }
       return null;
     },

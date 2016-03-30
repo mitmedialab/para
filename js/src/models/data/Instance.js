@@ -1396,7 +1396,16 @@ define([
 
 		transformSelf: function() {
 			var geom = this.get('geom');
+			var selected = this.get('selected').getValue();
+			var constraint_selected = this.get('constraintSelected').getValue();
 
+
+			if (selected || constraint_selected) {
+				var bbox = this.get('bbox');
+				var w = bbox.bounds.width;
+				var h = bbox.bounds.height;
+				bbox.scale(geom.bounds.width/w,geom.bounds.height/h);
+			}
 			geom.position = new paper.Point(0, 0);
 			var center = geom.position;
 
@@ -1558,10 +1567,10 @@ define([
 
 
 			if (selected || constraint_selected) {
-				//bbox.transform(geom.matrix);
-				var w = bbox.bounds.width;
-				var h = bbox.bounds.height;
-				bbox.scale(geom.bounds.width/w,geom.bounds.height/h);
+				bbox.transform(bbox.matrix.inverted());
+				bbox.position = new paper.Point(0,0);
+
+				bbox.transform(geom.globalMatrix);
 				bbox.position = geom.parent.localToGlobal(geom.position);
 
 				geom.selectedColor = this.getSelectionColor();
