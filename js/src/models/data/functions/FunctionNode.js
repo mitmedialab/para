@@ -204,44 +204,6 @@ define([
 				}
 			},
 
-<<<<<<< HEAD
-			reset: function() {
-				for (var i = 0; i < this.renderQueue.length; i++) {
-
-					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-						this.renderQueue[i].reset();
-					}
-				}
-			},
-
-
-			childModified: function(child) {
-
-				//console.log(this.get('name'),'modified child',child.get('name'), child.get('id'));
-				GeometryNode.prototype.childModified.call(this, child);
-				this.stopListening(child);
-
-			},
-
-		clearRenderQueue: function() {
-			this.reset();
-			this.render();
-		},
-
-			render: function() {
-
-				for (var i = 0; i < this.renderQueue.length; i++) {
-					if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-						this.renderQueue[i].render();
-						if(this.children.indexOf(this.renderQueue[i])>-1){
-             			 // console.log(this.get('name'),'restoring rendering to ',this.renderQueue[i].get('name'));
-             			  this.listenTo(this.renderQueue[i],"modified",this.childModified);
-           				}
-					}
-				}
-				this.renderQueue = [];
-=======
->>>>>>> transform_dev
 
 			childModified: function(child) {
 				GeometryNode.prototype.childModified.call(this, child);

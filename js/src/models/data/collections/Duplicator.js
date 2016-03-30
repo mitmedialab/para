@@ -177,17 +177,11 @@ define([
 
             setInternalConstraint: function() {
 
-<<<<<<< HEAD
-                var internalConstraints = []
-                /*if (this.get('target').get('name') == 'group') {
-                   internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
-                }*/
-=======
+
                 var internalConstraints = [];
                 if (this.get('target').get('name') == 'group') {
                     internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
                 }
->>>>>>> transform_dev
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
                 if (this.masterList.members.length > 1) {

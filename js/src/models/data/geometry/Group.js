@@ -45,12 +45,6 @@ define([
       this.get('fillColor').setNoColor(true);
       this.get('strokeColor').setNoColor(true);
       this.get('strokeWidth').setValue(1);
-
-<<<<<<< HEAD
-      this.centerUI.fillColor = 'blue';
-      this.center = geom.position;
-=======
->>>>>>> transform_dev
       var ui_group = new paper.Group();
       var targetLayer = paper.project.layers.filter(function(layer) {
         return layer.name === 'ui_layer';
@@ -209,8 +203,7 @@ define([
     deleteAllChildren: function(deleted) {
       if (!deleted) {
         deleted = [];
-      }
-      for (var i = this.children.length - 1; i >= 0; i--) {
+      } for (var i = this.children.length - 1; i >= 0; i--) {
         deleted.push.apply(deleted, this.children[i].deleteAllChildren());
         var d = this.removeChildNode(this.children[i]);
         deleted.push(d.deleteSelf());
@@ -308,19 +301,10 @@ define([
 
       this.get('geom').insertChild(index, child.get('geom'));
       this.get('bbox').insertChild(index, child.get('bbox'));
-<<<<<<< HEAD
 
-      this.createBBox();
-      this.createSelectionClone();
-      var listeningTo = this._listeningTo || (this._listeningTo = {});
-
-      this.trigger('modified', this);
-
-=======
       this.get('translationDelta').setValue(this.get('geom').position);
       this.createBBox();
       this.currentBounds = this.get('geom').bounds;
->>>>>>> transform_dev
     },
 
     removeChildNode: function(node, registerUndo) {
@@ -332,12 +316,6 @@ define([
 
         this.createBBox();
         this.stopListening(removed);
-<<<<<<< HEAD
-        this.recalculateCenter();
-        this.trigger('modified', this);
-=======
-
->>>>>>> transform_dev
         return removed;
       }
     },
@@ -526,10 +504,6 @@ define([
       if (!this.get('inFocus')) {
         this.get('geom').opacity = 0.5;
       } else {
-<<<<<<< HEAD
-=======
-
->>>>>>> transform_dev
         this.get('geom').opacity = 1;
       }
     },
@@ -572,25 +546,6 @@ define([
       return new_delta;
     },
 
-<<<<<<< HEAD
-    transformSelf: function() {
-
-      var m2 = new paper.Matrix();
-
-      var value = this.getValue();
-      var scalingDelta, rotationDelta, translationDelta;
-
-      scalingDelta = value.scalingDelta;
-      rotationDelta = value.rotationDelta;
-      translationDelta = value.translationDelta;
-
-
-      m2.translate(translationDelta.x, translationDelta.y);
-      m2.rotate(rotationDelta, this.center.x, this.center.y);
-      m2.scale(scalingDelta.x, scalingDelta.y, this.center.x, this.center.y);
-
-      this._matrix = m2;
-=======
 
 
     calculateTranslationCentroid: function(){
@@ -599,7 +554,7 @@ define([
         pointList.push(this.children[i].calculateTranslationCentroid());
       }
       return TrigFunc.centroid(pointList);
->>>>>>> transform_dev
+
     },
 
 
