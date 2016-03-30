@@ -240,70 +240,13 @@ define([
 
 
 
-    moveOrigin: function(added) {
-      var pointList = _.map(this.children, function(child) {
-        return child.getAbsoluteOrigin();
-      });
-
-      var centroid_curr = this.get('translationDelta').getValue();
-      var centroid_new = TrigFunc.centroid(pointList);
-      var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
-      /*if(centroid_diff.x<0.00001 && centroid_diff.y<0.00001){
-        console.log("centroid is in correct place");
-        return;
-      }*/
-   //   console.log('centroid changes', centroid_curr, centroid_new, centroid_diff);
-      if (added) {
-        added.transformAbsoluteCoordinates(centroid_new);
-        added.reset();
-      }
-      for (var i = 0; i < this.children.length; i++) {
-        this.children[i].setRelativeOrigin(centroid_diff);
-      }
-      this.get('translationDelta').setValue(centroid_new);
-
-    },
-
-
-    recalculateOrigin: function() {
-     // console.log('recalculateOrigin for',this.get('name'),this.get('id'));
-
-       var pointList = _.map(this.children, function(child) {
-        return child.getAbsoluteOrigin();
-      });
-
-      var centroid_curr = this.get('translationDelta').getValue();
-      var centroid_new = TrigFunc.centroid(pointList);
-      var centroid_diff = TrigFunc.subtract(centroid_new, centroid_curr);
-     // console.log('centroid_diff',centroid_diff);
-      if(centroid_diff.x===0 && centroid_diff.y===0 ){
-        //console.log('no origin change');
-        return false;
-      }
-
-      for (var i = 0; i < this.children.length; i++) {
-        this.children[i].setRelativeOrigin(centroid_diff);
-      }
-      this.get('translationDelta').setValue(centroid_new);
-      return true;
-
-      // var centroid_curr = this.get('translationDelta').getValue();
-
-    },
-
-
-
+    
     insertChild: function(index, child, registerUndo) {
-      if (this.get('name') !== 'root') {       
-        this.moveOrigin(child);
-      }
+      
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
 
       this.get('geom').insertChild(index, child.get('geom'));
-      this.get('bbox').insertChild(index, child.get('bbox'));
-
       this.get('translationDelta').setValue(this.get('geom').position);
-      this.createBBox();
       this.currentBounds = this.get('geom').bounds;
     },
 
@@ -314,37 +257,10 @@ define([
         this.currentBounds = this.get('geom').bounds;
         this.get('translationDelta').setValue(this.get('geom').position);
 
-        this.createBBox();
         this.stopListening(removed);
         return removed;
       }
     },
-
-
-    childModified: function(child) {
-      //console.log(this.get('name'),'modified child',child.get('name'), child.get('id'),'root');
-      //console.log(this.get('name'),'nolonger listening to ',child.get('name'),child.get('id'));
-
-     // console.trace();
-      GeometryNode.prototype.childModified.call(this, child);
-      //console.log('render queue for',this.get('name'),this.renderQueue,this.nodeParent.renderQueue,this.nodeParent._listeningTo,'root');
-      this.stopListening(child);
-      //var parentlisteningTo = this.nodeParent._listeningTo;
-
-      if(!this.recalculateOrigin()){
-        this.listenTo(child,'modified',this.get('childModified'));
-          //console.log('no centroid change, parent is listening to',parentlisteningTo);
-      }
-      else{
-       // console.log('centroid change, parent is listening to',parentlisteningTo);
-
-      }
-      //var listeningTo = this._listeningTo;
-      //console.log('group is listening to after modifiy',listeningTo);
-      this.trigger('modified',this);
-
-    },
-
 
     unGroup: function() {
 
@@ -461,45 +377,6 @@ define([
 
 
 
-
-
-    reset: function() {
-      if (this.get('rendered')) {
-        
-           GeometryNode.prototype.reset.apply(this, arguments);
-        for (var i = 0; i < this.renderQueue.length; i++) {
-          if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-            this.renderQueue[i].reset();
-          }
-        }
-     
-      }
-
-    },
-
-    render: function() {
-
-      if (!this.get('rendered')) {
-        console.log('rendering',this.renderQueue);
-        
-        for (var i = 0; i < this.renderQueue.length; i++) {
-          if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-            this.renderQueue[i].render();
-           if(this.children.indexOf(this.renderQueue[i])>-1){
-           // console.log(this.get('name'),'restoring rendering to ',this.renderQueue[i].get('name'),'root');
-            this.listenTo(this.renderQueue[i],"modified",this.childModified);
-           }
-          }
-        }
-         GeometryNode.prototype.render.apply(this, arguments);
-        this.createBBox();
-       
-       
-        
-      }
-    },
-
-
     renderStyle: function() {
       if (!this.get('inFocus')) {
         this.get('geom').opacity = 0.5;
@@ -508,7 +385,7 @@ define([
       }
     },
 
-    renderSelection: function() {
+    /*renderSelection: function() {
       var selected = this.get('selected').getValue();
       var constraint_selected = this.get('constraintSelected').getValue();
       var geom = this.get('geom');
@@ -526,7 +403,7 @@ define([
         bbox.visible = false;
         geom.selected = false;
       }
-    },
+    },*/
 
     inverseTransformPoint: function(point) {
       var r = this.get('rotationDelta').getValue();
@@ -556,10 +433,6 @@ define([
       return TrigFunc.centroid(pointList);
 
     },
-
-
-
-   
 
     createBBox: function() {
       var ui_group = this.get('bbox');

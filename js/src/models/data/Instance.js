@@ -602,7 +602,7 @@ define([
 			var size = new paper.Size(geom.bounds.width, geom.bounds.height);
 
 			var bbox = new paper.Path.Rectangle(geom.bounds.topLeft, size);
-
+			bbox.applyMatrix = false;
 			bbox.data.instance = this;
 			this.set('bbox', bbox);
 			var targetLayer = paper.project.layers.filter(function(layer) {
@@ -1383,7 +1383,6 @@ define([
 			if (this.get('rendered')) {
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
-
 				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);
 				geom.rotate(0 - this.resetTransforms.rotationDelta, this.resetTransforms.center);
 				geom.scale(1 / this.resetTransforms.scalingDelta.x, 1 / this.resetTransforms.scalingDelta.y, this.resetTransforms.center);
@@ -1496,13 +1495,10 @@ define([
 			if (!this.get('rendered')) {
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
-				//bbox.position = geom.position;
-
 				this.transformSelf();
-				//this.updateScreenBounds(geom);
-
+				this.updateScreenBounds(geom);
 				this.renderStyle(geom);
-				//this.renderSelection(geom);
+				this.renderSelection(geom);
 
 				this.set('rendered', true);
 			}
@@ -1526,8 +1522,6 @@ define([
 				geom.fillColor.saturation = this._fillColor.s;
 				geom.fillColor.lightness = this._fillColor.l;
 				geom.fillColor.alpha = this._fillColor.a;
-
-
 
 			} else {
 				geom.fillColor = undefined;
@@ -1564,6 +1558,12 @@ define([
 
 
 			if (selected || constraint_selected) {
+				//bbox.transform(geom.matrix);
+				var w = bbox.bounds.width;
+				var h = bbox.bounds.height;
+				bbox.scale(geom.bounds.width/w,geom.bounds.height/h);
+				bbox.position = geom.parent.localToGlobal(geom.position);
+
 				geom.selectedColor = this.getSelectionColor();
 
 				bbox.selectedColor = (constraint_selected) ? this.get(constraint_selected + '_color') : this.getSelectionColor();
@@ -1574,6 +1574,7 @@ define([
 				bbox.selected = false;
 				bbox.visible = false;
 				geom.selected = false;
+
 			}
 
 		},
