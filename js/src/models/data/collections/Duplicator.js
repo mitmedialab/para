@@ -30,13 +30,13 @@ define([
             }),
 
             initialize: function(attributes, options) {
+
                 Group.prototype.initialize.apply(this, arguments);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
+
                 this.internalList.set('id', 'internal' + this.internalList.get('id'));
                 this.masterList.set('id', 'internal' + this.masterList.get('id'));
-                this.listenTo(this.masterList, 'modified', this.modified);
-                this.listenTo(this.internalList, 'modified', this.modified);
 
                 //members of the duplicator which are constrained
                 this.group_relative = [];
@@ -79,6 +79,7 @@ define([
 
                 return data;
             },
+
 
 
             parseJSON: function(data) {
@@ -150,12 +151,43 @@ define([
                 return Group.prototype.getInternalListOwner.call(this, id);
             },
 
+
+            //TODO: Duplicator creation in progress
+            create: function(noInheritor) {
+                var instance = Group.prototype.create.call(this, noInheritor);
+                var target_index = this.children.indexOf(this.get('target'));
+                var target = instance.children[target_index];
+
+                instance.get('count').setValue(this.get('count'));
+
+                for (var i = 0; i < instance.children.length; i++) {
+                    instance.masterList.addMember(instance.children[i]);
+                }
+
+                instance.internalList.addMember(target);
+                instance.internalList.get('ui').remove();
+                if (instance.masterList.members.length > 1) {
+                    instance.internalList.addMember(instance.masterList.members[instance.masterList.members.length - 1]);
+                }
+                instance.setTarget(target);
+                instance.stopListening(instance.internalList);
+                instance.stopListening(instance.masterList);
+                return instance;
+            },
+
             setInternalConstraint: function() {
 
+<<<<<<< HEAD
                 var internalConstraints = []
                 /*if (this.get('target').get('name') == 'group') {
                    internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
                 }*/
+=======
+                var internalConstraints = [];
+                if (this.get('target').get('name') == 'group') {
+                    internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
+                }
+>>>>>>> transform_dev
                 this.internalList.addMember(this.get('target'));
                 this.internalList.get('ui').remove();
                 if (this.masterList.members.length > 1) {
@@ -176,11 +208,13 @@ define([
                     ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
+
                 constraint.create(data);
-                constraint.setExemptForAll(targetId,true);
-                constraint.setExemptForAll(lastId,true);
+                constraint.setExemptForAll(targetId, true);
+                constraint.setExemptForAll(lastId, true);
 
                 internalConstraints.push(constraint);
+
                 return internalConstraints;
             },
 
@@ -198,15 +232,17 @@ define([
                     this.group_relative.push(relative_list);
                     this.group_reference.push(reference_list);
                     reference_list.addMember(target.children[i]);
-                     var targetId = target.children[i].get('id');
-                   var lastId;
+                    var targetId = target.children[i].get('id');
+                    var lastId;
                     if (this.masterList.members.length > 1) {
                         reference_list.addMember(this.masterList.members[this.masterList.members.length - 1].children[i]);
                         lastId = this.masterList.members[this.masterList.members.length - 1].children[i].get('id');
                     }
+
                     for (var j = 0; j < this.masterList.members.length; j++) {
                         relative_list.addMember(this.masterList.members[j].children[i]);
                     }
+
                     var constraint = new Constraint();
                     constraint.set('references', reference_list);
                     constraint.set('relatives', relative_list);
@@ -221,9 +257,9 @@ define([
                         ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                     ];
                     constraint.create(data);
-                    constraint.setExemptForAll(targetId,true);
-                    if(lastId){
-                        constraint.setExemptForAll(lastId,true);
+                    constraint.setExemptForAll(targetId, true);
+                    if (lastId) {
+                        constraint.setExemptForAll(lastId, true);
                     }
                     member_constraints.push(constraint);
                 }
@@ -242,6 +278,7 @@ define([
                 if (!this.masterList.hasMember(target, true)) {
                     this.masterList.addMember(target, 0);
                 }
+                console.log('duplicator target', this.get('target'));
             },
 
 
@@ -351,7 +388,6 @@ define([
              */
             deleteAllChildren: function() {
 
-                //console.log('calling delete children duplicator');
                 this.internalList.deleteSelf();
                 this.internalList = null;
                 for (var i = 0; i < this.group_relative.length; i++) {
@@ -364,7 +400,6 @@ define([
                 var deleted = [];
 
                 for (var k = this.children.length - 1; k >= 0; k--) {
-                    //console.log('deleting member at', i, this.members.length);
                     deleted.push.apply(deleted, this.children[k].deleteAllChildren());
                     var deleted_member = this.removeChildNode(this.members[k], true);
                     deleted.push(deleted_member);
@@ -376,7 +411,6 @@ define([
 
 
             deleteSelf: function() {
-                // console.log('calling delete self duplicator');
                 this.stopListening();
                 this.masterList.deleteSelf();
                 this.internalList.deleteSelf();

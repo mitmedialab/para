@@ -33,28 +33,7 @@ define([
       this.set('points', []);
     },
 
-    removePrototype: function() {
-      GeometryNode.prototype.removePrototype.apply(this, arguments);
-      this.setPathAltered();
-      var geom = this.get('geom');
-      var bbox = this.get('bbox');
-      var selection_clone = this.get('selection_clone');
-
-      geom.transform(this._ti_matrix);
-      geom.transform(this._si_matrix);
-      geom.transform(this._ri_matrix);
-      selection_clone.transform(this._ti_matrix);
-      selection_clone.transform(this._si_matrix);
-      selection_clone.transform(this._ri_matrix);
-      bbox.transform(this._ti_matrix);
-      bbox.transform(this._si_matrix);
-      bbox.transform(this._ri_matrix);
-      geom.selected = false;
-      bbox.selected = false;
-
-      this.generatePoints(geom);
-
-    },
+    
 
     create: function() {
       var instance = GeometryNode.prototype.create.apply(this, arguments);
@@ -68,21 +47,6 @@ define([
       GeometryNode.prototype.deleteSelf.apply(this, arguments);
     },
 
-
-    /*returns a clone of the paper js shape*/
-    getShapeClone: function(relative) {
-      var toggleClosed = false;
-      if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-        this.nodeParent.toggleOpen(this.nodeParent);
-        toggleClosed = true;
-      }
-      var clone = this.get('geom').clone();
-      if (toggleClosed) {
-        this.nodeParent.toggleClosed(this.nodeParent);
-      }
-
-      return clone;
-    },
 
     toJSON: function(noUndoCache) {
       var data = GeometryNode.prototype.toJSON.call(this,noUndoCache);
@@ -299,20 +263,21 @@ define([
     }
       var proto_node = this.get('proto_node');
 
-
+      console.log('master modification',data.translationDelta);
       var geom = this.get('geom');
-      var selection_clone = this.get('selection_clone');
       var startWidth = geom.bounds.width;
       var startHeight = geom.bounds.height;
 
       var selectedPoints = this.inheritSelectedPoints();
       var indicies = [];
-
+      var inheritor_delta = {x:data.translationDelta.x,y:data.translationDelta.y};
+      var delta = this.inverseTransformPoint(data.translationDelta);
+      data.translationDelta.x = delta.x;
+      data.translationDelta.y = delta.y;
       for (var i = 0; i < selectedPoints.length; i++) {
 
         var selectedPoint = selectedPoints[i];
         var geomS = geom.segments[selectedPoint.get('index')];
-        var selectionS = selection_clone.segments[selectedPoint.get('index')];
         indicies.push({
           index: selectedPoint.get('index'),
           type: selectedPoint.get('selection_type')
@@ -324,8 +289,6 @@ define([
             p.add(data.translationDelta);
             geomS.point.x += data.translationDelta.x;
             geomS.point.y += data.translationDelta.y;
-            selectionS.point.x += data.translationDelta.x;
-            selectionS.point.y += data.translationDelta.y;
 
             break;
           case 'handle-in':
@@ -333,8 +296,6 @@ define([
             hi.add(data.translationDelta);
             geomS.handleIn.x += data.translationDelta.x;
             geomS.handleIn.y += data.translationDelta.y;
-            selectionS.handleIn.x += data.translationDelta.x;
-            selectionS.handleIn.y += data.translationDelta.y;
             break;
 
           case 'handle-out':
@@ -342,8 +303,6 @@ define([
             ho.add(data.translationDelta);
             geomS.handleOut.x += data.translationDelta.x;
             geomS.handleOut.y += data.translationDelta.y;
-            selectionS.handleOut.x += data.translationDelta.x;
-            selectionS.handleOut.y += data.translationDelta.y;
             break;
         }
         this.trigger('modified', this);
@@ -356,22 +315,23 @@ define([
       var hDiff = (endHeight - startHeight) / 2;
 
       var inheritors = this.get('inheritors').inheritors;
-      var delta;
       var toggleClosed = false;
       if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
         this.nodeParent.toggleOpen(this.nodeParent);
         toggleClosed = true;
       }
-      delta = this.inverseTransformPoint(new paper.Point(data.translationDelta.x, data.translationDelta.y));
+      //delta = this.inverseTransformPoint(new paper.Point(data.translationDelta.x, data.translationDelta.y));
       if (toggleClosed) {
         this.nodeParent.toggleClosed(this.nodeParent);
       }
 
       for (var j = 0; j < inheritors.length; j++) {
-        inheritors[j].modifyPointsByIndex(delta, indicies, exclude);
+
+        inheritors[j].modifyPointsByIndex({x:delta.x, y:delta.y}, indicies, exclude);
       }
       if (proto_node) {
-        proto_node.modifyPointsByIndex(delta, indicies, this);
+        proto_node.modifyPointsByIndex({x:delta.x, y:delta.y}, indicies, this);
+
       }
 
     },
@@ -386,7 +346,6 @@ define([
     modifyPointsByIndex: function(initial_delta, indicies, exclude) {
 
       var geom = this.get('geom');
-      var selection_clone = this.get('selection_clone');
 
       var delta;
       var toggleClosed = false;
@@ -394,34 +353,32 @@ define([
         this.nodeParent.toggleOpen(this.nodeParent);
         toggleClosed = true;
       }
-      delta = this.transformPoint(initial_delta);
 
+      delta = this.transformPoint({x:initial_delta.x,y:initial_delta.y});
+
+
+      delta ={x:initial_delta.x,y:initial_delta.y};
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
 
-        var selectionS = selection_clone.segments[indicies[i].index];
 
         switch (indicies[i].type) {
           case 'segment':
           case 'curve':
             geomS.point.x += delta.x;
             geomS.point.y += delta.y;
-            selectionS.point.x += delta.x;
-            selectionS.point.y += delta.y;
-
+          
             break;
           case 'handle-in':
             geomS.handleIn.x += delta.x;
             geomS.handleIn.y += delta.y;
-            selectionS.handleIn.x += delta.x;
-            selectionS.handleIn.y += delta.y;
+         
             break;
 
           case 'handle-out':
             geomS.handleOut.x += delta.x;
             geomS.handleOut.y += delta.y;
-            selectionS.handleOut.x += delta.x;
-            selectionS.handleOut.y += delta.y;
+            
             break;
         }
 
@@ -430,6 +387,7 @@ define([
       if (toggleClosed) {
         this.nodeParent.toggleClosed(this.nodeParent);
       }
+      console.log('initial_delta after',initial_delta);
 
       var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {

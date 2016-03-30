@@ -260,7 +260,6 @@ define([
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
 			var changed = constraint.setExempt(propName, subpropName, current_index, !status);
-						console.log('setting exempt to',!status,changed);
 
 			if (changed) {
 				if (status) {
@@ -578,13 +577,12 @@ define([
 							activePoint = hitResult.segment;
 							break;
 						case 'curve':
-							//console.log('hit detected',event.point);
 							//lagrange_pts.push(event.point);
 							//this.setFunctionPath(functionPath);
 							/*var curve = hitResult.location.curve;
 							var curveOffset = hitResult.location.curveOffset;
 							activePoint = curve.divide(curveOffset).segment1;
-							console.log('hit curve');*/
+							*/
 							break;
 					}
 				}

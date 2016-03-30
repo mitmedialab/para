@@ -116,6 +116,8 @@ define([
 
 		addToUndoStack: function(selected) {
 			if (!stateStored) {
+				this.trigger('modified');
+
 				var selected_ids = [];
 				for (var i = 0; i < selected.length; i++) {
 					if (selected[i].get('type') == 'collection') {
@@ -133,7 +135,9 @@ define([
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-						item.trimUndoStack();
+						if (item) {
+							item.trimUndoStack();
+						}
 
 					});
 
@@ -147,7 +151,9 @@ define([
 		undo: function(event) {
 
 			if (undoStack.length > 0) {
-
+				while (currentNode != rootNode) {
+					this.toggleClosed();
+				}
 				var toUndo = undoStack.pop();
 
 				var self = this;
@@ -172,7 +178,9 @@ define([
 					var shifted = redoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-						item.trimRedoStack();
+						if (item) {
+							item.trimRedoStack();
+						}
 
 					});
 
@@ -183,7 +191,9 @@ define([
 		redo: function() {
 
 			if (redoStack.length > 0) {
-
+				while (currentNode != rootNode) {
+					this.toggleClosed();
+				}
 				var toRedo = redoStack.pop();
 
 				var self = this;
@@ -209,8 +219,9 @@ define([
 					var shifted = undoStack.shift();
 					shifted.forEach(function(id) {
 						var item = self.getById(id);
-
-						item.trimUndoStack();
+						if (item) {
+							item.trimUndoStack();
+						}
 
 					});
 
@@ -292,8 +303,6 @@ define([
 			this.deleteAll();
 
 			paper.view.draw();
-			console.log('number of paper instances', paper.project.layers[0].children.length, paper.project.layers[1]);
-			//paper.project.layers[1].removeChildren();
 
 			var geomChanged = rootNode.parseJSON(json.geometry, this);
 			var listChanged = collectionManager.parseJSON(json.lists, this);
@@ -336,34 +345,20 @@ define([
 				id: 'import',
 				action: 'importSVG'
 			});
+
 			var start_item = new paper.Group();
 			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
-			var path, pathMatrix;
-			if (item.children) {
-				var children = item.removeChildren();
-				paper.project.activeLayer.addChildren(children);
-				var new_children = [];
-				for (var i = 0; i < children.length; i++) {
-					if (children[i].children) {
-						path = new SVGNode();
-					} else {
-						path = new PathNode();
-					}
-					pathMatrix = new paper.Matrix();
-					pathMatrix.translate(children[i].bounds.center.x, children[i].bounds.center.y);
-					path.normalizeGeometry(children[i], pathMatrix);
-					this.addShape(path, true);
-					new_children.push(path);
 
-				}
+			var position = item.position;
 
-			} else {
-				path = new PathNode();
-				pathMatrix = new paper.Matrix();
-				pathMatrix.translate(item.bounds.center.x, item.bounds.center.y);
-				path.normalizeGeometry(item, pathMatrix);
-				this.addShape(path, true);
-			}
+			var svgNode = new SVGNode({}, {
+				geometryGenerator: GeometryGenerator
+			});
+			svgNode.get('translationDelta').setValue({x:position.x,y:position.y});
+			svgNode.get('scalingDelta').setValue({x:1,y:1});
+			item.position.x=item.position.y=0;
+			svgNode.changeGeomInheritance(item,data);
+			this.addShape(svgNode,true);
 
 		},
 
@@ -531,7 +526,6 @@ define([
 
 
 		addListener: function(target, recurse) {
-			//console.log('adding listener to target',target,target.get('name'));
 			this.stopListening(target);
 			this.listenTo(target, 'modified', this.modified);
 			if (recurse) {
@@ -584,7 +578,6 @@ define([
 			}
 
 
-			this.trigger('modified');
 
 		},
 
@@ -615,21 +608,24 @@ define([
 		},
 
 		removeObject: function() {
-			for (var i = 0; i < selected.length; i++) {
+			var s = selected.slice(0);
+			this.deselectAllShapes();
+
+			for (var i = 0; i < s.length; i++) {
 				collectionManager.removeObjectFromLists(selected[i]);
-				switch (selected[i].get('type')) {
+				switch (s[i].get('type')) {
 					case 'geometry':
-						this.removeGeometry(selected[i], true);
+						this.removeGeometry(s[i], true);
 						break;
 					case 'function':
 						//functionManager.removeFunction(selected[i]);
 						break;
 						//TODO: this replicates functionality in the ungroup function, should this function differently?
 					case 'collection':
-						this.removeCollection(selected[i], true);
+						this.removeCollection(s[i], true);
 						break;
 				}
-				this.stopListening(selected[i]);
+				this.stopListening(s[i]);
 
 			}
 
@@ -970,10 +966,15 @@ define([
 				geometryGenerator: GeometryGenerator
 			});
 
+			//todo: not sure why this is needed since listeners are never assigned...
+			duplicator.stopListening(duplicator.masterList);
+			duplicator.stopListening(duplicator.internalList);
+	
 			duplicator.setTarget(object);
+		
 
 			var data = duplicator.setCount(8);
-
+ 
 			currentNode.insertChild(index, duplicator);
 
 
@@ -982,6 +983,7 @@ define([
 			this.selectShape(duplicator);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
+		
 			constraintManager.addConstraintArray(constraints, registerUndo);
 
 			this.addToUndoStack([constraintManager, nodeParent]);
@@ -992,6 +994,7 @@ define([
 				layersView.addConstraint(constraints[i]);
 
 			}
+			
 			return duplicator;
 		},
 
@@ -1049,7 +1052,6 @@ define([
 				this.updateMapView(constraint.get('id'));
 			}
 
-			this.trigger('modified');
 		},
 
 		removeConstraint: function(id, registerUndo) {
@@ -1093,7 +1095,6 @@ define([
 						}
 						break;
 					default:
-						//console.log('moved shape is sibing', movedShape.isSibling(relativeShape));
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
 							if (parent.get('name') === 'group') {
@@ -1121,7 +1122,6 @@ define([
 
 						}
 
-						//console.log('mode', mode);
 						switch (mode) {
 							case 'after':
 								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
@@ -1449,13 +1449,11 @@ define([
 		toggleOpen: function() {
 
 			var target = selected[selected.length - 1];
-			console.log('target id', target.get('id'), target.get('name'));
 			if (target.get('name') == 'duplicator' || target.get('name') == 'group') {
 				this.deselectAllShapes();
 
 				var siblings = target.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting out of focus', item.get('id'), item.get('name'));
 					item.toggleClosed();
 					item.set('inFocus', false);
 					item.trigger('modified', item);
@@ -1476,23 +1474,19 @@ define([
 			this.deselectAllShapes();
 
 			if (currentNode != rootNode) {
-				console.log('closing', currentNode.get('id'), currentNode.get('name'));
 				currentNode.toggleClosed();
 
 				var siblings = currentNode.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting in focus', item.get('id'), item.get('name'));
 					item.set('inFocus', true);
 					item.trigger('modified', item);
 				});
 				currentNode = currentNode.nodeParent;
-				console.log('currentNode =', currentNode.get('id'), currentNode.get('name'));
 				currentNode.reorderGeom();
 
 			}
 
 			if (currentNode == rootNode) {
-				console.log('back to root');
 				paper.project.activeLayer.opacity = 1;
 			}
 

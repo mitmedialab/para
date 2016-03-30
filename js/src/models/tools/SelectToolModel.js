@@ -251,20 +251,6 @@ define([
           scaleX = scaleDelta.x * scaleX / scaleDelta.x;
         }
 
-        // vertical and horiz snapping feature, needs work
-        // else {
-        //   console.log('draggedVect.y ' + draggedVect.y);
-        //   console.log('draggedVect.x ' + draggedVect.x);
-        //   if (Math.abs(draggedVect.y/draggedVect.x) > 20) {
-        //     console.log('y threshold');
-        //     scaleX = 1;
-        //   }
-        //   else if (Math.abs(draggedVect.x/draggedVect.y) > 20) {
-        //     console.log('x threshold');
-        //     scaleY = 1;
-        //   }
-        // }
-
         var data = {};
         data.scalingDelta = {
           x: scaleX,

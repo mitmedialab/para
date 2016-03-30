@@ -68,7 +68,7 @@ define([
             var stripped_data = TrigFunc.stripBoolean(set_data, constrained_props[i], reference_status);
             this.members[i].setValue(stripped_data, registerUndo);
           } else {
-            this.members[i].setValue(data,registerUndo);
+            this.members[i].setValue(data, registerUndo);
           }
         }
         this.trigger('modified', this);
@@ -263,36 +263,25 @@ define([
       renderSelection: function(ui) {
         var selected = this.get('selected').getValue();
         var constraint_selected = this.get('constraintSelected').getValue();
-        var selection_clone = this.get('selection_clone');
         var bbox = this.get('bbox');
 
-        if (constraint_selected) {
-          if (!selection_clone) {
-            this.createSelectionClone();
-            selection_clone = this.get('selection_clone');
-          }
-          selection_clone.visible = true;
-          selection_clone.strokeColor = this.get(constraint_selected + '_color');
-          bbox.selected = false;
 
-        } else {
-          if (selection_clone) {
-            selection_clone.visible = false;
-          }
-          if (selected || this.get('open')) {
-            ui.visible = true;
-          } else {
-            ui.visible = false;
-          }
+        if (selected || this.get('open') || constraint_selected) {
+          ui.visible = true;
+          bbox.selectedColor = (constraint_selected) ? this.get(constraint_selected + '_color') : this.getSelectionColor();
 
-          bbox.selectedColor = this.getSelectionColor();
-          bbox.selected = this.get('selected').getValue();
-          bbox.visible = this.get('selected').getValue();
-          if (this.get('open')) {
+          bbox.selected = true;
+          bbox.visible = true;
+          if (this.get('open') && !constraint_selected) {
             bbox.strokeColor = new paper.Color(255, 0, 0, 0.5);
             bbox.strokeWidth = 1;
             bbox.visible = true;
+            bbox.selected = false;
           }
+        } else {
+          ui.visible = false;
+          bbox.selected = false;
+          bbox.visible = false;
         }
 
 

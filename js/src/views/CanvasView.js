@@ -152,7 +152,6 @@ define([
 
 
     resizeCanvas: function() {
-      console.log('resize canvas');
       var c = $('#canvas');
       c.attr('width', $(window).attr('innerWidth'));
       c.attr('height', $(window).attr('innerHeight'));

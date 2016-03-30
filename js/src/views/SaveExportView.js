@@ -15,8 +15,8 @@ define([
 ], function($, ui, _, AWS, Backbone, Handlebars, FileSaver, analytics, ui_html) {
 
 
-	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer,delayTimer, bucket;
-	var SAMPLE_INTERVAL = 600000*2; // starts at 20 minutes
+	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer, delayTimer, bucket, saved_params, s3;
+	var SAMPLE_INTERVAL = 600000 * 2; // starts at 20 minutes
 	var DELAY_INTERVAL = 300000; //delay interval of 5 minutes
 	var SaveExportView = Backbone.View.extend({
 
@@ -44,7 +44,7 @@ define([
 			});
 			$("body").append(ui_html);
 			self = this;
-			$('#sample_button').on( "click",this.triggerSampleDialog);
+			$('#sample_button').on("click", this.triggerSampleDialog);
 			working = $("#working");
 			difficult = $("#difficult");
 			allFields = $([]).add(working).add(difficult);
@@ -69,22 +69,37 @@ define([
 				IdentityPoolId: 'us-east-1:60d2d4f9-df27-47b2-bf73-c8b01736c9f4'
 			});
 			AWS.config.credentials = creds;
-			
-			new AWS.S3().listObjects({
-				Bucket: 'kimpara'
-			}, function(error, data) {
+
+
+			saved_params = {
+				Bucket: 'kimpara',
+				Delimiter: '/',
+				Prefix: 'saved_files/'
+			};
+			s3 = new AWS.S3();
+			s3.listObjects(saved_params, function(error, data) {
 				if (error) {
 					console.log(error); // an error occurred
+
 				} else {
-					console.log(data); // request succeeded
+					for (var i = 0; i < data.Contents.length; i++) {
+						var key = data.Contents[i].Key.split('/')[1].split('.txt')[0];
+						self.addFileToSelect(key, data.Contents[i].Key);
+					}
 				}
 			});
 
-			bucket = new AWS.S3({params: {Bucket: 'kimpara'}});
+
+
+			bucket = new AWS.S3({
+				params: {
+					Bucket: 'kimpara'
+				}
+			});
+			this.addUntitled();
 		},
 
 		triggerSampleDialog: function() {
-			console.log('trigger sample');
 			clearTimeout(sampleTimer);
 			clearTimeout(delayTimer);
 			$('#sample_button').removeClass('animation');
@@ -92,10 +107,8 @@ define([
 			self.model.trigger('pauseKeyListeners');
 		},
 
-		startDelay: function(){
-			console.log('start delay');
+		startDelay: function() {
 			$('#sample_button').addClass('animation');
-			console.log(this.triggerSampleDialog,DELAY_INTERVAL);
 			delayTimer = setTimeout(self.triggerSampleDialog, DELAY_INTERVAL);
 		},
 
@@ -110,13 +123,12 @@ define([
 				exp_data.difficult = difficult.val();
 				exp_data.file = self.model.exportProjectJSON();
 				var sample_responses = {};
-				sample_responses.work =  working.val();
-				sample_responses.difficult =  difficult.val();
+				sample_responses.work = working.val();
+				sample_responses.difficult = difficult.val();
 
 
 				ui_form.dialog("close");
 				self.model.trigger('unpauseKeyListeners');
-				console.log('exp_data=', exp_data);
 				clearTimeout(delayTimer);
 				sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
 				analytics.log('experience_sample', {
@@ -127,22 +139,20 @@ define([
 				});
 
 				var sample_file = {
-				Key: 'stored_data/sample_'+time.getTime()+'.txt',
-				Body: JSON.stringify(sample_responses)
-			};
-			var drawing_file = {
-				Key: 'stored_data/file_'+time.getTime()+'.txt',
-				Body: JSON.stringify(exp_data.file)
-			};
-			bucket.upload(sample_file, function(err, data) {
-				var results = err ? 'ERROR!' : 'SAVED.';
-				console.log(results);
-			});
+					Key: 'stored_data/sample_' + time.getTime() + '.txt',
+					Body: JSON.stringify(sample_responses)
+				};
+				var drawing_file = {
+					Key: 'stored_data/file_' + time.getTime() + '.txt',
+					Body: JSON.stringify(exp_data.file)
+				};
+				bucket.upload(sample_file, function(err, data) {
+					var results = err ? 'ERROR!' : 'SAVED.';
+				});
 
-			bucket.upload(drawing_file, function(err, data) {
-				var results = err ? 'ERROR!' : 'SAVED.';
-				console.log(results);
-			});
+				bucket.upload(drawing_file, function(err, data) {
+					var results = err ? 'ERROR!' : 'SAVED.';
+				});
 
 			}
 
@@ -186,7 +196,7 @@ define([
 			}
 		},
 
-		addFileToSelect: function(filename) {
+		addFileToSelect: function(filename, etag) {
 			var select = $("#fileselect");
 
 			var exists = false;
@@ -198,7 +208,7 @@ define([
 			});
 			if (!exists) {
 				select.append($('<option>', {
-					value: filename,
+					value: etag,
 					text: filename
 				}));
 				return true;
@@ -208,13 +218,23 @@ define([
 
 		},
 
+		removeUntitled: function(){
+			$("#fileselect option[value='untitled']").remove();
+		},
+
+		addUntitled: function(){
+			this.removeUntitled();
+			$("#fileselect").prepend("<option value='untitled'>untitiled</option>").val('untitled');
+		},
+
 		save: function(event, data) {
+			this.removeUntitled();
 			if (!currentName) {
 				var name = this.promptName();
 				if (!name) {
 					return;
 				} else {
-					var added = this.addFileToSelect(name);
+					var added = this.addFileToSelect(name,'saved_files/'+name+'.txt');
 					if (!added) {
 						if (!confirm("this will overwrite the file " + name)) {
 							return;
@@ -231,16 +251,18 @@ define([
 				data = this.model.exportProjectJSON();
 			}
 			var string_data = JSON.stringify(data);
-			localStorage.removeItem(currentName);
-			try {
-				localStorage.setItem(currentName, string_data);
-				this.disableSave();
-				return true;
 
-			} catch (e) {
-				console.log("LIMIT REACHED:", e);
-				return false;
-			}
+			var drawing_file = {
+				Key: 'saved_files/' + currentName + '.txt',
+				Body: JSON.stringify(data),
+				ACL: 'public-read-write'
+
+			};
+			bucket.upload(drawing_file, function(err, data) {
+				var results = err ? 'ERROR!' : 'SAVED.';
+			});
+			this.disableSave();
+			return true;
 
 		},
 
@@ -251,16 +273,28 @@ define([
 		},
 
 
-
 		load: function(filename) {
 
 			//this.save();
-			var data = localStorage.getItem(filename);
-			var data_obj = JSON.parse(data);
-			//console.log('data, data_obj',data,data_obj);
+			//
+			this.removeUntitled();
+			var self = this;
+			var params = {Bucket: 'kimpara', Key: filename};
+			s3.getObject(params, function(error, data) {
+				if (error) {
+					console.log(error); // an error occurred
 
-			this.loadJSON(data_obj);
-			currentName = filename;
+				} else {
+					
+					var data_obj = JSON.parse(data.Body.toString());
+
+					self.loadJSON(data_obj);
+					currentName = filename;
+				}
+			});
+
+
+
 		},
 
 		loadJSON: function(data_obj) {
@@ -335,6 +369,7 @@ define([
 			this.listenToOnce(this, 'loadComplete', function(result) {
 				var r = JSON.parse(result);
 				if (r) {
+					this.addUntitled();
 					this.loadJSON(r);
 				}
 
