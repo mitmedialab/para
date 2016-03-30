@@ -30,9 +30,8 @@ define([
             }),
 
             initialize: function(attributes, options) {
-                 console.log('duplicator listeners 1',this._listeningTo);
+                
                 Group.prototype.initialize.apply(this, arguments);
-                  console.log('duplicator listeners 2',this._listeningTo);
                 this.masterList = new ConstrainableList();
                 this.internalList = new ConstrainableList();
 
@@ -357,7 +356,6 @@ define([
              */
             deleteAllChildren: function() {
 
-                //console.log('calling delete children duplicator');
                 this.internalList.deleteSelf();
                 this.internalList = null;
                 for (var i = 0; i < this.group_relative.length; i++) {
@@ -370,7 +368,6 @@ define([
                 var deleted = [];
 
                 for (var k = this.children.length - 1; k >= 0; k--) {
-                    //console.log('deleting member at', i, this.members.length);
                     deleted.push.apply(deleted, this.children[k].deleteAllChildren());
                     var deleted_member = this.removeChildNode(this.members[k], true);
                     deleted.push(deleted_member);
@@ -382,7 +379,6 @@ define([
 
 
             deleteSelf: function() {
-                // console.log('calling delete self duplicator');
                 this.stopListening();
                 this.masterList.deleteSelf();
                 this.internalList.deleteSelf();

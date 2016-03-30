@@ -303,8 +303,6 @@ while(currentNode!=rootNode){
 			this.deleteAll();
 
 			paper.view.draw();
-			console.log('number of paper instances', paper.project.layers[0].children.length, paper.project.layers[1]);
-			//paper.project.layers[1].removeChildren();
 
 			var geomChanged = rootNode.parseJSON(json.geometry, this);
 			var listChanged = collectionManager.parseJSON(json.lists, this);
@@ -352,7 +350,6 @@ while(currentNode!=rootNode){
 			var item = start_item.importSVG(data); //,{expandShapes:true,applyMatrix:true});
 			
 			var position = item.position;
-			console.log('svg position',position);
 			var svgNode = new SVGNode({}, {
 				geometryGenerator: GeometryGenerator
 			});
@@ -527,7 +524,6 @@ while(currentNode!=rootNode){
 
 
 		addListener: function(target, recurse) {
-			//console.log('adding listener to target',target,target.get('name'));
 			this.stopListening(target);
 			this.listenTo(target, 'modified', this.modified);
 			if (recurse) {
@@ -903,7 +899,6 @@ while(currentNode!=rootNode){
 
 		addShape: function(shape, registerUndo) {
 			if (!shape.nodeParent) {
-				console.log('adding',shape.get('name'),registerUndo);
 				currentNode.addChildNode(shape, registerUndo);
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
@@ -1097,7 +1092,6 @@ while(currentNode!=rootNode){
 						}
 						break;
 					default:
-						//console.log('moved shape is sibing', movedShape.isSibling(relativeShape));
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
 							if (parent.get('name') === 'group') {
@@ -1125,7 +1119,6 @@ while(currentNode!=rootNode){
 
 						}
 
-						//console.log('mode', mode);
 						switch (mode) {
 							case 'after':
 								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
@@ -1397,7 +1390,6 @@ while(currentNode!=rootNode){
 
 
 		_selectSingleShape: function(instance, segments) {
-			console.log('instance',instance);
 			if (instance.get('type') == 'geometry') {
 				instance = instance.filterSelection();
 			}
@@ -1422,7 +1414,6 @@ while(currentNode!=rootNode){
 				this.toggleOpen();
 			} else {
 				if (selected[selected.length - 1].get('open')) {
-					console.log('toggling list closed');
 					this.toggleClosedList();
 				} else {
 					this.toggleOpenList();
@@ -1453,13 +1444,11 @@ while(currentNode!=rootNode){
 		toggleOpen: function() {
 
 			var target = selected[selected.length - 1];
-			console.log('target id', target.get('id'), target.get('name'));
 			if (target.get('name') == 'duplicator' || target.get('name') == 'group') {
 				this.deselectAllShapes();
 
 				var siblings = target.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting out of focus', item.get('id'), item.get('name'));
 					item.toggleClosed();
 					item.set('inFocus', false);
 					item.trigger('modified',item);
@@ -1480,23 +1469,19 @@ while(currentNode!=rootNode){
 			this.deselectAllShapes();
 
 			if (currentNode != rootNode) {
-				console.log('closing', currentNode.get('id'), currentNode.get('name'));
 				currentNode.toggleClosed();
 
 				var siblings = currentNode.getSiblings();
 				_.each(siblings, function(item) {
-					console.log('sibling setting in focus', item.get('id'), item.get('name'));
 					item.set('inFocus', true);
 					item.trigger('modified', item);
 				});
 				currentNode = currentNode.nodeParent;
-				console.log('currentNode =', currentNode.get('id'), currentNode.get('name'));
 				currentNode.reorderGeom();
 
 			}
 
 			if (currentNode == rootNode) {
-				console.log('back to root');
 				paper.project.activeLayer.opacity = 1;
 			}
 

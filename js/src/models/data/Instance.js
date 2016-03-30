@@ -440,7 +440,6 @@ define([
 		modifyPointsByIndex: function(initial_delta, indicies, exclude) {},
 
 		filterSelection: function() {
-			console.log(this.get('name'));
 			if (this.nodeParent.get('open')) {
 				return this;
 			} else {
@@ -455,7 +454,6 @@ define([
 		 * TODO: add in checks to prevent diamond inheritance
 		 */
 		create: function(noInheritor) {
-			console.log('calling create');
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
@@ -470,14 +468,10 @@ define([
 			if (!noInheritor) {
 				this.addInheritor(instance);
 			}
-			console.log('before clone');
-			console.log('clone');
 			var g_clone = this.getShapeClone();
-			console.log('after clone');
 			instance.changeGeomInheritance(g_clone);
 			
 			instance.set('rendered', true);
-			console.log('created instance',instance,instance.get('geom'));
 			return instance;
 		},
 
@@ -533,10 +527,7 @@ define([
 				}
 				this.get('geom').appendTop(this.children[i].get('geom'));
 			}
-			/*for (var i = 0; i < this.children.length; i++) {
-				
-				console.log('actual index for',this.children[i].get('name'),'=',this.children[i].get('geom').index,this.children[i].get('zIndex').getValue());
-			}*/
+			
 		},
 
 		removeChildNode: function(node, registerUndo) {
@@ -896,7 +887,6 @@ define([
 
 		//callback triggered when a subproperty is modified externally 
 		modified: function() {
-			//console.log('modified',this.get('name'));
 			PConstraint.prototype.modified.apply(this, arguments);
 		},
 
@@ -913,7 +903,6 @@ define([
 			if (this.previousStates.length > 0) {
 				var toRemove = [];
 				var toAdd = [];
-				//console.log('calling undo on', this.get('name'));
 
 				var state = this.previousStates.pop();
 				var currentState = this.toJSON();
@@ -941,7 +930,6 @@ define([
 			if (this.futureStates.length > 0) {
 				var toRemove = [];
 				var toAdd = [];
-				//console.log('calling redo on', this.get('name'));
 				var state = this.futureStates.pop();
 				var currentState = this.toJSON();
 				this.previousStates.push(currentState);
@@ -962,7 +950,6 @@ define([
 				this.previousStates.push(this.toJSON());
 				this.stateStored = true;
 				this.futureStates = [];
-				//console.log(this.get('name'), ' stored state', this.previousStates);
 			}
 		},
 		/*setValue
@@ -1366,7 +1353,6 @@ define([
 				geom.scale(1 / this.resetTransforms.scalingDelta.x, 1 / this.resetTransforms.scalingDelta.y,this.resetTransforms.center);
 				this.rotationUI.rotate(0-this.resetTransforms.rotationDelta,this.rotationUI.firstSegment.point);
 				this.set('rendered', false);
-				console.log('resetting', this.get('name'), this.get('id'), geom.position);
 
 
 			}
@@ -1468,7 +1454,6 @@ define([
 		render: function() {
 
 			if (!this.get('rendered')) {
-				console.log('rendering', this.get('name'), this.get('id'));
 				var geom = this.get('geom');
 				var bbox = this.get('bbox');
 				//bbox.position = geom.position;

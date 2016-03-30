@@ -357,7 +357,6 @@ define([
 
     toggleOpen: function() {
       this.startingPosition = this.get('geom').position;
-      console.log("open=",this.startingPosition,this.get('translationDelta').getValue(),TrigFunc.subtract(this.startingPosition,this.get('translationDelta').getValue()));
       this.set('open', true);
 
     },

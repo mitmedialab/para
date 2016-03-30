@@ -194,11 +194,6 @@ define([
 
 
 			childModified: function(child) {
-				if(child.get('name')=='duplicator'){
-					console.log('duplicator modified');
-					console.trace();
-
-				}
 				GeometryNode.prototype.childModified.call(this, child);
 			},
 			

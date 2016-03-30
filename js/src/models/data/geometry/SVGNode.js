@@ -51,14 +51,12 @@ define([
     },
 
     parseJSON: function(data, manager) {
-      console.log('calling parse json for svg', this.get('translationDelta').getValue(),data.translationDelta);
       if (!this.get('geom')) {
         var geom = new paper.Group();
         var item = geom.importSVG(data.svg_data);
         item.position.x = 0;
         item.position.y = 0;
         this.changeGeomInheritance(item, data.svg_data);
-        console.log('imported svg', item);
       }
       return GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
@@ -73,7 +71,6 @@ define([
     },
 
     setValue: function(data, registerUndo) {
-      console.log('setting value for svg',registerUndo);
       GeometryNode.prototype.setValue.call(this, data, registerUndo);
     },
 
@@ -132,20 +129,17 @@ define([
       GeometryNode.prototype.transformSelf.call(this);
     },
     render: function() {
-
       if (!this.get('rendered')) {
         var geom = this.get('geom');
-        console.log('svg translation delta', this.get('translationDelta').getValue());
         this.transformSelf();
         this.renderStyle(geom);
         this.renderSelection(geom);
 
         this.set('rendered', true);
       }
-
-      //GeometryNode.prototype.render.apply(this, arguments);
-
     },
+
+
     reset: function() {
       GeometryNode.prototype.reset.apply(this, arguments);
 
