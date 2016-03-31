@@ -292,9 +292,7 @@ define([
                     }
                 }
                 this.insertChild(index, copy);
-
                 this.masterList.addMember(copy, index);
-
             },
 
             deleteRelativeMember: function() {

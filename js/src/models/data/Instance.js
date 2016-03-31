@@ -1429,6 +1429,7 @@ define([
 		childModified: function(child) {
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
+				this.childrenModified = true;
 			}
 		},
 

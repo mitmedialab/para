@@ -52,7 +52,7 @@ define([
       targetLayer.addChild(ui_group);
       this.set('bbox', ui_group);
       this.createBBox();
-      this.currentBounds = new paper.Rectangle(0,0,0,0);
+      this.currentBounds = new paper.Rectangle(0, 0, 0, 0);
       /*
       this.startingUI = new paper.Path.Circle(new paper.Point(0,0),10);
       this.startingUI.fillColor = 'green';
@@ -139,9 +139,9 @@ define([
       for (var k = 0; k < dataClone.length; k++) {
         var newChild = this.geometryGenerator.getTargetClass(dataClone[k].name);
         //TODO: not sure why this is needed..
-        if(newChild.get('name')=='duplicator'){
-            newChild.stopListening(newChild.masterList);
-            newChild.stopListening(newChild.internalList);
+        if (newChild.get('name') == 'duplicator') {
+          newChild.stopListening(newChild.masterList);
+          newChild.stopListening(newChild.internalList);
         }
         changed.toAdd.push(newChild);
         newChild.parseJSON(dataClone[k]);
@@ -208,12 +208,13 @@ define([
     deleteAllChildren: function(deleted) {
       if (!deleted) {
         deleted = [];
-      } for (var i = this.children.length - 1; i >= 0; i--) {
+      }
+      for (var i = this.children.length - 1; i >= 0; i--) {
         deleted.push.apply(deleted, this.children[i].deleteAllChildren());
 
-        var d = this.removeChildNode(this.children[i],false,true);
-        console.log('d',d);
-        if(d){
+        var d = this.removeChildNode(this.children[i], false, true);
+        console.log('d', d);
+        if (d) {
           deleted.push(d.deleteSelf());
         }
 
@@ -243,13 +244,13 @@ define([
         var clone = this.children[i].create(noInheritor);
         instance.addChildNode(clone);
       }
-
+      instance.transformSelf();
+      console.log('rotation delta',instance.get('rotationDelta').getValue());
       return instance;
     },
 
 
 
-    
     insertChild: function(index, child, registerUndo) {
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
@@ -265,7 +266,7 @@ define([
         this.currentBounds = this.get('geom').bounds;
         this.get('translationDelta').setValue(this.get('geom').position);
         this.stopListening(removed);
-         this.bboxInvalid = true;
+        this.bboxInvalid = true;
         return removed;
       }
     },
@@ -364,22 +365,29 @@ define([
       }
     },
 
+
+    reset: function() {
+      if (this.childrenModified) {
+        var formerTdelta = this.get('translationDelta').getValue();
+        this.get('translationDelta').setValue(this.get('geom').position);
+        this.bboxInvalid = true;
+        this.childrenModified =false;
+
+      }
+      GeometryNode.prototype.reset.call(this);
+    },
+
     toggleOpen: function() {
-      this.startingPosition = this.get('geom').position;
       this.set('open', true);
-       var listeningTo = this._listeningTo || (this._listeningTo = {});
-
-
     },
 
     toggleClosed: function() {
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].toggleClosed();
       }
-      this.get('translationDelta').setValue(this.get('geom').position);
-      this.bboxInvalid = true;
+    
       this.set('open', false);
-     },
+    },
 
 
 
@@ -392,14 +400,14 @@ define([
     },
 
 
-   calculateCentroid: function() {
-      var pointList = this.children.map(function(child){
+    calculateCentroid: function() {
+      var pointList = this.children.map(function(child) {
         return child.calculateCentroid();
       });
       return TrigFunc.centroid(pointList);
     },
 
-   
+
 
   });
 
