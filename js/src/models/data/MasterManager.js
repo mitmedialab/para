@@ -978,8 +978,10 @@ define([
 				geometryGenerator: GeometryGenerator
 			});
 
-			//todo: not sure why this is needed since listeners are never assigned...
-			
+			//TODO: not sure why this is needed since listeners are never assigned...
+			duplicator.stopListening(duplicator.masterList);
+			duplicator.stopListening(duplicator.internalList);
+	
 			duplicator.setTarget(object);
 		
 

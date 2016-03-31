@@ -138,6 +138,11 @@ define([
       //addChildren in JSON that didn't already exist
       for (var k = 0; k < dataClone.length; k++) {
         var newChild = this.geometryGenerator.getTargetClass(dataClone[k].name);
+        //TODO: not sure why this is needed..
+        if(newChild.get('name')=='duplicator'){
+            newChild.stopListening(newChild.masterList);
+            newChild.stopListening(newChild.internalList);
+        }
         changed.toAdd.push(newChild);
         newChild.parseJSON(dataClone[k]);
         newChild.previousStates = dataClone[k].previousStates;
@@ -371,10 +376,8 @@ define([
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].toggleClosed();
       }
-      //var closingPosition = this.get('geom').position;
-      //this.endingUI.position = closingPosition;
       this.get('translationDelta').setValue(this.get('geom').position);
-    this.bboxInvalid = true;
+      this.bboxInvalid = true;
       this.set('open', false);
      },
 
@@ -388,34 +391,12 @@ define([
       }
     },
 
-    
-    inverseTransformPoint: function(point) {
-      var r = this.get('rotationDelta').getValue();
-      var s = this.get('scalingDelta').getValue();
-      var delta = new paper.Point(point.x, point.y);
-      var new_delta = delta.rotate(-r, new paper.Point(0, 0));
-      new_delta = new_delta.divide(new paper.Point(s.x, s.y));
-      return new_delta;
-    },
 
-    transformPoint: function(point) {
-      var r = this.get('rotationDelta').getValue();
-      var s = this.get('scalingDelta').getValue();
-      var delta = new paper.Point(point.x, point.y);
-      var new_delta = delta.rotate(r, new paper.Point(0, 0));
-      new_delta = new_delta.multiply(new paper.Point(s.x, s.y));
-      return new_delta;
-    },
-
-
-
-    calculateTranslationCentroid: function(){
-      var pointList = [];
-      for(var i=0;i<this.children.length;i++){
-        pointList.push(this.children[i].calculateTranslationCentroid());
-      }
+   calculateCentroid: function() {
+      var pointList = this.children.map(function(child){
+        return child.calculateCentroid();
+      });
       return TrigFunc.centroid(pointList);
-
     },
 
    

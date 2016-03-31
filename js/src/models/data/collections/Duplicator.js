@@ -45,9 +45,6 @@ define([
 
                 var count = new PFloat(0);
                 this.set('count', count);
-               this.stopListening(this.masterList);
-           this.stopListening(this.internalList);
-    
             },
 
             importSVG: function(data) {

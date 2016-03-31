@@ -255,7 +255,7 @@ define([
 				center: new paper.Point(0,0)
 			};
 			this.stateStored = false;
-			this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
+			/*this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
 			this.originUI.fillColor = 'yellow';
 
 			this.centroidUI = new paper.Path.Circle(new paper.Point(0, 0), 10);
@@ -973,13 +973,11 @@ define([
 			}
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
-
-				if (this.nodeParent.get('name') != 'root') {
-					var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
-					data.translationDelta.x = ndelta.x;
-					data.translationDelta.y = ndelta.y;
-				}
+				var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
+				data.translationDelta.x = ndelta.x;
+				data.translationDelta.y = ndelta.y;	
 			}
+
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
 
@@ -1381,22 +1379,15 @@ define([
 			});
 		},	
 
-		calculateTranslationCentroid: function() {
-			return this.get('geom').position;
+		calculateCentroid: function() {
+			var geom = this.get('geom');
+			var pointList = geom.segments.map(function(seg){
+				return seg.point;
+			});
+			var centroid = TrigFunc.add(TrigFunc.centroid(pointList),this.get('translationDelta').getValue());
+			return centroid;
 		},
 
-
-		transformPoint: function(delta) {
-			var translationDelta = this.get('translationDelta').getValue();
-			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
-			line.transform(this.get('geom').matrix);
-			var new_delta = line.segments[1].point;
-			new_delta.x -= translationDelta.x;
-			new_delta.y -= translationDelta.y;
-			line.remove();
-
-			return new_delta;
-		},
 
 		inverseTransformPoint: function(delta) {
 			var value = this.getValue();
@@ -1414,6 +1405,24 @@ define([
 			else{
 				return pVector;
 			}
+		},
+
+
+		transformPoint: function(delta) {
+			var value = this.getValue();
+			var scalingDelta, rotationDelta;
+			scalingDelta = value.scalingDelta;
+			rotationDelta = value.rotationDelta;
+			var geomPosition =  this.get('geom').position;
+			var pVector = new paper.Point(delta.x,delta.y);
+			pVector = pVector.rotate(rotationDelta,new paper.Point(0,0));
+			pVector = pVector.multiply(new paper.Point(scalingDelta.x,scalingDelta.y));
+			/*if(this.nodeParent){
+				return this.nodeParent.inverseTransformPoint(pVector);
+			}
+			else{*/
+				return pVector;
+			//}
 		},
 
 
@@ -1447,7 +1456,7 @@ define([
 					this.renderQueue[i].render();
 				}
 			}
-			this.centroidUI.position = this.get('geom').position;
+			//this.centroidUI.position = this.get('geom').position;
 			this.renderQueue = [];
 		},
 
@@ -1485,7 +1494,7 @@ define([
 
 		transformSelf: function() {
 			var geom = this.get('geom');
-			this.originUI.position = geom.position;
+			//this.originUI.position = geom.position;
 			geom.position = new paper.Point(0, 0);
 			var center = geom.position;
 

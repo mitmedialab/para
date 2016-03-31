@@ -251,7 +251,6 @@ define([
         var selected_points = points.filter(function(point) {
           return point.get('selected').getValue();
         });
-        console.log('selected points',selected_points);
         return selected_points;
       }
     },
@@ -260,30 +259,26 @@ define([
      * called when segment in geometry is modified
      */
     modifyPoints: function(data, mode, modifier, exclude, registerUndo) {
-
       if (registerUndo) {
         this.addToUndoStack();
       }
-      if(!this.pointsModified){
+      if (!this.pointsModified) {
         this.formerPosition = this.get('geom').position.clone();
       }
       var proto_node = this.get('proto_node');
 
-      console.log('master modification', data.translationDelta);
       var geom = this.get('geom');
       var startWidth = geom.bounds.width;
       var startHeight = geom.bounds.height;
 
       var selectedPoints = this.inheritSelectedPoints();
       var indicies = [];
-      var inheritor_delta = {
-        x: data.translationDelta.x,
-        y: data.translationDelta.y
-      };
+    console.log('translationDelta before',data.translationDelta);
+
       var delta = this.inverseTransformPoint(data.translationDelta);
-      console.log('delta',delta);
-      data.translationDelta.x = delta.x;
-      data.translationDelta.y = delta.y;
+      console.log('master delta', delta);
+
+
       for (var i = 0; i < selectedPoints.length; i++) {
 
         var selectedPoint = selectedPoints[i];
@@ -296,23 +291,23 @@ define([
           case 'segment':
           case 'curve':
             var p = selectedPoint.get('position');
-            p.add(data.translationDelta);
-            geomS.point.x += data.translationDelta.x;
-            geomS.point.y += data.translationDelta.y;
+            p.add(delta);
+            geomS.point.x += delta.x;
+            geomS.point.y += delta.y;
 
             break;
           case 'handle-in':
             var hi = selectedPoint.get('handle_in');
-            hi.add(data.translationDelta);
-            geomS.handleIn.x += data.translationDelta.x;
-            geomS.handleIn.y += data.translationDelta.y;
+            hi.add(delta);
+            geomS.handleIn.x += delta.x;
+            geomS.handleIn.y += delta.y;
             break;
 
           case 'handle-out':
             var ho = selectedPoint.get('handle_out');
-            ho.add(data.translationDelta);
-            geomS.handleOut.x += data.translationDelta.x;
-            geomS.handleOut.y += data.translationDelta.y;
+            ho.add(delta);
+            geomS.handleOut.x += delta.x;
+            geomS.handleOut.y += delta.y;
             break;
         }
       }
@@ -324,44 +319,37 @@ define([
       var hDiff = (endHeight - startHeight) / 2;
 
       var inheritors = this.get('inheritors').inheritors;
-      
-     
+      console.log('translationDelta',data.translationDelta);
+      var inheritor_delta = this.transformPoint(data.translationDelta);
+
       for (var j = 0; j < inheritors.length; j++) {
 
         inheritors[j].modifyPointsByIndex({
-          x: delta.x,
-          y: delta.y
+          x: inheritor_delta.x,
+          y: inheritor_delta.y
         }, indicies, exclude);
       }
       if (proto_node) {
         proto_node.modifyPointsByIndex({
-          x: delta.x,
-          y: delta.y
+          x: inheritor_delta.x,
+          y: inheritor_delta.y
         }, indicies, this);
 
       }
 
     },
 
-    reset: function(){
-      if(this.pointsModified){
+    reset: function() {
+      if (this.pointsModified) {
         var formerTdelta = this.get('translationDelta').getValue();
-        var gP = this.get('geom').position.clone();
-        this.get('geom').position = this.formerPosition;
-        console.log('tDelta',this.get('translationDelta').getValue(),'starting position',this.formerPosition,'endingPosition',gP);
         this.get('translationDelta').setValue(this.get('geom').position);
-
         this.pointsModified = false;
         this.bboxInvalid = true;
       }
-    
-
       GeometryNode.prototype.reset.call(this);
-      
-
     },
 
-   
+
 
     /* modifyPointsByIndex
      * called by prototpye to update inheritor points
@@ -374,19 +362,16 @@ define([
 
       var geom = this.get('geom');
 
-      var delta;
-     
-
-      delta = this.transformPoint({
-        x: initial_delta.x,
-        y: initial_delta.y
-      });
-
-
-      delta = {
+      var inheritor_delta = {
         x: initial_delta.x,
         y: initial_delta.y
       };
+
+      var delta = this.inverseTransformPoint(initial_delta);
+       console.log('delta for inheritor',delta);
+
+      this.pointsModified = true;
+
       for (var i = 0; i < indicies.length; i++) {
         var geomS = geom.segments[indicies[i].index];
 
@@ -396,14 +381,11 @@ define([
           case 'curve':
             geomS.point.x += delta.x;
             geomS.point.y += delta.y;
-
             break;
           case 'handle-in':
             geomS.handleIn.x += delta.x;
             geomS.handleIn.y += delta.y;
-
             break;
-
           case 'handle-out':
             geomS.handleOut.x += delta.x;
             geomS.handleOut.y += delta.y;
@@ -413,13 +395,15 @@ define([
 
       }
 
-     
-      console.log('initial_delta after', initial_delta);
+
 
       var inheritors = this.get('inheritors').inheritors;
       for (var j = 0; j < inheritors.length; j++) {
         if (!exclude || inheritors[j] != exclude) {
-          inheritors[j].modifyPointsByIndex(initial_delta, indicies);
+          inheritors[j].modifyPointsByIndex({
+            x: inheritor_delta.x,
+            y: inheritor_delta.y
+          }, indicies);
         }
       }
 
