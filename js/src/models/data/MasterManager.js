@@ -912,13 +912,21 @@ define([
 		},
 
 		addShape: function(shape, registerUndo) {
+			while(currentNode.get('name')=='duplicator'){
+				this.toggleClosed();
+			}
 			if (!shape.nodeParent) {
 				currentNode.addChildNode(shape, registerUndo);
 				this.addToUndoStack([currentNode]);
 				this.modificationEnded([currentNode]);
 			}
+
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
-				layersView.addShape(shape.toJSON());
+				var parentId;
+				if(currentNode!=rootNode){
+					parentId = currentNode.get('id');
+				}
+				layersView.addShape(shape.toJSON(),parentId);
 			}
 			this.selectShape(shape);
 

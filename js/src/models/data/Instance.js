@@ -971,6 +971,12 @@ define([
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
+			if(data.fillColor){
+console.log('data fill color =',data.fillColor)	;		
+}
+			if(data.strokeColor){
+console.log('data stroke color =',data.strokeColor)	;		
+			}
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
 				var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
@@ -1498,8 +1504,6 @@ define([
 			//this.originUI.position = geom.position;
 			geom.position = new paper.Point(0, 0);
 			var center = geom.position;
-
-			
 			var value = this.getValue();
 			var scalingDelta, rotationDelta, translationDelta;
 			scalingDelta = value.scalingDelta;

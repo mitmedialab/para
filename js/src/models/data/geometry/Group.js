@@ -59,6 +59,7 @@ define([
       this.endingUI = this.startingUI.clone();
       this.endingUI.fillColor = 'red';*/
       this.bboxInvalid = false;
+      this.childrenModified = false;
     },
 
 

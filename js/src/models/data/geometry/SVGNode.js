@@ -41,7 +41,7 @@ define([
         s: 0,
         b: 0
       });
-      this.set('geom',null);
+      this.set('geom', null);
     },
 
     toJSON: function(noUndoCache) {
@@ -155,6 +155,8 @@ define([
       instance.changeGeomInheritance(g_clone);
       instance.set('rendered', true);
       instance.createBBox();
+      instance.svg_data = this.svg_data;
+
       return instance;
     },
 
