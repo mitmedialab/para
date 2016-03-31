@@ -31,7 +31,7 @@ define([
       }]);
     },
 
-    normalizeGeometry: function(path, matrix) {
+    Ï: function(path, matrix) {
       var userParams = this.get('userParams');
       userParams[0].val = path.segments.length;
       this.set('userParams', userParams);
@@ -47,11 +47,7 @@ define([
         if (proto_node) {
           proto_node.updateParams(data);
         } else {
-          var toggleClosed = false;
-          if (this.nodeParent && this.nodeParent.get('name') === 'group' && !this.nodeParent.get('open')) {
-            this.nodeParent.toggleOpen(this.nodeParent);
-            toggleClosed = true;
-          }
+
           var userParams = this.get('userParams');
           userParams[0].val = data.value;
           this.set('userParams', userParams);
@@ -64,15 +60,11 @@ define([
           this.generatePoints(path, true);
           this.changeGeomInheritance(path);
 
-          path.visible = false;
 
           this.transformSelf();
-          if (toggleClosed) {
-            this.nodeParent.toggleClosed(this.nodeParent);
-          }
+
 
           var inheritors = this.get('inheritors').inheritors;
-          this.trigger('modified', this);
         }
       }
       this.updateInheritorParams(data);
@@ -83,31 +75,20 @@ define([
 
       var inheritors = this.get('inheritors').inheritors;
       for (var i = 0; i < inheritors.length; i++) {
-        var toggleClosed = false;
-        if (inheritors[i].nodeParent && inheritors[i].nodeParent.get('name') === 'group' && !inheritors[i].nodeParent.get('open')) {
-          inheritors[i].nodeParent.toggleOpen(inheritors[i].nodeParent);
-          toggleClosed = true;
-        }
-
-        var path = this.get('normal_geom').clone();
-        var userParams = inheritors[i].get('userParams');
+        var inheritor = inheritors[i];
+        var userParams = inheritor.get('userParams');
         userParams[0].val = data.value;
-        inheritors[i].set('userParams', userParams);
+        inheritor.set('userParams', userParams);
 
-        var radius = inheritors[i].get('width') / 2;
+        var radius = inheritor.get('width') / 2;
+        console.log('inheritor radius',radius)
+        var path = new paper.Path.RegularPolygon(new paper.Point(0, 0), data.value, radius);
         path.position = new paper.Point(0, 0);
-        path.fillColor = inheritors[i].get('geom').fillColor;
-        path.strokeColor = inheritors[i].get('geom').strokeColor;
-        inheritors[i].generatePoints(path, true);
-        inheritors[i].changeGeomInheritance(path);
-
-        path.visible = false;
-        inheritors[i].transformSelf();
-
-        if (toggleClosed) {
-          inheritors[i].nodeParent.toggleClosed(inheritors[i].nodeParent);
-        }
-        inheritors[i].trigger('modified', inheritors[i]);
+        path.fillColor = inheritor.get('geom').fillColor;
+        path.strokeColor = inheritor.get('geom').strokeColor;
+        inheritor.generatePoints(path, true);
+        inheritor.changeGeomInheritance(path);
+        inheritor.transformSelf();
       }
     }
 

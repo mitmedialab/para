@@ -162,19 +162,9 @@ define([
 
       var imatrix = matrix.inverted();
       path.transform(imatrix);
-
-      this.set('width', path.bounds.width);
-      this.set('height', path.bounds.height);
-
-
-      path.visible = false;
-      path.selected = false;
-
       this.changeGeomInheritance(path);
-
       this.setValue(data);
-      this.get('strokeColor').setNull(false);
-      this.get('fillColor').setNull(false);
+
       return data;
     },
 
@@ -191,8 +181,7 @@ define([
           var pointNode = new PointNode({}, {
             geometryGenerator: this.geometryGenerator
           });
-          pointNode.normalizeGeometry(segments[j]);
-          //this.addChildNode(pointNode);
+          pointNode.changeGeomInheritance(segments[j]);
           points.push(pointNode);
         }
       }

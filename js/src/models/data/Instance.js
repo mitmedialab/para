@@ -252,7 +252,7 @@ define([
 					y: 1
 				},
 				rotationDelta: 0,
-				center: new paper.Point(0,0)
+				center: new paper.Point(0, 0)
 			};
 			this.stateStored = false;
 			/*this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
@@ -632,6 +632,11 @@ define([
 
 
 			this.set('geom', geom);
+			this.set('width', geom.bounds.width);
+			this.set('height', geom.bounds.height);
+			this.get('strokeColor').setNull(false);
+			this.get('fillColor').setNull(false);
+
 			geom.applyMatrix = false;
 			geom.data.instance = this;
 			geom.data.geom = true;
@@ -971,17 +976,17 @@ define([
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
-			if(data.fillColor){
-console.log('data fill color =',data.fillColor)	;		
-}
-			if(data.strokeColor){
-console.log('data stroke color =',data.strokeColor)	;		
+			if (data.fillColor) {
+				console.log('data fill color =', data.fillColor);
+			}
+			if (data.strokeColor) {
+				console.log('data stroke color =', data.strokeColor);
 			}
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
 				var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
 				data.translationDelta.x = ndelta.x;
-				data.translationDelta.y = ndelta.y;	
+				data.translationDelta.y = ndelta.y;
 			}
 
 			for (var prop in data) {
@@ -1383,14 +1388,14 @@ console.log('data stroke color =',data.strokeColor)	;
 				x: nX,
 				y: nY
 			});
-		},	
+		},
 
 		calculateCentroid: function() {
 			var geom = this.get('geom');
-			var pointList = geom.segments.map(function(seg){
+			var pointList = geom.segments.map(function(seg) {
 				return seg.point;
 			});
-			var centroid = TrigFunc.add(TrigFunc.centroid(pointList),this.get('translationDelta').getValue());
+			var centroid = TrigFunc.add(TrigFunc.centroid(pointList), this.get('translationDelta').getValue());
 			return centroid;
 		},
 
@@ -1400,15 +1405,14 @@ console.log('data stroke color =',data.strokeColor)	;
 			var scalingDelta, rotationDelta;
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
-			var geomPosition =  this.get('geom').position;
-			var pVector = new paper.Point(delta.x,delta.y);
-			pVector = pVector.rotate(-rotationDelta,new paper.Point(0,0));
+			var geomPosition = this.get('geom').position;
+			var pVector = new paper.Point(delta.x, delta.y);
+			pVector = pVector.rotate(-rotationDelta, new paper.Point(0, 0));
 
-			pVector = pVector.multiply(new paper.Point(1/scalingDelta.x,1/scalingDelta.y));
-			if(this.nodeParent){
+			pVector = pVector.multiply(new paper.Point(1 / scalingDelta.x, 1 / scalingDelta.y));
+			if (this.nodeParent) {
 				return this.nodeParent.inverseTransformPoint(pVector);
-			}
-			else{
+			} else {
 				return pVector;
 			}
 		},
@@ -1419,15 +1423,15 @@ console.log('data stroke color =',data.strokeColor)	;
 			var scalingDelta, rotationDelta;
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
-			var geomPosition =  this.get('geom').position;
-			var pVector = new paper.Point(delta.x,delta.y);
-			pVector = pVector.rotate(rotationDelta,new paper.Point(0,0));
-			pVector = pVector.multiply(new paper.Point(scalingDelta.x,scalingDelta.y));
+			var geomPosition = this.get('geom').position;
+			var pVector = new paper.Point(delta.x, delta.y);
+			pVector = pVector.rotate(rotationDelta, new paper.Point(0, 0));
+			pVector = pVector.multiply(new paper.Point(scalingDelta.x, scalingDelta.y));
 			/*if(this.nodeParent){
 				return this.nodeParent.inverseTransformPoint(pVector);
 			}
 			else{*/
-				return pVector;
+			return pVector;
 			//}
 		},
 

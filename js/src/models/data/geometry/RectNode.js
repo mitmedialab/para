@@ -34,13 +34,12 @@ define([
       }]);
     },
 
-    normalizeGeometry: function(path, matrix) {
+   changeGeomInheritance: function(geom) {
       var userParams = this.get('userParams');
-      userParams[0].val = path.bounds.width;
-      userParams[1].val = path.bounds.height;
+      userParams[0].val = geom.bounds.width;
+      userParams[1].val = geom.bounds.height;
       this.set('userParams', userParams);
-      var data = PathNode.prototype.normalizeGeometry.apply(this, arguments);
-      return data;
+     PathNode.prototype.changeGeomInheritance.call(this, geom);
     },
 
     //called when path points are modified 

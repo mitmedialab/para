@@ -646,6 +646,9 @@ define([
 
 		removeGeometry: function(target, registerUndo) {
 			var undoQueue = [];
+			if(target == currentNode){
+				this.toggleClosed();
+			}
 			var constraints = constraintManager.removeConstraintsOn(target, registerUndo);
 			if (constraints) {
 				undoQueue.push(constraintManager);

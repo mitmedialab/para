@@ -36,14 +36,13 @@ define([
       this.set('handle_out', handleOut);
     },
 
-    normalizeGeometry: function(segment) {
+    changeGeomInheritance: function(segment) {
       var data = {};
       data.position = new PPoint(segment.point.x,segment.point.y);
       data.handle_in = new PPoint(segment.handleIn.x,segment.handleIn.y);
       data.handle_out = new PPoint(segment.handleOut.x,segment.handleOut.y);
       data.index = segment.index;
       this.set(data);
-      return data;
     },
 
     deleteSelf: function(){
