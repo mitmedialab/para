@@ -273,7 +273,6 @@ define([
 
       var selectedPoints = this.inheritSelectedPoints();
       var indicies = [];
-    console.log('translationDelta before',data.translationDelta);
 
       var delta = this.inverseTransformPoint(data.translationDelta);
       console.log('master delta', delta);
@@ -319,8 +318,7 @@ define([
       var hDiff = (endHeight - startHeight) / 2;
 
       var inheritors = this.get('inheritors').inheritors;
-      console.log('translationDelta',data.translationDelta);
-      var inheritor_delta = this.transformPoint(data.translationDelta);
+      var inheritor_delta = data.translationDelta;
 
       for (var j = 0; j < inheritors.length; j++) {
 
