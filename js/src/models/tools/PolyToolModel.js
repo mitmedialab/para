@@ -159,7 +159,7 @@ define([
     //mouse up event
     mouseUp: function(event) {
       if (polyPath && (this.get('mode') !== 'pen')) {
-        if (drag) {
+        if (!isNaN(polyPath.area) && drag) {
           var matrix = this.get('matrix');
           matrix.reset();
           matrix.translate(polyPath.bounds.center.x, polyPath.bounds.center.y);
