@@ -143,7 +143,7 @@ define([
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
         this.insertChild(dataClone[k].zIndex, newChild);
-        newChild.trigger('modified', newChild);
+        //newChild.trigger('modified', newChild);
       }
 
       return changed;
@@ -374,7 +374,7 @@ define([
       //var closingPosition = this.get('geom').position;
       //this.endingUI.position = closingPosition;
       this.get('translationDelta').setValue(this.get('geom').position);
-
+    this.bboxInvalid = true;
       this.set('open', false);
      },
 
@@ -388,13 +388,7 @@ define([
       }
     },
 
-    renderSelection: function(geom) {
-     if(this.bboxInvalid){
-      this.createBBox();
-     }
-     GeometryNode.prototype.renderSelection.call(this,geom);
-    },
-
+    
     inverseTransformPoint: function(point) {
       var r = this.get('rotationDelta').getValue();
       var s = this.get('scalingDelta').getValue();

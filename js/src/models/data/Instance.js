@@ -248,18 +248,20 @@ define([
 					y: 0
 				},
 				scalingDelta: {
-					x: 0,
-					y: 0
+					x: 1,
+					y: 1
 				},
-				rotationDelta: 0
+				rotationDelta: 0,
+				center: new paper.Point(0,0)
 			};
 			this.stateStored = false;
-
-			/*this.centroidUI = new paper.Path.Circle(new paper.Point(0, 0), 10);
-			this.centroidUI.fillColor = 'blue';
 			this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
 			this.originUI.fillColor = 'yellow';
-			this.rotationUI = new paper.Path(new paper.Point(0, 0), new paper.Point(100, 0));
+
+			this.centroidUI = new paper.Path.Circle(new paper.Point(0, 0), 10);
+			this.centroidUI.fillColor = 'blue';
+			
+			/*this.rotationUI = new paper.Path(new paper.Point(0, 0), new paper.Point(100, 0));
 			this.rotationUI.strokeColor = 'red';
 			this.rotationUI.strokeWidth = 2;*/
 
@@ -300,7 +302,7 @@ define([
 			if (geom) {
 				geom.remove();
 				geom.data = null;
-				this.set('geom',null);
+				this.set('geom', null);
 
 			}
 			this.clearBoundingBoxes();
@@ -610,6 +612,7 @@ define([
 				return layer.name === 'ui_layer';
 			})[0];
 			targetLayer.addChild(bbox);
+			this.bboxInvalid = false;
 
 		},
 
@@ -1376,52 +1379,7 @@ define([
 				x: nX,
 				y: nY
 			});
-		},
-
-
-
-		reset: function() {
-			if (this.get('rendered')) {
-				var geom = this.get('geom');
-				var bbox = this.get('bbox');
-				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);
-				geom.rotate(0 - this.resetTransforms.rotationDelta, this.resetTransforms.center);
-				geom.scale(1 / this.resetTransforms.scalingDelta.x, 1 / this.resetTransforms.scalingDelta.y, this.resetTransforms.center);
-				//this.rotationUI.rotate(0 - this.resetTransforms.rotationDelta, this.rotationUI.firstSegment.point);
-				this.set('rendered', false);
-
-
-			}
-
-		},
-
-		transformSelf: function() {
-			var geom = this.get('geom');
-
-			geom.position = new paper.Point(0, 0);
-			var center = geom.position;
-
-			//this.originUI.position = geom.position;
-			var value = this.getValue();
-			var scalingDelta, rotationDelta, translationDelta;
-			scalingDelta = value.scalingDelta;
-			rotationDelta = value.rotationDelta;
-			translationDelta = value.translationDelta;
-
-
-			this.resetTransforms.translationDelta = translationDelta;
-			this.resetTransforms.scalingDelta = scalingDelta;
-			this.resetTransforms.rotationDelta = rotationDelta;
-			this.resetTransforms.center = center;
-
-			geom.scale(scalingDelta.x, scalingDelta.y, center);
-			geom.rotate(rotationDelta, center);
-			geom.translate(translationDelta.x, translationDelta.y);
-			/*this.rotationUI.position = geom.position;
-			this.rotationUI.position.x += this.rotationUI.bounds.width / 2;
-			this.rotationUI.rotate(rotationDelta, this.rotationUI.firstSegment.point);
-			*/
-		},
+		},	
 
 		calculateTranslationCentroid: function() {
 			return this.get('geom').position;
@@ -1436,21 +1394,26 @@ define([
 			new_delta.x -= translationDelta.x;
 			new_delta.y -= translationDelta.y;
 			line.remove();
+
 			return new_delta;
 		},
 
 		inverseTransformPoint: function(delta) {
-			var translationDelta = this.get('translationDelta').getValue();
-			delta.x += translationDelta.x;
-			delta.y += translationDelta.y;
-			var line = new paper.Path.Line(new paper.Point(0, 0), delta);
+			var value = this.getValue();
+			var scalingDelta, rotationDelta;
+			scalingDelta = value.scalingDelta;
+			rotationDelta = value.rotationDelta;
+			var geomPosition =  this.get('geom').position;
+			var pVector = new paper.Point(delta.x,delta.y);
+			pVector = pVector.rotate(-rotationDelta,new paper.Point(0,0));
 
-			var invertedMatrix = this.get('geom').matrix.inverted();
-
-			line.transform(invertedMatrix);
-			var new_delta = line.segments[1].point;
-			line.remove();
-			return new_delta;
+			pVector = pVector.multiply(new paper.Point(1/scalingDelta.x,1/scalingDelta.y));
+			if(this.nodeParent){
+				return this.nodeParent.inverseTransformPoint(pVector);
+			}
+			else{
+				return pVector;
+			}
 		},
 
 
@@ -1484,7 +1447,7 @@ define([
 					this.renderQueue[i].render();
 				}
 			}
-			//this.centroidUI.position = this.get('geom').position;
+			this.centroidUI.position = this.get('geom').position;
 			this.renderQueue = [];
 		},
 
@@ -1501,10 +1464,51 @@ define([
 				this.updateScreenBounds(geom);
 				this.renderStyle(geom);
 				this.renderSelection(geom);
-
 				this.set('rendered', true);
 			}
 
+		},
+
+		reset: function() {
+			if (this.get('rendered')) {
+				var geom = this.get('geom');
+				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);
+				geom.rotate(0 - this.resetTransforms.rotationDelta, this.resetTransforms.center);
+				geom.scale(1 / this.resetTransforms.scalingDelta.x, 1 / this.resetTransforms.scalingDelta.y, this.resetTransforms.center);
+				//this.rotationUI.rotate(0 - this.resetTransforms.rotationDelta, this.rotationUI.firstSegment.point);
+				this.set('rendered', false);
+
+
+			}
+
+		},
+
+		transformSelf: function() {
+			var geom = this.get('geom');
+			this.originUI.position = geom.position;
+			geom.position = new paper.Point(0, 0);
+			var center = geom.position;
+
+			
+			var value = this.getValue();
+			var scalingDelta, rotationDelta, translationDelta;
+			scalingDelta = value.scalingDelta;
+			rotationDelta = value.rotationDelta;
+			translationDelta = value.translationDelta;
+
+
+			this.resetTransforms.translationDelta = translationDelta;
+			this.resetTransforms.scalingDelta = scalingDelta;
+			this.resetTransforms.rotationDelta = rotationDelta;
+			this.resetTransforms.center = center;
+
+			geom.scale(scalingDelta.x, scalingDelta.y, center);
+			geom.rotate(rotationDelta, center);
+			geom.translate(translationDelta.x, translationDelta.y);
+			/*this.rotationUI.position = geom.position;
+			this.rotationUI.position.x += this.rotationUI.bounds.width / 2;
+			this.rotationUI.rotate(rotationDelta, this.rotationUI.firstSegment.point);
+			*/
 		},
 
 
@@ -1554,6 +1558,11 @@ define([
 
 
 		renderSelection: function(geom) {
+
+			if (this.bboxInvalid) {
+				this.createBBox();
+
+			}
 			var selected = this.get('selected').getValue();
 			var constraint_selected = this.get('constraintSelected').getValue();
 			var bbox = this.get('bbox');
@@ -1561,7 +1570,7 @@ define([
 
 			if (selected || constraint_selected) {
 				bbox.transform(bbox.matrix.inverted());
-				bbox.position = new paper.Point(0,0);
+				bbox.position = new paper.Point(0, 0);
 				bbox.transform(geom.globalMatrix);
 				bbox.position = geom.parent.localToGlobal(geom.position);
 
