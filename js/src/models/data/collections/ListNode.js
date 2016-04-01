@@ -580,9 +580,11 @@ define([
     toJSON: function(noUndoCache) {
       var data = Instance.prototype.toJSON.call(this, noUndoCache);
       var members = [];
-      _.each(this.members, function(item) {
-        members.push(item.toJSON(noUndoCache));
-      });
+     for(var i=0;i<this.members.length;i++) {
+        var item = this.members[i].toJSON(noUndoCache);
+        item.listIndex = i;
+        members.push(item);
+      }
       data.members = members;
       return data;
     },
@@ -635,7 +637,7 @@ define([
         } else {
           member = manager.getById(dataClone[k].id);
         }
-        this.addMember(member, dataClone[k].zIndex);
+        this.addMember(member, dataClone[k].listIndex);
 
         member.trigger('modified', member);
 

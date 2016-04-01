@@ -78,6 +78,19 @@ define([
 				return null;
 			},
 
+			toggleOpen: function() {
+      			this.set('open', true);
+      			return true;
+    		},
+
+    		toggleClosed: function() {
+      			return false;
+    		},
+
+    		getSiblings: function(){
+    			return [];
+    		},
+
 			addParameter: function(param) {
 				param.setName('param_' + this.pcount);
 				this.pcount++;

@@ -294,6 +294,10 @@ define([
 
 
 		importProjectJSON: function(json) {
+			while(currentNode!=rootNode){
+				this.toggleClosed();
+			}
+
 			analytics.log(eventType, {
 				type: eventType,
 				id: 'import',
@@ -325,9 +329,9 @@ define([
 				constraints: constraint_json,
 				lists: list_json
 			};
-			while(currentNode!=cNode){
-				this.toggleOpen();
-			}
+			currentNode = cNode;
+			currentNode.toggleOpen();
+			
 			return project_json;
 		},
 
@@ -887,7 +891,7 @@ define([
 					layersView.addList(copy.toJSON());
 
 				} else {
-					copy = selected[i].create();
+					copy = selected[i].create(true);
 					geom_copy.push(copy);
 
 				}
@@ -1471,7 +1475,6 @@ define([
 			}
 		},
 
-
 		/* toggleOpen
 		 * moves down a level in the geometery heirarchy based on selection
 		 */
@@ -1500,6 +1503,9 @@ define([
 		 * moves up a level in the geometery heirarchy
 		 */
 		toggleClosed: function() {
+			if(currentNode == rootNode){
+				return;
+			}
 			this.deselectAllShapes();
 
 			if (currentNode != rootNode) {

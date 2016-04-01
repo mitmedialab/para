@@ -58,7 +58,7 @@ define([
       this.startingUI.fillColor = 'green';
       this.endingUI = this.startingUI.clone();
       this.endingUI.fillColor = 'red';*/
-      
+
       this.bboxInvalid = false;
       this.childrenModified = false;
     },
@@ -68,7 +68,7 @@ define([
     toJSON: function(noUndoCache) {
       var data = GeometryNode.prototype.toJSON.call(this, noUndoCache);
       console.log('data transforms',data.resetTransforms,this.center);
-
+      data.matrix = this.get('geom').matrix.values;
       data.childrenModified =this.childrenModified;
 
       for (var i = 0; i < this.children.length; i++) {
@@ -90,7 +90,7 @@ define([
       var changed = GeometryNode.prototype.parseJSON.call(this, data, manager);
       var childClone = this.children.slice(0, this.children.length);
       var dataClone = data.children.slice(0, data.children.length);
-      this.childrenModified =data.childrenModified;
+      
 
 
       for (var i = 0; i < this.children.length; i++) {
@@ -115,7 +115,6 @@ define([
 
       //remove children not in JSON
       for (var j = 0; j < childClone.length; j++) {
-
         var currentFuture = this.futureStates[this.futureStates.length - 1];
         var currentPast = this.previousStates[this.previousStates.length - 1];
         if (currentFuture) {
@@ -155,6 +154,15 @@ define([
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
         this.insertChild(dataClone[k].zIndex, newChild);
+        if(data.matrix){
+          console.log('matrix',data.matrix);
+          newChild.childrenModified = true;
+          var matrix = new paper.Matrix(data.matrix[0],data.matrix[1],data.matrix[2],data.matrix[3],data.matrix[4],data.matrix[5]);
+         newChild.get('geom').transform(matrix);
+          newChild.set('rendered',false);
+          newChild.reset();
+          newChild.render();
+        }
         //newChild.trigger('modified', newChild);
       }
 
@@ -239,7 +247,6 @@ define([
       var instance = this.geometryGenerator.getTargetClass(this.get('name'));
       var value = this.getValue();
       instance.setValue(value);
-      instance.set('rendered', true);
       instance.resetTransforms.center = this.resetTransforms.center.clone();
       instance.resetTransforms.translationDelta.x = this.resetTransforms.translationDelta.x;
       instance.resetTransforms.translationDelta.y = this.resetTransforms.translationDelta.y;
@@ -251,8 +258,12 @@ define([
         var clone = this.children[i].create(noInheritor);
         instance.addChildNode(clone);
       }
-      instance.transformSelf();
-      console.log('rotation delta',instance.get('rotationDelta').getValue());
+      instance.childrenModified = true;
+      instance.get('geom').transform(this.get('geom').matrix);
+      instance.set('rendered',false);
+      instance.reset();
+      instance.render();
+
       return instance;
     },
 
@@ -306,7 +317,9 @@ define([
         }
 
       }
-      GeometryNode.prototype.setValue.call(this, data, registerUndo);
+      else{
+        GeometryNode.prototype.setValue.call(this, data, registerUndo);
+      }
     },
 
     /* getValueFor
@@ -386,6 +399,10 @@ define([
 
     toggleOpen: function() {
       this.set('open', true);
+      if(!this.nodeParent.get('open')){
+        this.nodeParent.toggleOpen();
+      }
+      return true;
     },
 
     toggleClosed: function() {
@@ -394,6 +411,7 @@ define([
       }
     
       this.set('open', false);
+      return true;
     },
 
 

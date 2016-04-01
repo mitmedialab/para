@@ -279,8 +279,9 @@ define([
 
             addRelativeMember: function(copy, index) {
                 if (this.masterList.members.length > 1) {
-
+                   // console.log('copy geom position',copy.get('geom').position);
                     copy.setValue(this.masterList.members[this.masterList.members.length - 2].getValue());
+                   // console.log('copy position after value set',copy.getValue().translationDelta,copy.get('geom').position);
 
                     if (!index) {
                         index = this.masterList.members.length - 1;
@@ -295,7 +296,9 @@ define([
                 }
 
                 this.insertChild(index, copy);
+                
                 this.masterList.addMember(copy, index);
+                
                 if (copy.get('name') == 'group') {
                     this.addRelativeGroupMember(copy, index);
                 }
@@ -425,7 +428,7 @@ define([
                     toRemove: toRemove
                 };
 
-                console.log('relative_group_list',this.group_relative,'reference_list',this.group_reference);
+                console.log('relative_group_list', this.group_relative, 'reference_list', this.group_reference);
 
                 return data;
             },

@@ -260,6 +260,7 @@ define([
 			};
 			bucket.upload(drawing_file, function(err, data) {
 				var results = err ? 'ERROR!' : 'SAVED.';
+				alert(results);
 			});
 			this.disableSave();
 			return true;

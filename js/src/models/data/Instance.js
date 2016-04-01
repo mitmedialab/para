@@ -400,9 +400,13 @@ define([
 			return 1;
 		},
 
-		toggleOpen: function() {},
+		toggleOpen: function() {
+			return false;
+		},
 
-		toggleClosed: function() {},
+		toggleClosed: function() {
+			return false;
+		},
 
 		addMemberToOpen: function(data, added_bool) {
 			return false;
@@ -481,7 +485,7 @@ define([
 		},
 
 		/*returns a clone of the paper js shape*/
-		getShapeClone: function(relative) {
+		getShapeClone: function() {
 			this.get('geom').data.instance = null;
 			var clone = this.get('geom').clone();
 			this.get('geom').data.instance = this;
@@ -809,7 +813,10 @@ define([
 			data.children = [];
 			data.rendered = this.get('rendered');
 			data.resetTransforms = {};
-			data.resetTransforms.center = {x:this.resetTransforms.center.x,y:this.resetTransforms.center.y};
+			data.resetTransforms.center = {
+				x: this.resetTransforms.center.x,
+				y: this.resetTransforms.center.y
+			};
 			data.resetTransforms.translationDelta = this.resetTransforms.translationDelta;
 			data.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
 			data.resetTransforms.scalingDelta = this.resetTransforms.scalingDelta;
@@ -851,7 +858,7 @@ define([
 			this.resetTransforms.translationDelta = data.resetTransforms.translationDelta;
 			this.resetTransforms.rotationDelta = data.resetTransforms.rotationDelta;
 			this.resetTransforms.scalingDelta = data.resetTransforms.scalingDelta;
-			this.set('rendered',true);
+			this.set('rendered', true);
 
 			if (this.get('name') == 'root') {
 				this.set('open', true);
@@ -1033,6 +1040,18 @@ define([
 			}
 		},
 
+		//sets all transformation values to 0
+		resetValue: function() {
+			this.get('translationDelta').setValue({
+				x: 0,
+				y: 0
+			});
+			this.get('rotationDelta').setValue(0);
+			this.get('scalingDelta').setValue({
+				x: 1,
+				y: 1
+			});
+		},
 
 		/*setValueEnded
 		 * called when a manual adujstment is ended
@@ -1488,21 +1507,30 @@ define([
 		 * draws instance on canvas
 		 */
 		render: function() {
+			var geom = this.get('geom');
 
 			if (!this.get('rendered')) {
-				var geom = this.get('geom');
-				var bbox = this.get('bbox');
-				this.transformSelf();
-				this.updateScreenBounds(geom);
-				this.renderStyle(geom);
-				this.renderSelection(geom);
-				this.set('rendered', true);
+				var modified = this.transformSelf();
+				if (modified) {
+					this.updateScreenBounds(geom);
+					this.set('rendered', true);
+					console.log('rendering',this.get('name'));
+				}
+				else{
+					this.set('rendered',false);
+
+				}
+
 			}
+			this.renderStyle(geom);
+			this.renderSelection(geom);
+
 
 		},
 
 		reset: function() {
 			if (this.get('rendered')) {
+				console.log('resetting',this.get('name'));
 				var geom = this.get('geom');
 				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);
 				geom.rotate(0 - this.resetTransforms.rotationDelta, this.resetTransforms.center);
@@ -1516,15 +1544,29 @@ define([
 		},
 
 		transformSelf: function() {
-			var geom = this.get('geom');
-			//this.originUI.position = geom.position;
-			geom.position = new paper.Point(0, 0);
-			var center = geom.position;
-			var value = this.getValue();
 			var scalingDelta, rotationDelta, translationDelta;
+			var value = this.getValue();
+			var geom = this.get('geom');
+
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
+			var obj = {
+				translationDelta: translationDelta,
+				scalingDelta: scalingDelta,
+				rotationDelta: rotationDelta,
+				center: geom.position
+			};
+
+			if (_.isEqual(obj, this.resetTransforms) && this.get('rendered')) {
+				console.log('is equal');
+				return false;
+			}
+
+			//this.originUI.position = geom.position;
+			geom.position = new paper.Point(0, 0);
+			var center = geom.position;
+
 
 
 			this.resetTransforms.translationDelta = translationDelta;
@@ -1535,6 +1577,9 @@ define([
 			geom.scale(scalingDelta.x, scalingDelta.y, center);
 			geom.rotate(rotationDelta, center);
 			geom.translate(translationDelta.x, translationDelta.y);
+			this.set('rendered', true);
+
+			return true;
 			/*this.rotationUI.position = geom.position;
 			this.rotationUI.position.x += this.rotationUI.bounds.width / 2;
 			this.rotationUI.rotate(rotationDelta, this.rotationUI.firstSegment.point);
@@ -1563,7 +1608,7 @@ define([
 				geom.fillColor = undefined;
 			}
 			if (!this._strokeColor.noColor && (this._strokeColor.h > -1 && this._strokeColor.s > -1 && this._strokeColor.l > -1)) {
-				if (!geom.fillColor) {
+				if (!geom.strokeColor) {
 					geom.strokeColor = new paper.Color(0, 0, 0);
 				}
 				geom.strokeColor.hue = this._strokeColor.h;

@@ -128,23 +128,7 @@ define([
     transformSelf: function() {
       GeometryNode.prototype.transformSelf.call(this);
     },
-    render: function() {
-      if (!this.get('rendered')) {
-        var geom = this.get('geom');
-        this.transformSelf();
-        this.renderStyle(geom);
-        this.renderSelection(geom);
-
-        this.set('rendered', true);
-      }
-    },
-
-
-    reset: function() {
-      GeometryNode.prototype.reset.apply(this, arguments);
-
-    },
-
+   
 
 
     create: function(noInheritor) {
@@ -158,10 +142,6 @@ define([
       instance.svg_data = this.svg_data;
 
       return instance;
-    },
-
-    getShapeClone: function() {
-      return PathNode.prototype.getShapeClone.call(this);
     },
 
 
