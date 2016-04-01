@@ -808,6 +808,11 @@ define([
 			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
 			data.rendered = this.get('rendered');
+			data.resetTransforms = {};
+			data.resetTransforms.center = {x:this.resetTransforms.center.x,y:this.resetTransforms.center.y};
+			data.resetTransforms.translationDelta = this.resetTransforms.translationDelta;
+			data.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
+			data.resetTransforms.scalingDelta = this.resetTransforms.scalingDelta;
 			if (!noUndoCache) {
 				data.stateStored = this.stateStored;
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
@@ -840,7 +845,14 @@ define([
 			this.set('visible', data.visible);
 			this.set('open', data.open);
 			this.set('rendered', data.rendered);
-			this.trigger('modified', this);
+			this.resetTransforms.center = new paper.Point();
+			this.resetTransforms.center.x = data.resetTransforms.center.x;
+			this.resetTransforms.center.y = data.resetTransforms.center.y;
+			this.resetTransforms.translationDelta = data.resetTransforms.translationDelta;
+			this.resetTransforms.rotationDelta = data.resetTransforms.rotationDelta;
+			this.resetTransforms.scalingDelta = data.resetTransforms.scalingDelta;
+			this.set('rendered',true);
+
 			if (this.get('name') == 'root') {
 				this.set('open', true);
 			}

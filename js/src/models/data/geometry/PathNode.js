@@ -54,7 +54,7 @@ define([
       this.get('geom').data.instance = null;
       data.geom = this.get('geom').exportJSON(false);
       this.get('geom').data.instance = this;
-
+      data.pointsModified = this.pointsModified;
       return data;
     },
 
@@ -65,6 +65,7 @@ define([
       var geom = new paper.Path();
       geom.importJSON(data.geom);
       this.changeGeomInheritance(geom);
+      this.pointsModified = data.pointsModified;
       return GeometryNode.prototype.parseJSON.call(this, data, manager);
     },
 

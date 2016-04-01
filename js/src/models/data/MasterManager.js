@@ -313,7 +313,10 @@ define([
 		},
 
 		exportProjectJSON: function(json) {
-
+			var cNode = currentNode;
+			while(currentNode!=rootNode){
+				this.toggleClosed();
+			}
 			var geometry_json = rootNode.toJSON(true);
 			var constraint_json = constraintManager.toJSON(true);
 			var list_json = collectionManager.toJSON(true);
@@ -322,6 +325,9 @@ define([
 				constraints: constraint_json,
 				lists: list_json
 			};
+			while(currentNode!=cNode){
+				this.toggleOpen();
+			}
 			return project_json;
 		},
 

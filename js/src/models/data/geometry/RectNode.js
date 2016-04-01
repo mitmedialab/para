@@ -59,6 +59,7 @@ define([
         } else {
           new_master = new paper.Path.Ellipse(new paper.Point(0, 0), userParams[0].val, userParams[1].val);
         }
+        
         new_master.visible = false;
         new_master.data.instance = this;
         new_master.data.geom = true;

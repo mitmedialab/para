@@ -58,6 +58,7 @@ define([
       this.startingUI.fillColor = 'green';
       this.endingUI = this.startingUI.clone();
       this.endingUI.fillColor = 'red';*/
+      
       this.bboxInvalid = false;
       this.childrenModified = false;
     },
@@ -66,6 +67,10 @@ define([
 
     toJSON: function(noUndoCache) {
       var data = GeometryNode.prototype.toJSON.call(this, noUndoCache);
+      console.log('data transforms',data.resetTransforms,this.center);
+
+      data.childrenModified =this.childrenModified;
+
       for (var i = 0; i < this.children.length; i++) {
         data.children.push(this.children[i].toJSON(noUndoCache));
       }
@@ -85,6 +90,7 @@ define([
       var changed = GeometryNode.prototype.parseJSON.call(this, data, manager);
       var childClone = this.children.slice(0, this.children.length);
       var dataClone = data.children.slice(0, data.children.length);
+      this.childrenModified =data.childrenModified;
 
 
       for (var i = 0; i < this.children.length; i++) {

@@ -175,8 +175,6 @@ define([
             },
 
             setInternalConstraint: function() {
-
-
                 var internalConstraints = [];
                 if (this.get('target').get('name') == 'group') {
                     internalConstraints.push.apply(internalConstraints, this.setInternalGroupConstraint());
@@ -215,15 +213,8 @@ define([
                 var member_constraints = [];
                 var target = this.get('target');
                 for (var i = 0; i < target.children.length; i++) {
-                    var relative_list = new ConstrainableList();
-                    var reference_list = new ConstrainableList();
-                    relative_list.set('id', 'internal' + relative_list.get('id'));
-                    relative_list.get('ui').remove();
-                    reference_list.set('id', 'internal' + reference_list.get('id'));
-                    reference_list.get('ui').remove();
-
-                    this.group_relative.push(relative_list);
-                    this.group_reference.push(reference_list);
+                    var reference_list = this.group_reference[i];
+                    var relative_list = this.group_relative[i];
                     reference_list.addMember(target.children[i]);
                     var targetId = target.children[i].get('id');
                     var lastId;
@@ -232,9 +223,6 @@ define([
                         lastId = this.masterList.members[this.masterList.members.length - 1].children[i].get('id');
                     }
 
-                    for (var j = 0; j < this.masterList.members.length; j++) {
-                        relative_list.addMember(this.masterList.members[j].children[i]);
-                    }
 
                     var constraint = new Constraint();
                     constraint.set('references', reference_list);
@@ -271,7 +259,21 @@ define([
                 if (!this.masterList.hasMember(target, true)) {
                     this.masterList.addMember(target, 0);
                 }
-                console.log('duplicator target', this.get('target'));
+
+
+                if (target.get('name') == 'group') {
+                    for (var i = 0; i < target.children.length; i++) {
+                        var relative_list = new ConstrainableList();
+                        relative_list.addMember(target.children[i]);
+                        var reference_list = new ConstrainableList();
+                        relative_list.set('id', 'internal' + relative_list.get('id'));
+                        relative_list.get('ui').remove();
+                        reference_list.set('id', 'internal' + reference_list.get('id'));
+                        reference_list.get('ui').remove();
+                        this.group_relative.push(relative_list);
+                        this.group_reference.push(reference_list);
+                    }
+                }
             },
 
 
@@ -291,8 +293,19 @@ define([
                         index = 1;
                     }
                 }
+
                 this.insertChild(index, copy);
                 this.masterList.addMember(copy, index);
+                if (copy.get('name') == 'group') {
+                    this.addRelativeGroupMember(copy, index);
+                }
+            },
+
+            addRelativeGroupMember: function(copy, index) {
+                for (var i = 0; i < copy.children.length; i++) {
+                    var target_list = this.group_relative[i];
+                    target_list.addMember(copy.children[i], index);
+                }
 
             },
 
@@ -304,19 +317,6 @@ define([
                     this.get('target').removeInheritor(data);
                     data.deleteSelf();
                     return data;
-                }
-            },
-
-
-
-            insertChild: function(index, child, registerUndo) {
-                Group.prototype.insertChild.call(this, index, child, registerUndo);
-                if (child.get('name') === 'group') {
-                    for (var j = 0; j < child.children.length; j++) {
-                        for (var i = 0; i < this.group_relative.length; i++) {
-                            this.group_relative[j].addMember(child.children[j], index);
-                        }
-                    }
                 }
             },
 
@@ -376,7 +376,7 @@ define([
 
             deleteSelf: function() {
                 this.stopListening();
-                 for (var i = 0; i < this.group_relative.length; i++) {
+                for (var i = 0; i < this.group_relative.length; i++) {
                     this.group_relative[i].deleteSelf();
                 }
                 for (var j = 0; i < this.group_reference.length; j++) {
@@ -388,9 +388,6 @@ define([
                 return data;
             },
 
-
-
-          
 
 
             setCount: function(count, registerUndo) {
@@ -428,7 +425,7 @@ define([
                     toRemove: toRemove
                 };
 
-
+                console.log('relative_group_list',this.group_relative,'reference_list',this.group_reference);
 
                 return data;
             },

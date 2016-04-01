@@ -43,7 +43,7 @@ define([
 					model: this,
 				});
 				this.pcount = 1;
-      		//this.centroidUI.fillColor ='pink';
+				//this.centroidUI.fillColor ='pink';
 
 				this.selectedParam = null;
 			},
@@ -58,6 +58,14 @@ define([
 				data.open = this.get('open');
 				data.children = [];
 				data.rendered = this.get('rendered');
+				data.resetTransforms = {};
+				data.resetTransforms.center = {
+					x: 0,
+					y: 0
+				};
+				data.resetTransforms.translationDelta = this.resetTransforms.translationDelta;
+				data.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
+				data.resetTransforms.scalingDelta = this.resetTransforms.scalingDelta;
 				return this.parseJSON(data);
 			},
 
@@ -207,7 +215,7 @@ define([
 			childModified: function(child) {
 				GeometryNode.prototype.childModified.call(this, child);
 			},
-			
+
 
 			toJSON: function(noUndoCache) {
 				// // call prototype
