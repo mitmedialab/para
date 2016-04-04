@@ -32,10 +32,10 @@ define([
   var hitOptions = {
     stroke: true,
     fill: true,
-    bounds: true,
-    center: true,
-    segments: true,
-    curves: true,
+    bounds: false,
+    center: false,
+    segments: false,
+    curves: false,
     tolerance: 2,
   };
 

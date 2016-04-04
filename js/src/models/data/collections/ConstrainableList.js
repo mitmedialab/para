@@ -61,15 +61,17 @@ define([
       setValue: function(data, registerUndo) {
         Instance.prototype.setValue.call(this, data, registerUndo);
         var constrained_props = this.getConstraintValues();
+
         for (var i = 0; i < this.members.length; i++) {
-          if (constrained_props[i]) {
+          /*if (constrained_props[i]) {
             var reference_status = this.isReference(this.members[i]);
             var set_data = this.members[i].getAddedValueFor(data);
             var stripped_data = TrigFunc.stripBoolean(set_data, constrained_props[i], reference_status);
+            console.log('stripped data =', stripped_data, constrained_props[i]);
             this.members[i].setValue(stripped_data, registerUndo);
-          } else {
+          } else {*/
             this.members[i].setValue(data, registerUndo);
-          }
+          //}
         }
         this.trigger('modified', this);
       },
@@ -89,6 +91,7 @@ define([
        */
       getConstraintValues: function() {
         var constraints = this.getConstraint();
+        console.log('constraints = ',constraints);
         if (constraints.getValue) {
           return constraints.getValue();
         } else {

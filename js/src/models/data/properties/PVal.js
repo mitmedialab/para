@@ -60,8 +60,8 @@ define([
 					var v = this.v.getConstraint();
 					if (v) {
 						data.v = v;
+						return data;
 					}
-					return data;
 				}
 
 			},

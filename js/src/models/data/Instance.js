@@ -1226,19 +1226,17 @@ define([
 			if (self) {
 				return self;
 			} else {
-				var constraintFound = false;
 				for (var propertyName in constrainMap) {
 					if (constrainMap.hasOwnProperty(propertyName)) {
 						var constraint = this.get(propertyName).getConstraint();
 						if (constraint) {
 							data[propertyName] = constraint;
 						}
-						constraintFound = true;
 					}
 				}
-				if (constraintFound) {
-					return data;
-				}
+				
+				return data;
+				
 			}
 
 
