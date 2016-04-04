@@ -94,6 +94,8 @@ define([
       }
       if (state == 'constraintTool') {
         this.trigger('constraintModeChanged',true);
+        console.log('currentTool',this.get('tool_collection').get(this.get('state')));
+        this.trigger('initConstraintOnSelected',this.get('tool_collection').get(this.get('state')));
       } else {
         this.trigger('constraintModeChanged',false);
         this.trigger('compileRequest');
@@ -278,6 +280,11 @@ define([
 
         event.preventDefault();
       }
+    },
+
+    zeroOrigin: function(){
+       paper.view.center = this.zeroedPan;
+       paper.view.zoom = this.zeroedZoom;
     },
 
     changeZoom: function(oldZoom, delta, c, p) {

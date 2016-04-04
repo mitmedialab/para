@@ -1073,12 +1073,12 @@ define([
         var center = TrigFunc.midpoint(min, max);
         var polar_min = TrigFunc.cartToPolar(center, min);
         var polar_max = TrigFunc.cartToPolar(center, max);
-
+        console.log("rad",polar_min.rad,polar_max.rad);
         var range = this.get('relatives').getRange();
         var theta_increment = Math.PI / (range);
         var vals = [];
         vals.length = range;
-        for (var m = 0; m < range; m += 2) {
+        for (var m = 0; m < Math.floor(range/2); m ++) {
           var y;
           var angle;
           angle = polar_min.theta + (theta_increment * m);
@@ -1092,7 +1092,7 @@ define([
           vals[m] = y;
         }
 
-        for (var m = 1; m < range; m += 2) {
+        for (var m = Math.floor(range/2); m < range; m ++) {
           var y;
           var angle;
           angle = polar_max.theta + (theta_increment * (m + 1));
@@ -1104,19 +1104,35 @@ define([
 
           }
           vals[m] = y;
-
         }
 
         for (var m = 0; m < range; m++) {
-
+         /* var val = this.get('relatives').members[m].getValue()[ref_prop_key][ref_dimension];
+           console.log('val for',m,val);
+          if (reference_values[ref_dimension].vals[m]) {
+            reference_values[ref_dimension].vals[m].setValue(val);
+          } else {
+            var newVal = new PFloat(val);
+            newVal.setNull(false);
+            reference_values[ref_dimension].vals.push(newVal);
+          }*/
+          console.log('val for',m,vals[m]);
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(vals[m]);
+
           } else {
             var newVal = new PFloat(vals[m]);
             newVal.setNull(false);
-            reference_values[ref_dimension].vals.push(newVal);
+            if(reference_values[ref_dimension].vals.length<2){
+              reference_values[ref_dimension].vals.push(newVal);
+            }
+            else{
+                reference_values[ref_dimension].vals.splice(reference_values.length-1,0,newVal);
+            }
           }
         }
+
+       reference_values[ref_dimension].vals.length = range;
 
 
       }

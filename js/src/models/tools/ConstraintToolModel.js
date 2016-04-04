@@ -186,26 +186,19 @@ define([
       this.trigger('delegateMethod', 'select', 'selectDown', event);
       this.trigger('selectionRequest', this);
       var type = (event.modifiers.control) ? 'point' : 'shape';
-      var flag = this.get('currentConstraint').setSelection(this.selected, type);
+      this.selectTarget(this.selected,type);
+    },
+
+    selectTarget: function(target,type){
+      var flag = this.get('currentConstraint').setSelection(target, type);
       this.trigger('compileRequest');
 
       if (flag) {
         this.set('mode', 'ref');
         this.modeSwitch();
-      } else {
-        // visitor get constraints on instance
-        // unique constraints by ref
-      }
+      } 
     },
 
-    selectMouseDown: function(event) {
-      // hopefully could be here but to get working should be in select view
-      // check which constraint was hit
-      // set this constraint to selected
-      // set current constraint to selected constraint
-      // remove visibility of all other constraints ( maybe save for later )
-      // set mode to ref 
-    },
 
     refMouseDown: function(event) {
       var constraint = this.get('currentConstraint');

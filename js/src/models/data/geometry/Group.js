@@ -67,12 +67,13 @@ define([
 
     toJSON: function(noUndoCache) {
       var data = GeometryNode.prototype.toJSON.call(this, noUndoCache);
-      console.log('data transforms',data.resetTransforms,this.center);
+      console.log('data transforms', data.resetTransforms, this.center);
       data.matrix = this.get('geom').matrix.values;
-      data.childrenModified =this.childrenModified;
+      data.childrenModified = this.childrenModified;
 
       for (var i = 0; i < this.children.length; i++) {
         data.children.push(this.children[i].toJSON(noUndoCache));
+        console.log('children location, children matrix',i,data.children[i].translationDelta,data.children[i].matrix);
       }
       return data;
     },
@@ -90,7 +91,7 @@ define([
       var changed = GeometryNode.prototype.parseJSON.call(this, data, manager);
       var childClone = this.children.slice(0, this.children.length);
       var dataClone = data.children.slice(0, data.children.length);
-      
+
 
 
       for (var i = 0; i < this.children.length; i++) {
@@ -154,16 +155,15 @@ define([
         newChild.previousStates = dataClone[k].previousStates;
         newChild.futureStates = dataClone[k].futureStates;
         this.insertChild(dataClone[k].zIndex, newChild);
-        if(data.matrix){
-          console.log('matrix',data.matrix);
+        if (data.matrix) {
+          console.log('matrix', data.matrix);
           newChild.childrenModified = true;
-          var matrix = new paper.Matrix(data.matrix[0],data.matrix[1],data.matrix[2],data.matrix[3],data.matrix[4],data.matrix[5]);
-         newChild.get('geom').transform(matrix);
-          newChild.set('rendered',false);
+          var matrix = new paper.Matrix(data.matrix[0], data.matrix[1], data.matrix[2], data.matrix[3], data.matrix[4], data.matrix[5]);
+          newChild.get('geom').transform(matrix);
+          newChild.set('rendered', false);
           newChild.reset();
           newChild.render();
         }
-        //newChild.trigger('modified', newChild);
       }
 
       return changed;
@@ -260,7 +260,7 @@ define([
       }
       instance.childrenModified = true;
       instance.get('geom').transform(this.get('geom').matrix);
-      instance.set('rendered',false);
+      instance.set('rendered', false);
       instance.reset();
       instance.render();
 
@@ -316,8 +316,7 @@ define([
           this.children[i].setValue(style_data, registerUndo);
         }
 
-      }
-      else{
+      } else {
         GeometryNode.prototype.setValue.call(this, data, registerUndo);
       }
     },
@@ -391,7 +390,7 @@ define([
         var formerTdelta = this.get('translationDelta').getValue();
         this.get('translationDelta').setValue(this.get('geom').position);
         this.bboxInvalid = true;
-        this.childrenModified =false;
+        this.childrenModified = false;
 
       }
       GeometryNode.prototype.reset.call(this);
@@ -399,7 +398,7 @@ define([
 
     toggleOpen: function() {
       this.set('open', true);
-      if(!this.nodeParent.get('open')){
+      if (!this.nodeParent.get('open')) {
         this.nodeParent.toggleOpen();
       }
       return true;
@@ -409,7 +408,7 @@ define([
       for (var i = 0; i < this.children.length; i++) {
         this.children[i].toggleClosed();
       }
-    
+
       this.set('open', false);
       return true;
     },

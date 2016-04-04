@@ -1069,6 +1069,25 @@ define([
 			}
 		},
 
+		initConstraintOnSelected: function(constraintTool){
+			if(selected.length===0){
+				return;
+			}
+			else{
+				if(selected.length==1){
+					constraintTool.selectTarget(selected);
+				}
+				else if(selected.length == 2){
+				constraintTool.selectTarget(selected.slice(-2,-1));
+				constraintTool.selectTarget(selected.slice(-1));
+				}
+				else{
+					var list = this.addList(selected);
+					constraintTool.selectTarget([list]);
+				}
+			}
+		},
+
 		addConstraint: function(constraint, noUpdate) {
 			analytics.log(eventType, {
 				type: eventType,

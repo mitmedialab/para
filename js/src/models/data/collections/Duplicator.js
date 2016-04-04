@@ -279,16 +279,16 @@ define([
 
             addRelativeMember: function(copy, index) {
                 if (this.masterList.members.length > 1) {
-                   // console.log('copy geom position',copy.get('geom').position);
-                    copy.setValue(this.masterList.members[this.masterList.members.length - 2].getValue());
-                   // console.log('copy position after value set',copy.getValue().translationDelta,copy.get('geom').position);
+                    // console.log('copy geom position',copy.get('geom').position);
+                    //copy.setValue(this.masterList.members[this.masterList.members.length - 2].getValue());
+                    // console.log('copy position after value set',copy.getValue().translationDelta,copy.get('geom').position);
 
                     if (!index) {
                         index = this.masterList.members.length - 1;
                     }
                 } else {
 
-                    copy.setValue(this.masterList.members[0].getValue());
+                    //copy.setValue(this.masterList.members[0].getValue());
 
                     if (!index) {
                         index = 1;
@@ -296,12 +296,23 @@ define([
                 }
 
                 this.insertChild(index, copy);
-                
+                console.log('copy translation after insert',copy.getValue().translationDelta);
                 this.masterList.addMember(copy, index);
-                
+                console.log('copy translation after list insert',copy.getValue().translationDelta);
+
                 if (copy.get('name') == 'group') {
                     this.addRelativeGroupMember(copy, index);
                 }
+                /*var master_ids = this.masterList.members.map(function(item) {
+                    return item.get('id');
+                });
+
+                var children_ids = this.children.map(function(child) {
+                    return child.get('id');
+                });
+                var equal = _.isEqual(master_ids, children_ids);*/
+
+                //console.log(equal, 'master list members', master_ids, 'child list members', children_ids);
             },
 
             addRelativeGroupMember: function(copy, index) {
@@ -375,6 +386,15 @@ define([
             show: function() {
                 Instance.prototype.show.call(this);
 
+            },
+
+            clearRenderQueue: function() {
+                if (this.renderQueue.length > 0) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        console.log('var child position at', i, this.children[i].get('geom').position);
+                    }
+                }
+                Group.prototype.clearRenderQueue.call(this);
             },
 
             deleteSelf: function() {

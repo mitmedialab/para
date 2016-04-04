@@ -29,6 +29,7 @@ define([
   var rightArrow = 39; // right arrow
   var leftArrow = 37; // left arrow
   var pan, alt, cmd, shift = false;
+  var origin_key = 79;
   var undo_key = 90;
   var redo_key = 86;
 
@@ -196,6 +197,9 @@ define([
       if (event.keyCode == redo_key) {
         this.model.redo();
       }
+      if(event.keyCode == origin_key && shift){
+        this.model.zeroOrigin();
+      }
       if (event.keyCode == functionKey) {
         //this.model.createFunction();
       }
@@ -321,30 +325,7 @@ define([
       this.model.canvasDblclick();
     },
 
-    subDblclick: function(event) {
-      /* event.data.parent.setSubActive();
-       event.data.parent.model.toggleView(false);
-       $('#sub-canvas').css('background-color', '#5B5B5B');
-       $('#canvas').css('background-color', '#232323');*/
-    },
-
-    /*centers the sub-view on a specific point */
-    centerGeom: function(targetPoint) {
-      var view = paper.View._viewsById['sub-canvas'];
-      var subCanvas = $('#sub-canvas');
-      var subCanvasCon = $('.sub-canvas-container');
-      var c_dim = new PPoint(subCanvas.width(), subCanvas.height());
-      var con_dim = new PPoint(subCanvasCon.width(), subCanvasCon.height());
-      var con_center = con_dim.div(2, true);
-      var c_center = c_dim.div(2, true);
-      var diffCenter = c_center.sub(con_center, true);
-      var diffTarget = new PPoint(targetPoint.x, targetPoint.y).sub(c_center, true);
-      view.center = c_center.toPaperPoint();
-      view.zoom = 1;
-      view.scrollBy(diffCenter.add(diffTarget, true));
-      view.draw();
-    },
-
+   
 
 
   });

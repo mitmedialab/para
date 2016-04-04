@@ -183,14 +183,11 @@ define([
 
 		TrigFunc.wrap = function(value, lower, upper) {
 
-			if (lower >= upper) {
-				throw ("Rotary bounds are of negative or zero size");
-			}
-
+			
 			var distance = upper - lower;
-			var times = (value - lower) / distance;
-			return value - (times * distance);
-		};
+    		return Math.abs(value - distance * Math.floor( value / distance));
+
+    	};
 
 
 		//merges properties of two objects (recursive)

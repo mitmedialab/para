@@ -62,6 +62,7 @@ define([
 
       masterManager.listenTo(toolManager, 'addConstraint', masterManager.addConstraint);
       masterManager.listenTo(toolManager, 'constraintModeChanged', masterManager.constraintModeChanged);
+      masterManager.listenTo(toolManager, 'initConstraintOnSelected', masterManager.initConstraintOnSelected);
       masterManager.listenTo(toolManager, 'toggleOpen', masterManager.toggleOpen);
       masterManager.listenTo(toolManager, 'toggleClosed', masterManager.toggleClosed);
       masterManager.listenTo(toolManager, 'doubleClick', masterManager.toggleItem);

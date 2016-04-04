@@ -1593,13 +1593,13 @@ define([
 			this._strokeColor = value.strokeColor;
 			this._strokeWidth = value.strokeWidth;
 			this._visible = this.get('visible');
-
-			if (!this._fillColor.noColor && (this._fillColor.h > -1 && this._fillColor.s > -1 && this._fillColor.l > -1)) {
+			if (!this._fillColor.noColor) {
 				if (!geom.fillColor) {
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
 
-				geom.fillColor.hue = this._fillColor.h;
+				geom.fillColor.hue =  this._fillColor.h;
+				console.log("hue for",this.get('name'),value.fillColor);
 				geom.fillColor.saturation = this._fillColor.s;
 				geom.fillColor.lightness = this._fillColor.l;
 				geom.fillColor.alpha = this._fillColor.a;
@@ -1607,11 +1607,11 @@ define([
 			} else {
 				geom.fillColor = undefined;
 			}
-			if (!this._strokeColor.noColor && (this._strokeColor.h > -1 && this._strokeColor.s > -1 && this._strokeColor.l > -1)) {
+			if (!this._strokeColor.noColor) {
 				if (!geom.strokeColor) {
 					geom.strokeColor = new paper.Color(0, 0, 0);
 				}
-				geom.strokeColor.hue = this._strokeColor.h;
+				geom.strokeColor.hue = TrigFunc.wrap(this._strokeColor.h,0,360);
 				geom.strokeColor.saturation = this._strokeColor.s;
 				geom.strokeColor.lightness = this._strokeColor.l;
 				geom.strokeColor.alpha = this._strokeColor.a;
