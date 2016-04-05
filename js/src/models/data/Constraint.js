@@ -746,9 +746,7 @@ define([
 
             relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
             relative_target.get(rel_prop_key)[rel_dimension].getValue();
-            if(rel_prop_key == 'fillColor'){
-                  console.log('setting constraint on',rel_dimension, relative_target.get(rel_prop_key)[rel_dimension].getValue());
-            }
+           
 
           }
           if (relative.get('type') == 'collection') {
@@ -1083,12 +1081,12 @@ define([
         var center = TrigFunc.midpoint(min, max);
         var polar_min = TrigFunc.cartToPolar(center, min);
         var polar_max = TrigFunc.cartToPolar(center, max);
-        console.log("rad",polar_min.rad,polar_max.rad);
+       // console.log("rad",polar_min.rad,polar_max.rad);
         var range = this.get('relatives').getRange();
         var theta_increment = Math.PI / (range);
         var vals = [];
         vals.length = range;
-        for (var m = 0; m < Math.floor(range/2); m ++) {
+        for (var m = 0; m < range; m += 2) {
           var y;
           var angle;
           angle = polar_min.theta + (theta_increment * m);
@@ -1102,7 +1100,7 @@ define([
           vals[m] = y;
         }
 
-        for (var m = Math.floor(range/2); m < range; m ++) {
+         for (var m = 1; m < range; m += 2) {
           var y;
           var angle;
           angle = polar_max.theta + (theta_increment * (m + 1));
@@ -1126,7 +1124,7 @@ define([
             newVal.setNull(false);
             reference_values[ref_dimension].vals.push(newVal);
           }*/
-          console.log('val for',m,vals[m]);
+          //console.log('val for',m,vals[m]);
           if (reference_values[ref_dimension].vals[m]) {
             reference_values[ref_dimension].vals[m].setValue(vals[m]);
 

@@ -296,9 +296,7 @@ define([
                 }
 
                 this.insertChild(index, copy);
-                console.log('copy translation after insert',copy.getValue().translationDelta);
                 this.masterList.addMember(copy, index);
-                console.log('copy translation after list insert',copy.getValue().translationDelta);
 
                 if (copy.get('name') == 'group') {
                     this.addRelativeGroupMember(copy, index);
@@ -389,11 +387,6 @@ define([
             },
 
             clearRenderQueue: function() {
-                if (this.renderQueue.length > 0) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        console.log('var child position at', i, this.children[i].get('geom').position);
-                    }
-                }
                 Group.prototype.clearRenderQueue.call(this);
             },
 
@@ -448,7 +441,6 @@ define([
                     toRemove: toRemove
                 };
 
-                console.log('relative_group_list', this.group_relative, 'reference_list', this.group_reference);
 
                 return data;
             },

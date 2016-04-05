@@ -995,12 +995,6 @@ define([
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
-			if (data.fillColor) {
-				console.log('data fill color =', data.fillColor);
-			}
-			if (data.strokeColor) {
-				console.log('data stroke color =', data.strokeColor);
-			}
 			if (data.translationDelta && this.nodeParent) {
 				var tdelta = data.translationDelta;
 				var ndelta = this.nodeParent.inverseTransformPoint(tdelta);

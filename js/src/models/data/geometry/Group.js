@@ -67,13 +67,11 @@ define([
 
     toJSON: function(noUndoCache) {
       var data = GeometryNode.prototype.toJSON.call(this, noUndoCache);
-      console.log('data transforms', data.resetTransforms, this.center);
       data.matrix = this.get('geom').matrix.values;
       data.childrenModified = this.childrenModified;
 
       for (var i = 0; i < this.children.length; i++) {
         data.children.push(this.children[i].toJSON(noUndoCache));
-        console.log('children location, children matrix',i,data.children[i].translationDelta,data.children[i].matrix);
       }
       return data;
     },
@@ -156,7 +154,6 @@ define([
         newChild.futureStates = dataClone[k].futureStates;
         this.insertChild(dataClone[k].zIndex, newChild);
         if (data.matrix) {
-          console.log('matrix', data.matrix);
           newChild.childrenModified = true;
           var matrix = new paper.Matrix(data.matrix[0], data.matrix[1], data.matrix[2], data.matrix[3], data.matrix[4], data.matrix[5]);
           newChild.get('geom').transform(matrix);
@@ -228,7 +225,6 @@ define([
         deleted.push.apply(deleted, this.children[i].deleteAllChildren());
 
         var d = this.removeChildNode(this.children[i], false, true);
-        console.log('d', d);
         if (d) {
           deleted.push(d.deleteSelf());
         }

@@ -115,7 +115,6 @@
 
 			//callback triggered when a subproperty is modified externally 
 			modified: function(event) {
-				console.log(event.target);
 				if (!this.pauseModNotice) {
 					this.trigger('modified', this);
 

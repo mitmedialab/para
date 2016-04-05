@@ -265,7 +265,6 @@ define([
       var indicies = [];
 
       var delta = this.inverseTransformPoint(data.translationDelta);
-      console.log('master delta', delta);
 
 
       for (var i = 0; i < selectedPoints.length; i++) {
@@ -356,7 +355,6 @@ define([
       };
 
       var delta = this.inverseTransformPoint(initial_delta);
-       console.log('delta for inheritor',delta);
 
       this.pointsModified = true;
 
