@@ -82,6 +82,10 @@ define([
       l: {
         min: 0,
         max: 1
+      },
+      a: {
+        min: 0,
+        max: 1
       }
     },
     strokeColor: {
@@ -96,6 +100,10 @@ define([
       l: {
         min: 0,
         max: 1
+      },
+       a: {
+        min: 0,
+        max: 1
       }
     },
   };
@@ -104,8 +112,8 @@ define([
     'translationDelta': 2,
     'scalingDelta': 2,
     'rotationDelta': 1,
-    'fillColor': 3,
-    'strokeColor': 3
+    'fillColor': 4,
+    'strokeColor': 4
   };
 
   var ziggurat = new Ziggurat();
@@ -427,7 +435,7 @@ define([
       var relative = this.get('relatives');
       var keys;
       var instance;
-      var index = 0
+      var index = 0;
       var relativeRange = relative.getRange();
       if (ref_dimensions.length === rel_dimensions.length) {
 
@@ -738,7 +746,9 @@ define([
 
             relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
             relative_target.get(rel_prop_key)[rel_dimension].getValue();
-
+            if(rel_prop_key == 'fillColor'){
+                  console.log('setting constraint on',rel_dimension, relative_target.get(rel_prop_key)[rel_dimension].getValue());
+            }
 
           }
           if (relative.get('type') == 'collection') {

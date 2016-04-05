@@ -194,8 +194,8 @@ define([
                 var data = [
                     ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
                     ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
-                    ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
-                    ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                    ['fillColor_hsla', 'fillColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
+                    ['strokeColor_hsla', 'strokeColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
                     ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
                     ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                 ];
@@ -232,8 +232,8 @@ define([
                     var data = [
                         ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
                         ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
-                        ['fillColor_hsl', 'fillColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
-                        ['strokeColor_hsl', 'strokeColor_hsl', ['interpolate', 'interpolate', 'interpolate']],
+                        ['fillColor_hsla', 'fillColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
+                        ['strokeColor_hsla', 'strokeColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
                         ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
                         ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
                     ];

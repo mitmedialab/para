@@ -6,7 +6,7 @@ define([
 ], function(_, paper, Backbone, PaperUI) {
 
   var targetLayer, self, interval;
-  var prop_map = ['h', 's', 'l'];
+  var prop_map = ['h', 's', 'l','a'];
   var ConstraintHandles = PaperUI.extend({
 
     initialize: function(data) {
@@ -97,19 +97,22 @@ define([
         var fill_h = paper.project.importSVG(document.getElementById('h_b')).children[0];
         var fill_s = paper.project.importSVG(document.getElementById('s_b')).children[0];
         var fill_l = paper.project.importSVG(document.getElementById('b_b')).children[0];
+        var fill_a = paper.project.importSVG(document.getElementById('a_b')).children[0];
 
         fill_s.position = new paper.Point(fill_h.position.x + fill_h.bounds.width + 2, fill_h.position.y);
         fill_l.position = new paper.Point(fill_s.position.x + fill_s.bounds.width + 2, fill_l.position.y);
+        fill_a.position = new paper.Point(fill_l.position.x + fill_l.bounds.width + 2, fill_a.position.y);
 
         var stroke_h = fill_h.clone();
         var stroke_s = fill_s.clone();
         var stroke_l = fill_l.clone();
+        var stroke_a = fill_a.clone();
 
-        fill_h.children[0].name = fill_s.children[0].name = fill_l.children[0].name = stroke_h.children[0].name = stroke_s.children[0].name = stroke_l.children[0].name = 'box';
-        fill_h.children[1].name = fill_s.children[1].name = fill_l.children[1].name = stroke_h.children[1].name = stroke_s.children[1].name = stroke_l.children[1].name = 'letter';
+        fill_h.children[0].name = fill_s.children[0].name = fill_l.children[0].name = fill_a.children[0].name = stroke_h.children[0].name = stroke_s.children[0].name = stroke_l.children[0].name  = stroke_a.children[0].name= 'box';
+        fill_h.children[1].name = fill_s.children[1].name = fill_l.children[1].name  = fill_a.children[1].name= stroke_h.children[1].name = stroke_s.children[1].name = stroke_l.children[1].name  = stroke_a.children[1].name= 'letter';
 
-        var fill_group = new paper.Group(fill_h, fill_s, fill_l);
-        var stroke_group = new paper.Group(stroke_h, stroke_s, stroke_l);
+        var fill_group = new paper.Group(fill_h, fill_s, fill_l,fill_a);
+        var stroke_group = new paper.Group(stroke_h, stroke_s, stroke_l,stroke_a);
 
         fill.position = new paper.Point(corners[2].bounds.center.x - fill.bounds.width / 2, corners[2].bounds.center.y);
         stroke.position = new paper.Point(corners[2].bounds.center.x, corners[2].bounds.center.y + stroke.bounds.height / 2);
@@ -117,18 +120,20 @@ define([
         fill_group.position = new paper.Point(corners[2].bounds.center.x + fill.bounds.width + 5, corners[2].bounds.center.y - 8);
         stroke_group.position = new paper.Point(corners[2].bounds.center.x + stroke.bounds.width + 15, corners[2].bounds.center.y + stroke.bounds.height / 2);
 
-        fill.name = 'fillColor_hsl';
-        stroke.name = 'strokeColor_hsl';
+        fill.name = 'fillColor_hsla';
+        stroke.name = 'strokeColor_hsla';
         stroke_tab.name = fill_tab.name = 'options';
         stroke_tab.visible = fill_tab.visible = false;
         fill_h.name = 'fillColor_h';
         fill_s.name = 'fillColor_s';
         fill_l.name = 'fillColor_l';
+        fill_a.name = 'fillColor_a';
         stroke_h.name = 'strokeColor_h';
         stroke_s.name = 'strokeColor_s';
         stroke_l.name = 'strokeColor_l';
+         stroke_a.name = 'strokeColor_a';
 
-        return [stroke, fill, fill_h, fill_s, fill_l, stroke_h, stroke_s, stroke_l];
+        return [stroke, fill, fill_h, fill_s, fill_a, fill_l, stroke_h, stroke_s, stroke_l, stroke_a];
       };
 
       var createCross = function(bounds) {
@@ -350,7 +355,7 @@ define([
         if ((target.name == 'scalingDelta_x' || target.name == 'scalingDelta_y') && geometry.children['scalingDelta_xy'].active) {
           return;
         }
-        if ((target.name == thisGroup + '_h' || target.name == thisGroup + '_s' || target.name == thisGroup + '_l') && geometry.children[thisGroup + '_hsl'].active) {
+        if ((target.name == thisGroup + '_h' || target.name == thisGroup + '_s' || target.name == thisGroup + '_l') && geometry.children[thisGroup + '_hsla'].active) {
           return;
         }
 
@@ -359,7 +364,7 @@ define([
           target = geometry.children['scalingDelta_xy'];
         }
 
-        if (((target.name.split('fillColor')[1]) && target.name != 'fillColor_hsl') || ((target.name.split('strokeColor')[1]) && target.name != 'strokeColor_hsl')) {
+        if (((target.name.split('fillColor')[1]) && target.name != 'fillColor_hsla') || ((target.name.split('strokeColor')[1]) && target.name != 'strokeColor_hsla')) {
           var count = 0;
           for (var m = 0; m < prop_map.length; m++) {
             if (geometry.children[thisGroup + '_' + prop_map[m]].active) {
@@ -370,7 +375,7 @@ define([
             for (var g = 0; g < prop_map.length; g++) {
               geometry.children[thisGroup + '_' + prop_map[g]].active = false;
             }
-            target = geometry.children[thisGroup + '_hsl'];
+            target = geometry.children[thisGroup + '_hsla'];
           }
 
         }
@@ -383,11 +388,11 @@ define([
           var childGroup = child.name.split('_')[0];
           if (childGroup != thisGroup) {
             child.active = false;
-            if (child.name == 'fillColor_hsl') {
+            if (child.name == 'fillColor_hsla') {
               //TODO: change to match fill/stroke color of original object 
               child.children[0].strokeColor = 'black';
               child.children[0].fillColor = 'white';
-            } else if (child.name == 'strokeColor_hsl') {
+            } else if (child.name == 'strokeColor_hsla') {
               child.children[0].strokeColor = 'white';
               child.children[0].fillColor = 'black';
             } else if (child.name.split('fillColor')[1] || child.name.split('strokeColor')[1]) {
@@ -402,7 +407,7 @@ define([
             child.active = false;
             child.strokeColor = 'black';
             child.fillColor = 'black';
-          } else if (((child.name == 'fillColor_h' || child.name == 'fillColor_s' || child.name == 'fillColor_l') && target.name == 'fillColor_hsl') || ((child.name == 'strokeColor_h' || child.name == 'strokeColor_s' || child.name == 'strokeColor_l') && target.name == 'strokeColor_hsl')) {
+          } else if (((child.name == 'fillColor_h' || child.name == 'fillColor_s' || child.name == 'fillColor_l' || child.name == 'fillColor_a') && target.name == 'fillColor_hsla') || ((child.name == 'strokeColor_h' || child.name == 'strokeColor_s' || child.name == 'strokeColor_l'|| child.name == 'strokeColor_a') && target.name == 'strokeColor_hsla')) {
             child.active = false;
             child.children[0].strokeColor = 'black';
             child.children[0].fillColor = 'white';
@@ -415,11 +420,11 @@ define([
         var property;
         if (target.active) {
           property = target.name;
-          if (target.name == 'fillColor_hsl') {
+          if (target.name == 'fillColor_hsla') {
             target.bringToFront();
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'red';
-          } else if (target.name == 'strokeColor_hsl') {
+          } else if (target.name == 'strokeColor_hsla') {
             target.bringToFront();
             target.children[0].strokeColor = 'red';
 
@@ -450,12 +455,12 @@ define([
           return;
         } else {
           property = target.name;
-          if (target.name == 'fillColor_hsl') {
+          if (target.name == 'fillColor_hsla') {
 
             //TODO: change to match fill/stroke color of original object 
             target.children[0].strokeColor = 'black';
             target.children[0].fillColor = 'white';
-          } else if (target.name == 'strokeColor_hsl') {
+          } else if (target.name == 'strokeColor_hsla') {
 
             target.children[0].strokeColor = 'white';
             target.children[0].fillColor = 'black';

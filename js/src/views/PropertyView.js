@@ -16,6 +16,7 @@ define([
   var stateSet = false;
   var handlerActive = true;
   var timeout;
+  var selected_shape;
   var constraintTypeMap = {};
   constraintTypeMap['more-box'] = 'more';
   constraintTypeMap['more'] = 'more';
@@ -40,20 +41,25 @@ define([
       this.currentPaths = [];
       param_source = $('#parameterTemplate').html();
       param_template = Handlebars.default.compile(param_source);
-    var self = this;
+      var self = this;
       $('#fillColorBlock').addClass('color-block-selected');
       $('#fillColorBlock').css('background-color', 'white');
       $('#fill').val('#ffffff');
       $('#strokeColorBlock').css('background-color', 'black');
       $('#stroke').val('#000000');
+      $('#opacitySlider').on('change mousemove', function() {
+        window.clearTimeout(timeout);
+        timeout = window.setTimeout(self.modificationEnded, 500, self);
+        $('#opacitySlider').trigger('opacity-change');
+      });
       $('#strokeSlider').on('change mousemove', function() {
         window.clearTimeout(timeout);
-        timeout = window.setTimeout(self.modificationEnded, 500 ,self);
+        timeout = window.setTimeout(self.modificationEnded, 500, self);
         $('#strokeSlider').trigger('stroke-change');
       });
 
 
-    
+
       $('#color-window').each(function() {
         $(this).iris({
           palettes: ['#fff',
@@ -69,11 +75,11 @@ define([
           ],
           hide: false,
           color: '#fff',
-       
+
           change: function(event, ui) {
             if (handlerActive) {
               window.clearTimeout(timeout);
-              timeout = window.setTimeout(self.modificationEnded, 500 ,self);
+              timeout = window.setTimeout(self.modificationEnded, 500, self);
               $(this).trigger('colorChange', event, ui);
             }
           }
@@ -90,10 +96,11 @@ define([
       'change #fill': 'colorInputChange',
       'change #stroke': 'colorInputChange',
       'stroke-change': 'strokeChange',
+      'opacity-change': 'opacityChange',
       'param-change': 'paramChange',
       'colorChange': 'colorChange',
       'mousedown #color-window': 'modificationStarted',
-        // testing
+      // testing
     },
 
     removeBehavior: function(event) {
@@ -138,6 +145,7 @@ define([
         $('#fillColorBlock').css('background-color', color);
         if ($('#fillColorBlock').hasClass('color-block-selected')) {
           $('#color-window').iris('color', color);
+
         }
       }
       if (id == 'stroke') {
@@ -214,8 +222,9 @@ define([
       }
     },
 
-    geometrySelected: function(selected_shape) {
-      if (selected_shape) {
+    geometrySelected: function(sshape) {
+      if (sshape) {
+        selected_shape = sshape;
         this.undelegateEvents();
         var fillColor = selected_shape.getValueFor('fillColor');
         var strokeColor = selected_shape.getValueFor('strokeColor');
@@ -229,6 +238,8 @@ define([
             $('#fill').val(ColorUtils.toHex(fillColor));
             if ($('#fillColorBlock').hasClass('color-block-selected')) {
               $('#color-window').iris('color', ColorUtils.toHex(fillColor));
+              $('#opacitySlider').val(fillColor.a * 100);
+
             }
           }
         }
@@ -241,6 +252,8 @@ define([
             $('#stroke').val(ColorUtils.toHex(strokeColor));
             if ($('#strokeColorBlock').hasClass('color-block-selected')) {
               $('#color-window').iris('color', ColorUtils.toHex(strokeColor));
+              $('#opacitySlider').val(strokeColor.a * 100);
+
             }
           }
         }
@@ -258,6 +271,8 @@ define([
       this.undelegateEvents();
       // this.clearParams(params,id);
       this.delegateEvents();
+      selected_shape = null;
+
     },
 
     toggleFillStroke: function(event) {
@@ -268,12 +283,23 @@ define([
         $('#fillColorBlock').addClass('color-block-selected');
         if (!$('#fillColorBlock').hasClass('remove-color')) {
           $('#color-window').iris('color', $('#fillColorBlock').css('background-color'));
+          if (selected_shape) {
+            $('#opacitySlider').val(selected_shape.get('fillColor').getValue().a * 100);
+          } else {
+            $('#opacitySlider').val(100);
+          }
+
         }
       } else {
         $('#strokeColorBlock').addClass('color-block-selected');
         $('#fillColorBlock').removeClass('color-block-selected');
         if (!$('#strokeColorBlock').hasClass('remove-color')) {
           $('#color-window').iris('color', $('#strokeColorBlock').css('background-color'));
+          if (selected_shape) {
+            $('#opacitySlider').val(selected_shape.get('strokeColor').getValue().a * 100);
+          } else {
+            $('#opacitySlider').val(100);
+          }
         }
       }
       handlerActive = true;
@@ -287,6 +313,26 @@ define([
           operator: 'set'
         }
       };
+      this.model.modifyStyle(data);
+
+      stateSet = true;
+    },
+
+    opacityChange: function(event) {
+      var value = parseInt($(event.target).val(), 10);
+      var data = {};
+      if ($('#fillColorBlock').hasClass('color-block-selected')) {
+        data.fillColor = {
+          a: value / 100.0,
+          operator: 'set'
+        };
+
+      } else {
+        data.strokeColor = {
+          a: value / 100.0,
+          operator: 'set'
+        };
+      }
       this.model.modifyStyle(data);
 
       stateSet = true;
@@ -413,7 +459,7 @@ define([
       }
     },
 
-     modificationStarted: function() {
+    modificationStarted: function() {
       stateSet = true;
     }
 

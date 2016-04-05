@@ -32,11 +32,7 @@ define([
   var hitOptions = {
     stroke: true,
     fill: true,
-    bounds: false,
-    center: false,
-    segments: false,
-    curves: false,
-    tolerance: 2,
+    tolerance: 0,
   };
 
   var SelectToolModel = BaseToolModel.extend({

@@ -23,7 +23,7 @@ define([
 
 			defaults: _.extend({}, PConstraint.prototype.defaults, {
 				name: 'PColor',
-				dimension_num: 3
+				dimension_num: 4
 			}),
 			/* constructor
 			 * r,g,b,a: initial color values
@@ -53,6 +53,7 @@ define([
 				} else {
 					this.set('operator', 'set');
 				}
+				this.a.setValue(1);
 				this.setNull(false);
 			},
 
@@ -70,7 +71,7 @@ define([
 				data.h = this.h.isConstrained();
 				data.s = this.s.isConstrained();
 				data.l = this.l.isConstrained();
-				data.a = this.g.isConstrained();
+				data.a = this.a.isConstrained();
 				return data;
 			},
 
@@ -90,7 +91,7 @@ define([
 					var h = this.h.getConstraint();
 					var s = this.s.getConstraint();
 					var l = this.l.getConstraint();
-					var a = this.g.getConstraint();
+					var a = this.a.getConstraint();
 					if (r) {
 						data.r = r;
 					}
