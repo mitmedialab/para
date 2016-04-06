@@ -28,10 +28,7 @@ define([
     normalizeGeometry: function(path, matrix) {
       var data = {};
       data.rotationDelta = new PFloat(matrix.rotation);
-      // TODO: make some normalizations util function
-      if (data.rotationDelta > 360 || data.rotationDelta < 0) {
-        data.rotationDelta = TrigFunc.wrap(data.rotationDelta, 0, 360);
-      }
+    
       data.scalingDelta = new PPoint(matrix.scaling.x, matrix.scaling.y);
 
       var translationDelta = new PPoint(matrix.translation.x, matrix.translation.y, 'add');

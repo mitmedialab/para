@@ -217,7 +217,14 @@ define([
       if (posPoint) {
         var angle = event.lastPoint.subtract(posPoint).angle;
         var dAngle = event.point.subtract(posPoint).angle;
+        if(angle>0 && dAngle<0){
+          dAngle = Math.abs(dAngle);
+        }
+        else if(angle<0 && dAngle>0){
+          dAngle = 0-dAngle;
+        }
         var data = {};
+        console.log('rotationDelta=',angle,dAngle,dAngle - angle);
         data.rotationDelta = {
           v: dAngle - angle,
           operator: 'add'

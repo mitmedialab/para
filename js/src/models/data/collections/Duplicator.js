@@ -278,6 +278,7 @@ define([
 
 
             addRelativeMember: function(copy, index) {
+                copy.get('constraintSelected').setValue(false);
                 if (this.masterList.members.length > 1) {
                     // console.log('copy geom position',copy.get('geom').position);
                     //copy.setValue(this.masterList.members[this.masterList.members.length - 2].getValue());

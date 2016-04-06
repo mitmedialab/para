@@ -1489,7 +1489,9 @@ define([
 				if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
 					this.renderQueue[i].render();
 				}
+
 			}
+			
 			//this.centroidUI.position = this.get('geom').position;
 			this.renderQueue = [];
 		},

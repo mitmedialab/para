@@ -74,7 +74,7 @@ define([
 			'mouseleave': 'mouseLeave',
 			'change #min': 'minChange',
 			'change #max': 'maxChange',
-			'change #relative_index': 'changeIndex',
+			'change #relative_index': 'manualIndexChange',
 			'change input[name=subprop-tabs]:radio': 'changeSubprop',
 			'change #map-defaults': 'changeMapDefault',
 			'click #property_buttons': 'changeProperty',
@@ -92,7 +92,7 @@ define([
 
 			var subsource = $('#subpropertiesTemplate').html();
 			subpropertiesTemplate = Handlebars.default.compile(subsource);
-
+			$('#relative_index').prop('disabled', true);
 
 
 			/*paper.setup($('#collection-canvas')[0]);
@@ -141,6 +141,14 @@ define([
 			//this.resetMasterView();
 		},
 
+		countModified: function(duplicator){
+			if(constraint){
+				if(constraint.get('references')==duplicator.masterList){
+					this.setConstraint(constraint);
+				}
+			}
+		},
+
 		setConstraint: function(c) {
 			this.stopListening();
 
@@ -150,7 +158,7 @@ define([
 				properties = constraint.getProperties();
 				current_prop = 0;
 				current_subprop = 0;
-
+				$('#relative_index').prop('disabled', false);
 				$('#relative_index').attr('min', 1);
 				$('#relative_index').attr('max', constraint.getRelativeRange());
 				$('#relative_index').val(1);
@@ -173,6 +181,24 @@ define([
 
 
 			}
+		},
+
+		deactivate: function() {
+			var html = propertiesTemplate({
+				properties: {}
+			});
+			$('#constraint-properties').html(html);
+			html = subpropertiesTemplate({});
+			$('#subproperties').html(html);
+			$('#relative_index').prop('disabled', true);
+
+			//this.setFunctionPath();
+			//this.setMin();
+			//this.setMax();
+
+			constraint = null;
+			this.setRange();
+
 		},
 
 		changeProperty: function(event) {
@@ -225,6 +251,30 @@ define([
 
 		},
 
+		itemSelected: function(item) {
+			if (constraint) {
+				var target = constraint.get('relatives').getMemberById(item.get('id'));
+				if (target) {
+					if (constraint.get('relatives').get('type') == 'collection') {
+						$('#relative_index').val(constraint.get('relatives').members.indexOf(target) + 1);
+					} else {
+						$('#relative_index').val(1);
+					}
+					this.changeIndex();
+				}
+			}
+		},
+
+		manualIndexChange: function() {
+			this.changeIndex();
+			current_index = $('#relative_index').val() - 1;
+			var item = constraint.get('relatives').getMemberAt(current_index);
+			if (item) {
+				this.model.deselectAllShapes();
+				this.model.selectShape([item]);
+			}
+		},
+
 		changeIndex: function(event) {
 			//this.stopListening(properties[current_prop].subproperties[current_subprop].rel_vals[current_index]);
 			//this.stopListening(properties[current_prop].subproperties[current_subprop].ref_vals[current_index]);
@@ -235,11 +285,18 @@ define([
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
 			var id = constraint.get('relatives').getMemberAt(current_index).get('id');
 			var exempt = constraint.get('exempt_indicies')[propName][subpropName][id].getValue();
-			var status = $('#exempt_button').hasClass('active');
-			if (exempt && !status) {
+			console.log('exempt at', current_index, exempt);
+
+			if (exempt == 1) {
+				console.log('setting active');
 				$('#exempt_button').addClass('active');
-			} else if (!exempt && status) {
+				$('#exempt_button').css('background-color', '#ccc');
+
+			} else {
+				console.log('disabling active');
+
 				$('#exempt_button').removeClass('active');
+				$('#exempt_button').css('background-color', 'transparent');
 			}
 
 			$('#relative_offset').val(Math.round(properties[current_prop].subproperties[current_subprop].rel_vals[current_index].getValue() - properties[current_prop].subproperties[current_subprop].ref_vals.vals[current_index].getValue()));
@@ -260,20 +317,23 @@ define([
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
 			var memberId;
-			if(constraint.get('relatives').get('type')=='collection'){
+			if (constraint.get('relatives').get('type') == 'collection') {
 				memberId = constraint.get('relatives').members[current_index].get('id');
-			}
-			else{
+			} else {
 				memberId = constraint.get('relatives').get('id');
-			} 
-			var changed = constraint.setExempt(propName, subpropName,  memberId, !status);
+			}
+			var changed = constraint.setExempt(propName, subpropName, memberId, !status);
+			var exempt = constraint.get('exempt_indicies')[propName][subpropName][memberId].getValue();
+			if (exempt == 1) {
+				console.log('setting active');
+				$('#exempt_button').addClass('active');
+				$('#exempt_button').css('background-color', '#ccc');
 
-			if (changed) {
-				if (status) {
-					$('#exempt_button').removeClass('active');
-				} else {
-					$('#exempt_button').addClass('active');
-				}
+			} else {
+				console.log('disabling active');
+
+				$('#exempt_button').removeClass('active');
+				$('#exempt_button').css('background-color', 'transparent');
 			}
 
 		},
@@ -327,13 +387,7 @@ define([
 			this.setMax(cmax);
 		},
 
-		deactivate: function() {
-			//this.setFunctionPath();
-			//this.setMin();
-			//this.setMax();
-			this.setRange();
 
-		},
 
 		setFunctionPath: function(points) {
 			this.setCollectionView();

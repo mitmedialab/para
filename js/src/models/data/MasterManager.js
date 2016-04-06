@@ -1049,6 +1049,7 @@ define([
 			}
 			layersView.sortChildren(duplicator.get('id'));
 			this.updateListConstraints(duplicator);
+			mapView.countModified(duplicator);
 
 		},
 
@@ -1115,6 +1116,7 @@ define([
 				}
 				this.visualizeConstraint();
 				layersView.removeConstraint(id);
+				mapView.deactivate();
 			}
 		},
 
@@ -1271,6 +1273,9 @@ define([
 			});
 
 			layersView.updateSelection(layer_shapes);
+			if(selected.length==1){
+				mapView.itemSelected(selected[0]);
+			}
 		},
 
 		//event handler called when mapping is changed
