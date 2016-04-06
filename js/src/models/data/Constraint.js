@@ -35,6 +35,8 @@ define([
     'strokeColor:rotationDelta': 100,
     'strokeColor:translationDelta': 100,
     'strokeWidth:strokeWidth': 1,
+        'blendMode:blendMode': 1,
+
   };
 
   var minMaxMap = {
@@ -62,6 +64,12 @@ define([
       v: {
         min: 0,
         max: 360
+      }
+    },
+    blendMode: {
+      v: {
+        min: 0,
+        max: 32
       }
     },
     strokeWidth: {
@@ -113,7 +121,9 @@ define([
     'scalingDelta': 2,
     'rotationDelta': 1,
     'fillColor': 4,
-    'strokeColor': 4
+    'strokeColor': 4,
+    'blendMode':1,
+    'strokeWidth':1
   };
 
   var ziggurat = new Ziggurat();
@@ -654,8 +664,15 @@ define([
           (
             function(rpk, rd, rlpk, rld) {
               for (var g = 0; g < relative.get('memberCount').getValue(); g++) {
-                var id = relative.getMemberAt(g).get('id');
+                var target = relative.getMemberAt(g);
+                var id = target.get('id');
                 self.createOffsetFor(id, rpk, rd, rlpk, rld);
+                if(target.nodeParent.get('name')=='duplicator'){
+                  for(var n=0;n<rd.length;n++){
+                  self.updateOffset(rpk, rd[n], g, 0);
+                  }
+                }
+                
               }
             }(refProperties[i][0], refProperties[i][1], relProperties[i][0], relProperties[i][1])
           );
@@ -861,6 +878,9 @@ define([
         case 'gaussian':
           this.calculateReferenceValuesGaussian(ref_prop_key, ref_dimension, reference_values);
           break;
+         case 'alternate':
+          this.calculateReferenceValuesAlternate(ref_prop_key, ref_dimension, reference_values);
+        break;
         default:
           break;
       }
@@ -880,6 +900,42 @@ define([
         }
       
     },*/
+
+
+    calculateReferenceValuesAlternate: function(ref_prop_key, ref_dimension, reference_values) {
+      var reference = this.get('references');
+      if (reference) {
+        var members;
+        if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
+          members = reference.members;
+        } else {
+          members = [reference, reference];
+        }
+        var reference_points = [];
+        for(var i=0;i<members.length;i++){
+          reference_points.push(members[i].get(ref_prop_key)[ref_dimension].getValue());
+        }
+      
+        var range = this.get('relatives').getRange();
+        var count = 0;
+        for (var m = 0; m < range; m++) {
+
+          var y_val = reference_points[count];
+          count++;
+          if(count>reference_points.length-1){
+            count = 0;
+          }
+          if (reference_values[ref_dimension].vals[m]) {
+            reference_values[ref_dimension].vals[m].setValue(y_val);
+          } else {
+            var newVal = new PFloat(y_val);
+            newVal.setNull(false);
+            reference_values[ref_dimension].vals.push(newVal);
+          }
+        }
+      }
+
+    },
 
 
     calculateReferenceValuesRandom: function(ref_prop_key, ref_dimension, reference_values) {

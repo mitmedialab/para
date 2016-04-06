@@ -197,7 +197,8 @@ define([
                     ['fillColor_hsla', 'fillColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
                     ['strokeColor_hsla', 'strokeColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
                     ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
-                    ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
+                    ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']],
+                    ['blendMode_v', 'blendMode_v', ['alternate', 'alternate']]
                 ];
 
                 constraint.create(data);
@@ -279,6 +280,7 @@ define([
 
             addRelativeMember: function(copy, index) {
                 copy.get('constraintSelected').setValue(false);
+
                 if (this.masterList.members.length > 1) {
                     // console.log('copy geom position',copy.get('geom').position);
                     //copy.setValue(this.masterList.members[this.masterList.members.length - 2].getValue());
