@@ -206,6 +206,10 @@ define([
       this.trigger('redo');
     },
 
+    selectAllShapes: function() {
+      this.trigger('selectAllShapes');
+    },
+
     modificationEnded: function(){
 
         this.trigger('modificationEnded');

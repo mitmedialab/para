@@ -580,12 +580,12 @@ text-decoration: none;
 }
 .selectel {
   border: solid 1px rgb(170, 170, 170);
-  width: 215px;
-  margin: 5px 0px 10px 10px;
+  width: 205px;
+  margin: 5px 0px 10px 0px;
 }
 .selectel select {
    background: transparent;
-   width: 215px;
+   width: 205px;
    padding: 5px;
    border: 0;
    border-radius: 0;

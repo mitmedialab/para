@@ -66,6 +66,7 @@ define([
 			constraintSelected: null,
 			selected: null,
 			zIndex: null,
+			blend_mode: null,
 
 			/*basic datatypes to export to JSON*/
 			name: 'instance',
@@ -89,9 +90,12 @@ define([
 				strokeWidth: ['v'],
 				selected: ['v'],
 				memberCount: ['v'],
-				zIndex: ['v']
-					//inheritors: []
+				zIndex: ['v'],
+				blendMode: ['v'],
+				//inheritors: []
 			},
+
+			blendMode_map: ['normal', 'multiply', 'screen', 'overlay', 'soft-light', 'hard- light', 'color-dodge', 'color-burn', 'darken', 'lighten', 'difference', 'exclusion', 'hue', 'saturation', 'luminosity', 'color', 'add', 'subtract', 'average', 'pin-light','negation', 'source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'],
 
 			dimension_num: 6,
 
@@ -117,6 +121,7 @@ define([
 			isChanging: false,
 			rendered: false,
 			undo_limit: 10,
+
 
 		}),
 
@@ -169,7 +174,9 @@ define([
 			this.set('v', new PProperty(0));
 			this.set('zIndex', new PFloat(0));
 
-
+			var blendMode = new PVal(0);
+			blendMode.setNull(false);
+			this.set('blendMode', blendMode);
 			//============private properties==============//
 			//temporary attributes
 			this._fillColor = {
@@ -992,6 +999,7 @@ define([
 		 * @registerUndo: boolean that determines if setting is stored as an undo.
 		 */
 		setValue: function(data, registerUndo) {
+			console.log('setting value',data);
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
@@ -1004,7 +1012,7 @@ define([
 
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
-
+					console.log('has own prop');
 					var p = data[prop];
 					if (typeof data[prop] !== 'object') {
 						p = {
@@ -1025,6 +1033,7 @@ define([
 								data[prop].y = 0.01;
 							}
 						}
+						console.log('setting value conditional');
 						this.get(prop).setValue(p);
 					} else if (p.operator === 'add') {
 						this.get(prop).add(p);
@@ -1228,9 +1237,9 @@ define([
 						}
 					}
 				}
-				
+
 				return data;
-				
+
 			}
 
 
@@ -1491,7 +1500,7 @@ define([
 				}
 
 			}
-			
+
 			//this.centroidUI.position = this.get('geom').position;
 			this.renderQueue = [];
 		},
@@ -1508,10 +1517,9 @@ define([
 				if (modified) {
 					this.updateScreenBounds(geom);
 					this.set('rendered', true);
-					console.log('rendering',this.get('name'));
-				}
-				else{
-					this.set('rendered',false);
+					console.log('rendering', this.get('name'));
+				} else {
+					this.set('rendered', false);
 
 				}
 
@@ -1524,7 +1532,7 @@ define([
 
 		reset: function() {
 			if (this.get('rendered')) {
-				console.log('resetting',this.get('name'));
+				console.log('resetting', this.get('name'));
 				var geom = this.get('geom');
 				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);
 				geom.rotate(0 - this.resetTransforms.rotationDelta, this.resetTransforms.center);
@@ -1592,8 +1600,8 @@ define([
 					geom.fillColor = new paper.Color(0, 0, 0);
 				}
 
-				geom.fillColor.hue =  this._fillColor.h;
-				console.log("hue for",this.get('name'),value.fillColor);
+				geom.fillColor.hue = this._fillColor.h;
+				console.log("hue for", this.get('name'), value.fillColor);
 				geom.fillColor.saturation = this._fillColor.s;
 				geom.fillColor.lightness = this._fillColor.l;
 				geom.fillColor.alpha = this._fillColor.a;
@@ -1605,7 +1613,7 @@ define([
 				if (!geom.strokeColor) {
 					geom.strokeColor = new paper.Color(0, 0, 0);
 				}
-				geom.strokeColor.hue = TrigFunc.wrap(this._strokeColor.h,0,360);
+				geom.strokeColor.hue = TrigFunc.wrap(this._strokeColor.h, 0, 360);
 				geom.strokeColor.saturation = this._strokeColor.s;
 				geom.strokeColor.lightness = this._strokeColor.l;
 				geom.strokeColor.alpha = this._strokeColor.a;
@@ -1621,6 +1629,8 @@ define([
 			} else {
 				geom.opacity = 1;
 			}
+			console.log('blend',this.get('blendMode_map')[this.get('blendMode').getValue()],this.get('blendMode').getValue());
+			geom.blendMode = this.get('blendMode_map')[this.get('blendMode').getValue()];
 
 		},
 

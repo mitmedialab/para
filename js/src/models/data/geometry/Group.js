@@ -417,6 +417,8 @@ define([
       } else {
         this.get('geom').opacity = 1;
       }
+      this.get('geom').blendMode = this.get('blendMode_map')[this.get('blendMode').getValue()];
+
     },
 
 

@@ -30,7 +30,7 @@ define([
       var geometry_layer = new paper.Layer();
       geometry_layer.name = 'geometry_layer';
       var isolation_layer = new paper.Layer();
-      isolation_layer.name = 'isolation_layer'
+      isolation_layer.name = 'isolation_layer';
       var ui_layer = new paper.Layer();
       ui_layer.name = 'ui_layer';
       geometry_layer.activate();
@@ -42,13 +42,13 @@ define([
         model: toolManager
       });
 
-    
+
 
       //setup masterManager and function manager
       var masterManager = new MasterManager();
 
-      canvasView.listenTo(masterManager,'pauseKeyListeners',canvasView.pauseKeyListeners);
-      canvasView.listenTo(masterManager,'unpauseKeyListeners',canvasView.unpauseKeyListeners);
+      canvasView.listenTo(masterManager, 'pauseKeyListeners', canvasView.pauseKeyListeners);
+      canvasView.listenTo(masterManager, 'unpauseKeyListeners', canvasView.unpauseKeyListeners);
       /* event listener registers */
 
 
@@ -68,6 +68,8 @@ define([
       masterManager.listenTo(toolManager, 'doubleClick', masterManager.toggleItem);
 
       masterManager.listenTo(toolManager, 'deselectAll', masterManager.deselectAllShapes);
+      masterManager.listenTo(toolManager, 'selectAllShapes', masterManager.selectAllShapes);
+
       masterManager.listenTo(toolManager, 'selectShape', masterManager.selectShape);
       masterManager.listenTo(toolManager, 'deselectShape', masterManager.selectShape);
       masterManager.listenTo(toolManager, 'geometryModified', masterManager.modifyGeometry);

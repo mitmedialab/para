@@ -95,6 +95,7 @@ define([
       'click #no-color': 'clearColor',
       'change #fill': 'colorInputChange',
       'change #stroke': 'colorInputChange',
+      'change #blend_mode': 'blendModeChange',
       'stroke-change': 'strokeChange',
       'opacity-change': 'opacityChange',
       'param-change': 'paramChange',
@@ -225,6 +226,7 @@ define([
     geometrySelected: function(sshape) {
       if (sshape) {
         selected_shape = sshape;
+        $('#blend_mode').val(selected_shape.get('blendMode').getValue());
         this.undelegateEvents();
         var fillColor = selected_shape.getValueFor('fillColor');
         var strokeColor = selected_shape.getValueFor('strokeColor');
@@ -337,6 +339,15 @@ define([
 
       stateSet = true;
     },
+
+     blendModeChange: function(event) {
+      var value = Number($('#blend_mode').val());
+      console.log('blend mode value=',value);
+      var data = {blendMode: value};
+      this.model.modifyStyle(data);
+      stateSet = true;
+    },
+
 
     // TESTING
     setConstraintProperty: function(event) {

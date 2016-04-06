@@ -1049,7 +1049,6 @@ define([
 			}
 			layersView.sortChildren(duplicator.get('id'));
 			this.updateListConstraints(duplicator);
-			mapView.countModified(duplicator);
 
 		},
 
@@ -1243,6 +1242,10 @@ define([
 
 		},
 
+		selectAllShapes: function() {
+			this.selectShape(currentNode.children);
+		},
+
 		//returns currently selected objects
 		getCurrentSelection: function(reference) {
 			reference.selected = selected;
@@ -1413,6 +1416,7 @@ define([
 				id: 'modify',
 				action: 'modify style'
 			});
+			console.log('style_data',style_data);
 			if (selected.length > 0) {
 				var non_group_selected = [];
 				for (var i = 0; i < selected.length; i++) {

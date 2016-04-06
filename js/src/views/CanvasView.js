@@ -32,6 +32,7 @@ define([
   var origin_key = 79;
   var undo_key = 90;
   var redo_key = 86;
+  var select_all_key = 65;
 
   // explore ensuring key combinations (e.g. shift-click selects but shift advances)
   var advanceKey = 78; // n EXPERIMENTAL
@@ -100,7 +101,7 @@ define([
       this.listenTo(this.model, 'centerGeom', this.centerGeom);
 
       paper.view.parent = this;
-      
+
       window.onbeforeunload = function() {
         return 'unsaved changes';
       };
@@ -123,12 +124,12 @@ define([
       alt = false;
     },
 
-    pauseKeyListeners: function(){
+    pauseKeyListeners: function() {
       $(document).unbind('keydown');
       $(document).unbind('keyup');
     },
 
-    unpauseKeyListeners: function(){
+    unpauseKeyListeners: function() {
       $(document).bind('keydown', this.canvasKeydown);
       $(document).bind('keyup', this.canvasKeyup);
     },
@@ -184,7 +185,7 @@ define([
       this.parent.model.toolMouseMove(event);
     },
 
-   
+
     /* canvas event functions */
     canvasKeydown: function(event) {
       /*if (event.keyCode == saveKey) {
@@ -197,7 +198,7 @@ define([
       if (event.keyCode == redo_key) {
         this.model.redo();
       }
-      if(event.keyCode == origin_key && shift){
+      if (event.keyCode == origin_key && shift) {
         this.model.zeroOrigin();
       }
       if (event.keyCode == functionKey) {
@@ -207,6 +208,9 @@ define([
         this.model.createParams();
       }
       if (shift) {
+        if (event.keyCode == select_all_key) {
+          this.model.selectAllShapes();
+        }
         if (event.keyCode == upArrow) {
           this.model.closeSelected();
         } else if (event.keyCode == downArrow) {
@@ -325,7 +329,6 @@ define([
       this.model.canvasDblclick();
     },
 
-   
 
 
   });

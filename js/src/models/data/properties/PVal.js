@@ -71,7 +71,7 @@ define([
 			 */
 			setValue: function(data) {
 				var set;
-				if (data.v) {
+				if (data.v!=undefined) {
 					set = this.v.setValue(data.v);
 					this.setNull(false);
 				} else if (typeof data === "number") {
