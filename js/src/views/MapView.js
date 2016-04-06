@@ -259,7 +259,14 @@ define([
 			var status = $('#exempt_button').hasClass('active');
 			var propName = properties[current_prop].name;
 			var subpropName = properties[current_prop].subproperties[current_subprop].name;
-			var changed = constraint.setExempt(propName, subpropName, current_index, !status);
+			var memberId;
+			if(constraint.get('relatives').get('type')=='collection'){
+				memberId = constraint.get('relatives').members[current_index].get('id');
+			}
+			else{
+				memberId = constraint.get('relatives').get('id');
+			} 
+			var changed = constraint.setExempt(propName, subpropName,  memberId, !status);
 
 			if (changed) {
 				if (status) {

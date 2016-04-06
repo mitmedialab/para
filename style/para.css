@@ -285,6 +285,15 @@ input[type="range"]:active::-webkit-slider-thumb {
   background-position-y:-180px;
 }
 
+#exempt_button:hover {
+background-color: transparent;
+}
+
+#exempt_button.active:hover {
+background-color: #cccccc;
+}
+
+
 
 
 .btn-prop{

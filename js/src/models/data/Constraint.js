@@ -375,7 +375,7 @@ define([
 
     setExempt: function(rel_prop_key, rel_dimension, id, status) {
       var exempt_indicies = this.get('exempt_indicies');
-
+      console.log('setting exempt for',rel_prop_key, rel_dimension, id, status);
       var value = 0;
       if (status === true) {
         value = 1;
@@ -386,6 +386,7 @@ define([
       else{
         exempt_indicies[rel_prop_key][rel_dimension][id] = new PFloat(value);
       }
+       console.log('setting exempt for',rel_prop_key, rel_dimension, id, status,  exempt_indicies[rel_prop_key][rel_dimension][id].getValue());
       return true;
     },
 
