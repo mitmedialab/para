@@ -236,7 +236,9 @@ define([
                         ['fillColor_hsla', 'fillColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
                         ['strokeColor_hsla', 'strokeColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
                         ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
-                        ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']]
+                        ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']],
+                        ['blendMode_v', 'blendMode_v', ['alternate', 'alternate']]
+
                     ];
                     constraint.create(data);
                     constraint.setExemptForAll(targetId, true);
@@ -277,21 +279,47 @@ define([
                 }
             },
 
+            //placeholder for addAsReference duplicator function.
+            addAsReference: function(target) {
+                console.log('attempting add',this.internalList.getMember(target));
+                if (!this.internalList.getMember(target)) {
+                    var target_index = 1;
+                    var target_childIndex = this.children.indexOf(target);
+                    for (var i = 0; i < this.internalList.length - 1; i++) {
+                        var a = this.internalList[i].slave ?  this.internalList[i].slave : this.internalList[i];
+                        var b = this.internalList[i+1].slave ?  this.internalList[i+1].slave: this.internalList[i+1];
+                        var childIndexA = this.children.indexOf(a);
+                        var childIndexB = this.children.indexOf(b);
+                        if (target_childIndex > childIndexA && target_childIndex > childIndexB) {
+                            target_index = i;
+                            break;
+                        }
+                    }
+                    console.log('adding reference', target_index,childIndexA,childIndexB,a,this.internalList[i],i);
+                    var proxy = target.create();
+                    proxy.get('geom').remove();
+                    target.proxy =proxy;
+                    proxy.slave = target;
+                    this.internalList.addMember(proxy,target_index);
+                    return this.masterList;
+                }
+            },
+
+            requestAddReference:function(target){
+                 if (!this.internalList.getMember(target.proxy)) {
+                    return this.masterList;
+                }
+            },
 
             addRelativeMember: function(copy, index) {
                 copy.get('constraintSelected').setValue(false);
 
                 if (this.masterList.members.length > 1) {
-                    // console.log('copy geom position',copy.get('geom').position);
-                    //copy.setValue(this.masterList.members[this.masterList.members.length - 2].getValue());
-                    // console.log('copy position after value set',copy.getValue().translationDelta,copy.get('geom').position);
 
                     if (!index) {
                         index = this.masterList.members.length - 1;
                     }
                 } else {
-
-                    //copy.setValue(this.masterList.members[0].getValue());
 
                     if (!index) {
                         index = 1;
@@ -304,17 +332,10 @@ define([
                 if (copy.get('name') == 'group') {
                     this.addRelativeGroupMember(copy, index);
                 }
-                /*var master_ids = this.masterList.members.map(function(item) {
-                    return item.get('id');
-                });
 
-                var children_ids = this.children.map(function(child) {
-                    return child.get('id');
-                });
-                var equal = _.isEqual(master_ids, children_ids);*/
-
-                //console.log(equal, 'master list members', master_ids, 'child list members', children_ids);
             },
+
+
 
             addRelativeGroupMember: function(copy, index) {
                 for (var i = 0; i < copy.children.length; i++) {

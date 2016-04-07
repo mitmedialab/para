@@ -17,7 +17,8 @@ require.config({
         "html": "../../html",
         "cjs": "../../bower_components/constraintjs/build/cjs.min" ,
         "fancytree": "../../bower_components/fancytree/dist/jquery.fancytree-all.min",
-        "aws-sdk-js": "../../bower_components/aws-sdk-js/dist/aws-sdk.min"
+        "aws-sdk-js": "../../bower_components/aws-sdk-js/dist/aws-sdk.min",
+        "canvas-toBlob": "../../bower_components/canvas-toBlob/canvas-toBlob"
     },
   
     shim: {       

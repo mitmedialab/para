@@ -429,6 +429,11 @@ define([
 			return this.get('geom').bounds;
 		},
 
+		//placeholder for addAsReference duplicator function.
+		addAsReference: function(){
+
+		},
+
 
 
 		close: function() {
@@ -999,6 +1004,9 @@ define([
 		 * @registerUndo: boolean that determines if setting is stored as an undo.
 		 */
 		setValue: function(data, registerUndo) {
+			if(this.proxy){
+				this.proxy.setValue(data);
+			}
 			console.log('setting value',data);
 			if (registerUndo) {
 				this.addToUndoStack();

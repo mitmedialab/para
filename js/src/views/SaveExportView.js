@@ -10,9 +10,10 @@ define([
 	'handlebars',
 	'filesaver',
 	'utils/analytics',
-	"text!html/ui_dialog.html"
+	"text!html/ui_dialog.html",
+	"canvas-toBlob"
 
-], function($, ui, _, AWS, Backbone, Handlebars, FileSaver, analytics, ui_html) {
+], function($, ui, _, AWS, Backbone, Handlebars, FileSaver, analytics, ui_html, canvasToBlob) {
 
 
 	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer, delayTimer, bucket, saved_params, s3;
@@ -25,6 +26,7 @@ define([
 			'click #saveas': 'saveAs',
 			'click #downloadFile': 'downloadFile',
 			'click #export': 'exportSVG',
+			'click #exportBitmap': 'exportBitmap',
 			'change #importSVG': 'importSVG',
 			//'change #text-filename': 'nameChange',
 			'change #uploadFile': 'uploadFile',
@@ -218,11 +220,11 @@ define([
 
 		},
 
-		removeUntitled: function(){
+		removeUntitled: function() {
 			$("#fileselect option[value='untitled']").remove();
 		},
 
-		addUntitled: function(){
+		addUntitled: function() {
 			this.removeUntitled();
 			$("#fileselect").prepend("<option value='untitled'>untitiled</option>").val('untitled');
 		},
@@ -234,7 +236,7 @@ define([
 				if (!name) {
 					return;
 				} else {
-					var added = this.addFileToSelect(name,'saved_files/'+name+'.txt');
+					var added = this.addFileToSelect(name, 'saved_files/' + name + '.txt');
 					if (!added) {
 						if (!confirm("this will overwrite the file " + name)) {
 							return;
@@ -280,13 +282,16 @@ define([
 			//
 			this.removeUntitled();
 			var self = this;
-			var params = {Bucket: 'kimpara', Key: filename};
+			var params = {
+				Bucket: 'kimpara',
+				Key: filename
+			};
 			s3.getObject(params, function(error, data) {
 				if (error) {
 					console.log(error); // an error occurred
 
 				} else {
-					
+
 					var data_obj = JSON.parse(data.Body.toString());
 
 					self.loadJSON(data_obj);
@@ -345,6 +350,20 @@ define([
 				type: 'image/svg+xml'
 			});
 			var fileSaver = new FileSaver(blob, currentName);
+		},
+
+		exportBitmap: function() {
+			this.model.prepExport();
+
+			var canvas = document.getElementById("canvas"),
+				ctx = canvas.getContext("2d");
+			// draw to canvas...
+			canvas.toBlob(function(blob) {
+				saveAs(blob, currentName + ".png");
+			});
+
+
+
 		},
 
 		importSVG: function(event) {

@@ -55,7 +55,9 @@ define([
       masterManager.listenTo(toolManager, 'undo', masterManager.undo);
       masterManager.listenTo(toolManager, 'redo', masterManager.redo);
       masterManager.listenTo(toolManager, 'modificationEnded', masterManager.modificationEnded);
-
+      masterManager.listenTo(toolManager, 'changeZoom', masterManager.changeZoom);
+      masterManager.listenTo(toolManager, 'changePan', masterManager.changePan);
+      masterManager.listenTo(toolManager, 'zeroOrigin', masterManager.zeroOrigin);
 
       masterManager.listenTo(toolManager, 'removeShape', masterManager.removeObject);
       masterManager.listenTo(toolManager, 'addObject', masterManager.addObject);

@@ -60,6 +60,9 @@ define([
 		defaults: {},
 
 		initialize: function() {
+			 //setup default zeros for zoom and pan
+      this.zeroedZoom = paper.view.zoom;
+      this.zeroedPan = paper.view.center.clone();
 			//setup root node
 			rootNode = new FunctionNode({}, {
 				geometryGenerator: GeometryGenerator
@@ -294,7 +297,7 @@ define([
 
 
 		importProjectJSON: function(json) {
-			while(currentNode!=rootNode){
+			while (currentNode != rootNode) {
 				this.toggleClosed();
 			}
 
@@ -318,7 +321,7 @@ define([
 
 		exportProjectJSON: function(json) {
 			var cNode = currentNode;
-			while(currentNode!=rootNode){
+			while (currentNode != rootNode) {
 				this.toggleClosed();
 			}
 			var geometry_json = rootNode.toJSON(true);
@@ -331,7 +334,7 @@ define([
 			};
 			currentNode = cNode;
 			currentNode.toggleOpen();
-			
+
 			return project_json;
 		},
 
@@ -364,11 +367,17 @@ define([
 			var svgNode = new SVGNode({}, {
 				geometryGenerator: GeometryGenerator
 			});
-			svgNode.get('translationDelta').setValue({x:position.x,y:position.y});
-			svgNode.get('scalingDelta').setValue({x:1,y:1});
-			item.position.x=item.position.y=0;
-			svgNode.changeGeomInheritance(item,data);
-			this.addShape(svgNode,true);
+			svgNode.get('translationDelta').setValue({
+				x: position.x,
+				y: position.y
+			});
+			svgNode.get('scalingDelta').setValue({
+				x: 1,
+				y: 1
+			});
+			item.position.x = item.position.y = 0;
+			svgNode.changeGeomInheritance(item, data);
+			this.addShape(svgNode, true);
 
 		},
 
@@ -641,22 +650,21 @@ define([
 			var items = paper.project.getItems({
 				class: paper.Path
 			});
-			var names = items.map(function(item){
-				if(item.data.instance){
-					return [item.className,item.name,item.data.instance.get('name')];
+			var names = items.map(function(item) {
+				if (item.data.instance) {
+					return [item.className, item.name, item.data.instance.get('name')];
+				} else {
+					return [item.className, item.name];
 				}
-				else{
-					return [item.className,item.name];
-				}
-				
+
 			});
-			console.log('remaining items',names);
+			console.log('remaining items', names);
 
 		},
 
 		removeGeometry: function(target, registerUndo) {
 			var undoQueue = [];
-			if(target == currentNode){
+			if (target == currentNode) {
 				this.toggleClosed();
 			}
 			var constraints = constraintManager.removeConstraintsOn(target, registerUndo);
@@ -925,7 +933,7 @@ define([
 		},
 
 		addShape: function(shape, registerUndo) {
-			while(currentNode.get('name')=='duplicator'){
+			while (currentNode.get('name') == 'duplicator') {
 				this.toggleClosed();
 			}
 			if (!shape.nodeParent) {
@@ -936,10 +944,10 @@ define([
 
 			if (shape.get('name') !== 'ui-item' && shape.get('name') !== 'ui') {
 				var parentId;
-				if(currentNode!=rootNode){
+				if (currentNode != rootNode) {
 					parentId = currentNode.get('id');
 				}
-				layersView.addShape(shape.toJSON(),parentId);
+				layersView.addShape(shape.toJSON(), parentId);
 			}
 			this.selectShape(shape);
 
@@ -1002,12 +1010,12 @@ define([
 			//TODO: not sure why this is needed since listeners are never assigned...
 			duplicator.stopListening(duplicator.masterList);
 			duplicator.stopListening(duplicator.internalList);
-	
+
 			duplicator.setTarget(object);
-		
+
 
 			var data = duplicator.setCount(8);
- 
+
 			currentNode.insertChild(index, duplicator);
 
 
@@ -1016,7 +1024,7 @@ define([
 			this.selectShape(duplicator);
 			this.duplicatorCountModified(data, duplicator);
 			var constraints = duplicator.setInternalConstraint();
-		
+
 			constraintManager.addConstraintArray(constraints, registerUndo);
 
 			this.addToUndoStack([constraintManager, nodeParent]);
@@ -1027,7 +1035,7 @@ define([
 				layersView.addConstraint(constraints[i]);
 
 			}
-			
+
 			return duplicator;
 		},
 
@@ -1069,19 +1077,16 @@ define([
 			}
 		},
 
-		initConstraintOnSelected: function(constraintTool){
-			if(selected.length===0){
+		initConstraintOnSelected: function(constraintTool) {
+			if (selected.length === 0) {
 				return;
-			}
-			else{
-				if(selected.length==1){
+			} else {
+				if (selected.length == 1) {
 					constraintTool.selectTarget(selected);
-				}
-				else if(selected.length == 2){
-				constraintTool.selectTarget(selected.slice(-2,-1));
-				constraintTool.selectTarget(selected.slice(-1));
-				}
-				else{
+				} else if (selected.length == 2) {
+					constraintTool.selectTarget(selected.slice(-2, -1));
+					constraintTool.selectTarget(selected.slice(-1));
+				} else {
 					var list = this.addList(selected);
 					constraintTool.selectTarget([list]);
 				}
@@ -1135,7 +1140,7 @@ define([
 							return false;
 						}
 						if (relativeShape.get('name') === 'group') {
-							console.log('adding in relative shape to group',movedShape.get('name'));
+							console.log('adding in relative shape to group', movedShape.get('name'));
 							relativeShape.addChildNode(movedShape);
 							/*this.addToUndoStack([relativeShape]);
 							this.modificationEnded([relativeShape]);
@@ -1186,7 +1191,7 @@ define([
 						break;
 				}
 			}
-						this.trigger('modified');
+			this.trigger('modified');
 
 			return true;
 		},
@@ -1230,6 +1235,11 @@ define([
 			}
 		},
 
+
+		prepExport: function() {
+			this.deselectAllShapes();
+			//this.zeroOrigin();	
+		},
 
 		deselectAllShapes: function() {
 			// TODO: do this across all selections
@@ -1276,7 +1286,7 @@ define([
 			});
 
 			layersView.updateSelection(layer_shapes);
-			if(selected.length==1){
+			if (selected.length == 1) {
 				mapView.itemSelected(selected[0]);
 			}
 		},
@@ -1367,10 +1377,23 @@ define([
 				id: 'modify',
 				action: 'modify geometry'
 			});
+			console.log('modifiers', modifiers);
 			if (selected.length > 0) {
 
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
+					/*if (modifiers.shift) {
+						var relative = instance.nodeParent.requestAddReference(instance);
+						if (relative) {
+							var constraints = constraintManager.getConstraintsByRelative(relative);
+							for(var j=0;j<constraints.length;j++){
+							console.log('relative',constraints[j]);
+
+							//constraints[j].setExemptForAll(instance.get('id'), true);
+							}
+							instance.nodeParent.addAsReference(instance);
+						}
+					}*/
 					instance.setValue(data, !stateStored);
 				}
 				this.addToUndoStack(selected);
@@ -1391,6 +1414,7 @@ define([
 			if (instances.length > 0) {
 				for (var i = 0; i < instances.length; i++) {
 					var instance = instances[i];
+
 					instance.modifyPoints(data, this.get('tool-mode'), this.get('tool-modifier'), null, !stateStored);
 				}
 				this.addToUndoStack(selected);
@@ -1416,7 +1440,7 @@ define([
 				id: 'modify',
 				action: 'modify style'
 			});
-			console.log('style_data',style_data);
+			console.log('style_data', style_data);
 			if (selected.length > 0) {
 				var non_group_selected = [];
 				for (var i = 0; i < selected.length; i++) {
@@ -1531,7 +1555,7 @@ define([
 		 * moves up a level in the geometery heirarchy
 		 */
 		toggleClosed: function() {
-			if(currentNode == rootNode){
+			if (currentNode == rootNode) {
 				return;
 			}
 			this.deselectAllShapes();
@@ -1556,6 +1580,39 @@ define([
 			//var data = collectionManager.toggleClosed(selected[selected.length - 1]);
 			//this.deselectAllShapes();
 
+		},
+
+		zeroOrigin: function() {
+			paper.view.center = this.zeroedPan;
+			paper.view.zoom = this.zeroedZoom;
+		},
+
+		changeZoom: function(delta,viewPosition) {
+			var newZoom = this.calcZoom(paper.view.zoom, delta);
+
+			var beta = paper.view.zoom / newZoom;
+			var pc = viewPosition.subtract(paper.view.center);
+			var a = viewPosition.subtract(pc.multiply(beta)).subtract(paper.view.center);
+
+
+			paper.view.zoom = newZoom;
+			paper.view.center = paper.view.center.add(a);
+			paper.view.draw();
+		},
+
+		changePan: function(delta) {
+			var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
+			paper.view.scrollBy(inverseDelta);
+		},
+
+		calcZoom: function(oldZoom, delta) {
+			var factor = 1.05;
+			if (delta < 0) {
+				return oldZoom * factor;
+			}
+			if (delta > 0) {
+				return oldZoom / factor;
+			}
 		},
 
 

@@ -79,9 +79,7 @@ define([
       // setup helpers and factories
       PaperUIHelper.setup(this);
 
-      //setup default zeros for zoom and pan
-      this.zeroedZoom = paper.view.zoom;
-      this.zeroedPan = paper.view.center.clone();
+     
     },
 
     setState: function(state, mode) {
@@ -279,57 +277,28 @@ define([
 
     canvasMouseDrag: function(delta, pan) {
       if (pan) {
-        var inverseDelta = new paper.Point(-delta.x / paper.view.zoom, -delta.y / paper.view.zoom);
-        paper.view.scrollBy(inverseDelta);
-
+        this.trigger('changePan',delta);
         event.preventDefault();
       }
     },
 
     zeroOrigin: function(){
-       paper.view.center = this.zeroedPan;
-       paper.view.zoom = this.zeroedZoom;
-    },
-
-    changeZoom: function(oldZoom, delta, c, p) {
-      var newZoom = this.calcZoom(oldZoom, delta);
-
-      var beta = oldZoom / newZoom;
-      var pc = p.subtract(c);
-      var a = p.subtract(pc.multiply(beta)).subtract(c);
-      return {
-        z: newZoom,
-        o: a
-      };
-    },
-
-    calcZoom: function(oldZoom, delta) {
-      var factor = 1.05;
-      if (delta < 0) {
-        return oldZoom * factor;
-      }
-      if (delta > 0) {
-        return oldZoom / factor;
-      }
+      this.trigger('zeroOrigin');
     },
 
     canvasMouseWheel: function(event, pan, modify) {
       var delta = event.originalEvent.wheelDelta; //paper.view.center
 
       if (pan && delta!==0) {
-
         var mousePos = new paper.Point(event.offsetX, event.offsetY);
         var viewPosition = paper.view.viewToProject(mousePos);
-        var data = this.changeZoom(paper.view.zoom, delta, paper.view.center, viewPosition);
-        paper.view.zoom = data.z;
-        paper.view.center = paper.view.center.add(data.o);
+        this.trigger('changeZoom',delta,viewPosition);
         event.preventDefault();
-        paper.view.draw();
       }
     },
 
     canvasDblclick: function(event) {
-        this.trigger('doubleClick')
+        this.trigger('doubleClick');
     },
 
   });

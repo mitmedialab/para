@@ -34,7 +34,8 @@
     "requirejs-text": "~2.0.12",
     "constraintjs" : "git://github.com/soney/constraintjs.git",
     "fancytree" : "git://github.com/pixelmaid/fancytree.git#master",
-    "aws-sdk-js" : "git://github.com/aws/aws-sdk-js"
+    "aws-sdk-js" : "git://github.com/aws/aws-sdk-js",
+    "canvas-toBlob": "git://github.com/eligrey/canvas-toBlob.js.git"
 
   },
   "resolutions": {
