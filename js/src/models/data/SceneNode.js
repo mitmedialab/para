@@ -178,12 +178,14 @@ define([
         },
 
         setChildBefore: function(child, sibling) {
+            console.log('set child before',child.isSibling(sibling));
             if (child.isSibling(sibling)) {
 
                 var childIndex = child.getChildIndex();
                 this.children.splice(childIndex, 1);
                 var siblingIndex = sibling.getChildIndex();
                 this.children.splice(siblingIndex, 0, child);
+                console.log('startIndex',childIndex,'endIndex',child.getChildIndex());
             }
         },
 

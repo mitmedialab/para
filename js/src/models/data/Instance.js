@@ -581,6 +581,7 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
+			child.get('geom').moveBelow(sibling.get('geom'));
 
 		},
 
@@ -589,6 +590,8 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].get('zIndex').setValue(i);
 			}
+			child.get('geom').moveAbove(sibling.get('geom'));
+
 		},
 
 		addInheritor: function(instance) {

@@ -60,9 +60,9 @@ define([
 		defaults: {},
 
 		initialize: function() {
-			 //setup default zeros for zoom and pan
-      this.zeroedZoom = paper.view.zoom;
-      this.zeroedPan = paper.view.center.clone();
+			//setup default zeros for zoom and pan
+			this.zeroedZoom = paper.view.zoom;
+			this.zeroedPan = paper.view.center.clone();
 			//setup root node
 			rootNode = new FunctionNode({}, {
 				geometryGenerator: GeometryGenerator
@@ -1124,19 +1124,20 @@ define([
 			}
 		},
 
-		changeConstraintName: function(id,name){
-			layersView.setTitle(id,name);
+		changeConstraintName: function(id, name) {
+			layersView.setTitle(id, name);
 		},
 
-		layerNameChange: function(id,name){
+		layerNameChange: function(id, name) {
 			var target = this.getById(id);
-			target.set('user_name',name);
-			if(target.get('name')=='constraint'){
+			target.set('user_name', name);
+			if (target.get('name') == 'constraint') {
 				mapView.setName(name);
 			}
 		},
 
 		reorderShapes: function(movedId, relativeId, mode) {
+			console.log('mode', mode);
 			var movedShape = this.getById(movedId);
 			var relativeShape = this.getById(relativeId);
 			if (movedShape && relativeShape) {
@@ -1162,6 +1163,18 @@ define([
 							layersView.sortChildren(relativeShape.get('id'));*/
 						}
 						break;
+
+					case 'before':
+						if (movedShape.isSibling(relativeShape)) {
+							movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
+						}
+						break;
+					case 'after':
+						if (movedShape.isSibling(relativeShape)) {
+							console.log('after');
+							movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
+						}
+						break;
 					default:
 						if (!movedShape.isSibling(relativeShape)) {
 							var parent = movedShape.getParentNode();
@@ -1184,20 +1197,11 @@ define([
 								}
 
 							}
-
 							currentNode.addChildNode(movedShape);
 
 
 						}
 
-						switch (mode) {
-							case 'after':
-								movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
-								break;
-							case 'before':
-								movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
-								break;
-						}
 						break;
 				}
 			}
@@ -1597,7 +1601,7 @@ define([
 			paper.view.zoom = this.zeroedZoom;
 		},
 
-		changeZoom: function(delta,viewPosition) {
+		changeZoom: function(delta, viewPosition) {
 			var newZoom = this.calcZoom(paper.view.zoom, delta);
 
 			var beta = paper.view.zoom / newZoom;
