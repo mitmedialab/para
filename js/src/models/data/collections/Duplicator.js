@@ -22,6 +22,7 @@ define([
 
             defaults: _.extend({}, Group.prototype.defaults, {
                 name: 'duplicator',
+                user_name: 'duplicator',
                 count: null,
                 target: null,
                 mode: 'standard',

@@ -141,12 +141,24 @@ define([
 			//this.resetMasterView();
 		},
 
-		countModified: function(duplicator){
-			if(constraint){
-				if(constraint.get('references')==duplicator.masterList){
+		countModified: function(duplicator) {
+			if (constraint) {
+				if (constraint.get('references') == duplicator.masterList) {
 					this.setConstraint(constraint);
 				}
 			}
+		},
+
+		changeConstraintName: function() {
+			console.log('constraint name changed',$('#name').val());
+			if (constraint) {
+				constraint.set('user_name', $('#name').val());
+				self.model.changeConstraintName(constraint.get('id'),$('#name').val());
+			}
+		},
+
+		setName: function(name){
+			$('#name').val(name);
 		},
 
 		setConstraint: function(c) {
@@ -176,6 +188,8 @@ define([
 				data.name = constraint.get('user_name');
 				var html = propertiesTemplate(data);
 				$('#constraint-properties').html(html);
+				$('#name').change(this.changeConstraintName);
+
 				this.changeProperty();
 
 

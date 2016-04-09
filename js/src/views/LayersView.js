@@ -46,12 +46,47 @@ define([
 
 					},
 					dragDrop: function(node, data) {
-						if (view.checkValidDrop(data.otherNode, node,data.hitMode)) {
+						if (view.checkValidDrop(data.otherNode, node, data.hitMode)) {
 							data.otherNode.moveTo(node, data.hitMode);
 							view.dropCompleted(data.otherNode, node, data.hitMode);
 						}
 					}
-				}
+				},
+					edit: {
+						triggerStart: ["f2", "dblclick", "shift+click", "mac+enter"],
+						beforeEdit: function(event, data) {
+							// Return false to prevent edit mode
+						},
+						edit: function(event, data) {
+							// Editor was opened (available as data.input)
+						},
+						beforeClose: function(event, data) {
+							// Return false to prevent cancel/save (data.input is available)
+						},
+						save: function(event, data) {
+							// Save data.input.val() or return false to keep editor open
+							console.log("save...", this, data);
+							// Simulate to start a slow ajax request...
+							setTimeout(function() {
+								$(data.node.span).removeClass("pending");
+								// Let's pretend the server returned a slightly modified
+								// title:
+								data.node.setTitle(data.node.title);
+								view.model.layerNameChange(data.node.key,data.node.title);
+							}, 500);
+							// We return true, so ext-edit will set the current user input
+							// as title
+							return true;
+						},
+						close: function(event, data) {
+							// Editor was removed
+							if (data.save) {
+								// Since we started an async request, mark the node as preliminary
+								$(data.node.span).addClass("pending");
+							}
+						}
+					}
+				
 			});
 			this.$('#lists').fancytree({
 				source: [],
@@ -73,7 +108,42 @@ define([
 						data.otherNode.moveTo(node, data.hitMode);
 						view.dropCompleted(data.otherNode, node, data.hitMode);
 					}
-				}
+
+				},
+				edit: {
+						triggerStart: ["f2", "dblclick", "shift+click", "mac+enter"],
+						beforeEdit: function(event, data) {
+							// Return false to prevent edit mode
+						},
+						edit: function(event, data) {
+							// Editor was opened (available as data.input)
+						},
+						beforeClose: function(event, data) {
+							// Return false to prevent cancel/save (data.input is available)
+						},
+						save: function(event, data) {
+							// Save data.input.val() or return false to keep editor open
+							console.log("save...", this, data);
+							// Simulate to start a slow ajax request...
+							setTimeout(function() {
+								$(data.node.span).removeClass("pending");
+								// Let's pretend the server returned a slightly modified
+								// title:
+								data.node.setTitle(data.node.title);
+								view.model.layerNameChange(data.node.key,data.node.title);
+							}, 500);
+							// We return true, so ext-edit will set the current user input
+							// as title
+							return true;
+						},
+						close: function(event, data) {
+							// Editor was removed
+							if (data.save) {
+								// Since we started an async request, mark the node as preliminary
+								$(data.node.span).addClass("pending");
+							}
+						}
+					}
 			});
 
 			this.$('#constraints').fancytree({
@@ -96,7 +166,41 @@ define([
 						data.otherNode.moveTo(node, data.hitMode);
 						view.dropCompleted(data.otherNode, node, data.hitMode);
 					}
-				}
+				},
+				edit: {
+						triggerStart: ["f2", "dblclick", "shift+click", "mac+enter"],
+						beforeEdit: function(event, data) {
+							// Return false to prevent edit mode
+						},
+						edit: function(event, data) {
+							// Editor was opened (available as data.input)
+						},
+						beforeClose: function(event, data) {
+							// Return false to prevent cancel/save (data.input is available)
+						},
+						save: function(event, data) {
+							// Save data.input.val() or return false to keep editor open
+							console.log("save...", this, data);
+							// Simulate to start a slow ajax request...
+							setTimeout(function() {
+								$(data.node.span).removeClass("pending");
+								// Let's pretend the server returned a slightly modified
+								// title:
+								data.node.setTitle(data.node.title);
+								view.model.layerNameChange(data.node.key,data.node.title);
+							}, 500);
+							// We return true, so ext-edit will set the current user input
+							// as title
+							return true;
+						},
+						close: function(event, data) {
+							// Editor was removed
+							if (data.save) {
+								// Since we started an async request, mark the node as preliminary
+								$(data.node.span).addClass("pending");
+							}
+						}
+					}
 			});
 
 			shapeTree = $("#shapes").fancytree("getTree");
@@ -170,13 +274,13 @@ define([
 		positionConstraintIcons: function(checkVisible) {
 			this.toggleConstraintsForAllNodes();
 			if (currentRef && currentRel) {
-				if(currentRel.split('_')[0] == 'internalcollection'){
+				if (currentRel.split('_')[0] == 'internalcollection') {
 					currentRel = this.model.getInternalListOwner(currentRel).get('id');
 
 				}
 				var ref = shapeTree.getNodeByKey(currentRef);
 				var rel = shapeTree.getNodeByKey(currentRel);
-				
+
 				if (!ref) {
 					ref = listTree.getNodeByKey(currentRef);
 				}
@@ -310,6 +414,18 @@ define([
 				this.model.removeObjectById(active.key);
 			}
 
+		},
+
+		setTitle: function(id, title) {
+			var target = shapeTree.getNodeByKey(id);
+			if (!target) {
+				target = listTree.getNodeByKey(id);
+			}
+			if (!target) {
+				target = constraintTree.getNodeByKey(id);
+
+			}
+			target.setTitle(title);
 		},
 
 		deleteAll: function() {
@@ -449,11 +565,11 @@ define([
 
 		addShape: function(shape, parentId) {
 			var index = shape.zIndex;
-			
+
 			this.deselectAll(shapeRoot);
 			this.deselectAll(listRoot);
 			var s = {
-				title: shape.name,
+				title: shape.user_name,
 				key: shape.id,
 				zIndex: index,
 			};
@@ -469,18 +585,17 @@ define([
 			} else {
 				node = parentNode.addChildren(s);
 			}
-			parentNode.sortChildren(function(a,b){
-				var sort= b.data.zIndex-a.data.zIndex;
+			parentNode.sortChildren(function(a, b) {
+				var sort = b.data.zIndex - a.data.zIndex;
 				return sort;
 			});
 			this.selectNode(node);
-			this.resetConstraintHeight();	
+			this.resetConstraintHeight();
 			for (var i = 0; i < shape.children.length; i++) {
 				if (shape.children[i].name != 'point') {
 					this.addShape(shape.children[i], shape.id);
 				}
 			}
-
 
 
 
@@ -584,7 +699,7 @@ define([
 			this.deselectAll(listRoot);
 			this.deselectAll(constraintRoot);
 			var constraintData = {
-				title: data.get('name'),
+				title: data.get('user_name'),
 				key: data.get('id'),
 				rel: data.get('relatives').get('id'),
 				ref: data.get('references').get('id')

@@ -31,7 +31,7 @@ define([
 
 
 ], function(_, paper, Backbone, Instance, Group, PathNode, SVGNode, RectNode, EllipseNode, PolygonNode, FunctionNode, FunctionManager, CollectionManager, Duplicator, Constraint, ConstrainableList, LayersView, CollectionView, MapView, SaveExportView, analytics, GeometryGenerator, ConstraintManager) {
-	//debug vars for testing framerate
+	//debug vars for tescoting framerate
 	var fps = 0,
 		now, lastUpdate = (new Date()) * 1;
 	var fpsFilter = 10;
@@ -1124,7 +1124,17 @@ define([
 			}
 		},
 
+		changeConstraintName: function(id,name){
+			layersView.setTitle(id,name);
+		},
 
+		layerNameChange: function(id,name){
+			var target = this.getById(id);
+			target.set('user_name',name);
+			if(target.get('name')=='constraint'){
+				mapView.setName(name);
+			}
+		},
 
 		reorderShapes: function(movedId, relativeId, mode) {
 			var movedShape = this.getById(movedId);

@@ -166,7 +166,7 @@ define([
       operators: null,
       reference_properties: null,
       relative_properties: null,
-      user_name: null,
+      user_name: 'constraint',
       paused: false
     },
 

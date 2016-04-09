@@ -18,6 +18,7 @@ define([
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'list',
+        user_name: 'list'
       }),
 
       initialize: function() {

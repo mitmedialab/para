@@ -121,6 +121,7 @@ define([
 			isChanging: false,
 			rendered: false,
 			undo_limit: 10,
+			user_name: "instance",
 
 
 		}),
@@ -262,6 +263,7 @@ define([
 				center: new paper.Point(0, 0)
 			};
 			this.stateStored = false;
+			this.set('user_name',this.get('name'));
 			/*this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
 			this.originUI.fillColor = 'yellow';
 
@@ -817,6 +819,7 @@ define([
 				}
 			}
 			data.name = this.get('name');
+			data.user_name = this.get('user_name');
 			data.type = this.get('type');
 			data.id = this.get('id');
 			data.visible = this.get('visible');
@@ -859,6 +862,7 @@ define([
 				}
 			}
 			this.set('name', data.name);
+			this.set('user_name',data.user_name);
 			this.set('type', data.type);
 			this.set('id', data.id);
 			this.set('visible', data.visible);
@@ -1637,7 +1641,6 @@ define([
 			} else {
 				geom.opacity = 1;
 			}
-			console.log('blend',this.get('blendMode_map')[this.get('blendMode').getValue()],this.get('blendMode').getValue());
 			geom.blendMode = this.get('blendMode_map')[this.get('blendMode').getValue()];
 
 		},

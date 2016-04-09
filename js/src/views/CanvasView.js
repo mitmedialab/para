@@ -237,10 +237,6 @@ define([
       if (event.keyCode === groupKey) {
         this.model.createList();
       }
-      // EXPERIMENTAL
-      if (event.keyCode === advanceKey) {
-        this.model.advanceTool();
-      }
     },
 
     canvasKeyup: function(event) {

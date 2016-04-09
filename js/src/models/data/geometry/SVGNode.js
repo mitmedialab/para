@@ -140,7 +140,6 @@ define([
       instance.set('rendered', true);
       instance.createBBox();
       instance.svg_data = this.svg_data;
-
       return instance;
     },
 
@@ -151,17 +150,17 @@ define([
       if (!this.get('inFocus')) {
         geom.opacity = 0.5;
       } else {
-        geom.opacity = 1;
+        geom.opacity = this.get('fillColor').getValue().a;
       }
+      geom.blendMode = this.get('blendMode_map')[this.get('blendMode').getValue()];
+
     },
+
 
     getValueFor: function(property_name) {
-
       var property = this.get(property_name);
       return this.getValue()[property_name];
-
     },
-
 
     renderSelection: function(geom) {
       Group.prototype.renderSelection.call(this, geom);
