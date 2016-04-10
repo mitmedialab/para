@@ -80,6 +80,7 @@ define([
 			'click #property_buttons': 'changeProperty',
 			'change #relative_offset': 'changeOffset',
 			'click #exempt_button': 'toggleExempt',
+			'dblclick #property_buttons': 'removeProperty'
 		},
 
 		initialize: function(obj) {
@@ -150,14 +151,14 @@ define([
 		},
 
 		changeConstraintName: function() {
-			console.log('constraint name changed',$('#name').val());
+			console.log('constraint name changed', $('#name').val());
 			if (constraint) {
 				constraint.set('user_name', $('#name').val());
-				self.model.changeConstraintName(constraint.get('id'),$('#name').val());
+				self.model.changeConstraintName(constraint.get('id'), $('#name').val());
 			}
 		},
 
-		setName: function(name){
+		setName: function(name) {
 			$('#name').val(name);
 		},
 
@@ -213,6 +214,20 @@ define([
 			constraint = null;
 			this.setRange();
 
+		},
+
+		removeProperty: function(event) {
+			if (constraint) {
+				var propName = properties[current_prop].name;
+				var subprops = properties[current_prop].subproperties;
+				var subprop_string = "";
+				for (var i = 0; i < subprops.length; i++) {
+					subprop_string.concat(subprops[i].name);
+				}
+				this.model.removeConstraintProperty(constraint,propName,subprop_string,true);
+				this.setConstraint(constraint);
+
+			}
 		},
 
 		changeProperty: function(event) {

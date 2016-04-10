@@ -95,7 +95,7 @@ define([
 				//inheritors: []
 			},
 
-			blendMode_map: ['normal', 'multiply', 'screen', 'overlay', 'soft-light', 'hard- light', 'color-dodge', 'color-burn', 'darken', 'lighten', 'difference', 'exclusion', 'hue', 'saturation', 'luminosity', 'color', 'add', 'subtract', 'average', 'pin-light','negation', 'source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'],
+			blendMode_map: ['normal', 'multiply', 'screen', 'overlay', 'soft-light', 'hard- light', 'color-dodge', 'color-burn', 'darken', 'lighten', 'difference', 'exclusion', 'hue', 'saturation', 'luminosity', 'color', 'add', 'subtract', 'average', 'pin-light', 'negation', 'source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'],
 
 			dimension_num: 6,
 
@@ -250,6 +250,8 @@ define([
 			//undo redo variables
 			this.previousStates = [];
 			this.futureStates = [];
+			this.stateStored = false;
+
 			this.resetTransforms = {
 				translationDelta: {
 					x: 0,
@@ -262,8 +264,7 @@ define([
 				rotationDelta: 0,
 				center: new paper.Point(0, 0)
 			};
-			this.stateStored = false;
-			this.set('user_name',this.get('name'));
+			this.set('user_name', this.get('name'));
 			/*this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
 			this.originUI.fillColor = 'yellow';
 
@@ -432,7 +433,7 @@ define([
 		},
 
 		//placeholder for addAsReference duplicator function.
-		addAsReference: function(){
+		addAsReference: function() {
 
 		},
 
@@ -468,6 +469,14 @@ define([
 			} else {
 				return this.nodeParent.filterSelection();
 			}
+		},
+
+		createProxy: function() {
+			var proxy = this.create();
+			proxy.get('geom').remove();
+			this.proxy = proxy;
+			proxy.slave = this;
+			return proxy;
 		},
 
 		/* create
@@ -865,7 +874,7 @@ define([
 				}
 			}
 			this.set('name', data.name);
-			this.set('user_name',data.user_name);
+			this.set('user_name', data.user_name);
 			this.set('type', data.type);
 			this.set('id', data.id);
 			this.set('visible', data.visible);
@@ -1011,10 +1020,10 @@ define([
 		 * @registerUndo: boolean that determines if setting is stored as an undo.
 		 */
 		setValue: function(data, registerUndo) {
-			if(this.proxy){
+			if (this.proxy) {
 				this.proxy.setValue(data);
 			}
-			console.log('setting value',data);
+			console.log('setting value', data);
 			if (registerUndo) {
 				this.addToUndoStack();
 			}

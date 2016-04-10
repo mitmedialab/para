@@ -297,10 +297,8 @@ define([
                         }
                     }
                     console.log('adding reference', target_index,childIndexA,childIndexB,a,this.internalList[i],i);
-                    var proxy = target.create();
-                    proxy.get('geom').remove();
-                    target.proxy =proxy;
-                    proxy.slave = target;
+                    var proxy = target.createProxy();;
+                   
                     this.internalList.addMember(proxy,target_index);
                     return this.masterList;
                 }

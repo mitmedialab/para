@@ -219,6 +219,84 @@ define([
         }
       });
 
+      this.previousStates = [];
+      this.futureStates = [];
+
+      this.stateStored = false;
+    },
+
+
+    clearUndoCache: function() {
+      this.previousStates = [];
+      this.futureStates = [];
+      this.stateStored = false;
+    },
+
+    //undo to last state
+    undo: function(manager) {
+
+      if (this.previousStates.length > 0) {
+        var toRemove = [];
+        var toAdd = [];
+
+        var state = this.previousStates.pop();
+        var currentState = this.toJSON();
+        this.futureStates.push(currentState);
+        var changed = this.parseJSON(state,manager);
+
+        toRemove.push.apply(toRemove, changed.toRemove);
+        toAdd.push.apply(toAdd, changed.toAdd);
+        return {
+          toRemove: toRemove,
+          toAdd: toAdd
+        };
+      }
+    },
+
+    /*setValueEnded
+     * called when a manual adujstment is ended
+     * such as on a mouse up event
+     * sets stateStored to false, enabling the next
+     * state of an object to be saved
+     */
+    setValueEnded: function() {
+      this.stateStored = false;
+    },
+
+
+    trimUndoStack: function() {
+      this.previousStates.shift();
+    },
+
+    trimRedoStack: function() {
+      this.futureStates.shift();
+    },
+
+    redo: function(manager) {
+      if (this.futureStates.length > 0) {
+        var toRemove = [];
+        var toAdd = [];
+        var state = this.futureStates.pop();
+        var currentState = this.toJSON();
+        this.previousStates.push(currentState);
+        var changed = this.parseJSON(state,manager);
+
+        toRemove.push.apply(toRemove, changed.toRemove);
+        toAdd.push.apply(toAdd, changed.toAdd);
+        return {
+          toRemove: toRemove,
+          toAdd: toAdd
+        };
+      }
+
+    },
+
+    addToUndoStack: function() {
+      if (!this.stateStored) {
+        this.previousStates.push(this.toJSON());
+        this.stateStored = true;
+        this.futureStates = [];
+      }
     },
 
     toJSON: function(noUndoCache) {
@@ -1322,6 +1400,34 @@ define([
       this.set('ref_handle', null);
       this.set('rel_handle', null);
 
+    },
+
+    removeConstraintOn: function(property,dimensions,registerUndo){
+      if (registerUndo) {
+        this.addToUndoStack();
+      }
+      var relatives = this.get('relatives');
+      relatives.removeConstraint(property, dimensions);
+
+      var filtered_props = this.get('properties').filter(function(p){
+          if(p[0].indexOf(property) > -1){
+            return false;
+          }
+          return true;
+      });
+            this.set('properties',filtered_props);
+
+    var filtered_rel_props = this.get('relative_properties').filter(function(p){
+          if(p[0].indexOf(property) > -1){
+            return false;
+          }
+          return true;
+      });
+            this.set('relative_properties',filtered_rel_props);
+
+            console.log('removing constraint for',property, dimensions,this.get('properties'));
+
+      //need to do something about removing object from property list. which will be a pain.
     },
 
     deleteSelf: function() {

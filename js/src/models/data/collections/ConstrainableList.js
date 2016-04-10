@@ -10,11 +10,13 @@ define([
     'paper',
     'models/data/properties/PConstraint',
     'utils/TrigFunc',
-    'models/data/Instance'
+    'models/data/Instance',
+            'models/data/Constraint',
+
 
   ],
 
-  function(_, ListNode, PVal, PBool, paper, PConstraint, TrigFunc, Instance) {
+  function(_, ListNode, PVal, PBool, paper, PConstraint, TrigFunc, Instance, Constraint) {
     var ConstrainableList = ListNode.extend({
       defaults: _.extend({}, ListNode.prototype.defaults, {
         name: 'list',
@@ -22,8 +24,12 @@ define([
       }),
 
       initialize: function() {
-        ListNode.prototype.
-        initialize.apply(this, arguments);
+        ListNode.prototype.initialize.apply(this, arguments);
+         //this.internalList = new ConstrainableList();
+
+         //this.internalList.set('id', 'internal' + this.internalList.get('id'));
+           //        this.internalList.get('ui').remove();
+
         //code for creating list UI
         var rectangle = new paper.Rectangle(new paper.Point(0, 0), new paper.Size(100, 20));
         var path = new paper.Path.Rectangle(rectangle);
@@ -55,6 +61,38 @@ define([
         });
         this.count = 0;
       },
+
+       setInternalConstraint: function(reference_list) {
+          var internalConstraints = [];
+          if(this.members.length>0){
+
+          reference_list.addMember(this.members[0].createProxy());
+
+            if(this.members.length>1){
+              reference_list.addMember(this.members[this.members.length - 1].createProxy());
+            }
+
+              var constraint = new Constraint();
+                constraint.set('references', reference_list);
+                constraint.set('relatives', this);
+                constraint.set('proxy_references', this.members[0]);
+                var data = [
+                    ['translationDelta_xy', 'translationDelta_xy', ['interpolate', 'interpolate']],
+                    ['scalingDelta_xy', 'scalingDelta_xy', ['interpolate', 'interpolate']],
+                    ['fillColor_hsla', 'fillColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
+                    ['strokeColor_hsla', 'strokeColor_hsla', ['interpolate', 'interpolate', 'interpolate']],
+                    ['rotationDelta_v', 'rotationDelta_v', ['interpolate', 'interpolate']],
+                    ['strokeWidth_v', 'strokeWidth_v', ['interpolate', 'interpolate']],
+                    ['blendMode_v', 'blendMode_v', ['alternate', 'alternate']]
+                ];
+
+                constraint.create(data);
+
+                internalConstraints.push(constraint);
+              }
+
+                return internalConstraints;
+            },
 
       /*setValue
       passes modifications onto members, stripped of any properties that are constrained on the list

@@ -798,12 +798,24 @@ define([
 			var list = collectionManager.initializeList(selected, registerUndo);
 			this.deselectAllShapes();
 			if (list) {
-				if (registerUndo) {
-					this.addToUndoStack([collectionManager]);
-					this.modificationEnded([collectionManager]);
-				}
+			var reference_list = new ConstrainableList();
+			var constraints = list.setInternalConstraint(reference_list);
+
+			constraintManager.addConstraintArray(constraints, registerUndo);
+
 				layersView.addList(list.toJSON());
 				this.selectShape(list);
+			for (var i = 0; i < constraints.length; i++) {
+
+				layersView.addConstraint(constraints[i]);
+
+			}
+				if (registerUndo) {
+					this.addToUndoStack([collectionManager,constraintManager]);
+					this.modificationEnded([collectionManager,constraintManager]);
+
+				}
+			
 				this.addListener(list);
 
 				return list;
@@ -1124,6 +1136,15 @@ define([
 			}
 		},
 
+		removeConstraintProperty: function(constraint,propName,subprop_string,registerUndo){
+			if (registerUndo) {
+				constraint.removeConstraintOn(propName, subprop_string,registerUndo);
+				this.addToUndoStack([constraint]);
+				this.modificationEnded([constraint]);
+			}
+
+		},
+
 		changeConstraintName: function(id, name) {
 			layersView.setTitle(id, name);
 		},
@@ -1166,13 +1187,12 @@ define([
 
 					case 'before':
 						if (movedShape.isSibling(relativeShape)) {
-							movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
+							movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
 						}
 						break;
 					case 'after':
 						if (movedShape.isSibling(relativeShape)) {
-							console.log('after');
-							movedShape.getParentNode().setChildAfter(movedShape, relativeShape);
+							movedShape.getParentNode().setChildBefore(movedShape, relativeShape);
 						}
 						break;
 					default:
