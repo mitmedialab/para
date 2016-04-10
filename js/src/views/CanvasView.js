@@ -77,7 +77,6 @@ define([
       $(document).bind('keyup', this.canvasKeyup);
 
       $(window).bind('focus', this.setFocus);
-      $(window).on("resize", this.resizeCanvas);
 
       $("#sub-canvas").bind('mousedown', this.subCanvasMouseDown);
       $("#sub-canvas").bind('mouseup', {
@@ -152,14 +151,6 @@ define([
     },
 
 
-
-    resizeCanvas: function() {
-      var c = $('#canvas');
-      c.attr('width', $(window).attr('innerWidth'));
-      c.attr('height', $(window).attr('innerHeight'));
-      paper.view.update();
-      paper.view.draw();
-    },
 
     /* tool mouse event functions */
 
