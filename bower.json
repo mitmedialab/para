@@ -23,7 +23,7 @@
     "FileSaver": "*",
     "handlebars": "1.3.0",
     "jquery": "2.1.1",
-    "paper": "0.9.19",
+    "paper": "https://github.com/mbc/paper.js.git#fix-unchecked-inversetransform-bugs",
     "requirejs": "2.1.14",
     "js-toolbox": "git://github.com/jimmydo/js-toolbox.git",
     "underscore": "1.6.0",
