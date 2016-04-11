@@ -20,6 +20,7 @@ define([
   //keeps track of when a copy was released to set correct position data for the new instance
   var copyInitialized = false;
   var startPoint, startDist, startWidth, startHeight = null;
+  var startScalingDelta = null;
   var dHitOptions = {
     segments: true,
     curves: false,
@@ -63,6 +64,7 @@ define([
 
           startWidth = literal.bounds.width;
           startHeight = literal.bounds.height;
+          startScalingDelta = literal.data.instance.getValueFor('scalingDelta');
 
           break;
       }
@@ -235,29 +237,37 @@ define([
     },
 
     scaleDrag: function(event) {
-      var scaleDelta = literal.data.instance.getValueFor('scalingDelta');
       var posPoint = this.getRelativePoint();
       if (posPoint) {
 
+        var rotationDelta = literal.data.instance.getValueFor('rotationDelta');
+        var xAxis = { x: Math.cos(rotationDelta * (Math.PI / 180.0)), y: Math.sin(rotationDelta * (Math.PI / 180.0)) };
+        var yAxis = { x: Math.sin(rotationDelta * (Math.PI / 180.0)), y: -Math.cos(rotationDelta * (Math.PI / 180.0)) };
+
         var clickPos = startDist; //position of clicked point, relative to center
         var dragPos = event.point.subtract(posPoint); //position of the point dragged to (relative to center)
-        var draggedVect = dragPos; //vector of dragged pt movement
-        var signedX = clickPos.x / Math.abs(clickPos.x); //either -1 or 1 depending on what quadrant of the shape the user clicks
-        var signedY = clickPos.y / Math.abs(clickPos.y); //x = -1 in Q2 and Q3, x = -1 in Q1 and Q2
         var centerDist = clickPos.length; //distance from center of shape to clicked point
         const SCALING_FACTOR = 1;
-        var scaleX = 1 + (draggedVect.x * signedX * SCALING_FACTOR) / centerDist;
-        var scaleY = 1 + (draggedVect.y * signedY * SCALING_FACTOR) / centerDist;
+
+        var dragPosProjX = dragPos.project(xAxis);
+        var dragPosProjY = dragPos.project(yAxis);
+
+        var signedX = dragPosProjX.dot(clickPos) > 0.0 ? +1.0 : -1.0;
+        var signedY = dragPosProjY.dot(clickPos) > 0.0 ? +1.0 : -1.0;
+
+        var scaleX = dragPosProjX.length / Math.abs(clickPos.dot(xAxis)) * SCALING_FACTOR * signedX;
+        var scaleY = dragPosProjY.length / Math.abs(clickPos.dot(yAxis)) * SCALING_FACTOR * signedY;
+
+
 
         if (event.modifiers.shift) {
-          scaleY = scaleDelta.y * scaleX / scaleDelta.x;
-          scaleX = scaleDelta.x * scaleX / scaleDelta.x;
+          scaleY = scaleX;
         }
 
         var data = {};
         data.scalingDelta = {
-          x: scaleX,
-          y: scaleY,
+          x: scaleX * startScalingDelta.x,
+          y: scaleY * startScalingDelta.y,
           operator: 'set'
         };
         this.trigger('geometryModified', data, event.modifiers);
@@ -289,6 +299,8 @@ define([
       copyReset = true;
 
       modified = false;
+      
+      startScalingDelta = null;
     },
 
 
