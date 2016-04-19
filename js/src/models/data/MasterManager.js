@@ -1158,7 +1158,6 @@ define([
 		},
 
 		reorderShapes: function(movedId, relativeId, mode) {
-			console.log('mode', mode);
 			var movedShape = this.getById(movedId);
 			var relativeShape = this.getById(relativeId);
 			if (movedShape && relativeShape) {
@@ -1416,7 +1415,7 @@ define([
 
 				for (var i = 0; i < selected.length; i++) {
 					var instance = selected[i];
-					/*if (modifiers.shift) {
+					if (modifiers.shift) {
 						var relative = instance.nodeParent.requestAddReference(instance);
 						if (relative) {
 							var constraints = constraintManager.getConstraintsByRelative(relative);
@@ -1427,7 +1426,7 @@ define([
 							}
 							instance.nodeParent.addAsReference(instance);
 						}
-					}*/
+					}
 					instance.setValue(data, !stateStored);
 				}
 				this.addToUndoStack(selected);

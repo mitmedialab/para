@@ -65,7 +65,7 @@ define([
 				}
 
 			});
-			sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
+			//sampleTimer = setTimeout(this.startDelay, SAMPLE_INTERVAL);
 			AWS.config.region = 'us-east-1'; // Region
 			var creds = new AWS.CognitoIdentityCredentials({
 				IdentityPoolId: 'us-east-1:60d2d4f9-df27-47b2-bf73-c8b01736c9f4'
