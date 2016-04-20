@@ -1027,11 +1027,25 @@ define([
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
+
+			var dataClone = null;
+
 			if (data.translationDelta && this.nodeParent) {
+				data = dataClone || (dataClone = _.clone(data));
+
 				var tdelta = data.translationDelta;
 				var ndelta = this.nodeParent.inverseTransformPoint(tdelta);
 				data.translationDelta.x = ndelta.x;
 				data.translationDelta.y = ndelta.y;
+			}
+
+			if (data.hasOwnProperty('scalingDelta') && data.scalingDelta.operator == 'set') {
+				data = dataClone || (dataClone = _.clone(data));
+
+				var xScalingSign = (data.scalingDelta.x < 0.0) ? -1.0 : +1.0;
+				var yScalingSign = (data.scalingDelta.y < 0.0) ? -1.0 : +1.0;
+				data.scalingDelta.x = Math.max(1e-2, Math.min(1e+3, Math.abs(data.scalingDelta.x))) * xScalingSign;
+				data.scalingDelta.y = Math.max(1e-2, Math.min(1e+3, Math.abs(data.scalingDelta.y))) * yScalingSign;
 			}
 
 			for (var prop in data) {
@@ -1047,16 +1061,6 @@ define([
 						p.operator = 'set';
 					}
 					if (p.operator === 'set') {
-						if (prop === 'scalingDelta') {
-							if (data[prop].x && data[prop].x === 0) {
-
-								data[prop].x = 0.01;
-							}
-							if (data[prop].y && data[prop].y === 0) {
-
-								data[prop].y = 0.01;
-							}
-						}
 						console.log('setting value conditional');
 						this.get(prop).setValue(p);
 					} else if (p.operator === 'add') {
