@@ -247,7 +247,7 @@ define([
         var clickPos = startDist; //position of clicked point, relative to center
         var dragPos = event.point.subtract(posPoint); //position of the point dragged to (relative to center)
         var centerDist = clickPos.length; //distance from center of shape to clicked point
-        const SCALING_FACTOR = 1;
+        const SCALING_THROTTLE = 5.0;
 
         var dragPosProjX = dragPos.project(xAxis);
         var dragPosProjY = dragPos.project(yAxis);
@@ -255,8 +255,8 @@ define([
         var signedX = dragPosProjX.dot(clickPos) > 0.0 ? +1.0 : -1.0;
         var signedY = dragPosProjY.dot(clickPos) > 0.0 ? +1.0 : -1.0;
 
-        var scaleX = dragPosProjX.length / Math.abs(clickPos.dot(xAxis)) * SCALING_FACTOR * signedX;
-        var scaleY = dragPosProjY.length / Math.abs(clickPos.dot(yAxis)) * SCALING_FACTOR * signedY;
+        var scaleX = Math.max(1.0, dragPosProjX.length) / Math.max(SCALING_THROTTLE, Math.abs(clickPos.dot(xAxis))) * signedX;
+        var scaleY = Math.max(1.0, dragPosProjY.length) / Math.max(SCALING_THROTTLE, Math.abs(clickPos.dot(yAxis))) * signedY;
 
 
 
