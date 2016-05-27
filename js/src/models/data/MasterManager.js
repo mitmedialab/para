@@ -111,7 +111,7 @@ define([
 
 
 			paper.view.onFrame = function() {
-                          self.renderEverything();
+                          self.pullRenderUpdates();
 			};
 
 
@@ -538,15 +538,10 @@ define([
 
 		},
 
-		clearRenderQueue: function() {
-			rootNode.clearRenderQueue();
+		pullRenderUpdates: function() {
+			rootNode.getRenderUpdate().get();
 			//this.calculateFPS();
 		},
-
-          renderEverything: function() {
-            rootNode.getRenderValues().get();
-          },
-
 
 		addListener: function(target, recurse) {
 			this.stopListening(target);

@@ -1152,17 +1152,17 @@ define([
 			return addedData;
 		},
 
-          getRenderValues: function() {
-            if (!this.renderValues) {
+          getRenderUpdate: function() {
+            if (!this.renderUpdateFunc) {
               var self = this;
-              this.renderValues = cjs(function() {
+              this.renderUpdateFunc = cjs(function() {
                 self.reset();
                 self.render();
                 return undefined;
               });
             }
 
-            return this.renderValues;
+            return this.renderUpdateFunc;
           },
 
 		/*isReference

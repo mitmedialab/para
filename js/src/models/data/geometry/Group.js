@@ -329,11 +329,11 @@ define([
       }
     },
 
-    getRenderValues: function() {
-      if (!this.renderValues) {
+    getRenderUpdate: function() {
+      if (!this.renderUpdateFunc) {
         var self = this;
-        this.renderValues = cjs(function() {
-          _.map(self.children, function(c) { return c.getRenderValues().get(); });
+        this.renderUpdateFunc = cjs(function() {
+          _.map(self.children, function(c) { return c.getRenderUpdate().get(); });
           if (self.get('name') != 'root') { 
             self.reset();
           }
@@ -342,7 +342,7 @@ define([
         });
       }
 
-      return this.renderValues;
+      return this.renderUpdateFunc;
     },
 
 

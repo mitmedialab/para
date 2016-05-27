@@ -212,7 +212,7 @@ define([
                 this.children[i].index = i;
              }
 
-          this.getRenderValues().invalidate();
+          this.getRenderUpdate().invalidate();
         },
 
         getChildIndex: function() {
