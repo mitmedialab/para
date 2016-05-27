@@ -1055,7 +1055,6 @@ define([
 			}
 
                   this.set('rendered', false);
-                  this.getRenderValues().invalidate();
 		},
 
 		//sets all transformation values to 0
