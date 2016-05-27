@@ -917,24 +917,24 @@ define([
     calculateReferenceValues: function(ref_prop_key, ref_dimension) {
 
       var mode = this.get('modes')[ref_prop_key + '_' + ref_dimension];
-      var reference_values = [];
 
       //if((ref_prop_key==='fillColor' || ref_prop_key ==='strokeColor')&&
       switch (mode) {
         case 'interpolate':
-          return this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
+          return this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension);
           break;
         case 'random':
-          this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension, reference_values);
+          // FIXME: this needs to be fixed (random relies on previous values)
+          return this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension);
           break;
         case 'radial':
-          this.calculateReferenceValuesRadial(ref_prop_key, ref_dimension, reference_values);
+          return this.calculateReferenceValuesRadial(ref_prop_key, ref_dimension);
           break;
         case 'gaussian':
-          this.calculateReferenceValuesGaussian(ref_prop_key, ref_dimension, reference_values);
+          return this.calculateReferenceValuesGaussian(ref_prop_key, ref_dimension);
           break;
          case 'alternate':
-          return this.calculateReferenceValuesAlternate(ref_prop_key, ref_dimension, reference_values);
+          return this.calculateReferenceValuesAlternate(ref_prop_key, ref_dimension);
         break;
         default:
           break;
@@ -957,9 +957,10 @@ define([
     },*/
 
 
-    calculateReferenceValuesAlternate: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValuesAlternate: function(ref_prop_key, ref_dimension) {
       var reference = this.get('references');
       if (reference) {
+        var reference_values = [];
         var members;
         if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
@@ -991,9 +992,10 @@ define([
     },
 
 
-    calculateReferenceValuesRandom: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValuesRandom: function(ref_prop_key, ref_dimension) {
       var reference = this.get('references');
       if (reference) {
+        var reference_values = [];
         var members;
         if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
@@ -1073,9 +1075,10 @@ define([
 
     },
 
-    calculateReferenceValuesGaussian: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValuesGaussian: function(ref_prop_key, ref_dimension) {
       var reference = this.get('references');
       if (reference) {
+        var reference_values = [];
         var members;
         if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
           members = reference.members;
@@ -1090,27 +1093,24 @@ define([
         var range = this.get('relatives').getRange();
 
         for (var m = 0; m < range; m++) {
-
           var y_val = (std * ziggurat.nextGaussian()) + mean;
 
-          if (reference_values[ref_dimension].vals[m]) {
-            reference_values[ref_dimension].vals[m].setValue(y_val);
-          } else {
-            var newVal = new PFloat(y_val);
-            newVal.setNull(false);
-            reference_values[ref_dimension].vals.push(newVal);
-          }
+          reference_values.push(y_val);
         }
+
+        return reference_values;
       }
 
+      return undefined;
     },
 
-    calculateReferenceValuesRadial: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValuesRadial: function(ref_prop_key, ref_dimension) {
       if (ref_prop_key === 'translationDelta') {
-        this.calculateReferenceValuesPolar(ref_prop_key, ref_dimension, reference_values);
+        return this.calculateReferenceValuesPolar(ref_prop_key, ref_dimension);
       } else {
         var reference = this.get('references');
         if (reference) {
+          var reference_values = [];
           var members;
           if (reference.get('type') == 'collection' || reference.get('name') === 'duplicator') {
             members = reference.members;
@@ -1134,24 +1134,21 @@ define([
             vals[m] = y;
           }
           for (var m = 0; m < range; m++) {
-
-            if (reference_values[ref_dimension].vals[m]) {
-              reference_values[ref_dimension].vals[m].setValue(vals[m]);
-            } else {
-              var newVal = new PFloat(vals[m]);
-              newVal.setNull(false);
-              reference_values[ref_dimension].vals.push(newVal);
-            }
+            reference_values.push(vals[m]);
           }
 
+          return reference_values;
         }
+
+        return undefined;
       }
 
     },
 
-    calculateReferenceValuesPolar: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValuesPolar: function(ref_prop_key, ref_dimension) {
       var reference = this.get('references');
       if (reference) {
+        var reference_values = [];
         var members;
         if (reference.get('type') == 'collection') {
           members = reference.members;
@@ -1235,35 +1232,41 @@ define([
             reference_values[ref_dimension].vals.push(newVal);
           }*/
           //console.log('val for',m,vals[m]);
-          if (reference_values[ref_dimension].vals[m]) {
-            reference_values[ref_dimension].vals[m].setValue(vals[m]);
 
-          } else {
-            var newVal = new PFloat(vals[m]);
-            newVal.setNull(false);
-            if(reference_values[ref_dimension].vals.length<2){
-              reference_values[ref_dimension].vals.push(newVal);
-            }
-            else{
-                reference_values[ref_dimension].vals.splice(reference_values.length-1,0,newVal);
-            }
-          }
+          reference_values.push(vals[m]);
+
+          // if (reference_values[ref_dimension].vals[m]) {
+          //   reference_values[ref_dimension].vals[m].setValue(vals[m]);
+
+          // } else {
+          //   var newVal = new PFloat(vals[m]);
+          //   newVal.setNull(false);
+          //   if(reference_values[ref_dimension].vals.length<2){
+          //     reference_values[ref_dimension].vals.push(newVal);
+          //   }
+          //   else{
+          //       // FIXME: is this right? looks like a bug, i think...
+          //       reference_values[ref_dimension].vals.splice(reference_values.length-1,0,newVal);
+          //   }
+          // }
         }
 
-       reference_values[ref_dimension].vals.length = range;
+       // reference_values[ref_dimension].vals.length = range;
 
-
+        return reference_values;
       }
 
+      return undefined;
     },
 
 
 
 
 
-    calculateReferenceValuesInterpolate: function(ref_prop_key, ref_dimension, reference_values) {
+    calculateReferenceValuesInterpolate: function(ref_prop_key, ref_dimension) {
       var reference = this.get('references');
       if (reference) {
+        var reference_values = [];
         var members;
         if (reference.get('type') == 'collection') {
           members = reference.members;
