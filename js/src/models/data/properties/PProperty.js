@@ -26,11 +26,6 @@ define([
 			//Backbone.Model.apply(this, arguments);
 			this._val = cjs(val);
 
-			var callback = this.modified;
-			var target = this;
-			this._val.onChange(function() {
-				callback.call(target);
-			});
 			//this.storage =  val;
 			if (operator) {
 				this.set('operator', operator);
@@ -52,12 +47,6 @@ define([
 			return this._val.isValid();
 		},
 
-		//callback triggered when a subproperty is modified externally 
-		modified: function() {
-			this.trigger('modified', this);
-		},
-
-		
 		isValid: function(){
 			return this._val.isValid();
 		},

@@ -24,12 +24,6 @@
 
 			constructor: function() {
 				Backbone.Model.apply(this, arguments);
-				for (var p in this) {
-					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint || this[p] instanceof PProperty)) {
-
-						this.listenTo(this[p], 'modified', this.modified);
-					}
-				}
 				this.parentConstraint = false;
 				this.pauseModNotice = false;
 				this.constraintStack = [];
@@ -75,7 +69,6 @@
 			},
 
 			deleteSelf: function() {
-				this.stopListening();
 				this.removeAllConstraints();
 				for (var p in this) {
 					if (this.hasOwnProperty(p) && (this[p] instanceof PConstraint)) {
@@ -114,16 +107,6 @@
 				});
 
 			},
-
-			//callback triggered when a subproperty is modified externally 
-			modified: function(event) {
-				if (!this.pauseModNotice) {
-					this.trigger('modified', this);
-
-				}
-			},
-
-
 
 			/* removeConstraint
 			 * removes the constraint of this property

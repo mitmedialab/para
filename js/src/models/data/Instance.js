@@ -236,15 +236,6 @@ define([
 			var parent = this;
 			var constrainMap = this.get('constrain_map');
 
-			for (var propertyName in constrainMap) {
-				if (constrainMap.hasOwnProperty(propertyName)) {
-					var property = this.get(propertyName);
-					if (property) {
-						this.listenTo(property, 'modified', this.modified);
-					}
-				}
-			}
-
 			this.renderQueue = [];
 
 			//undo redo variables
@@ -944,13 +935,6 @@ define([
 		removeConstraint: function(prop, dimensions) {
 			this.get(prop).removeConstraint(dimensions);
 		},
-
-
-		//callback triggered when a subproperty is modified externally 
-		modified: function() {
-			PConstraint.prototype.modified.apply(this, arguments);
-		},
-
 
 		clearUndoCache: function() {
 			this.previousStates = [];
