@@ -211,6 +211,8 @@ define([
              for(var i=0;i<this.children.length;i++){
                 this.children[i].index = i;
              }
+
+          this.getRenderValues().invalidate();
         },
 
         getChildIndex: function() {

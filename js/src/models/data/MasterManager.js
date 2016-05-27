@@ -111,7 +111,7 @@ define([
 
 
 			paper.view.onFrame = function() {
-				self.clearRenderQueue();
+                          self.renderEverything();
 			};
 
 
@@ -542,6 +542,10 @@ define([
 			rootNode.clearRenderQueue();
 			//this.calculateFPS();
 		},
+
+          renderEverything: function() {
+            rootNode.getRenderValues().get();
+          },
 
 
 		addListener: function(target, recurse) {

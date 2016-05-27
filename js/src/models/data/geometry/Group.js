@@ -329,6 +329,22 @@ define([
       }
     },
 
+    getRenderValues: function() {
+      if (!this.renderValues) {
+        var self = this;
+        this.renderValues = cjs(function() {
+          _.map(self.children, function(c) { return c.getRenderValues().get(); });
+          if (self.get('name') != 'root') { 
+            self.reset();
+          }
+          self.render();
+          return undefined;
+        });
+      }
+
+      return this.renderValues;
+    },
+
 
 
     //returns all non-group children

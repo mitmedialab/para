@@ -1069,6 +1069,9 @@ define([
 				}
 
 			}
+
+                  this.set('rendered', false);
+                  this.getRenderValues().invalidate();
 		},
 
 		//sets all transformation values to 0
@@ -1166,11 +1169,25 @@ define([
 			return addedData;
 		},
 
+          getRenderValues: function() {
+            if (!this.renderValues) {
+              var self = this;
+              this.renderValues = cjs(function() {
+                self.reset();
+                self.render();
+                return undefined;
+              });
+            }
+
+            return this.renderValues;
+          },
+
 		/*isReference
 		 *recursively used to check if member is a reference object in 
 		 *order to allow edits to self-referencing constraints
 		 */
 
+          // FIXME: i think this function can be removed, right?
 		isReference: function(instance) {
 			if (this.isSelfConstrained()) {
 				var reference = this.constraintObject.get('references');
@@ -1559,7 +1576,8 @@ define([
 		},
 
 		reset: function() {
-			if (this.get('rendered')) {
+                        // FIXME: need to figure out when exactly this should be called (probably not all the time)
+			if (this.get('rendered') || true) {
 				console.log('resetting', this.get('name'));
 				var geom = this.get('geom');
 				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);

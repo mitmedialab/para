@@ -537,7 +537,7 @@ define([
             index = relative.getMemberIndex(instance);
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
-          conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]].vals[index].getValue() * convertFactor;
+          conversion[rel_dimensions[i]] = refPropValue[ref_dimensions[i]].vals[index].get() * convertFactor;
           if (offset[rel_dimensions[i]].length <= index) {
              
               offset[rel_dimensions[i]].push(new PFloat(relPropValue[rel_dimensions[i]] - conversion[rel_dimensions[i]]));
@@ -560,7 +560,7 @@ define([
             instance = instance.getMemberById(id);
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
-          conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]].vals[index].getValue() * convertFactor : refPropValue[keys[j]].vals[index].getValue() * convertFactor;
+          conversion[rel_dimensions[j]] = (refPropValue[rel_dimensions[j]]) ? refPropValue[rel_dimensions[j]].vals[index].get() * convertFactor : refPropValue[keys[j]].vals[index].get/*Value*/() * convertFactor;
           if (offset[rel_dimensions[j]].length <= index) {
             
               offset[rel_dimensions[j]].push(new PFloat(relPropValue[rel_dimensions[j]] - conversion[rel_dimensions[j]]));
@@ -585,7 +585,7 @@ define([
             instance = instance.getMemberById(id);
           }
           relPropValue = this.propSwitch(rel_prop_key, rel_dimensions, instance)[rel_prop_key];
-          conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]].vals[index].getValue() * convertFactor : (m < keys.length) ? refPropValue[keys[m]].vals[index].getValue() * convertFactor : refPropValue[keys[keys.length - 1]].vals[index].getValue();
+          conversion[rel_dimensions[m]] = (refPropValue[rel_dimensions[m]]) ? refPropValue[rel_dimensions[m]].vals[index].get() * convertFactor : (m < keys.length) ? refPropValue[keys[m]].vals[index].getValue() * convertFactor : refPropValue[keys[keys.length - 1]].vals[index].get/*Value*/();
           if (offset[rel_dimensions[m]].length <= index) {
               offset[rel_dimensions[m]].push(new PFloat(relPropValue[rel_dimensions[m]] - conversion[rel_dimensions[m]]));
             
@@ -805,55 +805,38 @@ define([
 
     setConstraintOnSubProperty: function(reference, relative, expression, offset, ref_prop_key, ref_dimension, rel_prop_key, rel_dimension) {
       var self = this;
-      var constraintF = function() {
-        var list = [];
 
-        
-          var exempt_indicies = self.get('exempt_indicies');
+      for (var i = 0; i < relative.getRange(); ++i) {
+        (function(i) {
+          var singleConstraintF = function() {
+            var exempt_indicies = self.get('exempt_indicies');
+            var reference_values = self.get('reference_values');
 
-          var relative_range = relative.getRange();
-          var reference_values = self.get('reference_values');
-
-          for (var z = 0; z < relative_range; z++) {
             var data = {};
             var y;
             data[rel_prop_key] = {};
-            var relative_target = relative.getMemberAt(z);
+            var relative_target = relative.getMemberAt(i);
             var relative_id = relative_target.get('id');
-            //var isReference = relative.get(rel_prop_key)[rel_dimension].isReference(relative_target);
+
             if (exempt_indicies[rel_prop_key][rel_dimension][relative_id].getValue() === 1 || self.get('paused')) {
               y = relative_target.get(rel_prop_key)[rel_dimension].getValue();
-
             } else {
-              var x = reference_values[ref_prop_key][ref_dimension].vals[z].getValue();
-              var offsetValue = offset[z].getValue();
+              var x = reference_values[ref_prop_key][ref_dimension].vals[i].get();
+              var offsetValue = offset[i].getValue();
               eval(expression);
             }
-
+            // FIXME: we don't need this anymore
             if (rel_prop_key === 'scalingDelta') {
               if (y === 0) {
                 y = 0.1;
               }
-
             }
-            data[rel_prop_key][rel_dimension] = y;
 
-            list.push(data);
-
-            relative_target.get(rel_prop_key)[rel_dimension].setValue(y);
-            relative_target.get(rel_prop_key)[rel_dimension].getValue();
-           
-
-          }
-          if (relative.get('type') == 'collection') {
-            return list;
-          } else {
-            return list[0][rel_prop_key][rel_dimension];
-          }
-        
-      };
-
-      relative.get(rel_prop_key)[rel_dimension].setConstraint(constraintF, this);
+            return y;
+          };
+          relative.getMemberAt(i).get(rel_prop_key)[rel_dimension].setConstraint(singleConstraintF, self);
+        })(i);
+      }
     },
 
 
@@ -885,27 +868,21 @@ define([
       ref_dimension_array.forEach(function(target_dimension) {
         var reference_subprops = reference.getLiteralSubprops(ref_prop_key, target_dimension);
 
-        reference_subprops.forEach(function(target_prop) {
-          (function(refVals) {
-            self.listenTo(target_prop, 'modified', function() {
-              (
-                function(rpk, td, rv) {
-                  self.calculateReferenceValues(rpk, td, rv);
-                }(ref_prop_key, target_dimension, refVals)
-              );
-            });
-          }(reference_values[ref_prop_key]));
-
-        });
         if (!reference_values[ref_prop_key][target_dimension]) {
           reference_values[ref_prop_key][target_dimension] = {
             min: null,
             max: null,
             vals: []
           };
-
         }
 
+        var calculatedVals = cjs(function() { return self.calculateReferenceValues(ref_prop_key, target_dimension); });
+        var range = self.get('relatives').getRange();
+        for (var m = 0; m < range; ++m) {
+          (function (m) {
+            reference_values[ref_prop_key][target_dimension].vals.push(cjs(function() { return calculatedVals.get()[m]; }));
+          })(m);
+        }
 
         var diff = reference_values[ref_prop_key][target_dimension].vals.length - self.get('relatives').getRange();
         if (diff > 0) {
@@ -927,7 +904,6 @@ define([
             reference_values[ref_prop_key][target_dimension].vals.push(newItem);
           }
         }
-        self.calculateReferenceValues(ref_prop_key, target_dimension, reference_values[ref_prop_key]);
       });
     },
 
@@ -937,15 +913,16 @@ define([
 
 
 
+    // FIXME: only interpolate and alternate have been updated; need to update random, radial, and gaussian, too!
     calculateReferenceValues: function(ref_prop_key, ref_dimension) {
 
       var mode = this.get('modes')[ref_prop_key + '_' + ref_dimension];
-      var reference_values = this.get('reference_values')[ref_prop_key];
+      var reference_values = [];
 
       //if((ref_prop_key==='fillColor' || ref_prop_key ==='strokeColor')&&
       switch (mode) {
         case 'interpolate':
-          this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
+          return this.calculateReferenceValuesInterpolate(ref_prop_key, ref_dimension, reference_values);
           break;
         case 'random':
           this.calculateReferenceValuesRandom(ref_prop_key, ref_dimension, reference_values);
@@ -957,7 +934,7 @@ define([
           this.calculateReferenceValuesGaussian(ref_prop_key, ref_dimension, reference_values);
           break;
          case 'alternate':
-          this.calculateReferenceValuesAlternate(ref_prop_key, ref_dimension, reference_values);
+          return this.calculateReferenceValuesAlternate(ref_prop_key, ref_dimension, reference_values);
         break;
         default:
           break;
@@ -1003,16 +980,14 @@ define([
           if(count>reference_points.length-1){
             count = 0;
           }
-          if (reference_values[ref_dimension].vals[m]) {
-            reference_values[ref_dimension].vals[m].setValue(y_val);
-          } else {
-            var newVal = new PFloat(y_val);
-            newVal.setNull(false);
-            reference_values[ref_dimension].vals.push(newVal);
-          }
+
+          reference_values.push(y_val);
         }
+
+        return reference_values;
       }
 
+      return undefined;
     },
 
 
@@ -1284,6 +1259,8 @@ define([
 
 
 
+
+
     calculateReferenceValuesInterpolate: function(ref_prop_key, ref_dimension, reference_values) {
       var reference = this.get('references');
       if (reference) {
@@ -1356,15 +1333,14 @@ define([
             x = TrigFunc.map(m, 0, range - 1, 0, points.length - 1);
           }
           var y = eval(expression);
-          if (reference_values[ref_dimension].vals[m]) {
-            reference_values[ref_dimension].vals[m].setValue(y);
-          } else {
-            var newVal = new PFloat(y);
-            newVal.setNull(false);
-            reference_values[ref_dimension].vals.push(newVal);
-          }
+
+          reference_values.push(y);
         }
+        
+        return reference_values;
       }
+
+      return undefined;
     },
 
 

@@ -78,15 +78,23 @@ define([
 			 * sets the value of the property
 			 */
 			setValue: function(data) {
-				var set;
-				if (data.v) {
-					set = this.v.setValue(data.v);
-					this.setNull(false);
-				} else if (typeof data === "number") {
-					set = this.v.setValue(data);
-					this.setNull(false);
-				}
-				return set;
+			  var set;
+                          if (typeof data == 'function')
+                          {
+                            set = this.v.setValue(data);
+			    this.setNull(false);
+                          }
+                          else if (data.v)
+                          {
+			    set = this.v.setValue(data.v);
+			    this.setNull(false);
+			  }
+                          else if (typeof data === "number")
+                          {
+			    set = this.v.setValue(data);
+			    this.setNull(false);
+			  }
+			  return set;
 			},
 
 			/*

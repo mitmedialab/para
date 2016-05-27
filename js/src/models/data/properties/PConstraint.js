@@ -98,12 +98,14 @@
 			 */
 			setConstraint: function(func, constraint) {
 				this.setNull(false);
-				if (!this.isSelfConstrained()) {
-					this.constraint = new PProperty(func);
-					this.listenTo(this.constraint, 'modified', this.modified);
-				} else {
-					this.constraint.setValue(func);
-				}
+				// if (!this.isSelfConstrained()) {
+				// 	this.constraint = new PProperty(func);
+				// 	this.listenTo(this.constraint, 'modified', this.modified);
+				// } else {
+				// 	this.constraint.setValue(func);
+				// }
+                          this.setValue(func);
+
 				this.constraintObject = constraint;
 				this.constraintStack.push({
 					obj: this.constraintObject,
