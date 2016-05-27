@@ -1152,18 +1152,22 @@ define([
 			return addedData;
 		},
 
-          getRenderUpdate: function() {
-            if (!this.renderUpdateFunc) {
-              var self = this;
-              this.renderUpdateFunc = cjs(function() {
-                self.reset();
-                self.render();
-                return undefined;
-              });
-            }
+    getRenderUpdate: function() {
+      if (!this.renderUpdateFunc) {
+        var self = this;
+        this.renderUpdateFunc = cjs(function() {
+          _.map(self.children, function(c) { return c.getRenderUpdate().get(); });
+          if (self.get('name') != 'root') { 
+            self.reset();
+          }
+          self.render();
+          return undefined;
+        });
+      }
 
-            return this.renderUpdateFunc;
-          },
+      return this.renderUpdateFunc;
+    },
+
 
 		/*isReference
 		 *recursively used to check if member is a reference object in 

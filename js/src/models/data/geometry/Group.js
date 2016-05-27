@@ -329,24 +329,6 @@ define([
       }
     },
 
-    getRenderUpdate: function() {
-      if (!this.renderUpdateFunc) {
-        var self = this;
-        this.renderUpdateFunc = cjs(function() {
-          _.map(self.children, function(c) { return c.getRenderUpdate().get(); });
-          if (self.get('name') != 'root') { 
-            self.reset();
-          }
-          self.render();
-          return undefined;
-        });
-      }
-
-      return this.renderUpdateFunc;
-    },
-
-
-
     //returns all non-group children
     getInstanceChildren: function(list) {
       if (!list) {
