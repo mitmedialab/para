@@ -253,18 +253,6 @@ define([
 			this.futureStates = [];
 			this.stateStored = false;
 
-			this.resetTransforms = {
-				translationDelta: {
-					x: 0,
-					y: 0
-				},
-				scalingDelta: {
-					x: 1,
-					y: 1
-				},
-				rotationDelta: 0,
-				center: new paper.Point(0, 0)
-			};
 			this.set('user_name', this.get('name'));
 			/*this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
 			this.originUI.fillColor = 'yellow';
@@ -490,12 +478,6 @@ define([
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
-			instance.resetTransforms.center = this.resetTransforms.center.clone();
-			instance.resetTransforms.translationDelta.x = this.resetTransforms.translationDelta.x;
-			instance.resetTransforms.translationDelta.y = this.resetTransforms.translationDelta.y;
-			instance.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
-			instance.resetTransforms.scalingDelta.x = this.resetTransforms.scalingDelta.x;
-			instance.resetTransforms.scalingDelta.y = this.resetTransforms.scalingDelta.y;
 
 
 			if (!noInheritor) {
@@ -840,14 +822,6 @@ define([
 			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
 			data.rendered = this.get('rendered');
-			data.resetTransforms = {};
-			data.resetTransforms.center = {
-				x: this.resetTransforms.center.x,
-				y: this.resetTransforms.center.y
-			};
-			data.resetTransforms.translationDelta = this.resetTransforms.translationDelta;
-			data.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
-			data.resetTransforms.scalingDelta = this.resetTransforms.scalingDelta;
 			if (!noUndoCache) {
 				data.stateStored = this.stateStored;
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
@@ -881,12 +855,6 @@ define([
 			this.set('visible', data.visible);
 			this.set('open', data.open);
 			this.set('rendered', data.rendered);
-			this.resetTransforms.center = new paper.Point();
-			this.resetTransforms.center.x = data.resetTransforms.center.x;
-			this.resetTransforms.center.y = data.resetTransforms.center.y;
-			this.resetTransforms.translationDelta = data.resetTransforms.translationDelta;
-			this.resetTransforms.rotationDelta = data.resetTransforms.rotationDelta;
-			this.resetTransforms.scalingDelta = data.resetTransforms.scalingDelta;
 			this.set('rendered', true);
 
 			if (this.get('name') == 'root') {
@@ -1558,10 +1526,6 @@ define([
 
 
 
-			this.resetTransforms.translationDelta = translationDelta;
-			this.resetTransforms.scalingDelta = scalingDelta;
-			this.resetTransforms.rotationDelta = rotationDelta;
-			this.resetTransforms.center = center;
 
                   geom.setMatrix(new paper.Matrix(1,0,0,1,0,0));
 

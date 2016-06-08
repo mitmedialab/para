@@ -243,12 +243,6 @@ define([
       var instance = this.geometryGenerator.getTargetClass(this.get('name'));
       var value = this.getValue();
       instance.setValue(value);
-      instance.resetTransforms.center = this.resetTransforms.center.clone();
-      instance.resetTransforms.translationDelta.x = this.resetTransforms.translationDelta.x;
-      instance.resetTransforms.translationDelta.y = this.resetTransforms.translationDelta.y;
-      instance.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
-      instance.resetTransforms.scalingDelta.x = this.resetTransforms.scalingDelta.x;
-      instance.resetTransforms.scalingDelta.y = this.resetTransforms.scalingDelta.y;
 
       for (var i = 0; i < this.children.length; i++) {
         var clone = this.children[i].create(noInheritor);
