@@ -1497,6 +1497,7 @@ define([
 
     },
 
+    // FIXME: i think this is never called, and if so, it can be removed
     reset: function() {
       this.clear().set(this.defaults);
     },

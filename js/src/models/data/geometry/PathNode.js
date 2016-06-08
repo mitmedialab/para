@@ -252,9 +252,6 @@ define([
       if (registerUndo) {
         this.addToUndoStack();
       }
-      if (!this.pointsModified) {
-        this.formerPosition = this.get('geom').position.clone();
-      }
       var proto_node = this.get('proto_node');
 
       var geom = this.get('geom');
@@ -326,14 +323,12 @@ define([
 
     },
 
-    reset: function() {
+    render: function() {
       if (this.pointsModified) {
-        var formerTdelta = this.get('translationDelta').getValue();
-        this.get('translationDelta').setValue(this.get('geom').position);
         this.pointsModified = false;
         this.bboxInvalid = true;
       }
-      GeometryNode.prototype.reset.call(this);
+      GeometryNode.prototype.render.call(this);
     },
 
 

@@ -379,17 +379,6 @@ define([
       }
     },
 
-
-    reset: function() {
-      if (this.childrenModified) {
-        var formerTdelta = this.get('translationDelta').getValue();
-        this.bboxInvalid = true;
-        this.childrenModified = false;
-
-      }
-      GeometryNode.prototype.reset.call(this);
-    },
-
     toggleOpen: function() {
       this.set('open', true);
       if (!this.nodeParent.get('open')) {

@@ -1,3 +1,4 @@
+// FIXME: 'rendered' can probably be removed completely now
 /*Instance.js
  * used to store references of a shape object
  *
@@ -1500,6 +1501,7 @@ define([
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 				this.childrenModified = true;
+				this.bboxInvalid = true;
 			}
 		},
 
@@ -1507,19 +1509,8 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].clearRenderQueue();
 			}
-			this.resetChildren();
 			this.renderChildren();
 		},
-
-		resetChildren: function() {
-			for (var i = 0; i < this.renderQueue.length; i++) {
-				if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-					this.renderQueue[i].reset();
-				}
-			}
-
-		},
-
 
 		renderChildren: function() {
 			for (var i = 0; i < this.renderQueue.length; i++) {
@@ -1539,35 +1530,11 @@ define([
 		 */
 		render: function() {
 			var geom = this.get('geom');
+			this.transformSelf();
+			this.updateScreenBounds(geom);
 
-			if (!this.get('rendered')) {
-				var modified = this.transformSelf();
-				if (modified) {
-					this.updateScreenBounds(geom);
-					this.set('rendered', true);
-					console.log('rendering', this.get('name'));
-				} else {
-					this.set('rendered', false);
-
-				}
-
-			}
 			this.renderStyle(geom);
 			this.renderSelection(geom);
-
-
-		},
-
-		reset: function() {
-			if (this.get('rendered')) {
-				console.log('resetting', this.get('name'));
-				var geom = this.get('geom');
-				//this.rotationUI.rotate(0 - this.resetTransforms.rotationDelta, this.rotationUI.firstSegment.point);
-				this.set('rendered', false);
-
-
-			}
-
 		},
 
 		transformSelf: function() {
@@ -1585,10 +1552,6 @@ define([
 				center: geom.position
 			};
 
-			if (_.isEqual(obj, this.resetTransforms) && this.get('rendered')) {
-				console.log('is equal');
-				return false;
-			}
 
 			//this.originUI.position = geom.position;
 			var center = geom.position;
@@ -1606,9 +1569,7 @@ define([
 			geom.scale(scalingDelta.x, scalingDelta.y, geom.getPosition());
 			geom.rotate(rotationDelta, geom.getPosition());
 			geom.translate(translationDelta.x, translationDelta.y);
-			this.set('rendered', true);
 
-			return true;
 			/*this.rotationUI.position = geom.position;
 			this.rotationUI.position.x += this.rotationUI.bounds.width / 2;
 			this.rotationUI.rotate(rotationDelta, this.rotationUI.firstSegment.point);
