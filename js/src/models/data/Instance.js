@@ -1562,9 +1562,6 @@ define([
 			if (this.get('rendered')) {
 				console.log('resetting', this.get('name'));
 				var geom = this.get('geom');
-				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);
-				geom.rotate(0 - this.resetTransforms.rotationDelta, this.resetTransforms.center);
-				geom.scale(1 / this.resetTransforms.scalingDelta.x, 1 / this.resetTransforms.scalingDelta.y, this.resetTransforms.center);
 				//this.rotationUI.rotate(0 - this.resetTransforms.rotationDelta, this.rotationUI.firstSegment.point);
 				this.set('rendered', false);
 
@@ -1594,7 +1591,6 @@ define([
 			}
 
 			//this.originUI.position = geom.position;
-			geom.position = new paper.Point(0, 0);
 			var center = geom.position;
 
 
@@ -1604,8 +1600,11 @@ define([
 			this.resetTransforms.rotationDelta = rotationDelta;
 			this.resetTransforms.center = center;
 
-			geom.scale(scalingDelta.x, scalingDelta.y, center);
-			geom.rotate(rotationDelta, center);
+                  geom.setMatrix(new paper.Matrix(1,0,0,1,0,0));
+
+
+			geom.scale(scalingDelta.x, scalingDelta.y, geom.getPosition());
+			geom.rotate(rotationDelta, geom.getPosition());
 			geom.translate(translationDelta.x, translationDelta.y);
 			this.set('rendered', true);
 

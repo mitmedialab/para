@@ -268,7 +268,6 @@ define([
     insertChild: function(index, child, registerUndo) {
       GeometryNode.prototype.insertChild.call(this, index, child, registerUndo);
       this.get('geom').insertChild(index, child.get('geom'));
-      this.get('translationDelta').setValue(this.get('geom').position);
       this.currentBounds = this.get('geom').bounds;
       this.bboxInvalid = true;
     },
@@ -384,7 +383,6 @@ define([
     reset: function() {
       if (this.childrenModified) {
         var formerTdelta = this.get('translationDelta').getValue();
-        this.get('translationDelta').setValue(this.get('geom').position);
         this.bboxInvalid = true;
         this.childrenModified = false;
 
