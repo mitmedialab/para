@@ -1513,21 +1513,16 @@ define([
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-			var obj = {
-				translationDelta: translationDelta,
-				scalingDelta: scalingDelta,
-				rotationDelta: rotationDelta,
-				center: geom.position
-			};
-
 
 			//this.originUI.position = geom.position;
-			var center = geom.position;
 
+			// for paperjs groups, setting the transform
+			// matrix to identity still allows us to use
+			// getPosition() to get the centroid, which is
+			// the point around which we want to
+			// scale+rotate.
 
-
-
-                  geom.setMatrix(new paper.Matrix(1,0,0,1,0,0));
+			geom.setMatrix(new paper.Matrix(1,0,0,1,0,0));
 
 
 			geom.scale(scalingDelta.x, scalingDelta.y, geom.getPosition());
