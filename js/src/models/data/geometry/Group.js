@@ -305,9 +305,10 @@ define([
           this.children[i].setValue(style_data, registerUndo);
         }
 
-      } else {
-        GeometryNode.prototype.setValue.call(this, data, registerUndo);
       }
+
+      GeometryNode.prototype.setValue.call(this, data, registerUndo);
+
     },
 
     /* getValueFor
