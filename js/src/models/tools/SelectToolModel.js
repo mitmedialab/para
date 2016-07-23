@@ -97,7 +97,7 @@ define([
 
         literal = path;
         instance = literal.data.instance;
-        if(instance.nodeParent && instance.nodeParent.get('name')==='group' && !instance.nodeParent.get('open')){
+        while (instance.nodeParent && instance.nodeParent.get('name') !== 'root' && !instance.nodeParent.get('open')) {
           instance = instance.nodeParent;
           literal = instance.get('geom');
         }
