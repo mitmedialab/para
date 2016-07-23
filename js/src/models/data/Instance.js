@@ -1,3 +1,4 @@
+// FIXME: 'rendered' can probably be removed completely now
 /*Instance.js
  * used to store references of a shape object
  *
@@ -243,18 +244,6 @@ define([
 			this.futureStates = [];
 			this.stateStored = false;
 
-			this.resetTransforms = {
-				translationDelta: {
-					x: 0,
-					y: 0
-				},
-				scalingDelta: {
-					x: 1,
-					y: 1
-				},
-				rotationDelta: 0,
-				center: new paper.Point(0, 0)
-			};
 			this.set('user_name', this.get('name'));
 			/*this.originUI = new paper.Path.Circle(new paper.Point(0, 0), 5);
 			this.originUI.fillColor = 'yellow';
@@ -480,12 +469,6 @@ define([
 			var instance = new this.constructor();
 			var value = this.getValue();
 			instance.setValue(value);
-			instance.resetTransforms.center = this.resetTransforms.center.clone();
-			instance.resetTransforms.translationDelta.x = this.resetTransforms.translationDelta.x;
-			instance.resetTransforms.translationDelta.y = this.resetTransforms.translationDelta.y;
-			instance.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
-			instance.resetTransforms.scalingDelta.x = this.resetTransforms.scalingDelta.x;
-			instance.resetTransforms.scalingDelta.y = this.resetTransforms.scalingDelta.y;
 
 
 			if (!noInheritor) {
@@ -830,14 +813,6 @@ define([
 			data.inheritors = this.get('inheritors').toJSON();
 			data.children = [];
 			data.rendered = this.get('rendered');
-			data.resetTransforms = {};
-			data.resetTransforms.center = {
-				x: this.resetTransforms.center.x,
-				y: this.resetTransforms.center.y
-			};
-			data.resetTransforms.translationDelta = this.resetTransforms.translationDelta;
-			data.resetTransforms.rotationDelta = this.resetTransforms.rotationDelta;
-			data.resetTransforms.scalingDelta = this.resetTransforms.scalingDelta;
 			if (!noUndoCache) {
 				data.stateStored = this.stateStored;
 				data.previousStates = this.previousStates.slice(0, this.previousStates.length);
@@ -871,12 +846,6 @@ define([
 			this.set('visible', data.visible);
 			this.set('open', data.open);
 			this.set('rendered', data.rendered);
-			this.resetTransforms.center = new paper.Point();
-			this.resetTransforms.center.x = data.resetTransforms.center.x;
-			this.resetTransforms.center.y = data.resetTransforms.center.y;
-			this.resetTransforms.translationDelta = data.resetTransforms.translationDelta;
-			this.resetTransforms.rotationDelta = data.resetTransforms.rotationDelta;
-			this.resetTransforms.scalingDelta = data.resetTransforms.scalingDelta;
 			this.set('rendered', true);
 
 			if (this.get('name') == 'root') {
@@ -1504,6 +1473,7 @@ define([
 			if (!_.contains(this.renderQueue, child)) {
 				this.renderQueue.push(child);
 				this.childrenModified = true;
+				this.bboxInvalid = true;
 			}
 		},
 
@@ -1511,19 +1481,8 @@ define([
 			for (var i = 0; i < this.children.length; i++) {
 				this.children[i].clearRenderQueue();
 			}
-			this.resetChildren();
 			this.renderChildren();
 		},
-
-		resetChildren: function() {
-			for (var i = 0; i < this.renderQueue.length; i++) {
-				if (this.renderQueue[i] && !this.renderQueue[i].deleted) {
-					this.renderQueue[i].reset();
-				}
-			}
-
-		},
-
 
 		renderChildren: function() {
 			for (var i = 0; i < this.renderQueue.length; i++) {
@@ -1543,38 +1502,12 @@ define([
 		 */
 		render: function() {
 			var geom = this.get('geom');
+			this.transformSelf();
+			this.updateScreenBounds(geom);
 
-			if (!this.get('rendered')) {
-				var modified = this.transformSelf();
-				if (modified) {
-					this.updateScreenBounds(geom);
-					this.set('rendered', true);
-					console.log('rendering', this.get('name'));
-				} else {
-					this.set('rendered', false);
-
-				}
-
-			}
 			this.renderStyle(geom);
 			this.renderSelection(geom);
 
-
-		},
-
-		reset: function() {
-                        // FIXME: need to figure out when exactly this should be called (probably not all the time)
-			if (this.get('rendered') || true) {
-				console.log('resetting', this.get('name'));
-				var geom = this.get('geom');
-				geom.translate(0 - this.resetTransforms.translationDelta.x, 0 - this.resetTransforms.translationDelta.y);
-				geom.rotate(0 - this.resetTransforms.rotationDelta, this.resetTransforms.center);
-				geom.scale(1 / this.resetTransforms.scalingDelta.x, 1 / this.resetTransforms.scalingDelta.y, this.resetTransforms.center);
-				//this.rotationUI.rotate(0 - this.resetTransforms.rotationDelta, this.rotationUI.firstSegment.point);
-				this.set('rendered', false);
-
-
-			}
 
 		},
 
@@ -1586,35 +1519,22 @@ define([
 			scalingDelta = value.scalingDelta;
 			rotationDelta = value.rotationDelta;
 			translationDelta = value.translationDelta;
-			var obj = {
-				translationDelta: translationDelta,
-				scalingDelta: scalingDelta,
-				rotationDelta: rotationDelta,
-				center: geom.position
-			};
-
-			if (_.isEqual(obj, this.resetTransforms) && this.get('rendered')) {
-				console.log('is equal');
-				return false;
-			}
 
 			//this.originUI.position = geom.position;
-			geom.position = new paper.Point(0, 0);
-			var center = geom.position;
+
+			// for paperjs groups, setting the transform
+			// matrix to identity still allows us to use
+			// getPosition() to get the centroid, which is
+			// the point around which we want to
+			// scale+rotate.
+
+			geom.setMatrix(new paper.Matrix(1,0,0,1,0,0));
 
 
-
-			this.resetTransforms.translationDelta = translationDelta;
-			this.resetTransforms.scalingDelta = scalingDelta;
-			this.resetTransforms.rotationDelta = rotationDelta;
-			this.resetTransforms.center = center;
-
-			geom.scale(scalingDelta.x, scalingDelta.y, center);
-			geom.rotate(rotationDelta, center);
+			geom.scale(scalingDelta.x, scalingDelta.y, geom.getPosition());
+			geom.rotate(rotationDelta, geom.getPosition());
 			geom.translate(translationDelta.x, translationDelta.y);
-			this.set('rendered', true);
 
-			return true;
 			/*this.rotationUI.position = geom.position;
 			this.rotationUI.position.x += this.rotationUI.bounds.width / 2;
 			this.rotationUI.rotate(rotationDelta, this.rotationUI.firstSegment.point);

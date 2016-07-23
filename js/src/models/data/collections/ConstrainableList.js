@@ -212,15 +212,6 @@ define([
         }
       },
 
-      reset: function() {
-        ListNode.prototype.reset.call(this, arguments);
-        this.get('index').setValue(0);
-        var ui = this.get('ui');
-        ui.position.x = 0;
-        ui.position.y = 0;
-
-      },
-
       deleteSelf: function() {
         var data = ListNode.prototype.deleteSelf.call(this);
         var ui = this.get('ui');
@@ -264,6 +255,11 @@ define([
 
       //renders the List UI
       render: function() {
+        this.get('index').setValue(0);
+        var ui = this.get('ui');
+        ui.position.x = 0;
+        ui.position.y = 0;
+
         ListNode.prototype.render.call(this, arguments);
         var ui = this.get('ui');
         var bottomLeft = this.get('screen_bottom_left').getValue();

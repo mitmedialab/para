@@ -122,11 +122,9 @@ define([
 
         },
 
-        /*reset
-         *resets visited value after graph traversal is complete
-         */
-        reset: function() {
-            this.vistied = false;
+        // leave this empty function here temporarily so errors don't get thrown
+        reset: function () {
+          // 
         },
 
 
