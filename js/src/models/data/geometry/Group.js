@@ -158,7 +158,6 @@ define([
           var matrix = new paper.Matrix(data.matrix[0], data.matrix[1], data.matrix[2], data.matrix[3], data.matrix[4], data.matrix[5]);
           newChild.get('geom').transform(matrix);
           newChild.set('rendered', false);
-          newChild.reset();
           newChild.render();
         }
       }
@@ -251,7 +250,6 @@ define([
       instance.childrenModified = true;
       instance.get('geom').transform(this.get('geom').matrix);
       instance.set('rendered', false);
-      instance.reset();
       instance.render();
 
       return instance;

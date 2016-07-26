@@ -122,10 +122,6 @@ define([
 
         },
 
-        // leave this empty function here temporarily so errors don't get thrown
-        reset: function () {
-          // 
-        },
 
 
         /*================ SceneNode method defintions ================*/

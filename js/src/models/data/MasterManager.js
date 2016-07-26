@@ -521,7 +521,6 @@ define([
 
 		modified: function(target) {
 			if (target.get('type') == 'collection') {
-				target.reset();
 				target.compile();
 				target.render();
 			} else {
@@ -530,7 +529,6 @@ define([
 				while (t.nodeParent.get('name') != 'root' && t.nodeParent.nodeParent) {
 					t = t.nodeParent;
 				}
-				t.reset();
 				t.compile();
 				t.render();
 			}

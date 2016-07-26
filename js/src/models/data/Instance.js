@@ -1121,14 +1121,17 @@ define([
 			return addedData;
 		},
 
+          // FIXME: can get rid of childrenModified altogether?
     getRenderUpdate: function() {
       if (!this.renderUpdateFunc) {
         var self = this;
         this.renderUpdateFunc = cjs(function() {
-          _.map(self.children, function(c) { return c.getRenderUpdate().get(); });
-          if (self.get('name') != 'root') { 
-            self.reset();
-          }
+          _.map(self.children, function(c) {
+            if (!c.getRenderUpdate().isValid()) {
+              self.childrenModified = true;
+            }
+            return c.getRenderUpdate().get();
+          });
           self.render();
           return undefined;
         });
