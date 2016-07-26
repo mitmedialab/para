@@ -66,10 +66,10 @@ define([
           var internalConstraints = [];
           if(this.members.length>0){
 
-          reference_list.addMember(this.members[0].createProxy());
+          reference_list.addMember(this.members[0]);
 
             if(this.members.length>1){
-              reference_list.addMember(this.members[this.members.length - 1].createProxy());
+              reference_list.addMember(this.members[this.members.length - 1]);
             }
 
               var constraint = new Constraint();
@@ -91,18 +91,43 @@ define([
                 internalConstraints.push(constraint);
               }
 
+         this.referenceList = reference_list;
                 return internalConstraints;
             },
 
       /*setValue
       passes modifications onto members, stripped of any properties that are constrained on the list
       */
+      // FIXME: this should probably be split into two different
+      // functions, to handle the two branches separately (one is
+      // specific to user interaction; the other is when it's used
+      // e.g. as part of a duplicator)
       setValue: function(data, registerUndo) {
         Instance.prototype.setValue.call(this, data, registerUndo);
-        var constrained_props = this.getConstraintValues();
-        for (var i = 0; i < this.members.length; i++) {
-          this.members[i].setValue(data, registerUndo);
+
+        if (this.referenceList)
+        {
+          // this branch is taken if setInternalConstraint() has been
+          // called on this list, i.e. if the list is internally
+          // constrained by its endpoints
+
+          for (var i = 0; i < this.referenceList.members.length; ++i) {
+            this.referenceList.members[i].setValue(data, registerUndo);
+          }
         }
+        else
+        {
+          // this branch is taken if setInternalConstraint() has NOT
+          // been called, which means the endpoints are not what
+          // control the values
+
+          var constrained_props = this.getConstraintValues();
+          for (var i = 0; i < this.members.length; i++) {
+            this.members[i].setValue(data, registerUndo);
+          }
+
+        }
+
         this.trigger('modified', this);
       },
 
