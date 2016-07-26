@@ -51,6 +51,10 @@ define([
 			return this._val.isValid();
 		},
 
+		onValueChanged: function(handler) {
+			this._val.onChange(handler);
+		},
+
 		//invalidate all constrainable properties
 		invalidate: function() {
 			this._val.invalidate();

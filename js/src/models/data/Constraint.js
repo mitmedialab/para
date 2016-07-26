@@ -652,37 +652,101 @@ define([
       var relProperties = [];
       var modes = {};
 
+      var self = this;
+      var reference = this.get('references');
+      var relative = this.get('relatives');
+
+
       if (!json_loaded) {
-
         this.set('modes', modes);
-
         this.set('offsets', offsets);
         this.set('exempt_indicies', exempt_indicies);
         this.set('expressions', expressions);
       } else {
+        modes = this.get('modes');
         offsets = this.get('offsets');
         exempt_indicies = this.get('exempt_indicies');
         expressions = this.get('expressions');
-        modes = this.get('modes');
       }
       this.set('relative_properties', relProperties);
       this.set('reference_properties', refProperties);
-      var constraint_data = {};
+
+
+      // FIXME: should remove the listeners when this constraint is destroyed
+
+
+      relative.get('memberCount').onValueChanged(function() {
+
+        for (var i = 0; i < refProperties.length; i++) {
+          (
+            function(rpk, rd) {
+              self.setReferenceValues(rpk, rd);
+            }(refProperties[i][0], refProperties[i][1])
+          );
+        }
+
+        self.constrainRelativesToReferences(properties, json_loaded);
+      });
+
+
+      //
+      //
+      //
+      this.constrainRelativesToReferences(properties, json_loaded);
+
+
+
+      reference.get('memberCount').onValueChanged(function() {
+
+        for (var i = 0; i < refProperties.length; i++) {
+          (
+            function(rpk, rd) {
+              self.setReferenceValues(rpk, rd);
+            }(refProperties[i][0], refProperties[i][1])
+          );
+        }
+
+      });
+
+      relative.get('memberCount').onValueChanged(function() {
+
+        for (var i = 0; i < relProperties.length; i++) {
+          (
+            function(rpk, rd, rlpk, rld) {
+              for (var g = 0; g < relative.get('memberCount').getValue(); g++) {
+                var target = relative.getMemberAt(g);
+                var id = target.get('id');
+                self.createOffsetFor(id, rpk, rd, rlpk, rld);
+                if(target.nodeParent.get('name')=='duplicator'){
+                  for(var n=0;n<rd.length;n++){
+                  self.updateOffset(rpk, rd[n], g, 0);
+                  }
+                }
+                
+              }
+            }(refProperties[i][0], refProperties[i][1], relProperties[i][0], relProperties[i][1])
+          );
+
+        }
+      });
+
+    },
+
+    // private
+    constrainRelativesToReferences: function(properties, json_loaded) {
+      console.trace();
+      var offsets = this.get('offsets');
+      var expressions = this.get('expressions');
+      var refProperties = this.get('reference_properties');
+      var relProperties = this.get('relative_properties');
+      var modes = this.get('modes');
+
       var self = this;
       var reference = this.get('references');
       var relative = this.get('relatives');
 
       var relative_range = relative.getRange();
 
-      var setOnInstance = false;
-
-      this.listenTo(relative.get('memberCount'), 'modified', function() {
-        for (var h = 0; h < refProperties.length; h++) {
-          for (var m = 0; m < refProperties[h][1].length; m++) {
-            self.calculateReferenceValues(refProperties[h][0], refProperties[h][1][m]);
-          }
-        }
-      });
 
       for (var j = 0; j < properties.length; j++) {
 
@@ -706,8 +770,6 @@ define([
             } else {
               modes[ref_prop_key + '_' + ref_dimensions[m]] = 'interpolate';
             }
-
-
           }
         }
         this.setReferenceValues(ref_prop_key, ref_dimensions);
@@ -723,40 +785,6 @@ define([
           this.setConstraintOnSubProperty(reference, relative, expressions[rel_prop_key][rel_dimensions[n]], offsets[rel_prop_key][rel_dimensions[n]], ref_prop_key, ref_dimensions[n], rel_prop_key, rel_dimensions[n]);
         }
       }
-
-      this.listenTo(reference.get('memberCount'), 'modified', function() {
-
-        for (var i = 0; i < refProperties.length; i++) {
-          (
-            function(rpk, rd) {
-              self.setReferenceValues(rpk, rd);
-            }(refProperties[i][0], refProperties[i][1])
-          );
-
-        }
-      });
-
-      this.listenTo(relative.get('memberCount'), 'modified', function() {
-
-        for (var i = 0; i < relProperties.length; i++) {
-          (
-            function(rpk, rd, rlpk, rld) {
-              for (var g = 0; g < relative.get('memberCount').getValue(); g++) {
-                var target = relative.getMemberAt(g);
-                var id = target.get('id');
-                self.createOffsetFor(id, rpk, rd, rlpk, rld);
-                if(target.nodeParent.get('name')=='duplicator'){
-                  for(var n=0;n<rd.length;n++){
-                  self.updateOffset(rpk, rd[n], g, 0);
-                  }
-                }
-                
-              }
-            }(refProperties[i][0], refProperties[i][1], relProperties[i][0], relProperties[i][1])
-          );
-
-        }
-      });
 
     },
 
@@ -878,32 +906,14 @@ define([
 
         var calculatedVals = cjs(function() { return self.calculateReferenceValues(ref_prop_key, target_dimension); });
         var range = self.get('relatives').getRange();
+        // FIXME: this is pretty inefficient...
+        reference_values[ref_prop_key][target_dimension].vals = [];
         for (var m = 0; m < range; ++m) {
           (function (m) {
             reference_values[ref_prop_key][target_dimension].vals.push(cjs(function() { return calculatedVals.get()[m]; }));
           })(m);
         }
 
-        var diff = reference_values[ref_prop_key][target_dimension].vals.length - self.get('relatives').getRange();
-        if (diff > 0) {
-          for (var j = 0; j < diff; j++) {
-            var removedItem = reference_values[ref_prop_key][target_dimension].vals.pop();
-          }
-        } else if (diff < 0) {
-          for (var k = 0; k < -diff; k++) {
-            var newItem;
-            if (reference_values[ref_prop_key][target_dimension].vals.length > 0) {
-              var last = reference_values[ref_prop_key][target_dimension].vals[reference_values[ref_prop_key][target_dimension].vals.length - 1];
-              newItem = new PFloat(last.getValue());
-              newItem.setNull(true);
-            } else {
-              newItem = new PFloat(1);
-              newItem.setNull(true);
-            }
-
-            reference_values[ref_prop_key][target_dimension].vals.push(newItem);
-          }
-        }
       });
     },
 

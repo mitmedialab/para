@@ -123,6 +123,11 @@ define([
 				return new PFloat(this.getValue());
 			},
 
+			onValueChanged: function(handler) {
+				this.v.onValueChanged(handler);
+			},
+
+
 			/* basic math operations */
 			add: function(data, newP) {
 				if (newP) {

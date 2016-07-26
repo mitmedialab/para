@@ -428,7 +428,7 @@ define([
             },
 
 
-
+          // FIXME: there's currently some inefficiency, because the ref/rel values get recalculated every time the rel. list is incremented, but it only needs to be done once...
             setCount: function(count, registerUndo) {
                 if (registerUndo) {
                     this.addToUndoStack();
@@ -464,6 +464,8 @@ define([
                     toRemove: toRemove
                 };
 
+
+                this.getRenderUpdate().invalidate();
 
                 return data;
             },
