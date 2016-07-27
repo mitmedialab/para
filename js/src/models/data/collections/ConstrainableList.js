@@ -86,6 +86,19 @@ define([
                     ['blendMode_v', 'blendMode_v', ['alternate', 'alternate']]
                 ];
 
+                // NOTE: this is only for when the list appears directly in the UI!
+                data.map(function(datum) { return datum[1]; }).forEach(function (propAndDims) {
+                  var split = propAndDims.split('_');
+                  var prop = split[0];
+                  var dims = split[1];
+                  
+                  for (var i = 0; i < dims.length; ++i) {
+                    for (var j = 0; j < reference_list.members.length; ++j) {
+                      constraint.setExempt(prop, dims[i], reference_list.members[j].get('id'), true);
+                    }
+                  }
+                });
+
                 constraint.create(data);
 
                 internalConstraints.push(constraint);

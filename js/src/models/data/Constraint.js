@@ -219,6 +219,8 @@ define([
         }
       });
 
+      this.set('exempt_indicies', {});
+
       this.previousStates = [];
       this.futureStates = [];
 
@@ -468,12 +470,21 @@ define([
       if (status === true) {
         value = 1;
       }
-      if( exempt_indicies[rel_prop_key][rel_dimension][id]){
+      
+      if (!exempt_indicies[rel_prop_key]) {
+        exempt_indicies[rel_prop_key] = {};
+      }
+
+      if (!exempt_indicies[rel_prop_key][rel_dimension]) {
+        exempt_indicies[rel_prop_key][rel_dimension] = {};
+      }
+
+      if (!exempt_indicies[rel_prop_key][rel_dimension][id]) {
+        exempt_indicies[rel_prop_key][rel_dimension][id] = new PFloat(value);
+      } else {
         exempt_indicies[rel_prop_key][rel_dimension][id].setValue(value);
       }
-      else{
-        exempt_indicies[rel_prop_key][rel_dimension][id] = new PFloat(value);
-      }
+
        console.log('setting exempt for',rel_prop_key, rel_dimension, id, status,  exempt_indicies[rel_prop_key][rel_dimension][id].getValue());
       return true;
     },
@@ -646,7 +657,7 @@ define([
       this.stopListening();
       this.set('properties', properties);
       var offsets = {};
-      var exempt_indicies = {};
+      var exempt_indicies = this.get('exempt_indicies');
       var expressions = [];
       var refProperties = [];
       var relProperties = [];
@@ -663,6 +674,7 @@ define([
 
       for (var i = 0; i < members.length; ++i) {
         if (members[i].doNewConstraintsConflictWithCurrentConstraints(refProps)) {
+          console.log('DEBUG: constraint conflict');
           return false;
         }
       }
@@ -671,12 +683,10 @@ define([
       if (!json_loaded) {
         this.set('modes', modes);
         this.set('offsets', offsets);
-        this.set('exempt_indicies', exempt_indicies);
         this.set('expressions', expressions);
       } else {
         modes = this.get('modes');
         offsets = this.get('offsets');
-        exempt_indicies = this.get('exempt_indicies');
         expressions = this.get('expressions');
       }
       this.set('relative_properties', relProperties);
@@ -874,7 +884,10 @@ define([
 
             return y;
           };
-          relative.getMemberAt(i).get(rel_prop_key)[rel_dimension].setConstraint(singleConstraintF, self);
+          var exempt = self.get('exempt_indicies')[rel_prop_key][rel_dimension][relative.getMemberAt(i).get('id')];
+          if (!exempt || exempt.getValue() !== 1) {
+            relative.getMemberAt(i).get(rel_prop_key)[rel_dimension].setConstraint(singleConstraintF, self);
+          }
         })(i);
       }
     },

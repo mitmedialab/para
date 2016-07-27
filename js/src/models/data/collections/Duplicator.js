@@ -202,9 +202,18 @@ define([
                     ['blendMode_v', 'blendMode_v', ['alternate', 'alternate']]
                 ];
 
+                data.map(function(datum) { return datum[1]; }).forEach(function (propAndDims) {
+                  var split = propAndDims.split('_');
+                  var prop = split[0];
+                  var dims = split[1];
+                  
+                  for (var i = 0; i < dims.length; ++i) {
+                    constraint.setExempt(prop, dims[i], targetId, true);
+                    constraint.setExempt(prop, dims[i], lastId, true);
+                  }
+                });
+
                 constraint.create(data);
-                constraint.setExemptForAll(targetId, true);
-                constraint.setExemptForAll(lastId, true);
 
                 internalConstraints.push(constraint);
 

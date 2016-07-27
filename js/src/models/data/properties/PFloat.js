@@ -83,18 +83,31 @@ define([
                           {
                             set = this.v.setValue(data);
 			    this.setNull(false);
+                            return set;
                           }
-                          else if (data.v)
+                          else
                           {
-			    set = this.v.setValue(data.v);
-			    this.setNull(false);
-			  }
-                          else if (typeof data === "number")
-                          {
-			    set = this.v.setValue(data);
-			    this.setNull(false);
-			  }
-			  return set;
+                            if (this.hasConstraint())
+                            {
+                              return false;
+                            }
+                            else if (data.v)
+                            {
+			      set = this.v.setValue(data.v);
+			      this.setNull(false);
+			    }
+                            else if (typeof data === "number")
+                            {
+			      set = this.v.setValue(data);
+			      this.setNull(false);
+			    }
+                            else
+                            {
+                              return false;
+                            }
+
+			    return set;
+                          }
 			},
 
 			/*
