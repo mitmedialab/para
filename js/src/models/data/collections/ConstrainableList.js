@@ -60,10 +60,16 @@ define([
           y: 1
         });
         this.count = 0;
+
+        this.internalConstraints = [];
+      },
+
+      getInternalConstraint: function() {
+        return this.internalConstraints;
       },
 
        setInternalConstraint: function(reference_list) {
-          var internalConstraints = [];
+          this.internalConstraints = [];
           if(this.members.length>0){
 
           reference_list.addMember(this.members[0]);
@@ -99,13 +105,15 @@ define([
                   }
                 });
 
-                constraint.create(data);
+                if (!constraint.create(data)) {
+                  return null;
+                }
 
-                internalConstraints.push(constraint);
+                this.internalConstraints.push(constraint);
               }
 
          this.referenceList = reference_list;
-                return internalConstraints;
+                return this.internalConstraints;
             },
 
       /*setValue

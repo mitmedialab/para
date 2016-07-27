@@ -312,7 +312,15 @@ define([
 		initializeList: function(selected, registerUndo) {
 
 			var list = new ConstrainableList();
+			var reference_list = new ConstrainableList();
+
 			list.addMember(selected);
+
+			var constraint = list.setInternalConstraint(reference_list);
+			if (!constraint) {
+				return null;
+			}
+
 			this.insertList(lists.length, list, registerUndo);
 			return list;
 		},

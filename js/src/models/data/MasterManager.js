@@ -794,29 +794,30 @@ define([
 
 			var list = collectionManager.initializeList(selected, registerUndo);
 			this.deselectAllShapes();
-			if (list) {
-			var reference_list = new ConstrainableList();
-			var constraints = list.setInternalConstraint(reference_list);
+			if (!list) {
+				// FIXME: show a real error here
+				alert('object for list is already constrained');
+				return null;
+			}
 
+			var constraints = list.getInternalConstraint();
 			constraintManager.addConstraintArray(constraints, registerUndo);
 
-				layersView.addList(list.toJSON());
-				this.selectShape(list);
+			layersView.addList(list.toJSON());
+			this.selectShape(list);
+
 			for (var i = 0; i < constraints.length; i++) {
-
 				layersView.addConstraint(constraints[i]);
-
 			}
-				if (registerUndo) {
-					this.addToUndoStack([collectionManager,constraintManager]);
-					this.modificationEnded([collectionManager,constraintManager]);
 
-				}
+			if (registerUndo) {
+				this.addToUndoStack([collectionManager,constraintManager]);
+				this.modificationEnded([collectionManager,constraintManager]);
+			}
 			
-				this.addListener(list);
+			this.addListener(list);
 
-				return list;
-			}
+			return list;
 		},
 
 
