@@ -9,11 +9,11 @@ define([
 	'models/data/collections/ConstrainableList',
 	'models/data/collections/Duplicator',
 	'utils/GeometryGenerator',
-	'models/data/ConstraintManager'
+	'models/data/ConstraintManager',
 
+	'debug'
 
-
-], function(_, Backbone, ConstrainableList, Duplicator, GeometryGenerator, ConstraintManager) {
+], function(_, Backbone, ConstrainableList, Duplicator, GeometryGenerator, ConstraintManager, Debug) {
 
 
 	//stores para lists
@@ -342,7 +342,8 @@ define([
 			if (registerUndo) {
 				this.addToUndoStack();
 			}
-			if (!this.addToOpenLists(list)) {
+
+			if (Debug.FORCE_INSERT_LIST_TOPLEVEL || !this.addToOpenLists(list)) {
 				for (var i = lists.length - 1; i >= 0; i--) {
 					if (list.hasMember(lists[i], true)) {
 						lists.splice(i, 1);
