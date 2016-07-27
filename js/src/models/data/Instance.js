@@ -1694,7 +1694,29 @@ define([
 			this.get('area').setValue(screen_bounds.area);
 			this.get('screen_width').setValue(screen_bounds.width);
 			this.get('screen_height').setValue(screen_bounds.height);
-		}
+		},
+
+          doNewConstraintsConflictWithCurrentConstraints: function (constraintProperties) {
+            for (var i = 0; i < constraintProperties.length; ++i) {
+              var split = constraintProperties[i].split('_');
+              var property = split[0];
+              var dims = split[1];
+
+              var attr = this.get(property);
+              if (!!attr) {
+                for (var j = 0; j < dims.length; ++j) {
+                  var p = attr[dims[j]];
+                  if (!!p) {
+                    if (p.hasConstraint()) {
+                      return true;
+                    }
+                  }
+                }
+              }
+            }
+            
+            return false;
+          }
 
 	});
 

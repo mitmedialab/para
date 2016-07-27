@@ -108,6 +108,11 @@
 
 			},
 
+                  // FIXME: should probably rename this isConstrained(), and get rid of the other isConstrained()s
+                  hasConstraint: function() {
+                    return !!this.constraintObject;
+                  },
+
 			/* removeConstraint
 			 * removes the constraint of this property
 			 */

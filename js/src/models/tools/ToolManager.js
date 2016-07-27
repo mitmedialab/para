@@ -141,7 +141,12 @@ define([
     applyConstraint: function() {
       var constraint_tool = this.get('tool_collection').get('constraintTool');
       var constraint_data = constraint_tool.applyConstraint();
-      this.trigger('addConstraint', constraint_data);
+      if (!!constraint_data) {
+        this.trigger('addConstraint', constraint_data);
+      } else {
+        // FIXME: show a real error here
+        alert('object is already constrained');
+      }
     },
 
     constraintReset: function() {

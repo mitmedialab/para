@@ -656,6 +656,17 @@ define([
       var reference = this.get('references');
       var relative = this.get('relatives');
 
+      var members = relative.members || [relative];
+      var refProps = properties.map(function (property) { return property[1]; });
+
+      // FIXME: take exempt indices into account?
+
+      for (var i = 0; i < members.length; ++i) {
+        if (members[i].doNewConstraintsConflictWithCurrentConstraints(refProps)) {
+          return false;
+        }
+      }
+
 
       if (!json_loaded) {
         this.set('modes', modes);
@@ -730,6 +741,7 @@ define([
         }
       });
 
+      return true;
     },
 
     // private

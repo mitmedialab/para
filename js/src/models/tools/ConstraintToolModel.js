@@ -138,16 +138,18 @@ define([
       var rel_prop = constraint.get('rel_prop');
       constraint.clearUI();
       constraint.clearSelection();
-      constraint.create([[ref_prop,rel_prop]]);
-      var constraintMap = this.get('constraints');
-      constraintMap[constraint.get('id')] = constraint;
 
+      if (constraint.create([[ref_prop,rel_prop]])) {
+        var constraintMap = this.get('constraints');
+        constraintMap[constraint.get('id')] = constraint;
+        this.set('currentConstraint', new Constraint());
+      } else {
+        constraint = null;
+      }
 
-      this.set('currentConstraint', new Constraint());
       this.reset();
       this.trigger('compileRequest');
       return constraint;
-
     },
 
     modeSwitch: function() {
