@@ -799,17 +799,17 @@ define([
 			this.deselectAllShapes();
 			if (list) {
 			var reference_list = new ConstrainableList();
-			var constraints = list.setInternalConstraint(reference_list);
+			//var constraints = list.setInternalConstraint(reference_list);
 
-			constraintManager.addConstraintArray(constraints, registerUndo);
+			//constraintManager.addConstraintArray(constraints, registerUndo);
 
 				layersView.addList(list.toJSON());
 				this.selectShape(list);
-			for (var i = 0; i < constraints.length; i++) {
+			//for (var i = 0; i < constraints.length; i++) {
 
-				layersView.addConstraint(constraints[i]);
+			//	layersView.addConstraint(constraints[i]);
 
-			}
+			//}
 				if (registerUndo) {
 					this.addToUndoStack([collectionManager,constraintManager]);
 					this.modificationEnded([collectionManager,constraintManager]);

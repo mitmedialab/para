@@ -156,7 +156,8 @@ define([
 
       var createScaleArrows = function(corners) {
         // svg arrows
-        var yarrow = paper.project.importSVG(document.getElementById('yarrow')).children[0];
+        var yarrow;
+        paper.project.importSVG(document.getElementById('yarrow')).children[0];
         var xarrow = yarrow.clone();
         xarrow.rotate(90);
         var xyarrow = yarrow.clone();
