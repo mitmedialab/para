@@ -460,10 +460,6 @@ define([
       return null;
     },
 
-    reset: function() {
-
-    },
-
     compile: function() {
 
     },
