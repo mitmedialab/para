@@ -17,8 +17,8 @@ define([
 
 
 	var currentName, unsavedChanges, ui_form, allFields, working, difficult, self, sampleTimer, delayTimer, bucket, saved_params, s3;
-	var SAMPLE_INTERVAL = 600000 * 2; // starts at 20 minutes
-	var DELAY_INTERVAL = 300000; //delay interval of 5 minutes
+	var SAMPLE_INTERVAL = 1000; // starts at 20 minutes
+	var DELAY_INTERVAL = 2000; //delay interval of 5 minutes
 	var SaveExportView = Backbone.View.extend({
 
 		events: {
